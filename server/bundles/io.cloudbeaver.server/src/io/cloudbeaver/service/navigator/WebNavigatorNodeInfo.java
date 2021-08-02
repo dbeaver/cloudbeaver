@@ -118,6 +118,15 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNContainer) {
             features.add("container");
         }
+        boolean isShared = false;
+        if (node instanceof DBNDatabaseNode) {
+            isShared = !((DBNDatabaseNode) node).getDataSourceContainer().isManageable();
+        } else if (node instanceof DBNLocalFolder) {
+            //isShared = ((DBNLocalFolder) node).getDataSourceRegistry().is
+        }
+        if (isShared) {
+            features.add("shared");
+        }
         return features.toArray(new String[0]);
     }
 

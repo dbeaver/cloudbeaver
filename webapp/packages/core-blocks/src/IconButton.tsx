@@ -9,7 +9,7 @@
 import { Button, ButtonProps } from 'reakit/Button';
 import styled, { css } from 'reshadow';
 
-import { Icon } from './Icons/Icon';
+import { Icon } from './Icon';
 
 const styles = css`
   Button {

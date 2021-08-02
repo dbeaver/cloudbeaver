@@ -12,13 +12,556 @@ export interface Scalars {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Object: any;
   DateTime: any;
+  Object: any;
+}
+
+export interface AdminConnectionGrantInfo {
+  connectionId: Scalars['ID'];
+  subjectId: Scalars['ID'];
+  subjectType: AdminSubjectType;
+}
+
+export interface AdminConnectionSearchInfo {
+  displayName: Scalars['String'];
+  host: Scalars['String'];
+  port: Scalars['Int'];
+  possibleDrivers: Array<Scalars['ID']>;
+  defaultDriver: Scalars['ID'];
+}
+
+export interface AdminPermissionInfo {
+  id: Scalars['ID'];
+  label?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  provider: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+}
+
+export interface AdminRoleInfo {
+  roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  rolePermissions: Array<Maybe<Scalars['ID']>>;
+}
+
+export enum AdminSubjectType {
+  User = 'user',
+  Role = 'role'
+}
+
+export interface AdminUserInfo {
+  userId: Scalars['ID'];
+  metaParameters: Scalars['Object'];
+  configurationParameters: Scalars['Object'];
+  grantedRoles: Array<Scalars['ID']>;
+  grantedConnections: AdminConnectionGrantInfo[];
+  origins: ObjectOrigin[];
+  linkedAuthProviders: Array<Scalars['String']>;
+}
+
+export interface AsyncTaskInfo {
+  id: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  running: Scalars['Boolean'];
+  status?: Maybe<Scalars['String']>;
+  error?: Maybe<ServerError>;
+  /** @deprecated Field no longer supported */
+  result?: Maybe<SqlExecuteInfo>;
+  taskResult?: Maybe<Scalars['Object']>;
+}
+
+export enum AuthCredentialEncryption {
+  None = 'none',
+  Plain = 'plain',
+  Hash = 'hash'
+}
+
+export interface AuthCredentialInfo {
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  admin?: Maybe<Scalars['Boolean']>;
+  user?: Maybe<Scalars['Boolean']>;
+  identifying?: Maybe<Scalars['Boolean']>;
+  possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
+  encryption?: Maybe<AuthCredentialEncryption>;
+}
+
+export interface AuthProviderInfo {
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  icon?: Maybe<Scalars['ID']>;
+  description?: Maybe<Scalars['String']>;
+  defaultProvider?: Maybe<Scalars['Boolean']>;
+  credentialParameters: AuthCredentialInfo[];
+}
+
+export interface ConnectionConfig {
+  connectionId?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  templateId?: Maybe<Scalars['ID']>;
+  driverId?: Maybe<Scalars['ID']>;
+  host?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['String']>;
+  databaseName?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  template?: Maybe<Scalars['Boolean']>;
+  readOnly?: Maybe<Scalars['Boolean']>;
+  saveCredentials?: Maybe<Scalars['Boolean']>;
+  authModelId?: Maybe<Scalars['ID']>;
+  credentials?: Maybe<Scalars['Object']>;
+  providerProperties?: Maybe<Scalars['Object']>;
+  networkHandlersConfig?: Maybe<NetworkHandlerConfigInput[]>;
+  dataSourceId?: Maybe<Scalars['ID']>;
+  userName?: Maybe<Scalars['String']>;
+  userPassword?: Maybe<Scalars['String']>;
+}
+
+export interface ConnectionInfo {
+  id: Scalars['ID'];
+  driverId: Scalars['ID'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  host?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['String']>;
+  databaseName?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  template: Scalars['Boolean'];
+  connected: Scalars['Boolean'];
+  provided: Scalars['Boolean'];
+  readOnly: Scalars['Boolean'];
+  useUrl: Scalars['Boolean'];
+  saveCredentials: Scalars['Boolean'];
+  connectTime?: Maybe<Scalars['String']>;
+  connectionError?: Maybe<ServerError>;
+  serverVersion?: Maybe<Scalars['String']>;
+  clientVersion?: Maybe<Scalars['String']>;
+  origin: ObjectOrigin;
+  authNeeded: Scalars['Boolean'];
+  authModel?: Maybe<Scalars['ID']>;
+  authProperties: ObjectPropertyInfo[];
+  providerProperties: Scalars['Object'];
+  networkHandlersConfig: NetworkHandlerConfig[];
+  features: Array<Scalars['String']>;
+  navigatorSettings: NavigatorSettings;
+  supportedDataFormats: ResultDataFormat[];
+}
+
+export interface DataTransferParameters {
+  processorId: Scalars['ID'];
+  settings?: Maybe<Scalars['Object']>;
+  processorProperties: Scalars['Object'];
+  filter?: Maybe<SqlDataFilter>;
+}
+
+export interface DataTransferProcessorInfo {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  fileExtension?: Maybe<Scalars['String']>;
+  appFileExtension?: Maybe<Scalars['String']>;
+  appName?: Maybe<Scalars['String']>;
+  order: Scalars['Int'];
+  icon?: Maybe<Scalars['String']>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  isBinary?: Maybe<Scalars['Boolean']>;
+  isHTML?: Maybe<Scalars['Boolean']>;
+}
+
+export interface DataTypeLogicalOperation {
+  id: Scalars['ID'];
+  expression: Scalars['String'];
+  argumentCount?: Maybe<Scalars['Int']>;
+}
+
+export interface DatabaseAuthModel {
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  properties: ObjectPropertyInfo[];
+}
+
+export interface DatabaseDocument {
+  id?: Maybe<Scalars['String']>;
+  contentType?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  data?: Maybe<Scalars['Object']>;
+}
+
+export interface DatabaseObjectInfo {
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  ordinalPosition?: Maybe<Scalars['Int']>;
+  fullyQualifiedName?: Maybe<Scalars['String']>;
+  overloadedName?: Maybe<Scalars['String']>;
+  uniqueName?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  features?: Maybe<Array<Scalars['String']>>;
+  editors?: Maybe<Array<Scalars['String']>>;
+}
+
+export interface DatabaseObjectInfoPropertiesArgs {
+  filter?: Maybe<ObjectPropertyFilter>;
+}
+
+export interface DatabaseStructContainers {
+  catalogList: DatabaseObjectInfo[];
+  schemaList: DatabaseObjectInfo[];
+}
+
+export interface DriverInfo {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  iconBig?: Maybe<Scalars['String']>;
+  providerId?: Maybe<Scalars['ID']>;
+  driverClassName?: Maybe<Scalars['String']>;
+  defaultPort?: Maybe<Scalars['String']>;
+  defaultDatabase?: Maybe<Scalars['String']>;
+  defaultServer?: Maybe<Scalars['String']>;
+  defaultUser?: Maybe<Scalars['String']>;
+  sampleURL?: Maybe<Scalars['String']>;
+  driverInfoURL?: Maybe<Scalars['String']>;
+  driverPropertiesURL?: Maybe<Scalars['String']>;
+  embedded?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
+  allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
+  licenseRequired?: Maybe<Scalars['Boolean']>;
+  license?: Maybe<Scalars['String']>;
+  custom?: Maybe<Scalars['Boolean']>;
+  promotedScore?: Maybe<Scalars['Int']>;
+  driverProperties: ObjectPropertyInfo[];
+  driverParameters: Scalars['Object'];
+  providerProperties: ObjectPropertyInfo[];
+  anonymousAccess?: Maybe<Scalars['Boolean']>;
+  defaultAuthModel: Scalars['ID'];
+  applicableAuthModel: Array<Scalars['ID']>;
+  applicableNetworkHandlers: Array<Maybe<Scalars['ID']>>;
+}
+
+export interface LogEntry {
+  time?: Maybe<Scalars['DateTime']>;
+  type: Scalars['String'];
+  message?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
+}
+
+export interface Mutation {
+  asyncReadDataFromContainer: AsyncTaskInfo;
+  asyncSqlExecuteQuery: AsyncTaskInfo;
+  asyncSqlExecuteResults: SqlExecuteInfo;
+  asyncSqlExplainExecutionPlan: AsyncTaskInfo;
+  asyncSqlExplainExecutionPlanResult: SqlExecutionPlan;
+  asyncTaskCancel?: Maybe<Scalars['Boolean']>;
+  asyncTaskInfo: AsyncTaskInfo;
+  /** @deprecated Field no longer supported */
+  asyncTaskStatus: AsyncTaskInfo;
+  changeSessionLanguage?: Maybe<Scalars['Boolean']>;
+  closeConnection: ConnectionInfo;
+  closeSession?: Maybe<Scalars['Boolean']>;
+  copyConnectionFromNode: ConnectionInfo;
+  createConnection: ConnectionInfo;
+  createConnectionFromTemplate: ConnectionInfo;
+  deleteConnection: Scalars['Boolean'];
+  initConnection: ConnectionInfo;
+  /** @deprecated Field no longer supported */
+  openConnection: ConnectionInfo;
+  openSession: SessionInfo;
+  refreshSessionConnections?: Maybe<Scalars['Boolean']>;
+  setConnectionNavigatorSettings: ConnectionInfo;
+  sqlContextCreate: SqlContextInfo;
+  sqlContextDestroy: Scalars['Boolean'];
+  sqlContextSetDefaults: Scalars['Boolean'];
+  sqlResultClose: Scalars['Boolean'];
+  testConnection: ConnectionInfo;
+  testNetworkHandler: NetworkEndpointInfo;
+  touchSession?: Maybe<Scalars['Boolean']>;
+  updateConnection: ConnectionInfo;
+  updateResultsData?: Maybe<SqlExecuteInfo>;
+  updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
+}
+
+export interface MutationAsyncReadDataFromContainerArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  containerNodePath: Scalars['ID'];
+  filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
+}
+
+export interface MutationAsyncSqlExecuteQueryArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  sql: Scalars['String'];
+  filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
+}
+
+export interface MutationAsyncSqlExecuteResultsArgs {
+  taskId: Scalars['ID'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanResultArgs {
+  taskId: Scalars['ID'];
+}
+
+export interface MutationAsyncTaskCancelArgs {
+  id: Scalars['String'];
+}
+
+export interface MutationAsyncTaskInfoArgs {
+  id: Scalars['String'];
+  removeOnFinish: Scalars['Boolean'];
+}
+
+export interface MutationAsyncTaskStatusArgs {
+  id: Scalars['String'];
+}
+
+export interface MutationChangeSessionLanguageArgs {
+  locale?: Maybe<Scalars['String']>;
+}
+
+export interface MutationCloseConnectionArgs {
+  id: Scalars['ID'];
+}
+
+export interface MutationCopyConnectionFromNodeArgs {
+  nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
+}
+
+export interface MutationCreateConnectionArgs {
+  config: ConnectionConfig;
+}
+
+export interface MutationCreateConnectionFromTemplateArgs {
+  templateId: Scalars['ID'];
+  connectionName?: Maybe<Scalars['String']>;
+}
+
+export interface MutationDeleteConnectionArgs {
+  id: Scalars['ID'];
+}
+
+export interface MutationInitConnectionArgs {
+  id: Scalars['ID'];
+  credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
+  saveCredentials?: Maybe<Scalars['Boolean']>;
+}
+
+export interface MutationOpenConnectionArgs {
+  config: ConnectionConfig;
+}
+
+export interface MutationSetConnectionNavigatorSettingsArgs {
+  id: Scalars['ID'];
+  settings: NavigatorSettingsInput;
+}
+
+export interface MutationSqlContextCreateArgs {
+  connectionId: Scalars['ID'];
+  defaultCatalog?: Maybe<Scalars['String']>;
+  defaultSchema?: Maybe<Scalars['String']>;
+}
+
+export interface MutationSqlContextDestroyArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+}
+
+export interface MutationSqlContextSetDefaultsArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  defaultCatalog?: Maybe<Scalars['ID']>;
+  defaultSchema?: Maybe<Scalars['ID']>;
+}
+
+export interface MutationSqlResultCloseArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultId: Scalars['ID'];
+}
+
+export interface MutationTestConnectionArgs {
+  config: ConnectionConfig;
+}
+
+export interface MutationTestNetworkHandlerArgs {
+  config: NetworkHandlerConfigInput;
+}
+
+export interface MutationUpdateConnectionArgs {
+  config: ConnectionConfig;
+}
+
+export interface MutationUpdateResultsDataArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  updateRow: Array<Maybe<Scalars['Object']>>;
+  updateValues?: Maybe<Scalars['Object']>;
+}
+
+export interface MutationUpdateResultsDataBatchArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  updatedRows?: Maybe<SqlResultRow[]>;
+  deletedRows?: Maybe<SqlResultRow[]>;
+  addedRows?: Maybe<SqlResultRow[]>;
+}
+
+export interface NavigatorNodeInfo {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  nodeType?: Maybe<Scalars['String']>;
+  hasChildren?: Maybe<Scalars['Boolean']>;
+  object?: Maybe<DatabaseObjectInfo>;
+  features?: Maybe<Array<Scalars['String']>>;
+  nodeDetails?: Maybe<ObjectPropertyInfo[]>;
+  folder?: Maybe<Scalars['Boolean']>;
+  inline?: Maybe<Scalars['Boolean']>;
+  navigable?: Maybe<Scalars['Boolean']>;
+}
+
+export interface NavigatorSettings {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
+}
+
+export interface NavigatorSettingsInput {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
+}
+
+export interface NetworkEndpointInfo {
+  message?: Maybe<Scalars['String']>;
+  clientVersion?: Maybe<Scalars['String']>;
+  serverVersion?: Maybe<Scalars['String']>;
+}
+
+export interface NetworkHandlerConfig {
+  id: Scalars['ID'];
+  enabled: Scalars['Boolean'];
+  userName?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  savePassword: Scalars['Boolean'];
+  properties: Scalars['Object'];
+}
+
+export interface NetworkHandlerConfigInput {
+  id: Scalars['ID'];
+  enabled?: Maybe<Scalars['Boolean']>;
+  userName?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  savePassword?: Maybe<Scalars['Boolean']>;
+  properties?: Maybe<Scalars['Object']>;
+}
+
+export interface NetworkHandlerDescriptor {
+  id: Scalars['ID'];
+  codeName: Scalars['String'];
+  label: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  secured: Scalars['Boolean'];
+  type?: Maybe<NetworkHandlerType>;
+  properties: ObjectPropertyInfo[];
+}
+
+export enum NetworkHandlerType {
+  Tunnel = 'TUNNEL',
+  Proxy = 'PROXY',
+  Config = 'CONFIG'
+}
+
+export interface ObjectDescriptor {
+  id?: Maybe<Scalars['Int']>;
+  displayName?: Maybe<Scalars['String']>;
+  fullName?: Maybe<Scalars['String']>;
+  uniqueName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+}
+
+export interface ObjectDetails {
+  id?: Maybe<Scalars['Int']>;
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
+}
+
+export interface ObjectOrigin {
+  type: Scalars['ID'];
+  subType?: Maybe<Scalars['ID']>;
+  displayName: Scalars['String'];
+  icon?: Maybe<Scalars['String']>;
+  configuration?: Maybe<Scalars['Object']>;
+  details?: Maybe<ObjectPropertyInfo[]>;
+}
+
+export interface ObjectPropertyFilter {
+  ids?: Maybe<Array<Scalars['String']>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  categories?: Maybe<Array<Scalars['String']>>;
+  dataTypes?: Maybe<Array<Scalars['String']>>;
+}
+
+export interface ObjectPropertyInfo {
+  id?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  category?: Maybe<Scalars['String']>;
+  dataType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
+  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  defaultValue?: Maybe<Scalars['Object']>;
+  features: Array<Scalars['String']>;
+  order: Scalars['Int'];
+}
+
+export interface ProductInfo {
+  id: Scalars['ID'];
+  version: Scalars['String'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  buildTime: Scalars['String'];
+  releaseTime: Scalars['String'];
+  licenseInfo?: Maybe<Scalars['String']>;
 }
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
   allConnections: ConnectionInfo[];
+  authChangeLocalPassword: Scalars['Boolean'];
   authLogin: UserAuthToken;
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: DatabaseAuthModel[];
@@ -64,14 +607,21 @@ export interface Query {
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
-  sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
+  sqlListContexts: Array<Maybe<SqlContextInfo>>;
+  sqlSupportedOperations: DataTypeLogicalOperation[];
   templateConnections: ConnectionInfo[];
   updateConnectionConfiguration: ConnectionInfo;
+  updateRole: AdminRoleInfo;
   userConnections: ConnectionInfo[];
 }
 
 export interface QueryAllConnectionsArgs {
   id?: Maybe<Scalars['ID']>;
+}
+
+export interface QueryAuthChangeLocalPasswordArgs {
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
 }
 
 export interface QueryAuthLoginArgs {
@@ -107,6 +657,8 @@ export interface QueryCreateConnectionConfigurationArgs {
 
 export interface QueryCreateRoleArgs {
   roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
 }
 
 export interface QueryCreateUserArgs {
@@ -237,6 +789,7 @@ export interface QuerySqlCompletionProposalsArgs {
   query: Scalars['String'];
   position: Scalars['Int'];
   maxResults?: Maybe<Scalars['Int']>;
+  simpleMode?: Maybe<Scalars['Boolean']>;
 }
 
 export interface QuerySqlDialectInfoArgs {
@@ -244,7 +797,15 @@ export interface QuerySqlDialectInfoArgs {
 }
 
 export interface QuerySqlListContextsArgs {
+  connectionId?: Maybe<Scalars['ID']>;
+  contextId?: Maybe<Scalars['ID']>;
+}
+
+export interface QuerySqlSupportedOperationsArgs {
   connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  attributeIndex: Scalars['Int'];
 }
 
 export interface QueryUpdateConnectionConfigurationArgs {
@@ -252,234 +813,140 @@ export interface QueryUpdateConnectionConfigurationArgs {
   config: ConnectionConfig;
 }
 
+export interface QueryUpdateRoleArgs {
+  roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+}
+
 export interface QueryUserConnectionsArgs {
   id?: Maybe<Scalars['ID']>;
 }
 
-export interface Mutation {
-  asyncReadDataFromContainer: AsyncTaskInfo;
-  asyncSqlExecuteQuery: AsyncTaskInfo;
-  asyncSqlExecuteResults: SqlExecuteInfo;
-  asyncTaskCancel?: Maybe<Scalars['Boolean']>;
-  asyncTaskInfo: AsyncTaskInfo;
-  /** @deprecated Field no longer supported */
-  asyncTaskStatus: AsyncTaskInfo;
-  changeSessionLanguage?: Maybe<Scalars['Boolean']>;
-  closeConnection: ConnectionInfo;
-  closeSession?: Maybe<Scalars['Boolean']>;
-  copyConnectionFromNode: ConnectionInfo;
-  createConnection: ConnectionInfo;
-  createConnectionFromTemplate: ConnectionInfo;
-  deleteConnection: Scalars['Boolean'];
-  initConnection: ConnectionInfo;
-  /** @deprecated Field no longer supported */
-  openConnection: ConnectionInfo;
-  openSession: SessionInfo;
-  refreshSessionConnections?: Maybe<Scalars['Boolean']>;
-  setConnectionNavigatorSettings: ConnectionInfo;
-  sqlContextCreate: SqlContextInfo;
-  sqlContextDestroy: Scalars['Boolean'];
-  sqlContextSetDefaults: Scalars['Boolean'];
-  sqlResultClose: Scalars['Boolean'];
-  testConnection: ConnectionInfo;
-  testNetworkHandler: NetworkEndpointInfo;
-  touchSession?: Maybe<Scalars['Boolean']>;
-  updateConnection: ConnectionInfo;
-  updateResultsData?: Maybe<SqlExecuteInfo>;
-  updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
+export enum ResultDataFormat {
+  Resultset = 'resultset',
+  Document = 'document',
+  Graph = 'graph',
+  Timeseries = 'timeseries'
 }
 
-export interface MutationAsyncReadDataFromContainerArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  containerNodePath: Scalars['ID'];
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
+export interface SqlCompletionProposal {
+  displayString: Scalars['String'];
+  type: Scalars['String'];
+  score?: Maybe<Scalars['Int']>;
+  replacementString: Scalars['String'];
+  replacementOffset: Scalars['Int'];
+  replacementLength: Scalars['Int'];
+  cursorPosition?: Maybe<Scalars['Int']>;
+  icon?: Maybe<Scalars['String']>;
+  nodePath?: Maybe<Scalars['String']>;
 }
 
-export interface MutationAsyncSqlExecuteQueryArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  sql: Scalars['String'];
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
-}
-
-export interface MutationAsyncSqlExecuteResultsArgs {
-  taskId: Scalars['ID'];
-}
-
-export interface MutationAsyncTaskCancelArgs {
-  id: Scalars['String'];
-}
-
-export interface MutationAsyncTaskInfoArgs {
-  id: Scalars['String'];
-  removeOnFinish: Scalars['Boolean'];
-}
-
-export interface MutationAsyncTaskStatusArgs {
-  id: Scalars['String'];
-}
-
-export interface MutationChangeSessionLanguageArgs {
-  locale?: Maybe<Scalars['String']>;
-}
-
-export interface MutationCloseConnectionArgs {
+export interface SqlContextInfo {
   id: Scalars['ID'];
-}
-
-export interface MutationCopyConnectionFromNodeArgs {
-  nodePath: Scalars['String'];
-  config?: Maybe<ConnectionConfig>;
-}
-
-export interface MutationCreateConnectionArgs {
-  config: ConnectionConfig;
-}
-
-export interface MutationCreateConnectionFromTemplateArgs {
-  templateId: Scalars['ID'];
-  connectionName?: Maybe<Scalars['String']>;
-}
-
-export interface MutationDeleteConnectionArgs {
-  id: Scalars['ID'];
-}
-
-export interface MutationInitConnectionArgs {
-  id: Scalars['ID'];
-  credentials?: Maybe<Scalars['Object']>;
-  networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
-  saveCredentials?: Maybe<Scalars['Boolean']>;
-}
-
-export interface MutationOpenConnectionArgs {
-  config: ConnectionConfig;
-}
-
-export interface MutationSetConnectionNavigatorSettingsArgs {
-  id: Scalars['ID'];
-  settings: NavigatorSettingsInput;
-}
-
-export interface MutationSqlContextCreateArgs {
   connectionId: Scalars['ID'];
   defaultCatalog?: Maybe<Scalars['String']>;
   defaultSchema?: Maybe<Scalars['String']>;
 }
 
-export interface MutationSqlContextDestroyArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
+export interface SqlDataFilter {
+  offset?: Maybe<Scalars['Float']>;
+  limit?: Maybe<Scalars['Int']>;
+  constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
+  where?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<Scalars['String']>;
 }
 
-export interface MutationSqlContextSetDefaultsArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['ID']>;
-  defaultSchema?: Maybe<Scalars['ID']>;
+export interface SqlDataFilterConstraint {
+  attribute: Scalars['String'];
+  orderPosition?: Maybe<Scalars['Int']>;
+  orderAsc?: Maybe<Scalars['Boolean']>;
+  criteria?: Maybe<Scalars['String']>;
+  operator?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
 }
 
-export interface MutationSqlResultCloseArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultId: Scalars['ID'];
+export interface SqlDialectInfo {
+  name: Scalars['String'];
+  dataTypes: Array<Maybe<Scalars['String']>>;
+  functions: Array<Maybe<Scalars['String']>>;
+  reservedWords: Array<Maybe<Scalars['String']>>;
+  quoteStrings: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
+  singleLineComments: Array<Maybe<Scalars['String']>>;
+  multiLineComments: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
+  catalogSeparator?: Maybe<Scalars['String']>;
+  structSeparator?: Maybe<Scalars['String']>;
+  scriptDelimiter?: Maybe<Scalars['String']>;
+  supportsExplainExecutionPlan: Scalars['Boolean'];
 }
 
-export interface MutationTestConnectionArgs {
-  config: ConnectionConfig;
+export interface SqlExecuteInfo {
+  statusMessage?: Maybe<Scalars['String']>;
+  duration: Scalars['Int'];
+  filterText?: Maybe<Scalars['String']>;
+  results: SqlQueryResults[];
 }
 
-export interface MutationTestNetworkHandlerArgs {
-  config: NetworkHandlerConfigInput;
+export interface SqlExecutionPlan {
+  query: Scalars['String'];
+  nodes: SqlExecutionPlanNode[];
 }
 
-export interface MutationUpdateConnectionArgs {
-  config: ConnectionConfig;
+export interface SqlExecutionPlanNode {
+  id: Scalars['ID'];
+  parentId?: Maybe<Scalars['ID']>;
+  kind: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  condition?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  properties: ObjectPropertyInfo[];
 }
 
-export interface MutationUpdateResultsDataArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  updateRow: Array<Maybe<Scalars['Object']>>;
+export interface SqlQueryResults {
+  title?: Maybe<Scalars['String']>;
+  updateRowCount?: Maybe<Scalars['Float']>;
+  sourceQuery?: Maybe<Scalars['String']>;
+  dataFormat?: Maybe<ResultDataFormat>;
+  resultSet?: Maybe<SqlResultSet>;
+}
+
+export interface SqlResultColumn {
+  position: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  label?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  entityName?: Maybe<Scalars['String']>;
+  dataKind?: Maybe<Scalars['String']>;
+  typeName?: Maybe<Scalars['String']>;
+  fullTypeName?: Maybe<Scalars['String']>;
+  maxLength?: Maybe<Scalars['Float']>;
+  scale?: Maybe<Scalars['Int']>;
+  precision?: Maybe<Scalars['Int']>;
+  required: Scalars['Boolean'];
+  readOnly: Scalars['Boolean'];
+  readOnlyStatus?: Maybe<Scalars['String']>;
+  supportedOperations: DataTypeLogicalOperation[];
+}
+
+export interface SqlResultRow {
+  data: Array<Maybe<Scalars['Object']>>;
   updateValues?: Maybe<Scalars['Object']>;
 }
 
-export interface MutationUpdateResultsDataBatchArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  updatedRows?: Maybe<SqlResultRow[]>;
-  deletedRows?: Maybe<SqlResultRow[]>;
-  addedRows?: Maybe<SqlResultRow[]>;
-}
-
-export interface ObjectPropertyInfo {
-  id?: Maybe<Scalars['String']>;
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  category?: Maybe<Scalars['String']>;
-  dataType?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
-  defaultValue?: Maybe<Scalars['Object']>;
-  features: Array<Scalars['String']>;
-  order: Scalars['Int'];
-}
-
-export interface AsyncTaskInfo {
-  id: Scalars['String'];
-  name?: Maybe<Scalars['String']>;
-  running: Scalars['Boolean'];
-  status?: Maybe<Scalars['String']>;
-  error?: Maybe<ServerError>;
-  /** @deprecated Field no longer supported */
-  result?: Maybe<SqlExecuteInfo>;
-  taskResult?: Maybe<Scalars['Object']>;
-}
-
-export interface ServerError {
-  message?: Maybe<Scalars['String']>;
-  errorCode?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
-  causedBy?: Maybe<ServerError>;
-}
-
-export interface ServerMessage {
-  time?: Maybe<Scalars['String']>;
-  message?: Maybe<Scalars['String']>;
-}
-
-export interface ServerLanguage {
-  isoCode: Scalars['String'];
-  displayName?: Maybe<Scalars['String']>;
-  nativeName?: Maybe<Scalars['String']>;
-}
-
-export interface WebServiceConfig {
-  id: Scalars['String'];
-  name: Scalars['String'];
-  description: Scalars['String'];
-  bundleVersion: Scalars['String'];
-}
-
-export interface ProductInfo {
+export interface SqlResultSet {
   id: Scalars['ID'];
-  version: Scalars['String'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  buildTime: Scalars['String'];
-  releaseTime: Scalars['String'];
-  licenseInfo?: Maybe<Scalars['String']>;
+  columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
+  rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
+  hasMoreData?: Maybe<Scalars['Boolean']>;
 }
 
 export interface ServerConfig {
   name: Scalars['String'];
   version: Scalars['String'];
   workspaceId: Scalars['ID'];
+  serverURL: Scalars['String'];
+  rootURI: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
@@ -502,393 +969,9 @@ export interface ServerConfig {
   defaultNavigatorSettings: NavigatorSettings;
 }
 
-export interface SessionInfo {
-  createTime: Scalars['String'];
-  lastAccessTime: Scalars['String'];
-  locale: Scalars['String'];
-  cacheExpired: Scalars['Boolean'];
-  serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
-  connections: ConnectionInfo[];
-}
-
-export interface DatabaseAuthModel {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  properties: ObjectPropertyInfo[];
-}
-
-export interface DriverInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  iconBig?: Maybe<Scalars['String']>;
-  providerId?: Maybe<Scalars['ID']>;
-  driverClassName?: Maybe<Scalars['String']>;
-  defaultPort?: Maybe<Scalars['String']>;
-  defaultDatabase?: Maybe<Scalars['String']>;
-  defaultServer?: Maybe<Scalars['String']>;
-  defaultUser?: Maybe<Scalars['String']>;
-  sampleURL?: Maybe<Scalars['String']>;
-  driverInfoURL?: Maybe<Scalars['String']>;
-  driverPropertiesURL?: Maybe<Scalars['String']>;
-  embedded?: Maybe<Scalars['Boolean']>;
-  /** @deprecated Field no longer supported */
-  allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
-  licenseRequired?: Maybe<Scalars['Boolean']>;
-  license?: Maybe<Scalars['String']>;
-  custom?: Maybe<Scalars['Boolean']>;
-  promotedScore?: Maybe<Scalars['Int']>;
-  driverProperties: ObjectPropertyInfo[];
-  driverParameters: Scalars['Object'];
-  providerProperties: ObjectPropertyInfo[];
-  anonymousAccess?: Maybe<Scalars['Boolean']>;
-  defaultAuthModel: Scalars['ID'];
-  applicableAuthModel: Array<Scalars['ID']>;
-  applicableNetworkHandlers: Array<Maybe<Scalars['ID']>>;
-}
-
-export enum ResultDataFormat {
-  Resultset = 'resultset',
-  Document = 'document',
-  Graph = 'graph',
-  Timeseries = 'timeseries'
-}
-
-export enum NetworkHandlerType {
-  Tunnel = 'TUNNEL',
-  Proxy = 'PROXY',
-  Config = 'CONFIG'
-}
-
-export interface NetworkHandlerDescriptor {
-  id: Scalars['ID'];
-  codeName: Scalars['String'];
-  label: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  secured: Scalars['Boolean'];
-  type?: Maybe<NetworkHandlerType>;
-  properties: ObjectPropertyInfo[];
-}
-
-export interface NetworkHandlerConfig {
-  id: Scalars['ID'];
-  enabled: Scalars['Boolean'];
-  userName?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
-  savePassword: Scalars['Boolean'];
-  properties: Scalars['Object'];
-}
-
-export interface ConnectionInfo {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  host?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  databaseName?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
-  template: Scalars['Boolean'];
-  connected: Scalars['Boolean'];
-  provided: Scalars['Boolean'];
-  readOnly: Scalars['Boolean'];
-  useUrl: Scalars['Boolean'];
-  saveCredentials: Scalars['Boolean'];
-  connectTime?: Maybe<Scalars['String']>;
-  connectionError?: Maybe<ServerError>;
-  serverVersion?: Maybe<Scalars['String']>;
-  clientVersion?: Maybe<Scalars['String']>;
-  origin: ObjectOrigin;
-  authNeeded: Scalars['Boolean'];
-  authModel?: Maybe<Scalars['ID']>;
-  authProperties: ObjectPropertyInfo[];
-  providerProperties: Scalars['Object'];
-  networkHandlersConfig: NetworkHandlerConfig[];
-  features: Array<Scalars['String']>;
-  navigatorSettings: NavigatorSettings;
-  supportedDataFormats: ResultDataFormat[];
-}
-
-export interface NetworkEndpointInfo {
-  message?: Maybe<Scalars['String']>;
-  clientVersion?: Maybe<Scalars['String']>;
-  serverVersion?: Maybe<Scalars['String']>;
-}
-
-export interface ObjectOrigin {
-  type: Scalars['ID'];
-  subType?: Maybe<Scalars['ID']>;
-  displayName: Scalars['String'];
-  icon?: Maybe<Scalars['String']>;
-  configuration?: Maybe<Scalars['Object']>;
-  details?: Maybe<ObjectPropertyInfo[]>;
-}
-
-export interface NavigatorSettings {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
-  hideFolders: Scalars['Boolean'];
-  hideSchemas: Scalars['Boolean'];
-  hideVirtualModel: Scalars['Boolean'];
-}
-
-export interface LogEntry {
-  time?: Maybe<Scalars['DateTime']>;
-  type: Scalars['String'];
-  message?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
-}
-
-export interface NavigatorSettingsInput {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
-  hideFolders: Scalars['Boolean'];
-  hideSchemas: Scalars['Boolean'];
-  hideVirtualModel: Scalars['Boolean'];
-}
-
-export interface NetworkHandlerConfigInput {
-  id: Scalars['ID'];
-  enabled?: Maybe<Scalars['Boolean']>;
-  userName?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
-  savePassword?: Maybe<Scalars['Boolean']>;
-  properties?: Maybe<Scalars['Object']>;
-}
-
-export interface ConnectionConfig {
-  connectionId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  templateId?: Maybe<Scalars['ID']>;
-  driverId?: Maybe<Scalars['ID']>;
-  host?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  databaseName?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
-  template?: Maybe<Scalars['Boolean']>;
-  readOnly?: Maybe<Scalars['Boolean']>;
-  saveCredentials?: Maybe<Scalars['Boolean']>;
-  authModelId?: Maybe<Scalars['ID']>;
-  credentials?: Maybe<Scalars['Object']>;
-  providerProperties?: Maybe<Scalars['Object']>;
-  networkHandlersConfig?: Maybe<NetworkHandlerConfigInput[]>;
-  dataSourceId?: Maybe<Scalars['ID']>;
-  userName?: Maybe<Scalars['String']>;
-  userPassword?: Maybe<Scalars['String']>;
-}
-
-export interface ObjectDescriptor {
-  id?: Maybe<Scalars['Int']>;
-  displayName?: Maybe<Scalars['String']>;
-  fullName?: Maybe<Scalars['String']>;
-  uniqueName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-}
-
-export interface ObjectPropertyFilter {
-  ids?: Maybe<Array<Scalars['String']>>;
-  features?: Maybe<Array<Scalars['String']>>;
-  categories?: Maybe<Array<Scalars['String']>>;
-  dataTypes?: Maybe<Array<Scalars['String']>>;
-}
-
-export interface ObjectDetails {
-  id?: Maybe<Scalars['Int']>;
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-}
-
-export interface DatabaseObjectInfo {
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
-  ordinalPosition?: Maybe<Scalars['Int']>;
-  fullyQualifiedName?: Maybe<Scalars['String']>;
-  overloadedName?: Maybe<Scalars['String']>;
-  uniqueName?: Maybe<Scalars['String']>;
-  state?: Maybe<Scalars['String']>;
-  features?: Maybe<Array<Scalars['String']>>;
-  editors?: Maybe<Array<Scalars['String']>>;
-}
-
-export interface DatabaseObjectInfoPropertiesArgs {
-  filter?: Maybe<ObjectPropertyFilter>;
-}
-
-export interface NavigatorNodeInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  nodeType?: Maybe<Scalars['String']>;
-  hasChildren?: Maybe<Scalars['Boolean']>;
-  object?: Maybe<DatabaseObjectInfo>;
-  features?: Maybe<Array<Scalars['String']>>;
-  nodeDetails?: Maybe<ObjectPropertyInfo[]>;
-  folder?: Maybe<Scalars['Boolean']>;
-  inline?: Maybe<Scalars['Boolean']>;
-  navigable?: Maybe<Scalars['Boolean']>;
-}
-
-export interface DatabaseStructContainers {
-  catalogList: DatabaseObjectInfo[];
-  schemaList: DatabaseObjectInfo[];
-}
-
-export interface SqlDialectInfo {
-  name?: Maybe<Scalars['String']>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
-  functions?: Maybe<Array<Maybe<Scalars['String']>>>;
-  reservedWords?: Maybe<Array<Maybe<Scalars['String']>>>;
-  quoteStrings?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  singleLineComments?: Maybe<Array<Maybe<Scalars['String']>>>;
-  multiLineComments?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  catalogSeparator?: Maybe<Scalars['String']>;
-  structSeparator?: Maybe<Scalars['String']>;
-  scriptDelimiter?: Maybe<Scalars['String']>;
-}
-
-export interface SqlCompletionProposal {
-  displayString?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
-  score?: Maybe<Scalars['Int']>;
-  replacementString?: Maybe<Scalars['String']>;
-  replacementOffset?: Maybe<Scalars['Int']>;
-  replacementLength?: Maybe<Scalars['Int']>;
-  cursorPosition?: Maybe<Scalars['Int']>;
-  icon?: Maybe<Scalars['String']>;
-  nodePath?: Maybe<Scalars['String']>;
-}
-
-export interface SqlContextInfo {
-  id: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['String']>;
-  defaultSchema?: Maybe<Scalars['String']>;
-}
-
-export interface SqlDataFilterConstraint {
-  attribute: Scalars['String'];
-  orderPosition?: Maybe<Scalars['Int']>;
-  orderAsc?: Maybe<Scalars['Boolean']>;
-  criteria?: Maybe<Scalars['String']>;
-  operator?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-}
-
-export interface SqlDataFilter {
-  offset?: Maybe<Scalars['Float']>;
-  limit?: Maybe<Scalars['Int']>;
-  constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
-  where?: Maybe<Scalars['String']>;
-  orderBy?: Maybe<Scalars['String']>;
-}
-
-export interface SqlResultColumn {
-  position: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
-  label?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  entityName?: Maybe<Scalars['String']>;
-  dataKind?: Maybe<Scalars['String']>;
-  typeName?: Maybe<Scalars['String']>;
-  fullTypeName?: Maybe<Scalars['String']>;
-  maxLength?: Maybe<Scalars['Float']>;
-  scale?: Maybe<Scalars['Int']>;
-  precision?: Maybe<Scalars['Int']>;
-  readOnly: Scalars['Boolean'];
-  readOnlyStatus?: Maybe<Scalars['String']>;
-}
-
-export interface DatabaseDocument {
-  id?: Maybe<Scalars['String']>;
-  contentType?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
-  data?: Maybe<Scalars['Object']>;
-}
-
-export interface SqlResultSet {
-  id: Scalars['ID'];
-  columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
-  rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
-  hasMoreData?: Maybe<Scalars['Boolean']>;
-}
-
-export interface SqlQueryResults {
-  title?: Maybe<Scalars['String']>;
-  updateRowCount?: Maybe<Scalars['Float']>;
-  sourceQuery?: Maybe<Scalars['String']>;
-  dataFormat?: Maybe<ResultDataFormat>;
-  resultSet?: Maybe<SqlResultSet>;
-}
-
-export interface SqlExecuteInfo {
-  statusMessage?: Maybe<Scalars['String']>;
-  duration?: Maybe<Scalars['Int']>;
-  results: SqlQueryResults[];
-}
-
-export interface SqlResultRow {
-  data: Array<Maybe<Scalars['Object']>>;
-  updateValues?: Maybe<Scalars['Object']>;
-}
-
-export enum AdminSubjectType {
-  User = 'user',
-  Role = 'role'
-}
-
-export interface AdminConnectionGrantInfo {
-  connectionId: Scalars['ID'];
-  subjectId: Scalars['ID'];
-  subjectType: AdminSubjectType;
-}
-
-export interface AdminConnectionSearchInfo {
-  displayName: Scalars['String'];
-  host: Scalars['String'];
-  port: Scalars['Int'];
-  possibleDrivers: Array<Scalars['ID']>;
-  defaultDriver: Scalars['ID'];
-}
-
-export interface AdminUserInfo {
-  userId: Scalars['ID'];
-  metaParameters: Scalars['Object'];
-  configurationParameters: Scalars['Object'];
-  grantedRoles: Array<Scalars['ID']>;
-  grantedConnections: AdminConnectionGrantInfo[];
-  origin: ObjectOrigin;
-}
-
-export interface AdminRoleInfo {
-  roleId: Scalars['ID'];
-  roleName?: Maybe<Scalars['String']>;
-  rolePermissions: Array<Maybe<Scalars['ID']>>;
-}
-
-export interface AdminPermissionInfo {
-  id: Scalars['ID'];
-  label?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  provider: Scalars['String'];
-  category?: Maybe<Scalars['String']>;
-}
-
 export interface ServerConfigInput {
   serverName?: Maybe<Scalars['String']>;
+  serverURL?: Maybe<Scalars['String']>;
   adminName?: Maybe<Scalars['String']>;
   adminPassword?: Maybe<Scalars['String']>;
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
@@ -900,29 +983,31 @@ export interface ServerConfigInput {
   sessionExpireTime?: Maybe<Scalars['Int']>;
 }
 
-export enum AuthCredentialEncryption {
-  None = 'none',
-  Plain = 'plain',
-  Hash = 'hash'
+export interface ServerError {
+  message?: Maybe<Scalars['String']>;
+  errorCode?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
+  causedBy?: Maybe<ServerError>;
 }
 
-export interface AuthCredentialInfo {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  admin?: Maybe<Scalars['Boolean']>;
-  user?: Maybe<Scalars['Boolean']>;
-  possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
-  encryption?: Maybe<AuthCredentialEncryption>;
+export interface ServerLanguage {
+  isoCode: Scalars['String'];
+  displayName?: Maybe<Scalars['String']>;
+  nativeName?: Maybe<Scalars['String']>;
 }
 
-export interface AuthProviderInfo {
-  id: Scalars['ID'];
-  label: Scalars['String'];
-  icon?: Maybe<Scalars['ID']>;
-  description?: Maybe<Scalars['String']>;
-  defaultProvider?: Maybe<Scalars['Boolean']>;
-  credentialParameters: AuthCredentialInfo[];
+export interface ServerMessage {
+  time?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+}
+
+export interface SessionInfo {
+  createTime: Scalars['String'];
+  lastAccessTime: Scalars['String'];
+  locale: Scalars['String'];
+  cacheExpired: Scalars['Boolean'];
+  serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
+  connections: ConnectionInfo[];
 }
 
 export interface UserAuthToken {
@@ -935,31 +1020,17 @@ export interface UserAuthToken {
 }
 
 export interface UserInfo {
-  userId: Scalars['String'];
+  userId: Scalars['ID'];
   displayName?: Maybe<Scalars['String']>;
   authTokens: UserAuthToken[];
   linkedAuthProviders: Array<Scalars['String']>;
 }
 
-export interface DataTransferProcessorInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  fileExtension?: Maybe<Scalars['String']>;
-  appFileExtension?: Maybe<Scalars['String']>;
-  appName?: Maybe<Scalars['String']>;
-  order: Scalars['Int'];
-  icon?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
-  isBinary?: Maybe<Scalars['Boolean']>;
-  isHTML?: Maybe<Scalars['Boolean']>;
-}
-
-export interface DataTransferParameters {
-  processorId: Scalars['ID'];
-  settings?: Maybe<Scalars['Object']>;
-  processorProperties: Scalars['Object'];
-  filter?: Maybe<SqlDataFilter>;
+export interface WebServiceConfig {
+  id: Scalars['String'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+  bundleVersion: Scalars['String'];
 }
 
 export type AsyncTaskCancelMutationVariables = Exact<{
@@ -967,6 +1038,13 @@ export type AsyncTaskCancelMutationVariables = Exact<{
 }>;
 
 export interface AsyncTaskCancelMutation { result: Mutation['asyncTaskCancel'] }
+
+export type AuthChangeLocalPasswordQueryVariables = Exact<{
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+export type AuthChangeLocalPasswordQuery = Pick<Query, 'authChangeLocalPassword'>;
 
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
@@ -997,7 +1075,7 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthProvidersQuery {
   providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
-    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
+    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
   )>;
 }
 
@@ -1024,7 +1102,7 @@ export type GetRolesListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> }
+export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>>> }
 
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
@@ -1192,6 +1270,37 @@ export type DriverListQueryVariables = Exact<{
 
 export interface DriverListQuery { drivers: DatabaseDriverFragment[] }
 
+export type ExecutionContextCreateMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  defaultCatalog?: Maybe<Scalars['String']>;
+  defaultSchema?: Maybe<Scalars['String']>;
+}>;
+
+export interface ExecutionContextCreateMutation { context: Pick<SqlContextInfo, 'id' | 'connectionId' | 'defaultCatalog' | 'defaultSchema'> }
+
+export type ExecutionContextDestroyMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+}>;
+
+export type ExecutionContextDestroyMutation = Pick<Mutation, 'sqlContextDestroy'>;
+
+export type ExecutionContextListQueryVariables = Exact<{
+  connectionId?: Maybe<Scalars['ID']>;
+  contextId?: Maybe<Scalars['ID']>;
+}>;
+
+export interface ExecutionContextListQuery { contexts: Array<Maybe<Pick<SqlContextInfo, 'id' | 'connectionId' | 'defaultCatalog' | 'defaultSchema'>>> }
+
+export type ExecutionContextUpdateMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  defaultCatalog?: Maybe<Scalars['ID']>;
+  defaultSchema?: Maybe<Scalars['ID']>;
+}>;
+
+export interface ExecutionContextUpdateMutation { context: Mutation['sqlContextSetDefaults'] }
+
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetAuthModelsQuery {
@@ -1325,8 +1434,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminUserInfoFragment = (
-  Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
-  & { origin: ObjectOriginInfoFragment }
+  Pick<AdminUserInfo, 'userId' | 'grantedRoles' | 'linkedAuthProviders'>
+  & { origins: ObjectOriginInfoFragment[] }
 );
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
@@ -1338,12 +1447,12 @@ export type AuthTokenFragment = (
 
 export type DatabaseConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'supportedDataFormats' | 'authNeeded' | 'authModel'>
-  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<MakeOptional<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>, 'userName' | 'password' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
+  & { origin?: Maybe<ObjectOriginInfoFragment>; authProperties?: Maybe<UserConnectionAuthPropertiesFragment[]>; networkHandlersConfig: Array<MakeOptional<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>, 'userName' | 'password' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
 );
 
 export type DatabaseDriverFragment = (
   MakeOptional<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers' | 'driverParameters'>, 'driverParameters'>
-  & { providerProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>; driverProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>> }
+  & { providerProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>>; driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
 );
 
 export type NavNodeInfoFragment = (
@@ -1415,19 +1524,50 @@ export interface AsyncSqlExecuteQueryMutation {
   );
 }
 
+export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}>;
+
+export interface AsyncSqlExplainExecutionPlanMutation {
+  taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  );
+}
+
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
 
 export interface GetSqlExecuteTaskResultsMutation {
   result: (
-    Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
+    Pick<SqlExecuteInfo, 'duration' | 'statusMessage' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
+        & { columns?: Maybe<Array<Maybe<(
+          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'required' | 'readOnly' | 'readOnlyStatus' | 'scale' | 'typeName'>
+          & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
+        )>>>; }
       )>; }
+    )>; }
+  );
+}
+
+export type GetSqlExecutionPlanResultMutationVariables = Exact<{
+  taskId: Scalars['ID'];
+}>;
+
+export interface GetSqlExecutionPlanResultMutation {
+  result: (
+    Pick<SqlExecutionPlan, 'query'>
+    & { nodes: Array<(
+      Pick<SqlExecutionPlanNode, 'id' | 'parentId' | 'kind' | 'name' | 'type' | 'condition' | 'description'>
+      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
     )>; }
   );
 }
@@ -1442,7 +1582,7 @@ export type UpdateResultsDataMutationVariables = Exact<{
 
 export interface UpdateResultsDataMutation {
   result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration'>
+    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
@@ -1461,7 +1601,7 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
 
 export interface UpdateResultsDataBatchMutation {
   result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration'>
+    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
@@ -1527,6 +1667,7 @@ export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   contextId: Scalars['ID'];
   position: Scalars['Int'];
   query: Scalars['String'];
+  simple?: Maybe<Scalars['Boolean']>;
   maxResults?: Maybe<Scalars['Int']>;
 }>;
 
@@ -1536,7 +1677,7 @@ export type QuerySqlDialectInfoQueryVariables = Exact<{
   connectionId: Scalars['ID'];
 }>;
 
-export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter'>> }
+export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter' | 'supportsExplainExecutionPlan'>> }
 
 export type ConfigureServerQueryVariables = Exact<{
   configuration: ServerConfigInput;
@@ -1571,7 +1712,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'rootURI' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -1587,30 +1728,6 @@ export interface SessionStateQuery { sessionState: SessionStateFragment }
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
 export type TouchSessionMutation = Pick<Mutation, 'touchSession'>;
-
-export type SqlContextCreateMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['String']>;
-  defaultSchema?: Maybe<Scalars['String']>;
-}>;
-
-export interface SqlContextCreateMutation { context: Pick<SqlContextInfo, 'id' | 'defaultCatalog' | 'defaultSchema'> }
-
-export type SqlContextDestroyMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-}>;
-
-export type SqlContextDestroyMutation = Pick<Mutation, 'sqlContextDestroy'>;
-
-export type SqlContextSetDefaultsMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['ID']>;
-  defaultSchema?: Maybe<Scalars['ID']>;
-}>;
-
-export interface SqlContextSetDefaultsMutation { context: Mutation['sqlContextSetDefaults'] }
 
 export type SqlResultCloseMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1644,7 +1761,8 @@ export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
-  origin {
+  linkedAuthProviders
+  origins {
     ...ObjectOriginInfo
   }
 }
@@ -1824,6 +1942,11 @@ export const AsyncTaskCancelDocument = `
   result: asyncTaskCancel(id: $taskId)
 }
     `;
+export const AuthChangeLocalPasswordDocument = `
+    query authChangeLocalPassword($oldPassword: String!, $newPassword: String!) {
+  authChangeLocalPassword(oldPassword: $oldPassword, newPassword: $newPassword)
+}
+    `;
 export const AuthLoginDocument = `
     query authLogin($provider: ID!, $credentials: Object!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
   authToken: authLogin(
@@ -1866,6 +1989,7 @@ export const GetAuthProvidersDocument = `
       description
       admin
       user
+      identifying
       possibleValues
       encryption
     }
@@ -1900,6 +2024,7 @@ export const GetRolesListDocument = `
   roles: listRoles(roleId: $roleId) {
     roleId
     roleName
+    description
   }
 }
     `;
@@ -2047,6 +2172,45 @@ export const DriverListDocument = `
   }
 }
     ${DatabaseDriverFragmentDoc}`;
+export const ExecutionContextCreateDocument = `
+    mutation executionContextCreate($connectionId: ID!, $defaultCatalog: String, $defaultSchema: String) {
+  context: sqlContextCreate(
+    connectionId: $connectionId
+    defaultCatalog: $defaultCatalog
+    defaultSchema: $defaultSchema
+  ) {
+    id
+    connectionId
+    defaultCatalog
+    defaultSchema
+  }
+}
+    `;
+export const ExecutionContextDestroyDocument = `
+    mutation executionContextDestroy($connectionId: ID!, $contextId: ID!) {
+  sqlContextDestroy(connectionId: $connectionId, contextId: $contextId)
+}
+    `;
+export const ExecutionContextListDocument = `
+    query executionContextList($connectionId: ID, $contextId: ID) {
+  contexts: sqlListContexts(connectionId: $connectionId, contextId: $contextId) {
+    id
+    connectionId
+    defaultCatalog
+    defaultSchema
+  }
+}
+    `;
+export const ExecutionContextUpdateDocument = `
+    mutation executionContextUpdate($connectionId: ID!, $contextId: ID!, $defaultCatalog: ID, $defaultSchema: ID) {
+  context: sqlContextSetDefaults(
+    connectionId: $connectionId
+    contextId: $contextId
+    defaultCatalog: $defaultCatalog
+    defaultSchema: $defaultSchema
+  )
+}
+    `;
 export const GetAuthModelsDocument = `
     query getAuthModels {
   models: authModels {
@@ -2299,11 +2463,33 @@ export const AsyncSqlExecuteQueryDocument = `
   }
 }
     `;
+export const AsyncSqlExplainExecutionPlanDocument = `
+    mutation asyncSqlExplainExecutionPlan($connectionId: ID!, $contextId: ID!, $query: String!, $configuration: Object!) {
+  taskInfo: asyncSqlExplainExecutionPlan(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+    configuration: $configuration
+  ) {
+    id
+    name
+    running
+    status
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+    taskResult
+  }
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
     duration
     statusMessage
+    filterText
     results {
       title
       updateRowCount
@@ -2321,12 +2507,45 @@ export const GetSqlExecuteTaskResultsDocument = `
           name
           position
           precision
+          required
           readOnly
+          readOnlyStatus
           scale
           typeName
+          supportedOperations {
+            id
+            expression
+            argumentCount
+          }
         }
         rows
         hasMoreData
+      }
+    }
+  }
+}
+    `;
+export const GetSqlExecutionPlanResultDocument = `
+    mutation getSqlExecutionPlanResult($taskId: ID!) {
+  result: asyncSqlExplainExecutionPlanResult(taskId: $taskId) {
+    query
+    nodes {
+      id
+      parentId
+      kind
+      name
+      type
+      condition
+      description
+      properties {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+        order
       }
     }
   }
@@ -2342,6 +2561,7 @@ export const UpdateResultsDataDocument = `
     updateValues: $values
   ) {
     duration
+    filterText
     results {
       updateRowCount
       resultSet {
@@ -2363,6 +2583,7 @@ export const UpdateResultsDataBatchDocument = `
     addedRows: $addedRows
   ) {
     duration
+    filterText
     results {
       updateRowCount
       resultSet {
@@ -2426,13 +2647,14 @@ export const NavRefreshNodeDocument = `
 }
     `;
 export const QuerySqlCompletionProposalsDocument = `
-    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $maxResults: Int) {
+    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $simple: Boolean, $maxResults: Int) {
   sqlCompletionProposals(
     connectionId: $connectionId
     contextId: $contextId
-    maxResults: $maxResults
-    position: $position
     query: $query
+    position: $position
+    maxResults: $maxResults
+    simpleMode: $simple
   ) {
     cursorPosition
     displayString
@@ -2459,6 +2681,7 @@ export const QuerySqlDialectInfoDocument = `
     catalogSeparator
     structSeparator
     scriptDelimiter
+    supportsExplainExecutionPlan
   }
 }
     `;
@@ -2500,13 +2723,14 @@ export const ServerConfigDocument = `
     name
     version
     workspaceId
+    serverURL
+    rootURI
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces
     sessionExpireTime
     anonymousAccessEnabled
-    authenticationEnabled
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
     licenseRequired
@@ -2552,34 +2776,6 @@ export const TouchSessionDocument = `
   touchSession
 }
     `;
-export const SqlContextCreateDocument = `
-    mutation sqlContextCreate($connectionId: ID!, $defaultCatalog: String, $defaultSchema: String) {
-  context: sqlContextCreate(
-    connectionId: $connectionId
-    defaultCatalog: $defaultCatalog
-    defaultSchema: $defaultSchema
-  ) {
-    id
-    defaultCatalog
-    defaultSchema
-  }
-}
-    `;
-export const SqlContextDestroyDocument = `
-    mutation sqlContextDestroy($connectionId: ID!, $contextId: ID!) {
-  sqlContextDestroy(connectionId: $connectionId, contextId: $contextId)
-}
-    `;
-export const SqlContextSetDefaultsDocument = `
-    mutation sqlContextSetDefaults($connectionId: ID!, $contextId: ID!, $defaultCatalog: ID, $defaultSchema: ID) {
-  context: sqlContextSetDefaults(
-    connectionId: $connectionId
-    contextId: $contextId
-    defaultCatalog: $defaultCatalog
-    defaultSchema: $defaultSchema
-  )
-}
-    `;
 export const SqlResultCloseDocument = `
     mutation sqlResultClose($connectionId: ID!, $contextId: ID!, $resultId: ID!) {
   result: sqlResultClose(
@@ -2597,6 +2793,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables): Promise<AsyncTaskCancelMutation> {
       return withWrapper(() => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables));
+    },
+    authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables): Promise<AuthChangeLocalPasswordQuery> {
+      return withWrapper(() => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables));
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
       return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));
@@ -2682,6 +2881,18 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     driverList(variables: DriverListQueryVariables): Promise<DriverListQuery> {
       return withWrapper(() => client.request<DriverListQuery>(DriverListDocument, variables));
     },
+    executionContextCreate(variables: ExecutionContextCreateMutationVariables): Promise<ExecutionContextCreateMutation> {
+      return withWrapper(() => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables));
+    },
+    executionContextDestroy(variables: ExecutionContextDestroyMutationVariables): Promise<ExecutionContextDestroyMutation> {
+      return withWrapper(() => client.request<ExecutionContextDestroyMutation>(ExecutionContextDestroyDocument, variables));
+    },
+    executionContextList(variables?: ExecutionContextListQueryVariables): Promise<ExecutionContextListQuery> {
+      return withWrapper(() => client.request<ExecutionContextListQuery>(ExecutionContextListDocument, variables));
+    },
+    executionContextUpdate(variables: ExecutionContextUpdateMutationVariables): Promise<ExecutionContextUpdateMutation> {
+      return withWrapper(() => client.request<ExecutionContextUpdateMutation>(ExecutionContextUpdateDocument, variables));
+    },
     getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
       return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
     },
@@ -2736,8 +2947,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
       return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
     },
+    asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables): Promise<AsyncSqlExplainExecutionPlanMutation> {
+      return withWrapper(() => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables));
+    },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
+    },
+    getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables): Promise<GetSqlExecutionPlanResultMutation> {
+      return withWrapper(() => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables));
     },
     updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
       return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));
@@ -2795,15 +3012,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     touchSession(variables?: TouchSessionMutationVariables): Promise<TouchSessionMutation> {
       return withWrapper(() => client.request<TouchSessionMutation>(TouchSessionDocument, variables));
-    },
-    sqlContextCreate(variables: SqlContextCreateMutationVariables): Promise<SqlContextCreateMutation> {
-      return withWrapper(() => client.request<SqlContextCreateMutation>(SqlContextCreateDocument, variables));
-    },
-    sqlContextDestroy(variables: SqlContextDestroyMutationVariables): Promise<SqlContextDestroyMutation> {
-      return withWrapper(() => client.request<SqlContextDestroyMutation>(SqlContextDestroyDocument, variables));
-    },
-    sqlContextSetDefaults(variables: SqlContextSetDefaultsMutationVariables): Promise<SqlContextSetDefaultsMutation> {
-      return withWrapper(() => client.request<SqlContextSetDefaultsMutation>(SqlContextSetDefaultsDocument, variables));
     },
     sqlResultClose(variables: SqlResultCloseMutationVariables): Promise<SqlResultCloseMutation> {
       return withWrapper(() => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables));

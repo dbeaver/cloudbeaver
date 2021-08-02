@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -56,10 +57,13 @@ import org.jkiss.dbeaver.registry.ProjectMetadata;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -74,6 +78,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private static final Log log = Log.getLog(WebSession.class);
 
     private static final String ATTR_LOCALE = "locale";
+    private static final String SESSION_TEMP_COOKIE = "cb-session";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
@@ -407,7 +412,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
-    synchronized void updateInfo(HttpServletRequest request) {
+    synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -430,6 +435,17 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 addSessionError(e);
                 log.error("Error persisting web session", e);
             }
+        }
+        {
+            long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Cookie sessionCookie = new Cookie(SESSION_TEMP_COOKIE, sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime)));
+            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
+            sessionCookie.setPath(CBApplication.getInstance().getRootURI());
+            //sessionCookie.setComment("CB session cookie");
+            response.addCookie(sessionCookie);
         }
     }
 
@@ -718,13 +734,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
-    public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+    public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
         try {
             // Properties from nested auth sessions
             // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
             DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
             if (nestedProvider != null) {
-                if (!nestedProvider.provideAuthParameters(dataSourceContainer, configuration)) {
+                if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
                     return false;
                 }
             }

@@ -14,9 +14,9 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const SSHTab: TabContainerTabComponent<IConnectionFormTabProps> = observer(function SSHTab({
+export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab({
   style,
   ...rest
 }) {
@@ -24,7 +24,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormTabProps> = observe
   const handler = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID);
 
   return styled(styles)(
-    <Tab {...rest} style={style}>
+    <Tab {...rest} title={handler.data?.description} style={style}>
       <TabTitle><Translate token={handler.data?.label || 'connections_network_handler_ssh_tunnel_title'} /></TabTitle>
     </Tab>
   );

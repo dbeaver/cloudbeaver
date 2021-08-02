@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDataContainerOptions } from '../ContainerDataSource';
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
+import type { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 
@@ -17,7 +17,7 @@ const fetchingSettings = {
   fetchDefault: 200,
 };
 
-export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, IDatabaseDataResult> {
+export class DataModelWrapper extends DatabaseDataModel<IDatabaseDataOptions, IDatabaseDataResult> {
   constructor(
     source: IDatabaseDataSource<any>
   ) {
@@ -71,7 +71,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   }
 
   private getDefaultRowsCount(count?: number) {
-    return count
+    return count !== undefined
       ? Math.max(
         fetchingSettings.fetchMin,
         Math.min(count, fetchingSettings.fetchMax)

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.valueSerializer" name="Web value serializers"/>
+      </appInfo>
+      <documentation>
+         DBeaver web value serializers
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="serializer"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="serializer">
+      <annotation>
+         <documentation>
+            DBeaver web value serializer
+         </documentation>
+      </annotation>
+   </element>
+
+
+</schema>

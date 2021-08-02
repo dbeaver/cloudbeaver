@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, Loader
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
@@ -24,49 +25,31 @@ import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 
 const styles = composes(
   css`
-    Tab {
-      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
     ErrorMessage {
-      composes: theme-background-secondary from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
-  `,
+`,
   css`
-    custom-connection {
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-    }
     CommonDialogWrapper {
       min-height: 400px;
-      min-width: 600px;
+      min-width: 500px;
     }
     SubmittingForm {
       overflow: auto;
       margin: auto;
-      margin-top: 20px;
-      margin-bottom: 20px;
     }
     SubmittingForm, AuthProviderForm {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-
     TabList {
-      box-sizing: border-box;
-      display: inline-flex;
-      width: 100%;
-      padding-left: 24px;
-      outline: none;
+      justify-content: center;
     }
     Tab {
-      composes: theme-typography--body2 from global;
       text-transform: uppercase;
-      font-weight: normal;
-
       &:global([aria-selected=true]) {
-        font-weight: normal !important;
+        font-weight: 500 !important;
       }
     }
     AuthProviderForm {
@@ -74,16 +57,9 @@ const styles = composes(
       padding: 18px 24px;
     }
     ErrorMessage {
-      position: sticky;
-      bottom: 0;
-      padding: 8px 24px;
+      flex: 1;
     }
-    auth-token-info-message {
-      composes: theme-typography--caption from global;
-      padding: 8px 24px;
-    }
-  `
-);
+`);
 
 interface IAuthPayload {
   provider: string | null;
@@ -91,55 +67,68 @@ interface IAuthPayload {
 }
 
 export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
-  payload: { provider, link },
+  payload: {
+    provider,
+    link = false,
+  },
   options,
   rejectDialog,
 }) {
+  const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, link || false, rejectDialog);
+  const controller = useController(AuthDialogController, link, rejectDialog);
   const translate = useTranslate();
 
   if (provider) {
     controller.selectProvider(provider);
+  } else {
+    controller.setAdminMode(administrationScreenService.activeScreen !== null);
   }
 
   const showTabs = !provider && controller.providers.length > 1;
+  const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
 
-  const additional = userInfo.data !== null && controller.provider?.id && !userInfo.hasToken(controller.provider?.id);
+  const additional = userInfo.data !== null
+    && controller.provider?.id !== undefined
+    && !userInfo.hasToken(controller.provider.id);
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
-        title={translate('authentication_login_dialog_title')}
+        title={dialogTitle}
         icon={controller.provider?.icon}
-        header={(
-          <>
-            {additional && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
-            {showTabs && (
-              <TabList aria-label='Auth providers'>
-                {controller.providers.map(provider => (
-                  <Tab
-                    key={provider.id}
-                    tabId={provider.id}
-                    disabled={controller.isAuthenticating}
-                    onOpen={() => controller.selectProvider(provider.id)}
-                  >
-                    <TabTitle>{provider.label}</TabTitle>
-                  </Tab>
-                ))}
-              </TabList>
-            )}
-          </>
-        )}
+        subTitle={additional ? translate('authentication_request_token') : undefined}
         footer={(
           <AuthDialogFooter
             isAuthenticating={controller.isAuthenticating}
             onLogin={controller.login}
-          />
+          >
+            {controller.error?.responseMessage && (
+              <ErrorMessage
+                text={controller.error.responseMessage}
+                hasDetails={controller.error.hasDetails}
+                onShowDetails={controller.showDetails}
+              />
+            )}
+          </AuthDialogFooter>
         )}
-        noBodyPadding
         onReject={options?.persistent ? undefined : rejectDialog}
       >
+        {showTabs && (
+          <TabList aria-label='Auth providers'>
+            {controller.providers.map(provider => (
+              <Tab
+                key={provider.id}
+                tabId={provider.id}
+                title={provider.description || provider.label}
+                disabled={controller.isAuthenticating}
+                onOpen={() => controller.selectProvider(provider.id)}
+              >
+                <TabTitle>{provider.label}</TabTitle>
+              </Tab>
+            ))}
+          </TabList>
+        )}
         <SubmittingForm onSubmit={controller.login}>
           {controller.provider && (
             <AuthProviderForm
@@ -151,13 +140,6 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
           {controller.isLoading && <Loader />}
           {!controller.isLoading && !controller.provider && <>Select available provider</>}
         </SubmittingForm>
-        {controller.error.responseMessage && (
-          <ErrorMessage
-            text={controller.error.responseMessage}
-            hasDetails={controller.error.hasDetails}
-            onShowDetails={controller.showDetails}
-          />
-        )}
       </CommonDialogWrapper>
     </TabsState>
   );

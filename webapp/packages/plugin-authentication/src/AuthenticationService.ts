@@ -7,11 +7,10 @@
  */
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppScreenService } from '@cloudbeaver/core-app';
 import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
@@ -23,7 +22,6 @@ export class AuthenticationService extends Bootstrap {
   private authPromise: Promise<void> | null;
   constructor(
     private screenService: ScreenService,
-    private appScreenService: AppScreenService,
     private appAuthService: AppAuthService,
     private authDialogService: AuthDialogService,
     private userInfoResource: UserInfoResource,
@@ -71,20 +69,23 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.auth(true);
+    await this.auth(true, null, true);
   }
 
   register(): void {
+    this.sessionDataResource.beforeLoad.addHandler(
+      ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
+    );
     this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
+    this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
-    this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       const userInfo = await this.userInfoResource.load();
       if (userInfo) {
         return;
       }
 
-      await this.auth(false);
+      await this.auth(false, null, true);
     });
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }

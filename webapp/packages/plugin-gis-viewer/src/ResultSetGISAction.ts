@@ -7,7 +7,7 @@
  */
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { databaseDataAction, IResultSetElementKey, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import { databaseDataAction, IResultSetElementKey, IDatabaseResultSet, DatabaseDataAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction';
 
@@ -19,16 +19,11 @@ export interface IGISType {
   properties: Record<string, any> | null;
 }
 @databaseDataAction()
-export class ResultSetGISAction implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet> {
+export class ResultSetGISAction extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet> {
   private readonly GISValueType = 'geometry';
 
   static dataFormat = ResultDataFormat.Resultset;
-  result: IDatabaseResultSet;
-
-  constructor(
-    result: IDatabaseResultSet) {
-    this.result = result;
-  }
 
   isGISFormat(cell: IResultSetElementKey): boolean {
     if (cell.row === undefined || cell.column === undefined) {
@@ -64,9 +59,5 @@ export class ResultSetGISAction implements IDatabaseDataGISAction<IResultSetElem
     }
 
     return this.result.data.rows[cell.row][cell.column];
-  }
-
-  updateResult(result: IDatabaseResultSet) {
-    this.result = result;
   }
 }

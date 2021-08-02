@@ -115,7 +115,7 @@ export const InlineEditorStyles = composes(
     box-sizing: border-box;
     display: flex;
     width: 24px;
-    padding: 5px;
+    padding: 4px;
     cursor: pointer;
 
     & Icon {

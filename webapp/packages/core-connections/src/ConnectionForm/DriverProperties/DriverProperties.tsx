@@ -11,45 +11,34 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IProperty, Loader, PropertiesTable, TabContainerPanelComponent, useMapResource, useTab } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, TabContainerPanelComponent, useMapResource, useTab } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../DBDriverResource';
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
-import { useConnectionData } from '../useConnectionData';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const styles = css`
-  properties {
-    display: flex;
+  ColoredContainer {
     flex: 1;
-    flex-direction: column;
     overflow: auto;
   }
-  center {
-    margin: auto;
+  Group {
+    max-height: 100%;
+  }
+  PropertiesTable {
+    padding-top: 8px;
+    max-height: 100%;
+    box-sizing: border-box;
   }
 `;
 
-export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function DriverProperties({
+export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({
   tabId,
-  data,
-  form,
+  state: formState,
 }) {
-  const style = useStyles(styles);
+  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const { selected } = useTab(tabId);
-
-  useConnectionData(data, data => {
-    if (!data.config.properties) {
-      data.config.properties = {};
-    }
-
-    if (!data.info) {
-      return;
-    }
-
-    data.config.properties = { ...data.info.properties };
-  });
 
   const [state] = useState(() => {
     const propertiesList: IProperty[] = observable([]);
@@ -64,21 +53,25 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
       });
     }
 
-    return { propertiesList, add };
+    function remove(property: IProperty) {
+      propertiesList.splice(propertiesList.indexOf(property), 1);
+    }
+
+    return { propertiesList, add, remove };
   });
 
   const driver = useMapResource(
     DBDriverResource,
-    { key: (selected && data.config.driverId) || null, includes: ['includeDriverProperties'] },
+    { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
     {
       onData: driver => {
-        for (const key of Object.keys(data.config.properties)) {
+        for (const key of Object.keys(formState.config.properties)) {
           if (driver.driverProperties?.some(property => property.id === key)
            || state.propertiesList.some(property => property.key === key)) {
             continue;
           }
 
-          state.add(key, data.config.properties[key]);
+          state.add(key, formState.config.properties[key]);
         }
       },
     }
@@ -101,17 +94,20 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
   ])), [driver.data]);
 
   return styled(style)(
-    <properties as="div">
-      <Loader state={driver}>
-        {() => (
-          <PropertiesTable
-            properties={joinedProperties.get()}
-            propertiesState={data.config.properties}
-            readOnly={form.form.readonly}
-            onAdd={state.add}
-          />
-        )}
-      </Loader>
-    </properties>
+    <Loader state={driver}>
+      {() => styled(style)(
+        <ColoredContainer parent>
+          <Group box keepSize large>
+            <PropertiesTable
+              properties={joinedProperties.get()}
+              propertiesState={formState.config.properties}
+              readOnly={formState.readonly}
+              onAdd={state.add}
+              onRemove={state.remove}
+            />
+          </Group>
+        </ColoredContainer>
+      )}
+    </Loader>
   );
 });

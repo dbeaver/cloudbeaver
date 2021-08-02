@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { forwardRef } from 'react';
+
+import { filterContainerFakeProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
 
-export const Container: React.FC<IContainerProps> = function Container({ children, ...rest }) {
-  return (
-    <div {...rest}>
-      {children}
-    </div>
-  );
-};
+export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(props, ref) {
+  const divProps = filterContainerFakeProps(props);
+
+  return <div ref={ref} {...divProps} />;
+});

@@ -44,7 +44,6 @@ export const DriverSelectorDialog = observer(
     return styled(styles)(
       <CommonDialogWrapper
         title={title}
-        noBodyPadding
         onReject={onClose}
       >
         {isLoading && <Loader />}

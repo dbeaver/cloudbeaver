@@ -10,6 +10,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
+import { isResultSetContentValue } from './Actions/ResultSet/isResultSetContentValue';
 import { DataUpdateType, IDatabaseDataEditor, IDatabaseDataEditorActionsData, IDatabaseDataResultEditor, IDataUpdate, IResultEditingDiff } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
@@ -127,6 +128,17 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
    */
   setCell(result: TResult, row: number, column: number, value: any): void {
     const diff = this.getOrCreateDiff(result, row);
+    const prevValue = diff.source[column];
+
+    if (isResultSetContentValue(prevValue) && value !== null) {
+      if ('text' in prevValue) {
+        value = {
+          ...prevValue,
+          text: String(value),
+          contentLength: String(value).length,
+        };
+      }
+    }
 
     diff.update[column] = value;
 
@@ -280,8 +292,21 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
   }
 
   private compareCellValue(valueA: any, valueB: any) {
+    valueA = valueA === undefined ? '' : valueA;
+    valueB = valueB === undefined ? '' : valueB;
+
     if (typeof valueA === 'number' || typeof valueB === 'number') {
-      return Number(valueA) === Number(valueB);
+      return String(valueA) === String(valueB);
+    }
+
+    if (typeof valueA === 'boolean' || typeof valueB === 'boolean') {
+      return String(valueA).toLowerCase() === String(valueB).toLowerCase();
+    }
+
+    if (isResultSetContentValue(valueA) && isResultSetContentValue(valueB)) {
+      if ('text' in valueA && 'text' in valueB) {
+        return valueA.text === valueB.text;
+      }
     }
 
     return valueA === valueB;

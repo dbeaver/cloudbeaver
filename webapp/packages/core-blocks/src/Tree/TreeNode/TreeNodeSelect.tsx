@@ -6,27 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+
+import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
+import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
 
-const styles = css`
-  Icon {
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-  }
-`;
-
 interface Props {
+  group?: boolean;
+  onSelect?: () => void;
+  selected?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
-export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
+export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect({
+  onSelect,
+  group,
+  selected,
   disabled,
   className,
 }) {
@@ -37,17 +37,20 @@ export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
   }
 
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    event.stopPropagation();
+    EventContext.set(event, EventTreeNodeSelectFlag);
   };
 
-  const preventPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
+  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    EventContext.set(event, EventTreeNodeSelectFlag);
   };
 
-  return styled(styles)(
-    <div className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
-      <Checkbox checked={context.selected} disabled={disabled} onChange={() => context.select(true)} />
+  return (
+    <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
+      <Checkbox
+        checked={selected ?? context.selected}
+        disabled={disabled}
+        onChange={onSelect ?? (() => context.select(true, group))}
+      />
     </div>
   );
-};
+});

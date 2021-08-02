@@ -63,7 +63,6 @@ export const ProcessorSelectDialog = observer(
     return styled(styles)(
       <CommonDialogWrapper
         title={translate('data_transfer_dialog_title')}
-        noBodyPadding
         onReject={onClose}
       >
         <export-object as="div">

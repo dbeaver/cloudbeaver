@@ -28,7 +28,9 @@ export interface IMenuItem {
   onClick?: () => void; // it is not mandatory if it is just opens submenu
   isDisabled?: boolean;
   isHidden?: boolean;
+  keepMenuOpen?: boolean;
   icon?: string; // path to icon or svg icon name
+  tooltip?: string;
   panel?: IMenuPanel; // if menu has sub-items
   type?: MenuItemType;
   separator?: boolean;
@@ -40,4 +42,7 @@ export type MenuTriggerProps = PropsWithChildren<{
   style?: Style[];
   placement?: MenuInitialState['placement'];
   modal?: boolean;
+  visible?: boolean;
+  rtl?: boolean;
+  onVisibleSwitch?: (visible: boolean) => void;
 }> & Omit<ButtonHTMLAttributes<any>, 'style'>;

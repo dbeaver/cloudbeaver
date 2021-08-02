@@ -18,8 +18,10 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Pair;
 
 /**
@@ -81,4 +83,7 @@ public class WebSQLDialectInfo {
         return SQLUtils.getDefaultScriptDelimiter(dialect);
     }
 
+    public boolean isSupportsExplainExecutionPlan() {
+        return GeneralUtils.adapt(dataSource, DBCQueryPlanner.class) != null;
+    }
 }

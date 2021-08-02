@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AuthProvidersResource, AuthProvider, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -26,14 +26,23 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   get providers(): AuthProvider[] {
-    return this.authProvidersResource
-      .getEnabledProviders()
-      .sort(this.compareProviders);
+    const providers = this.authProvidersResource.getEnabledProviders();
+
+    if (this.admin && !this.authProvidersResource.isEnabled(AUTH_PROVIDER_LOCAL_ID)) {
+      const local = this.authProvidersResource.get(AUTH_PROVIDER_LOCAL_ID);
+
+      if (local) {
+        providers.push(local);
+      }
+    }
+
+    return providers.sort(this.compareProviders);
   }
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
   private link!: boolean;
+  private admin: boolean;
   private close!: () => void;
 
   constructor(
@@ -42,18 +51,29 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
-    makeObservable(this, {
+    makeObservable<AuthDialogController, 'admin'>(this, {
       provider: observable,
       isAuthenticating: observable,
       credentials: observable,
+      admin: observable,
       providers: computed,
     });
+
+    this.admin = false;
   }
 
-  init(link: boolean, onClose: () => void) {
+  init(link: boolean, onClose: () => void): void {
     this.link = link;
     this.close = onClose;
     this.loadProviders();
+  }
+
+  setAdminMode(mode: boolean): void {
+    if (this.admin !== mode) {
+      this.admin = mode;
+
+      this.selectFirstAvailable();
+    }
   }
 
   destruct(): void {
@@ -95,11 +115,16 @@ export class AuthDialogController implements IInitializableController, IDestruct
   private async loadProviders() {
     try {
       await this.authProvidersResource.loadAll();
-      if (this.providers.length > 0) {
-        this.provider = this.providers[0];
-      }
+
+      this.selectFirstAvailable();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth providers');
+    }
+  }
+
+  private selectFirstAvailable(): void {
+    if (this.providers.length > 0) {
+      this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
     }
   }
 

@@ -7,9 +7,9 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class EnvironmentService {
-  readonly gqlEndpoint = '/api/gql';
-  readonly staticEndpoint = '/api';
+  readonly gqlEndpoint = GlobalConstants.absoluteServiceUrl('gql');
 }

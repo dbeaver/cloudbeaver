@@ -18,7 +18,7 @@ import { buttonStyles } from './splitButtonStyles';
 
 export const SplitControls: React.FC = function SplitControls() {
   const {
-    split, mode, isResizing, setMode, setSize, isMainSecond, getMainSize,
+    split, mode, isResizing, setMode, setSize, isMainSecond, getMainSize, ...splitContext
   } = useContext(SplitContext);
   const [state, setState] = useState(-1);
   const styles = useStyles(buttonStyles);
@@ -38,7 +38,6 @@ export const SplitControls: React.FC = function SplitControls() {
   }, [isResizing]);
 
   const handleCollapse = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
     if (mode === 'maximize') {
       setMode('resize');
       setSize(state);
@@ -49,7 +48,6 @@ export const SplitControls: React.FC = function SplitControls() {
   }, [mode, state, setMode]);
 
   const handleExpand = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
     if (mode === 'minimize') {
       setMode('resize');
       setSize(state);
@@ -60,23 +58,30 @@ export const SplitControls: React.FC = function SplitControls() {
   }, [mode, state, setMode]);
 
   return styled(styles)(
-    <container as="div" {...use({ split, inverse, mode: inverseMode })}>
+    <container
+      onMouseDown={splitContext.onMouseDown}
+      onTouchStart={splitContext.onTouchStart}
+      onTouchEnd={splitContext.onTouchEnd}
+      onClick={splitContext.onClick}
+      onDoubleClick={splitContext.onDoubleClick}
+      {...use({ split, inverse, mode: inverseMode })}
+    >
       {mode !== 'minimize' && (
         <button
           type="button"
           {...use({ isPrimary: !inverse })}
-          onMouseDown={handleCollapse}
+          onClick={handleCollapse}
         >
-          <ripple as="div" />
+          <ripple />
         </button>
       )}
       {mode !== 'maximize' && (
         <button
           type="button"
           {...use({ isPrimary: inverse })}
-          onMouseDown={handleExpand}
+          onClick={handleExpand}
         >
-          <ripple as="div" />
+          <ripple />
         </button>
       )}
     </container>

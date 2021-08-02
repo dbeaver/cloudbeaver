@@ -9,33 +9,45 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoFormNew, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 import { css } from '@reshadow/react';
 
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const style = css`
   Loader {
     height: 100%;
   }
+  ColoredContainer {
+    flex: 1;
+    overflow: auto;
+  }
 `;
 
-export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function OriginInfo({
+export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
   tabId,
-  data,
+  state: {
+    info,
+    resource,
+  },
 }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
-  const state = useTabState<Record<string, any>>(() => ({}));
+  const userInfoService = useService(UserInfoResource);
+  const state = useTabState<Record<string, any>>();
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
-  const connection = useMapResource(data.resource!, {
-    key: tab.selected ? data.info!.id : null,
+  const connection = useMapResource(resource, {
+    key: tab.selected ? info!.id : null,
     includes: ['includeOrigin', 'customIncludeOriginDetails'],
   }, {
+    isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
     onData: (connection, res, prev) => {
       if (!connection.origin.details) {
         return;
@@ -71,6 +83,16 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
     );
   }
 
+  const authorized = !info?.origin || userInfoService.hasOrigin(info.origin);
+
+  if (!authorized && info?.origin) {
+    return styled(styles)(
+      <ColoredContainer parent vertical>
+        <AuthenticationProvider origin={info.origin} onAuthenticate={connection.reload} />
+      </ColoredContainer>
+    );
+  }
+
   if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
     return styled(styles)(
       <ColoredContainer parent>
@@ -85,7 +107,8 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
         <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}
-          editable={false}
+          readOnly
+          small
           autoHide
         />
       </Group>

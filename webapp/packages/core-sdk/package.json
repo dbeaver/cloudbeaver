@@ -11,6 +11,7 @@
     "prebuild": "rimraf lib/*",
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
+    "pregql:gen": "rimraf node_modules",
     "gql:gen": "graphql-codegen",
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",

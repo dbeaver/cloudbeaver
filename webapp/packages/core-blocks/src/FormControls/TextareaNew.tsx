@@ -100,7 +100,7 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
   const value = state ? state[name] : controlledValue;
 
   return styled(useStyles(baseFormControlStylesNew, styles, style))(
-    <field as="div" className={className} {...use({ small, medium, large, embedded })}>
+    <field className={className} {...use({ small, medium, large, embedded })}>
       <field-label as='label'>{children}</field-label>
       <textarea
         {...rest}

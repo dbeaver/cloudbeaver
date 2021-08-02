@@ -5,6 +5,7 @@
 
     <extension-point id="io.cloudbeaver.service" name="Web services" schema="schema/io.cloudbeaver.service.exsd"/>
     <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
+    <extension-point id="io.cloudbeaver.valueSerializer" name="Web value serializers" schema="schema/io.cloudbeaver.valueSerializer.exsd"/>
 
     <extension point="org.eclipse.core.runtime.adapters">
         <factory adaptableType="org.jkiss.dbeaver.runtime.DBWorkbench" class="io.cloudbeaver.server.WebPlatformAdapterFactory">

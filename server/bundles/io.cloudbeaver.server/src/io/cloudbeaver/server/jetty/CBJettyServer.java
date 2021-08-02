@@ -45,8 +45,9 @@ public class CBJettyServer {
                 // Handler configuration
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 servletContextHandler.setResourceBase(application.getContentRoot());
-                servletContextHandler.setContextPath(application.getRootURI());
-                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), application.getRootURI());
+                String rootURI = application.getRootURI();
+                servletContextHandler.setContextPath(rootURI);
+                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), "/*");
                 servletContextHandler.addServlet(new ServletHolder("images", new CBImageServlet()), application.getServicesURI() + "images/*");
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener());

@@ -1,6 +1,7 @@
 export default [
   ['data_transfer_dialog_title', 'Export data'],
   ['data_transfer_dialog_export', 'Export'],
+  ['data_transfer_dialog_export_tooltip', 'Export result set as a file'],
   ['data_transfer_dialog_configuration_title', 'Export configuration'],
   ['data_transfer_dialog_preparation', 'We prepare your file for export. Please wait...'],
   ['data_transfer_notification_preparation', 'We prepare your file for download. Please wait...'],

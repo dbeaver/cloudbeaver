@@ -31,45 +31,63 @@ export enum DialogueStateResult {
   Rejected
 }
 
-export interface DialogInternal {
+export interface DialogInternal<TResult> {
   component: DialogComponent<any, any>;
   payload: any;
   options?: DialogOptions;
-  resolve: (result: any) => void;
+  resolve: (result: TResult | DialogueStateResult) => void;
+  promise: Promise<TResult | DialogueStateResult>;
 }
 
 @injectable()
 export class CommonDialogService {
-  dialogs: DialogInternal[] = observable([], { deep: false });
+  dialogs: Array<DialogInternal<any>> = observable([], { deep: false });
 
   // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
-  async open<TPayload, TResult>(
+  open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
     options?: DialogOptions
   ): Promise<TResult | DialogueStateResult> {
-    return new Promise<TResult>((resolve, reject) => {
-      const dialogInternal: DialogInternal = {
-        component,
-        payload,
-        resolve,
-        options,
-      };
-      this.dialogs.push(dialogInternal);
+    let _resolve: (value: TResult | DialogueStateResult) => void;
+    let _reject: (reason?: any) => void;
+
+    const promise = new Promise<TResult | DialogueStateResult>((resolve, reject) => {
+      _resolve = resolve;
+      _reject = reject;
     });
+
+    const dialogInternal: DialogInternal<TResult> = {
+      component,
+      payload,
+      resolve: _resolve!,
+      options,
+      promise,
+    };
+    this.dialogs.push(dialogInternal);
+
+    return promise;
   }
 
-  rejectDialog(dialog: DialogInternal): void {
-    dialog.resolve(DialogueStateResult.Rejected);
-    this.removeDialog(dialog);
+  rejectDialog(promise: Promise<any>): void {
+    const dialog = this.dialogs.find(internal => internal.promise === promise);
+
+    if (dialog) {
+      dialog.resolve(DialogueStateResult.Rejected);
+      this.removeDialog(dialog);
+    }
   }
 
-  resolveDialog<TResult>(dialog: DialogInternal, result: TResult): void {
-    dialog.resolve(result ?? DialogueStateResult.Resolved);
-    this.removeDialog(dialog);
+  resolveDialog<TResult>(promise: Promise<TResult | DialogueStateResult>, result?: TResult): void {
+    const dialog = this.dialogs.find(internal => internal.promise === promise);
+
+    if (dialog) {
+      dialog.resolve(result ?? DialogueStateResult.Resolved);
+      this.removeDialog(dialog);
+    }
   }
 
-  private removeDialog(dialog: DialogInternal) {
+  private removeDialog(dialog: DialogInternal<any>) {
     const index = this.dialogs.findIndex(i => i === dialog);
     if (index !== -1) {
       this.dialogs.splice(index, 1);

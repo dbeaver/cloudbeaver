@@ -10,22 +10,35 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
 
 @injectable()
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null, void> {
   update: ServerConfigInput;
+  navigatorSettingsUpdate: NavigatorSettingsInput;
 
   constructor(
     private graphQLService: GraphQLService
   ) {
     super(null);
-    makeObservable(this, {
-      update: observable,
-    });
 
     this.update = {};
+    this.navigatorSettingsUpdate = {
+      hideFolders: false,
+      hideSchemas: false,
+      hideVirtualModel: false,
+      mergeEntities: false,
+      showOnlyEntities: false,
+      showSystemObjects: false,
+      showUtilityObjects: false,
+    };
+
+    makeObservable(this, {
+      update: observable,
+      navigatorSettingsUpdate: observable,
+    });
   }
 
   get serverVersion(): string {
@@ -62,7 +75,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   isChanged(): boolean {
-    if (!this.data) {
+    if (!this.data || Object.keys(this.update).length === 0) {
       return false;
     }
 
@@ -72,49 +85,79 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     return (
       this.update.serverName !== this.data.name
-    || this.update.sessionExpireTime !== this.data.sessionExpireTime
+      || this.update.serverURL !== this.data.serverURL
+      || this.update.sessionExpireTime !== this.data.sessionExpireTime
 
-    || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
-    || this.update.authenticationEnabled !== this.data.authenticationEnabled
+      || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
 
-    || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
-    || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
+      || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
+      || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
 
-    || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
-    || this.update.enabledAuthProviders !== this.data.enabledAuthProviders
+      || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
+      || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
     );
   }
 
-  isNavigatorSettingsChanged(settings: NavigatorSettingsInput): boolean {
+  isNavigatorSettingsChanged(): boolean {
     if (!this.data?.defaultNavigatorSettings) {
       return false;
     }
 
-    return !isNavigatorViewSettingsEqual(this.data.defaultNavigatorSettings, settings);
+    return !isNavigatorViewSettingsEqual(this.data.defaultNavigatorSettings, this.navigatorSettingsUpdate);
   }
 
   setDataUpdate(update: ServerConfigInput): void {
     this.update = update;
   }
 
-  async setDefaultNavigatorSettings(settings: NavigatorSettingsInput): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings });
-
-      if (this.data) {
-        this.data.defaultNavigatorSettings = { ...settings };
-      } else {
-        this.data = await this.loader();
-      }
-    }, () => !this.isNavigatorSettingsChanged(settings));
+  setNavigatorSettingsUpdate(update: NavigatorSettingsInput): void {
+    this.navigatorSettingsUpdate = update;
   }
 
-  async save(onlyRestart = false): Promise<void> {
+  unlinkUpdate(): void {
+    this.update = {};
+
+    if (this.data) {
+      Object.assign(this.navigatorSettingsUpdate, this.data.defaultNavigatorSettings);
+    } else {
+      this.navigatorSettingsUpdate = {
+        hideFolders: false,
+        hideSchemas: false,
+        hideVirtualModel: false,
+        mergeEntities: false,
+        showOnlyEntities: false,
+        showSystemObjects: false,
+        showUtilityObjects: false,
+      };
+    }
+  }
+
+  async save(skipConfigUpdate = false): Promise<void> {
+    await this.performUpdate(undefined, undefined, async () => {
+      if (this.isNavigatorSettingsChanged()) {
+        await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
+
+        if (this.data) {
+          this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
+        } else {
+          this.data = await this.loader();
+        }
+      }
+
+      if (this.isChanged() && !skipConfigUpdate) {
+        await this.graphQLService.sdk.configureServer({
+          configuration: this.update,
+        });
+        this.data = await this.loader();
+      }
+    }, () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate));
+  }
+
+  async finishConfiguration(onlyRestart = false): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.configureServer({
-        configuration: onlyRestart ? {} : this.update,
+        configuration: !this.isChanged() && onlyRestart ? {} : this.update,
       });
-
       this.data = await this.loader();
     }, () => !this.isChanged() && !onlyRestart);
   }
@@ -128,19 +171,21 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   private syncUpdateData(serverConfig: ServerConfig) {
+    Object.assign(this.navigatorSettingsUpdate, serverConfig.defaultNavigatorSettings);
+
     this.update.serverName = serverConfig.name;
+    this.update.serverURL = serverConfig.serverURL;
     this.update.sessionExpireTime = serverConfig.sessionExpireTime;
 
     this.update.adminName = undefined;
     this.update.adminPassword = undefined;
 
     this.update.anonymousAccessEnabled = serverConfig.anonymousAccessEnabled;
-    this.update.authenticationEnabled = serverConfig.authenticationEnabled;
 
     this.update.adminCredentialsSaveEnabled = serverConfig.adminCredentialsSaveEnabled;
     this.update.publicCredentialsSaveEnabled = serverConfig.publicCredentialsSaveEnabled;
 
     this.update.customConnectionsEnabled = serverConfig.supportsCustomConnections;
-    this.update.enabledAuthProviders = serverConfig.enabledAuthProviders;
+    this.update.enabledAuthProviders = [...serverConfig.enabledAuthProviders];
   }
 }

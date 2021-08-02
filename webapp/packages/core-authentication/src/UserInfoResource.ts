@@ -8,8 +8,9 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
@@ -35,7 +36,19 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data?.userId || 'anonymous';
   }
 
+  hasOrigin(origin: ObjectOrigin): boolean {
+    if (!this.data) {
+      return false;
+    }
+
+    return this.hasToken(origin.type, origin.subType);
+  }
+
   hasToken(type: string, subType?: string): boolean {
+    if (type === AUTH_PROVIDER_LOCAL_ID) {
+      return true;
+    }
+
     if (!this.data) {
       return false;
     }
@@ -49,14 +62,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     await this.performUpdate(undefined, undefined, async () => {
       const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
-      // TODO: will be replaced with another function
       const { authToken } = await this.graphQLService.sdk.authLogin({
         provider,
         credentials: processedCredentials,
         linkUser: link,
         customIncludeOriginDetails: true,
       });
-
       if (this.data === null || link) {
         this.data = await this.loader();
       } else {

@@ -8,34 +8,36 @@
 
 import { observable } from 'mobx';
 import { useState } from 'react';
-import type { Position } from 'react-data-grid/lib/types';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-import type { IEditingContext } from './EditingContext';
+import type { CellPosition, IEditingContext } from './EditingContext';
 
-function findPosition(position: Position): (position: Position) => boolean {
-  return p => p.idx === position.idx && p.rowIdx === position.rowIdx;
+function getPositionHash(position: CellPosition): string {
+  return `${position.idx}_${position.rowIdx}`;
 }
 
 interface IEditingOptions {
   readonly?: boolean;
-  onEdit: (position: Position, key?: string) => boolean;
+  onEdit: (position: CellPosition, key?: string) => boolean;
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
-  const optionsRef = useObjectRef<IEditingOptions>(options);
-  const [editingCells] = useState(() => observable<Position>([]));
+  const optionsRef = useObjectRef(options);
+  const state = useObjectRef({
+    options,
+    editingCells: new Set<string>(),
+  }, { options }, { editingCells: observable });
 
   const [context] = useState<IEditingContext>({
-    edit(position: Position, key?: string) {
+    edit(position: CellPosition, key?: string) {
       if (optionsRef.readonly) {
         return;
       }
       // TODO: not works yet
       switch (key) {
         case 'Escape':
-          editingCells.splice(editingCells.findIndex(findPosition(position)), 1);
+          state.editingCells.delete(getPositionHash(position));
           break;
       }
 
@@ -43,17 +45,17 @@ export function useEditing(options: IEditingOptions): IEditingContext {
         return;
       }
 
-      editingCells.clear();
-      editingCells.push(position);
+      state.editingCells.clear();
+      state.editingCells.add(getPositionHash(position));
     },
-    closeEditor(position: Position) {
-      editingCells.splice(editingCells.findIndex(findPosition(position)), 1);
+    closeEditor(position: CellPosition) {
+      state.editingCells.delete(getPositionHash(position));
     },
     close() {
-      editingCells.clear();
+      state.editingCells.clear();
     },
-    isEditing(position: Position) {
-      return editingCells.some(findPosition(position));
+    isEditing(position: CellPosition) {
+      return state.editingCells.has(getPositionHash(position));
     },
   });
 

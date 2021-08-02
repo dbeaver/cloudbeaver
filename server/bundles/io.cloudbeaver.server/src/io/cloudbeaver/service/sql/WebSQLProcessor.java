@@ -25,20 +25,23 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDDataFilter;
-import org.jkiss.dbeaver.model.data.DBDDocument;
-import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
+import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
+import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -96,7 +99,7 @@ public class WebSQLProcessor {
         return ruleManager;
     }
 
-    DBCExecutionContext getExecutionContext() {
+    public DBCExecutionContext getExecutionContext() {
         return DBUtils.getDefaultContext(connection.getDataSource(), false);
     }
 
@@ -153,22 +156,22 @@ public class WebSQLProcessor {
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
-        {
-            DBDDataFilter dataFilter = filter.makeDataFilter();
-            if (dataFilter.hasFilters()) {
-                sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
-                    monitor,
-                    context.getDataSource(),
-                    sql,
-                    dataFilter);
-            }
-        }
-
-        final WebSQLDataFilter dataFilter = filter;
-        final String sqlQueryText = sql;
-        SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
-
         try {
+            {
+                DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
+                if (dataFilter.hasFilters()) {
+                    sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
+                        monitor,
+                        context.getDataSource(),
+                        sql,
+                        dataFilter);
+                }
+            }
+
+            final WebSQLDataFilter dataFilter = filter;
+            final String sqlQueryText = sql;
+            SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
+
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                 try (DBCSession session = context.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
                     AbstractExecutionSource source = new AbstractExecutionSource(
@@ -215,7 +218,7 @@ public class WebSQLProcessor {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
-        DBDDataFilter dataFilter = filter.makeDataFilter();
+        DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
@@ -231,10 +234,14 @@ public class WebSQLProcessor {
                     executeInfo.setDuration(statistics.getTotalTime());
 
                     WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
-                    results.setResultSet(dataReceiver.getResultSet());
+                    WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
+                    results.setResultSet(resultSet);
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
+                    setResultFilterText(dataContainer, session.getDataSource(), executeInfo, filter);
 
-                    executeInfo.setStatusMessage(dataReceiver.getResultSet().getRows().length + " row(s) fetched");
+                    if (resultSet != null && resultSet.getRows() != null) {
+                        executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
+                    }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
                 }
@@ -379,7 +386,12 @@ public class WebSQLProcessor {
                                 for (int i = 0; i < updateAttributes.length; i++) {
                                     DBDAttributeBinding updateAttribute = updateAttributes[i];
                                     Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                                    Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                    cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
+                                    Object realCellValue = cellRawValue;
+                                    // In some cases we already have final value here
+                                    if (!(realCellValue instanceof DBDValue)) {
+                                        realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                    }
                                     rowValues[i] = realCellValue;
                                     finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                                 }
@@ -387,19 +399,30 @@ public class WebSQLProcessor {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];
                                     if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
                                         // Document reference
+                                        DBDDocument document = null;
                                         Map<String, Object> keyMap = new LinkedHashMap<>();
                                         DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
                                         for (int j = 0; j < attributes.length; j++) {
                                             DBDAttributeBinding attr = attributes[j];
-                                            keyMap.put(attr.getName(), row.getData().get(j));
+                                            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData().get(j));
+                                            if (plainValue instanceof DBDDocument) {
+                                                // FIXME: Hack for DynamoDB. We pass entire document as a key
+                                                // FIXME: Let's just return it back for now
+                                                document = (DBDDocument) plainValue;
+                                                break;
+                                            }
+                                            keyMap.put(attr.getName(), plainValue);
                                         }
-                                        DBDDocument document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
                                         if (document == null) {
-                                            throw new DBCException("Error finding document by key " + keyMap);
+                                            document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
+                                            if (document == null) {
+                                                throw new DBCException("Error finding document by key " + keyMap);
+                                            }
                                         }
                                         rowValues[updateAttributes.length + i] = document;
                                     } else {
                                         Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
+                                        cellValueRaw = WebSQLUtils.makePlainCellValue(session, keyAttribute, cellValueRaw);
                                         rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
                                     }
                                 }
@@ -440,6 +463,51 @@ public class WebSQLProcessor {
         return result;
     }
 
+    ////////////////////////////////////////////////
+    // ExecutionPlan
+
+    @NotNull
+    public WebSQLExecutionPlan explainExecutionPlan(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @NotNull Map<String, Object> configuration) throws DBWebException {
+
+        DBCQueryPlanner planner;
+        DBCExecutionContext executionContext = getExecutionContext();
+        if (executionContext != null) {
+            DBPDataSource dataSource = executionContext.getDataSource();
+            planner = GeneralUtils.adapt(dataSource, DBCQueryPlanner.class);
+        } else {
+            throw new DBWebException("Not connected to data source");
+        }
+
+        if (planner == null) {
+            throw new DBWebException("Datasource '" + executionContext.getDataSource() + "' doesn't support execution plan");
+        }
+
+        DBCPlan[] dbcPlan = new DBCPlan[1];
+
+        try {
+            DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+                try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
+                    DBCQueryPlannerConfiguration planConfig = new DBCQueryPlannerConfiguration();
+                    planConfig.getParameters().putAll(configuration);
+                    dbcPlan[0] = planner.planQueryExecution(session, sql, planConfig);
+                } catch (DBException e) {
+                    throw new InvocationTargetException(e);
+                }
+            });
+        } catch (DBException e) {
+            throw new DBWebException("Error explaining execution plan", e);
+        }
+
+        return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
+    }
+
+    ////////////////////////////////////////////////
+    // Misc
+
     private void checkRowIdentifier(WebSQLResultsInfo resultsInfo, DBDRowIdentifier rowIdentifier) throws DBWebException {
         if (rowIdentifier == null || !rowIdentifier.isValidIdentifier()) {
             throw new DBWebException("Can't detect row identifier for data container '" + resultsInfo.getDataContainer().getName() + "'. It must have at least one unique key.");
@@ -470,7 +538,8 @@ public class WebSQLProcessor {
 
 
     private void fillQueryResults(
-        @NotNull WebSQLContextInfo contextInfo, @NotNull DBSDataContainer dataContainer,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull DBSDataContainer dataContainer,
         @NotNull DBCStatement dbStat,
         boolean hasResultSet,
         @NotNull WebSQLExecuteInfo executeInfo,
@@ -490,7 +559,7 @@ public class WebSQLProcessor {
                     results.setResultSet(dataReceiver.getResultSet());
                 }
             } else {
-                int updateRowCount = dbStat.getUpdateRowCount();
+                long updateRowCount = dbStat.getUpdateRowCount();
                 if (updateRowCount >= 0) {
                     results.setUpdateRowCount(updateRowCount);
                 } else {
@@ -502,6 +571,21 @@ public class WebSQLProcessor {
         }
 
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
+
+        setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, filter);
+    }
+
+    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull WebSQLDataFilter filter) throws DBException {
+        if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
+            StringBuilder where = new StringBuilder();
+            SQLUtils.appendConditionString(
+                filter.makeDataFilter(webSession.getProgressMonitor(), dataContainer),
+                dataSource,
+                null,
+                where,
+                true);
+            executeInfo.setFilterText(where.toString());
+        }
     }
 
     private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebSQLQueryDataReceiver dataReceiver) throws DBCException {

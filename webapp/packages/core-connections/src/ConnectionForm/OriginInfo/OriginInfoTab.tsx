@@ -13,16 +13,16 @@ import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-block
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const OriginInfoTab: TabContainerTabComponent<IConnectionFormTabProps> = observer(function OriginInfoTab({
-  data,
+export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({
+  state: { info },
   style,
   ...rest
 }) {
   return styled(useStyles(style))(
     <Tab {...rest} style={style}>
-      <TabTitle><Translate token={data.info?.origin.displayName || 'Origin'} /></TabTitle>
+      <TabTitle><Translate token={info?.origin?.displayName || 'Origin'} /></TabTitle>
     </Tab>
   );
 });

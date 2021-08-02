@@ -12,5 +12,6 @@ query querySqlDialectInfo( $connectionId: ID! ) {
       catalogSeparator
       structSeparator
       scriptDelimiter
+      supportsExplainExecutionPlan
     }
 }

@@ -7,14 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
 const styles = composes(
@@ -33,31 +34,50 @@ const styles = composes(
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({
   model,
+  resultIndex,
 }) {
   const translate = useTranslate();
-  const [filterValue, setValue] = useState(() => model.source.options?.whereFilter || '');
+  const hasResult = model.source.hasResult(resultIndex);
+  let filterValue = model.source.options?.whereFilter || '';
+
+  if (hasResult) {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    if (constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
+      filterValue = model.source.requestInfo.requestFilter;
+    }
+  }
+
+  const setValue = useCallback((filterValue: string) => {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+
+    model.source.options.whereFilter = filterValue;
+    constraints?.deleteFilters();
+  }, [model.source.options]);
+
+  const props = useObjectRef({ model, resultIndex, filterValue });
 
   const handleApply = useCallback(() => {
-    if (model.isLoading()) {
+    const { model, resultIndex } = props;
+    if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
-    model.source.options!.whereFilter = filterValue;
     model.refresh();
-  }, [model, filterValue]);
+  }, []);
 
   const resetFilter = useCallback(() => {
-    if (model.isLoading()) {
+    const { model, resultIndex } = props;
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
-    const applyNeeded = model.source.options?.whereFilter === filterValue;
 
-    setValue('');
+    constraints.deleteDataFilters();
 
+    const applyNeeded = !!model.requestInfo.requestFilter;
     if (applyNeeded) {
-      model.source.options!.whereFilter = '';
       model.refresh();
     }
-  }, [model, filterValue]);
+  }, []);
 
   return styled(useStyles(styles))(
     <InlineEditor
@@ -66,7 +86,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
-      disabled={model.isLoading() || model.source.results.length > 1}
+      disabled={model.isLoading() || model.source.results.length > 1 || model.isDisabled(resultIndex)}
       simple
       onSave={handleApply}
       onUndo={resetFilter}

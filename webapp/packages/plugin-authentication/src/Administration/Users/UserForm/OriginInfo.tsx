@@ -7,13 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
+import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
 
@@ -29,9 +32,12 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   tabId,
   user,
 }) {
+  const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
+  const userInfoService = useService(UserInfoResource);
   const state = useTabState<IState>(() => ({
+    origin: null,
     properties: [],
     state: {},
     loading: false,
@@ -39,8 +45,16 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     exception: null,
   }));
 
+  let origin = user.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+
+  if (!origin) {
+    origin = user.origins[0];
+  }
+
+  const authorized = userInfoService.hasOrigin(origin);
+
   const load = async () => {
-    if (state.loaded) {
+    if (state.loaded || !origin || !userInfoService.hasOrigin(origin)) {
       return;
     }
     state.loading = true;
@@ -49,10 +63,17 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     try {
       const userOrigin = await usersResource.load(user.userId, ['customIncludeOriginDetails']);
       const propertiesState = {} as Record<string, any>;
-      for (const property of userOrigin.origin.details!) {
+
+      let origin = userOrigin.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+
+      if (!origin) {
+        origin = userOrigin.origins[0];
+      }
+
+      for (const property of origin.details!) {
         propertiesState[property.id!] = property.value;
       }
-      state.properties = userOrigin.origin.details!;
+      state.properties = origin.details!;
       state.state = propertiesState;
       state.loaded = true;
     } catch (error) {
@@ -69,41 +90,56 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   }
 
   if (state.loading) {
-    return (
-      <FormBox>
-        <Loader key="static" />
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <Loader key="static" />
+        </Group>
+      </ColoredContainer>
     );
   }
 
   if (state.exception) {
-    return (
-      <FormBox>
-        <ExceptionMessage exception={state.exception} onRetry={load} />
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <ExceptionMessage exception={state.exception} onRetry={load} />
+        </Group>
+      </ColoredContainer>
     );
   }
 
-  if (state.properties.length === 0) {
-    return (
-      <FormBox>
-        <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
-      </FormBox>
+  if (!authorized) {
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <AuthenticationProvider origin={origin} onAuthenticate={load} />
+        </Group>
+      </ColoredContainer>
     );
   }
 
-  return (
-    <FormBox>
-      <FormBoxElement>
-        <FormGroup><br /></FormGroup>
-        <ObjectPropertyInfoForm
+  if (!origin || (state.loaded && state.properties.length === 0)) {
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
+        </Group>
+      </ColoredContainer>
+    );
+  }
+
+  return styled(style)(
+    <ColoredContainer parent>
+      <Group gap large>
+        <ObjectPropertyInfoFormNew
           properties={state.properties}
           state={state.state}
-          editable={false}
+          readOnly
+          small
           autoHide
         />
-      </FormBoxElement>
-      <Loader key="overlay" loading={state.loading} overlay />
-    </FormBox>
+      </Group>
+    </ColoredContainer>
   );
 });

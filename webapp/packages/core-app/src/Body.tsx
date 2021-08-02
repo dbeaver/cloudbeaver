@@ -25,6 +25,7 @@ const bodyStyles = css`
     display: flex;
     padding: 0 !important; /* fix additional padding with modal reakit menu */
     flex-direction: column;
+    overflow: hidden;
   }
 `;
 
@@ -44,7 +45,7 @@ export const Body = observer(function Body() {
   });
 
   return styled(useStyles(bodyStyles))(
-    <theme ref={ref} as="div">
+    <theme ref={ref}>
       {Screen && <Screen />}
       <DialogsPortal />
       <Notifications />

@@ -10,24 +10,26 @@ import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
+import { UserMenuService } from './UserMenu/UserMenuService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private serverService: ServerService,
+    private serverConfigResource: ServerConfigResource,
     private authDialogService: AuthDialogService,
     private authenticationService: AuthenticationService,
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService,
+    private userMenuService: UserMenuService,
     private readonly serverConfigurationService: ServerConfigurationService
   ) {
     super();
@@ -39,9 +41,9 @@ export class PluginBootstrap extends Bootstrap {
       {
         id: 'login',
         order: 0,
-        isHidden: () => !this.serverService.config.data?.authenticationEnabled || !!this.authInfoService.userInfo,
+        isHidden: () => this.serverConfigResource.enabledAuthProviders.length === 0 || !!this.authInfoService.userInfo,
         title: 'authentication_login',
-        onClick: () => this.authDialogService.showLoginForm(),
+        onClick: () => this.authDialogService.showLoginForm(false, null, true),
       }
     );
 
@@ -55,7 +57,7 @@ export class PluginBootstrap extends Bootstrap {
         onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
     );
-
+    this.userMenuService.register();
     this.topNavService.placeholder.add(UserInfo, 4);
     this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);

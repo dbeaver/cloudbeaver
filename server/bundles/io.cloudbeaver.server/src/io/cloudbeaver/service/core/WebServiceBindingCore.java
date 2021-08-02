@@ -79,13 +79,15 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         ;
 
         model.getMutationType()
-            .dataFetcher("openSession", env -> getService(env).openSession(sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false)))
+            .dataFetcher("openSession", env -> getService(env).openSession(
+                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env), false)))
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
-            .dataFetcher("touchSession", env -> getService(env).touchSession(GraphQLEndpoint.getServletRequest(env)))
-            .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(GraphQLEndpoint.getServletRequest(env)))
+            .dataFetcher("touchSession", env -> getService(env).touchSession(
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
+            .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
-            .dataFetcher("openConnection", env -> getService(env).openConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("updateConnection", env -> getService(env).updateConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id")))

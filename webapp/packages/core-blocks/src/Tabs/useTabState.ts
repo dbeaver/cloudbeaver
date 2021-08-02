@@ -20,7 +20,5 @@ export function useTabState<T>(valueGetter?: MetadataValueGetter<string, T>): T 
     throw new Error('Tabs context was not provided');
   }
 
-  const tabInfo = state.getTabInfo(tabContext.tabId);
-
-  return state.tabsState.get(tabContext.tabId, valueGetter || tabInfo?.stateGetter?.(state.props));
+  return state.getTabState(tabContext.tabId, valueGetter);
 }

@@ -30,13 +30,16 @@ public class CBConstants {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String RUNTIME_DATA_DIR_NAME = ".data";
-    public static final String RUNTIME_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
+    public static final String RUNTIME_APP_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
+    public static final String RUNTIME_PRODUCT_CONFIG_FILE_NAME = ".product.runtime.conf";
+    public static final String AUTO_CONFIG_FILE_NAME = ".cloudbeaver.auto.conf";
 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 
     public static final String PARAM_SERVER_PORT = "serverPort";
     public static final String PARAM_SERVER_NAME = "serverName";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
+    public static final String PARAM_SERVER_URL = "serverURL";
     public static final String PARAM_ROOT_URI = "rootURI";
     public static final String PARAM_SERVICES_URI = "serviceURI";
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
@@ -66,9 +69,15 @@ public class CBConstants {
 
     public static final String DEFAUL_APP_ANONYMOUS_ROLE_NAME = "user";
 
+
+    public static final String DEFAULT_SERVER_ADDR = "localhost";
+
     public static final String VAR_CB_LOCAL_HOST_ADDR = "CB_LOCAL_HOST_ADDR";
-
-
     public static final String VAR_HOST_DOCKER_INTERNAL = "host.docker.internal";
+
+    public static final String VAR_AUTO_CB_SERVER_NAME = "CB_SERVER_NAME";
+    public static final String VAR_AUTO_CB_SERVER_URL = "CB_SERVER_URL";
+    public static final String VAR_AUTO_CB_ADMIN_NAME = "CB_ADMIN_NAME";
+    public static final String VAR_AUTO_CB_ADMIN_PASSWORD = "CB_ADMIN_PASSWORD";
 
 }

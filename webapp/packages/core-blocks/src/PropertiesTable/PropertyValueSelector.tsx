@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   useMenuState,
   Menu,
@@ -57,25 +57,25 @@ const styles = composes(
   `
 );
 
-type Props = React.PropsWithChildren<{
+interface Props {
   propertyName?: string;
   values: string[];
   onSelect: (value: string) => void;
   onSwitch: (state: boolean) => void;
-}>;
+}
 
-export const PropertyValueSelector = observer(function PropertyValueSelector({
+export const PropertyValueSelector: React.FC<Props> = observer(function PropertyValueSelector({
   propertyName,
   values,
   children,
   onSelect,
   onSwitch,
-}: Props) {
+}) {
   const menu = useMenuState();
   const handleMenuSelect = useCallback(
-    (value: string) => {
+    (event: React.MouseEvent<HTMLButtonElement>) => {
       menu.hide();
-      onSelect(value);
+      onSelect(event.currentTarget.id);
     },
     [menu, onSelect]
   );
@@ -85,8 +85,8 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
     <>
       <MenuButton {...menu}>{children}</MenuButton>
       <Menu {...menu} aria-label={propertyName}>
-        {values.map(value => (
-          <MenuItem key={value} type='button' {...menu} onClick={() => handleMenuSelect(value)}>
+        {menu.visible && values.map(value => (
+          <MenuItem key={value} id={value} type='button' {...menu} onClick={handleMenuSelect}>
             {value}
           </MenuItem>
         ))}

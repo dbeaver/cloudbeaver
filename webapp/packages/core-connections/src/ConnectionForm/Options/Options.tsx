@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   InputFieldNew,
   SubmittingForm,
@@ -31,12 +31,14 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
+import { isLocalConnection } from '../../Administration/ConnectionsResource';
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import { IConnectionFormTabProps, ConnectionFormService } from '../ConnectionFormService';
-import { useConnectionData } from '../useConnectionData';
+import { ConnectionFormService } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ParametersFormNew } from './ParametersFormNew';
 import { useOptions } from './useOptions';
 
@@ -47,78 +49,35 @@ const styles = css`
   }
 `;
 
-export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function Options(props) {
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options(props) {
   const {
-    data,
-    form,
-    options,
+    state,
   } = props;
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
+  const {
+    info,
+    config,
+    availableDrivers,
+    submittingTask: submittingHandlers,
+    save,
+    readonly,
+    disabled,
+  } = state;
 
-  useFormValidator(form.submittingHandlers.for(service.formValidationTask), formRef);
-  useConnectionData(data, action((data, update) => {
-    if (!data.config.credentials || update) {
-      data.config.credentials = {};
-      data.config.saveCredentials = false;
-    }
+  const authentication = useAuthenticationAction({
+    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+  });
 
-    if (!data.config.providerProperties || update) {
-      data.config.providerProperties = {};
-    }
-
-    if ((!data.availableDrivers || data.availableDrivers.length === 0) && data.config.driverId) {
-      data.availableDrivers = [data.config.driverId];
-    }
-
-    if (!data.info) {
-      return;
-    }
-
-    data.config.connectionId = data.info.id;
-
-    data.config.name = data.info.name;
-    data.config.description = data.info.description;
-    data.config.template = data.info.template;
-    data.config.driverId = data.info.driverId;
-
-    if (!data.availableDrivers || data.availableDrivers.length === 0) {
-      data.availableDrivers = [data.info.driverId];
-    }
-
-    data.config.host = data.info.host;
-    data.config.port = data.info.port;
-    data.config.databaseName = data.info.databaseName;
-    data.config.url = data.info.url;
-
-    data.config.authModelId = data.info.authModel;
-    data.config.saveCredentials = data.info.saveCredentials;
-
-    if (data.info.authProperties) {
-      for (const property of data.info.authProperties) {
-        if (!property.features.includes('password')) {
-          data.config.credentials[property.id!] = property.value;
-        }
-      }
-    }
-
-    if (data.info.providerProperties) {
-      data.config.providerProperties = { ...data.info.providerProperties };
-    }
-  }));
-  const optionsHook = useOptions({ data, form: form.form, options });
+  useFormValidator(submittingHandlers.for(service.formValidationTask), formRef);
+  const optionsHook = useOptions(props.state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const driver = useMapResource(
     DBDriverResource,
-    { key: data.config.driverId || null, includes: ['includeProviderProperties'] },
+    { key: config.driverId || null, includes: ['includeProviderProperties'] },
     {
-      onLoad: async () => {
-        if (!data.config.driverId && data.info) {
-          data.info.authModel = undefined;
-        }
-      },
       onData: (data, resource, prevData) => optionsHook.setDefaults(data, prevData),
     }
   );
@@ -131,21 +90,22 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
   const { data: authModel } = useMapResource(
     DatabaseAuthModelsResource,
-    data.info?.authModel || driver.data?.defaultAuthModel || null,
+    info?.authModel || driver.data?.defaultAuthModel || null,
     {
       onData: data => optionsHook.setAuthModel(data),
     }
   );
 
-  const JDBC = isJDBCConnection(driver.data, data.info);
-  const admin = options.type === 'admin';
-  const edit = options.mode === 'edit';
+  const JDBC = isJDBCConnection(driver.data, info);
+  const admin = state.type === 'admin';
+  const edit = state.mode === 'edit';
+  const originLocal = !info || isLocalConnection(info);
 
-  const drivers = driver.resource.values.filter(({ id }) => data.availableDrivers?.includes(id));
+  const drivers = driver.resource.values.filter(({ id }) => availableDrivers?.includes(id));
   let properties = authModel?.properties;
 
-  if (data.info && data.info.authProperties.length > 0) {
-    properties = data.info.authProperties;
+  if (info?.authProperties && info.authProperties.length > 0) {
+    properties = info.authProperties;
   }
 
   // TODO we need to get these values other way
@@ -153,19 +113,19 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
   const booleanProviderProperties = driver.data?.providerProperties?.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
-    <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
+    <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={save}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
             <Container wrap gap>
               <ComboboxNew
                 name='driverId'
-                state={data.config}
+                state={config}
                 items={drivers}
                 keySelector={driver => driver.id}
                 valueSelector={driver => driver?.name ?? ''}
-                readOnly={form.form.readonly || edit || drivers.length < 2}
-                disabled={form.form.disabled}
+                readOnly={readonly || edit || drivers.length < 2}
+                disabled={disabled}
                 tiny
                 fill
               >
@@ -175,9 +135,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 type="text"
                 name="name"
                 minLength={1}
-                state={data.config}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
+                state={config}
+                disabled={disabled}
+                readOnly={readonly}
                 mod='surface'
                 required
                 tiny
@@ -190,30 +150,30 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
               <InputFieldNew
                 type="text"
                 name="url"
-                state={data.config}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
-                autoComplete={`section-${data.config.driverId || 'driver'} section-jdbc`}
+                state={config}
+                disabled={disabled}
+                readOnly={readonly}
+                autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
                 mod='surface'
               >
                 {translate('customConnection_url_JDBC')}
               </InputFieldNew>
             ) : (
               <ParametersFormNew
-                config={data.config}
+                config={config}
                 embedded={driver.data?.embedded}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
-                originLocal={form.form.originLocal}
+                disabled={disabled}
+                readOnly={readonly}
+                originLocal={originLocal}
               />
             )}
-            {admin && form.form.originLocal && (
+            {admin && originLocal && (
               <FieldCheckboxNew
+                id={config.connectionId}
                 name="template"
-                value={data.config.connectionId}
-                state={data.config}
-                disabled={edit || form.form.disabled}
-                readOnly={form.form.readonly}
+                state={config}
+                disabled={edit || disabled}
+                readOnly={readonly}
                 // autoHide={} // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
@@ -222,35 +182,35 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
             <TextareaNew
               name="description"
               rows={3}
-              state={data.config}
-              disabled={form.form.disabled}
-              readOnly={form.form.readonly}
+              state={config}
+              disabled={disabled}
+              readOnly={readonly}
             >
               {translate('connections_connection_description')}
             </TextareaNew>
           </Group>
         </Container>
         <Container medium gap>
-          {(authModel && !driver.data?.anonymousAccess) && (
+          {(authModel && !driver.data?.anonymousAccess && properties && authentication.authorized) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <Container wrap gap>
                 <ObjectPropertyInfoFormNew
                   autofillToken='new-password'
                   properties={properties}
-                  state={data.config.credentials}
-                  disabled={form.form.disabled}
-                  readOnly={form.form.readonly}
+                  state={config.credentials}
+                  disabled={disabled}
+                  readOnly={readonly}
                   showRememberTip
                   tiny
                 />
               </Container>
               {credentialsSavingEnabled && (
                 <FieldCheckboxNew
+                  id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
-                  value={data.config.connectionId + 'authNeeded'}
-                  state={data.config}
-                  disabled={form.form.disabled || form.form.readonly}
+                  state={config}
+                  disabled={disabled || readonly}
                 >{translate('connections_connection_edit_save_credentials')}
                 </FieldCheckboxNew>
               )}
@@ -263,9 +223,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 <Container gap wrap>
                   <ObjectPropertyInfoFormNew
                     properties={booleanProviderProperties}
-                    state={data.config.providerProperties}
-                    disabled={form.form.disabled}
-                    readOnly={form.form.readonly}
+                    state={config.providerProperties}
+                    disabled={disabled}
+                    readOnly={readonly}
                     keepSize
                   />
                 </Container>
@@ -274,9 +234,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 <Container wrap gap>
                   <ObjectPropertyInfoFormNew
                     properties={providerPropertiesWithoutBoolean}
-                    state={data.config.providerProperties}
-                    disabled={form.form.disabled}
-                    readOnly={form.form.readonly}
+                    state={config.providerProperties}
+                    disabled={disabled}
+                    readOnly={readonly}
                     tiny
                   />
                 </Container>

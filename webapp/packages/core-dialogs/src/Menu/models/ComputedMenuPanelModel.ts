@@ -8,7 +8,7 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import type { IMenuItem, IMenuPanel } from '../IMenuPanel';
 
 export interface IComputedMenuPanelOptions {
   id: string;

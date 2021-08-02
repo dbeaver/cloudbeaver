@@ -8,8 +8,8 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, DataTransferParameters, EnvironmentService } from '@cloudbeaver/core-sdk';
-import { Deferred, OrderedMap } from '@cloudbeaver/core-utils';
+import { GraphQLService, DataTransferParameters } from '@cloudbeaver/core-sdk';
+import { Deferred, GlobalConstants, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
@@ -33,8 +33,7 @@ export class DataExportProcessService {
 
   constructor(
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private environmentService: EnvironmentService
+    private notificationService: NotificationService
   ) { }
 
   async cancel(exportId: string): Promise<void> {
@@ -83,7 +82,7 @@ export class DataExportProcessService {
     if (!dataFileId) {
       return;
     }
-    return `${this.environmentService.staticEndpoint}/data/${dataFileId}`;
+    return GlobalConstants.absoluteServiceUrl('/data/', dataFileId);
   }
 
   async exportData(

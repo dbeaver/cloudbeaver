@@ -12,5 +12,6 @@ export interface IDatabaseDataResult {
   id: string;
   dataFormat: ResultDataFormat;
   loadedFully: boolean;
+  updateRowCount: number;
   data: any;
 }

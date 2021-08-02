@@ -6,59 +6,56 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
-
+import type { ConnectionExecutionContextService, IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
-import { EDeferredState } from '@cloudbeaver/core-utils';
+import type { ITask } from '@cloudbeaver/core-executor';
+import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataEditor } from './DatabaseDataModel/DatabaseDataEditor';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
+import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
-import type { IExecutionContext } from './IExecutionContext';
 
-export interface IDataContainerOptions {
+export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
-  sourceName?: string; // TODO: should be refactored, used only in QueryDataSource
-  connectionId: string;
-  whereFilter: string;
-  constraints: SqlDataFilterConstraint[];
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
-  currentFetchTableProcess: FetchTableDataAsyncProcess | null;
+  currentTask: ITask<SqlExecuteInfo> | null;
 
   get canCancel(): boolean {
-    return this.currentFetchTableProcess?.getState() === EDeferredState.PENDING;
+    return this.currentTask?.cancellable || false;
   }
 
   constructor(
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
+    private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
     super();
 
-    makeObservable(this, {
-      currentFetchTableProcess: observable,
-    });
-
-    this.currentFetchTableProcess = null;
+    this.currentTask = null;
     this.executionContext = null;
     this.editor = new DatabaseDataEditor();
   }
 
-  cancel(): boolean {
-    if (this.currentFetchTableProcess) {
-      return this.currentFetchTableProcess.cancel();
+  isDisabled(resultIndex: number): boolean {
+    return !this.getResult(resultIndex)?.data && this.error === null;
+  }
+
+  async cancel(): Promise<void> {
+    if (this.currentTask) {
+      await this.currentTask.cancel();
     }
-    return false;
   }
 
   async request(
     prevResults: IDatabaseResultSet[]
   ): Promise<IDatabaseResultSet[]> {
-    if (!this.options?.containerNodePath) {
+    const options = this.options;
+
+    if (!options) {
       throw new Error('containerNodePath must be provided for table');
     }
 
@@ -68,29 +65,33 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
 
-    fetchTableProcess.start(
-      {
-        connectionId: executionContext.connectionId,
-        contextId: executionContext.contextId,
-        containerNodePath: this.options.containerNodePath,
-      },
-      {
-        offset,
-        limit,
-        constraints: this.options.constraints,
-        where: this.options.whereFilter || undefined,
-      },
-      this.dataFormat,
-    );
+    this.currentTask = executionContext.run(async () => {
+      await fetchTableProcess.start(
+        {
+          connectionId: executionContext.context!.connectionId,
+          contextId: executionContext.context!.id,
+          containerNodePath: options.containerNodePath,
+        },
+        {
+          offset,
+          limit,
+          constraints: options.constraints,
+          where: options.whereFilter || undefined,
+        },
+        this.dataFormat,
+      );
 
-    this.currentFetchTableProcess = fetchTableProcess;
+      return fetchTableProcess.promise;
+    }, () => { fetchTableProcess.cancel(); });
 
     try {
-      const response = await fetchTableProcess.promise;
+      const response = await this.currentTask;
 
       this.requestInfo = {
         requestDuration: response?.duration || 0,
         requestMessage: response?.statusMessage || '',
+        requestFilter: response.filterText || '',
+        source: null,
       };
 
       this.clearError();
@@ -102,6 +103,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       return response.results.map<IDatabaseResultSet>(result => ({
         id: result.resultSet?.id || '0',
         dataFormat: result.dataFormat!,
+        updateRowCount: result.updateRowCount || 0,
         loadedFully: (result.resultSet?.rows?.length || 0) < limit,
         data: result.resultSet,
       }));
@@ -125,8 +127,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     try {
       for (const update of changes) {
         const response = await this.graphQLService.sdk.updateResultsDataBatch({
-          connectionId: executionContext.connectionId,
-          contextId: executionContext.contextId,
+          connectionId: executionContext.context!.connectionId,
+          contextId: executionContext.context!.id,
           resultsId: update.resultId,
           updatedRows: Array.from(update.diff.values()).map(diff => ({
             data: diff.source,
@@ -140,8 +142,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         });
 
         this.requestInfo = {
+          ...this.requestInfo,
           requestDuration: response.result?.duration || 0,
           requestMessage: 'Saved successfully',
+          source: null,
         };
 
         const result = prevResults.find(result => result.id === update.resultId)!;
@@ -167,39 +171,16 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   async dispose(): Promise<void> {
-    if (this.executionContext) {
-      await this.graphQLService.sdk.sqlContextDestroy({
-        connectionId: this.executionContext.connectionId,
-        contextId: this.executionContext.contextId,
-      });
-    }
+    await this.executionContext?.destroy();
   }
 
-  private async ensureContextCreated(): Promise<IExecutionContext> {
-    if (!this.executionContext) {
+  private async ensureContextCreated(): Promise<IConnectionExecutionContext> {
+    if (!this.executionContext?.context) {
       if (!this.options) {
         throw new Error('Options must be provided');
       }
-      this.executionContext = await this.createExecutionContext(this.options.connectionId);
+      this.executionContext = await this.connectionExecutionContextService.create(this.options.connectionId);
     }
     return this.executionContext;
-  }
-
-  private async createExecutionContext(
-    connectionId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IExecutionContext> {
-    const response = await this.graphQLService.sdk.sqlContextCreate({
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    });
-    return {
-      contextId: response.context.id,
-      connectionId,
-      objectCatalogId: response.context.defaultCatalog,
-      objectSchemaId: response.context.defaultSchema,
-    };
   }
 }

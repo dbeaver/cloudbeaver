@@ -9,7 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
+import { useMapResource } from '@cloudbeaver/core-blocks';
+import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
+import { EPermission, usePermission } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { TopMenuItem } from '../../shared/TopMenuItem';
@@ -23,6 +26,11 @@ const menuStyles = css`
 `;
 
 const connectionMenu = css`
+  MenuItem IconOrImage {
+    background-color: #fff;
+    padding: 2px;
+    border-radius: 2px;
+  }
   menu-trigger-icon {
     background-color: #fff;
     border-radius: 4px;
@@ -34,7 +42,7 @@ const connectionMenu = css`
   }
 `;
 
-const style = css`
+const styles = css`
   connection-selector {
     display: flex;
     height: 100%;
@@ -47,11 +55,18 @@ const style = css`
   }
 `;
 export const ConnectionSelector = observer(function ConnectionSelector() {
+  const style = useStyles(styles);
   const controller = useController(ConnectionSelectorController);
+  const isEnabled = usePermission(EPermission.public);
+  const driver = useMapResource(DBDriverResource, null, { onLoad: resource => isEnabled && resource.loadAll() });
   const ConnectionMenu = TopMenuItem;
   const SchemaOrCatalogMenu = TopMenuItem;
 
-  return styled(useStyles(style))(
+  if (!isEnabled || !driver.isLoaded()) {
+    return null;
+  }
+
+  return styled(style)(
     <connection-selector as="div" {...use({ isVisible: controller.isConnectionSelectorVisible })}>
       <ConnectionMenu menuItem={controller.connectionMenu} style={[menuStyles, connectionMenu]} />
       {controller.isObjectContainerSelectorVisible && (

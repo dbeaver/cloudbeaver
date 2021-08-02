@@ -14,6 +14,7 @@ import type { ITabData } from '../TabsContainer/ITabsContainer';
 
 export type TabProps = PropsWithChildren<{
   tabId: string;
+  title?: string;
   disabled?: boolean;
   className?: string;
   style?: ComponentStyle;

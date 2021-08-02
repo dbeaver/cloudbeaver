@@ -8,11 +8,13 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource, IConnectionFormDataOptions, IConnectionFormOptions } from '@cloudbeaver/core-connections';
+import { ConnectionFormService, ConnectionInfoResource, IConnectionFormState } from '@cloudbeaver/core-connections';
+import { ConnectionFormState } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { PublicConnectionForm } from './PublicConnectionForm';
@@ -21,37 +23,43 @@ const formGetter = () => PublicConnectionForm;
 
 @injectable()
 export class PublicConnectionFormService {
-  options: IConnectionFormOptions;
-  dataOptions: IConnectionFormDataOptions | null;
+  formState: IConnectionFormState | null;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly optionsPanelService: OptionsPanelService,
-    private readonly connectionInfoResource: ConnectionInfoResource
+    private readonly connectionFormService: ConnectionFormService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly sessionDataResource: SessionDataResource
   ) {
     makeObservable(this, {
-      dataOptions: observable,
-      options: observable,
+      formState: observable.shallow,
+      change: action,
       open: action,
       close: action,
     });
-
-    this.options = {
-      mode: 'create',
-      type: 'public',
-    };
-    this.dataOptions = null;
+    this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
-    this.connectionInfoResource.onItemDelete.addHandler(this.closeDeleted);
+    this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeDeleted);
+    // this.sessionDataResource.onDataOutdated.addHandler(() => {
+    //   this.close(true);
+    // });
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {
-    this.dataOptions = {
-      config: { ...config },
-      availableDrivers: availableDrivers,
-      resource: this.connectionInfoResource,
-    };
-    this.options.mode = config.connectionId ? 'edit' : 'create';
+    if (!this.formState) {
+      this.formState = new ConnectionFormState(
+        this.connectionFormService,
+        this.connectionInfoResource
+      );
+    }
+
+    this.formState
+      .setOptions(config.connectionId ? 'edit' : 'create', 'public')
+      .setConfig(config)
+      .setAvailableDrivers(availableDrivers || []);
+
+    this.formState.load();
   }
 
   async open(config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
@@ -66,35 +74,41 @@ export class PublicConnectionFormService {
 
   async close(saved?: boolean): Promise<void> {
     if (saved) {
-      this.dataOptions = null;
+      this.clearFormState();
     }
 
     const state = await this.optionsPanelService.close();
 
     if (state) {
-      this.dataOptions = null;
+      this.clearFormState();
     }
   }
 
-  private closeDeleted: IExecutorHandler<ResourceKey<string>> = async (data, contexts) => {
-    if (!this.dataOptions) {
+  private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+    if (!this.formState || !this.formState.config.connectionId) {
       return;
     }
 
-    if (ResourceKeyUtils.includes(data, this.dataOptions.config.connectionId)) {
-      this.close();
+    if (!this.connectionInfoResource.has(this.formState.config.connectionId)) {
+      this.close(true);
     }
   };
 
   private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (
-      !this.dataOptions
-      || this.optionsPanelService.panelComponent !== formGetter
+      !this.formState
+      || !this.optionsPanelService.isOpen(formGetter)
       || (
-        this.dataOptions.config.connectionId
-        && !this.connectionInfoResource.has(this.dataOptions.config.connectionId)
+        this.formState.config.connectionId
+        && !this.connectionInfoResource.has(this.formState.config.connectionId)
       )
     ) {
+      return;
+    }
+
+    const state = await this.formState.checkFormState();
+
+    if (!state?.edited) {
       return;
     }
 
@@ -108,4 +122,9 @@ export class PublicConnectionFormService {
       ExecutorInterrupter.interrupt(contexts);
     }
   };
+
+  private clearFormState() {
+    this.formState?.dispose();
+    this.formState = null;
+  }
 }

@@ -8,16 +8,17 @@
 
 $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
-$mdc-theme-secondary: #1b1b1d;
+$mdc-theme-secondary: hsl(240deg, 10%, 15%);
 $mdc-theme-on-secondary: #cbcbcb;
-$mdc-theme-surface: #2b2a32;
+$mdc-theme-surface: hsl(240deg, 10%, 18%);
 $mdc-theme-on-surface: #ffffff;
-$mdc-theme-background: #474551;
+$mdc-theme-background: hsl(240deg, 10%, 26%);
 $mdc-theme-error: #e94948;
 
 $color-positive: #52c41a;
 $color-on-positive: #fff;
 $color-negative: #e73e52;
+$color-status: #a08600;
 
 $link-color: $mdc-theme-primary;
 $link-color-focus: #3f96d1;
@@ -48,18 +49,18 @@ $mdc-theme-text-colors: (
 
 $mdc-ripple-dark-ink-opacities: (
   hover: 0.04,
-  focus: 0.12,
-  press: 0.12,
-  selected: 0.08,
-  activated: 0.12,
+  focus: 0.10,
+  press: 0.10,
+  selected: 0.06,
+  activated: 0.10,
 ) !default;
 
 $mdc-ripple-light-ink-opacities: (
   hover: 0.04,
-  focus: 0.12,
-  press: 0.12,
-  selected: 0.08,
-  activated: 0.12,
+  focus: 0.10,
+  press: 0.10,
+  selected: 0.06,
+  activated: 0.10,
 ) !default;
 
 $theme-name: "dark";

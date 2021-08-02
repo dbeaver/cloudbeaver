@@ -10,16 +10,31 @@ import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, isResourceKeyList, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments } from '@cloudbeaver/core-sdk';
+import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader } from '@cloudbeaver/core-sdk';
 
 import { useObjectRef } from './useObjectRef';
 
-interface IActions<TResource extends CachedMapResource<any, any, any>> {
+interface IActions<
+  TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
+  TResource extends CachedMapResource<any, any, any>,
+  TIncludes
+> {
+  isActive?: () => Promise<boolean> | boolean;
   onLoad?: (resource: TResource) => Promise<any> | any;
   onData?: (
-    data: CachedMapResourceValue<TResource>,
+    data: CachedMapResourceLoader<
+    TKeyArg,
+    CachedMapResourceKey<TResource>,
+    CachedMapResourceValue<TResource>,
+    TIncludes
+    >,
     resource: TResource,
-    prevData: CachedMapResourceValue<TResource> | undefined,
+    prevData: CachedMapResourceLoader<
+    TKeyArg,
+    CachedMapResourceKey<TResource>,
+    CachedMapResourceValue<TResource>,
+    TIncludes
+    > | undefined,
   ) => Promise<any> | any;
   onError?: (exception: Error) => void;
 }
@@ -52,13 +67,13 @@ export function useMapResource<
 >(
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
-  actions?: IActions<TResource>
+  actions?: TResource extends any ? IActions<TKeyArg, TResource, TIncludes> : never
 ): IMapResourceResult<TKeyArg, TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
-  let key: TKeyArg = keyObj as TKeyArg;
+  let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as TIncludes;
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
@@ -73,7 +88,12 @@ export function useMapResource<
     exception,
     includes,
     actions,
-    prevData: (isResourceKeyList(key) ? [] : undefined) as CachedMapResourceValue<TResource> | undefined,
+    prevData: undefined as CachedMapResourceLoader<
+    TKeyArg,
+    CachedMapResourceKey<TResource>,
+    CachedMapResourceValue<TResource>,
+    TIncludes
+    > | undefined,
     load: () => {},
   }, {
     resource,
@@ -88,7 +108,9 @@ export function useMapResource<
   refObj.load = async function load() {
     const { loading, resource, actions, prevData } = refObj;
 
-    if (loading) {
+    const active = await actions?.isActive?.();
+
+    if (loading || active === false) {
       return;
     }
 

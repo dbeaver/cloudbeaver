@@ -30,6 +30,31 @@
 
   .rdg-cell {
     border-color: transparent;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .text-formatter {
+    display: flex;
+    align-items: center;
+    & a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    & svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .text-formatter_value {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .rdg-cell-editing {

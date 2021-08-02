@@ -319,6 +319,15 @@ public class GraphQLEndpoint extends HttpServlet {
         return request;
     }
 
+    public static HttpServletResponse getServletResponse(DataFetchingEnvironment env) {
+        GraphQLContext context = env.getContext();
+        HttpServletResponse response = context.get("response");
+        if (response == null) {
+            throw new IllegalStateException("Null response");
+        }
+        return response;
+    }
+
     public static GraphQLBindingContext getBindingContext(DataFetchingEnvironment env) {
         GraphQLContext context = env.getContext();
         return context.get("bindingContext");

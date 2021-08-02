@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { forwardRef } from 'react';
+
+import { filterContainerFakeProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
 
-export const ColoredContainer: React.FC<IContainerProps> = function ColoredContainer({ children, className }) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
-};
+export const ColoredContainer = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function ColoredContainer(props, ref) {
+  const divProps = filterContainerFakeProps(props);
+
+  return <div ref={ref} {...divProps} />;
+});

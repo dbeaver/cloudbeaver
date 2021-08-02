@@ -11,7 +11,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
   readonly requestInfo: IRequestInfo;
@@ -19,6 +19,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   readonly countGain: number;
 
   isReadonly: () => boolean;
+  isDisabled: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
 
@@ -31,8 +32,11 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
 
+  retry: () => Promise<void>;
   refresh: () => Promise<void>;
   reload: () => Promise<void>;
   requestDataPortion: (offset: number, count: number) => Promise<void>;
   requestData: () => Promise<void>;
+  cancel: () => Promise<void> | void;
+  dispose: () => Promise<void>;
 }

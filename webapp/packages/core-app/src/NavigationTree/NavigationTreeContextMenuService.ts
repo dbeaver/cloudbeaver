@@ -177,9 +177,13 @@ export class NavigationTreeContextMenuService extends Bootstrap {
         },
         order: Number.MAX_SAFE_INTEGER,
         title: 'app_navigationTree_refreshNode',
-        onClick: context => {
+        onClick: async context => {
           const node = context.data;
-          this.navNodeManagerService.refreshTree(node.id);
+          try {
+            await this.navNodeManagerService.refreshTree(node.id);
+          } catch (exception) {
+            this.notificationService.logException(exception, 'Failed to refresh node');
+          }
         },
       }
     );

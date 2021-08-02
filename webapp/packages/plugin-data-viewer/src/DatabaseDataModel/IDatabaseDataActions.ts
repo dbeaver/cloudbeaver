@@ -9,10 +9,10 @@
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
-export interface IDatabaseDataActions<TResult extends IDatabaseDataResult> {
-  get: <T extends IDatabaseDataAction<TResult>>(
+export interface IDatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> {
+  get: <T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
-    action: IDatabaseDataActionClass<TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
 
   updateResults: (results: TResult[]) => void;

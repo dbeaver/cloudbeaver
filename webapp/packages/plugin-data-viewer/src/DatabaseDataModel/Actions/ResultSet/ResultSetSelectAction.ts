@@ -11,24 +11,25 @@ import { makeObservable, observable } from 'mobx';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { DatabaseDataAction } from '../../DatabaseDataAction';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
+import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
-export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultSetElementKey, IDatabaseResultSet> {
+export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseDataSelectAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  result: IDatabaseResultSet;
-
-  readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetElementKey>>;
+  readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetElementKey>>;
   readonly selectedElements: Map<number, number[]>;
 
   private focusedElement: IResultSetElementKey | null;
 
-  constructor(result: IDatabaseResultSet) {
-    this.result = result;
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+    super(source, result);
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
@@ -37,10 +38,6 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
       selectedElements: observable,
       focusedElement: observable,
     });
-  }
-
-  updateResult(result: IDatabaseResultSet): void {
-    this.result = result;
   }
 
   isSelected(): boolean {

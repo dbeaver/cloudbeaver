@@ -150,6 +150,10 @@ public class WebSQLContextInfo {
         return id;
     }
 
+    public String getConnectionId() {
+        return processor.getConnection().getId();
+    }
+
     public String getDefaultCatalog() {
         return defaultCatalog == null ? null : defaultCatalog.getName();
     }

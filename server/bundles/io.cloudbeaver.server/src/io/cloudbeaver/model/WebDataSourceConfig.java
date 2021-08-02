@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.WebServiceUtils;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.meta.Property;
 
@@ -40,7 +39,7 @@ public class WebDataSourceConfig {
         this.id = ds.getId();
         this.name = ds.getName();
         this.description = ds.getDescription();
-        this.driverId = WebServiceUtils.makeDriverFullId(ds.getDriver());
+        this.driverId = ds.getDriver().getFullId();
         this.host = ds.getConnectionConfiguration().getHostName();
         this.port = ds.getConnectionConfiguration().getHostPort();
         this.url = ds.getConnectionConfiguration().getUrl();

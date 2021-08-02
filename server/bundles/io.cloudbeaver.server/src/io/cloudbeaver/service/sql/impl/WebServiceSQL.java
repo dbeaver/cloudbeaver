@@ -20,15 +20,19 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.*;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -37,9 +41,14 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
+import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +56,30 @@ import java.util.Map;
  * Web service implementation
  */
 public class WebServiceSQL implements DBWServiceSQL {
+
+    @Override
+    public WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException {
+        List<WebConnectionInfo> conToRead = new ArrayList<>();
+        if (connectionId != null) {
+            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, connectionId);
+            conToRead.add(webConnection);
+        } else {
+            conToRead.addAll(session.getConnections());
+        }
+
+        List<WebSQLContextInfo> contexts  = new ArrayList<>();
+        for (WebConnectionInfo con : conToRead) {
+            WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con, false);
+            if (sqlProcessor != null) {
+                WebSQLContextInfo[] conContexts = sqlProcessor.getContexts();
+                contexts.addAll(Arrays.asList(conContexts));
+            }
+        }
+        if (contextId != null) {
+            contexts.removeIf(c -> !c.getId().equals(contextId));
+        }
+        return contexts.toArray(new WebSQLContextInfo[0]);
+    }
 
     @Override
     @NotNull
@@ -57,19 +90,43 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    public WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException {
+    public WebSQLCompletionProposal[] getCompletionProposals(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String query,
+        Integer position,
+        Integer maxResults,
+        Boolean simpleMode) throws DBWebException
+    {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
+
             Document document = new Document();
             document.set(query);
-            SQLScriptElement activeQuery = new SQLQuery(dataSource, query);
+
+            WebSQLCompletionContext completionContext = new WebSQLCompletionContext(sqlContext);
+
+            SQLScriptElement activeQuery;
+
+            if (position != null) {
+                SQLParserContext parserContext = new SQLParserContext(
+                    () -> sqlContext.getProcessor().getExecutionContext(),
+                    completionContext.getSyntaxManager(),
+                    completionContext.getRuleManager(),
+                    document);
+                activeQuery = SQLScriptParser.extractActiveQuery(parserContext, position, 0);
+            } else {
+                activeQuery = new SQLQuery(dataSource, query);
+            }
+
+
             SQLCompletionRequest request = new SQLCompletionRequest(
-                new WebSQLCompletionContext(sqlContext),
+                completionContext,
                 document,
                 position == null ? 0 : position,
                 activeQuery,
-                false
+                CommonUtils.getBoolean(simpleMode, false)
             );
+
             SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
             analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
             List<SQLCompletionProposalBase> proposals = analyzer.getProposals();
@@ -86,6 +143,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         } catch (DBException e) {
             throw new DBWebException("Error processing SQL proposals", e);
         }
+    }
+
+    @Override
+    public DBCLogicalOperator[] getSupportedOperations(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, int attributeIndex) throws DBWebException {
+        WebSQLResultsInfo results = contextInfo.getResults(resultsId);
+        if (attributeIndex < 0 || attributeIndex >= results.getAttributes().length) {
+            throw new DBWebException("Invalid attribute index (" + attributeIndex + ")");
+        }
+        DBDAttributeBinding attribute = results.getAttributes()[attributeIndex];
+        return attribute.getValueHandler().getSupportedOperators(attribute);
     }
 
     @Override
@@ -199,5 +266,36 @@ public class WebServiceSQL implements DBWServiceSQL {
         return null;
     }
 
+    ////////////////////////////////////////////////////
+    // Explain plan
 
+    @Override
+    public WebAsyncTaskInfo asyncSqlExplainExecutionPlan(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @NotNull Map<String, Object> configuration) throws DBException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                try {
+                    monitor.beginTask("Explain execution plan", 1);
+                    monitor.subTask("Explain query [" + sql + "] execution plan");
+                    WebSQLExecutionPlan executeResults = contextInfo.getProcessor().explainExecutionPlan(monitor, contextInfo, sql, configuration);
+                    this.result = "Execution plan explain has been scheduled";
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL query execution plan explain", runnable);
+    }
+
+    @Override
+    public WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
+        if (taskStatus != null) {
+            return (WebSQLExecutionPlan) taskStatus.getExtendedResult();
+        }
+        return null;
+    }
 }

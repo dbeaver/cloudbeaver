@@ -15,15 +15,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 
-const productInfoDialogStyles = composes(
-  css`
-    IconOrImage {
-      composes: theme-background-primary from global;
-    }
-  `,
-  css`
+const productInfoDialogStyles = css`
     CommonDialogWrapper {
       min-width: 600px;
     }
@@ -38,20 +32,27 @@ const productInfoDialogStyles = composes(
       display: flex;
       white-space: pre-wrap;
     }
+    FormFieldDescriptionNew {
+      white-space: pre-wrap;
+    }
     IconOrImage {
-      padding: 10px;
+      max-width: 154px;
+      height: 32px;
       border-radius: 2px;
     }
-`);
+`;
 
 export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
   function ProductInfoDialog(props) {
     const translate = useTranslate();
     const styles = useStyles(BASE_CONTAINERS_STYLES, productInfoDialogStyles);
     const serverConfigResource = useService(ServerConfigResource);
+    const themeService = useService(ThemeService);
+
     const version = useAppVersion();
 
     const productInfo = serverConfigResource.data?.productInfo;
+    const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
     return styled(styles)(
       <CommonDialogWrapper
@@ -71,7 +72,7 @@ export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
               <TextPlaceholder>{translate('app_product_info_placeholder')}</TextPlaceholder>
             ) : (
               <>
-                <IconOrImage icon="/icons/logo.svg" />
+                <IconOrImage icon={logoIcon} />
                 <FormFieldDescriptionNew label={translate('app_product_info_name')}>
                   {productInfo.name}
                 </FormFieldDescriptionNew>

@@ -43,6 +43,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.isLoading();
   }
 
+  isDisabled(resultIndex: number): boolean {
+    return this.source.isDisabled(resultIndex);
+  }
+
   isReadonly(): boolean {
     return this.source.isReadonly();
   }
@@ -90,6 +94,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this;
   }
 
+  async retry(): Promise<void> {
+    await this.source.retry();
+  }
+
   async refresh(): Promise<void> {
     await this.requestData();
   }
@@ -108,5 +116,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   async requestData(): Promise<void> {
     await this.source.requestData();
+  }
+
+  cancel(): Promise<void> | void {
+    return this.source.cancel();
+  }
+
+  async dispose(): Promise<void> {
+    await this.source.dispose();
   }
 }

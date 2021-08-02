@@ -18,8 +18,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
-import { useConnectionData } from '../useConnectionData';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const SSH_STYLES = css`
   SubmittingForm {
@@ -30,38 +29,21 @@ const SSH_STYLES = css`
   }
 `;
 
-export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function SSH({
-  data,
-  form,
+export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSH({
+  state: formState,
 }) {
+  const {
+    info,
+    config,
+    save,
+    readonly,
+    disabled: formDisabled,
+  } = formState;
   const [loading, setLoading] = useState(false);
-  const initialConfig = data.info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  useConnectionData(data, data => {
-    if (!data.config.networkHandlersConfig) {
-      data.config.networkHandlersConfig = [];
-    }
-
-    if (!data.config.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
-      data.config.networkHandlersConfig.push({
-        id: SSH_TUNNEL_ID,
-        enabled: false,
-        password: '',
-        savePassword: true,
-        userName: '',
-        ...initialConfig,
-
-        properties: {
-          port: 22,
-          host: '',
-          ...initialConfig?.properties,
-        },
-      });
-    }
-  });
-
-  const state = data.config.networkHandlersConfig!.find(state => state.id === SSH_TUNNEL_ID)!;
+  const initialConfig = info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+  const state = config.networkHandlersConfig!.find(state => state.id === SSH_TUNNEL_ID)!;
 
   const resource = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
@@ -83,7 +65,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
 
   const styles = useStyles(SSH_STYLES, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
-  const disabled = form.form.disabled || loading;
+  const disabled = formDisabled || loading;
   const enabled = state.enabled || false;
   const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
   let passwordHint = '';
@@ -93,14 +75,14 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
   }
 
   return styled(styles)(
-    <SubmittingForm onSubmit={form.save}>
+    <SubmittingForm onSubmit={save}>
       <ColoredContainer parent>
         <Group form gap keepSize large>
           <SwitchNew
             name="enabled"
             state={state}
             mod={['primary']}
-            disabled={disabled || form.form.readonly}
+            disabled={disabled || readonly}
           >
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </SwitchNew>
@@ -110,7 +92,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="host"
               state={state.properties}
               disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
+              readOnly={readonly}
               mod='surface'
               small
             >
@@ -121,7 +103,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="port"
               state={state.properties}
               disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
+              readOnly={readonly}
               mod='surface'
               tiny
             >
@@ -134,7 +116,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="userName"
               state={state}
               disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
+              readOnly={readonly}
               mod='surface'
               tiny
             >
@@ -144,9 +126,10 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               type="password"
               name="password"
               placeholder={passwordHint}
+              autoComplete='new-password'
               state={state}
               disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
+              readOnly={readonly}
               mod='surface'
               tiny
             >
@@ -155,10 +138,10 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
           </Container>
           {credentialsSavingEnabled && (
             <FieldCheckboxNew
+              id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
-              value={SSH_TUNNEL_ID + ' savePassword'}
               state={state}
-              disabled={disabled || !enabled || form.form.readonly}
+              disabled={disabled || !enabled || readonly}
             >{translate('connections_connection_edit_save_credentials')}
             </FieldCheckboxNew>
           )}
@@ -167,6 +150,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               type='button'
               mod={['outlined']}
               disabled={disabled || !enabled || !passwordFilled}
+              loader
               onClick={testConnection}
             >
               {translate('connections_network_handler_test')}

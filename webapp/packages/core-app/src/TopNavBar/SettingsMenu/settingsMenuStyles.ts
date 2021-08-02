@@ -26,13 +26,11 @@ export const settingsMenuStyles = css`
     height: 24px;
   }
   menu-panel-item {
-    flex-direction: row-reverse;
     & menu-item-text  {
       text-align: right;
-      margin-left: auto;
     }
     & Icon {
-      transform: rotate(-180deg);
+      transform: rotate(90deg);
     }
   }
 `;

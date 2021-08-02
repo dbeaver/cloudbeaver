@@ -8,15 +8,20 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { isValuesEqual } from '@cloudbeaver/core-utils';
 
-import { ConnectionsResource } from '../../Administration/ConnectionsResource';
+import { ConnectionsResource, DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { getUniqueConnectionName } from '../../getUniqueConnectionName';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import { IConnectionFormSubmitData, ConnectionFormService } from '../ConnectionFormService';
+import { connectionConfigContext } from '../connectionConfigContext';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
+import { ConnectionFormService } from '../ConnectionFormService';
+import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
 import { Options } from './Options';
 
 @injectable()
@@ -47,29 +52,33 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     this.connectionFormService.formSubmittingTask
       .addHandler(this.save.bind(this));
+
+    this.connectionFormService.formStateTask
+      .addHandler(this.formState.bind(this));
+
+    this.connectionFormService.configureTask
+      .addHandler(this.configure.bind(this));
+
+    this.connectionFormService.fillConfigTask
+      .addHandler(this.fillConfig.bind(this));
   }
 
   load(): void { }
 
   private async save(
     {
-      form,
-      data,
-      options,
+      state,
       submitType,
     }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
-    const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
-
-    form.disabled = true;
-    form.loading = true;
+    const config = contexts.getContext(connectionConfigContext);
 
     try {
-      if (options.type === 'admin') {
+      if (state.type === 'admin') {
         if (submitType === 'submit') {
-          if (options.mode === 'edit') {
+          if (state.mode === 'edit') {
             const connection = await this.connectionsResource.update(config.connectionId!, config);
             status.info('Connection updated');
             status.info(connection.name);
@@ -88,14 +97,14 @@ export class ConnectionOptionsTabService extends Bootstrap {
         }
       } else {
         if (submitType === 'submit') {
-          if (options.mode === 'edit') {
+          if (state.mode === 'edit') {
             const connection = await this.connectionInfoResource.update(config);
-            status.info('Connection updated');
+            status.info('Connection was updated');
             status.info(connection.name);
           } else {
             const connection = await this.connectionInfoResource.createConnection(config);
             config.connectionId = connection.id;
-            status.info('Connection created');
+            status.info('Connection was created');
             status.info(connection.name);
           }
         } else {
@@ -112,44 +121,95 @@ export class ConnectionOptionsTabService extends Bootstrap {
       } else {
         status.error('connections_connection_test_fail', exception);
       }
-    } finally {
-      form.disabled = false;
-      form.loading = false;
     }
   }
 
   private validate(
     {
-      data,
-      options,
+      state,
     }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
-    if (!data.config.name?.length) {
+    if (!state.config.name?.length) {
       validation.error("Field 'name' can't be empty");
     }
   }
 
+  private fillConfig(
+    { state, updated }: IConnectionFormFillConfigData,
+    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
+  ) {
+    if (!updated) {
+      return;
+    }
+
+    if (!state.config.credentials || updated) {
+      state.config.credentials = {};
+      state.config.saveCredentials = false;
+    }
+
+    if (!state.config.providerProperties || updated) {
+      state.config.providerProperties = {};
+    }
+
+    if (!state.info) {
+      return;
+    }
+
+    state.config.connectionId = state.info.id;
+
+    state.config.name = state.info.name;
+    state.config.description = state.info.description;
+    state.config.template = state.info.template;
+    state.config.driverId = state.info.driverId;
+
+    state.config.host = state.info.host;
+    state.config.port = state.info.port;
+    state.config.databaseName = state.info.databaseName;
+    state.config.url = state.info.url;
+
+    state.config.authModelId = state.info.authModel;
+    state.config.saveCredentials = state.info.saveCredentials;
+
+    if (state.info.authProperties) {
+      for (const property of state.info.authProperties) {
+        if (!property.features.includes('password')) {
+          state.config.credentials[property.id!] = property.value;
+        }
+      }
+    }
+
+    if (state.info.providerProperties) {
+      state.config.providerProperties = { ...state.info.providerProperties };
+    }
+  }
+
+  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeAuthProperties');
+  }
+
   private async prepareConfig(
     {
-      data,
-      options,
+      state,
     }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
-    const driver = await this.dbDriverResource.load(data.config.driverId!);
+    const config = contexts.getContext(connectionConfigContext);
 
-    if (options.mode === 'edit') {
-      config.connectionId = data.config.connectionId;
+    const driver = await this.dbDriverResource.load(state.config.driverId!, ['includeProviderProperties']);
+
+    if (state.mode === 'edit') {
+      config.connectionId = state.config.connectionId;
     }
 
-    config.name = data.config.name?.trim();
+    config.name = state.config.name?.trim();
 
-    if (config.name && options.mode === 'create') {
-      if (options.type === 'admin') {
+    if (config.name && state.mode === 'create') {
+      if (state.type === 'admin') {
         await this.connectionsResource.loadAll();
         const connectionNames = this.connectionsResource.values.map(connection => connection.name);
         config.name = getUniqueConnectionName(config.name, connectionNames);
@@ -159,39 +219,33 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
     }
 
-    config.description = data.config.description;
-    config.template = data.config.template;
-    config.driverId = data.config.driverId;
+    config.description = state.config.description;
+    config.template = state.config.template;
+    config.driverId = state.config.driverId;
 
-    if (isJDBCConnection(driver, data.info)) {
-      config.url = data.config.url;
+    if (isJDBCConnection(driver, state.info)) {
+      config.url = state.config.url;
     } else {
       if (!driver.embedded) {
-        config.host = data.config.host;
-        config.port = data.config.port;
+        config.host = state.config.host;
+        config.port = state.config.port;
       }
-      config.databaseName = data.config.databaseName;
+      config.databaseName = state.config.databaseName;
     }
 
-    if (data.config.authModelId || driver.defaultAuthModel) {
-      config.authModelId = data.config.authModelId || driver.defaultAuthModel;
-      config.saveCredentials = data.config.saveCredentials;
+    if (state.config.authModelId || driver.defaultAuthModel) {
+      config.authModelId = state.config.authModelId || driver.defaultAuthModel;
+      config.saveCredentials = state.config.saveCredentials;
 
-      const authModel = await this.databaseAuthModelsResource.load(config.authModelId);
+      const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
 
-      let properties = authModel?.properties;
-
-      if (data.info && data.info.authProperties.length > 0) {
-        properties = data.info.authProperties;
-      }
-
-      if (this.isCredentialsChanged(properties, data.config.credentials)) {
-        config.credentials = data.config.credentials;
+      if (this.isCredentialsChanged(properties, state.config.credentials)) {
+        config.credentials = state.config.credentials;
       }
     }
 
     if (driver.providerProperties.length > 0) {
-      const providerProperties: Record<string, any> = { ...data.config.providerProperties };
+      const providerProperties: Record<string, any> = { ...state.config.providerProperties };
 
       for (const providerProperty of driver.providerProperties) {
         if (providerProperty.defaultValue === null
@@ -205,6 +259,43 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
 
       config.providerProperties = providerProperties;
+    }
+  }
+
+  private async formState(
+    data: IConnectionFormState,
+    contexts: IExecutionContextProvider<IConnectionFormState>
+  ) {
+    if (!data.info) {
+      return;
+    }
+
+    const config = contexts.getContext(connectionConfigContext);
+    const stateContext = contexts.getContext(connectionFormStateContext);
+    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
+
+    if (
+      !isValuesEqual(config.name, data.info.name, '')
+      || !isValuesEqual(config.description, data.info.description, '')
+      || !isValuesEqual(config.template, data.info.template, true)
+      || !isValuesEqual(config.driverId, data.info.driverId, '')
+      || (config.url !== undefined && !isValuesEqual(config.url, data.info.url, ''))
+      || (config.host !== undefined && !isValuesEqual(config.host, data.info.host, ''))
+      || (config.port !== undefined && !isValuesEqual(config.port, data.info.port, ''))
+      || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
+      || config.credentials !== undefined
+      || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
+      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.saveCredentials)
+      || (
+        config.providerProperties !== undefined
+        && !isObjectPropertyInfoStateEqual(
+          driver.providerProperties,
+          config.providerProperties,
+          data.info.providerProperties
+        )
+      )
+    ) {
+      stateContext.markEdited();
     }
   }
 
@@ -224,5 +315,20 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
     }
     return false;
+  }
+
+  private async getConnectionAuthModelProperties(
+    authModelId: string,
+    connectionInfo?: DatabaseConnection
+  ): Promise<ObjectPropertyInfo[]> {
+    const authModel = await this.databaseAuthModelsResource.load(authModelId);
+
+    let properties = authModel.properties;
+
+    if (connectionInfo?.authProperties && connectionInfo.authProperties.length > 0) {
+      properties = connectionInfo.authProperties;
+    }
+
+    return properties;
   }
 }

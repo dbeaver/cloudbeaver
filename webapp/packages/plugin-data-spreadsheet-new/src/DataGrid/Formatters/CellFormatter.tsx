@@ -6,62 +6,79 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useContext, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
+import styled, { css } from 'reshadow';
 
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
+import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
-import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
+import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
+import { TableDataContext } from '../TableDataContext';
+import { CellFormatterFactory } from './CellFormatterFactory';
+import { CellMenu } from './Menu/CellMenu';
 
-function getClasses(rawValue: any) {
-  const classes = [];
-  if (rawValue === null) {
-    classes.push('cell-null');
-  }
-  return classes.join(' ');
+interface Props extends FormatterProps {
+  className?: string;
 }
 
-export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ rowIdx, row, column, isCellSelected }) {
-  const editorRef = useRef<IEditorRef>(null);
-  const cellRef = useRef<HTMLDivElement>(null);
-  const context = useContext(DataGridContext);
-  const editingContext = useContext(EditingContext);
-  const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
-  const rawValue = row[column.key];
-  const classes = getClasses(rawValue);
-  const value = formatter?.toString(rawValue) ?? String(rawValue);
-
-  const handleClose = useCallback(() => {
-    editingContext?.closeEditor({ idx: column.idx, rowIdx });
-  }, [column, rowIdx]);
-
-  useEffect(() => {
-    if (isCellSelected) {
-      if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-        editorRef.current?.focus();
-      }
-    }
-  }, [isCellSelected]);
-
-  if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-    return (
-      <div className={`cell-formatter ${classes}`}>
-        <CellEditor
-          ref={editorRef}
-          rowIdx={rowIdx}
-          row={row}
-          column={column}
-          onClose={handleClose}
-        />
-      </div>
-    );
+const styles = css`
+  formatter-wrapper {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
   }
+  formatter-container {
+    flex: 1;
+    overflow: hidden;
+  }
+`;
 
-  return (
-    <cell-formatter ref={cellRef} as='div' className={`cell-formatter ${classes}`}>
-      {value}
-    </cell-formatter>
+export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ className, ...rest }) {
+  const context = useContext(DataGridContext);
+  const tableDataContext = useContext(TableDataContext);
+  const cellContext = useContext(CellContext);
+  const editingContext = useContext(EditingContext);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const isEditing = editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx }) ?? false;
+  const showCellMenu = !isEditing
+    && (rest.isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
+
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
+    edit(position) {
+      if (position.column === undefined || position.row === undefined) {
+        return;
+      }
+
+      const idx = tableDataContext?.getColumnIndexFromKey(position.column);
+
+      if (idx !== undefined && idx !== null) {
+        editingContext?.edit({ idx, rowIdx: position.row });
+      }
+    },
+  });
+
+  return styled(styles)(
+    <formatter-wrapper className={className}>
+      <formatter-container>
+        <CellFormatterFactory {...rest} isEditing={isEditing} />
+      </formatter-container>
+      {showCellMenu && context && (
+        <menu-container>
+          <CellMenu
+            model={context.model}
+            actions={context.actions}
+            spreadsheetActions={spreadsheetActions}
+            resultIndex={context.resultIndex}
+            row={rest.rowIdx}
+            column={Number(rest.column.key)}
+            onStateSwitch={setMenuVisible}
+          />
+        </menu-container>
+      )}
+    </formatter-wrapper>
   );
-};
+});

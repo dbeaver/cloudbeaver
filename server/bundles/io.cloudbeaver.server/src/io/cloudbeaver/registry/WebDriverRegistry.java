@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.registry;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CBApplication;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -63,7 +62,7 @@ public class WebDriverRegistry {
     }
 
     public boolean isDriverEnabled(DBPDriver driver) {
-        String driverId = WebServiceUtils.makeDriverFullId(driver);
+        String driverId = driver.getFullId();
         if (webDrivers.contains(driverId)) {
             String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
             if (enabledDrivers.length > 0 && !ArrayUtils.contains(enabledDrivers, driverId)) {

@@ -8,7 +8,7 @@
 
 import { useService } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
-import { BuildVersion } from '@cloudbeaver/core-utils';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 interface IAppVersion {
   backendVersion: string;
@@ -20,7 +20,7 @@ const VERSION_REGEX = /(\d+\.\d+\.\d+)/;
 export function useAppVersion(short = false): IAppVersion {
   const serverService = useService(ServerService);
   let backendVersion = serverService.config.data?.version || '';
-  let frontendVersion = BuildVersion.version || '';
+  let frontendVersion = GlobalConstants.version || '';
 
   if (short) {
     backendVersion = VERSION_REGEX.exec(backendVersion)?.[1] ?? backendVersion;

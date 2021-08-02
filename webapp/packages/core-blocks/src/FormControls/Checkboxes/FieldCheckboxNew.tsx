@@ -30,6 +30,9 @@ const fieldCheckboxStyles = css`
     padding-left: 10px;
     line-height: 16px;
   }
+  Checkbox[disabled] + field-label {
+    cursor: auto;
+  }
 `;
 
 export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
@@ -44,9 +47,15 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
   }
 
   return styled(styles)(
-    <field className={className} as="div">
+    <field className={className}>
       <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
-      <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
+      <field-label
+        htmlFor={rest.id || rest.name}
+        title={rest.title}
+        as="label"
+      >
+        {children}
+      </field-label>
     </field>
   );
 };

@@ -6,28 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
+import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
+import { isBooleanFormatterAvailable } from '../Formatters/CellFormatters/isBooleanFormatterAvailable';
 import { TableDataContext } from '../TableDataContext';
+import { CellContext, ICellContext } from './CellContext';
 
 export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function CellRenderer(props) {
+  const { rowIdx, column, isCellSelected } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
+  const mouse = useMouse<HTMLDivElement>({});
+  const cellContext = useMemo<ICellContext>(() => ({ mouse }), [mouse]);
+  const resultColumn = tableDataContext?.getColumnInfo(column.key);
   const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
-  const dataGridApi = dataGridContext?.getDataGridApi();
 
   const classes: string[] = [];
-  const { rowIdx, column } = props;
 
   if (selectionContext?.isSelected(rowIdx, column.idx)) {
     classes.push('rdg-cell-custom-selected');
@@ -37,70 +44,124 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     classes.push('rdg-cell-custom-editing');
   }
 
-  if (editor?.isCellEdited(rowIdx, Number(column.key))) {
+  if (!tableDataContext?.isIndexColumn(column.key) && editor?.isCellEdited(rowIdx, Number(column.key))) {
     classes.push('rdg-cell-custom-edited');
   }
 
-  const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (dataGridApi) {
-      dataGridApi.selectCell({ idx: column.idx, rowIdx });
-    }
+  const state = useObjectRef({
+    row: props.row,
+    column,
+    rowIdx,
+    resultColumn,
+    isCellSelected,
+    editor,
+    selectionContext,
+    dataGridContext,
+    editingContext,
+    tableDataContext,
+    get immutableRow() {
+      return this.editor?.get(this.rowIdx) || this.row; // performance heavy
+    },
+    mouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+      if (EventContext.has(event, EventStopPropagationFlag)) {
+        return;
+      }
 
-    selectionContext?.select(
-      {
-        colIdx: column.idx,
-        rowIdx,
-      },
-      event.ctrlKey || event.metaKey,
-      event.shiftKey,
-      true
-    );
-  }, [column, rowIdx, selectionContext]);
+      const dataGridApi = this.dataGridContext?.getDataGridApi();
 
-  const handleMouseUp = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    selectionContext?.select(
-      {
-        colIdx: column.idx,
-        rowIdx,
-      },
-      event.ctrlKey || event.metaKey,
-      event.shiftKey,
-      false
-    );
-  }, [column, rowIdx, selectionContext]);
+      if (dataGridApi && !this.isCellSelected) {
+        dataGridApi.selectCell({ idx: this.column.idx, rowIdx: this.rowIdx });
+      }
 
-  const handleDoubleClick = useCallback(() => {
-    if (!column.editable) {
-      return;
-    }
-    const format = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
-    const columnIndex = tableDataContext?.getDataColumnIndexFromKey(column.key) ?? null;
+      this.selectionContext?.select(
+        {
+          colIdx: this.column.idx,
+          rowIdx: this.rowIdx,
+        },
+        event.ctrlKey || event.metaKey,
+        event.shiftKey,
+        true
+      );
+    },
+    mouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+      if (!this.dataGridContext?.isGridInFocus() || EventContext.has(event, EventStopPropagationFlag)) {
+        return;
+      }
 
-    if (
-      columnIndex === null
-      || format?.isReadOnly({
-        row: rowIdx,
-        column: columnIndex,
-      })
-    ) {
-      return;
-    }
+      this.selectionContext?.select(
+        {
+          colIdx: this.column.idx,
+          rowIdx: this.rowIdx,
+        },
+        event.ctrlKey || event.metaKey,
+        event.shiftKey,
+        false
+      );
+    },
+    doubleClick(event: React.MouseEvent<HTMLDivElement>) {
+      if (EventContext.has(event, EventStopPropagationFlag)) {
+        return;
+      }
 
-    editingContext?.edit({ idx: column.idx, rowIdx });
-  }, [column, rowIdx, props.row]);
+      if (
+        !this.column.editable
+        || this.dataGridContext?.model.isDisabled(this.dataGridContext.resultIndex)
+        || (
+          this.resultColumn
+          && isBooleanFormatterAvailable(this.editor?.getCell(this.rowIdx, Number(this.column.key)), this.resultColumn)
+        )
+      ) {
+        return;
+      }
+      const format = this.dataGridContext?.model.source.getAction(
+        this.dataGridContext.resultIndex,
+        ResultSetFormatAction
+      );
+      const columnIndex = this.tableDataContext?.getDataColumnIndexFromKey(this.column.key) ?? null;
 
-  const row = editor?.get(rowIdx) || props.row;
+      if (
+        columnIndex === null
+        || format?.isReadOnly({
+          row: this.rowIdx,
+          column: columnIndex,
+        })
+      ) {
+        return;
+      }
+
+      this.editingContext?.edit({ idx: this.column.idx, rowIdx: this.rowIdx });
+    },
+  }, {
+    row: props.row,
+    column,
+    rowIdx,
+    resultColumn,
+    isCellSelected,
+    editor,
+    selectionContext,
+    dataGridContext,
+    editingContext,
+    tableDataContext,
+  }, {
+    rowIdx: observable.ref,
+    row: observable.ref,
+    editor: observable.ref,
+    immutableRow: computed,
+  }, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   return (
-    <Cell
-      className={classes.join(' ')}
-      data-row-index={rowIdx}
-      data-column-index={column.idx}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onDoubleClick={handleDoubleClick}
-      {...props}
-      row={[...row]}
-    />
+    <CellContext.Provider value={cellContext}>{/** performance super heavy */}
+      <Cell
+        ref={mouse.reference}
+        className={classes.join(' ')}
+        data-row-index={rowIdx}
+        data-column-index={column.idx}
+        onMouseDown={state.mouseDown}
+        onMouseUp={state.mouseUp}
+        onDoubleClick={state.doubleClick}
+        {...props}
+        row={state.immutableRow}
+      />
+    </CellContext.Provider>
   );
 });

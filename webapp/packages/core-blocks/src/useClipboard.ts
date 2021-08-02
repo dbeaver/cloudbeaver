@@ -8,22 +8,23 @@
 
 import { useCallback } from 'react';
 
+import { useService } from '@cloudbeaver/core-di';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { copyToClipboard } from '@cloudbeaver/core-utils';
+
 export function useClipboard() {
-  const copy = useCallback((data: string) => {
-    const shadowElement = document.createElement('textarea');
-    shadowElement.value = data;
-    shadowElement.style.position = 'absolute';
-    shadowElement.style.overflow = 'hidden';
-    shadowElement.style.width = '0';
-    shadowElement.style.height = '0';
-    shadowElement.style.top = '0';
-    shadowElement.style.left = '0';
+  const notificationService = useService(NotificationService);
 
-    document.body.appendChild(shadowElement);
-    shadowElement.select();
-    document.execCommand('copy');
-    document.body.removeChild(shadowElement);
-  }, []);
+  const copy = useCallback((value: string, notify = false) => {
+    try {
+      copyToClipboard(value);
+      if (notify) {
+        notificationService.notify({ title: 'ui_copy_to_clipboard_copied' }, ENotificationType.Success);
+      }
+    } catch (exception) {
+      notificationService.logException(exception, 'ui_copy_to_clipboard_failed_to_copy');
+    }
+  }, [notificationService]);
 
-  return [copy];
+  return copy;
 }

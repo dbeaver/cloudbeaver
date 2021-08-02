@@ -19,6 +19,7 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
@@ -46,6 +47,7 @@ public class CBAppConfig {
     private String[] enabledAuthProviders = null;
     private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
+    private Map<String, Object> authConfiguration = new LinkedHashMap<>();
 
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;
@@ -132,15 +134,16 @@ public class CBAppConfig {
         this.defaultNavigatorSettings = new DataSourceNavigatorSettings(defaultNavigatorSettings);
     }
 
+    @NotNull
     public Map<String, Object> getPlugins() {
         return plugins;
     }
 
-    public Map<String, Object> getPluginConfig(String pluginId) {
+    public Map<String, Object> getPluginConfig(@NotNull String pluginId) {
         return getPluginConfig(pluginId, false);
     }
 
-    public Map<String, Object> getPluginConfig(String pluginId, boolean create) {
+    public Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create) {
         Object config = plugins.get(pluginId);
         if (config instanceof Map) {
             return (Map<String, Object>) config;
@@ -155,8 +158,21 @@ public class CBAppConfig {
         }
     }
 
-    public <T> T getPluginOption(String pluginId, String option) {
+    public <T> T getPluginOption(@NotNull String pluginId, @NotNull String option) {
         return (T)getPluginConfig(pluginId).get(option);
+    }
+
+    public Map<String, Object> getAuthConfiguration() {
+        return authConfiguration;
+    }
+
+    @NotNull
+    public Map<String, Object> getAuthConfiguration(@NotNull String providerId) {
+        Object apConfig = authConfiguration.get(providerId);
+        if (apConfig instanceof Map) {
+            return (Map<String, Object>) apConfig;
+        }
+        return Collections.emptyMap();
     }
 
 }

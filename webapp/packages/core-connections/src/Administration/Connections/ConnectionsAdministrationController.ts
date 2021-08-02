@@ -21,11 +21,7 @@ export class ConnectionsAdministrationController {
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   get connections(): DatabaseConnection[] {
-    return Array.from(this.connectionsResource.data.values()).sort(compareConnections);
-  }
-
-  get isLoading(): boolean {
-    return this.connectionsResource.isLoading() || this.isProcessing;
+    return this.connectionsResource.values.slice().sort(compareConnections);
   }
 
   get itemsSelected(): boolean {
@@ -40,16 +36,22 @@ export class ConnectionsAdministrationController {
     makeObservable(this, {
       isProcessing: observable,
       connections: computed,
-      isLoading: computed,
       itemsSelected: computed,
     });
   }
 
   update = async (): Promise<void> => {
+    if (this.isProcessing) {
+      return;
+    }
+    this.isProcessing = true;
     try {
       await this.connectionsResource.refreshAll();
+      this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
     } catch (exception) {
-      this.notificationService.logException(exception, 'Connections update failed');
+      this.notificationService.logException(exception, 'connections_administration_tools_refresh_fail');
+    } finally {
+      this.isProcessing = false;
     }
   };
 

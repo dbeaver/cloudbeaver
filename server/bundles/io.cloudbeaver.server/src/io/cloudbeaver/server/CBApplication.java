@@ -74,6 +74,7 @@ public class CBApplication extends BaseApplicationImpl {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
+    private String serverURL;
     private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
@@ -101,6 +102,10 @@ public class CBApplication extends BaseApplicationImpl {
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
     public CBApplication() {
+    }
+
+    public String getServerURL() {
+        return serverURL;
     }
 
     public int getServerPort() {
@@ -174,7 +179,7 @@ public class CBApplication extends BaseApplicationImpl {
         try {
             loadConfiguration(configPath);
 
-            File runtimeConfigFile = getRuntimeConfigFile();
+            File runtimeConfigFile = getRuntimeAppConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -274,6 +279,11 @@ public class CBApplication extends BaseApplicationImpl {
         });
         Runtime.getRuntime().addShutdownHook(shutdownThread);
 
+        if (configurationMode) {
+            // Try to configure automatically
+            performAutoConfiguration(new File(configPath).getParentFile());
+        }
+
         try {
             initializeServer();
         } catch (DBException e) {
@@ -285,6 +295,55 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("Shutdown");
 
         return null;
+    }
+
+    /**
+     * Configures server automatically.
+     * Called on startup
+     * @param configPath
+     */
+    protected void performAutoConfiguration(File configPath) {
+        String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
+        String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
+        String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
+        String autoAdminPassword = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
+
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+            // Try to load from auto config file
+            if (configPath.exists()) {
+                File autoConfigFile = new File(configPath, CBConstants.AUTO_CONFIG_FILE_NAME);
+                if (autoConfigFile.exists()) {
+                    Properties autoProps = new Properties();
+                    try (InputStream is = new FileInputStream(autoConfigFile)) {
+                        autoProps.load(is);
+
+                        autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
+                        autoServerURL = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_URL);
+                        autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
+                        autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
+                    } catch (IOException e) {
+                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'", e);
+                    }
+                }
+            }
+        }
+
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+            log.info("No auto configuration was found. Server must be configured manually");
+            return;
+        }
+        try {
+            finishConfiguration(
+                autoServerName,
+                autoServerURL,
+                autoAdminName,
+                autoAdminPassword,
+                Collections.emptyList(),
+                maxSessionIdleTime,
+                getAppConfiguration());
+        } catch (Exception e) {
+            log.error("Error loading server auto configuration", e);
+        }
     }
 
     protected void initializeServer() throws DBException {
@@ -327,8 +386,13 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     @NotNull
-    private File getRuntimeConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+    private File getRuntimeAppConfigFile() {
+        return new File(getDataDirectory(false), CBConstants.RUNTIME_APP_CONFIG_FILE_NAME);
+    }
+
+    @NotNull
+    private File getRuntimeProductConfigFile() {
+        return new File(getDataDirectory(false), CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
     }
 
     @NotNull
@@ -398,6 +462,12 @@ public class CBApplication extends BaseApplicationImpl {
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
+            if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
+                serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
+            } else if (serverURL == null) {
+                serverURL = "http://" + InetAddress.getLocalHost().getHostName() + ":" + serverPort;
+            }
+
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
             contentRoot = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
@@ -436,6 +506,19 @@ public class CBApplication extends BaseApplicationImpl {
                     productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
                 } catch (Exception e) {
                     log.error("Error reading product configuration", e);
+                }
+            }
+        }
+
+        // Add product config from runtime
+        {
+            File rtConfig = getRuntimeProductConfigFile();
+            if (rtConfig.exists()) {
+                log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
+                try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                    productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+                } catch (Exception e) {
+                    log.error("Error reading product runtime configuration", e);
                 }
             }
         }
@@ -504,6 +587,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     public synchronized void finishConfiguration(
         @NotNull String newServerName,
+        @NotNull String newServerURL,
         @NotNull String adminName,
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
@@ -520,7 +604,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
+        saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
         if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
@@ -530,7 +614,7 @@ public class CBApplication extends BaseApplicationImpl {
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
-            File runtimeConfigFile = getRuntimeConfigFile();
+            File runtimeConfigFile = getRuntimeAppConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -543,7 +627,7 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     public synchronized void flushConfiguration() throws DBException {
-        saveRuntimeConfig(serverName, maxSessionIdleTime, appConfiguration);
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration);
     }
 
 
@@ -565,9 +649,9 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
 
-        File runtimeConfigFile = getRuntimeConfigFile();
+        File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setLenient()
@@ -581,6 +665,9 @@ public class CBApplication extends BaseApplicationImpl {
                     json.beginObject();
                     if (!CommonUtils.isEmpty(newServerName)) {
                         JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
+                    }
+                    if (!CommonUtils.isEmpty(newServerURL)) {
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
                     }
                     if (sessionExpireTime > 0) {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
@@ -619,11 +706,14 @@ public class CBApplication extends BaseApplicationImpl {
                         json.endObject();
                     }
                     if (appConfig.getEnabledAuthProviders() != null) {
-                        JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()));
+                        JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
                     }
 
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
+                    }
+                    if (!CommonUtils.isEmpty(appConfig.getAuthConfiguration())) {
+                        JSONUtils.serializeProperties(json, "authConfiguration", appConfig.getAuthConfiguration());
                     }
 
                     json.endObject();

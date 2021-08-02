@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
@@ -135,7 +134,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         }
 
         AdminConnectionSearchInfo searchInfo = portCache.get(driverPort);
-        String driverId = WebServiceUtils.makeDriverFullId(driver);
+        String driverId = driver.getFullId();
         if (searchInfo != null) {
             searchInfo.getPossibleDrivers().add(driverId);
             return;

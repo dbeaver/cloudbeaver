@@ -29,13 +29,14 @@ import {
   NavigationTreeContextMenuService,
   SettingsMenuService,
   LogViewerService,
-  LogViewerMenuService,
+  LogViewerBootstrap,
   TopNavService,
   AppScreenService,
   CoreSettingsService,
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
-  SessionExpiredDialogService
+  SessionExpiredDialogService,
+  SessionExpireWarningDialogService
 } from '@cloudbeaver/core-app';
 import {
   AppAuthService,
@@ -49,6 +50,8 @@ import {
 } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
+  ConnectionExecutionContextResource,
+  ConnectionExecutionContextService,
   ConnectionsManagerService,
   ConnectionInfoResource,
   ContainerResource,
@@ -78,6 +81,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
 import {
+  NetworkStateService,
   SessionService,
   ServerService,
   PermissionsService,
@@ -93,7 +97,7 @@ import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
-import { NavigationService, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { NavigationService, OptionsPanelService, ClipboardBootstrap, ClipboardService } from '@cloudbeaver/core-ui';
 import { ActiveViewService } from '@cloudbeaver/core-view';
 
 export const coreManifest: PluginManifest = {
@@ -104,6 +108,7 @@ export const coreManifest: PluginManifest = {
 
   providers: [
     RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
+    NetworkStateService,
     AdministrationLocaleService,
     AdministrationTopAppBarService,
     AdministrationScreenService,
@@ -133,7 +138,10 @@ export const coreManifest: PluginManifest = {
     PermissionsService,
     CoreSettingsService,
     CommonDialogService,
+    ClipboardService,
+    ClipboardBootstrap,
     SessionExpireService,
+    SessionExpireWarningDialogService,
     SessionExpiredDialogService,
     ConnectionsLocaleService,
     ConnectionFormService,
@@ -150,6 +158,8 @@ export const coreManifest: PluginManifest = {
     ContainerResource,
     DBDriverResource,
     NetworkHandlerResource,
+    ConnectionExecutionContextResource,
+    ConnectionExecutionContextService,
     ConnectionsManagerService,
     ScreenService,
     AppScreenService,
@@ -162,7 +172,7 @@ export const coreManifest: PluginManifest = {
     GraphQLService,
     LocalStorageSaveService,
     LocalizationService,
-    LogViewerMenuService,
+    LogViewerBootstrap,
     LogViewerService,
     MainMenuService,
     TopNavService,

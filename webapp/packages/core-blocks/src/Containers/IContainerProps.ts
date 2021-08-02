@@ -8,8 +8,9 @@
 
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
-export interface IContainerProps extends ILayoutSizeProps, React.HTMLAttributes<HTMLDivElement> {
+export interface IContainerProps extends ILayoutSizeProps {
   baseline?: boolean;
+  center?: boolean;
   vertical?: boolean;
   wrap?: boolean;
   overflow?: boolean;

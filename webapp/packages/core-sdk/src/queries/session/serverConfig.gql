@@ -3,6 +3,8 @@ query serverConfig {
     name
     version
     workspaceId
+    serverURL
+    rootURI
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
@@ -10,7 +12,6 @@ query serverConfig {
     sessionExpireTime
 
     anonymousAccessEnabled
-    authenticationEnabled
 
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled

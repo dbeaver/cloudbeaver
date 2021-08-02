@@ -90,6 +90,10 @@ type ServerConfig {
     version: String!
     workspaceId: ID!
 
+    serverURL: String!
+
+    rootURI: String!
+
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean @deprecated
     supportsCustomConnections: Boolean

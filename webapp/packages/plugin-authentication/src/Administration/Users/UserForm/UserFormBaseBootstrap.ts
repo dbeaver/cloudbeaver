@@ -27,19 +27,21 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'info',
       name: 'authentication_administration_user_info',
+      title: 'authentication_administration_user_info',
       order: 1,
       panel: () => UserInfo,
     });
     this.userFormService.tabsContainer.add({
       key: 'origin',
       order: 2,
-      isHidden: (tabId, props) => props?.user.origin.type === AUTH_PROVIDER_LOCAL_ID,
+      isHidden: (tabId, props) => !props?.user.origins.some(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID),
       panel: () => OriginInfo,
       tab: () => OriginInfoTab,
     });
     this.userFormService.tabsContainer.add({
       key: 'connections_access',
       name: 'authentication_administration_user_connections_access',
+      title: 'authentication_administration_user_connections_access',
       order: 3,
       panel: () => ConnectionAccess,
       onOpen: ({ props }) => props.controller.loadConnectionsAccess(),

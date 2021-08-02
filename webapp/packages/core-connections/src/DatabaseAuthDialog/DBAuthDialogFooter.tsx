@@ -13,29 +13,38 @@ import { Button } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 const styles = css`
-  controls {
+  footer-container {
     display: flex;
-    height: 100%;
+    width: min-content;
     flex: 1;
     align-items: center;
-    margin: auto;
     justify-content: flex-end;
+  }
+  footer-container > :not(:first-child) {
+    margin-left: 16px;
+  }
+  Button {
+    flex: 0 0 auto;
   }
 `;
 
 export interface Props {
   isAuthenticating: boolean;
   onLogin: () => void;
+  className?: string;
 }
 
-export const DBAuthDialogFooter = observer(function DBAuthDialogFooter({
+export const DBAuthDialogFooter: React.FC<Props> = observer(function DBAuthDialogFooter({
   isAuthenticating,
   onLogin,
-}: Props) {
+  className,
+  children,
+}) {
   const translate = useTranslate();
 
   return styled(styles)(
-    <controls as="div">
+    <footer-container className={className}>
+      {children}
       <Button
         type="button"
         mod={['unelevated']}
@@ -44,6 +53,6 @@ export const DBAuthDialogFooter = observer(function DBAuthDialogFooter({
       >
         {translate('authentication_login')}
       </Button>
-    </controls>
+    </footer-container>
   );
 });

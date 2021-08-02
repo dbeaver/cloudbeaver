@@ -6,19 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TableContext, useMapResource } from '@cloudbeaver/core-blocks';
-import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
-import type { IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
-import { useConnectionFormData } from '../../../ConnectionForm/useConnectionFormData';
+import { useConnectionFormState } from '../../../ConnectionForm/useConnectionFormState';
 import { ConnectionsResource } from '../../ConnectionsResource';
 
 const styles = composes(
@@ -30,10 +26,10 @@ const styles = composes(
   css`
     box {
       box-sizing: border-box;
-      padding: 24px 0;
+      padding-bottom: 24px;
       display: flex;
       flex-direction: column;
-      height: 630px;
+      height: 664px;
     }
   `
 );
@@ -45,10 +41,10 @@ interface Props {
 export const ConnectionEdit = observer(function ConnectionEditNew({
   item,
 }: Props) {
-  const connection = useMapResource(ConnectionsResource, { key: item, includes: ['customIncludeNetworkHandlerCredentials'] });
+  const connectionsResource = useService(ConnectionsResource);
   const boxRef = useRef<HTMLDivElement>(null);
-  const tableContext = useContext(TableContext);
-  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
+  // const tableContext = useContext(TableContext);
+  // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
 
   useEffect(() => {
     boxRef.current?.scrollIntoView({
@@ -57,30 +53,20 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
     });
   }, []);
 
-  const config = useMemo<ConnectionConfig>(() => observable({ connectionId: item }), [item]);
+  const data = useConnectionFormState(
+    connectionsResource,
+    state => state.setOptions('edit', 'admin')
+  );
 
-  const data = useConnectionFormData({
-    config,
-    resource: connection.resource,
-  });
-
-  const [options] = useState<IConnectionFormOptions>(() => ({
-    mode: 'edit',
-    type: 'admin',
-  }));
+  data.config.connectionId = item;
 
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>
-      <Loader state={connection}>
-        {() => (
-          <ConnectionForm
-            data={data}
-            options={options}
-            onCancel={collapse}
-            // onSave={collapse}
-          />
-        )}
-      </Loader>
+      <ConnectionForm
+        state={data}
+        // onCancel={collapse}
+        // onSave={collapse}
+      />
     </box>
   );
 });

@@ -10,28 +10,83 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  TabsState, TabList,
-  Button, BORDER_TAB_STYLES, TabPanelList, Placeholder, useObjectRef
-} from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormService, IConnectionFormData, IConnectionFormOptions } from './ConnectionFormService';
-import { useConnectionFormState } from './useConnectionFormState';
+import { connectionConfigContext } from './connectionConfigContext';
+import { ConnectionFormService } from './ConnectionFormService';
+import type { IConnectionFormState } from './IConnectionFormProps';
 
-const styles = composes(
+const tabsStyles = css`
+  TabList {
+    position: relative;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  Tab {
+    height: 46px!important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
+  }
+`;
+
+const topBarStyles = composes(
   css`
-    Tab {
-      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
+    connection-top-bar {
+      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
+    }
+  `,
+  css`
+    connection-top-bar {
+      position: relative;
+      display: flex;
+      padding-top: 16px;
+
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-bottom: solid 2px;
+        border-color: inherit;
+      }
+    }
+    connection-top-bar-tabs {
+      flex: 1;
     }
 
-    TabList {
-      composes: theme-background-surface theme-text-on-surface from global;
+    connection-top-bar-actions {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
     }
 
+    /*Button:not(:first-child) {
+      margin-right: 24px;
+    }*/
+
+    connection-status-message {
+      composes: theme-typography--caption from global;
+      height: 24px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      & IconOrImage {
+        height: 24px;
+        width: 24px;
+      }
+    }
+  `
+);
+
+const formStyles = composes(
+  css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
@@ -41,9 +96,6 @@ const styles = composes(
     }
   `,
   css`
-    TabList {
-      flex-shrink: 0;
-    }
     box {
       display: flex;
       flex-direction: column;
@@ -58,86 +110,78 @@ const styles = composes(
       flex-direction: column;
       overflow: auto;
     }
-
-    fill {
-      flex: 1;
-    }
-
-    Button:not(:first-child) {
-      margin-right: 24px;
-    }
   `
 );
 
 interface Props {
-  data: IConnectionFormData;
-  options: IConnectionFormOptions;
+  state: IConnectionFormState;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig) => void;
+  className?: string;
 }
 
-export const ConnectionForm = observer(function ConnectionForm({
-  data,
-  options,
-  onCancel = () => {},
+export const ConnectionForm: React.FC<Props> = observer(function ConnectionForm({
+  state,
+  onCancel,
   onSave = () => {},
-}: Props) {
-  const props = useObjectRef({ onSave });
-  const style = [styles, BORDER_TAB_STYLES];
+  className,
+}) {
   const translate = useTranslate();
+  const props = useObjectRef({ onSave });
+  const style = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
-  const formState = useConnectionFormState(data, options);
 
-  useEffect(() => {
-    formState.submittingHandlers.addPostHandler((data, contexts) => {
+  useExecutor({
+    executor: state.submittingTask,
+    postHandlers: [function save(data, contexts) {
       const validation = contexts.getContext(service.connectionValidationContext);
       const state = contexts.getContext(service.connectionStatusContext);
-      const config = contexts.getContext(service.connectionConfigContext);
+      const config = contexts.getContext(connectionConfigContext);
 
       if (validation.valid && state.saved && data.submitType === 'submit') {
         props.onSave(config);
       }
-    });
+    }],
+  });
+
+  useEffect(() => {
+    state.loadConnectionInfo();
   }, []);
 
-  return styled(useStyles(style))(
+  if (!state.configured) {
+    return styled(styles)(
+      <box className={className}>
+        <Loader />
+      </box>
+    );
+  }
+
+  return styled(styles)(
     <TabsState
       container={service.tabsContainer}
-      localState={data.partsState}
-      data={data}
-      form={formState}
-      options={options}
+      localState={state.partsState}
+      state={state}
+      onCancel={onCancel}
     >
-      <box as='div'>
-        <TabList style={style}>
-          <fill as="div" />
-          <Placeholder container={service.actionsContainer} data={data} form={formState.form} options={options} />
-          <Button
-            type="button"
-            disabled={formState.form.disabled}
-            mod={['outlined']}
-            onClick={onCancel}
-          >
-            {translate('ui_processing_cancel')}
-          </Button>
-          <Button
-            type="button"
-            disabled={formState.form.disabled}
-            mod={['outlined']}
-            onClick={formState.test}
-          >
-            {translate('connections_connection_test')}
-          </Button>
-          <Button
-            type="button"
-            disabled={formState.form.disabled || formState.form.readonly}
-            mod={['unelevated']}
-            onClick={formState.save}
-          >
-            {translate(options.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
-          </Button>
-        </TabList>
-        <content-box as="div">
+      <box className={className}>
+        <connection-top-bar>
+          <connection-top-bar-tabs>
+            <connection-status-message>
+              {state.statusMessage && (
+                <>
+                  <IconOrImage icon='/icons/info_icon.svg' />
+                  {translate(state.statusMessage)}
+                </>
+              )}
+            </connection-status-message>
+            <TabList style={style} disabled={state.disabled} />
+          </connection-top-bar-tabs>
+          <connection-top-bar-actions>
+            <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+          </connection-top-bar-actions>
+        </connection-top-bar>
+        <content-box>
           <TabPanelList style={style} />
         </content-box>
       </box>

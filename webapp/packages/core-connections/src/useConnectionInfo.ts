@@ -15,18 +15,19 @@ import { ConnectionsManagerService } from './ConnectionsManagerService';
 
 export function useConnectionInfo(connectionId: string) {
   const manager = useService(ConnectionsManagerService);
-  const service = useService(ConnectionInfoResource);
+  const resource = useService(ConnectionInfoResource);
 
-  const connectionInfo = service.get(connectionId);
-  const load = useCallback(() => service.load(connectionId), [service, connectionId]);
-  const refresh = useCallback(() => service.refresh(connectionId), [service, connectionId]);
-  const isLoading = useCallback(() => service.isDataLoading(connectionId), [service, connectionId]);
-  const isLoaded = useCallback(() => service.isLoaded(connectionId), [service, connectionId]);
-  const isOutdated = useCallback(() => service.isOutdated(connectionId), [service, connectionId]);
+  const connectionInfo = resource.get(connectionId);
+  const load = useCallback(() => resource.load(connectionId), [resource, connectionId]);
+  const refresh = useCallback(() => resource.refresh(connectionId), [resource, connectionId]);
+  const isLoading = useCallback(() => resource.isDataLoading(connectionId), [resource, connectionId]);
+  const isLoaded = useCallback(() => resource.isLoaded(connectionId), [resource, connectionId]);
+  const isOutdated = useCallback(() => resource.isOutdated(connectionId), [resource, connectionId]);
   const connect = useCallback(() => manager.requireConnection(connectionId), [manager, connectionId]);
 
   return {
     connectionInfo,
+    resource,
     isLoading,
     isLoaded,
     isOutdated,

@@ -53,14 +53,14 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     ResourceKeyUtils.forEach(keyObject, key => {
       const metadata = this.metadata.get(key);
 
-      if (!metadata.withDetails) {
+      if (metadata.withDetails !== state) {
         metadata.outdated = true;
       }
       metadata.withDetails = state;
     });
   }
 
-  protected async loader(key: ResourceKey<string>) {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, NavNode>> {
     if (isResourceKeyList(key)) {
       const values: NavNode[] = [];
       for (const nodePath of key.list) {

@@ -75,10 +75,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
-      origin: {
+      origins: [{
         type: AUTH_PROVIDER_LOCAL_ID,
         displayName: 'Local',
-      },
+      }],
+      linkedAuthProviders: [AUTH_PROVIDER_LOCAL_ID],
     };
   }
 
@@ -141,6 +142,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       providerId: AUTH_PROVIDER_LOCAL_ID,
       userId,
       credentials: processedCredentials,
+    });
+  }
+
+  async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
+    await this.graphQLService.sdk.authChangeLocalPassword({
+      oldPassword: this.authProviderService.hashValue(oldPassword),
+      newPassword: this.authProviderService.hashValue(newPassword),
     });
   }
 
@@ -210,5 +218,5 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 }
 
 export function isLocalUser(user: AdminUser): boolean {
-  return user.origin.type === AUTH_PROVIDER_LOCAL_ID;
+  return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
 }

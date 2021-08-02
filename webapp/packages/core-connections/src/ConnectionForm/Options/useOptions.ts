@@ -6,43 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
-
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import type { DBDriver } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import type { IConnectionFormProps } from '../ConnectionFormService';
-
-interface IRefObject {
-  prevName: string | null;
-  props: IConnectionFormProps;
-}
+import type { IConnectionFormState } from '../IConnectionFormProps';
 
 const MAX_HOST_LENGTH = 20;
 
-export function useOptions(props: IConnectionFormProps) {
-  const refObject = useObjectRef<IRefObject>({
-    prevName: null,
-    props,
+export function useOptions(state: IConnectionFormState) {
+  const refObject = useObjectRef({
+    prevName: null as string | null,
+    state,
   }, {
-    props,
+    state,
   });
 
   return useObjectRef({
     updateNameTemplate(driver: DBDriver | undefined) {
       const {
         prevName,
-        props: {
-          data: { config, info },
-          options,
+        state: {
+          config,
+          info,
+          mode,
         },
       } = refObject;
 
       const isAutoFill = config.name === prevName || prevName === null;
 
-      if (options.mode === 'edit' || !isAutoFill) {
+      if (mode === 'edit' || !isAutoFill) {
         return;
       }
 
@@ -69,8 +63,9 @@ export function useOptions(props: IConnectionFormProps) {
     },
     setDefaults(driver: DBDriver | undefined, prevDriver: DBDriver | undefined) {
       const {
-        props: {
-          data: { config, info },
+        state: {
+          config,
+          info,
         },
       } = refObject;
 
@@ -109,9 +104,5 @@ export function useOptions(props: IConnectionFormProps) {
 
       // config.credentials = {};
     },
-  }, undefined, {
-    updateNameTemplate: action,
-    setDefaults: action,
-    setAuthModel: action,
   });
 }

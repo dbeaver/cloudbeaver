@@ -8,7 +8,7 @@
 
 import type { IDatabaseDataActionClass } from '../IDatabaseDataAction';
 
-export function databaseDataAction<T extends IDatabaseDataActionClass<any, any>>() {
+export function databaseDataAction<T extends IDatabaseDataActionClass<any, any, any>>() {
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   return <U extends T>(constructor: U) => { };
 }

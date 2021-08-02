@@ -12,8 +12,10 @@ import type { Column } from 'react-data-grid';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 export interface ITableData {
-  columns: Array<Column<any[], any>>;
-  rows: any[][];
+  data: {
+    columns: Array<Column<any[], any>>;
+    rows: any[][];
+  };
   dataColumns: SqlResultColumn[];
   dataRows: any[][];
   getCellValue: (rowIndex: number, key: string | number) => any;
@@ -23,6 +25,7 @@ export interface ITableData {
   getColumnIndexFromKey: (columnKey: string | number) => number | null;
   isIndexColumn: (columnKey: string | number) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;
+  isReadOnly: () => boolean;
   getColumnKeyFromColumnIndex: (columnIndex: number) => number;
 }
 

@@ -8,16 +8,13 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem, CommonDialogService, DialogueStateResult
+  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
 } from '@cloudbeaver/core-dialogs';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DetailsError } from '@cloudbeaver/core-sdk';
 
-import type { DataModelWrapper } from '../../DataModelWrapper';
-import { ErrorDialog } from '../../ErrorDialog';
+import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 
 export interface ITableFooterMenuContext {
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any>;
   resultIndex: number;
 }
 
@@ -27,8 +24,7 @@ export class TableFooterMenuService {
   private tableFooterMenuToken = 'tableFooterMenu';
 
   constructor(
-    private contextMenuService: ContextMenuService,
-    private commonDialogService: CommonDialogService
+    private contextMenuService: ContextMenuService
   ) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
@@ -38,19 +34,21 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
           return true;
         }
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return context.data.model.isLoading() || !editor.isEdited();
+        return !editor.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
-      onClick: context => {
-        this.saveData(context.data.model);
-      },
+      onClick: context => context.data.model.source.saveData(),
     });
     this.registerMenuItem({
       id: 'cancel ',
@@ -58,7 +56,11 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
           return true;
         }
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
@@ -66,8 +68,9 @@ export class TableFooterMenuService {
         return !editor.isEdited();
       },
       order: 2,
-      title: 'ui_processing_cancel',
-      icon: 'table-cancel',
+      title: 'data_viewer_value_revert',
+      tooltip: 'data_viewer_value_revert_title',
+      icon: 'table-revert',
       onClick: context => {
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
         editor.cancelChanges();
@@ -75,7 +78,7 @@ export class TableFooterMenuService {
     });
   }
 
-  constructMenuWithContext(model: DataModelWrapper, resultIndex: number): IMenuItem[] {
+  constructMenuWithContext(model: IDatabaseDataModel<any>, resultIndex: number): IMenuItem[] {
     const context: IMenuContext<ITableFooterMenuContext> = {
       menuId: this.tableFooterMenuToken,
       contextId: model.id,
@@ -87,37 +90,5 @@ export class TableFooterMenuService {
 
   registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
-  }
-
-  private async saveData(model: DataModelWrapper) {
-    while (true) {
-      try {
-        await model.source.saveData();
-        return;
-      } catch (exception) {
-        let hasDetails = false;
-        let message = `${exception.name}: ${exception.message}`;
-
-        if (exception instanceof DetailsError) {
-          hasDetails = exception.hasDetails();
-          message = exception.errorMessage;
-        }
-
-        const state = await this.commonDialogService.open(
-          ErrorDialog,
-          {
-            message,
-            title: 'ui_data_saving_error',
-            onShowDetails: hasDetails
-              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
-              : undefined,
-          }
-        );
-
-        if (state === DialogueStateResult.Rejected) {
-          return;
-        }
-      }
-    }
   }
 }

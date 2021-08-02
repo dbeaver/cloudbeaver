@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature
-} from '@cloudbeaver/core-app';
+import { NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  IMenuContext, CommonDialogService, ContextMenuService
-} from '@cloudbeaver/core-dialogs';
-import { TableFooterMenuService, ITableFooterMenuContext } from '@cloudbeaver/plugin-data-viewer';
+import { IMenuContext, CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
+import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
+import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
 @injectable()
@@ -22,7 +20,8 @@ export class DataExportMenuService {
   constructor(
     private commonDialogService: CommonDialogService,
     private tableFooterMenuService: TableFooterMenuService,
-    private contextMenuService: ContextMenuService
+    private contextMenuService: ContextMenuService,
+    private dataExportSettingsService: DataExportSettingsService,
   ) { }
 
   register(): void {
@@ -31,11 +30,15 @@ export class DataExportMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
+      isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
       isDisabled(context) {
-        return context.data.model.isLoading() || !context.data.model.getResult(context.data.resultIndex);
+        return context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.getResult(context.data.resultIndex);
       },
       order: 5,
       title: 'data_transfer_dialog_export',
+      tooltip: 'data_transfer_dialog_export_tooltip',
       icon: 'table-export',
       onClick: this.exportData.bind(this),
     });
@@ -48,6 +51,7 @@ export class DataExportMenuService {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
+        isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
         order: 2,
         title: 'data_transfer_dialog_export',
         onClick: context => {
@@ -69,16 +73,18 @@ export class DataExportMenuService {
       throw new Error('Result must be provided');
     }
 
-    if (!context.data.model.source.options) {
+    const source = context.data.model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
+
+    if (!source.options) {
       throw new Error('Source options must be provided');
     }
 
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: context.data.model.source.options.connectionId,
-      contextId: context.data.model.source.executionContext?.contextId,
-      containerNodePath: context.data.model.source.options.containerNodePath,
+      connectionId: source.options.connectionId,
+      contextId: context.data.model.source.executionContext?.context?.id,
+      containerNodePath: source.options.containerNodePath,
       resultId: result.id,
-      sourceName: context.data.model.source.options.sourceName,
+      sourceName: source.options.query,
     });
   }
 }

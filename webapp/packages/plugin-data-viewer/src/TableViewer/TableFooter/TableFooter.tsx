@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
+import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { DataModelWrapper } from '../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(
@@ -23,11 +23,9 @@ const tableFooterStyles = composes(
     }
   `,
   css`
-    table-footer {
-      height: 40px;
-      flex: 0 0 auto;
-      display: flex;
+    ToolsPanel {
       align-items: center;
+      flex: 0 0 auto;
     }
     count input,
     count placeholder {
@@ -42,7 +40,14 @@ const tableFooterStyles = composes(
     reload {
       height: 100%;
       display: flex;
+      cursor: pointer;
       align-items: center;
+      padding: 0 16px;
+
+      & IconOrImage {
+        width: 24px;
+        height: 24px;
+      }
     }
     IconButton {
       position: relative;
@@ -50,7 +55,6 @@ const tableFooterStyles = composes(
       width: 24px;
       display: block;
     }
-    reload,
     count,
     TableFooterMenu {
       margin-left: 16px;
@@ -65,7 +69,7 @@ const tableFooterStyles = composes(
 
 interface TableFooterProps {
   resultIndex: number;
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
 }
 
 export const TableFooter = observer(function TableFooter({
@@ -88,24 +92,20 @@ export const TableFooter = observer(function TableFooter({
     [model]
   );
 
+  const disabled = model.isLoading() || model.isDisabled(resultIndex);
+
   return styled(useStyles(tableFooterStyles))(
-    <table-footer as="div">
-      <reload as="div">
-        <IconButton
-          type="button"
-          name='reload'
-          viewBox="0 0 16 16"
-          disabled={model.isLoading()}
-          onClick={() => model.refresh()}
-        />
+    <ToolsPanel>
+      <reload aria-disabled={disabled} onClick={() => model.refresh()}>
+        <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload>
-      <count as="div">
+      <count>
         <SubmittingForm onSubmit={handleChange}>
           <input
             ref={ref}
             type="number"
             value={model.countGain}
-            disabled={model.isLoading()}
+            disabled={disabled}
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
           />
@@ -117,6 +117,6 @@ export const TableFooter = observer(function TableFooter({
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>
       )}
-    </table-footer>
+    </ToolsPanel>
   );
 });

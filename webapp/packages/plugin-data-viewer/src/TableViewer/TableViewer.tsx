@@ -6,17 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { PropsWithChildren, useCallback } from 'react';
-import styled, { css, use } from 'reshadow';
+import { useEffect } from 'react';
+import styled, { css } from 'reshadow';
 
-import { Button, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useErrorDetails, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
+import type { IDataTableActionsPrivate } from './IDataTableActions';
+import { TableError } from './TableError';
 import { TableFooter } from './TableFooter/TableFooter';
 import { TableGrid } from './TableGrid';
 import { TableHeader } from './TableHeader/TableHeader';
@@ -26,7 +28,7 @@ import { TableViewerStorageService } from './TableViewerStorageService';
 
 const viewerStyles = composes(
   css`
-    error, pane-content {
+    pane-content {
       composes: theme-background-surface theme-text-on-surface from global;
     }
     table-viewer {
@@ -82,24 +84,6 @@ const viewerStyles = composes(
         margin-left: 4px;
       }
     }
-    error {
-      position: absolute;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      white-space: pre-wrap;
-      padding: 16px;
-      overflow: auto;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    error[|animated] {
-      opacity: 1;
-    }
-    Button {
-      margin-right: 16px;
-    }
     Loader {
       position: absolute;
       width: 100%;
@@ -108,7 +92,7 @@ const viewerStyles = composes(
   `
 );
 
-type TableViewerProps = PropsWithChildren<{
+interface Props {
   tableId: string;
   resultIndex: number | undefined;
   presentationId: string | undefined;
@@ -116,9 +100,9 @@ type TableViewerProps = PropsWithChildren<{
   className?: string;
   onPresentationChange: (id: string) => void;
   onValuePresentationChange: (id: string | null) => void;
-}>;
+}
 
-export const TableViewer = observer(function TableViewer({
+export const TableViewer: React.FC<Props> = observer(function TableViewer({
   tableId,
   resultIndex = 0,
   presentationId,
@@ -126,46 +110,91 @@ export const TableViewer = observer(function TableViewer({
   className,
   onPresentationChange,
   onValuePresentationChange,
-}: TableViewerProps) {
+}) {
   const styles = useStyles(viewerStyles, splitStyles);
   const dataPresentationService = useService(DataPresentationService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const dataModel = tableViewerStorageService.get(tableId);
   const result = dataModel?.getResult(resultIndex);
-  const translate = useTranslate();
-  const error = useErrorDetails(dataModel?.source.error || null);
-  const animated = useStateDelay(!!error.details, 1);
+  const loading = dataModel?.isLoading() ?? true;
+  const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
-  const handlePresentationChange = useCallback((id: string) => {
-    const presentation = dataPresentationService.get(id);
-    if (presentation) {
-      if (
-        presentation.dataFormat !== undefined
-        && presentation.dataFormat !== dataModel?.source.dataFormat
-      ) {
-        dataModel?.setDataFormat(presentation.dataFormat)
-          .reload();
+  const dataTableActions = useObjectRef<IDataTableActionsPrivate>({
+    presentationId,
+    valuePresentationId,
+    dataModel,
+    resultIndex,
+    dataFormat,
+    onPresentationChange,
+    onValuePresentationChange,
+
+    setPresentation(id: string) {
+      const presentation = dataPresentationService.get(id);
+
+      if (presentation) {
+        if (
+          presentation.dataFormat !== undefined
+          && presentation.dataFormat !== this.dataModel?.source.dataFormat
+        ) {
+          this.dataModel?.setDataFormat(presentation.dataFormat).reload();
+        }
+        this.onPresentationChange(id);
       }
-      onPresentationChange(id);
-    }
-  }, [onPresentationChange, dataModel]);
+    },
 
-  function handleValuePresentationChange(id: string) {
-    if (id === valuePresentationId) {
-      onValuePresentationChange(null);
+    setValuePresentation(id: string | null) {
+      if (id === this.valuePresentationId || id === null) {
+        this.onValuePresentationChange(null);
+        return;
+      }
+
+      let presentation = dataPresentationService.get(id);
+
+      if (!presentation && this.dataModel) {
+        presentation = dataPresentationService.getSupported(
+          DataPresentationType.toolsPanel,
+          this.dataFormat,
+          undefined,
+          this.dataModel,
+          this.resultIndex
+        ) ?? undefined;
+      }
+
+      if (presentation) {
+        this.onValuePresentationChange(presentation.id);
+      }
+    },
+  }, {
+    presentationId,
+    valuePresentationId,
+    dataModel,
+    resultIndex,
+    dataFormat,
+    onPresentationChange,
+    onValuePresentationChange,
+  }, {
+    presentationId: observable,
+    valuePresentationId: observable,
+    dataFormat: observable,
+    resultIndex: observable,
+    dataModel: observable.ref,
+  }, ['setPresentation', 'setValuePresentation']);
+
+  useEffect(() => {
+    if (!presentationId || !dataModel) {
       return;
     }
-    const presentation = dataPresentationService.get(id);
-    if (presentation) {
-      onValuePresentationChange(id);
+
+    const presentation = dataPresentationService.get(presentationId);
+
+    if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
+      onPresentationChange(dataFormat);
     }
-  }
+  }, [dataFormat]);
 
   if (!dataModel) {
     return <Loader />;
   }
-
-  const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
   const presentation = dataPresentationService.getSupported(
     DataPresentationType.main,
@@ -196,12 +225,11 @@ export const TableViewer = observer(function TableViewer({
     || valuePresentation?.dataFormat === dataFormat)
   && overlay
   && resultExist;
-  const loading = dataModel.isLoading();
 
   return styled(styles)(
-    <table-viewer as="div" className={className}>
-      <TableHeader model={dataModel} />
-      <table-content as='div'>
+    <table-viewer className={className}>
+      <TableHeader model={dataModel} resultIndex={resultIndex} />
+      <table-content>
         <TablePresentationBar
           type={DataPresentationType.main}
           presentationId={presentation.id}
@@ -209,14 +237,15 @@ export const TableViewer = observer(function TableViewer({
           supportedDataFormat={dataModel.supportedDataFormats}
           model={dataModel}
           resultIndex={resultIndex}
-          onPresentationChange={handlePresentationChange}
+          onPresentationChange={dataTableActions.setPresentation}
         />
-        <table-data as='div'>
+        <table-data>
           <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
             <Pane>
-              <pane-content as='div'>
+              <pane-content>
                 <TableGrid
                   model={dataModel}
+                  actions={dataTableActions}
                   dataFormat={dataFormat}
                   presentation={presentation}
                   resultIndex={resultIndex}
@@ -225,10 +254,11 @@ export const TableViewer = observer(function TableViewer({
             </Pane>
             {valuePanelDisplayed && <ResizerControls />}
             <Pane main>
-              <pane-content as='div'>
+              <pane-content>
                 {resultExist && (
                   <TableToolsPanel
                     model={dataModel}
+                    actions={dataTableActions}
                     dataFormat={dataFormat}
                     presentation={valuePresentation}
                     resultIndex={resultIndex}
@@ -237,18 +267,7 @@ export const TableViewer = observer(function TableViewer({
               </pane-content>
             </Pane>
           </Split>
-          <error as="div" hidden={!error.details} {...use({ animated })}>
-            {error.details?.message}
-            <br /><br />
-            <Button type='button' mod={['outlined']} onClick={() => dataModel.source.clearError()}>
-              {translate('ui_error_close')}
-            </Button>
-            {error.details?.hasDetails && (
-              <Button type='button' mod={['unelevated']} onClick={error.open}>
-                {translate('ui_errors_details')}
-              </Button>
-            )}
-          </error>
+          <TableError model={dataModel} loading={loading} />
           <Loader
             loading={loading}
             cancelDisabled={!dataModel.source.canCancel}
@@ -263,7 +282,7 @@ export const TableViewer = observer(function TableViewer({
           supportedDataFormat={[dataFormat]}
           model={dataModel}
           resultIndex={resultIndex}
-          onPresentationChange={handleValuePresentationChange}
+          onPresentationChange={dataTableActions.setValuePresentation}
         />
       </table-content>
       <TableFooter model={dataModel} resultIndex={resultIndex} />

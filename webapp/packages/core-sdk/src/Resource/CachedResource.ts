@@ -85,6 +85,26 @@ export abstract class CachedResource<
     this.onDataOutdated = new Executor(null, this.includes);
     this.onDataUpdate = new Executor(null, this.includes);
     this.onDataError = new Executor<IDataError<TParam>>(null, (a, b) => this.includes(a.param, b.param));
+
+    // const logName = (action: string) => () => console.log(this.constructor.name + ': ' + action);
+    // const logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
+    //   if (ExecutorInterrupter.isInterrupted(contexts)) {
+    //     console.log(this.constructor.name + ': ' + action + 'interrupted');
+    //   }
+    // };
+
+    // this.beforeLoad
+    //   .addHandler(logName('beforeLoad'))
+    //   .addPostHandler(logInterrupted('beforeLoad'));
+    // this.onDataOutdated
+    //   .addHandler(logName('onDataOutdated'))
+    //   .addPostHandler(logInterrupted('onDataOutdated'));
+    // this.onDataUpdate
+    //   .addHandler(logName('onDataUpdate'))
+    //   .addPostHandler(logInterrupted('onDataUpdate'));
+    // this.onDataError
+    //   .addHandler(logName('onDataError'))
+    //   .addPostHandler(logInterrupted('onDataError'));
   }
 
   sync(
@@ -104,6 +124,11 @@ export abstract class CachedResource<
 
   isLoading(): boolean {
     return this.loading;
+  }
+
+  getException(param: TParam): Error | null {
+    param = this.transformParam(param);
+    return this.metadata.get(param as unknown as TKey).exception;
   }
 
   isOutdated(param: TParam): boolean {
@@ -233,9 +258,11 @@ export abstract class CachedResource<
 
         return await this.taskWrapper(param, context, update);
       },
-      () => this.markDataLoaded(param, context),
-      () => this.onDataUpdate.execute(param),
-      exception => this.markDataError(exception, param, context));
+      {
+        after: () => this.markDataLoaded(param, context),
+        success: () => this.onDataUpdate.execute(param),
+        error: exception => this.markDataError(exception, param, context),
+      });
   }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
@@ -261,9 +288,11 @@ export abstract class CachedResource<
 
         await this.taskWrapper(param, context, this.loadingTask);
       },
-      () => this.markDataLoaded(param, context),
-      () => this.onDataUpdate.execute(param),
-      exception => this.markDataError(exception, param, context));
+      {
+        after: () => this.markDataLoaded(param, context),
+        success: () => this.onDataUpdate.execute(param),
+        error: exception => this.markDataError(exception, param, context),
+      });
   }
 
   private async loadingTask(param: TParam, context: TContext) {

@@ -9,6 +9,7 @@
 import { ConnectionInfoResource, ConnectionsManagerService, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
@@ -22,7 +23,8 @@ export class ConnectionDialogsService extends Bootstrap {
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
     private connectionsManagerService: ConnectionsManagerService,
-    private connectionInfoResource: ConnectionInfoResource
+    private connectionInfoResource: ConnectionInfoResource,
+    private notificationService: NotificationService,
   ) {
     super();
   }
@@ -76,15 +78,19 @@ export class ConnectionDialogsService extends Bootstrap {
             || !connection?.features.includes(EConnectionFeature.manageable);
         },
         title: 'ui_delete',
-        onClick: (context: IMenuContext<NavNode>) => {
+        onClick: async (context: IMenuContext<NavNode>) => {
           const node = context.data;
-          this.connectionsManagerService.deleteConnection(
-            NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
-          );
+          try {
+            await this.connectionsManagerService.deleteConnection(
+              NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
+            );
+          } catch (exception) {
+            this.notificationService.logException(exception, 'Failed to delete connection');
+          }
         },
       }
     );
   }
 
-  load(): void {}
+  load(): void { }
 }

@@ -12,8 +12,11 @@ import {
 } from 'react';
 import styled, { use } from 'reshadow';
 
+import { EventContext } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useObjectRef } from '../useObjectRef';
+import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext, ITableItemContext } from './TableItemContext';
 
@@ -21,7 +24,7 @@ interface ExpandProps {
   item: any;
 }
 
-type Props = React.PropsWithChildren<{
+interface Props {
   item: any;
   expandElement?: React.FunctionComponent<ExpandProps>;
   selectDisabled?: boolean;
@@ -29,9 +32,9 @@ type Props = React.PropsWithChildren<{
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
-}>;
+}
 
-export const TableItem = observer(function TableItem({
+export const TableItem: React.FC<Props> = observer(function TableItem({
   item,
   expandElement,
   selectDisabled = false,
@@ -40,7 +43,7 @@ export const TableItem = observer(function TableItem({
   className,
   onClick,
   onDoubleClick,
-}: Props) {
+}) {
   const styles = useStyles();
   const context = useContext(TableContext);
   if (!context) {
@@ -54,28 +57,32 @@ export const TableItem = observer(function TableItem({
     isExpanded: () => !!context.expandedItems.get(item),
   }), [item, selectDisabled]);
 
+  const isSelected = itemContext.isSelected();
+  const isExpanded = itemContext.isExpanded();
+
+  const ref = useObjectRef({ isSelected, itemContext, context, onClick });
+
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLTableRowElement>) => {
-      if (!selectDisabled) {
-        event.stopPropagation();
-        const isSelected = context.selectedItems.get(item);
-        context.setItemSelect(item, !isSelected);
+      const { isSelected, itemContext, context, onClick } = ref;
+
+      if (!itemContext.selectDisabled && !EventContext.has(event, EventTableItemSelectionFlag)) {
+        context.setItemSelect(itemContext.item, !isSelected);
       }
 
       if (onClick) {
         onClick();
       }
     },
-    [context, item, selectDisabled, onClick]
+    []
   );
+
   const handleDoubleClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     if (onDoubleClick) {
       onDoubleClick();
     }
   }, [onDoubleClick]);
 
-  const isSelected = itemContext.isSelected();
-  const isExpanded = itemContext.isExpanded();
   const ExpandElement = expandElement;
 
   return styled(styles)(

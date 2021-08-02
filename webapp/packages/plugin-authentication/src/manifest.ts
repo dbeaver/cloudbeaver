@@ -18,6 +18,7 @@ import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { PluginBootstrap } from './PluginBootstrap';
+import { UserMenuService } from './UserMenu/UserMenuService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -35,5 +36,6 @@ export const manifest: PluginManifest = {
     ServerConfigurationAuthenticationBootstrap,
     UserFormService,
     UserFormBaseBootstrap,
+    UserMenuService,
   ],
 };

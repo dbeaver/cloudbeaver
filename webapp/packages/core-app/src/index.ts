@@ -6,6 +6,7 @@ export * from './TopNavBar/SettingsMenu/SettingsMenuService';
 export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/TopNavBarService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
+export * from './TopNavBar/shared/topMenuStyles';
 export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';
@@ -16,16 +17,20 @@ export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NavTreeResource';
 export * from './shared/NodesManager/NavNodeExtensionsService';
+export * from './shared/NodesManager/NodeLink';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
-export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
-export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
+export * from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
+export * from './shared/ToolsPanel/LogViewer/LogViewerService';
+
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
+export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
+export * from './NavigationTree/useElementsTree';
 export * from './AppLocaleService';
 
 // Models

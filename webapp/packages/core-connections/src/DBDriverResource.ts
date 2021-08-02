@@ -62,6 +62,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
       });
 
       if (key === allKey) {
+        this.resetIncludes();
         this.data.clear();
       }
 

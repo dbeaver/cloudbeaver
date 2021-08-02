@@ -20,6 +20,7 @@ import type { IDataPresentationOptions } from '../../DataPresentationService';
 
 interface Props {
   model: IDatabaseDataModel<any>;
+  resultIndex: number;
   presentation: IDataPresentationOptions;
   className?: string;
   style?: ComponentStyle;

@@ -10,9 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useCallback } from 'react';
 import styled, { use } from 'reshadow';
 
+import { EventContext } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Icon } from '../Icons/Icon';
+import { Icon } from '../Icon';
+import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
+import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
@@ -22,11 +25,11 @@ interface Props {
   disabled?: boolean;
 }
 
-export const TableItemExpand = observer(function TableItemExpand({
+export const TableItemExpand: React.FC<Props> = observer(function TableItemExpand({
   onExpand,
   className,
   disabled,
-}: Props) {
+}) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const styles = useStyles();
@@ -34,14 +37,14 @@ export const TableItemExpand = observer(function TableItemExpand({
     throw new Error('TableContext must be provided');
   }
   const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
-    event.stopPropagation();
-
     if (disabled) {
       return;
     }
 
     const state = !context.isExpanded();
 
+    EventContext.set(event, EventTableItemExpandFlag, state);
+    EventContext.set(event, EventTableItemSelectionFlag);
     tableContext?.setItemExpand(context.item, state);
 
     if (onExpand) {
@@ -50,7 +53,7 @@ export const TableItemExpand = observer(function TableItemExpand({
   }, [tableContext, context, onExpand, disabled]);
 
   return styled(styles)(
-    <table-item-expand-box as='div' className={className} onClick={handleClick}>
+    <table-item-expand-box className={className} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
     </table-item-expand-box>
   );

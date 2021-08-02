@@ -7,15 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useFocus } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { useActiveView } from '@cloudbeaver/core-view';
 
-import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { ElementsTree } from './ElementsTree';
+import { navigationTreeConnectionGroupFilter } from './navigationTreeConnectionGroupFilter';
+import { navigationTreeConnectionGroupRenderer } from './navigationTreeConnectionGroupRenderer';
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
 
@@ -55,10 +59,18 @@ const navigationTreeStyles = css`
 
 export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+
   const [onFocus, onBlur] = useActiveView(navTreeService.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
-  const { isSelected, handleOpen, handleSelect } = useNavigationTree();
+  const { handleOpen, handleSelect } = useNavigationTree();
+
+  const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
+    connectionInfoResource,
+    navNodeInfoResource
+  ), [connectionInfoResource, navNodeInfoResource]);
 
   if (!isEnabled) {
     return null;
@@ -68,6 +80,9 @@ export const NavigationTree = observer(function NavigationTree() {
     <inside-box ref={ref} as='div' tabIndex={0}>
       <ElementsTree
         root={ROOT_NODE_PATH}
+        localState={navTreeService.treeState}
+        filters={[connectionGroupFilter]}
+        renderers={[navigationTreeConnectionGroupRenderer]}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center as="div">
             <message as="div">
@@ -76,9 +91,8 @@ export const NavigationTree = observer(function NavigationTree() {
             </message>
           </center>
         )}
-        isSelected={isSelected}
+        customSelect={handleSelect}
         onOpen={handleOpen}
-        onSelect={handleSelect}
       />
     </inside-box>
   );

@@ -9,16 +9,24 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 export interface IDatabaseDataActionClass<
+  TOptions,
   TResult extends IDatabaseDataResult,
-  TAction extends IDatabaseDataAction<TResult>
+  TAction extends IDatabaseDataAction<TOptions, TResult>
 > {
-  new (result: TResult): TAction;
+  new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult): TAction;
   dataFormat: ResultDataFormat;
 }
 
-export interface IDatabaseDataAction<TResult extends IDatabaseDataResult> {
-  readonly result: TResult;
+export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> {
+  readonly source: IDatabaseDataSource<TOptions, TResult>;
+  result: TResult;
+  resultIndex: number;
   updateResult: (result: TResult) => void;
+  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ) => T;
+  dispose: () => void;
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
@@ -23,6 +23,7 @@ import {
   ResourceKeyUtils,
   TestConnectionMutation,
   NavigatorSettingsInput,
+  ResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
@@ -46,10 +47,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
 
-  /**
-   * @deprecated Should be refactored according new SessionDataResource
-   */
-  readonly onSessionUpdate: IExecutor<Connection[]>;
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
@@ -68,13 +65,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
     this.onConnectionCreate = new Executor();
     this.onConnectionClose = new Executor();
-    this.onSessionUpdate = new Executor();
     this.sessionUpdate = false;
 
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
-    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    // this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
@@ -95,25 +91,21 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           }
         }
 
+        this.resetIncludes();
         const { connections } = await this.graphQLService.sdk.getUserConnections({
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(),
         });
 
-        const restoredConnections = new Set<string>();
+        runInAction(() => {
+          const unrestoredConnectionIdList = Array.from(this.data.values())
+            .map(connection => connection.id)
+            .filter(connectionId => !connections.some(connection => connection.id === connectionId));
 
-        for (const connection of connections) {
-          await this.add(connection);
-          restoredConnections.add(connection.id);
-        }
+          this.delete(resourceKeyList(unrestoredConnectionIdList));
+        });
 
-        const unrestoredConnectionIdList = Array.from(this.data.values())
-          .map(connection => connection.id)
-          .filter(connectionId => !restoredConnections.has(connectionId));
-
-        this.delete(resourceKeyList(unrestoredConnectionIdList));
-
-        await this.onSessionUpdate.execute(connections);
+        await this.addList(connections);
       });
     } finally {
       this.sessionUpdate = false;
@@ -156,6 +148,17 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     });
 
     return this.add(connection);
+  }
+
+  async addList(connections: Connection[]): Promise<Connection[]> {
+    const newConnections = connections.filter(connection => !this.data.has(connection.id));
+    const key = this.updateConnection(...connections);
+
+    for (const connection of newConnections) {
+      await this.onConnectionCreate.execute(this.get(connection.id)!);
+    }
+
+    return this.get(key) as Connection[];
   }
 
   async add(connection: Connection): Promise<Connection> {
@@ -244,17 +247,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
         ...this.getIncludesMap(key, includes),
       });
 
-      for (const connection of connections) {
-        this.updateConnection(connection);
-      }
+      this.updateConnection(...connections);
     });
 
     return this.data;
   }
 
-  private updateConnection(connection: Connection) {
-    const oldConnection = this.get(connection.id) || {};
-    this.set(connection.id, { ...oldConnection, ...connection });
+  private updateConnection(...connections: Connection[]): ResourceKeyList<string> {
+    const key = resourceKeyList(connections.map(connection => connection.id));
+
+    const oldConnection = this.get(key);
+    this.set(key, oldConnection.map((connection, i) => ({ ...connection, ...connections[i] })));
+
+    return key;
   }
 
   private getDefaultIncludes(): ConnectionInfoIncludes {
@@ -265,4 +270,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       includeOrigin: true,
     };
   }
+}
+
+export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+  return (a.name).localeCompare(b.name);
 }

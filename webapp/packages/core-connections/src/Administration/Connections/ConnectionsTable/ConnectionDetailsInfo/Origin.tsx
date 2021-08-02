@@ -18,13 +18,14 @@ import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Origin({
   connection,
 }) {
-  const isLocal = connection.origin.type === AUTH_PROVIDER_LOCAL_ID;
-  const icon = connection.origin.icon;
-  const title = connection.origin.displayName;
+  const isLocal = connection.origin?.type === AUTH_PROVIDER_LOCAL_ID;
 
-  if (isLocal) {
+  if (!connection.origin || isLocal) {
     return null;
   }
+
+  const icon = connection.origin.icon;
+  const title = connection.origin.displayName;
 
   return styled(CONNECTION_DETAILS_STYLES)(
     <StaticImage icon={icon} title={title} />

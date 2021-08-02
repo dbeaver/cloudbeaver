@@ -21,8 +21,8 @@ import styled, { css, use } from 'reshadow';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
-import { Icon } from '../Icons/Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 
@@ -46,7 +46,7 @@ const styles = composes(
       font-weight: 500;
     }
     input {
-      padding-right: 20px;
+      padding-right: 12px !important;
     }
     MenuButton {
       position: absolute;
@@ -74,7 +74,7 @@ const styles = composes(
       & MenuItem {
         background: transparent;
         display: block;
-        padding: 4px 36px;
+        padding: 4px 12px;
         text-align: left;
         outline: none;
         color: inherit;
@@ -85,12 +85,8 @@ const styles = composes(
       height: 16px;
       display: block;
     }
-    MenuButton Icon {
-      transform: rotate(90deg);
-
-      &[|focus] {
-        transform: rotate(-90deg);
-      }
+    MenuButton Icon[|focus] {
+      transform: rotate(180deg);
     }
     input-box {
       flex: 1;
@@ -101,10 +97,11 @@ const styles = composes(
   `
 );
 
-type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value'> & ILayoutSizeProps & {
+type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
   propertyName?: string;
   items: TValue[];
   searchable?: boolean;
+  defaultValue?: string;
   keySelector: (item: TValue) => TKey;
   valueSelector: (item: TValue) => string;
   onSwitch?: (state: boolean) => void;
@@ -133,6 +130,7 @@ interface ComboboxType {
 
 export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
   value: controlledValue,
+  defaultValue,
   name,
   state,
   propertyName,
@@ -158,14 +156,10 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
     gutter: 4,
   });
   const [searchValue, setSearchValue] = useState('');
-  let value: string | number | readonly string[] | undefined = controlledValue;
+  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
-  if (state) {
-    if (name in state) {
-      value = state[name];
-    } else if (rest.defaultValue !== undefined) {
-      value = rest.defaultValue;
-    }
+  if (state && name !== undefined && name in state) {
+    value = state[name];
   }
 
   const selectedItem = items.find(item => keySelector(item) === value);

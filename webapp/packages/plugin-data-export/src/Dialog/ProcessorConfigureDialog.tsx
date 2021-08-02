@@ -23,7 +23,7 @@ const styles = composes(
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
     ErrorMessage {
-      composes: theme-background-secondary from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
   css`
@@ -83,7 +83,6 @@ export const ProcessorConfigureDialog = observer(
             onCancel={onClose}
           />
         )}
-        noBodyPadding
         onReject={onClose}
       >
         <PropertiesTable

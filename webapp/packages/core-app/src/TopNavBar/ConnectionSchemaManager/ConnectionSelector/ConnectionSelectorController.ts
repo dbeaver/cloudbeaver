@@ -12,7 +12,8 @@ import {
   ConnectionInfoResource,
   DBDriverResource,
   Connection,
-  ConnectionsManagerService
+  ConnectionsManagerService,
+  compareConnectionsInfo
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
@@ -73,14 +74,14 @@ export class ConnectionSelectorController {
       || this.getObjectContainerItems().length === 0;
   }
 
-  private get currentConnectionTitle(): string | undefined {
+  private get currentConnectionTitle(): string {
     if (this.currentConnection) {
       return this.currentConnection.name;
     }
     return 'app_topnavbar_connection_schema_manager_not_selected';
   }
 
-  private get currentObjectContainerTitle(): string | undefined {
+  private get currentObjectContainerTitle(): string {
     const value = NodeManagerUtils.concatSchemaAndCatalog(
       this.connectionSelectorService.currentObjectCatalogId,
       this.connectionSelectorService.currentObjectSchemaId
@@ -95,7 +96,7 @@ export class ConnectionSelectorController {
 
   private get currentObjectContainerIcon(): string {
     if (this.connectionSelectorService.currentObjectSchema?.features?.includes(EObjectFeature.schema)) {
-    // TODO move such kind of icon paths to a set of constants
+      // TODO move such kind of icon paths to a set of constants
       return 'schema_system';
     }
     if (this.connectionSelectorService.currentObjectCatalog?.features?.includes(EObjectFeature.catalog)) {
@@ -116,6 +117,7 @@ export class ConnectionSelectorController {
       currentConnectionIcon: computed,
       objectContainerSelectionDisabled: computed,
       currentObjectContainerIcon: computed,
+      isObjectContainerSelectorVisible: computed,
     });
 
     this.connectionMenu = new ComputedMenuItemModel({
@@ -143,14 +145,20 @@ export class ConnectionSelectorController {
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return Array.from(this.connectionInfo.data.values()).map(item => {
-      const menuItem: IMenuItem = {
-        id: item.id,
-        title: item.name || item.id,
-        onClick: () => this.connectionSelectorService.selectConnection(item.id),
-      };
-      return menuItem;
-    });
+    return this.connectionInfo.values
+      .slice()
+      .sort(compareConnectionsInfo)
+      .map(item => {
+        const icon = this.dbDriverResource.get(item.driverId)?.icon;
+
+        const menuItem: IMenuItem = {
+          id: item.id,
+          title: item.name || item.id,
+          icon,
+          onClick: () => this.connectionSelectorService.selectConnection(item.id),
+        };
+        return menuItem;
+      });
   }
 
   private getObjectContainerItems(): IMenuItem[] {
@@ -174,9 +182,16 @@ export class ConnectionSelectorController {
           ? () => this.connectionSelectorService.selectCatalog(catalogName!)
           : () => this.connectionSelectorService.selectSchema(schemaName!);
 
+        let icon = 'database';
+
+        if (catalogName && schemaName) {
+          icon = 'schema_system';
+        }
+
         const menuItem: IMenuItem = {
           id: title,
           title,
+          icon,
           onClick: handler,
         };
         return menuItem;

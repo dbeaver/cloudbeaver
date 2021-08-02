@@ -46,7 +46,7 @@ public class WebDatabaseDriverConfig {
     public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
         this.driver = driver;
-        this.id = WebServiceUtils.makeDriverFullId(driver);
+        this.id = driver.getFullId();
     }
 
     @Property

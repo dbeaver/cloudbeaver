@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -65,21 +66,21 @@ public class WebSessionManager {
         return false;
     }
 
-    public boolean touchSession(@NotNull HttpServletRequest request) throws DBWebException {
-        WebSession webSession = getWebSession(request, false);
-        webSession.updateInfo(request);
+    public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+        WebSession webSession = getWebSession(request, response, false);
+        webSession.updateInfo(request, response);
         return true;
     }
 
-    public WebSession getWebSession(@NotNull HttpServletRequest request) throws DBWebException {
-        return getWebSession(request, true);
+    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+        return getWebSession(request, response, true);
     }
 
-    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(request, true, errorOnNoFound);
+    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
+        return getWebSession(request, response, true, errorOnNoFound);
     }
 
-    public WebSession getWebSession(HttpServletRequest request, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
@@ -103,7 +104,7 @@ public class WebSessionManager {
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request);
+                        webSession.updateInfo(request, response);
                         request.setAttribute("sessionUpdated", true);
                     }
                 }

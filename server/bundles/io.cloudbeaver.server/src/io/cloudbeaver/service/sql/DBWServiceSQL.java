@@ -24,6 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,24 @@ import java.util.Map;
 public interface DBWServiceSQL extends DBWService {
 
     @WebAction
+    WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException;
+
+    @WebAction
     WebSQLDialectInfo getDialectInfo(@NotNull WebSQLProcessor processor) throws DBWebException;
 
     @WebAction
-    WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException;
+    WebSQLCompletionProposal[] getCompletionProposals(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String query,
+        Integer position,
+        Integer maxResults,
+        Boolean simpleMode) throws DBWebException;
+
+    @WebAction
+    DBCLogicalOperator[] getSupportedOperations(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        int attributeIndex) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;
@@ -82,4 +97,14 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlExplainExecutionPlan(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @NotNull Map<String, Object> options) throws DBException;
+
+    @WebAction
+    WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
 }

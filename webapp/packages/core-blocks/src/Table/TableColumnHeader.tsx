@@ -10,18 +10,18 @@ import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-type Props = React.PropsWithChildren<{
+interface Props {
   title?: string;
   min?: boolean;
   className?: string;
-}>;
+}
 
-export function TableColumnHeader({
+export const TableColumnHeader: React.FC<Props> = function TableColumnHeader({
   title, children, min, className,
-}: Props) {
+}) {
   return styled(useStyles())(
     <th title={title} className={className} {...use({ min })}>
       {children}
     </th>
   );
-}
+};

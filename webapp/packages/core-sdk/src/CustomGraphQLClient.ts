@@ -13,9 +13,13 @@ import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 
 export class CustomGraphQLClient extends GraphQLClient {
+  get blockReason(): Error | string | null {
+    return this.requestsBlockedReason;
+  }
+
   private interceptors: IResponseInterceptor[] = [];
   private isRequestsBlocked = false;
-  private requestsBlockedReason?: Error | string;
+  private requestsBlockedReason: Error | string | null = null;
 
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.interceptors.push(interceptor);
@@ -28,6 +32,11 @@ export class CustomGraphQLClient extends GraphQLClient {
     );
   }
 
+  enableRequests(): void {
+    this.isRequestsBlocked = false;
+    this.requestsBlockedReason = null;
+  }
+
   blockRequests(reason: Error | string): void {
     this.isRequestsBlocked = true;
     this.requestsBlockedReason = reason;
@@ -38,7 +47,7 @@ export class CustomGraphQLClient extends GraphQLClient {
       if (this.requestsBlockedReason instanceof Error) {
         throw this.requestsBlockedReason;
       } else {
-        throw new Error(this.requestsBlockedReason);
+        throw new Error(this.requestsBlockedReason ?? undefined);
       }
     }
   }

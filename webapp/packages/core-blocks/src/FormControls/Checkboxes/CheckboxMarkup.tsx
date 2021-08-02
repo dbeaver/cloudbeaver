@@ -110,7 +110,7 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  label, className, title, mod = ['primary'], ripple = true, style, ...rest
+  id, label, className, title, mod = ['primary'], ripple = true, style, ...rest
 }) {
   return styled(
     useStyles(
@@ -123,7 +123,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   )(
     <checkbox-container className={className} title={title} as='div'>
       <checkbox as='div'>
-        <checkbox-input as='input' type='checkbox' {...rest} />
+        <checkbox-input as='input' type='checkbox' {...rest} id={id || rest.name} />
         <checkbox-background as='div'>
           <checkbox-checkmark as='svg' viewBox='0 0 24 24'>
             <checkbox-checkmark-path as='path' fill='none' d='M1.73,12.91 8.1,19.28 22.79,4.59' />
@@ -134,7 +134,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
           <checkbox-ripple as='div' />
         )}
       </checkbox>
-      {label && rest.id && <checkbox-label as='label' htmlFor={rest.id}>{label}</checkbox-label>}
+      {label && (id || rest.name) && <checkbox-label as='label' htmlFor={id || rest.name}>{label}</checkbox-label>}
     </checkbox-container>
   );
 };

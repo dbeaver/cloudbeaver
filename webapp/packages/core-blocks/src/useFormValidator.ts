@@ -18,7 +18,8 @@ export function useFormValidator(
 ): void {
   useExecutor({
     executor: validationTask,
-    handlers: [function validate() {
+    postHandlers: [function validate() {
+      ref.current?.focus();
       ref.current?.checkValidity();
       ref.current?.reportValidity();
 

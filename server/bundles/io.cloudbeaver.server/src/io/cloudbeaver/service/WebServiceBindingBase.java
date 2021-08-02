@@ -31,6 +31,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -92,18 +93,22 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return GraphQLEndpoint.getServletRequest(env);
     }
 
+    protected static HttpServletResponse getServletResponse(DataFetchingEnvironment env) {
+        return GraphQLEndpoint.getServletResponse(env);
+    }
+
     protected static DBWBindingContext getBindingContext(DataFetchingEnvironment env) {
         return GraphQLEndpoint.getBindingContext(env);
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
         return CBPlatform.getInstance().getSessionManager().getWebSession(
-            getServletRequest(env));
+            getServletRequest(env), getServletResponse(env));
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         return CBPlatform.getInstance().getSessionManager().getWebSession(
-            getServletRequest(env), errorOnNotFound);
+            getServletRequest(env), getServletResponse(env), errorOnNotFound);
     }
 
     @NotNull

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -35,6 +35,15 @@ export type CachedMapResourceGetter<
 > = TRealKey extends ResourceKeyList<TKey>
   ? Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>
   : CachedResourceValueIncludes<TValue, TIncludes> | undefined;
+
+export type CachedMapResourceLoader<
+  TRealKey extends ResourceKey<TKey>,
+  TKey,
+  TValue,
+  TIncludes
+> = TRealKey extends ResourceKeyList<TKey>
+  ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
+  : CachedResourceValueIncludes<TValue, TIncludes>;
 
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
   includes: string[];
@@ -77,6 +86,8 @@ export abstract class CachedMapResource<
     }));
 
     makeObservable(this, {
+      set: action,
+      delete: action,
       values: computed,
       keys: computed,
     });
@@ -89,6 +100,14 @@ export abstract class CachedMapResource<
 
       return includes.every(include => metadata.includes.includes(include));
     });
+  }
+
+  getException(key: TKey): Error | null;
+  getException(key: ResourceKeyList<TKey>): Array<Error | null>;
+  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null;
+  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null {
+    key = this.transformParam(key);
+    return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
@@ -137,7 +156,7 @@ export abstract class CachedMapResource<
   markOutdated(key: ResourceKey<TKey>): Promise<void>
   async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
     if (!key) {
-      key = resourceKeyList(Array.from(this.data.keys()));
+      key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
     }
@@ -154,7 +173,7 @@ export abstract class CachedMapResource<
   markUpdated(key: ResourceKey<TKey>): void
   markUpdated(key?: ResourceKey<TKey>): void {
     if (!key) {
-      key = resourceKeyList(Array.from(this.data.keys()));
+      key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
     }

@@ -9,11 +9,13 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import { IConnectionFormSubmitData, IConnectionFormTabProps, ConnectionFormService } from '../ConnectionFormService';
+import { connectionConfigContext } from '../connectionConfigContext';
+import { ConnectionFormService } from '../ConnectionFormService';
+import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
@@ -34,26 +36,31 @@ export class ConnectionAccessTabService extends Bootstrap {
     this.connectionFormService.tabsContainer.add({
       key: this.key,
       name: 'connections_connection_edit_access',
+      title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: (tabId, props) => props?.options.type !== 'admin',
-      isDisabled: (tabId, props) => !props?.data.config.driverId
+      isHidden: (tabId, props) => props?.state.type !== 'admin',
+      isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
     });
 
     this.connectionFormService.formSubmittingTask
       .addHandler(this.save.bind(this));
+
+    this.connectionFormService.formStateTask
+      .addHandler(this.formState.bind(this));
   }
 
   load(): void { }
 
-  private stateGetter(context: IConnectionFormTabProps): MetadataValueGetter<string, IConnectionAccessTabState> {
+  private stateGetter(context: IConnectionFormProps): MetadataValueGetter<string, IConnectionAccessTabState> {
     return () => ({
-      selectedSubjects: new Map(),
       loading: false,
       loaded: false,
+      editing: false,
       grantedSubjects: [],
+      initialGrantedSubjects: [],
     });
   }
 
@@ -61,7 +68,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    if (data.submitType === 'test' || data.options.type === 'public') {
+    if (data.submitType === 'test' || data.state.type === 'public') {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
@@ -70,28 +77,61 @@ export class ConnectionAccessTabService extends Bootstrap {
       return;
     }
 
-    const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
-    const state = data.data.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
+    const config = contexts.getContext(connectionConfigContext);
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
+      data.state.partsState,
+      this.key,
+      { state: data.state }
+    );
 
-    if (!state || !config.connectionId) {
+    if (!config.connectionId || !state.loaded) {
       return;
     }
 
-    const subjects = await this.connectionsResource.loadAccessSubjects(config.connectionId);
+    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
 
-    if (this.isChanged(subjects, state.grantedSubjects)) {
+    if (changed) {
       await this.connectionsResource.setAccessSubjects(
         config.connectionId,
-        state.grantedSubjects.map(subject => subject.subjectId)
+        state.grantedSubjects
       );
+      state.initialGrantedSubjects = state.grantedSubjects.slice();
     }
   }
 
-  private isChanged(current: AdminConnectionGrantInfo[], next: AdminConnectionGrantInfo[]): boolean {
+  private async formState(
+    data: IConnectionFormState,
+    contexts: IExecutionContextProvider<IConnectionFormState>
+  ) {
+    if (data.type === 'public') {
+      return;
+    }
+    const config = contexts.getContext(connectionConfigContext);
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
+      data.partsState,
+      this.key,
+      { state: data }
+    );
+
+    if (!config.connectionId) {
+      return;
+    }
+
+    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
+
+    if (changed) {
+      const stateContext = contexts.getContext(connectionFormStateContext);
+
+      stateContext.markEdited();
+    }
+  }
+
+  private async isChanged(connectionId: string, next: string[]): Promise<boolean> {
+    const current = await this.connectionsResource.loadAccessSubjects(connectionId);
     if (current.length !== next.length) {
       return true;
     }
 
-    return current.some(value => !next.some(subject => subject.subjectId === value.subjectId));
+    return current.some(value => !next.some(subjectId => subjectId === value.subjectId));
   }
 }

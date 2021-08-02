@@ -32,10 +32,16 @@ export const UNDERLINE_TAB_STYLES = composes(
       padding: 0 14px !important;
       border-top: none !important;
       font-weight: normal !important;
+
       &:global([aria-selected="false"]) {
         opacity: 0.8;
         border-bottom: 2px solid transparent !important;
       }
+
+      &:global([aria-disabled="true"]) {
+        opacity: 0.5;
+      }
+
       &:hover {
         cursor: pointer;
         opacity: 1;

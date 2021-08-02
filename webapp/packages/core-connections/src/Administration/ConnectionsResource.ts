@@ -9,9 +9,10 @@
 import { action, makeObservable } from 'mobx';
 import { Observable, Subject } from 'rxjs';
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ConnectionConfig,
@@ -23,6 +24,8 @@ import {
   DatabaseConnectionFragment,
   GetConnectionsQueryVariables,
   TestConnectionMutation,
+  resourceKeyList,
+  ResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -31,10 +34,9 @@ export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 export type DatabaseConnection = DatabaseConnectionFragment;
 export type NewConnection = DatabaseConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
-const allKey = 'all';
-
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables> {
+  static keyAll = resourceKeyList(['all'], 'all');
   readonly onConnectionCreate: Observable<DatabaseConnection>;
 
   private changed: boolean;
@@ -43,6 +45,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   constructor(
     private graphQLService: GraphQLService,
+    private permissionsResource: PermissionsResource,
     sessionDataResource: SessionDataResource
   ) {
     super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
@@ -51,12 +54,19 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
       add: action,
     });
 
-    sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
+    sessionDataResource.onDataUpdate.addHandler(() => this.markOutdated());
 
     this.changed = false;
     this.connectionCreateSubject = new Subject<DatabaseConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
     this.loadedKeyMetadata = new MetadataMap(() => false);
+
+    this.addAlias(ConnectionsResource.keyAll, key => {
+      if (this.keys.length > 0) {
+        return resourceKeyList(this.keys, ConnectionsResource.keyAll.mark);
+      }
+      return ConnectionsResource.keyAll;
+    });
   }
 
   has(id: string): boolean {
@@ -74,16 +84,16 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     };
   }
 
-  async refreshAll(): Promise<Map<string, DatabaseConnection>> {
+  async refreshAll(): Promise<DatabaseConnection[]> {
     this.resetIncludes();
-    await this.refresh(allKey);
-    return this.data;
+    await this.refresh(ConnectionsResource.keyAll);
+    return this.values;
   }
 
-  async loadAll(): Promise<Map<string, DatabaseConnection>> {
+  async loadAll(): Promise<DatabaseConnection[]> {
     this.resetIncludes();
-    await this.load(allKey);
-    return this.data;
+    await this.load(ConnectionsResource.keyAll);
+    return this.values;
   }
 
   async searchDatabases(hosts: string[]): Promise<AdminConnectionSearchInfo[]> {
@@ -188,25 +198,28 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
   }
 
   protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DatabaseConnection>> {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+    if (!(await this.permissionsResource.hasAsync(EAdminPermission.admin))) {
+      return this.data;
+    }
+
+    const all = ResourceKeyUtils.hasMark(key, ConnectionsResource.keyAll.mark);
+
+    await ResourceKeyUtils.forEachAsync(all ? ConnectionsResource.keyAll : key, async key => {
       const { connections } = await this.graphQLService.sdk.getConnections({
-        id: key !== allKey ? key : undefined,
+        id: !all ? key : undefined,
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(undefined, includes),
       });
 
-      if (key === allKey) {
+      if (all) {
+        this.resetIncludes();
         this.data.clear();
       }
 
-      for (const connection of connections) {
-        this.updateConnection(connection);
-      }
+      this.updateConnection(...connections);
 
-      if (key === allKey) {
-        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
-        //       here we should check is it's was a full update
-        this.loadedKeyMetadata.set(allKey, true);
+      if (all) {
+        this.loadedKeyMetadata.set(ConnectionsResource.keyAll.list[0], true);
       }
     });
 
@@ -227,9 +240,13 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     this.data.delete(connectionId);
   }
 
-  private updateConnection(connection: DatabaseConnection) {
-    const oldConnection = this.get(connection.id) || {};
-    this.set(connection.id, { ...oldConnection, ...connection });
+  private updateConnection(...connections: DatabaseConnection[]): ResourceKeyList<string> {
+    const key = resourceKeyList(connections.map(connection => connection.id));
+
+    const oldConnection = this.get(key);
+    this.set(key, oldConnection.map((connection, i) => ({ ...connection, ...connections[i] })));
+
+    return key;
   }
 
   private getDefaultIncludes(): GetConnectionsQueryVariables {
@@ -250,6 +267,9 @@ export function isLocalConnection(connection: DatabaseConnection): boolean {
 }
 
 export function isCloudConnection(connection: DatabaseConnection): boolean {
+  if (!connection.origin) {
+    return false;
+  }
   return connection.origin.type === 'cloud';
 }
 

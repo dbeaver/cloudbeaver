@@ -6,28 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { PropsWithChildren } from 'react';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
-import { useService } from '@cloudbeaver/core-di';
-import { EnvironmentService } from '@cloudbeaver/core-sdk';
-
-type StaticImageProps = PropsWithChildren<{
+interface Props {
   icon?: string;
   className?: string;
   title?: string;
   onClick?: (e: React.MouseEvent) => void;
-}>;
+}
 
-export function StaticImage({
+export const StaticImage: React.FC<Props> = function StaticImage({
   icon, className, title, onClick,
-}: StaticImageProps) {
-  const { staticEndpoint } = useService(EnvironmentService);
-
+}) {
   if (!icon) {
     return null;
   }
 
-  const url = icon[0] === '/' ? icon : `${staticEndpoint}/images/${icon}`;
+  const url = GlobalConstants.absoluteUrl(icon);
 
   return <img className={className} src={url} title={title} onClick={onClick} />;
-}
+};

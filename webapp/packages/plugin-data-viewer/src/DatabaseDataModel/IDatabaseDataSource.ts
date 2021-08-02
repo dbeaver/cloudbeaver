@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionContext } from '../IExecutionContext';
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
@@ -17,6 +17,8 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 export interface IRequestInfo {
   readonly requestDuration: number;
   readonly requestMessage: string;
+  readonly requestFilter: string;
+  readonly source: string | null;
 }
 
 export enum DatabaseDataAccessMode {
@@ -28,7 +30,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
-  readonly actions: IDatabaseDataActions<TResult>;
+  readonly actions: IDatabaseDataActions<TOptions, TResult>;
   readonly editor: IDatabaseDataEditor<TResult> | null;
   readonly results: TResult[];
   readonly offset: number;
@@ -36,17 +38,18 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
-  readonly executionContext: IExecutionContext | null;
+  readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
 
   isReadonly: () => boolean;
   isLoading: () => boolean;
+  isDisabled: (resultIndex: number) => boolean;
 
   hasResult: (resultIndex: number) => boolean;
 
-  getAction: <T extends IDatabaseDataAction<TResult>>(
+  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
 
   /** @deprecated will be moved to getAction */
@@ -60,11 +63,12 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
-  setExecutionContext: (context: IExecutionContext | null) => this;
+  setExecutionContext: (context: IConnectionExecutionContext | null) => this;
 
+  retry: () => Promise<void>;
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
-  cancel: () => Promise<boolean> | boolean;
+  cancel: () => Promise<void> | void;
   clearError: () => void;
   dispose: () => Promise<void>;
 }

@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import type { DataModelWrapper } from '../../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { TableFooterMenuItem } from './TableFooterMenuItem';
 import { TableFooterMenuService } from './TableFooterMenuService';
 
@@ -20,15 +20,11 @@ const styles = css`
     display: flex;
     height: 100%;
   }
-  TableFooterMenuItem {
-    text-transform: uppercase;
-    font-weight: 700;
-  }
 `;
 
 interface TableFooterMenuProps {
   resultIndex: number;
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
   className?: string;
 }
 
@@ -40,7 +36,7 @@ export const TableFooterMenu = observer(function TableFooterMenu({
   const mainMenuService = useService(TableFooterMenuService);
 
   return styled(styles)(
-    <menu-wrapper as="div" className={className}>
+    <menu-wrapper className={className}>
       {mainMenuService.constructMenuWithContext(model, resultIndex).map((topItem, i) => (
         <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}

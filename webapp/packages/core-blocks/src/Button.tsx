@@ -6,17 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 import { use } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles, composes, ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { Icon } from './Icon';
 import { Loader } from './Loader/Loader';
+import { useObjectRef } from './useObjectRef';
 
 const buttonStyles = composes(
   css`
     Button {
       composes: theme-button from global;
+    }
+    button-label {
+      composes: theme-button__label from global;
+    }
+    button-icon {
+      composes: theme-button__icon from global;
     }
     ripple {
       composes: theme-button_ripple from global;
@@ -47,6 +57,10 @@ const buttonStyles = composes(
         & button-label {
           opacity: 0;
         }
+      }
+
+      &[href] {
+        text-decoration: none;
       }
     }
     
@@ -89,32 +103,63 @@ type ButtonProps = (
   & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
 ) & {
   loading?: boolean;
+  icon?: string;
+  viewBox?: string;
+  styles?: ComponentStyle;
   mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
+  loader?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement> | (() => Promise<any>);
   download?: boolean;
 };
 
-export const Button: React.FC<ButtonProps> = function Button({
+export const Button: React.FC<ButtonProps> = observer(function Button({
   children,
+  icon,
+  viewBox,
   mod,
+  styles,
   tag = 'button',
   disabled = false,
   loading,
+  loader,
+  onClick,
   className,
   ...rest
 }) {
+  const state = useObjectRef({
+    loading: false,
+    click: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) => {},
+  }, {
+    click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) {
+      const returnValue = onClick?.(e);
+
+      if (returnValue instanceof Promise) {
+        if (loader) {
+          this.loading = true;
+          returnValue.finally(() => {
+            this.loading = false;
+          });
+        }
+      }
+    },
+  }, { loading: observable.ref }, ['click']);
+
+  loading = state.loading || loading;
+
   if (loading) {
     disabled = true;
   }
 
   const Button = tag;
-  return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} disabled={disabled} {...use({ loading })} className={className}>
-      <ripple as="div" />
-      <button-label as='div'>{children}</button-label>
+  return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
+    <Button {...rest} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
+      <ripple />
+      {icon && <button-icon><Icon name={icon} viewBox={viewBox} /></button-icon>}
+      <button-label as='span'>{children}</button-label>
       <Loader small />
     </Button>
   );
-};
+});

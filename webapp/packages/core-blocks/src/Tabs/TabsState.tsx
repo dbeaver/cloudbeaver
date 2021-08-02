@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { useObjectRef } from '../useObjectRef';
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
@@ -72,6 +72,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     open: onOpen,
     close: onClose,
     props,
+    tabsState,
     container,
     state,
     selectedId: selectedId || currentTabId,
@@ -79,6 +80,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     open: onOpen,
     close: onClose,
     props,
+    tabsState,
     container,
     state,
   });
@@ -132,6 +134,13 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }), []);
 
   const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
+  const getTabState = useCallback(
+    (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => dynamic.container?.getTabState(
+      dynamic.tabsState,
+      tabId,
+      dynamic.props,
+      valueGetter
+    ), []);
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
@@ -142,6 +151,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     closeExecutor,
     lazy,
     getTabInfo,
+    getTabState,
     open: handleOpen,
     close: handleClose,
   }), [
@@ -153,6 +163,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     openExecutor,
     lazy,
     getTabInfo,
+    getTabState,
     handleClose,
     handleOpen,
   ]);

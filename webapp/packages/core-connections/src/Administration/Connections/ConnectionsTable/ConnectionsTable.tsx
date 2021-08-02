@@ -28,9 +28,6 @@ const styles = composes(
     Table {
       width: 100%;
     }
-    TableColumnHeader {
-      border-top: solid 1px;
-    }
     TableItemSeparator {
       text-align: center;
     }

@@ -9,8 +9,20 @@
 import { computed, observable, makeObservable } from 'mobx';
 
 import type { ITask } from './ITask';
+import { Task } from './Task';
+
+interface ITaskContainer<T, TValue> {
+  readonly id: T;
+  task: ITask<TValue>;
+}
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
+export interface IScheduleOptions {
+  cancel?: () => Promise<any> | any;
+  after?: () => Promise<any> | any;
+  success?: () => Promise<any> | any;
+  error?: (exception: Error) => Promise<any> | any;
+}
 
 const queueLimit = 100;
 
@@ -23,7 +35,7 @@ export class TaskScheduler<TIdentifier> {
     return this.queue.length > 0;
   }
 
-  private readonly queue: Array<ITask<TIdentifier>>;
+  private readonly queue: Array<ITaskContainer<TIdentifier, any>>;
 
   private readonly isBlocked: BlockedExecution<TIdentifier> | null;
 
@@ -37,65 +49,79 @@ export class TaskScheduler<TIdentifier> {
     this.isBlocked = isBlocked;
   }
 
-  async schedule<T>(
+  isExecuting(id: TIdentifier): boolean {
+    if (!this.isBlocked) {
+      return this.executing;
+    }
+    return this.queue.some(active => this.isBlocked!(active.id, id));
+  }
+
+  schedule<T>(
     id: TIdentifier,
     promise: () => Promise<T>,
-    after?: () => Promise<any> | any,
-    success?: () => Promise<any> | any,
-    error?: (exception: Error) => Promise<any> | any,
-  ): Promise<T> {
-    const task: ITask<TIdentifier> = {
-      id,
-      task: this.scheduler(id, promise),
-    };
-
+    options?: IScheduleOptions,
+  ): ITask<T> {
     if (this.queue.length > queueLimit) {
       throw new Error('Execution queue limit is reached');
     }
-    this.queue.push(task);
 
-    try {
-      const value = await task.task;
-      await success?.();
-      return value;
-    } catch (exception) {
-      await error?.(exception);
-      throw exception;
-    } finally {
-      await after?.();
+    const task = new Task<T>(promise, options?.cancel);
+    const container: ITaskContainer<TIdentifier, T> = { id, task };
+    this.queue.push(container);
+
+    this.execute(container);
+
+    return task
+      .then(async value => {
+        await options?.success?.();
+        return value;
+      })
+      .catch(async exception => {
+        await options?.error?.(exception);
+        throw exception;
+      })
+      .finally(() => options?.after?.())
+      .finally(() => this.queue.splice(this.queue.indexOf(container), 1));
+  }
+
+  async cancel(id: TIdentifier): Promise<void> {
+    const containers = this.queue.filter(container => container.id === id && !container.task.cancelled);
+
+    for (const container of containers) {
+      await container.task.cancel();
     }
   }
 
   async wait(): Promise<void> {
     const queueList = this.queue.slice();
 
-    for (const task of queueList) {
+    for (const container of queueList) {
       try {
-        await task.task;
+        await container.task;
       } catch {}
     }
   }
 
-  private async scheduler<T>(
-    id: TIdentifier,
-    promise: () => Promise<T>,
-  ) {
-    try {
-      if (!this.isBlocked) {
-        return await promise();
+  private async execute<T>(container: ITaskContainer<TIdentifier, T>) {
+    if (this.isBlocked) {
+      const queueList = this.queue.filter(
+        active =>
+          active !== container
+            && this.isBlocked!(active.id, container.id)
+      );
+
+      for (const _container of queueList) {
+        if (container.task.cancelled) {
+          throw new Error('Task was cancelled');
+        }
+        if (!_container.task.cancelled) {
+          try {
+            await _container.task;
+          } catch {}
+        }
       }
-
-      const queueList = this.queue.filter(active => this.isBlocked!(active.id, id));
-
-      for (const task of queueList) {
-        try {
-          await task.task;
-        } catch {}
-      }
-
-      return await promise();
-    } finally {
-      this.queue.splice(this.queue.findIndex(task => task.id === id), 1);
     }
+
+    container.task.run();
   }
 }

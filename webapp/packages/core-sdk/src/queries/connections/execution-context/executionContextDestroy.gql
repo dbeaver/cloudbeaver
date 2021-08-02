@@ -1,0 +1,9 @@
+mutation executionContextDestroy(
+  $connectionId: ID!
+  $contextId: ID!
+) {
+  sqlContextDestroy(
+    connectionId: $connectionId
+    contextId: $contextId
+  )
+}

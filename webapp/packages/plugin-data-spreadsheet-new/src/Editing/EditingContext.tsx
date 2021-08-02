@@ -7,13 +7,17 @@
  */
 
 import { createContext } from 'react';
-import type { Position } from 'react-data-grid/lib/types';
 
 export interface IEditingContext {
-  edit: (position: Position, key?: string) => void;
-  closeEditor: (position: Position) => void;
+  edit: (position: CellPosition, key?: string) => void;
+  closeEditor: (position: CellPosition) => void;
   close: () => void;
-  isEditing: (position: Position) => boolean;
+  isEditing: (position: CellPosition) => boolean;
+}
+
+export interface CellPosition {
+  idx: number;
+  rowIdx: number;
 }
 
 export const EditingContext = createContext<IEditingContext | null>(null);

@@ -13,13 +13,18 @@ import { Button } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 const styles = css`
-  controls {
+  footer-container {
     display: flex;
-    height: 100%;
+    width: min-content;
     flex: 1;
     align-items: center;
-    margin: auto;
     justify-content: flex-end;
+  }
+  footer-container > :not(:first-child) {
+    margin-left: 16px;
+  }
+  Button {
+    flex: 0 0 auto;
   }
 `;
 
@@ -28,14 +33,16 @@ export interface Props {
   onLogin: () => void;
 }
 
-export const AuthDialogFooter = observer(function AuthDialogFooter({
+export const AuthDialogFooter: React.FC<Props> = observer(function AuthDialogFooter({
   isAuthenticating,
   onLogin,
-}: Props) {
+  children,
+}) {
   const translate = useTranslate();
 
   return styled(styles)(
-    <controls as="div">
+    <footer-container>
+      {children}
       <Button
         type="button"
         mod={['unelevated']}
@@ -44,7 +51,6 @@ export const AuthDialogFooter = observer(function AuthDialogFooter({
       >
         {translate('authentication_login')}
       </Button>
-    </controls>
+    </footer-container>
   );
-}
-);
+});

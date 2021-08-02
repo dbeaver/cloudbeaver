@@ -137,16 +137,35 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
+    public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId, String roleName, String description) throws DBWebException {
         if (roleId.isEmpty()) {
             throw new DBWebException("Empty role ID");
         }
         try {
             WebRole newRole = new WebRole(roleId);
+            newRole.setName(roleName);
+            newRole.setDescription(description);
             CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole);
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public AdminRoleInfo updateRole(@NotNull WebSession webSession, String roleId, String roleName, String description) throws DBWebException {
+        if (roleId.isEmpty()) {
+            throw new DBWebException("Empty role ID");
+        }
+        try {
+            WebRole newRole = new WebRole(roleId);
+            newRole.setName(roleName);
+            newRole.setDescription(description);
+            CBPlatform.getInstance().getApplication().getSecurityController().updateRole(newRole);
+            return new AdminRoleInfo(newRole);
+        } catch (Exception e) {
+            throw new DBWebException("Error updating role " + roleId, e);
         }
     }
 
@@ -396,8 +415,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 }
             }
 
+            boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
+
             CBApplication.getInstance().finishConfiguration(
                 config.getServerName(),
+                config.getServerURL(),
                 adminName,
                 adminPassword,
                 authInfoList,
@@ -405,7 +427,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig);
 
             // Refresh active session
-            webSession.forceUserRefresh(null);
+            if (configurationMode) {
+                // In config mode we always refresh because admin user doesn't exist yet
+                webSession.forceUserRefresh(null);
+            } else {
+                // Just reload session state
+                webSession.forceUserRefresh(webSession.getUser());
+            }
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
         }

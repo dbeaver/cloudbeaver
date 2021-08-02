@@ -18,7 +18,9 @@ import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 import { DataValuePanelBootstrap } from './TableViewer/ValuePanel/DataValuePanelBootstrap';
 import { DataValuePanelService } from './TableViewer/ValuePanel/DataValuePanelService';
+import { ImageValuePresentationBootstrap } from './ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap';
 import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap';
+import { TextValuePresentationService } from './ValuePanelPresentation/TextValue/TextValuePresentationService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -35,7 +37,9 @@ export const manifest: PluginManifest = {
     TableHeaderService,
     LocaleService,
     DataValuePanelService,
+    TextValuePresentationService,
     TextValuePresentationBootstrap,
+    ImageValuePresentationBootstrap,
     DataValuePanelBootstrap,
   ],
 };

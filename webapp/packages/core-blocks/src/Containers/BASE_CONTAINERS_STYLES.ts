@@ -24,6 +24,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       display: flex;
       flex-direction: row;
       align-content: baseline;
+      position: relative;
 
       &[vertical] {
         flex-direction: column;
@@ -36,6 +37,12 @@ export const BASE_CONTAINERS_STYLES = composes(
 
       &[baseline] {
         align-items: baseline;
+      }
+
+      &[center] {
+        align-items: center;
+        justify-content: center;
+        align-content: center;
       }
 
       &[wrap] {
@@ -65,6 +72,11 @@ export const BASE_CONTAINERS_STYLES = composes(
         margin-right: 25%;
       }
 
+      &[box] {
+        padding: 0;
+        overflow: hidden;
+      }
+
       &[center] {
         margin: 0 auto;
       }
@@ -81,6 +93,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[keepSize], & > [keepSize] {
         flex-grow: 0;
         flex-basis: 0;
+        flex-basis: auto; /* test for layout */
       }
 
       &[tiny], & > [tiny] {
@@ -118,5 +131,15 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 0;
       text-transform: uppercase;
       opacity: 0.9;
-    }  
+    }
+
+    GroupClose {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      display: flex;
+      position: absolute;
+      right: 24px;
+      margin-right: 0 !important;
+    }
   `);

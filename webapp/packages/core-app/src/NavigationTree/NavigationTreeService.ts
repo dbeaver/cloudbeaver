@@ -6,28 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
-import { ConnectionAuthService } from '@cloudbeaver/core-connections';
+import { ConnectionAuthService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IActiveView } from '@cloudbeaver/core-view';
 
-import { CoreSettingsService } from '../CoreSettingsService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
-import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
-
-export interface INavigationNodeMetadata {
-  selected: boolean;
-  expanded: boolean;
-}
+import type { ITreeNodeState } from './useElementsTree';
 
 export interface INavigationNodeSelectionData {
   id: string;
@@ -36,66 +30,56 @@ export interface INavigationNodeSelectionData {
 
 @injectable()
 export class NavigationTreeService {
-  readonly navigationTreeMetadata: MetadataMap<string, INavigationNodeMetadata>;
+  readonly treeState: MetadataMap<string, ITreeNodeState>;
   readonly nodeSelectionTask: IExecutor<INavigationNodeSelectionData>;
-
-  get childrenLimit(): number {
-    return this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit');
-  }
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
     private connectionAuthService: ConnectionAuthService,
+    private connectionInfoResource: ConnectionInfoResource,
     private navNodeExtensionsService: NavNodeExtensionsService,
-    private navTreeResource: NavTreeResource,
-    private coreSettingsService: CoreSettingsService,
-    private navNodeInfoResource: NavNodeInfoResource
+    private navTreeResource: NavTreeResource
   ) {
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
-      childrenLimit: computed,
       unselectAll: action,
     });
+    this.treeState = new MetadataMap(() => ({
+      filter: '',
+      expanded: false,
+      selected: false,
+    }));
 
     this.nodeSelectionTask = new Executor();
-    this.navigationTreeMetadata = new MetadataMap<string, INavigationNodeMetadata>(() => ({
-      selected: false,
-      expanded: false,
-    }));
     this.getView = this.getView.bind(this);
-
-    this.navNodeInfoResource.onItemDelete.addHandler(key => {
-      ResourceKeyUtils.forEach(key, key => {
-        this.navigationTreeMetadata.delete(key);
-      });
-    });
-    this.navTreeResource.onItemDelete.addHandler(key => {
-      ResourceKeyUtils.forEach(key, key => {
-        this.expandNode(key, false);
-      });
-    });
   }
 
   getChildren(id: string): string[] | undefined {
-    const children = this.navTreeResource.get(id);
-
-    if (children) {
-      return children.slice(0, this.childrenLimit);
-    }
-
-    return children;
+    return this.navTreeResource.get(id);
   }
 
   async navToNode(id: string, parentId: string): Promise<void> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 
-  async loadNestedNodes(id = ROOT_NODE_PATH): Promise<boolean> {
+  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
     try {
-      if (this.isConnectionNode(id) && !(await this.tryInitConnection(id))) {
-        return false;
+      if (this.isConnectionNode(id)) {
+        const connection = await this.connectionInfoResource.load(
+          NodeManagerUtils.connectionNodeIdToConnectionId(id)
+        );
+
+        if (!connection.connected && !tryConnect) {
+          return false;
+        }
+
+        const connected = await this.tryInitConnection(id);
+
+        if (!connected) {
+          return false;
+        }
       }
-      await this.navNodeManagerService.loadTree(id);
+      await this.navTreeResource.load(id);
       return true;
     } catch (exception) {
       this.notificationService.logException(exception);
@@ -108,7 +92,7 @@ export class NavigationTreeService {
       await this.unselectAll();
     }
 
-    const metadata = this.navigationTreeMetadata.get(id);
+    const metadata = this.treeState.get(id);
     metadata.selected = !metadata.selected;
 
     await this.nodeSelectionTask.execute({
@@ -118,20 +102,20 @@ export class NavigationTreeService {
   }
 
   isNodeExpanded(navNodeId: string): boolean {
-    return this.navigationTreeMetadata.get(navNodeId).expanded;
+    return this.treeState.get(navNodeId).expanded;
   }
 
   isNodeSelected(navNodeId: string): boolean {
-    return this.navigationTreeMetadata.get(navNodeId).selected;
+    return this.treeState.get(navNodeId).selected;
   }
 
   expandNode(navNodeId: string, state: boolean): void {
-    const metadata = this.navigationTreeMetadata.get(navNodeId);
+    const metadata = this.treeState.get(navNodeId);
     metadata.expanded = state;
   }
 
   getView(): IActiveView<string> | null {
-    const element = Array.from(this.navigationTreeMetadata).find(([key, metadata]) => metadata.selected);
+    const element = Array.from(this.treeState).find(([key, metadata]) => metadata.selected);
 
     if (!element) {
       return null;
@@ -144,7 +128,7 @@ export class NavigationTreeService {
   }
 
   private async unselectAll() {
-    for (const [id, metadata] of this.navigationTreeMetadata) {
+    for (const [id, metadata] of this.treeState) {
       metadata.selected = false;
       await this.nodeSelectionTask.execute({
         id,

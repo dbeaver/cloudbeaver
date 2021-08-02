@@ -30,9 +30,9 @@ export const ServerConfigurationNavigatorViewForm: React.FC<Props> = observer(fu
 
   const onNavigatorViewChangeHandler = useCallback((value: boolean) => {
     if (value) {
-      configs.navigatorConfig = { ...configs.navigatorConfig, ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple };
+      Object.assign(configs.navigatorConfig, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
     } else {
-      configs.navigatorConfig = { ...configs.navigatorConfig, ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced };
+      Object.assign(configs.navigatorConfig, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
     }
   }, [configs]);
 

@@ -8,9 +8,9 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionContext } from '../IExecutionContext';
 import { DatabaseDataActions } from './DatabaseDataActions';
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
@@ -24,21 +24,23 @@ implements IDatabaseDataSource<TOptions, TResult> {
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
   editor: IDatabaseDataEditor<TResult> | null;
-  actions: IDatabaseDataActions<TResult>;
+  actions: IDatabaseDataActions<TOptions, TResult>;
   results: TResult[];
   offset: number;
   count: number;
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
-  executionContext: IExecutionContext | null;
+  executionContext: IConnectionExecutionContext | null;
   abstract get canCancel(): boolean;
 
+  protected disabled: boolean;
   private activeRequest: Promise<TResult[]> | null;
   private activeSave: Promise<TResult[]> | null;
+  private lastAction: () => Promise<void>;
 
   constructor() {
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'disabled'>(this, {
       access: observable,
       dataFormat: observable,
       supportedDataFormats: observable,
@@ -50,17 +52,19 @@ implements IDatabaseDataSource<TOptions, TResult> {
       requestInfo: observable,
       error: observable,
       executionContext: observable,
+      disabled: observable,
       activeRequest: observable,
       activeSave: observable,
     });
 
-    this.actions = new DatabaseDataActions();
+    this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
     this.editor = null;
     this.offset = 0;
     this.count = 0;
     this.options = null;
+    this.disabled = false;
     this.activeRequest = null;
     this.activeSave = null;
     this.executionContext = null;
@@ -69,13 +73,16 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.requestInfo = {
       requestDuration: 0,
       requestMessage: '',
+      requestFilter: '',
+      source: null,
     };
     this.error = null;
+    this.lastAction = this.requestData.bind(this);
   }
 
-  getAction<T extends IDatabaseDataAction<TResult>>(
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
     if (!this.hasResult(resultIndex)) {
       throw new Error('Result index out of range');
@@ -84,7 +91,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this.actions.get(this.results[resultIndex], action);
   }
 
-  abstract cancel(): Promise<boolean> | boolean;
+  abstract cancel(): Promise<void> | void;
 
   hasResult(resultIndex: number): boolean {
     return resultIndex < this.results.length;
@@ -112,16 +119,21 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   setResults(results: TResult[]): this {
     this.editor?.cancelChanges();
+    this.actions.updateResults(results);
     this.results = results;
     return this;
   }
 
   isReadonly(): boolean {
-    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1;
+    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
   }
 
   isLoading(): boolean {
     return !!this.activeRequest || !!this.activeSave;
+  }
+
+  isDisabled(resultIndex: number): boolean {
+    return !!this.activeRequest || !!this.activeSave || this.disabled;
   }
 
   setEditor(editor: IDatabaseDataEditor<TResult>): this {
@@ -152,13 +164,20 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
     this.supportedDataFormats = dataFormats;
-    this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
+
+    if (!this.supportedDataFormats.includes(this.dataFormat)) {
+      this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
+    }
     return this;
   }
 
-  setExecutionContext(context: IExecutionContext | null): this {
+  setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
     return this;
+  }
+
+  async retry(): Promise<void> {
+    await this.lastAction();
   }
 
   async requestData(): Promise<void> {
@@ -172,6 +191,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       await this.activeRequest;
       return;
     }
+    this.lastAction = this.requestData.bind(this);
 
     try {
       const promise = this.request(this.results);
@@ -179,8 +199,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeRequest = promise;
       }
-      this.editor?.cancelChanges();
-      this.results = await promise;
+      this.setResults(await promise);
     } finally {
       this.activeRequest = null;
     }
@@ -197,6 +216,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       await this.activeSave;
       return;
     }
+    this.lastAction = this.saveData.bind(this);
 
     try {
       const promise = this.save(this.results);
@@ -204,7 +224,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeSave = promise;
       }
-      this.results = await promise;
+      this.setResults(await promise);
     } finally {
       this.activeSave = null;
     }

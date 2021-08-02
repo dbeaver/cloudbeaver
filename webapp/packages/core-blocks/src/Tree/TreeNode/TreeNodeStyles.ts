@@ -28,7 +28,7 @@ export const TREE_NODE_STYLES = composes(
         }
 
         & > TreeNodeControl > TreeNodeExpand {
-          transform: rotate(90deg);
+          transform: rotate(0deg);
         }
       }
 
@@ -64,7 +64,7 @@ export const TREE_NODE_STYLES = composes(
       opacity: 0.5;
       width: 16px;
       height: 16px;
-
+      transform: rotate(-90deg);
       & [|size='small'] {
         display: block;
       }

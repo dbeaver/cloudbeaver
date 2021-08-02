@@ -6,21 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="react-sanitized-html.d.ts" />
+import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 
-import Sanitized from 'react-sanitized-html';
+const loader = createComplexLoader(async function loader() {
+  const { ReactSanitizedHTML } = await import('./ReactSanitizedHTML');
+  return { ReactSanitizedHTML };
+});
 
-export interface SanitizedHTMLProps {
+interface Props {
   html: string;
 }
 
-const allowedTags = ['h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
-  'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-  'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre'];
-
-const nonTextTags = ['title', 'style', 'script', 'textarea', 'noscript'];
-
-export function SanitizedHTML({ html }: SanitizedHTMLProps) {
-  return (<Sanitized html={html} allowedTags={allowedTags} nonTextTags={nonTextTags} />);
-}
+export const SanitizedHTML: React.FC<Props> = function SanitizedHTML({ html }) {
+  return (
+    <ComplexLoader
+      loader={loader}
+      placeholder={<Loader />}
+    >
+      {({ ReactSanitizedHTML }) => (
+        <ReactSanitizedHTML html={html} />
+      )}
+    </ComplexLoader>
+  );
+};

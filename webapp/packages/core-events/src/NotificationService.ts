@@ -9,6 +9,7 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { getErrorDetails, GQLError } from '@cloudbeaver/core-sdk';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
@@ -29,8 +30,9 @@ export const DELAY_DELETING = 1000;
 export class NotificationService {
   // todo change to common new Map()
 
-  readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
-  private notificationNextId = 0;
+  readonly notificationList: OrderedMap<number, INotification<any>>;
+  readonly closeTask: IExecutor<number>;
+  private notificationNextId: number;
 
   get visibleNotifications(): Array<INotification<any>> {
     return this.notificationList.values.filter(notification => !notification.isSilent);
@@ -38,7 +40,11 @@ export class NotificationService {
 
   constructor(
     private settings: EventsSettingsService
-  ) {}
+  ) {
+    this.notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
+    this.closeTask = new Executor();
+    this.notificationNextId = 0;
+  }
 
   notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
     options: INotificationOptions<TProps>, type: ENotificationType
@@ -64,7 +70,10 @@ export class NotificationService {
       state: observable({ deleteDelay: 0 }),
       timestamp: options.timestamp || Date.now(),
       type,
-      close: delayDeleting => this.close(id, delayDeleting),
+      close: delayDeleting => {
+        this.close(id, delayDeleting);
+        options.onClose?.(delayDeleting);
+      },
       showDetails: this.showDetails.bind(this, id),
     };
 
@@ -89,8 +98,8 @@ export class NotificationService {
     component: () => NotificationComponent<TProps>,
     props?: TProps extends any ? TProps : never, // some magic
     options?: INotificationOptions<TProps> & { type?: ENotificationType }
-  ): void {
-    this.notify({
+  ): INotification<TProps> {
+    return this.notify({
       title: '',
       ...options,
       customComponent: component,
@@ -117,16 +126,16 @@ export class NotificationService {
     return { controller: processController, notification };
   }
 
-  logInfo<T>(notification: INotificationOptions<T>): void {
-    this.notify(notification, ENotificationType.Info);
+  logInfo<T>(notification: INotificationOptions<T>): INotification<T> {
+    return this.notify(notification, ENotificationType.Info);
   }
 
-  logSuccess<T>(notification: INotificationOptions<T>): void {
-    this.notify(notification, ENotificationType.Success);
+  logSuccess<T>(notification: INotificationOptions<T>): INotification<T> {
+    return this.notify(notification, ENotificationType.Success);
   }
 
-  logError<T>(notification: INotificationOptions<T>): void {
-    this.notify(notification, ENotificationType.Error);
+  logError<T>(notification: INotificationOptions<T>): INotification<T> {
+    return this.notify(notification, ENotificationType.Error);
   }
 
   logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
@@ -154,11 +163,13 @@ export class NotificationService {
         notification.state.deleteDelay = DELAY_DELETING;
         setTimeout(() => {
           this.notificationList.remove(id);
+          this.closeTask.execute(id);
         }, DELAY_DELETING);
       }
       return;
     }
     this.notificationList.remove(id);
+    this.closeTask.execute(id);
   }
 
   showDetails(id: number): void {

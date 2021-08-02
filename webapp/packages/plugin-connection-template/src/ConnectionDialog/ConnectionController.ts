@@ -8,9 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName
-} from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName } from '@cloudbeaver/core-connections';
 import type { IFormInitConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -34,7 +32,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-  implements IInitializableController, IDestructibleController, IConnectionController {
+implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;

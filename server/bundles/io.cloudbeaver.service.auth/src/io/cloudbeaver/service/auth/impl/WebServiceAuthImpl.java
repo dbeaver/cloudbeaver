@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.*;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
@@ -74,7 +75,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
         } else {
             if (!providerEnabled) {
-                throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+                // Admin can use local provider anytime
+                if (!isAdminAuthTry(providerId, authParameters)) {
+                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+                }
             }
         }
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
@@ -137,11 +141,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                                         userId);
                                 }
                             }
-                        } else {
-                            // We may need to associate new credentials with active user
-                            if (linkWithActiveUser) {
-                                securityController.setUserCredentials(userId, authProvider, userCredentials);
-                            }
+                        }
+                        // We may need to associate new credentials with active user
+                        if (linkWithActiveUser) {
+                            securityController.setUserCredentials(userId, authProvider, userCredentials);
                         }
                     }
 
@@ -149,7 +152,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         throw new DBCException("Invalid user credentials");
                     }
                 }
-                if (curUser != null && !curUser.getUserId().equals(userId)) {
+                if (linkWithActiveUser && curUser != null && !curUser.getUserId().equals(userId)) {
                     log.debug("Attempt to authorize user '" + userId + "' while user '" + curUser.getUserId() + "' already authorized");
                     throw new DBCException("You cannot authorize with different users credentials");
                 }
@@ -205,6 +208,23 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
     }
 
+    private boolean isAdminAuthTry(@NotNull String providerId, @NotNull Map<String, Object> authParameters) {
+        boolean isAdmin = false;
+        if (LocalAuthProvider.PROVIDER_ID.equals(providerId)) {
+            Object userId = authParameters.get(LocalAuthProvider.CRED_USER);
+            if (userId != null) {
+                try {
+                    isAdmin = CBPlatform.getInstance().getApplication().getSecurityController()
+                        .getUserPermissions(CommonUtils.toString(userId))
+                            .contains(DBWConstants.PERMISSION_ADMIN);
+                } catch (DBCException e) {
+                    log.error(e);
+                }
+            }
+        }
+        return isAdmin;
+    }
+
     @Override
     public void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
         if (webSession.getUser() == null) {
@@ -226,6 +246,18 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         return WebServiceRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);
+    }
+
+    @Override
+    public boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("User must be logged in");
+        }
+        try {
+            return LocalAuthProvider.changeUserPassword(webSession, oldPassword, newPassword);
+        } catch (DBException e) {
+            throw new DBWebException("Error changing user password", e);
+        }
     }
 
 }

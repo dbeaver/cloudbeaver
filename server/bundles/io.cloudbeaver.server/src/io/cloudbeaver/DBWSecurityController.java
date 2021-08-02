@@ -85,6 +85,8 @@ public interface DBWSecurityController {
 
     void createRole(WebRole role) throws DBCException;
 
+    void updateRole(WebRole role) throws DBCException;
+
     void deleteRole(String roleId) throws DBCException;
 
     ///////////////////////////////////////////

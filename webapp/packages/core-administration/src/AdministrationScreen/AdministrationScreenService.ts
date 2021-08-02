@@ -13,7 +13,7 @@ import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { BuildVersion } from '@cloudbeaver/core-utils';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
@@ -68,21 +68,21 @@ export class AdministrationScreenService {
     private autoSaveService: LocalStorageSaveService,
     private serverConfigResource: ServerConfigResource
   ) {
-    makeObservable(this, {
-      info: observable,
-      itemState: observable,
-      activeScreen: computed,
-    });
-
     this.info = {
       workspaceId: '',
-      version: BuildVersion.version || '',
+      version: GlobalConstants.version || '',
       serverVersion: '',
       configurationMode: false,
     };
     this.itemState = new Map();
     this.activationEvent = new Executor();
     this.ensurePermissions = new Executor();
+
+    makeObservable(this, {
+      info: observable,
+      itemState: observable,
+      activeScreen: computed,
+    });
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
@@ -150,18 +150,7 @@ export class AdministrationScreenService {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
-    if (
-      this.info.workspaceId !== this.serverConfigResource.workspaceId
-      || this.info.configurationMode !== this.isConfigurationMode
-      || this.info.serverVersion !== this.serverConfigResource.serverVersion
-      || this.info.version !== BuildVersion.version
-    ) {
-      this.clearItemsState();
-      this.info.workspaceId = this.serverConfigResource.workspaceId;
-      this.info.configurationMode = this.isConfigurationMode;
-      this.info.serverVersion = this.serverConfigResource.serverVersion;
-      this.info.version = BuildVersion.version || '';
-    }
+    this.validateState();
 
     if (defaultState) {
       if (!this.itemState.has(name) || update) {
@@ -194,11 +183,13 @@ export class AdministrationScreenService {
 
     const toScreen = this.getScreen(nextState);
     const screen = this.getScreen(state);
+
     if (screen) {
       await this.administrationItemService.deActivate(
         screen,
         this.isConfigurationMode,
-        screen.item !== toScreen?.item
+        screen.item !== toScreen?.item,
+        toScreen === null
       );
     }
 
@@ -239,8 +230,24 @@ export class AdministrationScreenService {
       await this.administrationItemService.activate(
         screen,
         this.isConfigurationMode,
-        screen.item !== fromScreen?.item
+        screen.item !== fromScreen?.item,
+        fromScreen === null
       );
+    }
+  }
+
+  private validateState() {
+    if (
+      this.info.workspaceId !== this.serverConfigResource.workspaceId
+      || this.info.configurationMode !== this.isConfigurationMode
+      || this.info.serverVersion !== this.serverConfigResource.serverVersion
+      || this.info.version !== GlobalConstants.version
+    ) {
+      this.clearItemsState();
+      this.info.workspaceId = this.serverConfigResource.workspaceId;
+      this.info.configurationMode = this.isConfigurationMode;
+      this.info.serverVersion = this.serverConfigResource.serverVersion;
+      this.info.version = GlobalConstants.version || '';
     }
   }
 
@@ -249,7 +256,9 @@ export class AdministrationScreenService {
       return false;
     }
 
-    if (!(await this.isAccessProvided(state))) {
+    const accessProvided = await this.isAccessProvided(state);
+
+    if (!accessProvided) {
       this.screenService.navigateToRoot();
       return false;
     }
@@ -269,7 +278,9 @@ export class AdministrationScreenService {
 
     await this.ensurePermissions.execute();
 
-    if (!(await this.permissionsService.hasAsync(EAdminPermission.admin))) {
+    const administrator = await this.permissionsService.hasAsync(EAdminPermission.admin);
+
+    if (!administrator) {
       return false;
     }
 

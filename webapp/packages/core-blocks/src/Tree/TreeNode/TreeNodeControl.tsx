@@ -6,8 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, { useContext } from 'react';
 
+import { EventContext } from '@cloudbeaver/core-events';
+
+import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
+import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
 
 const KEY = {
@@ -20,7 +25,7 @@ interface Props {
   big?: boolean;
 }
 
-export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
+export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeControl({
   onClick,
   className,
   children,
@@ -32,7 +37,11 @@ export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
   }
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+      return;
+    }
+
+    EventContext.set(event, EventTreeNodeSelectFlag);
     switch ((event as unknown as KeyboardEvent).code) {
       case KEY.ENTER:
         context?.select(event.ctrlKey || event.metaKey);
@@ -42,11 +51,20 @@ export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
   };
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+      return;
+    }
 
     if (onClick) {
       onClick(event);
     }
+  };
+
+  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+      return;
+    }
+    context.open();
   };
 
   return (
@@ -56,9 +74,9 @@ export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
       className={className}
       onClick={handleClick}
       onKeyDown={handleEnter}
-      onDoubleClick={context.open}
+      onDoubleClick={handleDbClick}
     >
       {children}
     </div>
   );
-};
+});

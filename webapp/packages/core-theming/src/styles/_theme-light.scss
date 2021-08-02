@@ -17,16 +17,17 @@ $mdc-theme-background: #dedede;
 $color-positive: #52c41a;
 $color-on-positive: #fff;
 $color-negative: #e73e52;
+$color-status: #ff9900;
 
 $link-color: $mdc-theme-primary;
 $link-color-focus: #3f96d1;
 
-$input-border: #dedede;
-$input-border-disabled: transparent;
-$input-border-readonly: transparent;
+$input-border: #d9d9d9;
+$input-border-disabled: $input-border;
+$input-border-readonly: $input-border;
 $input-background: $mdc-theme-surface;
-$input-background-disabled: $mdc-theme-secondary;
-$input-background-readonly: $mdc-theme-secondary;
+$input-background-disabled: #e9e9e9;
+$input-background-readonly: #e9e9e9;
 
 $mdc-theme-text-colors: (
   light: (
@@ -40,7 +41,7 @@ $mdc-theme-text-colors: (
     primary: rgba(black, 0.87),
     secondary: rgba(black, 0.45),
     hint: rgba(black, 0.45),
-    disabled: rgba(black, 0.20),
+    disabled: rgba(black, 0.2),
     icon: rgba(black, 0.38),
   ),
 );

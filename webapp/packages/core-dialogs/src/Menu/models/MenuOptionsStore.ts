@@ -18,12 +18,15 @@ export interface IMenuItemOptions {
   id: string;
   // set title or getter
   title?: TLocalizationToken;
-  titleGetter?: () => TLocalizationToken | undefined;
+  titleGetter?: (...args: any[]) => TLocalizationToken | undefined;
   // set icon or getter
   icon?: string;
   iconGetter?: () => string | undefined;
+  tooltip?: string;
+  tooltipGetter?: () => TLocalizationToken | undefined;
   order?: number;
   isPanel?: boolean;
+  keepMenuOpen?: boolean;
   panel?: IMenuPanel;
   type?: MenuItemType;
   separator?: boolean;

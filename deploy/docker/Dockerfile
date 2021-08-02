@@ -1,7 +1,4 @@
-FROM adoptopenjdk/openjdk11:x86_64-ubuntu-jdk-11.0.7_10
-
-RUN apt-get update
-RUN apt-get install -y nano
+FROM adoptopenjdk/openjdk11:jdk-11.0.10_9-ubuntu-slim
 
 COPY cloudbeaver /opt/cloudbeaver
 

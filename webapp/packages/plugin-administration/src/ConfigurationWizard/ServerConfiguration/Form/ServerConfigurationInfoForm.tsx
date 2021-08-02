@@ -33,9 +33,20 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         state={state.serverConfig}
         mod='surface'
         required
-        tiny
+        medium
       >
         {translate('administration_configuration_wizard_configuration_server_name')}
+      </InputFieldNew>
+      <InputFieldNew
+        title={translate('administration_configuration_wizard_configuration_server_url_description')}
+        type="url"
+        name="serverURL"
+        state={state.serverConfig}
+        mod='surface'
+        required
+        medium
+      >
+        {translate('administration_configuration_wizard_configuration_server_url')}
       </InputFieldNew>
       <InputFieldNew
         title={translate('administration_configuration_wizard_configuration_server_session_lifetime_description')}
@@ -43,6 +54,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         name="sessionExpireTime"
         state={state.serverConfig}
         mod='surface'
+        min={1}
         mapState={v => (v ?? 1800000) / 1000 / 60}
         mapValue={v => (v ?? 30) * 1000 * 60}
         required

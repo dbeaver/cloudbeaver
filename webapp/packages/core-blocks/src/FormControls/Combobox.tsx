@@ -20,8 +20,8 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
-import { Icon } from '../Icons/Icon';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
@@ -70,12 +70,8 @@ const styles = composes(
       height: 16px;
       display: block;
     }
-    MenuButton Icon {
-      transform: rotate(90deg);
-
-      &[|focus] {
-        transform: rotate(-90deg);
-      }
+    MenuButton Icon[|focus] {
+      transform: rotate(180deg);
     }
     input-box {
       flex: 1;

@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
-
 export interface IConnectionAccessTabState {
   loading: boolean;
   loaded: boolean;
-  selectedSubjects: Map<string, boolean>;
-  grantedSubjects: AdminConnectionGrantInfo[];
+  grantedSubjects: string[];
+  initialGrantedSubjects: string[];
+  editing: boolean;
 }

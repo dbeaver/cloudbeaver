@@ -6,10 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
 import { isLocalConnection } from '../../Administration/ConnectionsResource';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
+import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormState } from '../IConnectionFormProps';
+import { ConnectionFormAuthenticationAction } from './ConnectionFormAuthenticationAction';
 import { OriginInfo } from './OriginInfo';
 import { OriginInfoTab } from './OriginInfoTab';
 
@@ -17,6 +23,7 @@ import { OriginInfoTab } from './OriginInfoTab';
 export class ConnectionOriginInfoTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
+    private readonly userInfoResource: UserInfoResource
   ) {
     super();
   }
@@ -27,9 +34,38 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       order: 3,
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
-      isHidden: (tabId, props) => props?.data.info ? isLocalConnection(props.data.info) : true,
+      stateGetter: () => () => ({}),
+      isHidden: (tabId, props) => props?.state.info ? isLocalConnection(props.state.info) : true,
     });
+
+    this.connectionFormService.configureTask
+      .addHandler(this.configure.bind(this));
+
+    this.connectionFormService.formStateTask
+      .addHandler(this.formState.bind(this));
+
+    this.connectionFormService.actionsContainer
+      .add(ConnectionFormAuthenticationAction, 0);
   }
 
   load(): void { }
+
+  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeOrigin');
+  }
+
+  private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    if (!data.info?.origin || data.info.origin.type === AUTH_PROVIDER_LOCAL_ID || data.mode !== 'edit') {
+      return;
+    }
+
+    const context = contexts.getContext(connectionFormStateContext);
+
+    if (!this.userInfoResource.hasOrigin(data.info.origin)) {
+      context.readonly = true;
+      context.setStatusMessage(`You need to sign in with ${data.info.origin.displayName} credentials to work with connection.`);
+    }
+  }
 }
