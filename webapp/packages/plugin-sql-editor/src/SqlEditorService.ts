@@ -75,8 +75,6 @@ export class SqlEditorService {
     }
 
     try {
-      await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
-
       return await this.connectionExecutionContextService.create(connection.id, catalogId, schemaId);
     } catch (exception) {
       this.notificationService.logException(
