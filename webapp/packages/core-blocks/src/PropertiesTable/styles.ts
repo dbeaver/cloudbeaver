@@ -39,7 +39,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
       width: 300px;
     }
     properties-header-add {
-      flex: 0 0 100%;
+      flex: 0 0 auto;
       padding: 0px 28px;
     }
 
