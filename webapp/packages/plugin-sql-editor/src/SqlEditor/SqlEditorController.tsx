@@ -32,6 +32,12 @@ import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 
 const closeCharacters = /[\s()[\]{};:>,=]/;
 
+interface ISubQuery {
+  begin: number;
+  end: number;
+  query: string;
+}
+
 @injectable()
 export class SqlEditorController implements IInitializableController {
   get dialect(): SqlDialectInfo | undefined {
@@ -131,7 +137,7 @@ export class SqlEditorController implements IInitializableController {
     }
     this.sqlQueryService.executeEditorQuery(
       this.tab.handlerState,
-      this.getSubQuery(),
+      this.getSubQuery().query,
       false
     );
   };
@@ -142,7 +148,7 @@ export class SqlEditorController implements IInitializableController {
     }
     this.sqlQueryService.executeEditorQuery(
       this.tab.handlerState,
-      this.getSubQuery(),
+      this.getSubQuery().query,
       true
     );
   };
@@ -153,7 +159,7 @@ export class SqlEditorController implements IInitializableController {
     }
     this.sqlExecutionPlanService.executeExecutionPlan(
       this.tab.handlerState,
-      this.getSubQuery(),
+      this.getSubQuery().query,
     );
   };
 
@@ -184,13 +190,21 @@ export class SqlEditorController implements IInitializableController {
     });
   }
 
-  private getExecutingQuery(): string {
+  private getExecutingQuery(): ISubQuery {
     if (!this.editor) {
-      return this.tab.handlerState.query;
+      return {
+        begin: 0,
+        end: 1,
+        query: this.tab.handlerState.query,
+      };
     }
 
     if (this.editor.somethingSelected()) {
-      return this.editor.getSelection();
+      return {
+        begin: this.editor.getCursor('from').line,
+        end: this.editor.getCursor('to').line,
+        query: this.editor.getSelection(),
+      };
     }
 
     const delimiters = [];
@@ -212,7 +226,16 @@ export class SqlEditorController implements IInitializableController {
         : 0;
     }
 
-    return this.editor.getRange({ line: begin, ch: 0 }, { line: end, ch: this.editor.getLine(end).length });
+    const query = this.editor.getRange(
+      { line: begin, ch: 0 },
+      { line: end, ch: this.editor.getLine(end).length }
+    );
+
+    return {
+      begin: begin,
+      end,
+      query,
+    };
   }
 
   private async getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined> {
@@ -307,26 +330,22 @@ export class SqlEditorController implements IInitializableController {
     }
 
     const query = this.getSubQuery();
-    const search = this.editor?.getSearchCursor(query, this.editor.getCursor('from'));
 
-    if (search?.find(false) || search?.find(true)) {
-      const from = search.from();
-      const to = search.to();
-
-      for (let line = from.line; line <= to.line; line++) {
-        this.editor?.addLineClass(line, 'background', 'active-query');
-      }
+    for (let line = query.begin; line <= query.end; line++) {
+      this.editor?.addLineClass(line, 'background', 'active-query');
     }
   }
 
-  private getSubQuery(): string {
+  private getSubQuery(): ISubQuery {
     const query = this.getExecutingQuery();
 
-    if (this.dialect?.scriptDelimiter && query.endsWith(this.dialect?.scriptDelimiter)) {
-      return query.slice(0, query.length - this.dialect.scriptDelimiter.length);
+    if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect?.scriptDelimiter)) {
+      query.query = query.query.slice(0, query.query.length - this.dialect.scriptDelimiter.length);
     }
 
-    return query.trim();
+    query.query = query.query.trim();
+
+    return query;
   }
 
   private findQueryBegin(editor: Editor, delimiters: string[], position: number) {
@@ -343,7 +362,7 @@ export class SqlEditorController implements IInitializableController {
     for (let line = position; line < count; line++) {
       const trimmed = editor.getLine(line).trim();
       if (this.isLineEndedWithDelimiter(delimiters, trimmed)) {
-        if (trimmed.length === 0 && line === position && line > 0) {
+        if (trimmed.length === 0 && line > 0) {
           return line - 1;
         }
         return line;
