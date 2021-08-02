@@ -95,7 +95,9 @@ export class ServerConfigurationService {
       .addHandler(this.validateForm)
       .addPostHandler(this.ensureValidation);
 
-    this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this, false));
+    this.serverConfigResource
+      .onDataUpdate
+      .addPostHandler(this.showUnsavedNotification.bind(this, false));
 
     this.administrationScreenService.activationEvent.addHandler(this.unlinkState.bind(this));
   }
@@ -122,6 +124,7 @@ export class ServerConfigurationService {
             return serverConfigStateContext();
           }
         );
+
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
         this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
 

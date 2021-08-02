@@ -171,6 +171,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   private syncUpdateData(serverConfig: ServerConfig) {
+    if (this.configurationMode) {
+      return;
+    }
+
     Object.assign(this.navigatorSettingsUpdate, serverConfig.defaultNavigatorSettings);
 
     this.update.serverName = serverConfig.name;
