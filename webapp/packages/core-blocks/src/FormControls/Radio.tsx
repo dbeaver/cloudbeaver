@@ -44,6 +44,9 @@ const radioStyles = composes(
       padding: 7px 12px;
       vertical-align: middle;
     }
+    label {
+      cursor: pointer;
+    }
   `
 );
 
@@ -164,8 +167,8 @@ export const Radio: RadioType = observer(function Radio({
   }
 
   return styled(useStyles(radioStyles, ...(mod || []).map(mod => radioMod[mod]), !ripple && noRippleStyles))(
-    <field as="div" className={className}>
-      <radio as="div">
+    <field className={className}>
+      <radio>
         <input
           {...rest}
           type="radio"
@@ -175,11 +178,11 @@ export const Radio: RadioType = observer(function Radio({
           checked={checked}
           onChange={handleChange}
         />
-        <radio-background as="div">
-          <radio-outer-circle as="div" />
-          <radio-inner-circle as="div" />
+        <radio-background>
+          <radio-outer-circle />
+          <radio-inner-circle />
         </radio-background>
-        {ripple && <radio-ripple as="div" />}
+        {ripple && <radio-ripple />}
       </radio>
       <label htmlFor={id}>{children}</label>
     </field>

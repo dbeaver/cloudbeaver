@@ -18,4 +18,5 @@ export default [
   ['data_viewer_presentation_value_image_title', 'Image'],
   ['data_viewer_presentation_value_image_fit', 'Fit Window'],
   ['data_viewer_presentation_value_image_original_size', 'Original Size'],
+  ['data_viewer_presentation_value_boolean_placeholder', "Can't show current value as boolean"],
 ];

@@ -113,10 +113,6 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
       row: position.rowIdx,
       column: column ? key : 0,
     });
-
-    if (!editingContext.isEditing(position)) {
-      editingContext.close();
-    }
   };
 
   const handleScroll = useCallback(

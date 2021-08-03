@@ -14,12 +14,11 @@ import { Cell } from 'react-data-grid';
 
 import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvaliable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { isBooleanFormatterAvailable } from '../Formatters/CellFormatters/isBooleanFormatterAvailable';
 import { TableDataContext } from '../TableDataContext';
 import { CellContext, ICellContext } from './CellContext';
 
@@ -108,7 +107,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
         || this.dataGridContext?.model.isDisabled(this.dataGridContext.resultIndex)
         || (
           this.resultColumn
-          && isBooleanFormatterAvailable(this.editor?.getCell(this.rowIdx, Number(this.column.key)), this.resultColumn)
+          && isBooleanValuePresentationAvaliable(
+            this.editor?.getCell(this.rowIdx, Number(this.column.key)),
+            this.resultColumn
+          )
         )
       ) {
         return;
