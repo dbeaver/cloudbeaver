@@ -66,7 +66,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
       <Radio
         id='true_value'
         mod={['primary']}
-        checked={value !== null && value}
+        checked={value === true}
         onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, true)}
       >
         TRUE
@@ -74,7 +74,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
       <Radio
         id='false_value'
         mod={['primary']}
-        checked={value !== null && !value}
+        checked={value === false}
         onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, false)}
       >
         FALSE
