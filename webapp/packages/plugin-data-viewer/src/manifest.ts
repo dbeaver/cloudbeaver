@@ -18,6 +18,7 @@ import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 import { DataValuePanelBootstrap } from './TableViewer/ValuePanel/DataValuePanelBootstrap';
 import { DataValuePanelService } from './TableViewer/ValuePanel/DataValuePanelService';
+import { BooleanValuePresentationBootstrap } from './ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap';
 import { ImageValuePresentationBootstrap } from './ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap';
 import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap';
 import { TextValuePresentationService } from './ValuePanelPresentation/TextValue/TextValuePresentationService';
@@ -40,6 +41,7 @@ export const manifest: PluginManifest = {
     TextValuePresentationService,
     TextValuePresentationBootstrap,
     ImageValuePresentationBootstrap,
+    BooleanValuePresentationBootstrap,
     DataValuePanelBootstrap,
   ],
 };

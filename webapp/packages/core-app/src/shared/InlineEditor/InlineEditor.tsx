@@ -23,18 +23,13 @@ import { InlineEditorStyles } from './styles';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
-export interface InlineEditorProps {
-  name?: string;
+export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus'> {
   value: string;
-  type?: string;
-  placeholder?: string;
   controlsPosition?: InlineEditorControls;
-  tabIndex?: number;
   simple?: boolean;
   hideSave?: boolean;
   hideCancel?: boolean;
   edited?: boolean;
-  disabled?: boolean;
   autofocus?: boolean;
   active?: boolean;
   onChange: (value: string) => void;
@@ -45,17 +40,12 @@ export interface InlineEditorProps {
 }
 
 export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>(function InlineEditor({
-  name,
   value,
-  type = 'text',
-  placeholder,
   controlsPosition = 'right',
-  tabIndex,
   simple,
   hideSave,
   hideCancel,
   edited = false,
-  disabled,
   autofocus,
   active,
   onChange,
@@ -63,6 +53,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   onUndo,
   onReject,
   className,
+  ...rest
 }, ref) {
   const props = useObjectRef({
     onChange,
@@ -109,26 +100,30 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   useImperativeHandle(ref, () => inputRef.current!);
 
   return styled(useStyles(InlineEditorStyles))(
-    <editor as="div" className={className} {...use({ active })}>
-      <editor-container as="div">
+    <editor className={className} {...use({ active })}>
+      <editor-container>
         <input
           ref={inputRef}
-          name={name}
           lang="en"
-          type={type}
           value={value}
-          tabIndex={tabIndex}
-          placeholder={placeholder}
           autoComplete="off"
-          disabled={disabled}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          {...rest}
         />
       </editor-container>
-      <editor-actions as="div" {...use({ position: controlsPosition })}>
+      <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
         {!hideSave && <editor-action as="div" onClick={onSave}><Icon name="apply" viewBox="0 0 12 10" /></editor-action>}
         {!hideCancel && onReject && <editor-action as="div" onClick={onReject}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>}
-        {onUndo && <editor-action as="div" onClick={edited ? onUndo : () => {}} {...use({ disabled: !edited })}><Icon name="table-revert-sm" viewBox="0 0 16 16" /></editor-action>}
+        {onUndo && (
+          <editor-action
+            as="div"
+            onClick={edited ? onUndo : undefined}
+            {...use({ disabled: !edited })}
+          >
+            <Icon name="table-revert-sm" viewBox="0 0 16 16" />
+          </editor-action>
+        )}
         {!simple && <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>}
       </editor-actions>
     </editor>

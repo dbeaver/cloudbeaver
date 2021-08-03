@@ -111,7 +111,6 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
         <editor ref={setPopperRef} as="div" style={popper.styles.popper} {...popper.attributes.popper}>
           <InlineEditor
             ref={inputRef}
-            type="text"
             value={value}
             edited
             hideSave
@@ -119,6 +118,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
             autofocus
             active
             simple
+            onBlur={handleSave}
             onSave={handleSave}
             onReject={handleReject}
             onChange={handleChange}

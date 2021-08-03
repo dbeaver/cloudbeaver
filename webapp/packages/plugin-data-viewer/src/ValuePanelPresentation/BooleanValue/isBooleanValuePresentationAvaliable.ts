@@ -9,11 +9,15 @@
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
-export function isBooleanFormatterAvailable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
+export function isStringifiedBoolean(value: string): boolean {
+  return ['false', 'true'].includes(value.toLowerCase());
+}
+
+export function isBooleanValuePresentationAvaliable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
   return column?.dataKind?.toLowerCase() === 'boolean'
     && (
       typeof cellValue === 'boolean'
       || cellValue === null
-      || (typeof cellValue === 'string' && ['false', 'true'].includes(cellValue.toLowerCase()))
+      || (typeof cellValue === 'string' && isStringifiedBoolean(cellValue))
     );
 }

@@ -66,7 +66,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
   return (
     <div title={value} className={classes}>
       {isUrl && (
-        <a href={rawValue} target='_blank' rel='noreferrer'>
+        <a href={rawValue} target='_blank' rel='noreferrer' draggable={false}>
           <IconOrImage icon='external-link' viewBox='0 0 24 24' />
         </a>
       )}

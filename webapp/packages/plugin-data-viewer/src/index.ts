@@ -51,3 +51,4 @@ export * from './TableViewer/TableDataModel/EditedRow';
 export * from './ContainerDataSource';
 export * from './DataPresentationService';
 export * from './useDataModel';
+export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvaliable';

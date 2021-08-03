@@ -7,9 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvaliable, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { isBooleanFormatterAvailable } from '../Formatters/CellFormatters/isBooleanFormatterAvailable';
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
@@ -59,7 +58,7 @@ export class DataGridContextMenuCellEditingService {
             return true;
           }
 
-          return isBooleanFormatterAvailable(cellValue, column);
+          return isBooleanValuePresentationAvaliable(cellValue, column);
         },
         order: 0,
         title: 'data_grid_table_editing_open_inline_editor',
