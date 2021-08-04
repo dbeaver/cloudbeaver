@@ -15,6 +15,7 @@ import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
+import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
@@ -27,6 +28,7 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlEditorBootstrap,
     SqlDialectInfoService,
     SqlEditorTabService,
+    SqlQueryResultService,
     SqlQueryService,
     SqlExecutionPlanService,
     SqlResultTabsService,

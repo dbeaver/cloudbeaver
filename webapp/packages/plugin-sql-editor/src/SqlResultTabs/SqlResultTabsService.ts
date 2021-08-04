@@ -10,12 +10,12 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
-import { SqlQueryService } from './SqlQueryService';
+import { SqlQueryResultService } from './SqlQueryResultService';
 
 @injectable()
 export class SqlResultTabsService {
   constructor(
-    private sqlQueryService: SqlQueryService,
+    private sqlQueryResultService: SqlQueryResultService,
     private sqlExecutionPlanService: SqlExecutionPlanService,
   ) { }
 
@@ -26,7 +26,7 @@ export class SqlResultTabsService {
       state.tabs.splice(state.tabs.indexOf(tab), 1);
     }
 
-    this.sqlQueryService.removeResultTab(state, tabId);
+    this.sqlQueryResultService.removeResultTab(state, tabId);
     this.sqlExecutionPlanService.removeExecutionPlanTab(state, tabId);
 
     if (state.currentTabId === tabId) {
