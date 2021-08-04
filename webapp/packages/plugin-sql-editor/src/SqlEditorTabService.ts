@@ -95,6 +95,7 @@ export class SqlEditorTabService extends Bootstrap {
         resultGroups: [],
         resultTabs: [],
         executionPlanTabs: [],
+        statisticsTabs: [],
       },
     };
   }
@@ -140,6 +141,7 @@ export class SqlEditorTabService extends Bootstrap {
         || !Array.isArray(tab.handlerState.executionPlanTabs)
         || !Array.isArray(tab.handlerState.resultGroups)
         || !Array.isArray(tab.handlerState.resultTabs)
+        || !Array.isArray(tab.handlerState.statisticsTabs)
     ) {
       return false;
     }
@@ -152,11 +154,13 @@ export class SqlEditorTabService extends Bootstrap {
       }
     }
 
+    // clean old results
     tab.handlerState.currentTabId = '';
-    tab.handlerState.tabs = []; // clean old results
-    tab.handlerState.resultGroups = []; // clean old results
-    tab.handlerState.resultTabs = []; // clean old results
-    tab.handlerState.executionPlanTabs = []; // clean old results
+    tab.handlerState.tabs = [];
+    tab.handlerState.resultGroups = [];
+    tab.handlerState.resultTabs = [];
+    tab.handlerState.executionPlanTabs = [];
+    tab.handlerState.statisticsTabs = [];
 
     return true;
   }

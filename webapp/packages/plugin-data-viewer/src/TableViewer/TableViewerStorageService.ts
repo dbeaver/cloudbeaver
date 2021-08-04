@@ -12,8 +12,6 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
-import type { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
-import { DataModelWrapper } from './DataModelWrapper';
 
 @injectable()
 export class TableViewerStorageService {
@@ -25,7 +23,7 @@ export class TableViewerStorageService {
 
   constructor() {
     makeObservable<this, 'tableModelMap'>(this, {
-      tableModelMap: observable,
+      tableModelMap: observable.shallow,
       values: computed,
     });
   }
@@ -38,20 +36,11 @@ export class TableViewerStorageService {
     return this.tableModelMap.get(tableId) as any;
   }
 
-  /**
-   * @deprecated Use add method instead
-   */
-  create(
-    source: IDatabaseDataSource<any, any>
-  ): DataModelWrapper {
-    return this.add(new DataModelWrapper(source)) as DataModelWrapper;
-  }
-
   add<TOptions, TResult extends IDatabaseDataResult>(
     model: IDatabaseDataModel<TOptions, TResult>
   ): IDatabaseDataModel<TOptions, TResult> {
     this.tableModelMap.set(model.id, model);
-    return this.tableModelMap.get(model.id)!;
+    return model;
   }
 
   remove(id: string): void {

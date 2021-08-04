@@ -14,6 +14,7 @@ import type {
   Hints,
   ShowHintOptions,
   HintFunction,
+  LineHandle,
 } from 'codemirror';
 import { observable, computed, makeObservable, autorun } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -48,12 +49,16 @@ export class SqlEditorController implements IInitializableController {
     return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.executionContext.connectionId);
   }
 
+  get readonly(): boolean {
+    return this.executingScript;
+  }
+
   get isActionsDisabled(): boolean {
     if (!this.tab.handlerState.executionContext) {
       return true;
     }
 
-    if (this.cursor && !this.getSubQuery()) {
+    if (this.cursor && !this.getSubQuery().query) {
       return true;
     }
 
@@ -80,11 +85,11 @@ export class SqlEditorController implements IInitializableController {
     showHint: true,
     extraKeys: {
       // Execute sql script
-      'Ctrl-Enter': () => { this.handleExecute(); },
+      'Ctrl-Enter': () => { this.executeQuery(); },
       // Execute sql script in new tab
-      'Ctrl-\\': () => { this.handleExecuteNewTab(); },
-      'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
-      'Shift-Ctrl-E': () => { this.handleExecutionPlan(); },
+      'Ctrl-\\': () => { this.executeQueryNewTab(); },
+      'Shift-Ctrl-Enter': () => { this.executeQueryNewTab(); },
+      'Shift-Ctrl-E': () => { this.showExecutionPlan(); },
 
       // Autocomplete
       'Ctrl-Space': () => { this.showHint(false); }, // classic for windows, linux
@@ -99,6 +104,7 @@ export class SqlEditorController implements IInitializableController {
     editorDidMount: this.handleEditorConfigure.bind(this),
   };
 
+  private executingScript: boolean;
   private cursor: Position | null;
   private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
@@ -113,12 +119,15 @@ export class SqlEditorController implements IInitializableController {
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
     this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
     this.cursor = null;
+    this.executingScript = false;
 
-    makeObservable<this, 'cursor'>(this, {
+    makeObservable<this, 'cursor' | 'executingScript'>(this, {
       dialect: computed,
       isActionsDisabled: computed,
       value: computed,
       cursor: observable,
+      executingScript: observable,
+      readonly: computed,
     });
   }
 
@@ -131,7 +140,7 @@ export class SqlEditorController implements IInitializableController {
     });
   }
 
-  handleExecute = async (): Promise<void> => {
+  executeQuery = async (): Promise<void> => {
     if (this.isActionsDisabled) {
       return;
     }
@@ -142,7 +151,7 @@ export class SqlEditorController implements IInitializableController {
     );
   };
 
-  handleExecuteNewTab = async (): Promise<void> => {
+  executeQueryNewTab = async (): Promise<void> => {
     if (this.isActionsDisabled) {
       return;
     }
@@ -153,14 +162,42 @@ export class SqlEditorController implements IInitializableController {
     );
   };
 
-  handleExecutionPlan = async (): Promise<void> => {
+  showExecutionPlan = async (): Promise<void> => {
     if (this.isActionsDisabled || !this.dialect?.supportsExplainExecutionPlan) {
       return;
     }
-    this.sqlExecutionPlanService.executeExecutionPlan(
+    await this.sqlExecutionPlanService.executeExecutionPlan(
       this.tab.handlerState,
       this.getSubQuery().query,
     );
+  };
+
+  executeScript = async (): Promise<void> => {
+    if (this.isActionsDisabled) {
+      return;
+    }
+
+    try {
+      this.executingScript = true;
+      const queries = this.getQueryList();
+
+      await this.sqlQueryService.executeQueries(
+        this.tab.handlerState,
+        queries.map(query => query.query),
+        {
+          onQueryExecutionStart: (query, index) => {
+            const subQuery = queries[index];
+            this.highlightExecutingLine(subQuery.begin, true);
+          },
+          onQueryExecuted: (query, index) => {
+            const subQuery = queries[index];
+            this.highlightExecutingLine(subQuery.begin, false);
+          },
+        }
+      );
+    } finally {
+      this.executingScript = false;
+    }
   };
 
   private async showHint(activeSuggest: boolean) {
@@ -277,6 +314,49 @@ export class SqlEditorController implements IInitializableController {
     return hints;
   }
 
+  private getQueryList(): ISubQuery[] {
+    const delimiters: string[] = [];
+
+    if (this.dialect?.scriptDelimiter) {
+      delimiters.push(this.dialect.scriptDelimiter);
+    }
+
+    const lines: ISubQuery[] = [];
+
+    let begin = 0;
+    let subQuery = '';
+
+    this.editor?.eachLine(handle => {
+      subQuery += handle.text;
+      const trimmed = handle.text.trim();
+
+      if (this.isLineEndedWithDelimiter(delimiters, trimmed)) {
+        const lineNumber = this.editor?.getLineNumber(handle) || 0;
+
+        let subQueryTrimmed = subQuery.trim();
+
+        if (this.dialect?.scriptDelimiter && subQueryTrimmed.endsWith(this.dialect?.scriptDelimiter)) {
+          subQueryTrimmed = subQueryTrimmed
+            .slice(0, subQueryTrimmed.length - this.dialect.scriptDelimiter.length)
+            .trim();
+        }
+
+        if (subQueryTrimmed.length > 0) {
+          lines.push({
+            query: subQueryTrimmed,
+            begin,
+            end: lineNumber - (trimmed.length === 0 ? 1 : 0),
+          });
+        }
+
+        subQuery = '';
+        begin = lineNumber + 1;
+      }
+    });
+
+    return lines;
+  }
+
   private handleEditorConfigure(editor: Editor) {
     this.editor = editor;
 
@@ -322,17 +402,44 @@ export class SqlEditorController implements IInitializableController {
 
   private highlightActiveQuery() {
     this.editor?.eachLine(line => {
-      this.editor?.removeLineClass(line, 'background', 'active-query');
+      this.highlightActiveLine(line, false);
     });
 
-    if (this.isActionsDisabled) {
+    if (!this.dialect) {
       return;
     }
 
     const query = this.getSubQuery();
 
-    for (let line = query.begin; line <= query.end; line++) {
-      this.editor?.addLineClass(line, 'background', 'active-query');
+    this.highlightActiveLine(query.begin, query.end, true);
+  }
+
+  private highlightActiveLine(from: LineHandle, state: boolean): void
+  private highlightActiveLine(from: number, to: number, state: boolean): void
+  private highlightActiveLine(from: LineHandle | number, to: number | boolean, state?: boolean): void {
+    if (typeof from === 'object') {
+      if (state) {
+        this.editor?.addLineClass(from, 'background', 'active-query');
+      } else {
+        this.editor?.removeLineClass(from, 'background', 'active-query');
+      }
+      return;
+    }
+
+    for (let line = from; line <= to; line++) {
+      if (state) {
+        this.editor?.addLineClass(line, 'background', 'active-query');
+      } else {
+        this.editor?.removeLineClass(line, 'background', 'active-query');
+      }
+    }
+  }
+
+  private highlightExecutingLine(line: number, state: boolean): void {
+    if (state) {
+      this.editor?.addLineClass(line, 'background', 'running-query');
+    } else {
+      this.editor?.removeLineClass(line, 'background', 'running-query');
     }
   }
 
@@ -382,6 +489,10 @@ export class SqlEditorController implements IInitializableController {
   }
 
   private handleQueryChange(editor: Editor, data: EditorChange, query: string) {
+    if (this.readonly) {
+      (data as any).cancel();
+      return;
+    }
     this.tab.handlerState.query = query;
   }
 }

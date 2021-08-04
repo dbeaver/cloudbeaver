@@ -7,17 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
-type TableGridProps = PropsWithChildren<{
+interface Props {
   model: IDatabaseDataModel<any>;
   resultIndex: number;
-}>;
+}
 
 const styles = css`
   statistics {
@@ -30,10 +29,10 @@ const styles = css`
   }
 `;
 
-export const TableStatistics = observer(function TableStatistics({
+export const TableStatistics: React.FC<Props> = observer(function TableStatistics({
   model,
   resultIndex,
-}: TableGridProps) {
+}) {
   const translate = useTranslate();
   const source = model.source;
   const result = model.getResult(resultIndex);

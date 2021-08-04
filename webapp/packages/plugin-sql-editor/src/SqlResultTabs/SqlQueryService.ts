@@ -6,18 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import { ConnectionExecutionContextService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { DatabaseDataAccessMode, DataModelWrapper, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataAccessMode, DatabaseDataModel, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { QueryDataSource } from '../QueryDataSource';
+import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
+import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
 import { SqlQueryResultService } from './SqlQueryResultService';
+
+interface IQueryExecutionOptions {
+  onQueryExecutionStart?: (query: string, index: number) => void;
+  onQueryExecuted?: (query: string, index: number) => void;
+}
+
+export interface IQueryExecutionStatistics {
+  queries: number;
+  executedQueries: number;
+  currentQuery: string | null;
+  updatedRows: number;
+  executeTime: number;
+}
 
 @injectable()
 export class SqlQueryService {
+  private statisticsMap: Map<string, IQueryExecutionStatistics>;
+
   constructor(
     private tableViewerStorageService: TableViewerStorageService,
     private graphQLService: GraphQLService,
@@ -25,7 +42,17 @@ export class SqlQueryService {
     private connectionInfoResource: ConnectionInfoResource,
     private connectionExecutionContextService: ConnectionExecutionContextService,
     private sqlQueryResultService: SqlQueryResultService
-  ) { }
+  ) {
+    this.statisticsMap = new Map();
+
+    makeObservable<this, 'statisticsMap'>(this, {
+      statisticsMap: observable,
+    });
+  }
+
+  getStatistics(tabId: string): IQueryExecutionStatistics | undefined {
+    return this.statisticsMap.get(tabId);
+  }
 
   async executeEditorQuery(
     editorState: ISqlEditorTabState,
@@ -41,7 +68,7 @@ export class SqlQueryService {
     }
 
     let source: QueryDataSource;
-    let model: DataModelWrapper;
+    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
     let isNewTabCreated = false;
 
     const connectionInfo = await this.connectionInfoResource.load(contextInfo.connectionId);
@@ -49,48 +76,140 @@ export class SqlQueryService {
 
     if (inNewTab || !tabGroup) {
       source = new QueryDataSource(this.graphQLService, this.notificationService);
-
-      model = this.tableViewerStorageService.create(source)
-        .setCountGain()
-        .setSlice(0);
-
+      model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
 
       isNewTabCreated = true;
     } else {
-      tabGroup.query = query;
       model = this.tableViewerStorageService.get(tabGroup.modelId)!;
-      source = model.source as any as QueryDataSource;
+      source = model.source as QueryDataSource;
+      tabGroup.query = query;
     }
 
     model
-      .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
-
-    source.setOptions({
-      query: query,
-      connectionId: contextInfo.connectionId,
-      constraints: [],
-      whereFilter: '',
-    })
+      .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+      .setOptions({
+        query: query,
+        connectionId: contextInfo.connectionId,
+        constraints: [],
+        whereFilter: '',
+      })
+      .source
       .setExecutionContext(executionContext)
       .setSupportedDataFormats(connectionInfo.supportedDataFormats);
 
-    this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+    this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
 
     try {
       await model
-        .setCountGain()
+        .setCountGain(getDefaultRowsCount())
         .setSlice(0)
         .requestData();
 
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
     } catch (exception) {
-      // remove first panel if execution was cancelled
+      // remove group if execution was cancelled
       if (source.currentTask?.cancelled && isNewTabCreated) {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
         const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
         this.notificationService.logException(exception, 'Query execution Error', message);
       }
     }
+  }
+
+  async executeQueries(
+    editorState: ISqlEditorTabState,
+    queries: string[],
+    options?: IQueryExecutionOptions
+  ): Promise<void> {
+    const contextInfo = editorState.executionContext;
+    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.baseId);
+
+    if (!contextInfo || !executionContext) {
+      console.error('executeEditorQuery executionContext is not provided');
+      return;
+    }
+
+    let source: QueryDataSource;
+    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
+
+    const connectionInfo = await this.connectionInfoResource.load(contextInfo.connectionId);
+    let tabGroup: IResultGroup | undefined;
+
+    const statisticsTab = this.sqlQueryResultService.createStatisticsTab(editorState);
+
+    this.statisticsMap.set(statisticsTab.tabId, {
+      queries: queries.length,
+      currentQuery: null,
+      executedQueries: 0,
+      executeTime: 0,
+      updatedRows: 0,
+    });
+
+    editorState.currentTabId = statisticsTab.tabId;
+
+    const statistics = this.getStatistics(statisticsTab.tabId)!;
+
+    for (let i = 0; i < queries.length; i++) {
+      const query = queries[i];
+
+      statistics.currentQuery = query;
+      options?.onQueryExecutionStart?.(query, i);
+
+      if (!tabGroup) {
+        source = new QueryDataSource(this.graphQLService, this.notificationService);
+        model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+        tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+      } else {
+        tabGroup.query = query;
+        model = this.tableViewerStorageService.get(tabGroup.modelId)!;
+        source = model.source as QueryDataSource;
+      }
+
+      model
+        .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+        .setOptions({
+          query: query,
+          connectionId: contextInfo.connectionId,
+          constraints: [],
+          whereFilter: '',
+        })
+        .source
+        .setExecutionContext(executionContext)
+        .setSupportedDataFormats(connectionInfo.supportedDataFormats);
+
+      this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+
+      try {
+        await model
+          .setCountGain(getDefaultRowsCount())
+          .setSlice(0)
+          .requestData();
+
+        statistics.executedQueries++;
+        statistics.executeTime += source.requestInfo.requestDuration;
+        for (const result of source.results) {
+          statistics.updatedRows += result.updateRowCount;
+        }
+
+        this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+
+        if (source.results.some(result => result.data)) {
+          tabGroup = undefined;
+        } else if (i === queries.length - 1) {
+          this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
+        }
+      } catch (exception) {
+        break;
+      } finally {
+        options?.onQueryExecuted?.(query, i);
+      }
+    }
+    statistics.currentQuery = null;
+  }
+
+  removeStatisticsTab(state: ISqlEditorTabState, tabId: string): void {
+    this.sqlQueryResultService.removeStatisticsTab(state, tabId);
+    this.statisticsMap.delete(tabId);
   }
 }

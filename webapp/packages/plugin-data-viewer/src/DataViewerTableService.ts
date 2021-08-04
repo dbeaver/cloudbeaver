@@ -11,10 +11,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { ContainerDataSource } from './ContainerDataSource';
+import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
+import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
-import { DataModelWrapper } from './TableViewer/DataModelWrapper';
+import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
+import { getDefaultRowsCount } from './getDefaultRowsCount';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
@@ -37,16 +39,17 @@ export class DataViewerTableService {
 
   async removeTableModel(tableId: string): Promise<void> {
     const model = this.tableViewerStorageService.get(tableId);
-    if (model instanceof DataModelWrapper) {
+
+    if (model) {
       await model.dispose();
+      this.tableViewerStorageService.remove(tableId);
     }
-    this.tableViewerStorageService.remove(tableId);
   }
 
   async create(
     connectionId: string,
     containerNodePath = ''
-  ): Promise<DataModelWrapper> {
+  ): Promise<IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet>> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
     const source = new ContainerDataSource(
       this.graphQLService,
@@ -54,17 +57,17 @@ export class DataViewerTableService {
       this.connectionExecutionContextService
     );
 
-    const dataModel = this.tableViewerStorageService.create(
-      source
-        .setOptions({
-          connectionId,
-          containerNodePath,
-          constraints: [],
-          whereFilter: '',
-        })
-        .setSupportedDataFormats(connectionInfo.supportedDataFormats)
-    )
-      .setCountGain()
+    source
+      .setOptions({
+        connectionId,
+        containerNodePath,
+        constraints: [],
+        whereFilter: '',
+      })
+      .setSupportedDataFormats(connectionInfo.supportedDataFormats);
+
+    const dataModel = this.tableViewerStorageService.add(new DatabaseDataModel(source))
+      .setCountGain(getDefaultRowsCount())
       .setSlice(0)
       .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
 

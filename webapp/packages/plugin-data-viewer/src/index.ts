@@ -41,7 +41,6 @@ export * from './TableViewer/IDataTableActions';
 export * from './TableViewer/IDataPresentationActions';
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
-export * from './TableViewer/DataModelWrapper';
 
 export * from './TableViewer/TableDataModel/TableColumn';
 export * from './TableViewer/TableDataModel/TableRow';
@@ -49,5 +48,6 @@ export * from './TableViewer/TableDataModel/EditedRow';
 
 export * from './ContainerDataSource';
 export * from './DataPresentationService';
+export * from './getDefaultRowsCount';
 export * from './useDataModel';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvaliable';

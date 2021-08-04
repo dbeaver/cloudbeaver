@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Icon, StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
+import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -51,10 +51,10 @@ const styles = composes(
       cursor: pointer;
     }
   
-    StaticImage, Icon {
-      padding: 4px;
-      height: 24px;
-      width: 24px;
+    StaticImage {
+      padding: 8px;
+      height: 20px;
+      width: 20px;
       cursor: pointer;
     }
 
@@ -94,31 +94,40 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
           disabled={controller.isActionsDisabled}
           title={translate('sql_editor_sql_execution_button_tooltip')}
           onMouseDown={preventFocus}
-          onClick={controller.handleExecute}
+          onClick={controller.executeQuery}
         >
-          <StaticImage icon="/icons/sql_exec.png" />
+          <StaticImage icon="/icons/sql_exec.svg" />
         </button>
         <button
           disabled={controller.isActionsDisabled}
           title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
           onMouseDown={preventFocus}
-          onClick={controller.handleExecuteNewTab}
+          onClick={controller.executeQueryNewTab}
         >
           <StaticImage icon="/icons/sql_exec_new.png" />
+        </button>
+        <button
+          disabled={controller.isActionsDisabled}
+          title={translate('sql_editor_sql_execution_script_button_tooltip')}
+          onMouseDown={preventFocus}
+          onClick={controller.executeScript}
+        >
+          <StaticImage icon="/icons/sql_script_exec.svg" />
         </button>
         {controller.dialect?.supportsExplainExecutionPlan && (
           <button
             disabled={controller.isActionsDisabled}
             title={translate('sql_editor_execution_plan_button_tooltip')}
             onMouseDown={preventFocus}
-            onClick={controller.handleExecutionPlan}
+            onClick={controller.showExecutionPlan}
           >
-            <Icon name="execution-plan" viewBox='0 0 24 24' />
+            <StaticImage icon="/icons/sql_execution_plan.svg" />
           </button>
         )}
       </actions>
       <SQLCodeEditorLoader
         ref={editor}
+        readonly={controller.readonly}
         bindings={controller.bindings}
         dialect={controller.dialect}
         value={controller.value}

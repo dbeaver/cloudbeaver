@@ -14,6 +14,7 @@ import type { ITab } from '@cloudbeaver/core-app';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
 import { SqlResultSetPanel } from './SqlResultSetPanel';
+import { SqlScriptStatisticsPanel } from './SqlScriptStatisticsPanel';
 
 const style = css`
   result-panel {
@@ -47,6 +48,16 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, id }: SqlR
     return styled(style)(
       <result-panel>
         <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
+      </result-panel>
+    );
+  }
+
+  const statisticsTab = tab.handlerState.statisticsTabs.find(tab => tab.tabId === id);
+
+  if (statisticsTab) {
+    return styled(style)(
+      <result-panel>
+        <SqlScriptStatisticsPanel tab={statisticsTab} />
       </result-panel>
     );
   }

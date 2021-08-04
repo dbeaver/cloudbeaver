@@ -16,6 +16,11 @@ export interface IResultTab {
   indexInResultSet: number;
 }
 
+export interface IStatisticsTab {
+  tabId: string;
+  order: number;
+}
+
 export interface IResultGroup {
   groupId: string;
   modelId: string;
@@ -46,5 +51,6 @@ export interface ISqlEditorTabState {
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];
   resultTabs: IResultTab[];
+  statisticsTabs: IStatisticsTab[];
   executionPlanTabs: IExecutionPlanTab[];
 }

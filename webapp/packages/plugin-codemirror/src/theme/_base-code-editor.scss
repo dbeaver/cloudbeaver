@@ -22,7 +22,7 @@
     @include mdc-theme-prop(color, on-surface, false);
 
     &:hover:before {
-      content: '';
+      content: "";
       position: absolute;
       left: 0;
       width: 100%;
@@ -30,7 +30,7 @@
       z-index: -1;
       opacity: 0.14;
       @include mdc-theme-prop(background-color, primary, false);
-  }
+    }
   }
   .material .CodeMirror-hint-active {
     @include mdc-theme-prop(background-color, primary, false);
@@ -89,7 +89,7 @@
 
     .CodeMirror :global(pre).CodeMirror-line,
     .CodeMirror :global(pre).CodeMirror-line-like {
-      padding: 0 8px;
+      padding: 0 16px;
     }
 
     .cm-s-material .CodeMirror-line::selection,
@@ -195,6 +195,20 @@
 
     .cm-s-material .active-query {
       background-color: $active-query;
+    }
+
+    .cm-s-material .running-query:before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 0;
+      width: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 6px solid;
+      @include mdc-theme-prop(border-left-color, primary, false);
     }
   }
 }

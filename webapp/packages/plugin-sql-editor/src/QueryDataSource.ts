@@ -41,7 +41,9 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   isDisabled(resultIndex: number): boolean {
-    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
+    return (!this.getResult(resultIndex)?.data && this.error === null)
+    || !this.executionContext?.context
+    || this.results.length === 0;
   }
 
   async cancel(): Promise<void> {
