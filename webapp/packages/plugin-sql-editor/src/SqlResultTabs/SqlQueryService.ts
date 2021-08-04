@@ -26,9 +26,9 @@ interface IQueryExecutionOptions {
 export interface IQueryExecutionStatistics {
   queries: number;
   executedQueries: number;
-  currentQuery: string | null;
   updatedRows: number;
   executeTime: number;
+  modelId: string | null;
 }
 
 @injectable()
@@ -136,10 +136,10 @@ export class SqlQueryService {
 
     this.statisticsMap.set(statisticsTab.tabId, {
       queries: queries.length,
-      currentQuery: null,
       executedQueries: 0,
       executeTime: 0,
       updatedRows: 0,
+      modelId: null,
     });
 
     editorState.currentTabId = statisticsTab.tabId;
@@ -152,13 +152,13 @@ export class SqlQueryService {
     for (let i = 0; i < queries.length; i++) {
       const query = queries[i];
 
-      statistics.currentQuery = query;
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
         source = new QueryDataSource(this.graphQLService, this.notificationService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       }
+      statistics.modelId = model.id;
 
       model
         .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
@@ -192,13 +192,19 @@ export class SqlQueryService {
           model = source = undefined;
         }
       } catch (exception) {
+        if (model && !source?.currentTask?.cancelled) {
+          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
+
+          model = source = undefined;
+        }
         break;
       } finally {
         options?.onQueryExecuted?.(query, i);
       }
     }
 
-    statistics.currentQuery = null;
+    statistics.modelId = null;
 
     if (model) {
       this.tableViewerStorageService.remove(model.id);

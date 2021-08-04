@@ -12,8 +12,10 @@ import styled, { css } from 'reshadow';
 import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IStatisticsTab } from '../ISqlEditorTabState';
+import type { QueryDataSource } from '../QueryDataSource';
 import { SqlQueryService } from './SqlQueryService';
 
 interface IProps {
@@ -44,6 +46,7 @@ export const SqlScriptStatisticsPanel: React.FC<IProps> = observer(function SqlS
   tab,
 }) {
   const sqlQueryService = useService(SqlQueryService);
+  const tableViewerStorageService = useService(TableViewerStorageService);
   const statistics = sqlQueryService.getStatistics(tab.tabId);
   const translate = useTranslate();
 
@@ -51,15 +54,23 @@ export const SqlScriptStatisticsPanel: React.FC<IProps> = observer(function SqlS
     return <TextPlaceholder>{translate('sql_editor_sql_statistics_unavailable')}</TextPlaceholder>;
   }
 
+  const source: QueryDataSource | undefined = statistics.modelId
+    ? tableViewerStorageService.get(statistics.modelId)?.source as QueryDataSource
+    : undefined;
+
   return styled(styles)(
     <statistics as='div'>
       {translate('sql_editor_sql_execution_queries')} {statistics.executedQueries} / {statistics.queries}<br />
       {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms<br />
       {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}<br />
-      {statistics.currentQuery && (
+      {source && (
         <>
-          <h3><box><icon><Loader small fullSize /></icon>{translate('sql_editor_sql_execution_executing')}</box></h3>
-          <pre>{statistics.currentQuery}</pre>
+          <Loader
+            message='sql_editor_sql_execution_executing'
+            cancelDisabled={!source.canCancel}
+            onCancel={() => source.cancel()}
+          />
+          <pre>{source.options?.query}</pre>
         </>
       )}
     </statistics>

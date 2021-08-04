@@ -102,21 +102,22 @@ export const TableError: React.FC<Props> = observer(function TableViewer({
   }, {}, {
     display: observable.ref,
   });
-  const error = useErrorDetails(model.source.error || null);
-  const animated = useStateDelay(!!errorInfo.error && !loading, 1);
 
   if (errorInfo.error !== model.source.error) {
     errorInfo.error = model.source.error || null;
     errorInfo.display = !!model.source.error;
   }
 
+  const error = useErrorDetails(model.source.error || null);
+  const animated = useStateDelay(!!errorInfo.error && !loading, 1);
+
   const errorHidden = errorInfo.error === null;
 
   return styled(useStyles(style))(
-    <error as="div" {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
-      <error-body as='div'>
+    <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
+      <error-body>
         <IconOrImage icon='/icons/error_icon.svg' onClick={() => errorInfo.show()} />
-        <error-message as='div'>{error.details?.message}</error-message>
+        <error-message>{error.details?.message}</error-message>
       </error-body>
       <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
         {translate('ui_error_close')}
