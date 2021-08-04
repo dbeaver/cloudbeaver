@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { DatabaseDataAccessMode, DatabaseDataModel, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
 import { SqlQueryResultService } from './SqlQueryResultService';
 
@@ -130,11 +130,7 @@ export class SqlQueryService {
       return;
     }
 
-    let source: QueryDataSource;
-    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
-
     const connectionInfo = await this.connectionInfoResource.load(contextInfo.connectionId);
-    let tabGroup: IResultGroup | undefined;
 
     const statisticsTab = this.sqlQueryResultService.createStatisticsTab(editorState);
 
@@ -150,20 +146,18 @@ export class SqlQueryService {
 
     const statistics = this.getStatistics(statisticsTab.tabId)!;
 
+    let source: QueryDataSource | undefined;
+    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet> | undefined;
+
     for (let i = 0; i < queries.length; i++) {
       const query = queries[i];
 
       statistics.currentQuery = query;
       options?.onQueryExecutionStart?.(query, i);
 
-      if (!tabGroup) {
+      if (!model || !source) {
         source = new QueryDataSource(this.graphQLService, this.notificationService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
-        tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-      } else {
-        tabGroup.query = query;
-        model = this.tableViewerStorageService.get(tabGroup.modelId)!;
-        source = model.source as QueryDataSource;
       }
 
       model
@@ -178,8 +172,6 @@ export class SqlQueryService {
         .setExecutionContext(executionContext)
         .setSupportedDataFormats(connectionInfo.supportedDataFormats);
 
-      this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
-
       try {
         await model
           .setCountGain(getDefaultRowsCount())
@@ -188,16 +180,16 @@ export class SqlQueryService {
 
         statistics.executedQueries++;
         statistics.executeTime += source.requestInfo.requestDuration;
+
         for (const result of source.results) {
           statistics.updatedRows += result.updateRowCount;
         }
 
-        this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
-
         if (source.results.some(result => result.data)) {
-          tabGroup = undefined;
-        } else if (i === queries.length - 1) {
-          this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
+          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+
+          model = source = undefined;
         }
       } catch (exception) {
         break;
@@ -205,7 +197,12 @@ export class SqlQueryService {
         options?.onQueryExecuted?.(query, i);
       }
     }
+
     statistics.currentQuery = null;
+
+    if (model) {
+      this.tableViewerStorageService.remove(model.id);
+    }
   }
 
   removeStatisticsTab(state: ISqlEditorTabState, tabId: string): void {
