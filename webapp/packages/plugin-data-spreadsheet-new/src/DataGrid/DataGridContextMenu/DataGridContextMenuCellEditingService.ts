@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvaliable, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -34,7 +34,8 @@ export class DataGridContextMenuCellEditingService {
         isHidden(context) {
           const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
           return format.isReadOnly({ column: context.data.column, row: context.data.row })
-            || context.data.model.isDisabled(context.data.resultIndex);
+            || context.data.model.isDisabled(context.data.resultIndex)
+            || context.data.model.isReadonly();
         },
         order: 4,
         title: 'data_grid_table_editing',
@@ -59,7 +60,7 @@ export class DataGridContextMenuCellEditingService {
             return true;
           }
 
-          return isBooleanValuePresentationAvaliable(cellValue, column);
+          return isBooleanValuePresentationAvailable(cellValue, column);
         },
         order: 0,
         title: 'data_grid_table_editing_open_inline_editor',

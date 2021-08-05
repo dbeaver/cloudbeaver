@@ -33,9 +33,11 @@
       width: 16px;
     }
 
-    &:global([disabled]),
-    &:global([readonly]) {
-      opacity: 0.8;
+    &[type="text"] {
+      &:global([disabled]),
+      &:global([readonly]) {
+        opacity: 0.8;
+      }
     }
 
     &[use|mod="surface"] {

@@ -13,12 +13,16 @@ import styled, { use, css } from 'reshadow';
 
 import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
+import { EditingContext } from '../../../Editing/EditingContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
 
 const styles = css`
   boolean-formatter {
     cursor: pointer;
+  }
+  boolean-formatter[|disabled] {
+    cursor: auto;
   }
   boolean-formatter[|boolean] {
     font-family: monospace;
@@ -28,41 +32,36 @@ const styles = css`
   }
 `;
 
-function getClasses(rawValue: any) {
-  const classes = [];
-  if (rawValue === null) {
-    classes.push('cell-null');
-  }
-  return classes.join(' ');
-}
-
 export const BooleanFormatter: React.FC<FormatterProps> = observer(function BooleanFormatter({ column, row, rowIdx }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
+  const editingContext = useContext(EditingContext);
+
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
   const resultColumn = tableDataContext?.getColumnInfo(column.key);
   const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
   const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
   const stringifiedValue = formatter?.toDisplayString(value) ?? String(value);
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
-  const classes = getClasses(rawValue);
+  const disabled = !column.editable || !!editingContext?.readonly;
 
-  const getNextValue = useCallback((prev: boolean | null) => {
-    if (!resultColumn?.required && prev === false) {
-      return null;
+  const toggleValue = useCallback(() => {
+    if (disabled) {
+      return;
     }
 
-    return !prev;
-  }, [resultColumn]);
+    const newValue = !resultColumn?.required && value === false ? null : !value;
+
+    context?.model.source.getEditor(context.resultIndex).setCell(rowIdx, Number(column.key), newValue);
+  }, [context, resultColumn, column.key, rowIdx, value, disabled]);
 
   return styled(styles)(
     <boolean-formatter
-      className={classes}
+      className={value === null ? 'cell-null' : undefined}
       as='span'
       title={stringifiedValue}
-      onClick={() => context?.model.source.getEditor(context.resultIndex)
-        .setCell(rowIdx, Number(column.key), getNextValue(value))}
-      {...use({ boolean: value !== null })}
+      onClick={toggleValue}
+      {...use({ disabled, boolean: value !== null })}
     >
       {valueRepresentation}
     </boolean-formatter>

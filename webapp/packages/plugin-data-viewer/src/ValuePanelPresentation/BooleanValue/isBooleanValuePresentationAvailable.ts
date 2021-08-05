@@ -13,7 +13,7 @@ export function isStringifiedBoolean(value: string): boolean {
   return ['false', 'true'].includes(value.toLowerCase());
 }
 
-export function isBooleanValuePresentationAvaliable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
+export function isBooleanValuePresentationAvailable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
   return column?.dataKind?.toLowerCase() === 'boolean'
     && (
       typeof cellValue === 'boolean'

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 
-import { isBooleanValuePresentationAvaliable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
@@ -34,7 +34,7 @@ export const CellFormatterFactory: React.FC<IProps> = observer(function CellForm
       const formatter = context.model.source.getAction(context.resultIndex, ResultSetFormatAction);
       const rawValue = formatter.get(props.row[props.column.key]);
 
-      if (resultColumn && isBooleanValuePresentationAvaliable(rawValue, resultColumn)) {
+      if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
         formatterRef.current = BooleanFormatter;
       }
     }
