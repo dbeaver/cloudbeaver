@@ -40,6 +40,9 @@ const styles = css`
     height: 16px;
     margin-right: 8px;
   }
+  pre {
+    white-space: pre-wrap;
+  }
 `;
 
 export const SqlScriptStatisticsPanel: React.FC<IProps> = observer(function SqlScriptStatisticsPanel({

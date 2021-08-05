@@ -12,13 +12,11 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDialectInfoService } from './SqlDialectInfoService';
 
 @injectable()
 export class SqlEditorService {
   constructor(
     private gql: GraphQLService,
-    private sqlDialectInfoService: SqlDialectInfoService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
     private connectionExecutionContextService: ConnectionExecutionContextService

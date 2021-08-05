@@ -98,7 +98,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         style={[styles]}
       >
         {orderedTabs.map(result => (
-          <TabPanel key={result.id} tabId={result.id}>
+          <TabPanel key={result.id} tabId={result.id} lazy>
             <SqlResultPanel tab={tab} id={result.id} />
           </TabPanel>
         ))}

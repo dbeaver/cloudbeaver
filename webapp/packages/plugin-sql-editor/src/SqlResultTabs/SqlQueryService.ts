@@ -187,14 +187,28 @@ export class SqlQueryService {
 
         if (source.results.some(result => result.data)) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+          this.sqlQueryResultService.updateGroupTabs(
+            editorState,
+            model,
+            tabGroup.groupId,
+            false,
+            statisticsTab.order,
+            i + 1
+          );
 
           model = source = undefined;
         }
       } catch (exception) {
         if (model && !source?.currentTask?.cancelled) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
+          this.sqlQueryResultService.updateGroupTabs(
+            editorState,
+            model,
+            tabGroup.groupId,
+            true,
+            statisticsTab.order,
+            i + 1
+          );
 
           model = source = undefined;
         }

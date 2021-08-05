@@ -53,6 +53,7 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',
+    '@typescript-eslint/no-for-in-array': 'off',
 
 
     'import/no-duplicates': 'off',
