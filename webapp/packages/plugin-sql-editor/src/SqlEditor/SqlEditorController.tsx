@@ -91,6 +91,8 @@ export class SqlEditorController implements IInitializableController {
       'Shift-Ctrl-Enter': () => { this.executeQueryNewTab(); },
       'Shift-Ctrl-E': () => { this.showExecutionPlan(); },
 
+      'Alt-X': () => { this.executeScript(); },
+
       // Autocomplete
       'Ctrl-Space': () => { this.showHint(false); }, // classic for windows, linux
       'Shift-Ctrl-Space': () => { this.showHint(false); },
