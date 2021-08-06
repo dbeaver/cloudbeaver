@@ -48,11 +48,15 @@ const styles = composes(
       padding: 0;
       margin: 0;
       height: 32px;
+      width: 32px;
       cursor: pointer;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   
     StaticImage {
-      padding: 8px;
       height: 20px;
       width: 20px;
       cursor: pointer;
@@ -104,7 +108,7 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
           onMouseDown={preventFocus}
           onClick={controller.executeQueryNewTab}
         >
-          <StaticImage icon="/icons/sql_exec_new.png" />
+          <StaticImage icon="/icons/sql_exec_new.svg" />
         </button>
         <button
           disabled={controller.isDisabled || controller.isScriptEmpty}
