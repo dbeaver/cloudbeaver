@@ -36,7 +36,7 @@ export default [
   ['connections_connection_access_grant', 'Разрешить'],
   ['connections_connection_access_edit', 'Изменить'],
   ['connections_connection_access_cloud_placeholder', 'Облачные подключения видны всем пользователям. Вы можете настроить доступ в "Консоль Управления AWS".'],
-  ['connections_connection_access_empty_table_placeholder', 'Вы еще ничего не добавили. Нажмите кнопку Изменить, чтобы добавить роль или пользователя.'],
+  ['connections_connection_access_empty_table_placeholder', 'Вы еще ничего не добавили. Нажмите кнопку Изменить, чтобы изменить настройки доступа.'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или роли'],
   ['connections_connection_access_filter_no_result', 'По вашему запросу ничего не найдено.'],
   ['connections_connection_access_admin_info', 'Администраторы видят все подключения.'],
