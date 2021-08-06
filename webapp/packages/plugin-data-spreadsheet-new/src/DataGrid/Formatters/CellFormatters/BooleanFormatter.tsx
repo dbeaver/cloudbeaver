@@ -50,9 +50,9 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
       return;
     }
 
-    const newValue = !resultColumn?.required && value === false ? null : !value;
+    const nextValue = !resultColumn?.required && value === false ? null : !value;
 
-    context?.model.source.getEditor(context.resultIndex).setCell(rowIdx, Number(column.key), newValue);
+    context?.model.source.getEditor(context.resultIndex).setCell(rowIdx, Number(column.key), nextValue);
   }, [context, resultColumn, column.key, rowIdx, value, disabled]);
 
   return styled(styles)(

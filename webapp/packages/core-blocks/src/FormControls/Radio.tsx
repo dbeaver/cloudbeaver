@@ -99,6 +99,11 @@ const radioState = {
       radio {
         composes: theme-radio--disabled from global;
       }
+    `,
+    css`
+      input {
+        opacity: 0 !important;
+      }
     `
   ),
 };
