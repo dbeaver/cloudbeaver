@@ -95,7 +95,9 @@ export class SQLParser {
 
     const line = this.getLineAtPos(position);
 
-    const closestScripts = this._scripts.filter(script => script.begin <= position && script.to === line);
+    const closestScripts = this._scripts.filter(
+      script => script.begin <= position && (script.to === line || script.to === line - 1)
+    );
 
     if (closestScripts.length > 0) {
       return closestScripts[closestScripts.length - 1];
