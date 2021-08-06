@@ -91,7 +91,7 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
     <sql-editor className={className}>
       <actions>
         <button
-          disabled={controller.isScriptEmpty || controller.isDisabled}
+          disabled={controller.isLineScriptEmpty || controller.isDisabled}
           title={translate('sql_editor_sql_execution_button_tooltip')}
           onMouseDown={preventFocus}
           onClick={controller.executeQuery}
@@ -99,7 +99,7 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
           <StaticImage icon="/icons/sql_exec.svg" />
         </button>
         <button
-          disabled={controller.isScriptEmpty || controller.isDisabled}
+          disabled={controller.isLineScriptEmpty || controller.isDisabled}
           title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
           onMouseDown={preventFocus}
           onClick={controller.executeQueryNewTab}
@@ -107,7 +107,7 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
           <StaticImage icon="/icons/sql_exec_new.png" />
         </button>
         <button
-          disabled={controller.isDisabled}
+          disabled={controller.isDisabled || controller.isScriptEmpty}
           title={translate('sql_editor_sql_execution_script_button_tooltip')}
           onMouseDown={preventFocus}
           onClick={controller.executeScript}
@@ -116,7 +116,7 @@ export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor(
         </button>
         {controller.dialect?.supportsExplainExecutionPlan && (
           <button
-            disabled={controller.isScriptEmpty || controller.isDisabled}
+            disabled={controller.isLineScriptEmpty || controller.isDisabled}
             title={translate('sql_editor_execution_plan_button_tooltip')}
             onMouseDown={preventFocus}
             onClick={controller.showExecutionPlan}

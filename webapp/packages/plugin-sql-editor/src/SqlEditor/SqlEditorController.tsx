@@ -48,8 +48,12 @@ export class SqlEditorController implements IInitializableController {
     return this.executingScript;
   }
 
-  get isScriptEmpty(): boolean {
+  get isLineScriptEmpty(): boolean {
     return this.cursor !== null && !this.getSubQuery()?.query;
+  }
+
+  get isScriptEmpty(): boolean {
+    return this.value === '' || this.parser.scripts.length === 0;
   }
 
   get isDisabled(): boolean {
@@ -125,7 +129,7 @@ export class SqlEditorController implements IInitializableController {
 
     makeObservable<this, 'cursor' | 'executingScript'>(this, {
       dialect: computed,
-      isScriptEmpty: computed,
+      isLineScriptEmpty: computed,
       isDisabled: computed,
       value: computed,
       cursor: observable,
@@ -136,7 +140,7 @@ export class SqlEditorController implements IInitializableController {
 
   init(tab: ITab<ISqlEditorTabState>): void {
     this.tab = tab;
-    this.parser.setScript(this.tab.handlerState.query);
+    this.parser.setScript(this.value);
 
     autorun(() => {
       if (this.tab.handlerState.executionContext) {
@@ -150,7 +154,7 @@ export class SqlEditorController implements IInitializableController {
   }
 
   executeQuery = async (): Promise<void> => {
-    if (this.isDisabled || this.isScriptEmpty) {
+    if (this.isDisabled || this.isLineScriptEmpty) {
       return;
     }
 
@@ -168,7 +172,7 @@ export class SqlEditorController implements IInitializableController {
   };
 
   executeQueryNewTab = async (): Promise<void> => {
-    if (this.isDisabled || this.isScriptEmpty) {
+    if (this.isDisabled || this.isLineScriptEmpty) {
       return;
     }
 
@@ -186,7 +190,7 @@ export class SqlEditorController implements IInitializableController {
   };
 
   showExecutionPlan = async (): Promise<void> => {
-    if (this.isDisabled || this.isScriptEmpty || !this.dialect?.supportsExplainExecutionPlan) {
+    if (this.isDisabled || this.isLineScriptEmpty || !this.dialect?.supportsExplainExecutionPlan) {
       return;
     }
 
@@ -203,7 +207,7 @@ export class SqlEditorController implements IInitializableController {
   };
 
   executeScript = async (): Promise<void> => {
-    if (this.isDisabled) {
+    if (this.isDisabled || this.isScriptEmpty) {
       return;
     }
 
@@ -261,8 +265,8 @@ export class SqlEditorController implements IInitializableController {
     if (!this.editor) {
       return {
         begin: 0,
-        end: this.tab.handlerState.query.length,
-        query: this.tab.handlerState.query,
+        end: this.value.length,
+        query: this.value,
         from: 0,
         to: this.parser.lineCount,
       };
