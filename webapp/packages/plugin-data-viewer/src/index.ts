@@ -50,4 +50,4 @@ export * from './ContainerDataSource';
 export * from './DataPresentationService';
 export * from './getDefaultRowsCount';
 export * from './useDataModel';
-export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvaliable';
+export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';

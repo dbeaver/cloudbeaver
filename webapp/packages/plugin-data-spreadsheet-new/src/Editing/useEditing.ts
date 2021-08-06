@@ -30,6 +30,7 @@ export function useEditing(options: IEditingOptions): IEditingContext {
   }, { options }, { editingCells: observable });
 
   const [context] = useState<IEditingContext>({
+    readonly: !!optionsRef.readonly,
     edit(position: CellPosition, key?: string) {
       if (optionsRef.readonly) {
         return;

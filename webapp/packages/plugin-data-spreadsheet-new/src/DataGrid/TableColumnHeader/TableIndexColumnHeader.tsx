@@ -22,6 +22,7 @@ const styles = css`
     cursor: pointer;
   }
   IconOrImage {
+    cursor: auto;
     width: 10px;
     position: absolute;
     right: 2px;
@@ -41,7 +42,7 @@ export const TableIndexColumnHeader: React.FC<HeaderRendererProps<any>> = functi
 
   return styled(styles)(
     <container as='div' title={translate('data_grid_table_index_column_tooltip')} onClick={() => selectionContext.selectTable()}>
-      {tableDataContext.isReadOnly() && <IconOrImage icon='/icons/lock.png' />}
+      {tableDataContext.isReadOnly() && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
       {props.column.name}
     </container>
   );

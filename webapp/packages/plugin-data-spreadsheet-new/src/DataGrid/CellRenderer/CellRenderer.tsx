@@ -14,7 +14,7 @@ import { Cell } from 'react-data-grid';
 
 import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { isBooleanValuePresentationAvaliable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
@@ -102,27 +102,20 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
         return;
       }
 
-      if (
-        !this.column.editable
-        || this.dataGridContext?.model.isDisabled(this.dataGridContext.resultIndex)
-        || (
-          this.resultColumn
-          && isBooleanValuePresentationAvaliable(
-            this.editor?.getCell(this.rowIdx, Number(this.column.key)),
-            this.resultColumn
-          )
-        )
-      ) {
-        return;
-      }
       const format = this.dataGridContext?.model.source.getAction(
         this.dataGridContext.resultIndex,
         ResultSetFormatAction
       );
       const columnIndex = this.tableDataContext?.getDataColumnIndexFromKey(this.column.key) ?? null;
+      const handleByBooleanFormatter = this.resultColumn && isBooleanValuePresentationAvailable(
+        this.editor?.getCell(this.rowIdx, Number(this.column.key)),
+        this.resultColumn
+      );
 
       if (
-        columnIndex === null
+        !this.column.editable
+        || handleByBooleanFormatter
+        || columnIndex === null
         || format?.isReadOnly({
           row: this.rowIdx,
           column: columnIndex,

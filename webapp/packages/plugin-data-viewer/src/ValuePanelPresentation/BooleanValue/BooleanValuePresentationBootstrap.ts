@@ -13,7 +13,7 @@ import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/R
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { BooleanValuePresentation } from './BooleanValuePresentation';
-import { isBooleanValuePresentationAvaliable } from './isBooleanValuePresentationAvaliable';
+import { isBooleanValuePresentationAvailable } from './isBooleanValuePresentationAvailable';
 
 @injectable()
 export class BooleanValuePresentationBootstrap extends Bootstrap {
@@ -46,7 +46,7 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
           const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
           const column = data.getColumn(firstSelectedCell.column);
 
-          return column === undefined || !isBooleanValuePresentationAvaliable(cellValue, column);
+          return column === undefined || !isBooleanValuePresentationAvailable(cellValue, column);
         }
 
         return true;

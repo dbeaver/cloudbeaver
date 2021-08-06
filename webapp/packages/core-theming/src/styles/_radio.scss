@@ -29,6 +29,9 @@
   .theme-radio_ripple {
     composes: mdc-radio__ripple;
   }
+  .theme-radio--disabled {
+    composes: mdc-radio--disabled;
+  }
 
   .theme-radio_primary {
     $mdc-radio-baseline-theme-color: primary;

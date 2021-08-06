@@ -15,4 +15,5 @@ export default [
   ['data_grid_table_context_menu_filter_dialog_title', 'Редактировать значение'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Дать доступ к буферу обмена'],
   ['data_grid_table_index_column_tooltip', 'Выбрать всю таблицу'],
+  ['data_grid_table_readonly_tooltip', 'Доступно только для чтения'],
 ];

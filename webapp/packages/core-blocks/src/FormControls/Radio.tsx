@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -46,6 +46,9 @@ const radioStyles = composes(
     }
     label {
       cursor: pointer;
+      &[|disabled] {
+        cursor: auto;
+      }
     }
   `
 );
@@ -90,6 +93,21 @@ const noRippleStyles = composes(
   `
 );
 
+const radioState = {
+  disabled: composes(
+    css`
+      radio {
+        composes: theme-radio--disabled from global;
+      }
+    `,
+    css`
+      input {
+        opacity: 0 !important;
+      }
+    `
+  ),
+};
+
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {
   mod?: Array<keyof typeof radioMod>;
   ripple?: boolean;
@@ -99,7 +117,6 @@ type ControlledProps = BaseProps & {
   value?: string | number;
   checked?: boolean;
   onChange?: (value: string | number, name: string) => any;
-
   state?: never;
 };
 
@@ -108,7 +125,6 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   value: TState[TKey];
   state: TState;
   onChange?: (value: TState[TKey], name: TKey) => any;
-
   checked?: never;
 };
 
@@ -166,7 +182,12 @@ export const Radio: RadioType = observer(function Radio({
     checked = state[name] === value;
   }
 
-  return styled(useStyles(radioStyles, ...(mod || []).map(mod => radioMod[mod]), !ripple && noRippleStyles))(
+  return styled(useStyles(
+    radioStyles,
+    ...(mod || []).map(mod => radioMod[mod]),
+    !ripple && noRippleStyles,
+    rest.disabled && radioState.disabled
+  ))(
     <field className={className}>
       <radio>
         <input
@@ -184,7 +205,7 @@ export const Radio: RadioType = observer(function Radio({
         </radio-background>
         {ripple && <radio-ripple />}
       </radio>
-      <label htmlFor={id}>{children}</label>
+      <label {...use({ disabled: rest.disabled })} htmlFor={id}>{children}</label>
     </field>
   );
 });

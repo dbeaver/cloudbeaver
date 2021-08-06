@@ -70,7 +70,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
           <IconOrImage icon='external-link' viewBox='0 0 24 24' />
         </a>
       )}
-      <div className='text-formatter_value'>{value}</div>
+      <div className='text-formatter__value'>{value}</div>
     </div>
   );
 });

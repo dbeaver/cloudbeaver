@@ -48,7 +48,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
 
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
   const editingContext = useEditing({
-    readonly: model.isReadonly(),
+    readonly: model.isReadonly() || model.isDisabled(resultIndex),
     onEdit: (position, key) => {
       const editor = model.source.getEditor(resultIndex);
 

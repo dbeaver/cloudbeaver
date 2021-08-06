@@ -13,10 +13,11 @@ import { Radio, TabContainerPanelComponent, TextPlaceholder } from '@cloudbeaver
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { isStringifiedBoolean } from './isBooleanValuePresentationAvaliable';
+import { isStringifiedBoolean } from './isBooleanValuePresentationAvailable';
 
 const styles = css`
   container {
@@ -48,8 +49,6 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
 
   const firstSelectedCell = selectedCells[0] || focusCell;
   const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
-  const column = data.getColumn(firstSelectedCell.column);
-  const nullable = column?.required === false;
 
   if (typeof cellValue === 'string' && isStringifiedBoolean(cellValue)) {
     value = cellValue.toLowerCase() === 'true';
@@ -61,12 +60,19 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     return <TextPlaceholder>{translate('data_viewer_presentation_value_boolean_placeholder')}</TextPlaceholder>;
   }
 
+  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+
+  const column = data.getColumn(firstSelectedCell.column);
+  const nullable = column?.required === false;
+  const readonly = model.isReadonly() || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
+
   return styled(styles)(
     <container>
       <Radio
         id='true_value'
         mod={['primary']}
         checked={value === true}
+        disabled={readonly}
         onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, true)}
       >
         TRUE
@@ -75,6 +81,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
         id='false_value'
         mod={['primary']}
         checked={value === false}
+        disabled={readonly}
         onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, false)}
       >
         FALSE
@@ -84,6 +91,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
           id='null_value'
           mod={['primary']}
           checked={value === null}
+          disabled={readonly}
           onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, null)}
         >
         NULL
