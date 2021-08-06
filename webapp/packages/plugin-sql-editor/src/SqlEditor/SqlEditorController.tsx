@@ -158,16 +158,13 @@ export class SqlEditorController implements IInitializableController {
       return;
     }
 
-    const query = this.getSubQuery();
-
-    if (!query) {
-      return;
-    }
-
-    this.sqlQueryService.executeEditorQuery(
-      this.tab.handlerState,
-      query.query,
-      false
+    await this.executeQueryAction(
+      this.getSubQuery(),
+      query => this.sqlQueryService.executeEditorQuery(
+        this.tab.handlerState,
+        query.query,
+        false
+      )
     );
   };
 
@@ -176,16 +173,13 @@ export class SqlEditorController implements IInitializableController {
       return;
     }
 
-    const query = this.getSubQuery();
-
-    if (!query) {
-      return;
-    }
-
-    this.sqlQueryService.executeEditorQuery(
-      this.tab.handlerState,
-      query.query,
-      true
+    await this.executeQueryAction(
+      this.getSubQuery(),
+      query => this.sqlQueryService.executeEditorQuery(
+        this.tab.handlerState,
+        query.query,
+        true
+      )
     );
   };
 
@@ -194,15 +188,12 @@ export class SqlEditorController implements IInitializableController {
       return;
     }
 
-    const query = this.getSubQuery();
-
-    if (!query) {
-      return;
-    }
-
-    await this.sqlExecutionPlanService.executeExecutionPlan(
-      this.tab.handlerState,
-      query.query,
+    await this.executeQueryAction(
+      this.getSubQuery(),
+      query => this.sqlExecutionPlanService.executeExecutionPlan(
+        this.tab.handlerState,
+        query.query,
+      )
     );
   };
 
@@ -211,6 +202,7 @@ export class SqlEditorController implements IInitializableController {
       return;
     }
 
+    this.beforeExecute();
     try {
       this.executingScript = true;
       const queries = this.parser.scripts;
@@ -223,9 +215,13 @@ export class SqlEditorController implements IInitializableController {
             const subQuery = queries[index];
             this.highlightExecutingLine(subQuery.from, true);
           },
-          onQueryExecuted: (query, index) => {
+          onQueryExecuted: (query, index, success) => {
             const subQuery = queries[index];
             this.highlightExecutingLine(subQuery.from, false);
+
+            if (!success) {
+              this.highlightExecutingErrorLine(subQuery.from, true);
+            }
           },
         }
       );
@@ -233,6 +229,27 @@ export class SqlEditorController implements IInitializableController {
       this.executingScript = false;
     }
   };
+
+  private async executeQueryAction(
+    query: ISQLScriptSegment | undefined,
+    action: (query: ISQLScriptSegment) => Promise<void>
+  ): Promise<void> {
+    if (!query) {
+      return;
+    }
+
+    this.beforeExecute();
+
+    try {
+      this.highlightExecutingLine(query.from, true);
+      await action(query);
+      this.highlightExecutingLine(query.from, false);
+    } catch (exception) {
+      this.highlightExecutingLine(query.from, false);
+      this.highlightExecutingErrorLine(query.from, true);
+      throw exception;
+    }
+  }
 
   private async showHint(activeSuggest: boolean) {
     if (!this.editor) {
@@ -343,6 +360,7 @@ export class SqlEditorController implements IInitializableController {
     const ignoredChanges = ['+delete', 'undo', 'complete'];
 
     editor.on('changes', (cm, changes) => {
+      this.resetLineStateHighlight();
       if (!this.activeSuggest || editor.state.completionActive) {
         return;
       }
@@ -393,6 +411,21 @@ export class SqlEditorController implements IInitializableController {
     }
   }
 
+  private beforeExecute(): void {
+    this.resetLineStateHighlight();
+  }
+
+  private resetLineStateHighlight(): void {
+    this.editor?.eachLine(line => {
+      const lineNumber = this.editor?.getLineNumber(line);
+
+      if (lineNumber !== null && lineNumber !== undefined) {
+        this.highlightExecutingLine(lineNumber, false);
+        this.highlightExecutingErrorLine(lineNumber, false);
+      }
+    });
+  }
+
   private highlightActiveLine(from: LineHandle, state: boolean): void
   private highlightActiveLine(from: number, to: number, state: boolean): void
   private highlightActiveLine(from: LineHandle | number, to: number | boolean, state?: boolean): void {
@@ -419,6 +452,14 @@ export class SqlEditorController implements IInitializableController {
       this.editor?.addLineClass(line, 'background', 'running-query');
     } else {
       this.editor?.removeLineClass(line, 'background', 'running-query');
+    }
+  }
+
+  private highlightExecutingErrorLine(line: number, state: boolean): void {
+    if (state) {
+      this.editor?.addLineClass(line, 'background', 'running-query-error');
+    } else {
+      this.editor?.removeLineClass(line, 'background', 'running-query-error');
     }
   }
 

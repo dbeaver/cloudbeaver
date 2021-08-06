@@ -78,9 +78,14 @@ export class SqlExecutionPlanService {
         executionPlan,
       });
     } catch (exception) {
-      const message = task.getState() === EDeferredState.CANCELLED ? 'Execution plan process has been canceled' : undefined;
+      const cancelled = task.getState() === EDeferredState.CANCELLED;
+      const message = cancelled ? 'Execution plan process has been canceled' : undefined;
       this.notificationService.logException(exception, 'Execution plan Error', message);
       this.removeTab(editorState, tabId);
+
+      if (!cancelled) {
+        throw exception;
+      }
     }
   }
 

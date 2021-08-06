@@ -210,5 +210,19 @@
       border-left: 6px solid;
       @include mdc-theme-prop(border-left-color, primary, false);
     }
+
+    .cm-s-material .running-query-error:before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 0;
+      width: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 6px solid;
+      @include mdc-theme-prop(border-left-color, negative, false);
+    }
   }
 }

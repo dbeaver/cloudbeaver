@@ -20,7 +20,7 @@ import { SqlQueryResultService } from './SqlQueryResultService';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
-  onQueryExecuted?: (query: string, index: number) => void;
+  onQueryExecuted?: (query: string, index: number, success: boolean) => void;
 }
 
 export interface IQueryExecutionStatistics {
@@ -113,7 +113,9 @@ export class SqlQueryService {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
         const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
         this.notificationService.logException(exception, 'Query execution Error', message);
+        return;
       }
+      throw exception;
     }
   }
 
@@ -198,6 +200,7 @@ export class SqlQueryService {
 
           model = source = undefined;
         }
+        options?.onQueryExecuted?.(query, i, true);
       } catch (exception) {
         if (model && !source?.currentTask?.cancelled) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -212,9 +215,8 @@ export class SqlQueryService {
 
           model = source = undefined;
         }
+        options?.onQueryExecuted?.(query, i, false);
         break;
-      } finally {
-        options?.onQueryExecuted?.(query, i);
       }
     }
 
