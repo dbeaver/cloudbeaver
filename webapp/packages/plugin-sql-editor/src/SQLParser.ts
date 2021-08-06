@@ -22,6 +22,8 @@ export interface ISQLScriptSegment {
 
   from: number; // query begin line
   to: number; // query end line
+  fromPosition: number;
+  toPosition: number;
 }
 
 export interface ISQLScriptLine {
@@ -110,6 +112,10 @@ export class SQLParser {
     return this.lines.find(line => line.begin <= position && line.end > position)?.index ?? 0;
   }
 
+  getScriptLineAtPos(position: number): ISQLScriptLine | undefined {
+    return this.lines.find(line => line.begin <= position && line.end > position);
+  }
+
   setScript(script: string): void {
     this.script = script;
   }
@@ -171,16 +177,20 @@ export class SQLParser {
           if (query) {
             const begin = script.indexOf(query, position - currentSegment.length);
             const end = begin + query.length;
-            const from = this.getLineAtPos(begin);
-            const to = this.getLineAtPos(end);
+            const from = this.getScriptLineAtPos(begin);
+            const to = this.getScriptLineAtPos(end);
 
-            this._scripts.push({
-              query,
-              begin,
-              end,
-              from,
-              to,
-            });
+            if (from && to) {
+              this._scripts.push({
+                query,
+                begin,
+                end,
+                from: from.index,
+                to: to.index,
+                fromPosition: begin - from.begin,
+                toPosition: end - to.begin,
+              });
+            }
           }
 
           currentSegment = '';

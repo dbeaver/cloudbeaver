@@ -286,6 +286,8 @@ export class SqlEditorController implements IInitializableController {
         query: this.value,
         from: 0,
         to: this.parser.lineCount,
+        fromPosition: 0,
+        toPosition: this.parser.getScriptLineAtPos(this.value.length)?.end || 0,
       };
     }
 
@@ -303,6 +305,8 @@ export class SqlEditorController implements IInitializableController {
         end,
         from: from.line,
         to: to.line,
+        fromPosition: from.ch,
+        toPosition: to.ch,
       };
     }
 
@@ -396,9 +400,7 @@ export class SqlEditorController implements IInitializableController {
   }
 
   private highlightActiveQuery() {
-    this.editor?.eachLine(line => {
-      this.highlightActiveLine(line, false);
-    });
+    this.highlightSegment(true);
 
     if (!this.dialect) {
       return;
@@ -407,7 +409,7 @@ export class SqlEditorController implements IInitializableController {
     const query = this.getSubQuery();
 
     if (query) {
-      this.highlightActiveLine(query.from, query.to, true);
+      this.highlightSegment(query);
     }
   }
 
@@ -426,25 +428,46 @@ export class SqlEditorController implements IInitializableController {
     });
   }
 
-  private highlightActiveLine(from: LineHandle, state: boolean): void
-  private highlightActiveLine(from: number, to: number, state: boolean): void
-  private highlightActiveLine(from: LineHandle | number, to: number | boolean, state?: boolean): void {
-    if (typeof from === 'object') {
-      if (state) {
-        this.editor?.addLineClass(from, 'background', 'active-query');
-      } else {
-        this.editor?.removeLineClass(from, 'background', 'active-query');
+  private highlightSegment(clear: true): void
+  private highlightSegment(segment: ISQLScriptSegment): void
+  private highlightSegment(segment: ISQLScriptSegment | true): void {
+    if (segment === true) {
+      const marks = this.editor?.getAllMarks();
+
+      if (marks) {
+        for (const mark of marks) {
+          if (mark.className === 'active-query') {
+            mark.clear();
+          }
+        }
       }
       return;
     }
 
-    for (let line = from; line <= to; line++) {
-      if (state) {
-        this.editor?.addLineClass(line, 'background', 'active-query');
-      } else {
-        this.editor?.removeLineClass(line, 'background', 'active-query');
+    this.editor?.markText(
+      { line: segment.from, ch: segment.fromPosition },
+      { line: segment.to, ch: segment.toPosition },
+      {
+        className: 'active-query',
       }
-    }
+    );
+
+    // if (typeof from === 'object') {
+    //   if (state) {
+    //     this.editor?.addLineClass(from, 'background', 'active-query');
+    //   } else {
+    //     this.editor?.removeLineClass(from, 'background', 'active-query');
+    //   }
+    //   return;
+    // }
+
+    // for (let line = from; line <= to; line++) {
+    //   if (state) {
+    //     this.editor?.addLineClass(line, 'background', 'active-query');
+    //   } else {
+    //     this.editor?.removeLineClass(line, 'background', 'active-query');
+    //   }
+    // }
   }
 
   private highlightExecutingLine(line: number, state: boolean): void {
