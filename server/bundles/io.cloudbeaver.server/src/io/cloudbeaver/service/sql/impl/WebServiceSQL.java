@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -198,8 +199,45 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
-        return contextInfo.getProcessor().updateResultsDataBatch(contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
+    public WebSQLExecuteInfo updateResultsDataBatch(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat) throws DBWebException
+    {
+        try {
+            WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
+
+            DBExecUtils.tryExecuteRecover(
+                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                contextInfo.getProcessor().getConnection().getDataSource(),
+                monitor -> {
+                    try {
+                        result[0] = contextInfo.getProcessor().updateResultsDataBatch(
+                            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+                    }
+                }
+            );
+            return result[0];
+        } catch (DBException e) {
+            throw new DBWebException("Error updating resultset data", e);
+        }
+    }
+
+    @Override
+    public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
+        try {
+            contextInfo.getProcessor().updateResultsDataBatch(
+                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
+            return "????";
+        } catch (DBException e) {
+            throw new DBWebException("Error genering update script", e);
+        }
     }
 
     @NotNull

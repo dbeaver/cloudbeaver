@@ -227,11 +227,21 @@ extend type Mutation {
         updatedRows: [ SQLResultRow! ],
         deletedRows: [ SQLResultRow! ],
         addedRows: [ SQLResultRow! ],
-    ): SQLExecuteInfo
+    ): SQLExecuteInfo!
+
+    # Return SQL script for cell values update
+    updateResultsDataBatchScript(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updatedRows: [ SQLResultRow! ],
+        deletedRows: [ SQLResultRow! ],
+        addedRows: [ SQLResultRow! ],
+    ): String!
 
     # Returns SQLExecuteInfo
     asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
-
 
     # Read data from table
     asyncSqlExplainExecutionPlan(

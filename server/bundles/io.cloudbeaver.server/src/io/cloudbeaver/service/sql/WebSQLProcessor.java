@@ -252,12 +252,13 @@ public class WebSQLProcessor {
 
     @WebAction
     public WebSQLExecuteInfo updateResultsDataBatch(
+        @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBWebException
+        @Nullable WebDataFormat dataFormat) throws DBException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -267,133 +268,124 @@ public class WebSQLProcessor {
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
 
-        DBRProgressMonitor monitor = webSession.getProgressMonitor();
         WebSQLExecuteInfo result = new WebSQLExecuteInfo();
         List<WebSQLQueryResults> queryResults = new ArrayList<>();
 
-        try {
-            DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
-                try {
-                    DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-                    try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update rows in container")) {
-                        WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
+        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update rows in container")) {
+            WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
 
-                        DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
-                        DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+            DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
+            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-                        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-                        updatedResultSet.setResultsInfo(resultsInfo);
-                        updatedResultSet.setColumns(resultsInfo.getAttributes());
+            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+            updatedResultSet.setResultsInfo(resultsInfo);
+            updatedResultSet.setColumns(resultsInfo.getAttributes());
 
-                        long totalUpdateCount = 0;
+            long totalUpdateCount = 0;
 
-                        List <Object[]> resultRows = new ArrayList<>();
+            List <Object[]> resultRows = new ArrayList<>();
 
-                        if (!CommonUtils.isEmpty(updatedRows)) {
+            if (!CommonUtils.isEmpty(updatedRows)) {
 
-                            for (WebSQLResultsRow row : updatedRows) {
-                                Map<String, Object> updateValues = row.getUpdateValues();
-                                if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
-                                    continue;
-                                }
-                                DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
-                                // Final row is what we return back
-                                Object[] finalRow = row.getData().toArray();
-
-                                int index = 0;
-                                for (String indexStr : updateValues.keySet()) {
-                                    int attrIndex = CommonUtils.toInt(indexStr, -1);
-                                    updateAttributes[index++] = allAttributes[attrIndex];
-                                }
-
-                                Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
-                                for (int i = 0; i < updateAttributes.length; i++) {
-                                    DBDAttributeBinding updateAttribute = updateAttributes[i];
-                                    Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                                    cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
-                                    Object realCellValue = cellRawValue;
-                                    // In some cases we already have final value here
-                                    if (!(realCellValue instanceof DBDValue)) {
-                                        realCellValue = updateAttribute.getValueHandler().getValueFromObject(
-                                            session,
-                                            updateAttribute,
-                                            cellRawValue,
-                                            false,
-                                            true);
-                                    }
-                                    rowValues[i] = realCellValue;
-                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
-                                }
-                                for (int i = 0; i < keyAttributes.length; i++) {
-                                    DBDAttributeBinding keyAttribute = keyAttributes[i];
-                                    if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
-                                        // Document reference
-                                        DBDDocument document = null;
-                                        Map<String, Object> keyMap = new LinkedHashMap<>();
-                                        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
-                                        for (int j = 0; j < attributes.length; j++) {
-                                            DBDAttributeBinding attr = attributes[j];
-                                            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData().get(j));
-                                            if (plainValue instanceof DBDDocument) {
-                                                // FIXME: Hack for DynamoDB. We pass entire document as a key
-                                                // FIXME: Let's just return it back for now
-                                                document = (DBDDocument) plainValue;
-                                                break;
-                                            }
-                                            keyMap.put(attr.getName(), plainValue);
-                                        }
-                                        if (document == null) {
-                                            document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
-                                            if (document == null) {
-                                                throw new DBCException("Error finding document by key " + keyMap);
-                                            }
-                                        }
-                                        rowValues[updateAttributes.length + i] = document;
-                                    } else {
-                                        Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
-                                        cellValueRaw = WebSQLUtils.makePlainCellValue(session, keyAttribute, cellValueRaw);
-                                        rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
-                                            session,
-                                            keyAttribute,
-                                            cellValueRaw,
-                                            false,
-                                            true);
-                                    }
-                                }
-
-                                DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
-                                updateBatch.add(rowValues);
-                                DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
-
-                                totalUpdateCount += statistics.getRowsUpdated();
-                                result.setDuration(result.getDuration() + statistics.getExecuteTime());
-                                resultRows.add(finalRow);
-                            }
-                        }
-
-                        if (!CommonUtils.isEmpty(addedRows)) {
-                            throw new DBCException("New row add is not supported");
-                        }
-
-                        if (!CommonUtils.isEmpty(deletedRows)) {
-                            throw new DBCException("Row delete is not supported");
-                        }
-
-                        WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
-                        updateResults.setUpdateRowCount(totalUpdateCount);
-                        updateResults.setResultSet(updatedResultSet);
-                        updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
-
-                        queryResults.add(updateResults);
+                for (WebSQLResultsRow row : updatedRows) {
+                    Map<String, Object> updateValues = row.getUpdateValues();
+                    if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
+                        continue;
                     }
-                } catch (Exception e) {
-                    throw new InvocationTargetException(e);
+                    DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
+                    // Final row is what we return back
+                    Object[] finalRow = row.getData().toArray();
+
+                    int index = 0;
+                    for (String indexStr : updateValues.keySet()) {
+                        int attrIndex = CommonUtils.toInt(indexStr, -1);
+                        updateAttributes[index++] = allAttributes[attrIndex];
+                    }
+
+                    Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
+                    for (int i = 0; i < updateAttributes.length; i++) {
+                        DBDAttributeBinding updateAttribute = updateAttributes[i];
+                        Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
+                        cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
+                        Object realCellValue = cellRawValue;
+                        // In some cases we already have final value here
+                        if (!(realCellValue instanceof DBDValue)) {
+                            realCellValue = updateAttribute.getValueHandler().getValueFromObject(
+                                session,
+                                updateAttribute,
+                                cellRawValue,
+                                false,
+                                true);
+                        }
+                        rowValues[i] = realCellValue;
+                        finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
+                    }
+                    for (int i = 0; i < keyAttributes.length; i++) {
+                        DBDAttributeBinding keyAttribute = keyAttributes[i];
+                        if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
+                            // Document reference
+                            DBDDocument document = null;
+                            Map<String, Object> keyMap = new LinkedHashMap<>();
+                            DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+                            for (int j = 0; j < attributes.length; j++) {
+                                DBDAttributeBinding attr = attributes[j];
+                                Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData().get(j));
+                                if (plainValue instanceof DBDDocument) {
+                                    // FIXME: Hack for DynamoDB. We pass entire document as a key
+                                    // FIXME: Let's just return it back for now
+                                    document = (DBDDocument) plainValue;
+                                    break;
+                                }
+                                keyMap.put(attr.getName(), plainValue);
+                            }
+                            if (document == null) {
+                                document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
+                                if (document == null) {
+                                    throw new DBCException("Error finding document by key " + keyMap);
+                                }
+                            }
+                            rowValues[updateAttributes.length + i] = document;
+                        } else {
+                            Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
+                            cellValueRaw = WebSQLUtils.makePlainCellValue(session, keyAttribute, cellValueRaw);
+                            rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
+                                session,
+                                keyAttribute,
+                                cellValueRaw,
+                                false,
+                                true);
+                        }
+                    }
+
+                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
+                    updateBatch.add(rowValues);
+                    DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
+
+                    totalUpdateCount += statistics.getRowsUpdated();
+                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                    resultRows.add(finalRow);
                 }
-            });
-        } catch (DBException e) {
-            throw new DBWebException("Error updating data", e);
+            }
+
+            if (!CommonUtils.isEmpty(addedRows)) {
+                throw new DBCException("New row add is not supported");
+            }
+
+            if (!CommonUtils.isEmpty(deletedRows)) {
+                throw new DBCException("Row delete is not supported");
+            }
+
+            WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
+            updateResults.setUpdateRowCount(totalUpdateCount);
+            updateResults.setResultSet(updatedResultSet);
+            updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
+
+            queryResults.add(updateResults);
         }
+
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
+
         return result;
     }
 
