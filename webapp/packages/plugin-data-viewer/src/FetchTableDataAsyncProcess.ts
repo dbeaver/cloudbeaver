@@ -39,7 +39,7 @@ export class FetchTableDataAsyncProcess extends Deferred<SqlExecuteInfo> {
     filter: SqlDataFilter,
     dataFormat?: ResultDataFormat,
   ): Promise<void> {
-    // start async task}
+    // start async task
     try {
       const taskInfo = await this.executeQueryAsync(tableDataParams, filter, dataFormat);
       await this.applyResult(taskInfo);

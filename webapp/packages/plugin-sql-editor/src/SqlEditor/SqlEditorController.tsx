@@ -14,7 +14,6 @@ import type {
   Hints,
   ShowHintOptions,
   HintFunction,
-  LineHandle,
 } from 'codemirror';
 import { observable, computed, makeObservable, autorun } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -363,6 +362,7 @@ export class SqlEditorController implements IInitializableController {
 
     const ignoredChanges = ['+delete', 'undo', 'complete'];
 
+    // TODO: probably should be moved to SQLCodeEditorController
     editor.on('changes', (cm, changes) => {
       this.resetLineStateHighlight();
       if (!this.activeSuggest || editor.state.completionActive) {
@@ -383,6 +383,7 @@ export class SqlEditorController implements IInitializableController {
       this.showHint(true);
     });
 
+    // TODO: probably should be moved to SQLCodeEditorController
     editor.on('cursorActivity', () => {
       const newCursor = editor.getCursor('from');
       this.cursor = { ...newCursor };
@@ -401,10 +402,6 @@ export class SqlEditorController implements IInitializableController {
 
   private highlightActiveQuery() {
     this.highlightSegment(true);
-
-    if (!this.dialect) {
-      return;
-    }
 
     const query = this.getSubQuery();
 
@@ -451,23 +448,6 @@ export class SqlEditorController implements IInitializableController {
         className: 'active-query',
       }
     );
-
-    // if (typeof from === 'object') {
-    //   if (state) {
-    //     this.editor?.addLineClass(from, 'background', 'active-query');
-    //   } else {
-    //     this.editor?.removeLineClass(from, 'background', 'active-query');
-    //   }
-    //   return;
-    // }
-
-    // for (let line = from; line <= to; line++) {
-    //   if (state) {
-    //     this.editor?.addLineClass(line, 'background', 'active-query');
-    //   } else {
-    //     this.editor?.removeLineClass(line, 'background', 'active-query');
-    //   }
-    // }
   }
 
   private highlightExecutingLine(line: number, state: boolean): void {
@@ -493,6 +473,7 @@ export class SqlEditorController implements IInitializableController {
       return undefined;
     }
 
+    // TODO: should be moved to SQLParser
     if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect?.scriptDelimiter)) {
       query.query = query.query.slice(0, query.query.length - this.dialect.scriptDelimiter.length);
     }
@@ -504,7 +485,7 @@ export class SqlEditorController implements IInitializableController {
 
   private handleQueryChange(editor: Editor, data: EditorChange, query: string) {
     if (this.readonly) {
-      (data as any).cancel();
+      (data as any).cancel(); // seems it doesn't works, after disabling read-only mode, typings appears
       return;
     }
     this.tab.handlerState.query = query;
