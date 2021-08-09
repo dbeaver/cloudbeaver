@@ -218,17 +218,6 @@ extend type Mutation {
     # Close results (free resources)
     sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
 
-    # Update single cell value
-    updateResultsData(
-        connectionId: ID!,
-        contextId: ID!,
-        resultsId: ID!,
-        # Row cell values (to identify row)
-        updateRow: [ Object ]!,
-        # Values to update - Map<Int,Object>
-        updateValues: Object
-    ): SQLExecuteInfo
-
     # Update multiple cell values
     updateResultsDataBatch(
         connectionId: ID!,

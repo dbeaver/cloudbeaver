@@ -251,84 +251,6 @@ public class WebSQLProcessor {
     }
 
     @WebAction
-    public WebSQLExecuteInfo updateResultsData(
-        @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
-        @NotNull List<Object> updateRow,
-        @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException
-    {
-        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
-        WebSession webSession = contextInfo.getProcessor().getWebSession();
-
-        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        checkRowIdentifier(resultsInfo, rowIdentifier);
-        DBSEntity dataContainer = rowIdentifier.getEntity();
-        checkDataEditAllowed(dataContainer);
-        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
-
-        DBRProgressMonitor monitor = this.webSession.getProgressMonitor();
-        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
-
-        try {
-            DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
-                try {
-                    DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-                    try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-                        WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
-
-                        DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
-                        DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
-                        DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
-                        // Final row is what we return back
-                        Object[] finalRow = updateRow.toArray();
-
-                        int index = 0;
-                        for (String indexStr : updateValues.keySet()) {
-                            int attrIndex = CommonUtils.toInt(indexStr, -1);
-                            updateAttributes[index++] = allAttributes[attrIndex];
-                        }
-
-                        Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
-                        for (int i = 0; i < updateAttributes.length; i++) {
-                            DBDAttributeBinding updateAttribute = updateAttributes[i];
-                            Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                            Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
-                            rowValues[i] = realCellValue;
-                            finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
-                        }
-                        for (int i = 0; i < keyAttributes.length; i++) {
-                            DBDAttributeBinding keyAttribute = keyAttributes[i];
-                            Object cellValueRaw = updateRow.get(keyAttribute.getOrdinalPosition());
-                            rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
-                        }
-
-                        DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
-                        updateBatch.add(rowValues);
-                        DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
-
-                        // Returns fake resultset with updated row values
-                        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-                        updatedResultSet.setResultsInfo(resultsInfo);
-                        updatedResultSet.setColumns(resultsInfo.getAttributes());
-                        updatedResultSet.setRows(new Object[][]{finalRow});
-
-                        WebSQLQueryResults updateResults = new WebSQLQueryResults(this.webSession, dataFormat);
-                        updateResults.setUpdateRowCount(statistics.getRowsUpdated());
-                        updateResults.setResultSet(updatedResultSet);
-                        result.setDuration(statistics.getExecuteTime());
-                        result.setResults(new WebSQLQueryResults[]{updateResults});
-                    }
-                } catch (Exception e) {
-                    throw new InvocationTargetException(e);
-                }
-            });
-        } catch (DBException e) {
-            throw new DBWebException("Error updating data", e);
-        }
-        return result;
-    }
-
-    @WebAction
     public WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
@@ -359,13 +281,15 @@ public class WebSQLProcessor {
                         DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
                         DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-                        if (!CommonUtils.isEmpty(updatedRows)) {
-                            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-                            updatedResultSet.setResultsInfo(resultsInfo);
-                            updatedResultSet.setColumns(resultsInfo.getAttributes());
-                            long totalUpdateCount = 0;
+                        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+                        updatedResultSet.setResultsInfo(resultsInfo);
+                        updatedResultSet.setColumns(resultsInfo.getAttributes());
 
-                            List <Object[]> resultRows = new ArrayList<>();
+                        long totalUpdateCount = 0;
+
+                        List <Object[]> resultRows = new ArrayList<>();
+
+                        if (!CommonUtils.isEmpty(updatedRows)) {
 
                             for (WebSQLResultsRow row : updatedRows) {
                                 Map<String, Object> updateValues = row.getUpdateValues();
@@ -390,7 +314,12 @@ public class WebSQLProcessor {
                                     Object realCellValue = cellRawValue;
                                     // In some cases we already have final value here
                                     if (!(realCellValue instanceof DBDValue)) {
-                                        realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                        realCellValue = updateAttribute.getValueHandler().getValueFromObject(
+                                            session,
+                                            updateAttribute,
+                                            cellRawValue,
+                                            false,
+                                            true);
                                     }
                                     rowValues[i] = realCellValue;
                                     finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
@@ -423,7 +352,12 @@ public class WebSQLProcessor {
                                     } else {
                                         Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
                                         cellValueRaw = WebSQLUtils.makePlainCellValue(session, keyAttribute, cellValueRaw);
-                                        rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
+                                        rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
+                                            session,
+                                            keyAttribute,
+                                            cellValueRaw,
+                                            false,
+                                            true);
                                     }
                                 }
 
@@ -435,13 +369,6 @@ public class WebSQLProcessor {
                                 result.setDuration(result.getDuration() + statistics.getExecuteTime());
                                 resultRows.add(finalRow);
                             }
-
-                            WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
-                            updateResults.setUpdateRowCount(totalUpdateCount);
-                            updateResults.setResultSet(updatedResultSet);
-                            updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
-
-                            queryResults.add(updateResults);
                         }
 
                         if (!CommonUtils.isEmpty(addedRows)) {
@@ -451,6 +378,13 @@ public class WebSQLProcessor {
                         if (!CommonUtils.isEmpty(deletedRows)) {
                             throw new DBCException("Row delete is not supported");
                         }
+
+                        WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
+                        updateResults.setUpdateRowCount(totalUpdateCount);
+                        updateResults.setResultSet(updatedResultSet);
+                        updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
+
+                        queryResults.add(updateResults);
                     }
                 } catch (Exception e) {
                     throw new InvocationTargetException(e);

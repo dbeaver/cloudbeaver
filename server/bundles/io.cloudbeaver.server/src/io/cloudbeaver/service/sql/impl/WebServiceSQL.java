@@ -198,11 +198,6 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo updateResultsData(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException {
-        return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues, dataFormat);
-    }
-
-    @Override
     public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         return contextInfo.getProcessor().updateResultsDataBatch(contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
     }

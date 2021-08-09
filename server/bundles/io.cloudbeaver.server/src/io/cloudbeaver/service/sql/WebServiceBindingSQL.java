@@ -93,13 +93,6 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getSQLContext(env),
                     env.getArgument("resultId")))
 
-            .dataFetcher("updateResultsData", env ->
-                getService(env).updateResultsData(
-                    getSQLContext(env),
-                    env.getArgument("resultsId"),
-                    env.getArgument("updateRow"),
-                    env.getArgument("updateValues"),
-                    getDataFormat(env)))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),
