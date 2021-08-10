@@ -11,7 +11,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from './LocalizationService';
 import type { TLocalizationToken } from './TLocalizationToken';
 
-export function useTranslate(): (<T extends TLocalizationToken | undefined>(token: T) => T) {
+export function useTranslate(): (<T extends TLocalizationToken | undefined>(token: T, fallback?: T) => T) {
   const localizationService = useService(LocalizationService);
 
   return localizationService.translate;

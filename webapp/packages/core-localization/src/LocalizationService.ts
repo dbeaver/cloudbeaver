@@ -57,7 +57,7 @@ export class LocalizationService extends Bootstrap {
     this.localeProviders.push(provider);
   }
 
-  readonly translate = <T extends TLocalizationToken | undefined>(token: T): T => {
+  readonly translate = <T extends TLocalizationToken | undefined>(token: T, fallback?: T): T => {
     if (token === undefined) {
       return undefined as T;
     }
@@ -75,6 +75,11 @@ export class LocalizationService extends Bootstrap {
     if (typeof translation === 'string') {
       return translation as T;
     }
+
+    if (fallback !== undefined) {
+      return this.translate(fallback);
+    }
+
     return token;
   };
 
