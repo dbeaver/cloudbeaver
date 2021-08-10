@@ -143,13 +143,13 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
         this.requestInfo = {
           ...this.requestInfo,
-          requestDuration: response.result?.duration || 0,
+          requestDuration: response.result.duration || 0,
           requestMessage: 'Saved successfully',
           source: null,
         };
 
         const result = prevResults.find(result => result.id === update.resultId)!;
-        const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+        const responseResult = response.result.results.find(result => result.resultSet?.id === update.resultId);
 
         if (responseResult?.resultSet?.rows && result.data?.rows) {
           let i = 0;

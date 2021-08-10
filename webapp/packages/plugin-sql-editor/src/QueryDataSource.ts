@@ -83,13 +83,13 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
         this.requestInfo = {
           ...this.requestInfo,
-          requestDuration: response.result?.duration || 0,
+          requestDuration: response.result.duration || 0,
           requestMessage: 'Saved successfully',
           source: this.options.query || null,
         };
 
         const result = prevResults.find(result => result.id === update.resultId)!;
-        const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+        const responseResult = response.result.results.find(result => result.resultSet?.id === update.resultId);
 
         if (responseResult?.resultSet?.rows && result.data?.rows) {
           let i = 0;

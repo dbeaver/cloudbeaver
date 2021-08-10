@@ -285,8 +285,8 @@ export interface Mutation {
   testNetworkHandler: NetworkEndpointInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
   updateConnection: ConnectionInfo;
-  updateResultsData?: Maybe<SqlExecuteInfo>;
-  updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
+  updateResultsDataBatch: SqlExecuteInfo;
+  updateResultsDataBatchScript: Scalars['String'];
 }
 
 export interface MutationAsyncReadDataFromContainerArgs {
@@ -411,15 +411,16 @@ export interface MutationUpdateConnectionArgs {
   config: ConnectionConfig;
 }
 
-export interface MutationUpdateResultsDataArgs {
+export interface MutationUpdateResultsDataBatchArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  updateRow: Array<Maybe<Scalars['Object']>>;
-  updateValues?: Maybe<Scalars['Object']>;
+  updatedRows?: Maybe<SqlResultRow[]>;
+  deletedRows?: Maybe<SqlResultRow[]>;
+  addedRows?: Maybe<SqlResultRow[]>;
 }
 
-export interface MutationUpdateResultsDataBatchArgs {
+export interface MutationUpdateResultsDataBatchScriptArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
@@ -1572,24 +1573,6 @@ export interface GetSqlExecutionPlanResultMutation {
   );
 }
 
-export type UpdateResultsDataMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  sourceRowValues: Array<Maybe<Scalars['Object']>> | Maybe<Scalars['Object']>;
-  values?: Maybe<Scalars['Object']>;
-}>;
-
-export interface UpdateResultsDataMutation {
-  result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount'>
-      & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )>; }
-  )>;
-}
-
 export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -1600,13 +1583,13 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
 }>;
 
 export interface UpdateResultsDataBatchMutation {
-  result?: Maybe<(
+  result: (
     Pick<SqlExecuteInfo, 'duration' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
     )>; }
-  )>;
+  );
 }
 
 export type MetadataGetNodeDdlQueryVariables = Exact<{
@@ -2551,27 +2534,6 @@ export const GetSqlExecutionPlanResultDocument = `
   }
 }
     `;
-export const UpdateResultsDataDocument = `
-    mutation updateResultsData($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $sourceRowValues: [Object]!, $values: Object) {
-  result: updateResultsData(
-    connectionId: $connectionId
-    contextId: $contextId
-    resultsId: $resultsId
-    updateRow: $sourceRowValues
-    updateValues: $values
-  ) {
-    duration
-    filterText
-    results {
-      updateRowCount
-      resultSet {
-        id
-        rows
-      }
-    }
-  }
-}
-    `;
 export const UpdateResultsDataBatchDocument = `
     mutation updateResultsDataBatch($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $updatedRows: [SQLResultRow!], $deletedRows: [SQLResultRow!], $addedRows: [SQLResultRow!]) {
   result: updateResultsDataBatch(
@@ -2955,9 +2917,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables): Promise<GetSqlExecutionPlanResultMutation> {
       return withWrapper(() => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables));
-    },
-    updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
-      return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));
     },
     updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables): Promise<UpdateResultsDataBatchMutation> {
       return withWrapper(() => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables));
