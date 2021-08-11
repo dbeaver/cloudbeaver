@@ -87,7 +87,7 @@
       background: rgba(128, 203, 196, 0.2);
     }
 
-    .cm-s-material :global(div).CodeMirror-selected {
+    &.custom-select .cm-s-material :global(div).CodeMirror-selected {
       display: none;
     }
 
