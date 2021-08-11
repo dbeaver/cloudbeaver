@@ -15,14 +15,8 @@ import {
   SubmittingForm,
   Loader,
   useFocus,
-  Container,
-  Group,
-  FieldCheckboxNew,
-  BASE_CONTAINERS_STYLES,
-  ObjectPropertyInfoFormNew,
-  GroupTitle
 } from '@cloudbeaver/core-blocks';
-import { SSH_TUNNEL_ID, SSHAuthForm } from '@cloudbeaver/core-connections';
+import { SSH_TUNNEL_ID, ConnectionCredentialsForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -73,10 +67,15 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   const sshConfig = controller.template?.networkHandlersConfig.find(
     handler => handler.id === SSH_TUNNEL_ID
   );
+  const sshAuthRequired = sshConfig?.enabled && !sshConfig.savePassword;
 
-  const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig.savePassword;
+  const networkHandlers: string[] = [];
 
-  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
+  if (sshAuthRequired) {
+    networkHandlers.push(SSH_TUNNEL_ID);
+  }
+
+  return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={translate('basicConnection_connectionDialog_newConnection')}
       subTitle={subtitle}
@@ -104,34 +103,14 @@ export const ConnectionDialog = observer(function ConnectionDialog({
         </center>
       ) : (
         <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <Container>
-            <Group gap small>
-              {isSSHAuthNeeded && <GroupTitle>{translate('connections_database_authentication')}</GroupTitle>}
-              <ObjectPropertyInfoFormNew
-                autofillToken={`section-${controller.template?.id || ''} section-auth`}
-                properties={controller.authModel.properties}
-                state={controller.config.credentials}
-                disabled={controller.isConnecting}
-              />
-              {credentialsSavingEnabled && (
-                <FieldCheckboxNew
-                  id={controller.template?.id || 'DBAuthSaveCredentials'}
-                  name="saveCredentials"
-                  label={translate('connections_connection_edit_save_credentials')}
-                  disabled={controller.isConnecting}
-                  state={controller.config}
-                />
-              )}
-            </Group>
-            {isSSHAuthNeeded && sshConfig && (
-              <SSHAuthForm
-                sshHandlerId={sshConfig.id}
-                config={controller.config}
-                disabled={controller.isConnecting}
-                allowPasswordSave={credentialsSavingEnabled}
-              />
-            )}
-          </Container>
+          <ConnectionCredentialsForm
+            config={controller.config}
+            authModelId={controller.authModel.id}
+            networkHandlers={networkHandlers}
+            formId={controller.template?.id}
+            allowSaveCredentials={credentialsSavingEnabled}
+            disabled={controller.isConnecting}
+          />
         </SubmittingForm>
       ))}
       {controller.responseMessage && (

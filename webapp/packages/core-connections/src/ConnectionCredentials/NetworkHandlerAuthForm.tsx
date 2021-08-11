@@ -11,39 +11,36 @@ import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, FieldCheckboxNew, GroupTitle, InputFieldNew, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource } from '../NetworkHandlerResource';
-import type { IFormInitConfig } from './IFormInitConfig';
 
 interface Props {
-  config: IFormInitConfig;
-  sshHandlerId: string;
-  allowPasswordSave: boolean;
-  disabled: boolean;
-  className?: string;
+  id: string;
+  networkHandlersConfig: NetworkHandlerConfigInput[];
+  allowSaveCredentials?: boolean;
+  disabled?: boolean;
 }
 
-export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
-  config, sshHandlerId, allowPasswordSave, disabled, className,
-}) {
+export const NetworkHandlerAuthForm: React.FC<Props> = observer(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const translate = useTranslate();
-  const handler = useMapResource(NetworkHandlerResource, sshHandlerId);
+  const handler = useMapResource(NetworkHandlerResource, id);
 
-  if (!config.networkCredentials.some(state => state.id === sshHandlerId)) {
-    config.networkCredentials.push({
-      id: sshHandlerId,
+  if (!networkHandlersConfig.some(state => state.id === id)) {
+    networkHandlersConfig!.push({
+      id: id,
       userName: '',
       password: '',
       savePassword: false,
     });
   }
 
-  const state = config.networkCredentials.find(state => state.id === sshHandlerId)!;
+  const state = networkHandlersConfig.find(state => state.id === id)!;
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <GroupTitle>{translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}</GroupTitle>
+      <GroupTitle>{handler.data?.label || translate(`connections_network_handler_${id}_title`, 'connections_network_handler_default_title')}</GroupTitle>
       <InputFieldNew
         type="text"
         name="userName"
@@ -51,7 +48,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
         disabled={disabled}
         mod='surface'
       >
-        {translate('connections_network_handler_ssh_tunnel_user')}
+        {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
       </InputFieldNew>
       <InputFieldNew
         type="password"
@@ -60,11 +57,11 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
         disabled={disabled}
         mod='surface'
       >
-        {translate('connections_network_handler_ssh_tunnel_password')}
+        {translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password')}
       </InputFieldNew>
-      {allowPasswordSave && (
+      {allowSaveCredentials && (
         <FieldCheckboxNew
-          id={sshHandlerId + ' savePassword'}
+          id={id + ' savePassword'}
           name="savePassword"
           state={state}
           label={translate('connections_connection_edit_save_credentials')}

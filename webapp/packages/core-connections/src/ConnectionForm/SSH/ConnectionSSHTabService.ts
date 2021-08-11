@@ -13,10 +13,11 @@ import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
-import { connectionConfigContext } from '../connectionConfigContext';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { SSH } from './SSH';
 import { SSHTab } from './SSHTab';
@@ -118,13 +119,16 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
 
     for (const handler of config.networkHandlersConfig) {
-      if (handler.enabled && handler.savePassword && this.isChanged(handler, info)) {
-        if (!handler.userName?.length) {
-          validation.error("Field SSH 'User' can't be empty");
+      if (handler.enabled && this.isChanged(handler, info)) {
+        if (handler.savePassword) {
+          if (!handler.userName?.length) {
+            validation.error("Field SSH 'User' can't be empty");
+          }
+          if (!handler.password?.length) {
+            validation.error("Field SSH 'Password' can't be empty");
+          }
         }
-        if (!handler.password?.length) {
-          validation.error("Field SSH 'Password' can't be empty");
-        }
+
         if (!handler.properties?.host?.length) {
           validation.error("Field SSH 'Host' can't be empty");
         }
@@ -144,21 +148,30 @@ export class ConnectionSSHTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
     if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
       return;
     }
 
     const configs: NetworkHandlerConfigInput[] = [];
+    let sshHandler: NetworkHandlerConfigInput | undefined;
 
     for (const handler of state.config.networkHandlersConfig) {
       if (this.isChanged(handler, state.info)) {
-        configs.push(handler);
+        configs.push({ ...handler });
+      }
+      if (handler.id === SSH_TUNNEL_ID) {
+        sshHandler = handler;
       }
     }
 
     if (configs.length > 0) {
       config.networkHandlersConfig = configs;
+    }
+
+    if (sshHandler?.enabled && !sshHandler.savePassword && hasMissingCredentials(sshHandler)) {
+      credentialsState.requireNetworkHandler(SSH_TUNNEL_ID);
     }
   }
 
@@ -197,4 +210,8 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     return false;
   }
+}
+
+function hasMissingCredentials(handler: NetworkHandlerConfigInput): boolean {
+  return !handler.userName;
 }

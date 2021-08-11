@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-type Cookies = Record<string, string>;
+type Cookies = Partial<Record<string, string>>;
 
 export function getCookies(): Cookies {
   if (!document.cookie) {

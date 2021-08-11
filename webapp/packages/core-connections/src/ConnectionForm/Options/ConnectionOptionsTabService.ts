@@ -17,12 +17,15 @@ import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { getUniqueConnectionName } from '../../getUniqueConnectionName';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import { connectionConfigContext } from '../connectionConfigContext';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
 import { Options } from './Options';
+
+const USER_NAME_AUTH_PROPERTY_ID = 'userName';
 
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
@@ -124,7 +127,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
   }
 
-  private validate(
+  private async validate(
     {
       state,
     }: IConnectionFormSubmitData,
@@ -134,6 +137,15 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (!state.config.name?.length) {
       validation.error("Field 'name' can't be empty");
+    }
+
+    if (state.config.authModelId && state.config.saveCredentials) {
+      const authProperties = await this.getConnectionAuthModelProperties(state.config.authModelId, state.info);
+      const userNameProperty = authProperties.find(property => property.id === USER_NAME_AUTH_PROPERTY_ID);
+
+      if (userNameProperty && (!state.config.credentials || !state.config.credentials[USER_NAME_AUTH_PROPERTY_ID])) {
+        validation.error(`Field '${userNameProperty.displayName || 'User name'}' can't be empty`);
+      }
     }
   }
 
@@ -199,6 +211,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
     const driver = await this.dbDriverResource.load(state.config.driverId!, ['includeProviderProperties']);
 
@@ -240,7 +253,15 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        config.credentials = state.config.credentials;
+        config.credentials = { ...state.config.credentials };
+      }
+
+      if (
+        config.authModelId
+        && !state.config?.saveCredentials
+        && (!state.config.credentials || hasMissingCredentials(properties, state.config.credentials))
+      ) {
+        credentialsState.requireAuthModel(config.authModelId);
       }
     }
 
@@ -331,4 +352,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     return properties;
   }
+}
+
+function hasMissingCredentials(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>) {
+  return authProperties.some(property => property.id === USER_NAME_AUTH_PROPERTY_ID)
+    && !credentials[USER_NAME_AUTH_PROPERTY_ID];
 }

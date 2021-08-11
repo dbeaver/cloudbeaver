@@ -16,7 +16,7 @@ import type { DatabaseConnection } from '../Administration/ConnectionsResource';
 import { EConnectionFeature } from '../EConnectionFeature';
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
 import type { ConnectionFormService } from './ConnectionFormService';
-import { connectionFormStateContext, IConnectionFormStateInfo } from './connectionFormStateContext';
+import { connectionFormStateContext, IConnectionFormStateInfo } from './Contexts/connectionFormStateContext';
 import type { IConnectionFormState, ConnectionFormMode, ConnectionFormType, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export class ConnectionFormState implements IConnectionFormState {

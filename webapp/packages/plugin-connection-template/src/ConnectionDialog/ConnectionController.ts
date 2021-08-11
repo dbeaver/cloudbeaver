@@ -9,7 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName } from '@cloudbeaver/core-connections';
-import type { IFormInitConfig } from '@cloudbeaver/core-connections';
+import type { IConnectionAuthCredentialsConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -25,7 +25,7 @@ export enum ConnectionStep {
 
 export interface IConnectionController {
   template: Connection | null;
-  config: IFormInitConfig;
+  config: IConnectionAuthCredentialsConfig;
   isConnecting: boolean;
   onConnect: () => void;
 }
@@ -38,9 +38,9 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   isConnecting = false;
   template: Connection | null = null;
   authModel?: DatabaseAuthModel;
-  config: IFormInitConfig = {
+  config: IConnectionAuthCredentialsConfig = {
     credentials: {},
-    networkCredentials: [],
+    networkHandlersConfig: [],
     saveCredentials: false,
   };
 
@@ -95,7 +95,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isDistructed = true;
   }
 
-  onStep = (step: ConnectionStep) => {
+  onStep = (step: ConnectionStep): void => {
     this.step = step;
     this.clearError();
 
@@ -104,7 +104,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   };
 
-  onConnect = async () => {
+  onConnect = async (): Promise<void> => {
     if (!this.template) {
       return;
     }
@@ -132,14 +132,14 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   };
 
-  onTemplateSelect = async (templateId: string) => {
+  onTemplateSelect = async (templateId: string): Promise<void> => {
     this.template = this.templateConnections.find(template => template.id === templateId)!;
 
     await this.loadAuthModel();
     this.clearError();
     this.config = {
       credentials: {},
-      networkCredentials: [],
+      networkHandlersConfig: [],
       saveCredentials: false,
     };
 
@@ -149,7 +149,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   };
 
-  onShowDetails = () => {
+  onShowDetails = (): void => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
@@ -165,8 +165,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       config.saveCredentials = this.config.saveCredentials;
     }
 
-    if (this.config.networkCredentials.length > 0) {
-      config.networkCredentials = this.config.networkCredentials;
+    if (this.config.networkHandlersConfig.length > 0) {
+      config.networkCredentials = this.config.networkHandlersConfig;
     }
 
     return config;

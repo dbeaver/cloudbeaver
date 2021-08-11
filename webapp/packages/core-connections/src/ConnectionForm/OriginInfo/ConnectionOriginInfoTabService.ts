@@ -13,7 +13,7 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isLocalConnection } from '../../Administration/ConnectionsResource';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormState } from '../IConnectionFormProps';
 import { ConnectionFormAuthenticationAction } from './ConnectionFormAuthenticationAction';
 import { OriginInfo } from './OriginInfo';

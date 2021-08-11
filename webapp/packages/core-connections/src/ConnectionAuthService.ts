@@ -55,11 +55,18 @@ export class ConnectionAuthService {
     }
 
     const sshConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
+    const sshAuthRequired = sshConfig?.enabled && !sshConfig?.savePassword;
+    const networkHandlers: string[] = [];
 
-    const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig?.savePassword;
+    if (sshAuthRequired) {
+      networkHandlers.push(SSH_TUNNEL_ID);
+    }
 
-    if (connection.authNeeded || isSSHAuthNeeded) {
-      await this.commonDialogService.open(DatabaseAuthDialog, connectionId);
+    if (connection.authNeeded || sshAuthRequired) {
+      await this.commonDialogService.open(DatabaseAuthDialog, {
+        connectionId,
+        networkHandlers,
+      });
     } else {
       await this.connectionInfoResource.init({ id: connectionId });
     }
