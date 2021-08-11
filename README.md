@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 21.1.2 - 2021-08-11
+- Option to run SQL Scripts is implemented.
+- Radio buttons are added to the Value panel to edit Boolean values.
+- Minor UI fixes and improvements are made.
+
 ### CloudBeaver 21.1.1 - 2021-08-02
 - The new notification way prevents users from working after session expiration.
 - The option to skip the Easy configuration step can be configured.
