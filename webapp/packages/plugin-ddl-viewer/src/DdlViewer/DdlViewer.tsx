@@ -32,8 +32,8 @@ export interface DdlViewerTabPanelProps {
 
 export const ddlViewer = (nodeId: string) => (<DdlViewerTabPanel nodeId={nodeId} />);
 
-const DdlViewerTabPanel = observer(function DdlViewerTabPanel(props: DdlViewerTabPanelProps) {
-  const controller = useController(DdlViewerController, props.nodeId);
+const DdlViewerTabPanel: React.FC<DdlViewerTabPanelProps> = observer(function DdlViewerTabPanel({ nodeId }) {
+  const controller = useController(DdlViewerController, nodeId);
 
   if (controller.isLoading) {
     return <Loader />;
