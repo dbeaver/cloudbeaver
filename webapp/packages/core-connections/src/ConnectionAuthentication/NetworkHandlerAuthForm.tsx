@@ -28,7 +28,7 @@ export const NetworkHandlerAuthForm: React.FC<Props> = observer(function Network
   const handler = useMapResource(NetworkHandlerResource, id);
 
   if (!networkHandlersConfig.some(state => state.id === id)) {
-    networkHandlersConfig!.push({
+    networkHandlersConfig.push({
       id: id,
       userName: '',
       password: '',

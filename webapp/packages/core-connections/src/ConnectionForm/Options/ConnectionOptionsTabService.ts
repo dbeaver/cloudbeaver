@@ -240,13 +240,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
       config.saveCredentials = state.config.saveCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
-      const credentialsChanged = this.isCredentialsChanged(properties, state.config.credentials);
 
-      if (credentialsChanged) {
+      if (this.isCredentialsChanged(properties, state.config.credentials)) {
         config.credentials = { ...state.config.credentials };
       }
 
-      if (!state.info?.saveCredentials || credentialsChanged) {
+      if (!config.saveCredentials) {
         credentialsState.requireAuthModel(config.authModelId);
       }
     }

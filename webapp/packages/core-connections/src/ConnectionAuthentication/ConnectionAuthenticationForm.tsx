@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Container, FieldCheckboxNew, Group, GroupTitle, ObjectPropertyInfoFormNew, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { DatabaseAuthModelsResource } from '../DatabaseAuthModelsResource';
@@ -21,7 +21,7 @@ import { NetworkHandlers } from './NetworkHandlers';
 interface Props {
   config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
-  authProperties?: UserConnectionAuthPropertiesFragment[];
+  authProperties?: ObjectPropertyInfo[];
   networkHandlers?: string[];
   formId?: string;
   allowSaveCredentials?: boolean;
@@ -33,9 +33,9 @@ export const ConnectionAuthenticationForm: React.FC<Props> = observer(function C
   config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
 }) {
   const translate = useTranslate();
-  const { data: authModel } = useMapResource(DatabaseAuthModelsResource, authModelId);
+  const authModel = useMapResource(DatabaseAuthModelsResource, authModelId);
 
-  let properties = authModel?.properties;
+  let properties = authModel.data?.properties;
 
   if (authProperties) {
     properties = authProperties;

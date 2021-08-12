@@ -67,12 +67,8 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   }
 
   const networkHandlers = useMemo(() => computed(() => controller.template?.networkHandlersConfig
-    .reduce((acc: string[], handler) => {
-      if (handler.enabled && !handler.savePassword) {
-        acc.push(handler.id);
-      }
-      return acc;
-    }, [])
+    .filter(handler => handler.enabled && !handler.savePassword)
+    .map(handler => handler.id)
   ), [controller.template?.networkHandlersConfig]);
 
   return styled(useStyles(styles))(

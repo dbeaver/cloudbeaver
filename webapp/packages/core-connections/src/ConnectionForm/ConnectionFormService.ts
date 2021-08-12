@@ -65,7 +65,7 @@ export class ConnectionFormService {
     this.formStateTask
       .before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
-    this.prepareConfigTask.addPostHandler(this.ensureCredentialsExisting);
+    this.prepareConfigTask.addPostHandler(this.askCredentials);
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
@@ -121,7 +121,7 @@ export class ConnectionFormService {
     }
   };
 
-  private ensureCredentialsExisting: IExecutorHandler<IConnectionFormSubmitData> = async (data, contexts) => {
+  private askCredentials: IExecutorHandler<IConnectionFormSubmitData> = async (data, contexts) => {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
     if (data.submitType !== 'test' || (!credentialsState.authModelId && !credentialsState.networkHandlers.length)) {

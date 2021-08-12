@@ -156,28 +156,17 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     const configs: NetworkHandlerConfigInput[] = [];
 
-    const initialSSHHandler = state.info?.networkHandlersConfig.find(h => h.id === SSH_TUNNEL_ID);
-    let currentSSHHandler: NetworkHandlerConfigInput | undefined;
-
     for (const handler of state.config.networkHandlersConfig) {
       if (this.isChanged(handler, state.info)) {
         configs.push({ ...handler });
       }
-
-      if (handler.id === SSH_TUNNEL_ID) {
-        currentSSHHandler = handler;
+      if (handler.enabled && !handler.savePassword) {
+        credentialsState.requireNetworkHandler(handler.id);
       }
     }
 
     if (configs.length > 0) {
       config.networkHandlersConfig = configs;
-    }
-
-    if (
-      currentSSHHandler?.enabled
-      && (!initialSSHHandler?.savePassword || isCredentialsChanged(currentSSHHandler, initialSSHHandler))
-    ) {
-      credentialsState.requireNetworkHandler(SSH_TUNNEL_ID);
     }
   }
 
@@ -216,21 +205,4 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     return false;
   }
-}
-
-function isCredentialsChanged(handler: NetworkHandlerConfigInput, initialHandler?: NetworkHandlerConfigInput): boolean {
-  if (!initialHandler && !handler.enabled) {
-    return false;
-  }
-
-  if (
-    handler.userName !== initialHandler?.userName
-    || (
-      (initialHandler?.password === null || initialHandler?.password === '') && handler.password !== ''
-    ) || !!handler.password?.length
-  ) {
-    return true;
-  }
-
-  return false;
 }

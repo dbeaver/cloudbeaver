@@ -74,7 +74,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   let authModelId: string | null = null;
 
   if (connection.connectionInfo?.authNeeded) {
-    authModelId = connection.connectionInfo?.authModel || driver?.defaultAuthModel || null;
+    authModelId = connection.connectionInfo.authModel || driver?.defaultAuthModel || null;
   }
 
   return styled(useStyles(styles))(
@@ -87,7 +87,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
           isAuthenticating={controller.isAuthenticating}
           onLogin={controller.login}
         >
-          {controller.error?.responseMessage && (
+          {controller.error.responseMessage && (
             <ErrorMessage
               text={controller.error.responseMessage}
               hasDetails={controller.error.hasDetails}
