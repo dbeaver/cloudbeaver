@@ -41,23 +41,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
   private lastAction: () => Promise<void>;
 
   constructor() {
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'disabled'>(this, {
-      access: observable,
-      dataFormat: observable,
-      supportedDataFormats: observable,
-      editor: observable,
-      results: observable,
-      offset: observable,
-      count: observable,
-      options: observable,
-      requestInfo: observable,
-      error: observable,
-      executionContext: observable,
-      disabled: observable,
-      activeRequest: observable,
-      activeSave: observable,
-    });
-
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
@@ -80,6 +63,24 @@ implements IDatabaseDataSource<TOptions, TResult> {
     };
     this.error = null;
     this.lastAction = this.requestData.bind(this);
+
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'activeTask' | 'disabled'>(this, {
+      access: observable,
+      dataFormat: observable,
+      supportedDataFormats: observable,
+      editor: observable.ref,
+      results: observable,
+      offset: observable,
+      count: observable,
+      options: observable,
+      requestInfo: observable,
+      error: observable.ref,
+      executionContext: observable,
+      disabled: observable,
+      activeRequest: observable.ref,
+      activeSave: observable.ref,
+      activeTask: observable.ref,
+    });
   }
 
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
