@@ -9,7 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName } from '@cloudbeaver/core-connections';
-import type { IConnectionAuthCredentialsConfig } from '@cloudbeaver/core-connections';
+import type { IConnectionAuthenticationConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -25,20 +25,20 @@ export enum ConnectionStep {
 
 export interface IConnectionController {
   template: Connection | null;
-  config: IConnectionAuthCredentialsConfig;
+  config: IConnectionAuthenticationConfig;
   isConnecting: boolean;
   onConnect: () => void;
 }
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
   template: Connection | null = null;
   authModel?: DatabaseAuthModel;
-  config: IConnectionAuthCredentialsConfig = {
+  config: IConnectionAuthenticationConfig = {
     credentials: {},
     networkHandlersConfig: [],
     saveCredentials: false,

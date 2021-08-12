@@ -12,7 +12,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import { ConnectionCredentialsDialog } from '../ConnectionCredentials/ConnectionCredentialsDialog';
+import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
 import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
@@ -138,7 +138,7 @@ export class ConnectionFormService {
       config.networkHandlersConfig = [];
     }
 
-    const result = await this.commonDialogService.open(ConnectionCredentialsDialog, {
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
       config,
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,

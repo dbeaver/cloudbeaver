@@ -23,7 +23,7 @@ export default [
   ['connections_connection_create_search_database', 'Search'],
   ['connections_connection_edit_save_credentials', 'Save credentials'],
   ['connections_connection_credentials_provisioning', 'Credentials provisioning'],
-  ['connections_connection_credentials_provisioning_description', 'You need to provide additional credentials to test this connection'],
+  ['connections_connection_credentials_provisioning_description', 'You need to provide or confirm credentials to test this connection'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_edit_settings', 'Settings'],
   ['connections_connection_edit_access', 'Access'],

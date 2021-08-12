@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
@@ -16,7 +18,7 @@ import {
   Loader,
   useFocus,
 } from '@cloudbeaver/core-blocks';
-import { SSH_TUNNEL_ID, ConnectionCredentialsForm } from '@cloudbeaver/core-connections';
+import { ConnectionAuthenticationForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -64,16 +66,14 @@ export const ConnectionDialog = observer(function ConnectionDialog({
     subtitle = controller.template.name;
   }
 
-  const sshConfig = controller.template?.networkHandlersConfig.find(
-    handler => handler.id === SSH_TUNNEL_ID
-  );
-  const sshAuthRequired = sshConfig?.enabled && !sshConfig.savePassword;
-
-  const networkHandlers: string[] = [];
-
-  if (sshAuthRequired) {
-    networkHandlers.push(SSH_TUNNEL_ID);
-  }
+  const networkHandlers = useMemo(() => computed(() => controller.template?.networkHandlersConfig
+    .reduce((acc: string[], handler) => {
+      if (handler.enabled && !handler.savePassword) {
+        acc.push(handler.id);
+      }
+      return acc;
+    }, [])
+  ), [controller.template?.networkHandlersConfig]);
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -103,10 +103,10 @@ export const ConnectionDialog = observer(function ConnectionDialog({
         </center>
       ) : (
         <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <ConnectionCredentialsForm
+          <ConnectionAuthenticationForm
             config={controller.config}
             authModelId={controller.authModel.id}
-            networkHandlers={networkHandlers}
+            networkHandlers={networkHandlers.get()}
             formId={controller.template?.id}
             allowSaveCredentials={credentialsSavingEnabled}
             disabled={controller.isConnecting}

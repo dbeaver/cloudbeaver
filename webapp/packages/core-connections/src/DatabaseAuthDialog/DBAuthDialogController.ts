@@ -14,14 +14,14 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionAuthCredentialsConfig } from '../ConnectionCredentials/IConnectionAuthCredentialsConfig';
+import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
 import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
-  config: IConnectionAuthCredentialsConfig = {
+  config: IConnectionAuthenticationConfig = {
     credentials: {},
     networkHandlersConfig: [],
     saveCredentials: false,

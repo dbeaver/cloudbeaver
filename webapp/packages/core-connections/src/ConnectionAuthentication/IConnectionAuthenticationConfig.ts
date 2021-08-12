@@ -8,7 +8,7 @@
 
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-export interface IConnectionAuthCredentialsConfig {
+export interface IConnectionAuthenticationConfig {
   credentials: any;
   networkHandlersConfig: NetworkHandlerConfigInput[];
   saveCredentials: boolean | undefined;

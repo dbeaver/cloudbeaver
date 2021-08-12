@@ -20,7 +20,7 @@ export default [
   ['connections_connection_create_search_database', 'Найти'],
   ['connections_connection_edit_save_credentials', ' Запомнить данные'],
   ['connections_connection_credentials_provisioning', 'Предоставление данных доступа'],
-  ['connections_connection_credentials_provisioning_description', 'Чтобы проверить подключение, необходимо предоставить дополнительные данные доступа'],
+  ['connections_connection_credentials_provisioning_description', 'Чтобы проверить подключение, необходимо предоставить или потвердить данные доступа'],
   ['connections_connection_edit_authentication', 'Авторизация'],
   ['connections_connection_edit_settings', 'Настройки'],
   ['connections_connection_edit_access', 'Доступ'],

@@ -11,15 +11,17 @@ import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Container, FieldCheckboxNew, Group, GroupTitle, ObjectPropertyInfoFormNew, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { DatabaseAuthModelsResource } from '../DatabaseAuthModelsResource';
-import type { IConnectionAuthCredentialsConfig } from './IConnectionAuthCredentialsConfig';
+import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
 import { NetworkHandlers } from './NetworkHandlers';
 
 interface Props {
-  config: Partial<IConnectionAuthCredentialsConfig>;
+  config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
+  authProperties?: UserConnectionAuthPropertiesFragment[];
   networkHandlers?: string[];
   formId?: string;
   allowSaveCredentials?: boolean;
@@ -27,22 +29,28 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionCredentialsForm: React.FC<Props> = observer(function ConnectionCredentialsForm({
-  config, networkHandlers, authModelId, formId, allowSaveCredentials, disabled, className,
+export const ConnectionAuthenticationForm: React.FC<Props> = observer(function ConnectionAuthenticationForm({
+  config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
 }) {
   const translate = useTranslate();
   const { data: authModel } = useMapResource(DatabaseAuthModelsResource, authModelId);
 
+  let properties = authModel?.properties;
+
+  if (authProperties) {
+    properties = authProperties;
+  }
+
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Container className={className}>
-      {authModel && (
+      {authModelId && (
         <Group gap small>
-          {authModel.properties ? (
+          {properties ? (
             <>
               {!!networkHandlers?.length && <GroupTitle>{translate('connections_database_authentication')}</GroupTitle>}
               <ObjectPropertyInfoFormNew
                 autofillToken={`section-${formId || ''} section-auth`}
-                properties={authModel.properties}
+                properties={properties}
                 state={config.credentials}
                 disabled={disabled}
               />

@@ -21,7 +21,7 @@ import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dia
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionCredentialsForm } from '../ConnectionCredentials/ConnectionCredentialsForm';
+import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
 import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
 import { DBAuthDialogController } from './DBAuthDialogController';
@@ -45,7 +45,7 @@ const styles = composes(
       display: flex;
       flex-direction: column;
     }
-    ConnectionCredentialsForm {
+    ConnectionAuthenticationForm {
       align-content: center;
     }
     ErrorMessage {
@@ -102,9 +102,10 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         ? <Loader />
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-            <ConnectionCredentialsForm
+            <ConnectionAuthenticationForm
               config={controller.config}
               authModelId={authModelId}
+              authProperties={connection.connectionInfo?.authProperties}
               networkHandlers={payload.networkHandlers}
               formId={payload.connectionId}
               allowSaveCredentials={credentialsSavingEnabled}

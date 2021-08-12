@@ -16,7 +16,7 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useDBDriver } from '../useDBDriver';
-import { ConnectionCredentialsForm } from './ConnectionCredentialsForm';
+import { ConnectionAuthenticationForm } from './ConnectionAuthenticationForm';
 
 const styles = css`
   CommonDialogWrapper {
@@ -30,7 +30,7 @@ const styles = css`
     display: flex;
     flex-direction: column;
   }
-  ConnectionCredentialsForm {
+  ConnectionAuthenticationForm {
     align-content: center;
   }
   Button {
@@ -45,7 +45,7 @@ interface Payload {
   driverId?: string;
 }
 
-export const ConnectionCredentialsDialog = observer(function ConnectionCredentialsDialog({
+export const ConnectionAuthenticationDialog = observer(function ConnectionAuthenticationDialog({
   payload,
   rejectDialog,
   resolveDialog,
@@ -67,7 +67,7 @@ export const ConnectionCredentialsDialog = observer(function ConnectionCredentia
       onReject={rejectDialog}
     >
       <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog()}>
-        <ConnectionCredentialsForm
+        <ConnectionAuthenticationForm
           config={payload.config}
           authModelId={payload.authModelId}
           networkHandlers={payload.networkHandlers}

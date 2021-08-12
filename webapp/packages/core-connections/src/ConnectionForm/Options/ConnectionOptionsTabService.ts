@@ -25,8 +25,6 @@ import { connectionFormStateContext } from '../Contexts/connectionFormStateConte
 import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
 import { Options } from './Options';
 
-const USER_NAME_AUTH_PROPERTY_ID = 'userName';
-
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
@@ -138,15 +136,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if (!state.config.name?.length) {
       validation.error("Field 'name' can't be empty");
     }
-
-    if (state.config.authModelId && state.config.saveCredentials) {
-      const authProperties = await this.getConnectionAuthModelProperties(state.config.authModelId, state.info);
-      const userNameProperty = authProperties.find(property => property.id === USER_NAME_AUTH_PROPERTY_ID);
-
-      if (userNameProperty && (!state.config.credentials || !state.config.credentials[USER_NAME_AUTH_PROPERTY_ID])) {
-        validation.error(`Field '${userNameProperty.displayName || 'User name'}' can't be empty`);
-      }
-    }
   }
 
   private fillConfig(
@@ -251,16 +240,13 @@ export class ConnectionOptionsTabService extends Bootstrap {
       config.saveCredentials = state.config.saveCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
+      const credentialsChanged = this.isCredentialsChanged(properties, state.config.credentials);
 
-      if (this.isCredentialsChanged(properties, state.config.credentials)) {
+      if (credentialsChanged) {
         config.credentials = { ...state.config.credentials };
       }
 
-      if (
-        config.authModelId
-        && !state.config?.saveCredentials
-        && (!state.config.credentials || hasMissingCredentials(properties, state.config.credentials))
-      ) {
+      if (!state.info?.saveCredentials || credentialsChanged) {
         credentialsState.requireAuthModel(config.authModelId);
       }
     }
@@ -352,9 +338,4 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     return properties;
   }
-}
-
-function hasMissingCredentials(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>) {
-  return authProperties.some(property => property.id === USER_NAME_AUTH_PROPERTY_ID)
-    && !credentials[USER_NAME_AUTH_PROPERTY_ID];
 }

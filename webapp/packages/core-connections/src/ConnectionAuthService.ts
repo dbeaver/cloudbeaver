@@ -54,15 +54,14 @@ export class ConnectionAuthService {
       return null;
     }
 
-    const sshConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
-    const sshAuthRequired = sshConfig?.enabled && !sshConfig?.savePassword;
-    const networkHandlers: string[] = [];
+    const networkHandlers = connection.networkHandlersConfig.reduce((acc: string[], handler) => {
+      if (handler.enabled && !handler.savePassword) {
+        acc.push(handler.id);
+      }
+      return acc;
+    }, []);
 
-    if (sshAuthRequired) {
-      networkHandlers.push(SSH_TUNNEL_ID);
-    }
-
-    if (connection.authNeeded || sshAuthRequired) {
+    if (connection.authNeeded || networkHandlers.includes(SSH_TUNNEL_ID)) {
       await this.commonDialogService.open(DatabaseAuthDialog, {
         connectionId,
         networkHandlers,

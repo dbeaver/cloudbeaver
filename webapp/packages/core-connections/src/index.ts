@@ -25,8 +25,8 @@ export * from './ConnectionForm/ConnectionFormState';
 export * from './ConnectionForm/Contexts/connectionFormStateContext';
 export * from './ConnectionForm/IConnectionFormProps';
 export * from './ConnectionForm/useConnectionFormState';
-export * from './ConnectionCredentials/IConnectionAuthCredentialsConfig';
-export * from './ConnectionCredentials/ConnectionCredentialsForm';
+export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
+export * from './ConnectionAuthentication/ConnectionAuthenticationForm';
 
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';
