@@ -37,6 +37,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   protected disabled: boolean;
   private activeRequest: Promise<TResult[]> | null;
   private activeSave: Promise<TResult[]> | null;
+  private activeTask: Promise<any> | null;
   private lastAction: () => Promise<void>;
 
   constructor() {
@@ -67,6 +68,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.disabled = false;
     this.activeRequest = null;
     this.activeSave = null;
+    this.activeTask = null;
     this.executionContext = null;
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
@@ -129,11 +131,11 @@ implements IDatabaseDataSource<TOptions, TResult> {
   }
 
   isLoading(): boolean {
-    return !!this.activeRequest || !!this.activeSave;
+    return !!this.activeRequest || !!this.activeSave || !!this.activeTask;
   }
 
   isDisabled(resultIndex: number): boolean {
-    return !!this.activeRequest || !!this.activeSave || this.disabled;
+    return this.isLoading() || this.disabled;
   }
 
   setEditor(editor: IDatabaseDataEditor<TResult>): this {
@@ -178,6 +180,34 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   async retry(): Promise<void> {
     await this.lastAction();
+  }
+
+  async runTask<T>(task: () => Promise<T>): Promise<T> {
+    if (this.activeTask) {
+      try {
+        await this.activeTask;
+      } catch {}
+    }
+
+    if (this.activeSave) {
+      try {
+        await this.activeSave;
+      } finally { }
+    }
+
+    if (this.activeRequest) {
+      try {
+        await this.activeRequest;
+      } finally { }
+    }
+
+    this.activeTask = task();
+
+    try {
+      return await this.activeTask;
+    } finally {
+      this.activeTask = null;
+    }
   }
 
   async requestData(): Promise<void> {
