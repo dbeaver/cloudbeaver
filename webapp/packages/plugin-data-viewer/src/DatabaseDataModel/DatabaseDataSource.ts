@@ -192,13 +192,13 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeSave) {
       try {
         await this.activeSave;
-      } finally { }
+      } catch { }
     }
 
     if (this.activeRequest) {
       try {
         await this.activeRequest;
-      } finally { }
+      } catch { }
     }
 
     this.activeTask = task();
