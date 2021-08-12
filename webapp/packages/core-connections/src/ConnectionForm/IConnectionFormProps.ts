@@ -11,7 +11,7 @@ import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables 
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
-import type { IConnectionFormStateInfo } from './connectionFormStateContext';
+import type { IConnectionFormStateInfo } from './Contexts/connectionFormStateContext';
 
 export type ConnectionFormMode = 'edit' | 'create';
 export type ConnectionFormType = 'admin' | 'public';

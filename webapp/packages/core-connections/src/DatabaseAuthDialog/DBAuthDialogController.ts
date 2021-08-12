@@ -14,16 +14,16 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
+import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
 import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
-import type { IFormInitConfig } from './IFormInitConfig';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
-  config: IFormInitConfig = {
+  config: IConnectionAuthenticationConfig = {
     credentials: {},
-    networkCredentials: [],
+    networkHandlersConfig: [],
     saveCredentials: false,
   };
 
@@ -45,7 +45,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     });
   }
 
-  init(connectionId: string, onClose: () => void) {
+  init(connectionId: string, onClose: () => void): void {
     this.connectionId = connectionId;
     this.close = onClose;
     this.loadAuthModel();
@@ -56,7 +56,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     this.isDistructed = true;
   }
 
-  login = async () => {
+  login = async (): Promise<void> => {
     if (this.isAuthenticating) {
       return;
     }
@@ -74,7 +74,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     }
   };
 
-  showDetails = () => {
+  showDetails = (): void => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
@@ -90,8 +90,8 @@ export class DBAuthDialogController implements IInitializableController, IDestru
       config.saveCredentials = this.config.saveCredentials;
     }
 
-    if (this.config.networkCredentials.length > 0) {
-      config.networkCredentials = this.config.networkCredentials;
+    if (this.config.networkHandlersConfig.length > 0) {
+      config.networkCredentials = this.config.networkHandlersConfig;
     }
 
     return config;

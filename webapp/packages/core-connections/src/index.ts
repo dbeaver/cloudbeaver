@@ -16,15 +16,17 @@ export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabSe
 export * from './ConnectionForm/SSH/ConnectionSSHTabService';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
 export * from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
-export * from './ConnectionForm/connectionConfigContext';
+export * from './ConnectionForm/Contexts/connectionConfigContext';
 export * from './ConnectionForm/ConnectionFormBaseActions';
 export * from './ConnectionForm/connectionFormConfigureContext';
 export * from './ConnectionForm/ConnectionForm';
 export * from './ConnectionForm/ConnectionFormService';
 export * from './ConnectionForm/ConnectionFormState';
-export * from './ConnectionForm/connectionFormStateContext';
+export * from './ConnectionForm/Contexts/connectionFormStateContext';
 export * from './ConnectionForm/IConnectionFormProps';
 export * from './ConnectionForm/useConnectionFormState';
+export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
+export * from './ConnectionAuthentication/ConnectionAuthenticationForm';
 
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';
@@ -35,8 +37,6 @@ export * from './EConnectionFeature';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './DatabaseAuthModelsResource';
-export * from './DatabaseAuthDialog/IFormInitConfig';
-export * from './DatabaseAuthDialog/SSHAuthForm';
 export * from './DBDriverResource';
 export * from './NetworkHandlerResource';
 export * from './useConnectionInfo';

@@ -8,10 +8,14 @@
 
 import { PlaceholderContainer, TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
+import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
 import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
+import { connectionConfigContext } from './Contexts/connectionConfigContext';
+import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
 import type { IConnectionFormProps, IConnectionFormState, IConnectionFormFillConfigData, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export interface IConnectionFormValidation {
@@ -42,7 +46,8 @@ export class ConnectionFormService {
   readonly formStateTask: IExecutorHandlersCollection<IConnectionFormState>;
 
   constructor(
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     this.tabsContainer = new TabsContainer();
     this.actionsContainer = new PlaceholderContainer();
@@ -60,6 +65,7 @@ export class ConnectionFormService {
     this.formStateTask
       .before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
+    this.prepareConfigTask.addPostHandler(this.askCredentials);
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
@@ -112,6 +118,35 @@ export class ConnectionFormService {
           message: status.messages.slice(1).join('\n'),
         }, status.saved ? ENotificationType.Success : ENotificationType.Error);
       }
+    }
+  };
+
+  private askCredentials: IExecutorHandler<IConnectionFormSubmitData> = async (data, contexts) => {
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
+
+    if (data.submitType !== 'test' || (!credentialsState.authModelId && !credentialsState.networkHandlers.length)) {
+      return;
+    }
+
+    const config = contexts.getContext(connectionConfigContext);
+
+    if (config.credentials === undefined && credentialsState.authModelId) {
+      config.credentials = {};
+    }
+
+    if (config.networkHandlersConfig === undefined && credentialsState.networkHandlers.length > 0) {
+      config.networkHandlersConfig = [];
+    }
+
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
+      config,
+      authModelId: credentialsState.authModelId,
+      networkHandlers: credentialsState.networkHandlers,
+      driverId: config.driverId,
+    });
+
+    if (result === DialogueStateResult.Rejected) {
+      ExecutorInterrupter.interrupt(contexts);
     }
   };
 

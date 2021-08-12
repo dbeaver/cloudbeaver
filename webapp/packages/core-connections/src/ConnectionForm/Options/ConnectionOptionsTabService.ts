@@ -17,10 +17,11 @@ import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { getUniqueConnectionName } from '../../getUniqueConnectionName';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import { connectionConfigContext } from '../connectionConfigContext';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
 import { Options } from './Options';
 
@@ -124,7 +125,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
   }
 
-  private validate(
+  private async validate(
     {
       state,
     }: IConnectionFormSubmitData,
@@ -199,6 +200,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
     const driver = await this.dbDriverResource.load(state.config.driverId!, ['includeProviderProperties']);
 
@@ -240,7 +242,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        config.credentials = state.config.credentials;
+        config.credentials = { ...state.config.credentials };
+      }
+
+      if (!config.saveCredentials) {
+        credentialsState.requireAuthModel(config.authModelId);
       }
     }
 

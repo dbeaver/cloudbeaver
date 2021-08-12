@@ -12,7 +12,6 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import { Connection, ConnectionInfoResource } from './ConnectionInfoResource';
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
-import { SSH_TUNNEL_ID } from './NetworkHandlerResource';
 
 @injectable()
 export class ConnectionAuthService {
@@ -54,12 +53,15 @@ export class ConnectionAuthService {
       return null;
     }
 
-    const sshConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
+    const networkHandlers = connection.networkHandlersConfig
+      .filter(handler => handler.enabled && !handler.savePassword)
+      .map(handler => handler.id);
 
-    const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig?.savePassword;
-
-    if (connection.authNeeded || isSSHAuthNeeded) {
-      await this.commonDialogService.open(DatabaseAuthDialog, connectionId);
+    if (connection.authNeeded || networkHandlers.length > 0) {
+      await this.commonDialogService.open(DatabaseAuthDialog, {
+        connectionId,
+        networkHandlers,
+      });
     } else {
       await this.connectionInfoResource.init({ id: connectionId });
     }

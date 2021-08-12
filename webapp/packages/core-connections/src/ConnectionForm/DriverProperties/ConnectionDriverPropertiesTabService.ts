@@ -11,9 +11,9 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
 
 import { DBDriverResource } from '../../DBDriverResource';
-import { connectionConfigContext } from '../connectionConfigContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormSubmitData, IConnectionFormState } from '../IConnectionFormProps';
 import { DriverProperties } from './DriverProperties';
 

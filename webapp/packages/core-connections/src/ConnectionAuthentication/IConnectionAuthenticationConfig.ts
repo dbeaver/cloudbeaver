@@ -8,8 +8,8 @@
 
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import type { ConnectionInitConfig } from '../ConnectionInfoResource';
-
-export interface IFormInitConfig extends Omit<Required<ConnectionInitConfig>, 'id'> {
-  networkCredentials: NetworkHandlerConfigInput[];
+export interface IConnectionAuthenticationConfig {
+  credentials: any;
+  networkHandlersConfig: NetworkHandlerConfigInput[];
+  saveCredentials: boolean | undefined;
 }

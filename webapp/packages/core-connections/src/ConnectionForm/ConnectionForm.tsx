@@ -16,8 +16,8 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { connectionConfigContext } from './connectionConfigContext';
 import { ConnectionFormService } from './ConnectionFormService';
+import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import type { IConnectionFormState } from './IConnectionFormProps';
 
 const tabsStyles = css`

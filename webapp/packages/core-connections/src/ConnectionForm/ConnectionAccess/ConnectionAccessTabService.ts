@@ -12,9 +12,9 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import { connectionConfigContext } from '../connectionConfigContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../connectionFormStateContext';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext';
+import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';

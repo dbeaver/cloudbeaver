@@ -14,26 +14,18 @@ import {
   SubmittingForm,
   Loader,
   useFocus,
-  BASE_CONTAINERS_STYLES,
-  Container,
-  Group,
-  FieldCheckboxNew,
-  ObjectPropertyInfoFormNew,
-  GroupTitle,
   ErrorMessage,
-  TextPlaceholder,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { SSH_TUNNEL_ID } from '../NetworkHandlerResource';
+import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
 import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
-import { SSHAuthForm } from './SSHAuthForm';
 
 const styles = composes(
   css`
@@ -53,7 +45,7 @@ const styles = composes(
       display: flex;
       flex-direction: column;
     }
-    Container {
+    ConnectionAuthenticationForm {
       align-content: center;
     }
     ErrorMessage {
@@ -61,31 +53,33 @@ const styles = composes(
     }
 `);
 
+interface Payload {
+  connectionId: string;
+  networkHandlers: string[];
+}
+
 export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   payload,
   options,
   rejectDialog,
-}: DialogComponentProps<string>) {
-  const connection = useConnectionInfo(payload);
-
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
-  const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
-  const controller = useController(DBAuthDialogController, payload, rejectDialog);
+}: DialogComponentProps<Payload>) {
   const translate = useTranslate();
+  const connection = useConnectionInfo(payload.connectionId);
+  const controller = useController(DBAuthDialogController, payload.connectionId, rejectDialog);
+
+  const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const { credentialsSavingEnabled } = useAdministrationSettings();
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const sshConfig = connection.connectionInfo?.networkHandlersConfig.find(
-    handler => handler.id === SSH_TUNNEL_ID
-  );
+  let authModelId: string | null = null;
 
-  const isAuthNeeded = connection.connectionInfo?.authNeeded;
-  const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig.savePassword;
+  if (connection.connectionInfo?.authNeeded) {
+    authModelId = connection.connectionInfo.authModel || driver?.defaultAuthModel || null;
+  }
 
-  const title = translate('connections_database_authentication');
-
-  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
+  return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={title}
+      title={translate('connections_database_authentication')}
       subTitle={connection.connectionInfo?.name}
       icon={driver?.icon}
       footer={(
@@ -93,7 +87,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
           isAuthenticating={controller.isAuthenticating}
           onLogin={controller.login}
         >
-          {controller.error?.responseMessage && (
+          {controller.error.responseMessage && (
             <ErrorMessage
               text={controller.error.responseMessage}
               hasDetails={controller.error.hasDetails}
@@ -108,48 +102,15 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         ? <Loader />
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-            <Container>
-              {isAuthNeeded && (
-                <Group gap small>
-                  {connection.connectionInfo?.authProperties ? (
-                    <>
-                      {isSSHAuthNeeded && sshConfig && <GroupTitle>{title}</GroupTitle>}
-                      <ObjectPropertyInfoFormNew
-                        autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
-                        properties={connection.connectionInfo.authProperties}
-                        state={controller.config.credentials}
-                        disabled={controller.isAuthenticating}
-                      />
-                      {credentialsSavingEnabled && (
-                        <FieldCheckboxNew
-                          id={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
-                          name="saveCredentials"
-                          label={translate('connections_connection_edit_save_credentials')}
-                          disabled={controller.isAuthenticating}
-                          state={controller.config}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <TextPlaceholder>Authentication data is not avaliable</TextPlaceholder>
-                  )}
-                </Group>
-              )}
-              {isSSHAuthNeeded && (
-                <Group gap small>
-                  {sshConfig ? (
-                    <SSHAuthForm
-                      config={controller.config}
-                      sshHandlerId={sshConfig.id}
-                      allowPasswordSave={credentialsSavingEnabled}
-                      disabled={controller.isAuthenticating}
-                    />
-                  ) : (
-                    <TextPlaceholder>SSH Authentication data is not avaliable</TextPlaceholder>
-                  )}
-                </Group>
-              )}
-            </Container>
+            <ConnectionAuthenticationForm
+              config={controller.config}
+              authModelId={authModelId}
+              authProperties={connection.connectionInfo?.authProperties}
+              networkHandlers={payload.networkHandlers}
+              formId={payload.connectionId}
+              allowSaveCredentials={credentialsSavingEnabled}
+              disabled={controller.isAuthenticating}
+            />
           </SubmittingForm>
         )}
     </CommonDialogWrapper>
