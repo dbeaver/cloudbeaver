@@ -272,12 +272,24 @@ public class WebSQLProcessor {
 
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-            Map<String, Object> options = Collections.emptyMap();
-            for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
-                DBCStatistics statistics = batch.execute(session, options);
+            DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
+            boolean revertToAutoCommit = false;
+            if (txnManager  != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
+                txnManager.setAutoCommit(monitor, false);
+                revertToAutoCommit = true;
+            }
+            try {
+                Map<String, Object> options = Collections.emptyMap();
+                for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
+                    DBCStatistics statistics = batch.execute(session, options);
 
-                totalUpdateCount += statistics.getRowsUpdated();
-                result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                    totalUpdateCount += statistics.getRowsUpdated();
+                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                }
+            } finally {
+                if (revertToAutoCommit) {
+                    txnManager.setAutoCommit(monitor, true);
+                }
             }
         }
 
