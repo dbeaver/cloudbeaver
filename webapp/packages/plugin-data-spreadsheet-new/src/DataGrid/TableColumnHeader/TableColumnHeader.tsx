@@ -13,7 +13,6 @@ import styled, { css } from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
@@ -73,16 +72,31 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const column = data.getColumn(Number(calculatedColumn.key));
-  const columnName = calculatedColumn.name as string;
+  let icon = calculatedColumn.icon;
+  let columnName = calculatedColumn.name as string;
+  const dataReadonly = tableDataContext.isReadOnly() || model.isReadonly();
+  let columnReadOnly = !calculatedColumn.editable;
+  let columnTooltip: string = columnName;
 
-  // TODO we want to get "sortable" property from SqlResultColumn data
-  const sortable = model.source.results.length === 1 && !model.source.isDisabled(resultIndex);
-  const readOnly = !tableDataContext.isReadOnly() && column?.readOnly;
-  const readOnlyStatus = column?.readOnlyStatus ? `(Read-only: ${column.readOnlyStatus})` : '';
-  const columnTooltip = `${columnName}${column?.fullTypeName ? ': ' + column.fullTypeName : ''} ${readOnlyStatus}`;
+  if (calculatedColumn.columnDataIndex !== null) {
+    const column = tableDataContext.data.getColumn(calculatedColumn.columnDataIndex);
 
+    if (column) {
+      columnName = column.label!;
+      icon = column.icon;
+      columnReadOnly ||= tableDataContext.format.isReadOnly({ column: calculatedColumn.columnDataIndex });
+
+      columnTooltip = columnName;
+
+      if (column.fullTypeName) {
+        columnTooltip += `: ${column.fullTypeName}`;
+      }
+
+      if (column.readOnlyStatus) {
+        columnTooltip += ` (Read-only: ${column.readOnlyStatus})`;
+      }
+    }
+  }
   const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
     gridSelectionContext.selectColumn(calculatedColumn.idx, e.ctrlKey || e.metaKey);
   };
@@ -91,13 +105,13 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
     <table-header>
       <shrink-container as='div' title={columnTooltip} onClick={handleColumnSelection}>
         <icon>
-          <StaticImage icon={column?.icon} />
-          {readOnly && <readonly-status className='rdg-table-header__readonly-status' />}
+          {icon && <StaticImage icon={icon} />}
+          {!dataReadonly && columnReadOnly && <readonly-status className='rdg-table-header__readonly-status' />}
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {sortable && column?.label && (
-        <OrderButton model={model} resultIndex={resultIndex} attribute={column.label} />
+      {!(dataReadonly || columnReadOnly) && calculatedColumn.columnDataIndex !== null && (
+        <OrderButton model={model} resultIndex={resultIndex} attribute={columnName} />
       )}
     </table-header>
   );

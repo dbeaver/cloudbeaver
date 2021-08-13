@@ -26,7 +26,6 @@ function copyGridSelectedDataToClipboard(
   selectedCells: Map<number, number[]>
 ) {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-  const editor = model.source.getEditor(resultIndex);
 
   const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
 
@@ -40,15 +39,14 @@ function copyGridSelectedDataToClipboard(
   const rowsValues: string[] = [];
   for (const [rowIdx, colIndexes] of orderedSelectedCells) {
     const rowCellsValues: string[] = [];
-    for (const column of tableData.data.columns) {
-      const columnIdx = tableData.getDataColumnIndexFromKey(column.key);
-      if (columnIdx === null || !selectedColumns.has(columnIdx)) {
+    for (const column of tableData.columns) {
+      if (column.columnDataIndex === null || !selectedColumns.has(column.columnDataIndex)) {
         continue;
       }
 
-      if (colIndexes.includes(columnIdx)) {
-        const cell = editor.getCell(rowIdx, columnIdx);
-        const cellValue = format.getText(cell);
+      if (colIndexes.includes(column.columnDataIndex)) {
+        const cell = tableData.getCellValue(rowIdx, column.columnDataIndex);
+        const cellValue = cell !== undefined ? format.getText(cell) : undefined;
         rowCellsValues.push(cellValue ?? '');
       } else {
         rowCellsValues.push('');

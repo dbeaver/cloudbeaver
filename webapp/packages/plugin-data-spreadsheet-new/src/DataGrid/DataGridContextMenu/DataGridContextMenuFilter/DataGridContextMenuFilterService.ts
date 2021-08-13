@@ -216,8 +216,9 @@ export class DataGridContextMenuFilterService {
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
           const supportedOperations = data.getColumnOperations(column);
+          const value = data.getCellValue({ column, row });
 
-          return supportedOperations.length === 0 || format.isNull(data.getCellValue({ column, row }));
+          return value === undefined || supportedOperations.length === 0 || format.isNull(value);
         },
         order: 1,
         title: 'data_grid_table_filter_cell_value',
@@ -242,10 +243,12 @@ export class DataGridContextMenuFilterService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden: context => {
-          const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const supportedOperations = data.getColumnOperations(context.data.column);
+          const { model, resultIndex, column, row } = context.data;
+          const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const cellValue = data.getCellValue({ column, row });
+          const supportedOperations = data.getColumnOperations(column);
 
-          return supportedOperations.length === 0;
+          return cellValue === undefined || supportedOperations.length === 0;
         },
         order: 2,
         title: 'data_grid_table_filter_custom_value',
@@ -259,6 +262,10 @@ export class DataGridContextMenuFilterService {
             const supportedOperations = data.getColumnOperations(column);
             const cellValue = data.getCellValue({ column, row });
             const columnLabel = data.getColumn(column)?.label || '';
+
+            if (!cellValue) {
+              return [];
+            }
 
             return supportedOperations
               .filter(operation => !nullOperationsFilter(operation))

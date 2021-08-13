@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
@@ -14,7 +13,7 @@ import { Cell } from 'react-data-grid';
 
 import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { isBooleanValuePresentationAvailable, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
@@ -30,37 +29,29 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const editingContext = useContext(EditingContext);
   const mouse = useMouse<HTMLDivElement>({});
   const cellContext = useMemo<ICellContext>(() => ({ mouse }), [mouse]);
-  const resultColumn = tableDataContext?.getColumnInfo(column.key);
-  const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
 
-  const classes: string[] = [];
+  let classes = '';
 
   if (selectionContext?.isSelected(rowIdx, column.idx)) {
-    classes.push('rdg-cell-custom-selected');
+    classes += ' rdg-cell-custom-selected';
   }
 
   if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-    classes.push('rdg-cell-custom-editing');
+    classes += ' rdg-cell-custom-editing';
   }
 
-  if (!tableDataContext?.isIndexColumn(column.key) && editor?.isCellEdited(rowIdx, Number(column.key))) {
-    classes.push('rdg-cell-custom-edited');
+  if (tableDataContext?.isCellEdited(rowIdx, column)) {
+    classes += ' rdg-cell-custom-edited';
   }
 
   const state = useObjectRef({
-    row: props.row,
     column,
     rowIdx,
-    resultColumn,
     isCellSelected,
-    editor,
     selectionContext,
     dataGridContext,
     editingContext,
     tableDataContext,
-    get immutableRow() {
-      return this.editor?.get(this.rowIdx) || this.row; // performance heavy
-    },
     mouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       if (EventContext.has(event, EventStopPropagationFlag)) {
         return;
@@ -83,11 +74,15 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       );
     },
     mouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-      if (!this.dataGridContext?.isGridInFocus() || EventContext.has(event, EventStopPropagationFlag)) {
+      if (
+        !this.selectionContext
+        || !this.dataGridContext?.isGridInFocus()
+        || EventContext.has(event, EventStopPropagationFlag)
+      ) {
         return;
       }
 
-      this.selectionContext?.select(
+      this.selectionContext.select(
         {
           colIdx: this.column.idx,
           rowIdx: this.rowIdx,
@@ -98,25 +93,30 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       );
     },
     doubleClick(event: React.MouseEvent<HTMLDivElement>) {
-      if (EventContext.has(event, EventStopPropagationFlag)) {
+      const columnIndex = this.column.columnDataIndex;
+
+      if (
+        !this.editingContext
+        || !this.tableDataContext
+        || EventContext.has(event, EventStopPropagationFlag)
+        || columnIndex === null
+      ) {
         return;
       }
 
-      const format = this.dataGridContext?.model.source.getAction(
-        this.dataGridContext.resultIndex,
-        ResultSetFormatAction
-      );
-      const columnIndex = this.tableDataContext?.getDataColumnIndexFromKey(this.column.key) ?? null;
-      const handleByBooleanFormatter = this.resultColumn && isBooleanValuePresentationAvailable(
-        this.editor?.getCell(this.rowIdx, Number(this.column.key)),
-        this.resultColumn
-      );
+      const resultColumn = this.tableDataContext.getColumnInfo(columnIndex);
+      const value = this.tableDataContext.getCellValue(this.rowIdx, columnIndex);
+
+      if (!resultColumn || value === undefined) {
+        return;
+      }
+
+      const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
 
       if (
         !this.column.editable
         || handleByBooleanFormatter
-        || columnIndex === null
-        || format?.isReadOnly({
+        || this.tableDataContext.format.isReadOnly({
           row: this.rowIdx,
           column: columnIndex,
         })
@@ -124,38 +124,32 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
         return;
       }
 
-      this.editingContext?.edit({ idx: this.column.idx, rowIdx: this.rowIdx });
+      this.editingContext.edit({
+        idx: this.column.idx,
+        rowIdx: this.rowIdx,
+      });
     },
   }, {
-    row: props.row,
     column,
     rowIdx,
-    resultColumn,
     isCellSelected,
-    editor,
     selectionContext,
     dataGridContext,
     editingContext,
     tableDataContext,
-  }, {
-    rowIdx: observable.ref,
-    row: observable.ref,
-    editor: observable.ref,
-    immutableRow: computed,
-  }, ['doubleClick', 'mouseUp', 'mouseDown']);
+  }, undefined, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   return (
     <CellContext.Provider value={cellContext}>{/** performance super heavy */}
       <Cell
         ref={mouse.reference}
-        className={classes.join(' ')}
+        className={classes}
         data-row-index={rowIdx}
         data-column-index={column.idx}
         onMouseDown={state.mouseDown}
         onMouseUp={state.mouseUp}
         onDoubleClick={state.doubleClick}
         {...props}
-        row={state.immutableRow}
       />
     </CellContext.Provider>
   );

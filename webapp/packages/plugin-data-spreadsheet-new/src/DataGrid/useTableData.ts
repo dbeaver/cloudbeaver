@@ -11,17 +11,17 @@ import type { Column } from 'react-data-grid';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { TextTools } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { TextTools, uuid } from '@cloudbeaver/core-utils';
+import { IDatabaseDataModel, IDatabaseResultSet, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { ResultSetTools } from '../ResultSetTools';
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
 import type { ITableData } from './TableDataContext';
 
 export const indexColumn: Column<any[], any> = {
-  key: String(Number.MAX_SAFE_INTEGER),
+  key: '#',
+  columnDataIndex: null,
   name: '#',
   minWidth: 60,
   width: 60,
@@ -32,36 +32,44 @@ export const indexColumn: Column<any[], any> = {
 };
 
 export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): ITableData {
-  const modelResultData = model.getResult(resultIndex);
+  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const data = model.source.getAction(resultIndex, ResultSetDataAction);
+  const editor = model.source.getEditor(resultIndex);
+
   const props = useObjectRef({
-    modelResultData,
-    model,
-    resultIndex,
+    format,
+    data,
+    editor,
   },
   undefined,
   {
-    modelResultData: observable.ref,
-    model: observable.ref,
-    resultIndex: observable.ref,
+    format: observable.ref,
+    data: observable.ref,
+    editor: observable.ref,
   });
 
   return useObjectRef({
-    get dataColumns() {
-      return props.modelResultData?.data?.columns || [];
-    },
-    get dataRows() {
-      return props.modelResultData?.data?.rows || [];
+    get format() {
+      return props.format;
     },
     get data() {
-      if (!props.modelResultData?.data) {
-        return { columns: [], rows: [] };
+      return props.data;
+    },
+    get editor() {
+      return props.editor;
+    },
+    get dataColumns() {
+      return this.data.columns;
+    },
+    get dataRows() {
+      return this.data.rows;
+    },
+    get columns() {
+      if (this.dataColumns.length === 0) {
+        return [];
       }
-
-      const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-
-      // TODO: seems it must be moved to ResultSetFormatAction
-      const columnNames = ResultSetTools.getHeaders(props.modelResultData.data);
-      const rowStrings = ResultSetTools.getLongestCells(props.modelResultData.data);
+      const columnNames = this.format.getHeaders();
+      const rowStrings = this.format.getLongestCells();
 
       // TODO: seems better to do not measure container size
       //       for detecting max columns size, better to use configurable variable
@@ -75,54 +83,51 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
         }),
       }).map(v => v + 16 + 32 + 20);
 
-      // TODO: we need some result type specified formatter to common actions with data
-      const rows = props.modelResultData.data?.rows || [];
-
-      const columns = props.modelResultData.data?.columns!.map<Column<any[], any>>((col, columnIndex) => ({
-        key: columnIndex + '',
+      const columns: Array<Column<any[], any>> = this.dataColumns.map<Column<any[], any>>((col, columnIndex) => ({
+        key: uuid(),
+        columnDataIndex: columnIndex,
         name: col.label!,
-        editable: !format.isReadOnly({ column: columnIndex }),
+        editable: true,
         width: Math.min(300, measuredCells[columnIndex]),
         headerRenderer: TableColumnHeader,
-      })) || [];
+      }));
       columns.unshift(indexColumn);
 
-      return { rows, columns };
+      return columns;
     },
-    getCellValue(rowIndex: number, key: string | number): any {
-      return this.data.rows[rowIndex][key as number];
+    getColumn(columnIndex: number) {
+      return this.columns[columnIndex];
     },
-    getColumnInfo(key: string | number): SqlResultColumn | undefined {
-      if (this.isIndexColumn(key)) {
-        return;
-      }
-
-      return this.dataColumns[Number(key)]; // performance heavy
+    getColumnByDataIndex(columnDataIndex: number) {
+      return this.columns.find(column => column.columnDataIndex === columnDataIndex)!;
     },
-    getDataColumnIndexFromKey(key: string | number) {
-      const info = this.getColumnInfo(key);
-
-      if (!info) {
-        return null;
-      }
-
-      return Number(key);
+    getColumnInfo(columnDataIndex: number): SqlResultColumn | undefined {
+      return this.data.getColumn(columnDataIndex);
     },
-    getColumnIndexFromKey(key: string | number) {
-      const index = this.data.columns.findIndex((column: any) => column.key === String(key));
-      return index === -1 ? null : index;
+    getCellValue(row: number, column: number) {
+      return this.editor.getCell(row, column);
+      // return props.data.getCellValue({ column, row });
+    },
+    getColumnIndexFromKey(key: string) {
+      return this.columns.findIndex(column => column.key === key);
     },
     getColumnsInRange(startIndex: number, endIndex: number) {
       if (startIndex === endIndex) {
-        return [this.data.columns[startIndex]];
+        return [this.columns[startIndex]];
       }
 
       const firstIndex = Math.min(startIndex, endIndex);
       const lastIndex = Math.max(startIndex, endIndex);
-      return this.data.columns.slice(firstIndex, lastIndex + 1);
+      return this.columns.slice(firstIndex, lastIndex + 1);
     },
-    isIndexColumn(columnKey: string | number) {
-      return String(columnKey) === indexColumn.key;
+    isCellEdited(rowIndex: number, column: Column<any[], any>) {
+      if (column.columnDataIndex === null) {
+        return false;
+      }
+      return this.editor.isCellEdited(rowIndex, column.columnDataIndex);
+    },
+    isIndexColumn(columnKey: string) {
+      return columnKey === indexColumn.key;
     },
     isIndexColumnInRange(columnsRange: Array<Column<any[], any>>) {
       return columnsRange.some(column => this.isIndexColumn(column.key));
@@ -130,11 +135,8 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
     isReadOnly() {
       return this.dataColumns.every(column => column.readOnly);
     },
-    getColumnKeyFromColumnIndex(columnIndex: number) {
-      return Number(this.data.columns[columnIndex].key);
-    },
   }, null, {
-    data: computed,
+    columns: computed,
     dataColumns: computed,
     dataRows: computed,
   });

@@ -11,8 +11,6 @@ import { useCallback, useContext } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled, { use, css } from 'reshadow';
 
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
-
 import { EditingContext } from '../../../Editing/EditingContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
@@ -32,28 +30,41 @@ const styles = css`
   }
 `;
 
-export const BooleanFormatter: React.FC<FormatterProps> = observer(function BooleanFormatter({ column, row, rowIdx }) {
+export const BooleanFormatter: React.FC<FormatterProps> = observer(function BooleanFormatter({ column, rowIdx }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);
 
-  const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
-  const resultColumn = tableDataContext?.getColumnInfo(column.key);
-  const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
+  if (!context || !tableDataContext || !editingContext || column.columnDataIndex === null) {
+    throw new Error('Contexts required');
+  }
+
+  const formatter = tableDataContext.format;
+  const rawValue = formatter.get(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!);
   const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
-  const stringifiedValue = formatter?.toDisplayString(value) ?? String(value);
+  const stringifiedValue = formatter.toDisplayString(value);
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
-  const disabled = !column.editable || !!editingContext?.readonly;
+  const disabled = (
+    !column.editable
+    || !!editingContext.readonly
+    || formatter.isReadOnly({ row: rowIdx, column: column.columnDataIndex })
+  );
 
   const toggleValue = useCallback(() => {
-    if (disabled) {
+    if (disabled || column.columnDataIndex === null) {
+      return;
+    }
+    const resultColumn = tableDataContext.getColumnInfo(column.columnDataIndex);
+
+    if (!resultColumn) {
       return;
     }
 
-    const nextValue = !resultColumn?.required && value === false ? null : !value;
+    const nextValue = !resultColumn.required && value === false ? null : !value;
 
-    context?.model.source.getEditor(context.resultIndex).setCell(rowIdx, Number(column.key), nextValue);
-  }, [context, resultColumn, column.key, rowIdx, value, disabled]);
+    tableDataContext.editor
+      .setCell(rowIdx, column.columnDataIndex, nextValue);
+  }, [tableDataContext, column, rowIdx, value, disabled]);
 
   return styled(styles)(
     <boolean-formatter

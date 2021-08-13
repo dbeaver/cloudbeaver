@@ -34,16 +34,6 @@ export function useGridSelectionContext(
     lastSelectedCell: null,
   }));
 
-  function getRealColumnIndex(colIdx: number) {
-    let column: number | undefined = props.tableData.getColumnKeyFromColumnIndex(colIdx);
-
-    if (props.tableData.isIndexColumn(column)) {
-      column = undefined;
-    }
-
-    return column;
-  }
-
   const selectRows = action(function selectRows(
     startPosition: number,
     lastPosition: number,
@@ -124,7 +114,11 @@ export function useGridSelectionContext(
     selectRows(
       startPosition.rowIdx,
       lastPosition.rowIdx,
-      isIndexColumnInRange ? undefined : columnsInRange.map(column => Number(column.key)),
+      isIndexColumnInRange
+        ? undefined
+        : (columnsInRange
+          .filter(column => column.columnDataIndex !== null)
+          .map(column => column.columnDataIndex!)),
       multiple,
       temporary
     );
@@ -134,10 +128,14 @@ export function useGridSelectionContext(
     colIdx: number,
     multiple: boolean
   ) {
-    state.temporarySelection.clear();
-    const column = getRealColumnIndex(colIdx);
+    const { selectionAction, tableData } = props;
 
-    const { selectionAction } = props;
+    state.temporarySelection.clear();
+
+    const column = tableData
+      .getColumn(colIdx)
+      .columnDataIndex ?? undefined;
+
     const selected = selectionAction.isElementSelected({ column });
 
     if (!multiple) {
@@ -153,7 +151,9 @@ export function useGridSelectionContext(
   }
 
   function isSelected(rowIdx: number, colIdx: number) {
-    const column = getRealColumnIndex(colIdx);
+    const column = props.tableData
+      .getColumn(colIdx)
+      .columnDataIndex ?? undefined;
 
     const temporaryRowSelection = state.temporarySelection.get(rowIdx);
 
@@ -205,8 +205,8 @@ export function useGridSelectionContext(
 
   function select(cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) {
     const { lastSelectedCell } = state;
-    const columnKey = props.tableData.getColumnKeyFromColumnIndex(cell.colIdx);
-    const isIndexColumn = props.tableData.isIndexColumn(columnKey);
+    const column = props.tableData.getColumn(cell.colIdx);
+    const isIndexColumn = props.tableData.isIndexColumn(column.key);
 
     if (!temporary) {
       state.lastSelectedCell = cell;
@@ -226,7 +226,9 @@ export function useGridSelectionContext(
       return;
     }
 
-    selectCell(cell.rowIdx, columnKey, multiple, temporary);
+    if (column.columnDataIndex !== null) {
+      selectCell(cell.rowIdx, column.columnDataIndex, multiple, temporary);
+    }
   }
 
   return useObjectRef<IDataGridSelectionContext>({
