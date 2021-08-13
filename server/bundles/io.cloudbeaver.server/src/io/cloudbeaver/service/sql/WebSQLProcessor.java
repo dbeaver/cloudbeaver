@@ -335,7 +335,7 @@ public class WebSQLProcessor {
             }
         }
 
-        return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), true);
+        return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false);
     }
 
     private DBSDataManipulator generateUpdateResultsDataBatch(
