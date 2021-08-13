@@ -231,10 +231,9 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         try {
-            contextInfo.getProcessor().updateResultsDataBatch(
+            return contextInfo.getProcessor().generateResultsDataUpdateScript(
                 contextInfo.getProcessor().getWebSession().getProgressMonitor(),
                 contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
-            return "????";
         } catch (DBException e) {
             throw new DBWebException("Error genering update script", e);
         }

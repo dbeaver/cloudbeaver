@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
@@ -28,6 +27,7 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
@@ -250,7 +250,6 @@ public class WebSQLProcessor {
         return executeInfo;
     }
 
-    @WebAction
     public WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
@@ -260,6 +259,84 @@ public class WebSQLProcessor {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
+        List<DBSDataManipulator.ExecuteBatch> resultBatches = new ArrayList<>();
+        List<Object[]> resultRows = new ArrayList<>();
+
+        DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
+            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, resultRows);
+
+        long totalUpdateCount = 0;
+
+        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
+        List<WebSQLQueryResults> queryResults = new ArrayList<>();
+
+        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
+            Map<String, Object> options = Collections.emptyMap();
+            for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
+                DBCStatistics statistics = batch.execute(session, options);
+
+                totalUpdateCount += statistics.getRowsUpdated();
+                result.setDuration(result.getDuration() + statistics.getExecuteTime());
+            }
+        }
+
+        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        updatedResultSet.setResultsInfo(resultsInfo);
+        updatedResultSet.setColumns(resultsInfo.getAttributes());
+
+        WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
+        updateResults.setUpdateRowCount(totalUpdateCount);
+        updateResults.setResultSet(updatedResultSet);
+        updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
+
+        queryResults.add(updateResults);
+
+        result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
+
+        return result;
+    }
+
+    public String generateResultsDataUpdateScript(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat) throws DBException
+    {
+        List<DBSDataManipulator.ExecuteBatch> resultBatches = new ArrayList<>();
+        List<Object[]> resultRows = new ArrayList<>();
+
+        DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
+            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, resultRows);
+
+        List<DBEPersistAction> actions = new ArrayList<>();
+
+        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
+            Map<String, Object> options = Collections.emptyMap();
+            for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
+                batch.generatePersistActions(session, actions, options);
+            }
+        }
+
+        return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), true);
+    }
+
+    private DBSDataManipulator generateUpdateResultsDataBatch(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat,
+        @NotNull List<DBSDataManipulator.ExecuteBatch> resultBatches,
+        @NotNull List<Object[]> resultRows) throws DBException
+    {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
@@ -268,11 +345,8 @@ public class WebSQLProcessor {
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
 
-        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
-        List<WebSQLQueryResults> queryResults = new ArrayList<>();
-
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update rows in container")) {
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
 
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
@@ -281,10 +355,6 @@ public class WebSQLProcessor {
             WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
             updatedResultSet.setResultsInfo(resultsInfo);
             updatedResultSet.setColumns(resultsInfo.getAttributes());
-
-            long totalUpdateCount = 0;
-
-            List <Object[]> resultRows = new ArrayList<>();
 
             if (!CommonUtils.isEmpty(updatedRows)) {
 
@@ -329,10 +399,7 @@ public class WebSQLProcessor {
 
                     DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
                     updateBatch.add(rowValues);
-                    DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
-
-                    totalUpdateCount += statistics.getRowsUpdated();
-                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                    resultBatches.add(updateBatch);
                     resultRows.add(finalRow);
                 }
             }
@@ -363,12 +430,9 @@ public class WebSQLProcessor {
                         finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                     }
 
-                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.insertData(session, updateAttributes, null, executionSource, new LinkedHashMap<>());
-                    updateBatch.add(rowValues);
-                    DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
-
-                    totalUpdateCount += statistics.getRowsUpdated();
-                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                    DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(session, updateAttributes, null, executionSource, new LinkedHashMap<>());
+                    insertBatch.add(rowValues);
+                    resultBatches.add(insertBatch);
                     resultRows.add(finalRow);
                 }
             }
@@ -394,26 +458,14 @@ public class WebSQLProcessor {
                             addedValues.get(String.valueOf(updateAttribute.getOrdinalPosition())));
                     }
 
-                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.deleteData(session, delAttributes, executionSource);
-                    updateBatch.add(rowValues);
-                    DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
-
-                    totalUpdateCount += statistics.getRowsUpdated();
-                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                    DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(session, delAttributes, executionSource);
+                    deleteBatch.add(rowValues);
+                    resultBatches.add(deleteBatch);
                 }
             }
-
-            WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
-            updateResults.setUpdateRowCount(totalUpdateCount);
-            updateResults.setResultSet(updatedResultSet);
-            updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
-
-            queryResults.add(updateResults);
         }
 
-        result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
-
-        return result;
+        return dataManipulator;
     }
 
     @NotNull
