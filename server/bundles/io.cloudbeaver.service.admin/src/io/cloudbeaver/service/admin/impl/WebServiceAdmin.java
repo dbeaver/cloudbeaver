@@ -397,12 +397,19 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean saveAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String providerId, @NotNull String id, @NotNull String displayName, @Nullable String iconURL, @Nullable String description, @Nullable Map<String, Object> parameters) throws DBWebException {
-        return false;
+        AuthProviderConfig providerConfig = new AuthProviderConfig();
+        providerConfig.setProvider(providerId);
+        providerConfig.setDisplayName(displayName);
+        providerConfig.setIconURL(iconURL);
+        providerConfig.setDescription(description);
+        providerConfig.setParameters(parameters);
+        CBApplication.getInstance().getAppConfiguration().setAuthProviderConfiguration(id, providerConfig);
+        return true;
     }
 
     @Override
     public boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
-        return false;
+        return CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id);
     }
 
     ////////////////////////////////////////////////////////////////////

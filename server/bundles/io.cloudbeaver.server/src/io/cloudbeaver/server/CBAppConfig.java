@@ -187,9 +187,9 @@ public class CBAppConfig {
         }
     }
 
-    public void deleteAuthProviderConfiguration(@NotNull String id) {
+    public boolean deleteAuthProviderConfiguration(@NotNull String id) {
         synchronized (authConfiguration) {
-            authConfiguration.remove(id);
+            return authConfiguration.remove(id) != null;
         }
     }
 
