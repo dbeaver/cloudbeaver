@@ -44,19 +44,22 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
   const isEditing = editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx }) ?? false;
-  const showCellMenu = !isEditing
-    && (rest.isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
+  const showCellMenu = !isEditing && (
+    rest.isCellSelected
+    || cellContext?.mouse.state.mouseEnter
+    || menuVisible
+  );
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
-      if (position.column === undefined || position.row === undefined) {
+      if (position.column === undefined || position.row === undefined || !tableDataContext || !editingContext) {
         return;
       }
 
-      const idx = tableDataContext?.getColumnIndexFromKey(position.column);
+      const idx = tableDataContext.getColumnIndexFromKey(tableDataContext.getColumnByDataIndex(position.column).key);
 
-      if (idx !== undefined && idx !== null) {
-        editingContext?.edit({ idx, rowIdx: position.row });
+      if (idx !== -1) {
+        editingContext.edit({ idx, rowIdx: position.row });
       }
     },
   });
@@ -66,7 +69,7 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && context && (
+      {showCellMenu && context && rest.column.columnDataIndex !== null && (
         <menu-container>
           <CellMenu
             model={context.model}
@@ -74,7 +77,7 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
             row={rest.rowIdx}
-            column={Number(rest.column.key)}
+            column={rest.column.columnDataIndex}
             onStateSwitch={setMenuVisible}
           />
         </menu-container>

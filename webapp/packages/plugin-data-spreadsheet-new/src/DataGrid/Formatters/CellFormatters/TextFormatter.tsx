@@ -12,11 +12,11 @@ import type { FormatterProps } from 'react-data-grid';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
 import { DataGridContext } from '../../DataGridContext';
+import { TableDataContext } from '../../TableDataContext';
 
 function getClasses(rawValue: any) {
   const classes = ['text-formatter'];
@@ -26,22 +26,28 @@ function getClasses(rawValue: any) {
   return classes.join(' '); // performance heavy
 }
 
-export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ rowIdx, row, column, isCellSelected }) {
+export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ rowIdx, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
-  const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
-  const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
+  const tableDataContext = useContext(TableDataContext);
+
+  if (!context || !tableDataContext || !editingContext || column.columnDataIndex === null) {
+    throw new Error('Contexts required');
+  }
+
+  const formatter = tableDataContext.format;
+  const rawValue = formatter.get(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!);
   const classes = getClasses(rawValue);
-  const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
+  const value = formatter.toDisplayString(rawValue);
 
   const handleClose = useCallback(() => {
-    editingContext?.closeEditor({ idx: column.idx, rowIdx });
+    editingContext.closeEditor({ idx: column.idx, rowIdx });
   }, [column, rowIdx]);
 
   useEffect(() => {
     if (isCellSelected) {
-      if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
+      if (editingContext.isEditing({ idx: column.idx, rowIdx })) {
         editorRef.current?.focus();
       }
     }
@@ -53,7 +59,6 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
         <CellEditor
           ref={editorRef}
           rowIdx={rowIdx}
-          row={row}
           column={column}
           onClose={handleClose}
         />
@@ -66,7 +71,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
   return (
     <div title={value} className={classes}>
       {isUrl && (
-        <a href={rawValue} target='_blank' rel='noreferrer' draggable={false}>
+        <a href={rawValue as string} target='_blank' rel='noreferrer' draggable={false}>
           <IconOrImage icon='external-link' viewBox='0 0 24 24' />
         </a>
       )}

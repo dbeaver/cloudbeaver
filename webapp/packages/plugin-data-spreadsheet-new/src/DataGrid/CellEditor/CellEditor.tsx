@@ -40,9 +40,8 @@ export interface IEditorRef {
   focus: () => void;
 }
 
-export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
+export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
   rowIdx,
-  row,
   column,
   onClose,
 }, ref) {
@@ -51,12 +50,11 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   const inputRef = useRef<HTMLInputElement>(null);
   const [elementRef, setElementRef] = useState<HTMLDivElement | null>(null);
   const [popperRef, setPopperRef] = useState<HTMLDivElement | null>(null);
-  const formatter = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
   const popper = usePopper(elementRef, popperRef, {
     placement: 'right',
   });
 
-  if (!dataGridContext || !tableDataContext) {
+  if (!dataGridContext || !tableDataContext || column.columnDataIndex === null) {
     throw new Error('DataGridContext should be provided');
   }
 
@@ -87,21 +85,28 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
     }
   });
 
-  const value = formatter?.getText(row[column.key]) ?? '';
+  const value = tableDataContext.format
+    .getText(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!) ?? '';
 
   const handleSave = () => onClose(false);
   const handleReject = () => {
-    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
-      .revertCell(rowIdx, Number(column.key));
+    if (column.columnDataIndex !== null) {
+      tableDataContext.editor
+        .revertCell(rowIdx, column.columnDataIndex);
+    }
     onClose(false);
   };
   const handleChange = (value: string) => {
-    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
-      .setCell(rowIdx, Number(column.key), value);
+    if (column.columnDataIndex !== null) {
+      tableDataContext.editor
+        .setCell(rowIdx, column.columnDataIndex, value);
+    }
   };
   const handleUndo = () => {
-    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
-      .revertCell(rowIdx, Number(column.key));
+    if (column.columnDataIndex !== null) {
+      tableDataContext.editor
+        .revertCell(rowIdx, column.columnDataIndex);
+    }
     onClose(false);
   };
 

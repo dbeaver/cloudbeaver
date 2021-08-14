@@ -83,7 +83,7 @@ export class DataGridContextMenuCellEditingService {
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
           const cellValue = data.getCellValue({ column, row });
 
-          return data.getColumn(column)?.required || format.isNull(cellValue);
+          return cellValue === undefined || data.getColumn(column)?.required || format.isNull(cellValue);
         },
         order: 1,
         title: 'data_grid_table_editing_set_to_null',

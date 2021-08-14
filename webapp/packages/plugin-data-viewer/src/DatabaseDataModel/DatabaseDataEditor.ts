@@ -34,7 +34,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const update = this.editedResults.get(result.id);
     const diff = update?.diff.get(row);
 
-    return !!diff?.source.some((value, index) => !this.compareCellValue(value, diff.update[index]));
+    return diff !== undefined;
   }
 
   isResultEdited(result: TResult): boolean {

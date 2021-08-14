@@ -17,6 +17,7 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
+import { ResultSetDataAction } from './ResultSetDataAction';
 
 @databaseDataAction()
 export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResultSet>
@@ -27,9 +28,11 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
   readonly selectedElements: Map<number, number[]>;
 
   private focusedElement: IResultSetElementKey | null;
+  private data: ResultSetDataAction;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
+    this.data = this.getAction(ResultSetDataAction);
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
@@ -46,7 +49,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   isElementSelected(key: IResultSetElementKey): boolean {
     if (key.row === undefined) {
-      const rows = this.result.data?.rows?.length || 0;
+      const rows = this.data.rows.length;
       for (let row = 0; row < rows; row++) {
         if (!this.isElementSelected({ row, column: key.column })) {
           return false;
@@ -66,7 +69,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
       return row.includes(key.column);
     }
 
-    return row.length === this.result.data?.columns?.length;
+    return row.length === this.data.columns.length;
   }
 
   getFocusedElement(): IResultSetElementKey | null {
@@ -89,7 +92,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   set(key: IResultSetElementKey, selected: boolean): void {
     if (key.row === undefined) {
-      for (let row = 0; row < (this.result.data?.rows?.length || 0); row++) {
+      for (let row = 0; row < this.data.rows.length; row++) {
         this.set({ row, column: key.column }, selected);
       }
 
@@ -97,7 +100,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     }
 
     if (key.column === undefined) {
-      for (let column = 0; column < (this.result.data?.columns?.length || 0); column++) {
+      for (let column = 0; column < this.data.columns.length; column++) {
         this.set({ row: key.row, column }, selected);
       }
       return;

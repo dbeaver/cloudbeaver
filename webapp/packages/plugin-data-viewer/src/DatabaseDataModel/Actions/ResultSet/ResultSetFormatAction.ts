@@ -9,6 +9,7 @@
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
@@ -24,17 +25,48 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
+  private data: ResultSetDataAction;
+
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+    super(source, result);
+    this.data = this.getAction(ResultSetDataAction);
+  }
+
+  getHeaders(): string[] {
+    return this.data.columns.map(column => column.name!).filter(Boolean);
+  }
+
+  getLongestCells(offset = 0, count?: number): string[] {
+    const rows = this.data.rows.slice(offset, count);
+    let cells: string[] = [];
+
+    for (const row of rows) {
+      if (cells.length === 0) {
+        cells = row.map(v => this.toDisplayString(v));
+        continue;
+      }
+
+      for (let i = 0; i < row.length; i++) {
+        const value = this.toDisplayString(row[i]);
+
+        if (value.length > cells[i].length) {
+          cells[i] = value;
+        }
+      }
+    }
+
+    return cells;
+  }
+
   isReadOnly(key: IResultSetElementKey): boolean {
     let columnReadonly = false;
     let cellReadonly = false;
 
-    const data = this.getAction(ResultSetDataAction);
-
     if (key.column !== undefined) {
-      columnReadonly = data.getColumn(key.column)?.readOnly || false;
+      columnReadonly = this.data.getColumn(key.column)?.readOnly || false;
     }
 
-    const value = data.getCellValue(key);
+    const value = this.data.getCellValue(key);
 
     if (isResultSetContentValue(value)) {
       cellReadonly = (

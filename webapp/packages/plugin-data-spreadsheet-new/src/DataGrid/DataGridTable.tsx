@@ -88,11 +88,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
         return;
       }
 
-      const idx = tableData.getColumnIndexFromKey(data.column);
-
-      if (idx === null) {
-        return;
-      }
+      const idx = tableData.getColumnIndexFromKey(tableData.getColumnByDataIndex(data.column).key);
 
       editingContext.closeEditor({
         rowIdx: data.row,
@@ -106,12 +102,11 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
   }, [model.source, resultIndex]);
 
   const handleFocusChange = (position: CellPosition) => {
-    const key = tableData.getColumnKeyFromColumnIndex(position.idx);
-    const column = tableData.getColumnInfo(key);
+    const column = tableData.getColumn(position.idx);
 
     selectionAction.focus({
       row: position.rowIdx,
-      column: column ? key : 0,
+      column: column.columnDataIndex ?? 0,
     });
   };
 
@@ -157,13 +152,13 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
               <DataGrid
                 ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
-                columns={tableData.data.columns}
+                columns={tableData.columns}
                 defaultColumnOptions={{
                   minWidth: 50,
                   resizable: true,
                   formatter: CellFormatter,
                 }}
-                rows={tableData.data.rows}
+                rows={tableData.dataRows}
                 headerRowHeight={28}
                 rowHeight={25}
                 rowRenderer={RowRenderer}
