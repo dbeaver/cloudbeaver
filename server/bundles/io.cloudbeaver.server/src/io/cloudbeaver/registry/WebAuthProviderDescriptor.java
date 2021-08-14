@@ -43,12 +43,14 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final DBPImage icon;
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
     private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
+    private final boolean configurable;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
         this.cfg = cfg;
         this.implType = new ObjectType(cfg, "class");
         this.icon = iconToImage(cfg.getAttribute("icon"));
+        this.configurable = CommonUtils.toBoolean(cfg.getAttribute("configurable"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
@@ -87,6 +89,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public DBPImage getIcon() {
         return icon;
+    }
+
+    public boolean isConfigurable() {
+        return configurable;
     }
 
     public List<PropertyDescriptor> getConfigurationParameters() {

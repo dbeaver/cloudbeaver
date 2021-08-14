@@ -17,12 +17,16 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * WebAuthProviderInfo.
@@ -35,6 +39,10 @@ public class WebAuthProviderInfo {
 
     public WebAuthProviderInfo(WebAuthProviderDescriptor descriptor) {
         this.descriptor = descriptor;
+    }
+
+    WebAuthProviderDescriptor getDescriptor() {
+        return descriptor;
     }
 
     public String getId() {
@@ -57,12 +65,27 @@ public class WebAuthProviderInfo {
         return descriptor.getId().equals(CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultAuthProvider());
     }
 
+    public boolean isConfigurable() {
+        return descriptor.isConfigurable();
+    }
+
+    public List<WebAuthProviderConfiguration> getConfigurations() {
+        List<WebAuthProviderConfiguration> result = new ArrayList<>();
+        for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
+            if (getId().equals(cfg.getValue().getProvider())) {
+                result.add(new WebAuthProviderConfiguration(this, cfg.getKey(), cfg.getValue()));
+            }
+        }
+        return result;
+    }
+
     public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
         return descriptor.getCredentialParameters();
     }
 
     @Override
     public String toString() {
-        return getId();
+        return getLabel();
     }
+
 }

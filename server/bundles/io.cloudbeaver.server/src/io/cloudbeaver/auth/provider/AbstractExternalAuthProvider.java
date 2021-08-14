@@ -18,18 +18,16 @@ package io.cloudbeaver.auth.provider;
 
 import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.access.DBASession;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
-
-import java.util.Map;
 
 /**
  * Abstract external auth provider
  */
 public abstract class AbstractExternalAuthProvider<SESSION extends DBASession> implements DBWAuthProviderExternal<SESSION> {
+
+    public static final String META_AUTH_PROVIDER = "$provider";
+    public static final String META_AUTH_SPACE_ID = "$space";
 
     @Deprecated
     protected void setUserOrigin(WebUser user, String type, String subType) {
@@ -39,9 +37,4 @@ public abstract class AbstractExternalAuthProvider<SESSION extends DBASession> i
         }
     }
 
-    @NotNull
-    @Override
-    public Map<String, Object> authFederatedUser(@NotNull DBRProgressMonitor monitor, @NotNull Map<String, Object> providerConfig, @NotNull String faProvider, @NotNull Map<String, Object> faParameters) throws DBException {
-        throw new DBException("Federated authorization not supported");
-    }
 }

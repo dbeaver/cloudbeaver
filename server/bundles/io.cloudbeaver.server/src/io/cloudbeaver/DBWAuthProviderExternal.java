@@ -28,12 +28,10 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.util.Map;
 
 /**
- * Auth provider
+ * External auth provider.
+ * Authenticates user using external user identity
  */
 public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBWAuthProvider<AUTH_SESSION> {
-
-    String META_AUTH_PROVIDER = "$provider";
-    String META_AUTH_SPACE_ID = "$space";
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
@@ -43,17 +41,6 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
         @NotNull DBRProgressMonitor monitor,
         @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
-    ) throws DBException;
-
-    /**
-     * Returns new identifying credentials which can be used to find/create user in database
-     */
-    @NotNull
-    Map<String, Object> authFederatedUser(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
-        @NotNull String faProvider,
-        @NotNull Map<String, Object> faParameters // Passed federated auth parameters (e.g. assertion ID, session token, etc)
     ) throws DBException;
 
     /**

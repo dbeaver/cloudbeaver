@@ -48,6 +48,17 @@ type AdminPermissionInfo {
     category: String
 }
 
+type AdminAuthProviderConfiguration {
+    provider: ID!
+    id: ID!
+    displayName: String!
+
+    iconURL: String
+    description: String
+
+    parameters: Object!
+}
+
 input ServerConfigInput {
     serverName: String
     serverURL: String
@@ -107,6 +118,20 @@ extend type Query {
 
     getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
+
+    #### Auth providers and configurations
+
+    listAuthProviderConfigurationParameters(providerId: ID!): [ObjectPropertyInfo!]!
+    listAuthProviderConfigurations: [AdminAuthProviderConfiguration!]!
+
+    saveAuthProviderConfiguration(
+        providerId: ID!,
+        id: ID!,
+        displayName: String,
+        iconURL: String
+        description: String
+        parameters: Object): Boolean!
+    deleteAuthProviderConfiguration(id: ID!): Boolean!
 
     #### Global configuration
 

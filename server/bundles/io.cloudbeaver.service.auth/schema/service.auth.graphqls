@@ -10,14 +10,28 @@ type AuthCredentialInfo {
     description: String
 
     # This field must be shown in admin panel
-    admin: Boolean
+    admin: Boolean!
     # This field must be shown in login form
-    user: Boolean
+    user: Boolean!
     # This field can be used as user identifier
 
-    identifying: Boolean
+    identifying: Boolean!
     possibleValues: [String]
     encryption: AuthCredentialEncryption
+}
+
+type AuthProviderConfiguration {
+    id: ID!
+    displayName: String!
+
+    iconURL: String
+    description: String
+
+    # URL to external authentication service.
+    # If specified then it is external auhentication provider (SSO).
+    # Otherwise authLogin function must be called.
+    signInLink: String
+    signOutLink: String
 }
 
 type AuthProviderInfo {
@@ -26,9 +40,13 @@ type AuthProviderInfo {
     icon: ID
     description: String
 
-    defaultProvider: Boolean
+    defaultProvider: Boolean!
 
-    #configurationParameters: [ObjectPropertyInfo]!
+    # Configurable providers must be configured first. See configurations field.
+    configurable: Boolean!
+
+    # Provider configurations (applicable only if configurable=true)
+    configurations: [AuthProviderConfiguration!]
 
     credentialParameters: [AuthCredentialInfo!]!
 }
@@ -36,6 +54,9 @@ type AuthProviderInfo {
 type UserAuthToken {
     # Auth provider used for autgorization
     authProvider: ID!
+
+    # Auth provider configuration ID
+    authConfiguration: ID
 
     # Authorization time
     loginTime: DateTime!
@@ -68,10 +89,10 @@ type UserInfo {
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, credentials: Object!, linkUser: Boolean): UserAuthToken!
+    authLogin(provider: ID!, configuration: ID, credentials: Object!, linkUser: Boolean): UserAuthToken!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
-    authLogout(provider: ID): Boolean
+    authLogout(provider: ID, configuration: ID): Boolean
 
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo

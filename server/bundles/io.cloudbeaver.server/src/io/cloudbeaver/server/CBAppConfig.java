@@ -16,10 +16,12 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
@@ -47,7 +49,7 @@ public class CBAppConfig {
     private String[] enabledAuthProviders = null;
     private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
-    private Map<String, Object> authConfiguration = new LinkedHashMap<>();
+    private final Map<String, AuthProviderConfig> authConfiguration = new LinkedHashMap<>();
 
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;
@@ -162,17 +164,33 @@ public class CBAppConfig {
         return (T)getPluginConfig(pluginId).get(option);
     }
 
-    public Map<String, Object> getAuthConfiguration() {
-        return authConfiguration;
-    }
+    ////////////////////////////////////////////
+    // Auth provider configs
 
     @NotNull
-    public Map<String, Object> getAuthConfiguration(@NotNull String providerId) {
-        Object apConfig = authConfiguration.get(providerId);
-        if (apConfig instanceof Map) {
-            return (Map<String, Object>) apConfig;
+    public Map<String, AuthProviderConfig> getAuthProviderConfigurations() {
+        synchronized (authConfiguration) {
+            return new LinkedHashMap<>(authConfiguration);
         }
-        return Collections.emptyMap();
+    }
+
+    @Nullable
+    public AuthProviderConfig getAuthProviderConfigurations(@NotNull String id) {
+        synchronized (authConfiguration) {
+            return authConfiguration.get(id);
+        }
+    }
+
+    public void setAuthProviderConfiguration(@NotNull String id, @NotNull AuthProviderConfig config) {
+        synchronized (authConfiguration) {
+            authConfiguration.put(id, config);
+        }
+    }
+
+    public void deleteAuthProviderConfiguration(@NotNull String id) {
+        synchronized (authConfiguration) {
+            authConfiguration.remove(id);
+        }
     }
 
 }
