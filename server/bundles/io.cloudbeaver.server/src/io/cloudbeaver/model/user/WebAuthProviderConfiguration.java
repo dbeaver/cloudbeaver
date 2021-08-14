@@ -19,8 +19,11 @@ package io.cloudbeaver.model.user;
 import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+
+import java.util.Map;
 
 /**
  * WebAuthProviderInfo.
@@ -29,12 +32,12 @@ public class WebAuthProviderConfiguration {
 
     private static final Log log = Log.getLog(WebAuthProviderConfiguration.class);
 
-    private final WebAuthProviderInfo info;
+    private final WebAuthProviderDescriptor providerDescriptor;
     private final String id;
     private final AuthProviderConfig config;
 
-    public WebAuthProviderConfiguration(WebAuthProviderInfo info, String id, AuthProviderConfig config) {
-        this.info = info;
+    public WebAuthProviderConfiguration(WebAuthProviderDescriptor providerDescriptor, String id, AuthProviderConfig config) {
+        this.providerDescriptor = providerDescriptor;
         this.id = id;
         this.config = config;
     }
@@ -55,13 +58,17 @@ public class WebAuthProviderConfiguration {
         return config.getDescription();
     }
 
+    public Map<String, Object> getParameters() {
+        return config.getParameters();
+    }
+
     public String getSignInLink() throws DBException {
-        DBWAuthProvider<?> instance = info.getDescriptor().getInstance();
+        DBWAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
     }
 
     public String getSignOutLink() throws DBException {
-        DBWAuthProvider<?> instance = info.getDescriptor().getInstance();
+        DBWAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
     }
 

@@ -98,6 +98,22 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setSubjectConnectionAccess",
             env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")))
 
+        .dataFetcher("listAuthProviderConfigurationParameters",
+            env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
+        .dataFetcher("listAuthProviderConfigurations",
+            env -> getService(env).listAuthProviderConfigurations(getWebSession(env)))
+        .dataFetcher("saveAuthProviderConfiguration",
+            env -> getService(env).saveAuthProviderConfiguration(
+                getWebSession(env),
+                env.getArgument("providerId"),
+                env.getArgument("id"),
+                env.getArgument("displayName"),
+                env.getArgument("iconURL"),
+                env.getArgument("description"),
+                env.getArgument("parameters")))
+        .dataFetcher("deleteAuthProviderConfiguration",
+            env -> getService(env).deleteAuthProviderConfiguration(getWebSession(env), env.getArgument("id")))
+
         .dataFetcher("configureServer",
             env -> getService(env).configureServer(getWebSession(env), new AdminServerConfig(env.getArgument("configuration"))))
         .dataFetcher("setDefaultNavigatorSettings",

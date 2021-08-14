@@ -19,11 +19,14 @@ package io.cloudbeaver.service.admin.impl;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -367,6 +370,44 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         return true;
     }
+
+    ////////////////////////////////////////////////////////////////////
+    // Auth providers
+
+    @Override
+    public List<WebPropertyInfo> listAuthProviderConfigurationParameters(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        if (authProvider == null) {
+            throw new DBWebException("Invalid provider ID " + providerId);
+        }
+        return authProvider.getConfigurationParameters().stream().map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession) throws DBWebException {
+        List<WebAuthProviderConfiguration> result = new ArrayList<>();
+        for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
+            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(cfg.getValue().getProvider());
+            if (authProvider != null) {
+                result.add(new WebAuthProviderConfiguration(authProvider, cfg.getKey(), cfg.getValue()));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean saveAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String providerId, @NotNull String id, @NotNull String displayName, @Nullable String iconURL, @Nullable String description, @Nullable Map<String, Object> parameters) throws DBWebException {
+        return false;
+    }
+
+    @Override
+    public boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
+        return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    // Server configuration
+
 
     @Override
     public boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException {

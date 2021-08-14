@@ -73,7 +73,7 @@ public class WebAuthProviderInfo {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
             if (getId().equals(cfg.getValue().getProvider())) {
-                result.add(new WebAuthProviderConfiguration(this, cfg.getKey(), cfg.getValue()));
+                result.add(new WebAuthProviderConfiguration(descriptor, cfg.getKey(), cfg.getValue()));
             }
         }
         return result;

@@ -19,7 +19,9 @@ package io.cloudbeaver.service.admin;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -90,6 +92,26 @@ public interface DBWServiceAdmin extends DBWService {
     WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+
+    ////////////////////////////////////////////////////////////////////
+    // Auth providers
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<WebPropertyInfo> listAuthProviderConfigurationParameters(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean saveAuthProviderConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @NotNull String id,
+        @NotNull String displayName,
+        @Nullable String iconURL,
+        @Nullable String description,
+        @Nullable Map<String, Object> parameters) throws DBWebException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Server configuration
