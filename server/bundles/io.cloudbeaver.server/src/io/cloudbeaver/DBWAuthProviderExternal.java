@@ -56,7 +56,7 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
         @NotNull Map<String, Object> userCredentials,
         @Nullable WebUser activeUser) throws DBException;
 
-    @Nullable
+    @NotNull
     DBWUserIdentity getUserIdentity(
         @NotNull DBRProgressMonitor monitor,
         @NotNull Map<String, Object> providerConfig,
