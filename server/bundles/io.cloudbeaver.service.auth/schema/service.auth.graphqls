@@ -94,6 +94,9 @@ extend type Query {
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID, configuration: ID): Boolean
 
+    # Tries to login using active federated session
+    tryFederatedLogin(provider: ID!): UserAuthToken!
+
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo
 

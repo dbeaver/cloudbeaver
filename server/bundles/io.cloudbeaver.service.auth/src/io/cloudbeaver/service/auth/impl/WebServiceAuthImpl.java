@@ -33,6 +33,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.access.DBASessionFederated;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -231,6 +232,20 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         webSession.removeAuthInfo(providerId);
+    }
+
+    @Override
+    public WebAuthInfo tryFederatedLogin(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
+        try {
+            DBASession spaceSession = webSession.getSessionContext().getSpaceSession(webSession.getProgressMonitor(), webSession.getSessionSpace());
+            if (spaceSession instanceof DBASessionFederated) {
+                throw new DBCException("Federated session discover not implemented yet");
+            } else {
+                throw new DBCException("Federated session required");
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error while discovering federated session", e);
+        }
     }
 
     @Override
