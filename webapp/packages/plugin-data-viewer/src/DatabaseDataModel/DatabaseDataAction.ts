@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
@@ -33,6 +33,12 @@ implements IDatabaseDataAction<TOptions, TResult> {
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
     return this.source.actions.get(this.result, action);
+  }
+
+  getActionImplementation <T extends IDatabaseDataAction<TOptions, TResult>>(
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ): T | undefined {
+    return this.source.actions.getImplementation(this.result, action);
   }
 
   dispose(): void {}

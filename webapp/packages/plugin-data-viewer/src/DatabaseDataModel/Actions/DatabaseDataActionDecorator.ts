@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDatabaseDataActionClass } from '../IDatabaseDataAction';
+import type { IDatabaseDataActionInterface } from '../IDatabaseDataAction';
 
-export function databaseDataAction<T extends IDatabaseDataActionClass<any, any, any>>() {
+export function databaseDataAction<T extends IDatabaseDataActionInterface<any, any, any>>() {
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   return <U extends T>(constructor: U) => { };
 }

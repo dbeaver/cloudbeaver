@@ -8,32 +8,28 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataEditorActionsData } from '../../IDatabaseDataEditor';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataEditAction, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
+import { DatabaseEditAction } from '../DatabaseEditAction';
 import { DocumentDataAction } from './DocumentDataAction';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 import type { IDocumentElementKey } from './IDocumentElementKey';
 
 @databaseDataAction()
-export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
+export class DocumentEditAction
+  extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Document;
 
-  readonly action: IExecutor<IDatabaseDataEditActionData<IDocumentElementKey, IDatabaseDataDocument>>;
   readonly editedElements: Map<number, IDatabaseDataDocument>;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.editedElements = new Map();
     this.resetEditedElements = this.resetEditedElements.bind(this);
-    this.action = new Executor();
 
     makeObservable(this, {
       editedElements: observable,

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IDatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> {
@@ -14,6 +14,10 @@ export interface IDatabaseDataActions<TOptions, TResult extends IDatabaseDataRes
     result: TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
+  getImplementation: <T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ) => T | undefined;
 
   updateResults: (results: TResult[]) => void;
 }

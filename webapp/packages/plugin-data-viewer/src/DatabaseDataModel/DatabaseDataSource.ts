@@ -12,7 +12,7 @@ import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections'
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataActions } from './DatabaseDataActions';
-import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
@@ -92,6 +92,17 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
 
     return this.actions.get(this.results[resultIndex], action);
+  }
+
+  getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ): T | undefined {
+    if (!this.hasResult(resultIndex)) {
+      throw new Error('Result index out of range');
+    }
+
+    return this.actions.getImplementation(this.results[resultIndex], action);
   }
 
   abstract cancel(): Promise<void> | void;

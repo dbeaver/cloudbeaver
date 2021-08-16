@@ -9,7 +9,7 @@
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
@@ -51,6 +51,10 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
     resultIndex: number,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
+  getActionImplementation: <T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ) => T | undefined;
 
   /** @deprecated will be moved to getAction */
   getEditor: (resultIndex: number) => IDatabaseDataResultEditor<TResult>;

@@ -11,14 +11,35 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
-export interface IDatabaseDataActionClass<
+type AbstractConstructorFunction<
   TOptions,
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>
-> {
-  new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult): TAction;
-  dataFormat: ResultDataFormat;
-}
+> = abstract new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult) => TAction;
+
+type ConstructorFunction<
+  TOptions,
+  TResult extends IDatabaseDataResult,
+  TAction extends IDatabaseDataAction<TOptions, TResult>
+> = new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult) => TAction;
+
+export type IDatabaseDataActionInterface<
+  TOptions,
+  TResult extends IDatabaseDataResult,
+  TAction extends IDatabaseDataAction<TOptions, TResult>
+> = AbstractConstructorFunction<TOptions, TResult, TAction> & {
+  dataFormat: ResultDataFormat | null;
+  prototype: TAction;
+};
+
+export type IDatabaseDataActionClass<
+  TOptions,
+  TResult extends IDatabaseDataResult,
+  TAction extends IDatabaseDataAction<TOptions, TResult>
+> = ConstructorFunction<TOptions, TResult, TAction> & {
+  dataFormat: ResultDataFormat | null;
+  prototype: TAction;
+};
 
 export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> {
   readonly source: IDatabaseDataSource<TOptions, TResult>;
@@ -28,5 +49,8 @@ export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResu
   getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
+  getActionImplementation: <T extends IDatabaseDataAction<TOptions, TResult>>(
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ) => T | undefined;
   dispose: () => void;
 }
