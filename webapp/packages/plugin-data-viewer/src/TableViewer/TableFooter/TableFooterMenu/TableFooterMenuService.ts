@@ -11,6 +11,7 @@ import {
   ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
 } from '@cloudbeaver/core-dialogs';
 
+import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 
 export interface ITableFooterMenuContext {
@@ -41,9 +42,14 @@ export class TableFooterMenuService {
         ) {
           return true;
         }
+
+        const newEditor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return !editor.isEdited();
+        return !editor.isEdited() && !newEditor?.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
@@ -63,15 +69,25 @@ export class TableFooterMenuService {
         ) {
           return true;
         }
+
+        const newEditor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return !editor.isEdited();
+        return !editor.isEdited() && !newEditor?.isEdited();
       },
       order: 2,
       title: 'data_viewer_value_revert',
       tooltip: 'data_viewer_value_revert_title',
       icon: 'table-revert',
       onClick: context => {
+        const newEditor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+        newEditor?.clear();
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
         editor.cancelChanges();
       },
