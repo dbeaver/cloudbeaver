@@ -157,7 +157,16 @@ export class ResultSetEditAction
   }
 
   delete(key: IResultSetRowKey): void {
-    this.getOrCreateUpdate(key, ResultSetChangeType.delete);
+    const serializedKey = ResultSetDataKeysUtils.serialize(key);
+    const update = this.editorData.get(serializedKey);
+
+    if (update && update.type !== ResultSetChangeType.delete) {
+      this.editorData.delete(serializedKey);
+    }
+
+    if (update?.type !== ResultSetChangeType.add) {
+      this.getOrCreateUpdate(key, ResultSetChangeType.delete);
+    }
   }
 
   applyUpdate(result: IDatabaseResultSet): void {
