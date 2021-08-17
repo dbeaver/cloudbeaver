@@ -11,7 +11,6 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IRequestInfo {
@@ -31,7 +30,6 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
   readonly actions: IDatabaseDataActions<TOptions, TResult>;
-  readonly editor: IDatabaseDataEditor<TResult> | null;
   readonly results: TResult[];
   readonly offset: number;
   readonly count: number;
@@ -47,21 +45,31 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   hasResult: (resultIndex: number) => boolean;
 
-  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
+  tryGetAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T;
-  getActionImplementation: <T extends IDatabaseDataAction<TOptions, TResult>>(
+  ) => T | undefined) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ) => T | undefined);
+  getAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ) => T) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ) => T);
+  getActionImplementation: (<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionInterface<TOptions, TResult, T>
-  ) => T | undefined;
+  ) => T | undefined) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ) => T | undefined);
 
-  /** @deprecated will be moved to getAction */
-  getEditor: (resultIndex: number) => IDatabaseDataResultEditor<TResult>;
   getResult: (index: number) => TResult | null;
 
   setResults: (results: TResult[]) => this;
-  setEditor: (editor: IDatabaseDataEditor<TResult>) => this;
   setAccess: (access: DatabaseDataAccessMode) => this;
   setSlice: (offset: number, count: number) => this;
   setOptions: (options: TOptions) => this;

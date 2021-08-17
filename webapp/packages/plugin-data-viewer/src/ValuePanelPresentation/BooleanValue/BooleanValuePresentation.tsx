@@ -12,9 +12,10 @@ import styled, { css } from 'reshadow';
 import { Radio, TabContainerPanelComponent, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { isStringifiedBoolean } from './isBooleanValuePresentationAvailable';
@@ -35,20 +36,19 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
 }) {
   const translate = useTranslate();
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
 
-  if (!selectedCells.length && !focusCell) {
+  if (!selection.elements.length && !focusCell) {
     return null;
   }
 
   let value: boolean | null | undefined;
 
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const editor = model.source.getEditor(resultIndex);
+  const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
 
-  const firstSelectedCell = selectedCells[0] || focusCell;
-  const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
+  const firstSelectedCell = selection.elements[0] || focusCell;
+  const cellValue = view.getCellValue(firstSelectedCell);
 
   if (typeof cellValue === 'string' && isStringifiedBoolean(cellValue)) {
     value = cellValue.toLowerCase() === 'true';
@@ -62,7 +62,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
 
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
-  const column = data.getColumn(firstSelectedCell.column);
+  const column = view.getColumn(firstSelectedCell.column);
   const nullable = column?.required === false;
   const readonly = model.isReadonly() || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
 
@@ -73,7 +73,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
         mod={['primary']}
         checked={value === true}
         disabled={readonly}
-        onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, true)}
+        onClick={() => editor.set(firstSelectedCell, true)}
       >
         TRUE
       </Radio>
@@ -82,7 +82,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
         mod={['primary']}
         checked={value === false}
         disabled={readonly}
-        onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, false)}
+        onClick={() => editor.set(firstSelectedCell, false)}
       >
         FALSE
       </Radio>
@@ -92,7 +92,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
           mod={['primary']}
           checked={value === null}
           disabled={readonly}
-          onClick={() => editor.setCell(firstSelectedCell.row, firstSelectedCell.column, null)}
+          onClick={() => editor.set(firstSelectedCell, null)}
         >
         NULL
         </Radio>

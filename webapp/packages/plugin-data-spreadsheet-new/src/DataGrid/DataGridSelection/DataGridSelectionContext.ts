@@ -8,10 +8,12 @@
 
 import { createContext } from 'react';
 
+import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+
 import type { IDraggingPosition } from '../useGridDragging';
 
 export interface IDataGridSelectionContext {
-  selectedCells: Map<number, number[]>;
+  selectedCells: Map<string, IResultSetElementKey[]>;
   select: (cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) => void;
   selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;

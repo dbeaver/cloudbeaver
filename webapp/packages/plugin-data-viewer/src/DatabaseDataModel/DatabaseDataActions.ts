@@ -29,13 +29,24 @@ implements IDatabaseDataActions<TOptions, TResult> {
     });
   }
 
+  tryGet <T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    Action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T | undefined {
+    if (Action.dataFormat !== result.dataFormat) {
+      return undefined;
+    }
+
+    return this.get(result, Action);
+  }
+
   get <T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     Action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
-    // if (Action.dataFormat !== result.dataFormat) {
-    //   throw new Error('DataFormat unsupported');
-    // }
+    if (Action.dataFormat !== result.dataFormat) {
+      throw new Error('DataFormat unsupported');
+    }
 
     if (!this.actions.has(result.id)) {
       this.actions.set(result.id, observable.array(undefined, { deep: false }));

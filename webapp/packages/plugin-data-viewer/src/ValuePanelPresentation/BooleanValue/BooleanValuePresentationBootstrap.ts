@@ -9,8 +9,8 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { BooleanValuePresentation } from './BooleanValuePresentation';
 import { isBooleanValuePresentationAvailable } from './isBooleanValuePresentationAvailable';
@@ -35,16 +35,19 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
 
-        const selectedCells = selection.getSelectedElements();
         const focusedElement = selection.getFocusedElement();
 
-        if (selectedCells.length > 0 || focusedElement) {
-          const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
-          const editor = context.model.source.getEditor(context.resultIndex);
+        if (selection.elements.length > 0 || focusedElement) {
+          const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
 
-          const firstSelectedCell = selectedCells[0] || focusedElement;
-          const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
-          const column = data.getColumn(firstSelectedCell.column);
+          const firstSelectedCell = selection.elements[0] || focusedElement;
+          const cellValue = view.getCellValue(firstSelectedCell);
+
+          if (cellValue === undefined) {
+            return true;
+          }
+
+          const column = view.getColumn(firstSelectedCell.column);
 
           return column === undefined || !isBooleanValuePresentationAvailable(cellValue, column);
         }

@@ -11,8 +11,10 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
-import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { ImageValuePresentation } from './ImageValuePresentation';
 
@@ -36,17 +38,20 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
 
-        const selectedCells = selection.getSelectedElements();
         const focusedElement = selection.getFocusedElement();
 
-        if (selectedCells.length > 0 || focusedElement) {
-          const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
-          const editor = context.model.source.getEditor(context.resultIndex);
+        if (selection.elements.length > 0 || focusedElement) {
+          const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
 
-          const firstSelectedCell = selectedCells[0] || focusedElement;
-          const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
+          const firstSelectedCell = selection.elements[0] || focusedElement;
 
-          return !(this.isImage(data.getContent(firstSelectedCell)) || this.isImageUrl(cellValue));
+          const cellValue = view.getCellValue(firstSelectedCell);
+
+          if (!this.isImageUrl(cellValue)) {
+            return true;
+          }
+
+          return !isResultSetContentValue(cellValue) || !this.isImage(cellValue);
         }
 
         return true;
@@ -64,7 +69,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     return false;
   }
 
-  private isImageUrl(value: any) {
+  private isImageUrl(value: IResultSetValue | undefined) {
     if (typeof value !== 'string') {
       return false;
     }

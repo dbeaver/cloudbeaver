@@ -27,8 +27,6 @@ export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataRe
   isSelected: () => boolean;
   isElementSelected: (key: TKey) => boolean;
   getFocusedElement: () => TKey | null;
-  getSelectedElements: () => TKey[];
   set: (key: TKey, selected: boolean) => void;
-  focus: (key: TKey | null) => void;
   clear: () => void;
 }

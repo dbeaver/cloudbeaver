@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { EOrder, IDatabaseDataModel, ResultSetConstraintAction, ResultSetDataAction, Order } from '@cloudbeaver/plugin-data-viewer';
+import { EOrder, IDatabaseDataModel, ResultSetConstraintAction, ResultSetDataAction, Order, IResultSetColumnKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -26,12 +26,12 @@ export class DataGridContextMenuOrderService {
   private async changeOrder(
     model: IDatabaseDataModel<any>,
     resultIndex: number,
-    columnIndex: number,
+    column: IResultSetColumnKey,
     order: Order
   ) {
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    const columnLabel = data.getColumn(columnIndex)?.label || '';
+    const columnLabel = data.getColumn(column)?.label || '';
 
     constraints.setOrder(columnLabel, order, true);
     await model.refresh();
@@ -63,14 +63,14 @@ export class DataGridContextMenuOrderService {
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.asc);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.asc);
         },
         type: 'radio',
         isChecked: context => {
-          const { model, resultIndex, column } = context.data;
+          const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(column)?.label || '';
+          const columnLabel = data.getColumn(key.column)?.label || '';
 
           return constraints.getOrder(columnLabel) === EOrder.asc;
         },
@@ -86,14 +86,14 @@ export class DataGridContextMenuOrderService {
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.desc);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.desc);
         },
         type: 'radio',
         isChecked: context => {
-          const { model, resultIndex, column } = context.data;
+          const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(column)?.label || '';
+          const columnLabel = data.getColumn(key.column)?.label || '';
 
           return constraints.getOrder(columnLabel) === EOrder.desc;
         },
@@ -109,14 +109,14 @@ export class DataGridContextMenuOrderService {
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, null);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, null);
         },
         type: 'radio',
         isChecked: context => {
-          const { model, resultIndex, column } = context.data;
+          const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(column)?.label || '';
+          const columnLabel = data.getColumn(key.column)?.label || '';
 
           return constraints.getOrder(columnLabel) === null;
         },

@@ -22,7 +22,8 @@ import {
   IDatabaseResultSet,
   IDatabaseDataOptions,
   ResultSetFormatAction,
-  isFilterConstraint
+  isFilterConstraint,
+  IResultSetColumnKey
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService, IDataGridCellMenuContext } from '../DataGridContextMenuService';
@@ -47,7 +48,7 @@ export class DataGridContextMenuFilterService {
   private async applyFilter(
     model: IDatabaseDataModel<IDatabaseDataOptions, IDatabaseResultSet>,
     resultIndex: number,
-    columnIndex: number,
+    column: IResultSetColumnKey,
     operator: string,
     filterValue?: any,
   ) {
@@ -57,7 +58,7 @@ export class DataGridContextMenuFilterService {
 
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const columnLabel = data.getColumn(columnIndex)?.label || '';
+    const columnLabel = data.getColumn(column)?.label || '';
 
     constraints.setFilter(columnLabel, operator, filterValue);
     await model.refresh();
@@ -75,11 +76,11 @@ export class DataGridContextMenuFilterService {
     icon: string,
     isHidden?: (context: IMenuContext<IDataGridCellMenuContext>) => boolean,
   ): Array<IContextMenuItem<IDataGridCellMenuContext>> {
-    const { model, resultIndex, column } = context.data;
+    const { model, resultIndex, key } = context.data;
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-    const supportedOperations = data.getColumnOperations(column);
-    const columnLabel = data.getColumn(column)?.label || '';
+    const supportedOperations = data.getColumnOperations(key.column);
+    const columnLabel = data.getColumn(key.column)?.label || '';
 
     return supportedOperations
       .filter(operation => !nullOperationsFilter(operation))
@@ -103,7 +104,7 @@ export class DataGridContextMenuFilterService {
         onClick: async () => {
           const val = typeof value === 'function' ? value() : value;
           const wrappedValue = wrapOperationArgument(operation.id, val);
-          await this.applyFilter(model, resultIndex, column, operation.id, wrappedValue);
+          await this.applyFilter(model, resultIndex, key.column, operation.id, wrappedValue);
         },
       }));
   }
@@ -162,7 +163,7 @@ export class DataGridContextMenuFilterService {
           }
 
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const supportedOperations = data.getColumnOperations(context.data.column);
+          const supportedOperations = data.getColumnOperations(context.data.key.column);
 
           return supportedOperations.length === 0;
         },
@@ -212,11 +213,11 @@ export class DataGridContextMenuFilterService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden: context => {
-          const { model, resultIndex, column, row } = context.data;
+          const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-          const supportedOperations = data.getColumnOperations(column);
-          const value = data.getCellValue({ column, row });
+          const supportedOperations = data.getColumnOperations(key.column);
+          const value = data.getCellValue(key);
 
           return value === undefined || supportedOperations.length === 0 || format.isNull(value);
         },
@@ -226,9 +227,9 @@ export class DataGridContextMenuFilterService {
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'cellValuePanel',
           menuItemsGetter: context => {
-            const { model, resultIndex, column, row } = context.data;
+            const { model, resultIndex, key } = context.data;
             const data = model.source.getAction(resultIndex, ResultSetDataAction);
-            const cellValue = data.getCellValue({ column, row });
+            const cellValue = data.getCellValue(key);
             const items = this.getGeneralizedMenuItems(context, cellValue, 'filter');
             return items;
           },
@@ -243,10 +244,10 @@ export class DataGridContextMenuFilterService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden: context => {
-          const { model, resultIndex, column, row } = context.data;
+          const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
-          const cellValue = data.getCellValue({ column, row });
-          const supportedOperations = data.getColumnOperations(column);
+          const cellValue = data.getCellValue(key);
+          const supportedOperations = data.getColumnOperations(key.column);
 
           return cellValue === undefined || supportedOperations.length === 0;
         },
@@ -256,12 +257,12 @@ export class DataGridContextMenuFilterService {
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'customValuePanel',
           menuItemsGetter: context => {
-            const { model, resultIndex, column, row } = context.data;
+            const { model, resultIndex, key } = context.data;
             const format = model.source.getAction(resultIndex, ResultSetFormatAction);
             const data = model.source.getAction(resultIndex, ResultSetDataAction);
-            const supportedOperations = data.getColumnOperations(column);
-            const cellValue = data.getCellValue({ column, row });
-            const columnLabel = data.getColumn(column)?.label || '';
+            const supportedOperations = data.getColumnOperations(key.column);
+            const cellValue = data.getCellValue(key);
+            const columnLabel = data.getColumn(key.column)?.label || '';
 
             if (!cellValue) {
               return [];
@@ -300,7 +301,7 @@ export class DataGridContextMenuFilterService {
                     await this.applyFilter(
                       model,
                       resultIndex,
-                      column,
+                      key.column,
                       operation.id,
                       customValue
                     );
@@ -320,7 +321,7 @@ export class DataGridContextMenuFilterService {
         },
         isHidden: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const supportedOperations = data.getColumnOperations(context.data.column);
+          const supportedOperations = data.getColumnOperations(context.data.key.column);
 
           return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
         },
@@ -328,11 +329,11 @@ export class DataGridContextMenuFilterService {
         icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const columnLabel = data.getColumn(context.data.column)?.label || '';
+          const columnLabel = data.getColumn(context.data.key.column)?.label || '';
           return `${columnLabel} IS NULL`;
         },
         onClick: async context => {
-          await this.applyFilter(context.data.model, context.data.resultIndex, context.data.column, IS_NULL_ID);
+          await this.applyFilter(context.data.model, context.data.resultIndex, context.data.key.column, IS_NULL_ID);
         },
 
       }
@@ -346,7 +347,7 @@ export class DataGridContextMenuFilterService {
         },
         isHidden: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const supportedOperations = data.getColumnOperations(context.data.column);
+          const supportedOperations = data.getColumnOperations(context.data.key.column);
 
           return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
         },
@@ -354,11 +355,11 @@ export class DataGridContextMenuFilterService {
         icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const columnLabel = data.getColumn(context.data.column)?.label || '';
+          const columnLabel = data.getColumn(context.data.key.column)?.label || '';
           return `${columnLabel} IS NOT NULL`;
         },
         onClick: async context => {
-          await this.applyFilter(context.data.model, context.data.resultIndex, context.data.column, IS_NOT_NULL_ID);
+          await this.applyFilter(context.data.model, context.data.resultIndex, context.data.key.column, IS_NOT_NULL_ID);
         },
       }
     );
@@ -370,11 +371,11 @@ export class DataGridContextMenuFilterService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden: context => {
-          const { model, resultIndex, column } = context.data;
+          const { model, resultIndex, key } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
 
-          const columnLabel = data.getColumn(column)?.label || '';
+          const columnLabel = data.getColumn(key.column)?.label || '';
           const currentConstraint = constraints.get(columnLabel);
 
           return !currentConstraint || !isFilterConstraint(currentConstraint);
@@ -383,14 +384,14 @@ export class DataGridContextMenuFilterService {
         icon: 'filter-reset',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const columnLabel = data.getColumn(context.data.column)?.name || '';
+          const columnLabel = data.getColumn(context.data.key.column)?.name || '';
           return `Delete filter for ${columnLabel}`;
         },
         onClick: async context => {
-          const { model, resultIndex, column } = context.data;
+          const { model, resultIndex, key } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
-          const columnLabel = data.getColumn(column)?.label || '';
+          const columnLabel = data.getColumn(key.column)?.label || '';
 
           constraints.deleteFilter(columnLabel);
           await model.refresh();

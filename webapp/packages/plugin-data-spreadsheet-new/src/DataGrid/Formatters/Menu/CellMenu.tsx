@@ -23,19 +23,17 @@ interface Props {
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
-  row: number;
-  column: number;
+  cellKey: IResultSetElementKey;
   onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
 }
 
-export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
+export const CellMenu: React.FC<Props> = observer(function CellMenu({
   model,
   actions,
   spreadsheetActions,
   resultIndex,
-  row,
-  column,
+  cellKey,
   onClick,
   onStateSwitch,
 }) {
@@ -43,7 +41,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   const style = useStyles(cellMenuStyles);
 
   const panel = dataGridContextMenuService.constructMenuWithContext(
-    model, actions, spreadsheetActions, resultIndex, row, column
+    model, actions, spreadsheetActions, resultIndex, cellKey
   );
 
   if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
@@ -51,7 +49,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   }
 
   function handleClick() {
-    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, row, column);
+    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey);
     onClick?.();
   }
 

@@ -14,7 +14,6 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DatabaseDataActions } from './DatabaseDataActions';
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
@@ -23,7 +22,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
-  editor: IDatabaseDataEditor<TResult> | null;
   actions: IDatabaseDataActions<TOptions, TResult>;
   results: TResult[];
   offset: number;
@@ -44,7 +42,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
-    this.editor = null;
     this.offset = 0;
     this.count = 0;
     this.options = null;
@@ -68,7 +65,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
       access: observable,
       dataFormat: observable,
       supportedDataFormats: observable,
-      editor: observable.ref,
       results: observable,
       offset: observable,
       count: observable,
@@ -83,26 +79,70 @@ implements IDatabaseDataSource<TOptions, TResult> {
     });
   }
 
+  tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T | undefined
+  tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T | undefined
+  tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number | TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T | undefined {
+    if (typeof resultIndex === 'number') {
+      if (!this.hasResult(resultIndex)) {
+        throw new Error('Result index out of range');
+      }
+      return this.actions.tryGet(this.results[resultIndex], action);
+    }
+
+    return this.actions.tryGet(resultIndex, action);
+  }
+
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number | TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
-    if (!this.hasResult(resultIndex)) {
-      throw new Error('Result index out of range');
+    if (typeof resultIndex === 'number') {
+      if (!this.hasResult(resultIndex)) {
+        throw new Error('Result index out of range');
+      }
+      return this.actions.get(this.results[resultIndex], action);
     }
 
-    return this.actions.get(this.results[resultIndex], action);
+    return this.actions.get(resultIndex, action);
   }
 
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ): T | undefined
+  getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+  ): T | undefined
+  getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
+    resultIndex: number | TResult,
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>
   ): T | undefined {
-    if (!this.hasResult(resultIndex)) {
-      throw new Error('Result index out of range');
+    if (typeof resultIndex === 'number') {
+      if (!this.hasResult(resultIndex)) {
+        throw new Error('Result index out of range');
+      }
+      return this.actions.getImplementation(this.results[resultIndex], action);
     }
 
-    return this.actions.getImplementation(this.results[resultIndex], action);
+    return this.actions.getImplementation(resultIndex, action);
   }
 
   abstract cancel(): Promise<void> | void;
@@ -119,20 +159,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return null;
   }
 
-  getEditor(resultIndex: number): IDatabaseDataResultEditor<TResult> {
-    if (!this.editor) {
-      throw new Error('Editor was not provided');
-    }
-
-    if (!this.hasResult(resultIndex)) {
-      throw new Error('Result index out of range');
-    }
-
-    return this.editor.getResultEditor(this.results[resultIndex]);
-  }
-
   setResults(results: TResult[]): this {
-    this.editor?.cancelChanges();
     this.actions.updateResults(results);
     this.results = results;
     return this;
@@ -148,11 +175,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   isDisabled(resultIndex: number): boolean {
     return this.isLoading() || this.disabled;
-  }
-
-  setEditor(editor: IDatabaseDataEditor<TResult>): this {
-    this.editor = editor;
-    return this;
   }
 
   setAccess(access: DatabaseDataAccessMode): this {

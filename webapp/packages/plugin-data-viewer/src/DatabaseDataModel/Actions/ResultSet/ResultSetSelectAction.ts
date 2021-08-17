@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -16,23 +16,28 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
-import type { IResultSetElementKey } from './IResultSetElementKey';
-import { ResultSetDataAction } from './ResultSetDataAction';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
+import { ResultSetViewAction } from './ResultSetViewAction';
 
 @databaseDataAction()
 export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataSelectAction<IResultSetElementKey, IDatabaseResultSet> {
+  implements IDatabaseDataSelectAction<IResultSetPartialKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetElementKey>>;
-  readonly selectedElements: Map<number, number[]>;
+  readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
+  readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
-  private data: ResultSetDataAction;
+  private data: ResultSetViewAction;
+
+  get elements(): IResultSetElementKey[] {
+    return Array.from(this.selectedElements.values()).flat();
+  }
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
-    this.data = this.getAction(ResultSetDataAction);
+    this.data = this.getAction(ResultSetViewAction);
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
@@ -40,6 +45,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     makeObservable<ResultSetSelectAction, 'focusedElement'>(this, {
       selectedElements: observable,
       focusedElement: observable,
+      elements: computed,
     });
   }
 
@@ -47,10 +53,9 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     return this.selectedElements.size > 0;
   }
 
-  isElementSelected(key: IResultSetElementKey): boolean {
+  isElementSelected(key: IResultSetPartialKey): boolean {
     if (key.row === undefined) {
-      const rows = this.data.rows.length;
-      for (let row = 0; row < rows; row++) {
+      for (const row of this.data.rowKeys) {
         if (!this.isElementSelected({ row, column: key.column })) {
           return false;
         }
@@ -59,40 +64,30 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
       return true;
     }
 
-    const row = this.selectedElements.get(key.row);
+    const row = this.selectedElements.get(ResultSetDataKeysUtils.serialize(key.row));
 
     if (!row) {
       return false;
     }
 
     if (key.column !== undefined) {
-      return row.includes(key.column);
+      return this.isColumnSelected(row, key.column);
     }
 
-    return row.length === this.data.columns.length;
+    return row.length === this.data.columnKeys.length;
   }
 
   getFocusedElement(): IResultSetElementKey | null {
     return this.focusedElement;
   }
 
-  getSelectedElements(): Array<Required<IResultSetElementKey>> {
-    const selectedKeys: Array<Required<IResultSetElementKey>> = [];
-
-    for (const [row, value] of this.selectedElements) {
-      selectedKeys.push(...value.map(column => ({ row, column })));
-    }
-
-    return selectedKeys;
+  getRowSelection(row: IResultSetRowKey): IResultSetElementKey[] {
+    return this.selectedElements.get(ResultSetDataKeysUtils.serialize(row)) || [];
   }
 
-  getRowSelection(row: number): number[] {
-    return this.selectedElements.get(row) || [];
-  }
-
-  set(key: IResultSetElementKey, selected: boolean): void {
+  set(key: IResultSetPartialKey, selected: boolean): void {
     if (key.row === undefined) {
-      for (let row = 0; row < this.data.rows.length; row++) {
+      for (const row of this.data.rowKeys) {
         this.set({ row, column: key.column }, selected);
       }
 
@@ -100,35 +95,31 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     }
 
     if (key.column === undefined) {
-      for (let column = 0; column < this.data.columns.length; column++) {
+      for (const column of this.data.columnKeys) {
         this.set({ row: key.row, column }, selected);
       }
       return;
     }
 
     try {
-      if (!this.selectedElements.has(key.row)) {
+      if (!this.selectedElements.has(ResultSetDataKeysUtils.serialize(key.row))) {
         if (!selected) {
           return;
         }
-        this.selectedElements.set(key.row, []);
+        this.selectedElements.set(ResultSetDataKeysUtils.serialize(key.row), []);
       }
 
-      const columns = this.selectedElements.get(key.row)!;
+      const columns = this.selectedElements.get(ResultSetDataKeysUtils.serialize(key.row))!;
 
       if (selected) {
-        if (!columns.includes(key.column)) {
-          columns.push(key.column);
+        if (!this.isColumnSelected(columns, key.column)) {
+          columns.push(key as IResultSetElementKey);
         }
       } else {
-        const index = columns.indexOf(key.column);
-
-        if (index >= 0) {
-          columns.splice(index, 1);
-        }
+        this.removeColumnSelection(columns, key.column);
 
         if (columns.length === 0) {
-          this.selectedElements.delete(key.row);
+          this.selectedElements.delete(ResultSetDataKeysUtils.serialize(key.row));
         }
       }
     } finally {
@@ -151,5 +142,17 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
       type: 'clear',
       resultId: this.result.id,
     });
+  }
+
+  private isColumnSelected(list: IResultSetElementKey[], key: IResultSetColumnKey) {
+    return list.some(selected => ResultSetDataKeysUtils.isEqual(selected.column, key));
+  }
+
+  private removeColumnSelection(list: IResultSetElementKey[], key: IResultSetColumnKey) {
+    const index = list.findIndex(selected => ResultSetDataKeysUtils.isEqual(selected.column, key));
+
+    if (index >= 0) {
+      list.splice(index, 1);
+    }
   }
 }

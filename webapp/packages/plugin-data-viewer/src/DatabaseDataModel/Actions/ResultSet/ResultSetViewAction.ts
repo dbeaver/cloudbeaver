@@ -18,12 +18,27 @@ import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { ResultSetDataAction } from './ResultSetDataAction';
+import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
+export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataResultAction<IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
+
+  get rowKeys(): IResultSetRowKey[] {
+    const rows = this.data.rows
+      .map((c, index) => ({ index }));
+
+    rows.push(...this.editor.addRows);
+    rows.sort((a, b) => a.index - b.index);
+    return rows;
+  }
+
+  get columnKeys(): IResultSetColumnKey[] {
+    return this.data.columns.map((c, index) => ({ index }));
+  }
 
   get rows(): IResultSetValue[][] {
     return this.result.data?.rows || [];
@@ -33,38 +48,18 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     return this.result.data?.columns || [];
   }
 
+  private data: ResultSetDataAction;
+  private editor: ResultSetEditAction;
+
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
+    this.data = this.getAction(ResultSetDataAction);
+    this.editor = this.getAction(ResultSetEditAction);
+
     makeObservable(this, {
       rows: computed,
       columns: computed,
     });
-  }
-
-  insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
-    if (this.result.data?.rows) {
-      this.result.data.rows.splice(row.index + shift, 0, value);
-    }
-  }
-
-  removeRow(row: IResultSetRowKey, shift = 0): void {
-    if (this.result.data?.rows) {
-      this.result.data.rows.splice(row.index + shift, 1);
-    }
-  }
-
-  setRowValue(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
-    if (this.result.data?.rows) {
-      this.result.data.rows[row.index + shift] = value;
-    }
-  }
-
-  getRowValue(row: IResultSetRowKey): IResultSetValue[] | undefined {
-    if (row.index >= this.rows.length) {
-      return undefined;
-    }
-
-    return this.rows[row.index];
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
@@ -75,6 +70,12 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
       || cell.column.index >= this.columns.length
     ) {
       return undefined;
+    }
+
+    const edited = this.editor.get(cell);
+
+    if (edited !== undefined) {
+      return edited;
     }
 
     return this.rows[cell.row.index][cell.column.index];

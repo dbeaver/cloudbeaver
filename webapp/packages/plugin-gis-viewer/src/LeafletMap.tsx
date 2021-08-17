@@ -20,16 +20,16 @@ import styled, { css } from 'reshadow';
 
 import { useSplit } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IAssociatedValue {
   key: string;
-  value: any;
+  value: IResultSetValue;
 }
 
 interface IFeatureProperties {
   srid: number;
-  associatedCell: Required<IResultSetElementKey>;
+  associatedCell: IResultSetElementKey;
 }
 
 export interface IGeoJSONFeature extends GeoJSON.Feature<GeoJSON.GeometryObject, IFeatureProperties> {
@@ -44,7 +44,7 @@ interface IBaseTile extends TileLayerProps {
 
 interface Props {
   geoJSON: IGeoJSONFeature[];
-  getAssociatedValues: (cell: Required<IResultSetElementKey>) => IAssociatedValue[];
+  getAssociatedValues: (cell: IResultSetElementKey) => IAssociatedValue[];
 }
 
 const baseTiles: Record<'street' | 'topography', IBaseTile> = {

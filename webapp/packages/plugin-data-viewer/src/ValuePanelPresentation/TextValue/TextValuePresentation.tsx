@@ -15,10 +15,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { TextValuePresentationService } from './TextValuePresentationService';
@@ -90,25 +92,23 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     lastContentType: observable,
   }, ['setContentType', 'setDefaultContentType']);
 
-  const result = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
+  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
 
-  const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
 
   let stringValue = '';
   let contentType = 'text/plain';
-  let firstSelectedCell: Required<IResultSetElementKey> | undefined;
+  let firstSelectedCell: IResultSetElementKey | undefined;
   let readonly = true;
 
-  if (result?.data?.rows && (selectedCells.length > 0 || focusCell)) {
+  if (selection.elements.length > 0 || focusCell) {
+    const view = model.source.getAction(resultIndex, ResultSetViewAction);
     const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
-    firstSelectedCell = selectedCells[0] || focusCell;
+    firstSelectedCell = selection.elements[0] || focusCell;
 
-    const value = model.source
-      .getEditor(resultIndex)
-      .getCell(firstSelectedCell.row, firstSelectedCell.column);
+    const value = view.getCellValue(firstSelectedCell) ?? '';
 
     stringValue = format.getText(value) ?? '';
     readonly = format.isReadOnly(firstSelectedCell);
@@ -136,9 +136,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const handleChange = (newValue: string) => {
     if (firstSelectedCell && !readonly) {
-      model.source
-        .getEditor(resultIndex)
-        .setCell(firstSelectedCell.row, firstSelectedCell.column, newValue);
+      editor.set(firstSelectedCell, newValue);
     }
   };
 

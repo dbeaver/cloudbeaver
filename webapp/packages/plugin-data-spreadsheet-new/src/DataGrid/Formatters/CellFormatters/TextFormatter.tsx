@@ -12,6 +12,7 @@ import type { FormatterProps } from 'react-data-grid';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
+import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
@@ -26,7 +27,7 @@ function getClasses(rawValue: any) {
   return classes.join(' '); // performance heavy
 }
 
-export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ rowIdx, column, isCellSelected }) {
+export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ row, rowIdx, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
@@ -36,8 +37,10 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
     throw new Error('Contexts required');
   }
 
+  const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
+
   const formatter = tableDataContext.format;
-  const rawValue = formatter.get(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!);
+  const rawValue = formatter.get(tableDataContext.getCellValue(cellKey)!);
   const classes = getClasses(rawValue);
   const value = formatter.toDisplayString(rawValue);
 
@@ -58,7 +61,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
       <div className={classes}>
         <CellEditor
           ref={editorRef}
-          rowIdx={rowIdx}
+          row={row}
           column={column}
           onClose={handleClose}
         />

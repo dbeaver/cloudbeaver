@@ -30,6 +30,7 @@ export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabase
   isElementEdited: (key: TKey) => boolean;
   set: (key: TKey, value: TValue) => void;
   get: (key: TKey) => TValue | undefined;
+  applyUpdate: (result: TResult) => void;
   revert: (key: TKey) => void;
   clear: () => void;
 }

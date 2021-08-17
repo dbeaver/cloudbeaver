@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import type { ITableData } from './TableDataContext';
@@ -20,33 +20,36 @@ const EVENT_KEY_CODE = {
 };
 
 function copyGridSelectedDataToClipboard(
-  model: IDatabaseDataModel<any, IDatabaseResultSet>,
-  resultIndex: number,
   tableData: ITableData,
-  selectedCells: Map<number, number[]>
+  selectedCells: Map<string, IResultSetElementKey[]>
 ) {
-  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const orderedSelectedCells = new Map<string, IResultSetElementKey[]>(
+    [...selectedCells]
+      .sort((a, b) => tableData.getRowIndexFromKey(a[1][0].row) - tableData.getRowIndexFromKey(b[1][0].row))
+  );
 
-  const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
-
-  const selectedColumns: Set<number> = new Set();
-  for (const colIndexes of orderedSelectedCells.values()) {
-    for (const colIdx of colIndexes) {
-      selectedColumns.add(colIdx);
+  const selectedColumns: IResultSetColumnKey[] = [];
+  for (const rowSelection of orderedSelectedCells.values()) {
+    for (const cell of rowSelection) {
+      selectedColumns.push(cell.column);
     }
   }
 
   const rowsValues: string[] = [];
-  for (const [rowIdx, colIndexes] of orderedSelectedCells) {
+  for (const rowSelection of orderedSelectedCells.values()) {
     const rowCellsValues: string[] = [];
-    for (const column of tableData.columns) {
-      if (column.columnDataIndex === null || !selectedColumns.has(column.columnDataIndex)) {
+    for (const column of tableData.view.columnKeys) {
+      if (
+        !selectedColumns.some(columnKey => ResultSetDataKeysUtils.isEqual(columnKey, column))
+      ) {
         continue;
       }
 
-      if (colIndexes.includes(column.columnDataIndex)) {
-        const cell = tableData.getCellValue(rowIdx, column.columnDataIndex);
-        const cellValue = cell !== undefined ? format.getText(cell) : undefined;
+      const cellKey = rowSelection.find(key => ResultSetDataKeysUtils.isEqual(key.column, column));
+
+      if (cellKey) {
+        const cell = tableData.getCellValue(cellKey);
+        const cellValue = cell !== undefined ? tableData.format.getText(cell) : undefined;
         rowCellsValues.push(cellValue ?? '');
       } else {
         rowCellsValues.push('');
@@ -62,18 +65,14 @@ function copyGridSelectedDataToClipboard(
 type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
 export function useGridSelectedCellsCopy(
-  model: IDatabaseDataModel<any, IDatabaseResultSet>,
-  resultIndex: number,
   tableData: ITableData,
   selectionContext: IDataGridSelectionContext
 ) {
-  const props = useObjectRef({ model, resultIndex, tableData, selectionContext });
+  const props = useObjectRef({ tableData, selectionContext });
 
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
       copyGridSelectedDataToClipboard(
-        props.model,
-        props.resultIndex,
         props.tableData,
         props.selectionContext.selectedCells
       );
