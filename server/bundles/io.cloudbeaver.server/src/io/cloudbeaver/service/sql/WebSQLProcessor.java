@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -423,59 +424,56 @@ public class WebSQLProcessor {
             // Add new rows
             if (!CommonUtils.isEmpty(addedRows)) {
                 for (WebSQLResultsRow row : addedRows) {
-                    Map<String, Object> addedValues = row.getUpdateValues();
-                    if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(addedValues)) {
+                    List<?> addedValues = row.getData();
+                    if (CommonUtils.isEmpty(row.getData())) {
                         continue;
                     }
-                    DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[addedValues.size()];
+                    Map<DBDAttributeBinding, Object> insertAttributes = new LinkedHashMap<>();
                     // Final row is what we return back
                     Object[] finalRow = row.getData().toArray();
 
-                    int index = 0;
-                    for (String indexStr : addedValues.keySet()) {
-                        int attrIndex = CommonUtils.toInt(indexStr, -1);
-                        updateAttributes[index++] = allAttributes[attrIndex];
+                    for (int i = 0; i < allAttributes.length; i++) {
+                        if (addedValues.get(i) != null) {
+                            Object realCellValue = convertInputCellValue(session, allAttributes[i],
+                                addedValues.get(i));
+                            insertAttributes.put(allAttributes[i], realCellValue);
+                            finalRow[i] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
+                        }
                     }
 
-                    Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
-                    for (int i = 0; i < updateAttributes.length; i++) {
-                        DBDAttributeBinding updateAttribute = updateAttributes[i];
-                        Object realCellValue = convertInputCellValue(session, updateAttribute,
-                            addedValues.get(String.valueOf(updateAttribute.getOrdinalPosition())));
-                        rowValues[i] = realCellValue;
-                        finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
-                    }
-
-                    DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(session, updateAttributes, null, executionSource, new LinkedHashMap<>());
-                    insertBatch.add(rowValues);
+                    DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(
+                        session,
+                        insertAttributes.keySet().toArray(new DBDAttributeBinding[0]),
+                        null,
+                        executionSource,
+                        new LinkedHashMap<>());
+                    insertBatch.add(insertAttributes.values().toArray());
                     resultBatches.add(insertBatch);
                     resultRows.add(finalRow);
                 }
             }
 
-            if (!CommonUtils.isEmpty(deletedRows)) {
+            if (keyAttributes.length > 0 && !CommonUtils.isEmpty(deletedRows)) {
                 for (WebSQLResultsRow row : deletedRows) {
-                    Map<String, Object> addedValues = row.getUpdateValues();
-                    if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(addedValues)) {
+                    List<?> keyData = row.getData();
+                    if (CommonUtils.isEmpty(row.getData())) {
                         continue;
                     }
-                    DBDAttributeBinding[] delAttributes = new DBDAttributeBinding[addedValues.size()];
+                    Map<DBDAttributeBinding, Object> delKeyAttributes = new LinkedHashMap<>();
 
-                    int index = 0;
-                    for (String indexStr : addedValues.keySet()) {
-                        int attrIndex = CommonUtils.toInt(indexStr, -1);
-                        delAttributes[index++] = allAttributes[attrIndex];
+                    for (int i = 0; i < allAttributes.length; i++) {
+                        if (ArrayUtils.contains(keyAttributes, allAttributes[i])) {
+                            Object realCellValue = convertInputCellValue(session, allAttributes[i],
+                                keyData.get(i));
+                            delKeyAttributes.put(allAttributes[i], realCellValue);
+                        }
                     }
 
-                    Object[] rowValues = new Object[delAttributes.length + keyAttributes.length];
-                    for (int i = 0; i < delAttributes.length; i++) {
-                        DBDAttributeBinding updateAttribute = delAttributes[i];
-                        rowValues[i] = convertInputCellValue(session, updateAttribute,
-                            addedValues.get(String.valueOf(updateAttribute.getOrdinalPosition())));
-                    }
-
-                    DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(session, delAttributes, executionSource);
-                    deleteBatch.add(rowValues);
+                    DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
+                        session,
+                        delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
+                        executionSource);
+                    deleteBatch.add(delKeyAttributes.values().toArray());
                     resultBatches.add(deleteBatch);
                 }
             }
