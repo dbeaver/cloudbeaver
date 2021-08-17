@@ -122,7 +122,7 @@ extend type Query {
     #### Auth providers and configurations
 
     listAuthProviderConfigurationParameters(providerId: ID!): [ObjectPropertyInfo!]!
-    listAuthProviderConfigurations: [AdminAuthProviderConfiguration!]!
+    listAuthProviderConfigurations(providerId: ID): [AdminAuthProviderConfiguration!]!
 
     saveAuthProviderConfiguration(
         providerId: ID!,

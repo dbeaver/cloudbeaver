@@ -384,9 +384,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession) throws DBWebException {
+    public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
+            if (providerId != null && !providerId.equals(cfg.getValue().getProvider())) {
+                continue;
+            }
             WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(cfg.getValue().getProvider());
             if (authProvider != null) {
                 result.add(new WebAuthProviderConfiguration(authProvider, cfg.getKey(), cfg.getValue()));

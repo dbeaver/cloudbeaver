@@ -101,7 +101,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("listAuthProviderConfigurationParameters",
             env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
         .dataFetcher("listAuthProviderConfigurations",
-            env -> getService(env).listAuthProviderConfigurations(getWebSession(env)))
+            env -> getService(env).listAuthProviderConfigurations(getWebSession(env), env.getArgument("providerId")))
         .dataFetcher("saveAuthProviderConfiguration",
             env -> getService(env).saveAuthProviderConfiguration(
                 getWebSession(env),
