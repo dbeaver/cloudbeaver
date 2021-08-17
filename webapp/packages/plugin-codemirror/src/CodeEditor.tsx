@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';
 
@@ -25,9 +26,38 @@ import type { ICodeEditorProps } from './ICodeEditorProps';
 import { SqlEditorStyles } from './theme';
 
 export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) {
+  const { readonly, className, editorDidMount } = props;
+
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<CodeMirror.Editor | null>(null);
+
+  useLayoutEffect(() => {
+    const observable = wrapperRef.current;
+
+    if (!observable) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      editorRef.current?.refresh();
+    });
+
+    observer.observe(observable);
+
+    return () => observer.unobserve(observable);
+  }, []);
+
+  const handleMount = useCallback((editor: CodeMirror.Editor, value: string, cb: () => void) => {
+    editorRef.current = editor;
+
+    if (editorDidMount) {
+      editorDidMount(editor, value, cb);
+    }
+  }, [editorDidMount]);
+
   return styled(useStyles(SqlEditorStyles))(
-    <code-editor {...use({ readonly: props.readonly })} className={props.className}>
-      <CodeMirror {...props} />
+    <code-editor ref={wrapperRef} {...use({ readonly })} className={className}>
+      <CodeMirror {...props} editorDidMount={handleMount} />
     </code-editor>
   );
 });

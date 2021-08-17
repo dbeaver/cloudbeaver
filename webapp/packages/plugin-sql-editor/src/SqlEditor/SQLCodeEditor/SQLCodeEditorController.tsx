@@ -25,7 +25,6 @@ const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
   indentWithTabs: true,
   smartIndent: true,
   autofocus: true,
-  lineWrapping: true,
 };
 
 @injectable()
