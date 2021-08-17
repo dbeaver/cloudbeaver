@@ -9,8 +9,10 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
 
+import { DocumentEditAction } from '../DatabaseDataModel/Actions/Document/DocumentEditAction';
+import { ResultSetEditAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import { ScriptPreviewDialog } from './ScriptPreviewDialog';
@@ -49,26 +51,21 @@ export class ScriptPreviewService {
       throw new Error(`There is no result for provided result index: '${resultIndex}'`);
     }
 
-    const changes = model.source.editor?.getChanges(true);
-    const resultChanges = changes?.find(update => update.resultId === result.id);
-
-    if (!resultChanges) {
-      throw new Error(`There are no changes for provided result id: '${result.id}'`);
-    }
-
-    return this.graphQLService.sdk.updateResultsDataBatchScript({
+    const updateVariables: UpdateResultsDataBatchScriptMutationVariables = {
       connectionId: executionContext.context!.connectionId,
       contextId: executionContext.context!.id,
-      resultsId: resultChanges.resultId,
-      updatedRows: Array.from(resultChanges.diff.values()).map(diff => ({
-        data: diff.source,
-        updateValues: diff.update.reduce((obj, value, index) => {
-          if (value !== diff.source[index]) {
-            obj[index] = value;
-          }
-          return obj;
-        }, {}),
-      })),
-    });
+      resultsId: result.id,
+    };
+    let editor: ResultSetEditAction | DocumentEditAction | undefined;
+
+    if (result.dataFormat === ResultDataFormat.Resultset) {
+      editor = model.source.getAction(result, ResultSetEditAction);
+      editor.fillBatch(updateVariables);
+    } else if (result.dataFormat === ResultDataFormat.Document) {
+      editor = model.source.getAction(result, DocumentEditAction);
+      editor.fillBatch(updateVariables);
+    }
+
+    return this.graphQLService.sdk.updateResultsDataBatchScript(updateVariables);
   }
 }

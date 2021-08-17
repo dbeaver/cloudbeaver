@@ -10,6 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
 } from '@cloudbeaver/core-dialogs';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
@@ -97,6 +98,9 @@ export class TableFooterMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
+      isHidden(context) {
+        return context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset;
+      },
       isDisabled(context) {
         if (
           context.data.model.isLoading()
@@ -105,8 +109,11 @@ export class TableFooterMenuService {
         ) {
           return true;
         }
-        const editor = context.data.model.source.getEditor(context.data.resultIndex);
-        return !editor.isEdited();
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+        return !editor?.isEdited();
       },
       order: 3,
       title: 'data_viewer_script_preview',
