@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useEffect, useImperativeHandle } from 'react';
+import { useImperativeHandle, useMemo } from 'react';
 
 import { useController } from '@cloudbeaver/core-di';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
@@ -19,7 +19,7 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
   const controller = useController(SQLCodeEditorController, props.bindings);
   controller.setDialect(props.dialect);
 
-  useEffect(() => {
+  useMemo(() => {
     controller.setBindings(props.bindings);
   }, [controller, props.bindings]);
 
