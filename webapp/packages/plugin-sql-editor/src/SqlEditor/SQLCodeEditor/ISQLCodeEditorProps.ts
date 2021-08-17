@@ -11,7 +11,7 @@ import type { IControlledCodeMirror } from 'react-codemirror2';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 export interface ISQLCodeEditorProps {
-  bindings?: Omit<IControlledCodeMirror, 'value'>;
+  bindings?: Partial<Omit<IControlledCodeMirror, 'value'>>;
   value?: string;
   dialect?: SqlDialectInfo;
   readonly?: boolean;

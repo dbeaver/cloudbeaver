@@ -43,6 +43,12 @@ const DdlViewerTabPanel: React.FC<DdlViewerTabPanelProps> = observer(function Dd
     <wrapper>
       {controller.metadata && (
         <SQLCodeEditorLoader
+          bindings={{
+            autoCursor: false,
+            options: {
+              lineWrapping: false,
+            },
+          }}
           value={controller.metadata}
           dialect={controller.dialect}
           readonly

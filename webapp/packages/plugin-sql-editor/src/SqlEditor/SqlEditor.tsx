@@ -33,6 +33,7 @@ const styles = composes(
       flex: 1 auto;
       height: 100%;
       display: flex;
+      overflow: auto;
     }
   
     actions {
@@ -50,7 +51,6 @@ const styles = composes(
       height: 32px;
       width: 32px;
       cursor: pointer;
-
       display: flex;
       justify-content: center;
       align-items: center;
@@ -65,6 +65,7 @@ const styles = composes(
     SQLCodeEditorLoader {
       composes: custom-select from global;
       flex: 1;
+      overflow: auto;
     }
   `
 );

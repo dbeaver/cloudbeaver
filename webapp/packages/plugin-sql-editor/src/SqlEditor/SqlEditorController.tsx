@@ -81,7 +81,7 @@ export class SqlEditorController implements IInitializableController {
     indentWithTabs: true,
     smartIndent: true,
     autofocus: true,
-    lineWrapping: true,
+    lineWrapping: false,
     showHint: true,
     extraKeys: {
       // Execute sql script
