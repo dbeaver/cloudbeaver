@@ -286,6 +286,10 @@ public class WebSQLProcessor {
                     totalUpdateCount += statistics.getRowsUpdated();
                     result.setDuration(result.getDuration() + statistics.getExecuteTime());
                 }
+
+                if (txnManager != null && txnManager.isSupportsTransactions()) {
+                    txnManager.commit(session);
+                }
             } finally {
                 if (revertToAutoCommit) {
                     txnManager.setAutoCommit(monitor, true);
