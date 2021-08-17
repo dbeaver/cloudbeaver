@@ -13,9 +13,9 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
-import type { IResultSetElementKey } from './IResultSetElementKey';
+import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
-import { ResultSetDataAction } from './ResultSetDataAction';
+import { ResultSetViewAction } from './ResultSetViewAction';
 
 export type IResultSetValue =
   string | number | boolean | Record<string, string | number | Record<string, any> | null> | null;
@@ -25,19 +25,19 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  private data: ResultSetDataAction;
+  private view: ResultSetViewAction;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
-    this.data = this.getAction(ResultSetDataAction);
+    this.view = this.getAction(ResultSetViewAction);
   }
 
   getHeaders(): string[] {
-    return this.data.columns.map(column => column.name!).filter(Boolean);
+    return this.view.columns.map(column => column.name!).filter(Boolean);
   }
 
   getLongestCells(offset = 0, count?: number): string[] {
-    const rows = this.data.rows.slice(offset, count);
+    const rows = this.view.rows.slice(offset, count);
     let cells: string[] = [];
 
     for (const row of rows) {
@@ -58,23 +58,25 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     return cells;
   }
 
-  isReadOnly(key: IResultSetElementKey): boolean {
+  isReadOnly(key: IResultSetPartialKey): boolean {
     let columnReadonly = false;
     let cellReadonly = false;
 
     if (key.column !== undefined) {
-      columnReadonly = this.data.getColumn(key.column)?.readOnly || false;
-    }
+      columnReadonly = this.view.getColumn(key.column)?.readOnly || false;
 
-    const value = this.data.getCellValue(key);
+      if (key.row) {
+        const value = this.view.getCellValue(key as IResultSetElementKey);
 
-    if (isResultSetContentValue(value)) {
-      cellReadonly = (
-        value.binary !== undefined
+        if (isResultSetContentValue(value)) {
+          cellReadonly = (
+            value.binary !== undefined
         || value.contentLength !== value.text?.length
-      );
-    } else if (value !== null && typeof value === 'object') {
-      cellReadonly = true;
+          );
+        } else if (value !== null && typeof value === 'object') {
+          cellReadonly = true;
+        }
+      }
     }
 
     return columnReadonly || cellReadonly;

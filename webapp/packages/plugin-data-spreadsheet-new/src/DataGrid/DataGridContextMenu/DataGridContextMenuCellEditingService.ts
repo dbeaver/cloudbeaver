@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvailable, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -33,7 +33,7 @@ export class DataGridContextMenuCellEditingService {
         },
         isHidden(context) {
           const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-          return format.isReadOnly({ column: context.data.column, row: context.data.row })
+          return format.isReadOnly(context.data.key)
             || context.data.model.isDisabled(context.data.resultIndex)
             || context.data.model.isReadonly();
         },
@@ -51,12 +51,11 @@ export class DataGridContextMenuCellEditingService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
-          const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const editor = context.data.model.source.getEditor(context.data.resultIndex);
-          const cellValue = editor.getCell(context.data.row, context.data.column);
-          const column = data.getColumn(context.data.column);
+          const view = context.data.model.source.getAction(context.data.resultIndex, ResultSetViewAction);
+          const cellValue = view.getCellValue(context.data.key);
+          const column = view.getColumn(context.data.key.column);
 
-          if (!column) {
+          if (!column || cellValue === undefined) {
             return true;
           }
 
@@ -66,7 +65,7 @@ export class DataGridContextMenuCellEditingService {
         title: 'data_grid_table_editing_open_inline_editor',
         icon: 'edit',
         onClick(context) {
-          context.data.spreadsheetActions.edit({ column: context.data.column, row: context.data.row });
+          context.data.spreadsheetActions.edit(context.data.key);
         },
       }
     );
@@ -78,18 +77,18 @@ export class DataGridContextMenuCellEditingService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
-          const { column, row, model, resultIndex } = context.data;
+          const { key, model, resultIndex } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-          const cellValue = data.getCellValue({ column, row });
+          const cellValue = data.getCellValue(key);
 
-          return cellValue === undefined || data.getColumn(column)?.required || format.isNull(cellValue);
+          return cellValue === undefined || data.getColumn(key.column)?.required || format.isNull(cellValue);
         },
         order: 1,
         title: 'data_grid_table_editing_set_to_null',
         onClick(context) {
-          context.data.model.source.getEditor(context.data.resultIndex)
-            .setCell(context.data.row, context.data.column, null);
+          context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction)
+            .set(context.data.key, null);
         },
       }
     );

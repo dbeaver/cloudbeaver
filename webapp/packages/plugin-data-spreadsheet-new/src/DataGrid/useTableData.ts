@@ -10,16 +10,15 @@ import { computed, observable } from 'mobx';
 import type { Column } from 'react-data-grid';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { TextTools, uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
 import type { ITableData } from './TableDataContext';
 
-export const indexColumn: Column<any[], any> = {
+export const indexColumn: Column<IResultSetRowKey, any> = {
   key: '#',
   columnDataIndex: null,
   name: '#',
@@ -34,18 +33,21 @@ export const indexColumn: Column<any[], any> = {
 export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const editor = model.source.getEditor(resultIndex);
+  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
+  const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
   const props = useObjectRef({
     format,
     data,
     editor,
+    view,
   },
   undefined,
   {
     format: observable.ref,
     data: observable.ref,
     editor: observable.ref,
+    view: observable.ref,
   });
 
   return useObjectRef({
@@ -58,14 +60,17 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
     get editor() {
       return props.editor;
     },
-    get dataColumns() {
-      return this.data.columns;
+    get view() {
+      return props.view;
     },
-    get dataRows() {
-      return this.data.rows;
+    get columnKeys() {
+      return this.view.columnKeys;
+    },
+    get rows() {
+      return this.view.rowKeys;
     },
     get columns() {
-      if (this.dataColumns.length === 0) {
+      if (this.columnKeys.length === 0) {
         return [];
       }
       const columnNames = this.format.getHeaders();
@@ -83,35 +88,48 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
         }),
       }).map(v => v + 16 + 32 + 20);
 
-      const columns: Array<Column<any[], any>> = this.dataColumns.map<Column<any[], any>>((col, columnIndex) => ({
-        key: uuid(),
-        columnDataIndex: columnIndex,
-        name: col.label!,
-        editable: true,
-        width: Math.min(300, measuredCells[columnIndex]),
-        headerRenderer: TableColumnHeader,
-      }));
+      const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>(
+        (col, index) => ({
+          key: uuid(),
+          columnDataIndex: { index },
+          name: this.getColumnInfo(col)?.label || '?',
+          editable: true,
+          width: Math.min(300, measuredCells[index]),
+          headerRenderer: TableColumnHeader,
+        }));
       columns.unshift(indexColumn);
 
       return columns;
     },
-    getColumn(columnIndex: number) {
+    getRow(rowIndex) {
+      return this.rows[rowIndex];
+    },
+    getColumn(columnIndex) {
       return this.columns[columnIndex];
     },
-    getColumnByDataIndex(columnDataIndex: number) {
-      return this.columns.find(column => column.columnDataIndex === columnDataIndex)!;
+    getColumnByDataIndex(key) {
+      return this.columns.find(column => (
+        column.columnDataIndex !== null
+        && ResultSetDataKeysUtils.isEqual(column.columnDataIndex, key)
+      ))!;
     },
-    getColumnInfo(columnDataIndex: number): SqlResultColumn | undefined {
-      return this.data.getColumn(columnDataIndex);
+    getColumnInfo(key) {
+      return this.data.getColumn(key);
     },
-    getCellValue(row: number, column: number) {
-      return this.editor.getCell(row, column);
-      // return props.data.getCellValue({ column, row });
+    getCellValue(key) {
+      return this.view.getCellValue(key);
     },
-    getColumnIndexFromKey(key: string) {
+    getColumnIndexFromKey(key) {
       return this.columns.findIndex(column => column.key === key);
     },
-    getColumnsInRange(startIndex: number, endIndex: number) {
+    getColumnIndexFromColumnKey(columnKey) {
+      return this.columnKeys
+        .findIndex(column => ResultSetDataKeysUtils.isEqual(columnKey, column));
+    },
+    getRowIndexFromKey(rowKey) {
+      return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
+    },
+    getColumnsInRange(startIndex, endIndex) {
       if (startIndex === endIndex) {
         return [this.columns[startIndex]];
       }
@@ -120,24 +138,21 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
       const lastIndex = Math.max(startIndex, endIndex);
       return this.columns.slice(firstIndex, lastIndex + 1);
     },
-    isCellEdited(rowIndex: number, column: Column<any[], any>) {
-      if (column.columnDataIndex === null) {
-        return false;
-      }
-      return this.editor.isCellEdited(rowIndex, column.columnDataIndex);
+    isCellEdited(key) {
+      return this.editor.isElementEdited(key);
     },
-    isIndexColumn(columnKey: string) {
+    isIndexColumn(columnKey) {
       return columnKey === indexColumn.key;
     },
-    isIndexColumnInRange(columnsRange: Array<Column<any[], any>>) {
+    isIndexColumnInRange(columnsRange) {
       return columnsRange.some(column => this.isIndexColumn(column.key));
     },
     isReadOnly() {
-      return this.dataColumns.every(column => column.readOnly);
+      return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
     },
   }, null, {
     columns: computed,
-    dataColumns: computed,
-    dataRows: computed,
+    rows: computed,
+    columnKeys: computed,
   });
 }

@@ -32,6 +32,7 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   abstract isElementEdited(key: TKey): boolean;
   abstract set(key: TKey, value: TValue): void;
   abstract get(key: TKey): TValue | undefined;
+  abstract applyUpdate(result: TResult): void;
   abstract revert(key: TKey): void;
   abstract clear(): void;
 }

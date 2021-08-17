@@ -15,8 +15,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 
@@ -60,21 +61,18 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const [stretch, setStretch] = useState(false);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
-  const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
 
   let src: string | undefined;
 
-  if (selectedCells.length > 0 || focusCell) {
-    const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const editor = model.source.getEditor(resultIndex);
-    const firstSelectedCell = selectedCells[0] || focusCell;
+  if (selection.elements.length > 0 || focusCell) {
+    const view = model.source.getAction(resultIndex, ResultSetViewAction);
+    const firstSelectedCell = selection.elements[0] || focusCell;
 
-    const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
-    const content = data.getContent(firstSelectedCell);
+    const cellValue = view.getCellValue(firstSelectedCell);
 
-    if (content?.binary) {
-      src = `data:${getMIME(content.binary)};base64,${content.binary}`;
+    if (isResultSetContentValue(cellValue) && cellValue.binary) {
+      src = `data:${getMIME(cellValue.binary)};base64,${cellValue.binary}`;
     } else if (typeof cellValue === 'string' && isValidUrl(cellValue) && isImageFormat(cellValue)) {
       src = cellValue;
     }

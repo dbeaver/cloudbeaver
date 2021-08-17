@@ -14,7 +14,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { IDatabaseDataEditorActionsData, IDatabaseResultSet, IDataPresentationProps, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseResultSet, IDataPresentationProps, IResultSetEditActionData, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -50,17 +50,24 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
   const editingContext = useEditing({
     readonly: model.isReadonly() || model.isDisabled(resultIndex),
     onEdit: (position, key) => {
-      const editor = model.source.getEditor(resultIndex);
+      const column = tableData.getColumn(position.idx);
+      const row = tableData.getRow(position.rowIdx);
+
+      if (!column.columnDataIndex) {
+        return false;
+      }
+
+      const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
       // TODO: not works yet
       switch (key) {
         case 'Delete':
         case 'Backspace':
-          editor.setCell(position.rowIdx, position.idx, '');
+          tableData.editor.set(cellKey, '');
           break;
         default:
           if (key) {
-            editor.setCell(position.rowIdx, position.idx, key);
+            tableData.editor.set(cellKey, key);
           }
       }
 
@@ -68,7 +75,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
     },
   });
 
-  const { onKeydownHandler } = useGridSelectedCellsCopy(model, resultIndex, tableData, gridSelectionContext);
+  const { onKeydownHandler } = useGridSelectedCellsCopy(tableData, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
@@ -82,31 +89,33 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
   });
 
   useEffect(() => {
-    function listener(data: IDatabaseDataEditorActionsData) {
-      const editor = model.source.getEditor(resultIndex);
-      if (data.resultId !== editor.result.id || data.type === 'edit') {
+    function listener(data: IResultSetEditActionData) {
+      const editor = tableData.editor;
+      if (data.resultId !== editor.result.id || data.type === 'edit' || !data.value) {
         return;
       }
 
-      const idx = tableData.getColumnIndexFromKey(tableData.getColumnByDataIndex(data.column).key);
+      const idx = tableData.getColumnIndexFromColumnKey(data.value.key.column);
+      const rowIdx = tableData.getRowIndexFromKey(data.value.key.row);
 
       editingContext.closeEditor({
-        rowIdx: data.row,
+        rowIdx,
         idx,
       });
     }
 
-    model.source.editor?.actions.addHandler(listener);
+    tableData.editor.action.addHandler(listener);
 
-    return () => model.source.editor?.actions.removeHandler(listener);
-  }, [model.source, resultIndex]);
+    return () => tableData.editor.action.removeHandler(listener);
+  }, [tableData.editor, editingContext]);
 
   const handleFocusChange = (position: CellPosition) => {
     const column = tableData.getColumn(position.idx);
+    const row = tableData.getRow(position.rowIdx);
 
     selectionAction.focus({
-      row: position.rowIdx,
-      column: column.columnDataIndex ?? 0,
+      row,
+      column: column.columnDataIndex ?? { index: 0 },
     });
   };
 
@@ -158,7 +167,8 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
                   resizable: true,
                   formatter: CellFormatter,
                 }}
-                rows={tableData.dataRows}
+                rows={tableData.rows}
+                rowKeyGetter={ResultSetDataKeysUtils.serialize}
                 headerRowHeight={28}
                 rowHeight={25}
                 rowRenderer={RowRenderer}

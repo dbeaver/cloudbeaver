@@ -8,9 +8,8 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataEditorActionsData } from '../../IDatabaseDataEditor';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
@@ -25,18 +24,16 @@ export class DocumentEditAction
   static dataFormat = ResultDataFormat.Document;
 
   readonly editedElements: Map<number, IDatabaseDataDocument>;
+  private data: DocumentDataAction;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.editedElements = new Map();
-    this.resetEditedElements = this.resetEditedElements.bind(this);
+    this.data = this.getAction(DocumentDataAction);
 
     makeObservable(this, {
       editedElements: observable,
     });
-
-    // TODO: remove
-    this.source.editor?.actions.addHandler(this.resetEditedElements);
   }
 
   isEdited(): boolean {
@@ -48,7 +45,7 @@ export class DocumentEditAction
       return false;
     }
 
-    const value = this.getAction(DocumentDataAction).get(key.index);
+    const value = this.data.get(key.index);
 
     return !this.compare(value, this.get(key));
   }
@@ -58,8 +55,7 @@ export class DocumentEditAction
       prevValue = this.get(key);
 
       if (!prevValue) {
-        prevValue = this.getAction(DocumentDataAction)
-          .get(key.index);
+        prevValue = this.data.get(key.index);
       }
     }
 
@@ -75,11 +71,6 @@ export class DocumentEditAction
       },
     });
 
-    // TODO: remove
-    this.source
-      .getEditor(this.resultIndex)
-      .setCell(key.index, 0, value);
-
     this.removeUnchanged(key);
   }
 
@@ -87,8 +78,7 @@ export class DocumentEditAction
     let previousValue = this.get(key);
 
     if (!previousValue) {
-      previousValue = this.getAction(DocumentDataAction)
-        .get(key.index);
+      previousValue = this.data.get(key.index);
     }
 
     if (!previousValue) {
@@ -109,6 +99,20 @@ export class DocumentEditAction
     return this.editedElements.get(key.index);
   }
 
+  applyUpdate(result: IDatabaseResultSet): void {
+    let rowIndex = 0;
+
+    for (const [id, document] of this.editedElements) {
+      const value = result.data?.rows?.[rowIndex];
+
+      if (value !== undefined) {
+        this.data.set(id, value[0]);
+      }
+      rowIndex++;
+    }
+    this.clear();
+  }
+
   revert(key: IDocumentElementKey): void {
     this.editedElements.delete(key.index);
 
@@ -117,11 +121,6 @@ export class DocumentEditAction
       resultId: this.result.id,
       value: { key: key },
     });
-
-    // TODO: remove
-    this.source
-      .getEditor(this.resultIndex)
-      .revert(key.index);
   }
 
   clear(): void {
@@ -134,13 +133,21 @@ export class DocumentEditAction
 
   dispose(): void {
     this.clear();
-    // TODO: remove
-    this.source.editor?.actions.removeHandler(this.resetEditedElements);
   }
 
-  private resetEditedElements(action: IDatabaseDataEditorActionsData) {
-    if (action.resultId === this.result.id && action.type === 'cancel') {
-      this.revert({ index: action.row });
+  fillBatch(batch: UpdateResultsDataBatchMutationVariables): void {
+    for (const [id, document] of this.editedElements) {
+      if (batch.updatedRows === undefined) {
+        batch.updatedRows = [];
+      }
+      const updatedRows = batch.updatedRows as SqlResultRow[];
+
+      updatedRows.push({
+        data: [this.data.get(id)],
+        updateValues: { // TODO: remove, place new document in data field
+          0: document,
+        },
+      });
     }
   }
 

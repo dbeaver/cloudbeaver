@@ -9,9 +9,10 @@
 import type { ConnectionExecutionContextService, IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataEditor } from './DatabaseDataModel/DatabaseDataEditor';
+import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
+import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
@@ -37,7 +38,6 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     this.currentTask = null;
     this.executionContext = null;
-    this.editor = new DatabaseDataEditor();
   }
 
   isDisabled(resultIndex: number): boolean {
@@ -100,13 +100,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         return prevResults;
       }
 
-      return response.results.map<IDatabaseResultSet>(result => ({
-        id: result.resultSet?.id || '0',
-        dataFormat: result.dataFormat!,
-        updateRowCount: result.updateRowCount || 0,
-        loadedFully: (result.resultSet?.rows?.length || 0) < limit,
-        data: result.resultSet,
-      }));
+      return this.transformResults(response.results, limit);
     } catch (exception) {
       this.error = exception;
       throw exception;
@@ -118,48 +112,40 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   ): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
-    const changes = this.editor?.getChanges(true);
-
-    if (!changes) {
-      return prevResults;
-    }
-
     try {
-      for (const update of changes) {
-        const response = await this.graphQLService.sdk.updateResultsDataBatch({
+      for (const result of prevResults) {
+        const updateVariables: UpdateResultsDataBatchMutationVariables = {
           connectionId: executionContext.context!.connectionId,
           contextId: executionContext.context!.id,
-          resultsId: update.resultId,
-          updatedRows: Array.from(update.diff.values()).map(diff => ({
-            data: diff.source,
-            updateValues: diff.update.reduce((obj, value, index) => {
-              if (value !== diff.source[index]) {
-                obj[index] = value;
-              }
-              return obj;
-            }, {}),
-          })),
-        });
-
-        this.requestInfo = {
-          ...this.requestInfo,
-          requestDuration: response.result.duration || 0,
-          requestMessage: 'Saved successfully',
-          source: null,
+          resultsId: result.id,
         };
+        let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
-        const result = prevResults.find(result => result.id === update.resultId)!;
-        const responseResult = response.result.results.find(result => result.resultSet?.id === update.resultId);
-
-        if (responseResult?.resultSet?.rows && result.data?.rows) {
-          let i = 0;
-          for (const row of update.diff.keys()) {
-            result.data.rows[row] = responseResult.resultSet.rows[i];
-            i++;
-          }
+        if (result.dataFormat === ResultDataFormat.Resultset) {
+          editor = this.actions.get(result, ResultSetEditAction);
+          editor.fillBatch(updateVariables);
+        } else if (result.dataFormat === ResultDataFormat.Document) {
+          editor = this.actions.get(result, DocumentEditAction);
+          editor.fillBatch(updateVariables);
         }
 
-        this.editor?.cancelResultChanges(result);
+        const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
+
+        if (editor) {
+          const responseResult = this.transformResults(response.result.results, 0)
+            .find(newResult => newResult.id === result.id);
+
+          if (responseResult) {
+            editor.applyUpdate(responseResult);
+          }
+
+          this.requestInfo = {
+            ...this.requestInfo,
+            requestDuration: response.result.duration,
+            requestMessage: 'Saved successfully',
+            source: null,
+          };
+        }
       }
       this.clearError();
     } catch (exception) {
@@ -172,6 +158,16 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
   async dispose(): Promise<void> {
     await this.executionContext?.destroy();
+  }
+
+  private transformResults(results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+    return results.map<IDatabaseResultSet>(result => ({
+      id: result.resultSet?.id || '0',
+      dataFormat: result.dataFormat!,
+      updateRowCount: result.updateRowCount || 0,
+      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+      data: result.resultSet,
+    }));
   }
 
   private async ensureContextCreated(): Promise<IConnectionExecutionContext> {

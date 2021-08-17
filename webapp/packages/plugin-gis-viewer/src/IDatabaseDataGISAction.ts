@@ -12,7 +12,7 @@ import type { IGISType } from './ResultSetGISAction';
 
 export interface IDatabaseDataGISAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  getGISDataFor: (selectedCells: Array<Required<IResultSetElementKey>>) => Array<Required<IResultSetElementKey>>;
+  getGISDataFor: (selectedCells: IResultSetElementKey[]) => IResultSetElementKey[];
   getCellValue: (cell: IResultSetElementKey) => IGISType | undefined;
   isGISFormat: (cell: IResultSetElementKey) => boolean;
 }

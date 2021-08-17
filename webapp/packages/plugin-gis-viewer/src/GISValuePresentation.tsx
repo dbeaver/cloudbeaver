@@ -12,7 +12,7 @@ import wellknown from 'wellknown';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
@@ -28,12 +28,12 @@ export const GISValuePresentation: React.FC<Props> = observer(function GISValueP
 }) {
   const translate = useTranslate();
 
-  const modelResultData = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const gis = model.source.getAction(resultIndex, ResultSetGISAction);
+  const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  const focusedCell = selection.getFocusedElement() as Required<IResultSetElementKey> | null;
-  const selectedCells = selection.getSelectedElements();
+  const focusedCell = selection.getFocusedElement();
+  const selectedCells = selection.elements;
 
   if (selectedCells.length === 0 && focusedCell) {
     selectedCells.push(focusedCell);
@@ -65,26 +65,27 @@ export const GISValuePresentation: React.FC<Props> = observer(function GISValueP
     return result;
   }, [selectedCells, gis]);
 
-  const getAssociatedValues = useCallback((cell: Required<IResultSetElementKey>): IAssociatedValue[] => {
-    if (!modelResultData?.data?.columns || !modelResultData?.data?.rows) {
-      return [];
-    }
+  const getAssociatedValues = useCallback((cell: IResultSetElementKey): IAssociatedValue[] => {
+    const values: IAssociatedValue[] = [];
 
-    const { column: columnIndex, row: rowIndex } = cell;
-
-    return modelResultData.data.columns.reduce((result: IAssociatedValue[], column, i) => {
-      if (i !== columnIndex) {
-        result.push({
-          key: column.name!,
-          value: model.source
-            .getEditor(resultIndex)
-            .getCell(rowIndex, i),
-        });
+    for (const column of view.columnKeys) {
+      if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
+        continue;
       }
 
-      return result;
-    }, []);
-  }, [modelResultData, model, resultIndex]);
+      const value = view.getCellValue({ ...cell, column });
+      const columnInfo = view.getColumn(column);
+
+      if (value && columnInfo?.name) {
+        values.push({
+          key: columnInfo.name,
+          value,
+        });
+      }
+    }
+
+    return values;
+  }, [view]);
 
   if (!parsedGISData.length) {
     return <TextPlaceholder>{translate('gis_presentation_placeholder')}</TextPlaceholder>;

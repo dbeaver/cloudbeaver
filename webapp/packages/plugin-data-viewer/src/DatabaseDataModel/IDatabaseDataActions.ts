@@ -10,6 +10,10 @@ import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataAction
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IDatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> {
+  tryGet: <T extends IDatabaseDataAction<TOptions, TResult>>(
+    result: TResult,
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ) => T | undefined;
   get: <T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>

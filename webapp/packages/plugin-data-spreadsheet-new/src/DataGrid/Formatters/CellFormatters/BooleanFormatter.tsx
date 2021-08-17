@@ -7,9 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useContext } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled, { use, css } from 'reshadow';
+
+import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { DataGridContext } from '../../DataGridContext';
@@ -30,7 +32,7 @@ const styles = css`
   }
 `;
 
-export const BooleanFormatter: React.FC<FormatterProps> = observer(function BooleanFormatter({ column, rowIdx }) {
+export const BooleanFormatter: React.FC<FormatterProps<IResultSetRowKey>> = observer(function BooleanFormatter({ column, row }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);
@@ -38,23 +40,24 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
   if (!context || !tableDataContext || !editingContext || column.columnDataIndex === null) {
     throw new Error('Contexts required');
   }
+  const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
   const formatter = tableDataContext.format;
-  const rawValue = formatter.get(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!);
+  const rawValue = formatter.get(tableDataContext.getCellValue(cellKey)!);
   const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
   const stringifiedValue = formatter.toDisplayString(value);
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
   const disabled = (
     !column.editable
     || !!editingContext.readonly
-    || formatter.isReadOnly({ row: rowIdx, column: column.columnDataIndex })
+    || formatter.isReadOnly(cellKey)
   );
 
-  const toggleValue = useCallback(() => {
-    if (disabled || column.columnDataIndex === null) {
+  function toggleValue() {
+    if (disabled || !tableDataContext) {
       return;
     }
-    const resultColumn = tableDataContext.getColumnInfo(column.columnDataIndex);
+    const resultColumn = tableDataContext.getColumnInfo(cellKey.column);
 
     if (!resultColumn) {
       return;
@@ -62,9 +65,8 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
 
     const nextValue = !resultColumn.required && value === false ? null : !value;
 
-    tableDataContext.editor
-      .setCell(rowIdx, column.columnDataIndex, nextValue);
-  }, [tableDataContext, column, rowIdx, value, disabled]);
+    tableDataContext.editor.set(cellKey, nextValue);
+  }
 
   return styled(styles)(
     <boolean-formatter

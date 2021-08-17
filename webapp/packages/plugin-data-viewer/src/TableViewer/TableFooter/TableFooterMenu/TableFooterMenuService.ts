@@ -45,13 +45,12 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const newEditor = context.data.model.source.getActionImplementation(
+        const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
         );
-        const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return !editor.isEdited() && !newEditor?.isEdited();
+        return !editor?.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
@@ -73,26 +72,23 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const newEditor = context.data.model.source.getActionImplementation(
+        const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
         );
-        const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return !editor.isEdited() && !newEditor?.isEdited();
+        return !editor?.isEdited();
       },
       order: 2,
       title: 'data_viewer_value_revert',
       tooltip: 'data_viewer_value_revert_title',
       icon: 'table-revert',
       onClick: context => {
-        const newEditor = context.data.model.source.getActionImplementation(
+        const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
         );
-        newEditor?.clear();
-        const editor = context.data.model.source.getEditor(context.data.resultIndex);
-        editor.cancelChanges();
+        editor?.clear();
       },
     });
 

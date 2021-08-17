@@ -29,6 +29,12 @@ implements IDatabaseDataAction<TOptions, TResult> {
     this.result = result;
   }
 
+  tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
+  ): T | undefined {
+    return this.source.actions.tryGet(this.result, action);
+  }
+
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {

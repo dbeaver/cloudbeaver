@@ -10,7 +10,7 @@ import { action, observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import type { IResultSetElementKey, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from '../TableDataContext';
 import type { IDraggingPosition } from '../useGridDragging';
@@ -18,7 +18,7 @@ import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
 interface IGridSelectionState {
   range: boolean;
-  temporarySelection: Map<number, number[]>;
+  temporarySelection: Map<string, IResultSetElementKey[]>;
   lastSelectedCell: IDraggingPosition | null;
 }
 
@@ -30,35 +30,40 @@ export function useGridSelectionContext(
 
   const [state] = useState<IGridSelectionState>(() => observable({
     range: false,
-    temporarySelection: new Map<number, number[]>(),
+    temporarySelection: new Map<string, IResultSetElementKey[]>(),
     lastSelectedCell: null,
   }));
 
   const selectRows = action(function selectRows(
-    startPosition: number,
-    lastPosition: number,
-    columns: number[] = [],
+    startRow: IResultSetRowKey,
+    lastRow: IResultSetRowKey,
+    columns: IResultSetColumnKey[] = [],
     multiple = false,
     temporary = false
   ) {
     const { selectionAction } = props;
     const { temporarySelection } = state;
 
-    const columnsLength = props.tableData.dataColumns.length;
-    const firstRow = Math.min(startPosition, lastPosition);
-    const lastRow = Math.max(startPosition, lastPosition);
+    const startPosition = props.tableData.getRowIndexFromKey(startRow);
+    const lastPosition = props.tableData.getRowIndexFromKey(lastRow);
+
+    const firstRowIndex = Math.min(startPosition, lastPosition);
+    const lastRowIndex = Math.max(startPosition, lastPosition);
 
     let selected = true;
-    const rowsSelection: number[][] = [];
-    const columnsToSelect: Array<number| undefined> = columns.length > 0 ? columns : [undefined];
+    const rowsSelection: IResultSetElementKey[][] = [];
+    const columnsToSelect: Array<IResultSetColumnKey| undefined> = columns.length > 0 ? columns : [undefined];
 
-    for (let row = firstRow; row <= lastRow; row++) {
+    for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
+      const row = props.tableData.getRow(rowIndex);
+
       for (const column of columnsToSelect) {
         if (!selectionAction.isElementSelected({ row, column })) {
           selected = false;
           break;
         }
       }
+
       rowsSelection.push(selectionAction.getRowSelection(row));
     }
 
@@ -72,20 +77,28 @@ export function useGridSelectionContext(
       const rowSelection = columns;
 
       if (columns.length === 0) {
-        for (let i = 0; i < columnsLength; i++) {
-          rowSelection.push(i);
+        for (const column of props.tableData.columns) {
+          if (column.columnDataIndex !== null) {
+            rowSelection.push(column.columnDataIndex);
+          }
         }
       }
 
       let i = 0;
-      for (let rowIdx = firstRow; rowIdx <= lastRow; rowIdx++) {
-        const newElements = rowSelection.filter(element => !rowsSelection[i].includes(element));
+      for (let rowIdx = firstRowIndex; rowIdx <= lastRowIndex; rowIdx++) {
+        const row = props.tableData.getRow(rowIdx);
+        const newElements = rowSelection
+          .filter(
+            element => !rowsSelection[i]
+              .some(column => ResultSetDataKeysUtils.isEqual(column.column, element))
+          )
+          .map<IResultSetElementKey>(column => ({ row, column }));
 
-        temporarySelection.set(rowIdx,
+        temporarySelection.set(ResultSetDataKeysUtils.serialize(row),
           [...rowsSelection[i], ...newElements]
             .filter(column => {
               if (selected) {
-                return !rowSelection.includes(column);
+                return !rowSelection.some(key => ResultSetDataKeysUtils.isEqual(key, column.column));
               }
               return true;
             }));
@@ -94,7 +107,9 @@ export function useGridSelectionContext(
       return;
     }
 
-    for (let row = firstRow; row <= lastRow; row++) {
+    for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
+      const row = props.tableData.getRow(rowIndex);
+
       for (const column of columnsToSelect) {
         selectionAction.set({ row, column }, !selected);
       }
@@ -110,10 +125,12 @@ export function useGridSelectionContext(
     state.range = temporary;
     const columnsInRange = props.tableData.getColumnsInRange(startPosition.colIdx, lastPosition.colIdx);
     const isIndexColumnInRange = props.tableData.isIndexColumnInRange(columnsInRange);
+    const startRow = props.tableData.getRow(startPosition.rowIdx);
+    const lastRow = props.tableData.getRow(lastPosition.rowIdx);
 
     selectRows(
-      startPosition.rowIdx,
-      lastPosition.rowIdx,
+      startRow,
+      lastRow,
       isIndexColumnInRange
         ? undefined
         : (columnsInRange
@@ -155,29 +172,26 @@ export function useGridSelectionContext(
       .getColumn(colIdx)
       .columnDataIndex ?? undefined;
 
-    const temporaryRowSelection = state.temporarySelection.get(rowIdx);
+    const row = props.tableData.getRow(rowIdx);
+
+    const temporaryRowSelection = state.temporarySelection.get(ResultSetDataKeysUtils.serialize(row));
 
     if (temporaryRowSelection) {
       if (column === undefined) {
-        return (temporaryRowSelection || []).length === props.tableData.dataColumns.length;
+        return (temporaryRowSelection || []).length === props.tableData.columnKeys.length;
       }
-      return temporaryRowSelection.includes(column) || false;
+      return temporaryRowSelection.some(key => ResultSetDataKeysUtils.isEqual(key.column, column));
     }
 
-    return props.selectionAction.isElementSelected({ row: rowIdx, column });
+    return props.selectionAction.isElementSelected({ row, column });
   }
 
-  function selectCell(rowIdx: number, columnIdx: number, multiple: boolean, temporary: boolean) {
+  function selectCell(key: IResultSetElementKey, multiple: boolean, temporary: boolean) {
     const { temporarySelection } = state;
     const { selectionAction } = props;
     temporarySelection.clear();
 
-    const key: IResultSetElementKey = {
-      column: columnIdx,
-      row: rowIdx,
-    };
-
-    const selectedColumns = selectionAction.getRowSelection(rowIdx);
+    const selectedColumns = selectionAction.getRowSelection(key.row);
     const selected = selectionAction.isElementSelected(key);
 
     if (!multiple) {
@@ -186,14 +200,14 @@ export function useGridSelectionContext(
 
     if (temporary) {
       temporarySelection.set(
-        rowIdx,
-        [...selectedColumns, columnIdx]
+        ResultSetDataKeysUtils.serialize(key.row),
+        [...selectedColumns, key]
           .filter(column => {
             if (!multiple) {
-              return column === columnIdx;
+              return ResultSetDataKeysUtils.isEqual(column.column, key.column);
             }
             if (selected) {
-              return column !== columnIdx;
+              return !ResultSetDataKeysUtils.isEqual(column.column, key.column);
             }
             return true;
           })
@@ -205,8 +219,6 @@ export function useGridSelectionContext(
 
   function select(cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) {
     const { lastSelectedCell } = state;
-    const column = props.tableData.getColumn(cell.colIdx);
-    const isIndexColumn = props.tableData.isIndexColumn(column.key);
 
     if (!temporary) {
       state.lastSelectedCell = cell;
@@ -217,17 +229,21 @@ export function useGridSelectionContext(
       return;
     }
 
+    const column = props.tableData.getColumn(cell.colIdx);
+
     if (state.range) {
       return;
     }
+    const isIndexColumn = props.tableData.isIndexColumn(column.key);
 
+    const row = props.tableData.getRow(cell.rowIdx);
     if (isIndexColumn) {
-      selectRows(cell.rowIdx, cell.rowIdx, undefined, multiple, temporary);
+      selectRows(row, row, undefined, multiple, temporary);
       return;
     }
 
     if (column.columnDataIndex !== null) {
-      selectCell(cell.rowIdx, column.columnDataIndex, multiple, temporary);
+      selectCell({ row, column: column.columnDataIndex }, multiple, temporary);
     }
   }
 

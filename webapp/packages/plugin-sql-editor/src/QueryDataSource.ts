@@ -10,8 +10,8 @@ import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
-import { DatabaseDataEditor, DatabaseDataSource, IDatabaseDataOptions, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutation, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
@@ -37,7 +37,6 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     });
 
     this.currentTask = null;
-    this.editor = new DatabaseDataEditor();
   }
 
   isDisabled(resultIndex: number): boolean {
@@ -58,54 +57,49 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       return prevResults;
     }
 
-    const changes = this.editor?.getChanges(true);
-
-    if (!changes) {
-      return prevResults;
-    }
-
     try {
-      for (const update of changes) {
-        const response = await this.graphQLService.sdk.updateResultsDataBatch({
+      for (const result of prevResults) {
+        const updateVariables: UpdateResultsDataBatchMutationVariables = {
           connectionId: this.options.connectionId,
           contextId: this.executionContext.context.id,
-          resultsId: update.resultId,
-          updatedRows: Array.from(update.diff.values()).map(diff => ({
-            data: diff.source,
-            updateValues: diff.update.reduce((obj, value, index) => {
-              if (value !== diff.source[index]) {
-                obj[index] = value;
-              }
-              return obj;
-            }, {}),
-          })),
-        });
-
-        this.requestInfo = {
-          ...this.requestInfo,
-          requestDuration: response.result.duration || 0,
-          requestMessage: 'Saved successfully',
-          source: this.options.query || null,
+          resultsId: result.id,
         };
+        let editor: ResultSetEditAction | DocumentEditAction | undefined;
+        let response: UpdateResultsDataBatchMutation | undefined;
 
-        const result = prevResults.find(result => result.id === update.resultId)!;
-        const responseResult = response.result.results.find(result => result.resultSet?.id === update.resultId);
+        if (result.dataFormat === ResultDataFormat.Resultset) {
+          editor = this.actions.get(result, ResultSetEditAction);
+          editor.fillBatch(updateVariables);
+          response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
 
-        if (responseResult?.resultSet?.rows && result.data?.rows) {
-          let i = 0;
-          for (const row of update.diff.keys()) {
-            result.data.rows[row] = responseResult.resultSet.rows[i];
-            i++;
-          }
+          editor.clear();
+        } else if (result.dataFormat === ResultDataFormat.Document) {
+          editor = this.actions.get(result, DocumentEditAction);
+          editor.fillBatch(updateVariables);
+          response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
         }
 
-        this.editor?.cancelResultChanges(result);
+        if (editor && response) {
+          const responseResult = this.transformResults(response.result.results, 0)
+            .find(newResult => newResult.id === result.id);
+
+          if (responseResult) {
+            editor.applyUpdate(responseResult);
+          }
+
+          this.requestInfo = {
+            ...this.requestInfo,
+            requestDuration: response.result.duration,
+            requestMessage: 'Saved successfully',
+            source: this.options.query,
+          };
+        }
       }
+      this.clearError();
     } catch (exception) {
       this.error = exception;
       throw exception;
     }
-    this.clearError();
     return prevResults;
   }
 
@@ -126,15 +120,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       return null;
     }
 
-    return response.results.map<IDatabaseResultSet>(result => ({
-      id: result.resultSet?.id || '0',
-      dataFormat: result.dataFormat!,
-      updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
-      // allays returns false
-      // || !result.resultSet?.hasMoreData,
-      data: result.resultSet,
-    }));
+    return this.transformResults(response.results, limit);
   }
 
   async request(
@@ -182,6 +168,18 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       this.error = exception;
       throw exception;
     }
+  }
+
+  private transformResults(results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+    return results.map<IDatabaseResultSet>(result => ({
+      id: result.resultSet?.id || '0',
+      dataFormat: result.dataFormat!,
+      updateRowCount: result.updateRowCount || 0,
+      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+      // allays returns false
+      // || !result.resultSet?.hasMoreData,
+      data: result.resultSet,
+    }));
   }
 
   async dispose(): Promise<void> {

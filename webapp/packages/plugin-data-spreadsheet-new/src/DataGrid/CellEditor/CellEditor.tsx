@@ -14,7 +14,7 @@ import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
@@ -40,8 +40,8 @@ export interface IEditorRef {
   focus: () => void;
 }
 
-export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
-  rowIdx,
+export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
+  row,
   column,
   onClose,
 }, ref) {
@@ -85,28 +85,21 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'colum
     }
   });
 
+  const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
+
   const value = tableDataContext.format
-    .getText(tableDataContext.getCellValue(rowIdx, column.columnDataIndex)!) ?? '';
+    .getText(tableDataContext.getCellValue(cellKey)!) ?? '';
 
   const handleSave = () => onClose(false);
   const handleReject = () => {
-    if (column.columnDataIndex !== null) {
-      tableDataContext.editor
-        .revertCell(rowIdx, column.columnDataIndex);
-    }
+    tableDataContext.editor.revert(cellKey);
     onClose(false);
   };
   const handleChange = (value: string) => {
-    if (column.columnDataIndex !== null) {
-      tableDataContext.editor
-        .setCell(rowIdx, column.columnDataIndex, value);
-    }
+    tableDataContext.editor.set(cellKey, value);
   };
   const handleUndo = () => {
-    if (column.columnDataIndex !== null) {
-      tableDataContext.editor
-        .revertCell(rowIdx, column.columnDataIndex);
-    }
+    tableDataContext.editor.revert(cellKey);
     onClose(false);
   };
 

@@ -41,16 +41,16 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   let filterValue = model.source.options?.whereFilter || '';
 
   if (hasResult) {
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    if (constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
+    const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+    if (constraints && constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
       filterValue = model.source.requestInfo.requestFilter;
     }
   }
 
   const setValue = useCallback((filterValue: string) => {
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-
     model.source.options.whereFilter = filterValue;
+
+    const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
     constraints?.deleteFilters();
   }, [model.source.options]);
 

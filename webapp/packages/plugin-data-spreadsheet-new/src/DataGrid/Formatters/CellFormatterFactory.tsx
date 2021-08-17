@@ -32,7 +32,7 @@ export const CellFormatterFactory: React.FC<IProps> = observer(function CellForm
     if (tableDataContext && context && props.column.columnDataIndex !== null) {
       const resultColumn = tableDataContext.getColumnInfo(props.column.columnDataIndex);
       const rawValue = tableDataContext.format
-        .get(tableDataContext.getCellValue(props.rowIdx, props.column.columnDataIndex)!);
+        .get(tableDataContext.getCellValue({ row: props.row, column: props.column.columnDataIndex })!);
 
       if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
         formatterRef.current = BooleanFormatter;
