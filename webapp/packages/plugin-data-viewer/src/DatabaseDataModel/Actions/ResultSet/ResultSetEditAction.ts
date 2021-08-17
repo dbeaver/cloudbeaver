@@ -9,6 +9,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -85,7 +86,7 @@ export class ResultSetEditAction
       return false;
     }
 
-    if (update.source === undefined) {
+    if (update.source === undefined || update.type === ResultSetChangeType.delete) {
       return true;
     }
 
@@ -100,6 +101,16 @@ export class ResultSetEditAction
     }
 
     return true;
+  }
+
+  getElementState(key: IResultSetElementKey): ResultSetChangeType | null {
+    const update = this.editorData.get(ResultSetDataKeysUtils.serialize(key.row));
+
+    if (!update) {
+      return null;
+    }
+
+    return update.type;
   }
 
   set(key: IResultSetElementKey, value: IResultSetValue): void {
@@ -135,6 +146,18 @@ export class ResultSetEditAction
     return this.editorData
       .get(ResultSetDataKeysUtils.serialize(key.row))
       ?.update[key.column.index];
+  }
+
+  add(key: IResultSetRowKey, value?: IResultSetValue[]): void {
+    if (value === undefined) {
+      value = this.data.columns.map(() => null);
+    }
+
+    this.getOrCreateUpdate({ ...key, key: uuid() }, ResultSetChangeType.add, value);
+  }
+
+  delete(key: IResultSetRowKey): void {
+    this.getOrCreateUpdate(key, ResultSetChangeType.delete);
   }
 
   applyUpdate(result: IDatabaseResultSet): void {
@@ -263,7 +286,11 @@ export class ResultSetEditAction
     }
   }
 
-  private getOrCreateUpdate(row: IResultSetRowKey, type: ResultSetChangeType): IResultSetUpdate {
+  private getOrCreateUpdate(
+    row: IResultSetRowKey,
+    type: ResultSetChangeType,
+    update?: IResultSetValue[]
+  ): IResultSetUpdate {
     const key = ResultSetDataKeysUtils.serialize(row);
 
     if (!this.editorData.has(key)) {
@@ -277,7 +304,7 @@ export class ResultSetEditAction
         row,
         type,
         source,
-        update: observable([...(source || [])]),
+        update: observable([...(source || update || [])]),
       });
     }
 

@@ -9,6 +9,8 @@
 @import "@cloudbeaver/core-theming/src/styles/branding";
 
 $edited-color: #ff99006b;
+$added-color: #91ff006b;
+$deleted-color: #ff33006b;
 
 @mixin base-react-grid() {
   :global {
@@ -27,6 +29,14 @@ $edited-color: #ff99006b;
 
       .rdg-cell-custom-edited {
         background-color: $edited-color;
+      }
+
+      .rdg-cell-custom-added {
+        background-color: $added-color;
+      }
+
+      .rdg-cell-custom-deleted {
+        background-color: $deleted-color;
       }
     }
     .cb-react-grid-theme {
@@ -83,6 +93,14 @@ $edited-color: #ff99006b;
 
       .rdg-cell-custom-edited {
         background-color: $edited-color;
+      }
+
+      .rdg-cell-custom-added {
+        background-color: $added-color;
+      }
+
+      .rdg-cell-custom-deleted {
+        background-color: $deleted-color;
       }
 
       .cell-formatter {

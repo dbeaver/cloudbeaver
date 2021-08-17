@@ -13,7 +13,7 @@ import { Cell } from 'react-data-grid';
 
 import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
@@ -44,7 +44,16 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
   }
 
   if (cellKey && tableDataContext?.isCellEdited(cellKey)) {
-    classes += ' rdg-cell-custom-edited';
+    switch (tableDataContext.getEditionState(cellKey)) {
+      case ResultSetChangeType.add:
+        classes += ' rdg-cell-custom-added';
+        break;
+      case ResultSetChangeType.delete:
+        classes += ' rdg-cell-custom-deleted';
+        break;
+      case ResultSetChangeType.update:
+        classes += ' rdg-cell-custom-edited';
+    }
   }
 
   const state = useObjectRef({

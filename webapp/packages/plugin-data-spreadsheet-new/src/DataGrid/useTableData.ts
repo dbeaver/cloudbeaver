@@ -138,6 +138,9 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
       const lastIndex = Math.max(startIndex, endIndex);
       return this.columns.slice(firstIndex, lastIndex + 1);
     },
+    getEditionState(key) {
+      return this.editor.getElementState(key);
+    },
     isCellEdited(key) {
       return this.editor.isElementEdited(key);
     },

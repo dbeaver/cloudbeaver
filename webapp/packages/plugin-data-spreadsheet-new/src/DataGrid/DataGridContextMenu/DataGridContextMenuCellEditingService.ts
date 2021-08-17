@@ -92,5 +92,35 @@ export class DataGridContextMenuCellEditingService {
         },
       }
     );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
+        id: 'row_add',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        order: 5,
+        title: 'data_grid_table_editing_row_add',
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          editor.add(context.data.key.row);
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
+        id: 'row_delete',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        order: 6,
+        title: 'data_grid_table_editing_row_delete',
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          editor.delete(context.data.key.row);
+        },
+      }
+    );
   }
 }

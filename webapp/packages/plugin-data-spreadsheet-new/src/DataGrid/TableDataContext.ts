@@ -10,7 +10,7 @@ import { createContext } from 'react';
 import type { Column } from 'react-data-grid';
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, IResultSetValue, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, IResultSetValue, ResultSetChangeType, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 declare module 'react-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {
@@ -36,6 +36,7 @@ export interface ITableData {
   getColumnIndexFromKey: (columnKey: string) => number;
   getColumnIndexFromColumnKey: (column: IResultSetColumnKey) => number;
   getRowIndexFromKey: (row: IResultSetRowKey) => number;
+  getEditionState: (key: IResultSetElementKey) => ResultSetChangeType | null;
   isCellEdited: (key: IResultSetElementKey) => boolean;
   isIndexColumn: (columnKey: string) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<IResultSetRowKey, any>>) => boolean;
