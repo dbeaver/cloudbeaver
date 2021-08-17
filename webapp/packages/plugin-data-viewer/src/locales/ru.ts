@@ -15,4 +15,7 @@ export default [
   ['data_viewer_presentation_value_image_fit', 'Растянуть'],
   ['data_viewer_presentation_value_image_original_size', 'Оригинальный размер'],
   ['data_viewer_presentation_value_boolean_placeholder', 'Не удалось отобразить текущее значение как boolean'],
+  ['data_viewer_script_preview', 'Скрипт'],
+  ['data_viewer_script_preview_dialog_title', 'Предпросмотр изменений'],
+  ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
 ];
