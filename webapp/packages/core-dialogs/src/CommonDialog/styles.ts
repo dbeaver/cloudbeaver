@@ -20,16 +20,15 @@ export const dialogStyles = css`
       bottom: 0px;
       left: 0px;
       z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     Dialog {
       box-sizing: border-box;
       display: flex;
-      position: fixed;
-      top: 50%;
-      left: 50%;
       max-height: calc(100vh);
-      transform: translate(-50%, -50%);
       z-index: 999;
       outline: none;
     }

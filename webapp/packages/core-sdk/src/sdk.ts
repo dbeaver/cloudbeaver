@@ -1592,6 +1592,17 @@ export interface UpdateResultsDataBatchMutation {
   );
 }
 
+export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  updatedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
+  deletedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
+  addedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
+}>;
+
+export interface UpdateResultsDataBatchScriptMutation { result: Mutation['updateResultsDataBatchScript'] }
+
 export type MetadataGetNodeDdlQueryVariables = Exact<{
   nodeId: Scalars['ID'];
 }>;
@@ -2556,6 +2567,18 @@ export const UpdateResultsDataBatchDocument = `
   }
 }
     `;
+export const UpdateResultsDataBatchScriptDocument = `
+    mutation updateResultsDataBatchScript($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $updatedRows: [SQLResultRow!], $deletedRows: [SQLResultRow!], $addedRows: [SQLResultRow!]) {
+  result: updateResultsDataBatchScript(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    updatedRows: $updatedRows
+    deletedRows: $deletedRows
+    addedRows: $addedRows
+  )
+}
+    `;
 export const MetadataGetNodeDdlDocument = `
     query metadataGetNodeDDL($nodeId: ID!) {
   metadataGetNodeDDL(nodeId: $nodeId)
@@ -2920,6 +2943,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables): Promise<UpdateResultsDataBatchMutation> {
       return withWrapper(() => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables));
+    },
+    updateResultsDataBatchScript(variables: UpdateResultsDataBatchScriptMutationVariables): Promise<UpdateResultsDataBatchScriptMutation> {
+      return withWrapper(() => client.request<UpdateResultsDataBatchScriptMutation>(UpdateResultsDataBatchScriptDocument, variables));
     },
     metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables): Promise<MetadataGetNodeDdlQuery> {
       return withWrapper(() => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables));

@@ -70,6 +70,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
 
   retry: () => Promise<void>;
+  runTask: <T>(task: () => Promise<T>) => Promise<T>;
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<void> | void;

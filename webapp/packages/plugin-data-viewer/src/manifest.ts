@@ -13,6 +13,7 @@ import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
 import { LocaleService } from './LocaleService';
+import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
 import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
@@ -39,6 +40,7 @@ export const manifest: PluginManifest = {
     LocaleService,
     DataValuePanelService,
     TextValuePresentationService,
+    ScriptPreviewService,
     TextValuePresentationBootstrap,
     ImageValuePresentationBootstrap,
     BooleanValuePresentationBootstrap,
