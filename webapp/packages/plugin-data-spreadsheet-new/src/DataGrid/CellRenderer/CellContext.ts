@@ -9,9 +9,17 @@
 import { createContext } from 'react';
 
 import type { IMouseHook } from '@cloudbeaver/core-blocks';
+import type { IResultSetElementKey, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
+
+import type { CellPosition } from '../../Editing/EditingContext';
 
 export interface ICellContext {
   mouse: IMouseHook<HTMLDivElement>;
+  cell: IResultSetElementKey | undefined;
+  position: CellPosition;
+  isEditing: boolean;
+  isSelected: boolean;
+  editionState: ResultSetChangeType | null;
 }
 
 export const CellContext = createContext<ICellContext | null>(null);

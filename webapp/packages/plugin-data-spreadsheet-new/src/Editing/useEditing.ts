@@ -6,12 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { CellPosition, IEditingContext } from './EditingContext';
+
+interface IEditingState {
+  editing: boolean;
+}
 
 function getPositionHash(position: CellPosition): string {
   return `${position.idx}_${position.rowIdx}`;
@@ -26,8 +30,8 @@ export function useEditing(options: IEditingOptions): IEditingContext {
   const optionsRef = useObjectRef(options);
   const state = useObjectRef({
     options,
-    editingCells: new Set<string>(),
-  }, { options }, { editingCells: observable });
+    editingCells: new MetadataMap<string, IEditingState>(() => ({ editing: false })),
+  }, { options });
 
   const [context] = useState<IEditingContext>({
     readonly: !!optionsRef.readonly,
@@ -47,16 +51,20 @@ export function useEditing(options: IEditingOptions): IEditingContext {
       }
 
       state.editingCells.clear();
-      state.editingCells.add(getPositionHash(position));
+      const info = state.editingCells.get(getPositionHash(position));
+      info.editing = true;
     },
     closeEditor(position: CellPosition) {
-      state.editingCells.delete(getPositionHash(position));
+      const info = state.editingCells.get(getPositionHash(position));
+      info.editing = false;
     },
     close() {
       state.editingCells.clear();
     },
     isEditing(position: CellPosition) {
-      return state.editingCells.has(getPositionHash(position));
+      return state.editingCells
+        .get(getPositionHash(position))
+        .editing;
     },
   });
 

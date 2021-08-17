@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
@@ -43,16 +43,12 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
   const cellContext = useContext(CellContext);
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
-  const isEditing = editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx }) ?? false;
+  const isEditing = cellContext?.isEditing ?? false;
   const showCellMenu = !isEditing && (
     rest.isCellSelected
     || cellContext?.mouse.state.mouseEnter
     || menuVisible
   );
-
-  const cellKey = useMemo<IResultSetElementKey | undefined>(() => rest.column.columnDataIndex !== null
-    ? { row: rest.row, column: rest.column.columnDataIndex }
-    : undefined, [rest.row, rest.column.columnDataIndex]);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
@@ -74,10 +70,10 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && context && cellKey && (
+      {showCellMenu && context && cellContext?.cell && (
         <menu-container>
           <CellMenu
-            cellKey={cellKey}
+            cellKey={cellContext.cell}
             model={context.model}
             actions={context.actions}
             spreadsheetActions={spreadsheetActions}

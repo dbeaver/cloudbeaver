@@ -8,15 +8,15 @@
 
 @import "@cloudbeaver/core-theming/src/styles/branding";
 
-$edited-color: #ff99006b;
-$added-color: #91ff006b;
-$deleted-color: #ff33006b;
+$edited-color: rgba(255,153,0,0.3);
+$added-color: rgba(145,255,0,0.3);
+$deleted-color: rgba(255,51,0,0.3);
 
 @mixin base-react-grid() {
   :global {
     .cb-react-grid-container:focus-within {
-      .rdg-cell-custom-selected:not(.rdg-cell-custom-editing) {
-        background-color: rgba(0, 145, 234, 0.3);
+      .rdg-cell-custom-selected::before {
+        background-color: rgba(0, 145, 234, 0.2);
       }
 
       .rdg-cell-selected {
@@ -25,6 +25,10 @@ $deleted-color: #ff33006b;
 
       .rdg-cell-custom-editing {
         box-shadow: none;
+
+        &::before {
+          background-color: transparent;
+        }
       }
 
       .rdg-cell-custom-edited {
@@ -78,8 +82,17 @@ $deleted-color: #ff33006b;
       }
 
       .rdg-cell-custom-selected {
-        background-color: rgba(150, 150, 150, 0.3);
         box-shadow: none;
+      }
+
+      .rdg-cell-custom-selected::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(150, 150, 150, 0.2);
       }
 
       .rdg-cell-selected {

@@ -6,57 +6,57 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
-import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
+import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
-
-function getClasses(rawValue: any) {
-  const classes = ['text-formatter'];
-  if (rawValue === null) {
-    classes.push('cell-null');
-  }
-  return classes.join(' '); // performance heavy
-}
 
 export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ row, rowIdx, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
   const tableDataContext = useContext(TableDataContext);
+  const cellContext = useContext(CellContext);
 
-  if (!context || !tableDataContext || !editingContext || column.columnDataIndex === null) {
+  if (!context || !tableDataContext || !editingContext || !cellContext?.cell) {
     throw new Error('Contexts required');
   }
 
-  const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
-
   const formatter = tableDataContext.format;
-  const rawValue = formatter.get(tableDataContext.getCellValue(cellKey)!);
-  const classes = getClasses(rawValue);
+  const rawValue = useMemo(
+    () => computed(() => formatter.get(tableDataContext.getCellValue(cellContext!.cell!)!)),
+    [tableDataContext, cellContext.cell, formatter]
+  ).get();
+
+  let classes = 'text-formatter';
+  if (rawValue === null) {
+    classes += ' cell-null';
+  }
+
   const value = formatter.toDisplayString(rawValue);
 
   const handleClose = useCallback(() => {
-    editingContext.closeEditor({ idx: column.idx, rowIdx });
-  }, [column, rowIdx]);
+    editingContext.closeEditor(cellContext.position);
+  }, [cellContext]);
 
   useEffect(() => {
     if (isCellSelected) {
-      if (editingContext.isEditing({ idx: column.idx, rowIdx })) {
+      if (cellContext.isEditing) {
         editorRef.current?.focus();
       }
     }
   }, [isCellSelected]);
 
-  if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
+  if (cellContext.isEditing) {
     return (
       <div className={classes}>
         <CellEditor

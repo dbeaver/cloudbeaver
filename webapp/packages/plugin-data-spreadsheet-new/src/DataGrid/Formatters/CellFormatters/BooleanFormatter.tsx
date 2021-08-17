@@ -6,14 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled, { use, css } from 'reshadow';
 
-import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
+import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
 
@@ -36,28 +38,31 @@ export const BooleanFormatter: React.FC<FormatterProps<IResultSetRowKey>> = obse
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);
+  const cellContext = useContext(CellContext);
 
-  if (!context || !tableDataContext || !editingContext || column.columnDataIndex === null) {
+  if (!context || !tableDataContext || !editingContext || !cellContext?.cell) {
     throw new Error('Contexts required');
   }
-  const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
   const formatter = tableDataContext.format;
-  const rawValue = formatter.get(tableDataContext.getCellValue(cellKey)!);
+  const rawValue = useMemo(
+    () => computed(() => formatter.get(tableDataContext.getCellValue(cellContext!.cell!)!)),
+    [tableDataContext, cellContext.cell, formatter]
+  ).get();
   const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
   const stringifiedValue = formatter.toDisplayString(value);
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
   const disabled = (
     !column.editable
     || !!editingContext.readonly
-    || formatter.isReadOnly(cellKey)
+    || formatter.isReadOnly(cellContext.cell)
   );
 
   function toggleValue() {
-    if (disabled || !tableDataContext) {
+    if (disabled || !tableDataContext || !cellContext?.cell) {
       return;
     }
-    const resultColumn = tableDataContext.getColumnInfo(cellKey.column);
+    const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
 
     if (!resultColumn) {
       return;
@@ -65,7 +70,7 @@ export const BooleanFormatter: React.FC<FormatterProps<IResultSetRowKey>> = obse
 
     const nextValue = !resultColumn.required && value === false ? null : !value;
 
-    tableDataContext.editor.set(cellKey, nextValue);
+    tableDataContext.editor.set(cellContext.cell, nextValue);
   }
 
   return styled(styles)(

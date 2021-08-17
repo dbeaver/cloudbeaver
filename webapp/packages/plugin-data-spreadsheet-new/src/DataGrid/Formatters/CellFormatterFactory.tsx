@@ -10,32 +10,37 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 
-import { isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 
+import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
 import { TextFormatter } from './CellFormatters/TextFormatter';
 
-interface IProps extends FormatterProps {
+interface IProps extends FormatterProps<IResultSetRowKey> {
   isEditing: boolean;
 }
 
 export const CellFormatterFactory: React.FC<IProps> = observer(function CellFormatterFactory(props) {
-  const formatterRef = useRef<React.FC<FormatterProps> | null>(null);
+  const formatterRef = useRef<React.FC<FormatterProps<IResultSetRowKey>> | null>(null);
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
+  const cellContext = useContext(CellContext);
 
   if (!props.isEditing || formatterRef === null) {
     formatterRef.current = TextFormatter;
 
-    if (tableDataContext && context && props.column.columnDataIndex !== null) {
-      const resultColumn = tableDataContext.getColumnInfo(props.column.columnDataIndex);
-      const rawValue = tableDataContext.format
-        .get(tableDataContext.getCellValue({ row: props.row, column: props.column.columnDataIndex })!);
+    if (tableDataContext && context && cellContext?.cell) {
+      const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
+      const value = tableDataContext.getCellValue(cellContext.cell);
 
-      if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
-        formatterRef.current = BooleanFormatter;
+      if (value !== undefined) {
+        const rawValue = tableDataContext.format.get(value);
+
+        if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
+          formatterRef.current = BooleanFormatter;
+        }
       }
     }
   }

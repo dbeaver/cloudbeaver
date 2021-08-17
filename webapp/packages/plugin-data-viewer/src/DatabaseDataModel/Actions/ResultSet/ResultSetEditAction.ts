@@ -110,7 +110,15 @@ export class ResultSetEditAction
       return null;
     }
 
-    return update.type;
+    if (update.source === undefined || update.type === ResultSetChangeType.delete) {
+      return update.type;
+    }
+
+    if (!this.compareCellValue(update.source[key.column.index], update.update[key.column.index])) {
+      return update.type;
+    }
+
+    return null;
   }
 
   set(key: IResultSetElementKey, value: IResultSetValue): void {

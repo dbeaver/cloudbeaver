@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
@@ -15,7 +16,7 @@ import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../Editing/EditingContext';
+import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
@@ -28,38 +29,67 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
   const mouse = useMouse<HTMLDivElement>({});
-  const cellContext = useMemo<ICellContext>(() => ({ mouse }), [mouse]);
 
-  let classes = '';
-  const cellKey: IResultSetElementKey | undefined = column.columnDataIndex !== null
+  const position: CellPosition = useMemo(() => ({ idx: column.idx, rowIdx }), [column.idx, rowIdx]);
+  const cellKey: IResultSetElementKey | undefined = useMemo(() => column.columnDataIndex !== null
     ? { row, column: column.columnDataIndex }
-    : undefined;
+    : undefined, [column.columnDataIndex, row]);
 
-  if (selectionContext?.isSelected(rowIdx, column.idx)) {
-    classes += ' rdg-cell-custom-selected';
-  }
+  const cellContext = useObjectRef<ICellContext>({
+    mouse,
+    cell: cellKey,
+    position,
+    get isEditing(): boolean {
+      return editingContext?.isEditing(this.position) || false;
+    },
+    get isSelected(): boolean {
+      return selectionContext?.isSelected(this.position.rowIdx, this.position.idx) || false;
+    },
+    get editionState(): ResultSetChangeType | null {
+      if (!this.cell || !tableDataContext) {
+        return null;
+      }
 
-  if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-    classes += ' rdg-cell-custom-editing';
-  }
+      return tableDataContext.getEditionState(this.cell);
+    },
+  }, { cell: cellKey, position }, {
+    cell: observable.ref,
+    position: observable.ref,
+    isEditing: computed,
+    isSelected: computed,
+    editionState: computed,
+  });
 
-  if (cellKey && tableDataContext?.isCellEdited(cellKey)) {
-    switch (tableDataContext.getEditionState(cellKey)) {
-      case ResultSetChangeType.add:
-        classes += ' rdg-cell-custom-added';
-        break;
-      case ResultSetChangeType.delete:
-        classes += ' rdg-cell-custom-deleted';
-        break;
-      case ResultSetChangeType.update:
-        classes += ' rdg-cell-custom-edited';
+  const classes = useMemo(() => computed(() => {
+    let classes = '';
+    if (cellContext.isSelected) {
+      classes += ' rdg-cell-custom-selected';
     }
-  }
+
+    if (cellContext.isEditing) {
+      classes += ' rdg-cell-custom-editing';
+    }
+
+    if (cellContext.editionState !== null) {
+      switch (cellContext.editionState) {
+        case ResultSetChangeType.add:
+          classes += ' rdg-cell-custom-added';
+          break;
+        case ResultSetChangeType.delete:
+          classes += ' rdg-cell-custom-deleted';
+          break;
+        case ResultSetChangeType.update:
+          classes += ' rdg-cell-custom-edited';
+      }
+    }
+    return classes;
+  }), []).get();
 
   const state = useObjectRef({
     column,
     rowIdx,
     cellKey,
+    position,
     isCellSelected,
     selectionContext,
     dataGridContext,
@@ -73,7 +103,7 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
       const dataGridApi = this.dataGridContext?.getDataGridApi();
 
       if (dataGridApi && !this.isCellSelected) {
-        dataGridApi.selectCell({ idx: this.column.idx, rowIdx: this.rowIdx });
+        dataGridApi.selectCell(this.position);
       }
 
       this.selectionContext?.select(
@@ -132,13 +162,11 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
         return;
       }
 
-      this.editingContext.edit({
-        idx: this.column.idx,
-        rowIdx: this.rowIdx,
-      });
+      this.editingContext.edit(this.position);
     },
   }, {
     column,
+    position,
     rowIdx,
     cellKey,
     isCellSelected,
@@ -149,7 +177,7 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
   }, undefined, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   return (
-    <CellContext.Provider value={cellContext}>{/** performance super heavy */}
+    <CellContext.Provider value={cellContext}>
       <Cell
         ref={mouse.reference}
         className={classes}
