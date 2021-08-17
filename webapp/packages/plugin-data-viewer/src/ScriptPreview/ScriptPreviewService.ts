@@ -27,10 +27,10 @@ export class ScriptPreviewService {
 
   async open(model: IDatabaseDataModel<any, IDatabaseDataResult>, resultIndex: number): Promise<void> {
     try {
-      const response = await model.source.runTask(() => this.tryGetScript(model, resultIndex));
+      const script = await model.source.runTask(() => this.tryGetScript(model, resultIndex));
 
       this.commonDialogService.open(ScriptPreviewDialog, {
-        script: response.result,
+        script,
         model,
       });
     } catch (exception) {
@@ -38,7 +38,10 @@ export class ScriptPreviewService {
     }
   }
 
-  private async tryGetScript(model: IDatabaseDataModel<any, IDatabaseDataResult>, resultIndex: number) {
+  private async tryGetScript(
+    model: IDatabaseDataModel<any, IDatabaseDataResult>,
+    resultIndex: number
+  ): Promise<string> {
     const executionContext = model.source.executionContext;
 
     if (!executionContext) {
@@ -66,6 +69,8 @@ export class ScriptPreviewService {
       editor.fillBatch(updateVariables);
     }
 
-    return this.graphQLService.sdk.updateResultsDataBatchScript(updateVariables);
+    const response = await this.graphQLService.sdk.updateResultsDataBatchScript(updateVariables);
+
+    return response.result;
   }
 }

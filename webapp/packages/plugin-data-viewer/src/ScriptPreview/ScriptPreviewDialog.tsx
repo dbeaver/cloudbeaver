@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, useClipboard } from '@cloudbeaver/core-blocks';
+import { Button, useClipboard, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -59,26 +60,31 @@ export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = obse
   const copy = useClipboard();
 
   const sqlDialectInfoService = useService(SqlDialectInfoService);
+  const connectionId = payload.model.source.executionContext?.context?.connectionId;
 
-  const [dialect, setDialect] = useState<SqlDialectInfo | null>(null);
+  const dialect = useObjectRef({
+    connectionId,
+    sqlDialectInfoService,
+    get dialect(): SqlDialectInfo | undefined {
+      if (!this.connectionId) {
+        return undefined;
+      }
+      return this.sqlDialectInfoService.getDialectInfo(this.connectionId);
+    },
+
+  }, { connectionId, sqlDialectInfoService }, { connectionId: observable.ref, dialect: computed });
 
   useEffect(() => {
-    const connectionId = payload.model.source.executionContext?.context?.connectionId;
-    if (!connectionId || dialect) {
+    if (!connectionId) {
       return;
     }
 
     sqlDialectInfoService.loadSqlDialectInfo(connectionId)
-      .then(dialect => {
-        if (dialect) {
-          setDialect(dialect);
-        }
-      })
       .catch(exception => {
         console.error(exception);
         console.warn(`Can't get dialect for connection: '${connectionId}'. Default dialect will be used`);
       });
-  }, [sqlDialectInfoService, payload.model, dialect]);
+  }, [sqlDialectInfoService, connectionId]);
 
   const apply = () => {
     payload.model.source.saveData();
@@ -105,7 +111,7 @@ export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = obse
             autoCursor: false,
           }}
           value={payload.script}
-          dialect={dialect || undefined}
+          dialect={dialect.dialect}
           readonly
         />
       </wrapper>
