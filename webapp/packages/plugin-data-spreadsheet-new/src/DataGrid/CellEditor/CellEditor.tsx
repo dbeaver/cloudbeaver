@@ -25,7 +25,7 @@ const styles = css`
   }
   box {
     position: absolute;
-    left: 0;
+    left: -8px;
     top: 0;
     width: 0;
     height: 100%;

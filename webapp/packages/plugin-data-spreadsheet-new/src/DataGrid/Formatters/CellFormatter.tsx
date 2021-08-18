@@ -30,6 +30,7 @@ const styles = css`
     flex: 1;
     display: flex;
     overflow: hidden;
+    position: relative;
   }
   formatter-container {
     flex: 1;
@@ -57,7 +58,7 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
       }
 
       const idx = tableDataContext.getColumnIndexFromColumnKey(position.column);
-      const rowIdx = tableDataContext.getRowIndexFromKey(position.column);
+      const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
 
       if (idx !== -1) {
         editingContext.edit({ idx, rowIdx });

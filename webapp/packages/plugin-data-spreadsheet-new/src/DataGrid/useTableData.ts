@@ -123,8 +123,11 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
       return this.columns.findIndex(column => column.key === key);
     },
     getColumnIndexFromColumnKey(columnKey) {
-      return this.columnKeys
-        .findIndex(column => ResultSetDataKeysUtils.isEqual(columnKey, column));
+      return this.columns
+        .findIndex(column => (
+          column.columnDataIndex !== null
+          && ResultSetDataKeysUtils.isEqual(columnKey, column.columnDataIndex)
+        ));
     },
     getRowIndexFromKey(rowKey) {
       return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
