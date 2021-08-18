@@ -65,21 +65,18 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
           resultsId: result.id,
         };
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
-        let response: UpdateResultsDataBatchMutation | undefined;
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
           editor = this.actions.get(result, ResultSetEditAction);
           editor.fillBatch(updateVariables);
-          response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
-
-          editor.clear();
         } else if (result.dataFormat === ResultDataFormat.Document) {
           editor = this.actions.get(result, DocumentEditAction);
           editor.fillBatch(updateVariables);
-          response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
         }
 
-        if (editor && response) {
+        const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
+
+        if (editor) {
           const responseResult = this.transformResults(response.result.results, 0)
             .find(newResult => newResult.id === result.id);
 
