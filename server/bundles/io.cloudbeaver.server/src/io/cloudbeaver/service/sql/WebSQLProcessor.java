@@ -260,11 +260,12 @@ public class WebSQLProcessor {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
-        List<DBSDataManipulator.ExecuteBatch> resultBatches = new ArrayList<>();
-        List<Object[]> resultRows = new ArrayList<>();
+        Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
+
+        KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
 
         DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, resultRows);
+            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, keyReceiver);
 
         long totalUpdateCount = 0;
 
@@ -281,8 +282,16 @@ public class WebSQLProcessor {
             }
             try {
                 Map<String, Object> options = Collections.emptyMap();
-                for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
+                for (Map.Entry<DBSDataManipulator.ExecuteBatch, Object[]> rb : resultBatches.entrySet()) {
+                    DBSDataManipulator.ExecuteBatch batch = rb.getKey();
+                    Object[] rowValues = rb.getValue();
+                    keyReceiver.setRow(rowValues);
                     DBCStatistics statistics = batch.execute(session, options);
+
+                    // Patch result rows (adapt to web format)
+                    for (int i = 0; i < rowValues.length; i++) {
+                        rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, null, rowValues[i], dataFormat);
+                    }
 
                     totalUpdateCount += statistics.getRowsUpdated();
                     result.setDuration(result.getDuration() + statistics.getExecuteTime());
@@ -306,7 +315,7 @@ public class WebSQLProcessor {
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
         updateResults.setUpdateRowCount(totalUpdateCount);
         updateResults.setResultSet(updatedResultSet);
-        updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
+        updatedResultSet.setRows(resultBatches.values().toArray(new Object[0][]));
 
         queryResults.add(updateResults);
 
@@ -324,18 +333,17 @@ public class WebSQLProcessor {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
-        List<DBSDataManipulator.ExecuteBatch> resultBatches = new ArrayList<>();
-        List<Object[]> resultRows = new ArrayList<>();
+        Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
         DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, resultRows);
+            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, null);
 
         List<DBEPersistAction> actions = new ArrayList<>();
 
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
             Map<String, Object> options = Collections.emptyMap();
-            for (DBSDataManipulator.ExecuteBatch batch : resultBatches) {
+            for (DBSDataManipulator.ExecuteBatch batch : resultBatches.keySet()) {
                 batch.generatePersistActions(session, actions, options);
             }
         }
@@ -351,8 +359,8 @@ public class WebSQLProcessor {
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat,
-        @NotNull List<DBSDataManipulator.ExecuteBatch> resultBatches,
-        @NotNull List<Object[]> resultRows) throws DBException
+        @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches, DBDDataReceiver keyReceiver)
+        throws DBException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -396,7 +404,7 @@ public class WebSQLProcessor {
                         Object realCellValue = convertInputCellValue(session, updateAttribute,
                             updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition())));
                         rowValues[i] = realCellValue;
-                        finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
+                        finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
                     for (int i = 0; i < keyAttributes.length; i++) {
                         DBDAttributeBinding keyAttribute = keyAttributes[i];
@@ -412,12 +420,13 @@ public class WebSQLProcessor {
                                 false,
                                 true);
                         }
+                        finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
                     }
 
-                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
+                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(
+                        session, updateAttributes, keyAttributes, keyReceiver, executionSource);
                     updateBatch.add(rowValues);
-                    resultBatches.add(updateBatch);
-                    resultRows.add(finalRow);
+                    resultBatches.put(updateBatch, finalRow);
                 }
             }
 
@@ -444,12 +453,11 @@ public class WebSQLProcessor {
                     DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(
                         session,
                         insertAttributes.keySet().toArray(new DBDAttributeBinding[0]),
-                        null,
+                        keyReceiver,
                         executionSource,
                         new LinkedHashMap<>());
                     insertBatch.add(insertAttributes.values().toArray());
-                    resultBatches.add(insertBatch);
-                    resultRows.add(finalRow);
+                    resultBatches.put(insertBatch, finalRow);
                 }
             }
 
@@ -474,7 +482,7 @@ public class WebSQLProcessor {
                         delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
                         executionSource);
                     deleteBatch.add(delKeyAttributes.values().toArray());
-                    resultBatches.add(deleteBatch);
+                    resultBatches.put(deleteBatch, new Object[0]);
                 }
             }
         }
@@ -666,6 +674,73 @@ public class WebSQLProcessor {
             rowCount++;
         }
         dataReceiver.fetchEnd(session, dbResult);
+    }
+
+    /**
+     * Key data receiver
+     */
+    static class KeyDataReceiver implements DBDDataReceiver {
+
+        private final WebSQLResultsInfo results;
+        private Object[] row;
+
+        public KeyDataReceiver(WebSQLResultsInfo results) {
+            this.results = results;
+        }
+
+        void setRow(Object[] row) {
+            this.row = row;
+        }
+
+        @Override
+        public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) {
+
+        }
+
+        @Override
+        public void fetchRow(DBCSession session, DBCResultSet resultSet)
+            throws DBCException {
+            DBDAttributeBinding[] resultsAttributes = results.getAttributes();
+
+            DBCResultSetMetaData rsMeta = resultSet.getMeta();
+            List<DBCAttributeMetaData> keyAttributes = rsMeta.getAttributes();
+            for (int i = 0; i < keyAttributes.size(); i++) {
+                DBCAttributeMetaData keyAttribute = keyAttributes.get(i);
+                DBDValueHandler valueHandler = DBUtils.findValueHandler(session, keyAttribute);
+                Object keyValue = valueHandler.fetchValueObject(session, resultSet, keyAttribute, i);
+                if (keyValue == null) {
+                    continue;
+                }
+                boolean updated = false;
+                if (!CommonUtils.isEmpty(keyAttribute.getName())) {
+                    DBDAttributeBinding binding = DBUtils.findObject(resultsAttributes, keyAttribute.getName());
+                    if (binding != null) {
+                        // Got it. Just update column oldValue
+                        row[binding.getOrdinalPosition()] = keyValue;
+                        continue;
+                    }
+                }
+                // Key not found
+                // Try to find and update auto-increment column
+                for (int k = 0; k < resultsAttributes.length; k++) {
+                    DBDAttributeBinding column = resultsAttributes[k];
+                    if (column.isAutoGenerated()) {
+                        // Got it
+                        row[k] = keyValue;
+                        break;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void fetchEnd(DBCSession session, DBCResultSet resultSet) {
+
+        }
+
+        @Override
+        public void close() {
+        }
     }
 
     ///////////////////////////////////////////////////////

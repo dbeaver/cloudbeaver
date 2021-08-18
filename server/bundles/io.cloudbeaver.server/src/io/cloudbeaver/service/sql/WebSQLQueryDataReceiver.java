@@ -37,9 +37,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
 
     private final WebSQLContextInfo contextInfo;
-    private DBSDataContainer dataContainer;
-    private WebDataFormat dataFormat;
-    private WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
+    private final DBSDataContainer dataContainer;
+    private final WebDataFormat dataFormat;
+    private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
     private List<Object[]> rows = new ArrayList<>();
