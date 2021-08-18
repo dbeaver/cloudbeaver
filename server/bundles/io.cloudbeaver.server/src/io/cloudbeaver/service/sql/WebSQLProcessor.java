@@ -636,6 +636,9 @@ public class WebSQLProcessor {
                 long updateRowCount = dbStat.getUpdateRowCount();
                 if (updateRowCount >= 0) {
                     results.setUpdateRowCount(updateRowCount);
+                    if (i > 0) {
+                        break;
+                    }
                 } else {
                     break;
                 }
