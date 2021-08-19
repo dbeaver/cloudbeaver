@@ -6,14 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const Link: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = function Link({
+import styled, { css, use } from 'reshadow';
+
+interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  wrapper?: boolean;
+}
+
+const styles = css`
+  a[|wrapper] {
+    &, &:hover, &:focus, &:active {
+      color: inherit;
+      text-decoration: none;
+      outline: none;
+    }
+  }
+`;
+
+export const Link: React.FC<Props> = function Link({
+  wrapper,
   className,
   children,
   ...rest
 }) {
-  return (
+  return styled(styles)(
     <div className={className}>
-      <a {...rest}>{children}</a>
+      <a {...use({ wrapper })} {...rest}>{children}</a>
     </div>
   );
 };

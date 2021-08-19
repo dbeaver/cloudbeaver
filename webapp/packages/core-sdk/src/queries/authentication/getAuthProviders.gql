@@ -18,6 +18,16 @@ query getAuthProviders {
     #  features
     #}
 
+    configurable
+    configurations {
+      id
+      displayName
+      iconURL
+      description
+      signInLink
+      signOutLink
+    }
+
     credentialParameters {
       id
       displayName

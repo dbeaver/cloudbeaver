@@ -16,6 +16,15 @@ export interface Scalars {
   Object: any;
 }
 
+export interface AdminAuthProviderConfiguration {
+  provider: Scalars['ID'];
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  iconURL?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  parameters: Scalars['Object'];
+}
+
 export interface AdminConnectionGrantInfo {
   connectionId: Scalars['ID'];
   subjectId: Scalars['ID'];
@@ -81,11 +90,20 @@ export interface AuthCredentialInfo {
   id: Scalars['ID'];
   displayName: Scalars['String'];
   description?: Maybe<Scalars['String']>;
-  admin?: Maybe<Scalars['Boolean']>;
-  user?: Maybe<Scalars['Boolean']>;
-  identifying?: Maybe<Scalars['Boolean']>;
+  admin: Scalars['Boolean'];
+  user: Scalars['Boolean'];
+  identifying: Scalars['Boolean'];
   possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
   encryption?: Maybe<AuthCredentialEncryption>;
+}
+
+export interface AuthProviderConfiguration {
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  iconURL?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  signInLink?: Maybe<Scalars['String']>;
+  signOutLink?: Maybe<Scalars['String']>;
 }
 
 export interface AuthProviderInfo {
@@ -93,7 +111,9 @@ export interface AuthProviderInfo {
   label: Scalars['String'];
   icon?: Maybe<Scalars['ID']>;
   description?: Maybe<Scalars['String']>;
-  defaultProvider?: Maybe<Scalars['Boolean']>;
+  defaultProvider: Scalars['Boolean'];
+  configurable: Scalars['Boolean'];
+  configurations?: Maybe<AuthProviderConfiguration[]>;
   credentialParameters: AuthCredentialInfo[];
 }
 
@@ -579,6 +599,7 @@ export interface Query {
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
+  deleteAuthProviderConfiguration: Scalars['Boolean'];
   deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
   deleteRole?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
@@ -586,6 +607,8 @@ export interface Query {
   getConnectionSubjectAccess: AdminConnectionGrantInfo[];
   getSubjectConnectionAccess: AdminConnectionGrantInfo[];
   grantUserRole?: Maybe<Scalars['Boolean']>;
+  listAuthProviderConfigurationParameters: ObjectPropertyInfo[];
+  listAuthProviderConfigurations: AdminAuthProviderConfiguration[];
   listPermissions: Array<Maybe<AdminPermissionInfo>>;
   listRoles: Array<Maybe<AdminRoleInfo>>;
   listUsers: Array<Maybe<AdminUserInfo>>;
@@ -597,6 +620,7 @@ export interface Query {
   networkHandlers: NetworkHandlerDescriptor[];
   readSessionLog: LogEntry[];
   revokeUserRole?: Maybe<Scalars['Boolean']>;
+  saveAuthProviderConfiguration: Scalars['Boolean'];
   searchConnections: AdminConnectionSearchInfo[];
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
@@ -611,6 +635,7 @@ export interface Query {
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
   sqlSupportedOperations: DataTypeLogicalOperation[];
   templateConnections: ConnectionInfo[];
+  tryFederatedLogin: UserAuthToken;
   updateConnectionConfiguration: ConnectionInfo;
   updateRole: AdminRoleInfo;
   userConnections: ConnectionInfo[];
@@ -627,12 +652,14 @@ export interface QueryAuthChangeLocalPasswordArgs {
 
 export interface QueryAuthLoginArgs {
   provider: Scalars['ID'];
+  configuration?: Maybe<Scalars['ID']>;
   credentials: Scalars['Object'];
   linkUser?: Maybe<Scalars['Boolean']>;
 }
 
 export interface QueryAuthLogoutArgs {
   provider?: Maybe<Scalars['ID']>;
+  configuration?: Maybe<Scalars['ID']>;
 }
 
 export interface QueryConfigureServerArgs {
@@ -683,6 +710,10 @@ export interface QueryDataTransferRemoveDataFileArgs {
   dataFileId: Scalars['String'];
 }
 
+export interface QueryDeleteAuthProviderConfigurationArgs {
+  id: Scalars['ID'];
+}
+
 export interface QueryDeleteConnectionConfigurationArgs {
   id: Scalars['ID'];
 }
@@ -710,6 +741,14 @@ export interface QueryGetSubjectConnectionAccessArgs {
 export interface QueryGrantUserRoleArgs {
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
+}
+
+export interface QueryListAuthProviderConfigurationParametersArgs {
+  providerId: Scalars['ID'];
+}
+
+export interface QueryListAuthProviderConfigurationsArgs {
+  providerId?: Maybe<Scalars['ID']>;
 }
 
 export interface QueryListRolesArgs {
@@ -753,6 +792,15 @@ export interface QueryReadSessionLogArgs {
 export interface QueryRevokeUserRoleArgs {
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
+}
+
+export interface QuerySaveAuthProviderConfigurationArgs {
+  providerId: Scalars['ID'];
+  id: Scalars['ID'];
+  displayName?: Maybe<Scalars['String']>;
+  iconURL?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  parameters?: Maybe<Scalars['Object']>;
 }
 
 export interface QuerySearchConnectionsArgs {
@@ -807,6 +855,10 @@ export interface QuerySqlSupportedOperationsArgs {
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
   attributeIndex: Scalars['Int'];
+}
+
+export interface QueryTryFederatedLoginArgs {
+  provider: Scalars['ID'];
 }
 
 export interface QueryUpdateConnectionConfigurationArgs {
@@ -1013,6 +1065,7 @@ export interface SessionInfo {
 
 export interface UserAuthToken {
   authProvider: Scalars['ID'];
+  authConfiguration?: Maybe<Scalars['ID']>;
   loginTime: Scalars['DateTime'];
   userId: Scalars['String'];
   displayName: Scalars['String'];
@@ -1075,8 +1128,8 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetAuthProvidersQuery {
   providers: Array<(
-    Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
-    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
+    Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider' | 'configurable'>
+    & { configurations?: Maybe<Array<Pick<AuthProviderConfiguration, 'id' | 'displayName' | 'iconURL' | 'description' | 'signInLink' | 'signOutLink'>>>; credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
   )>;
 }
 
@@ -1977,6 +2030,15 @@ export const GetAuthProvidersDocument = `
     icon
     description
     defaultProvider
+    configurable
+    configurations {
+      id
+      displayName
+      iconURL
+      description
+      signInLink
+      signOutLink
+    }
     credentialParameters {
       id
       displayName
