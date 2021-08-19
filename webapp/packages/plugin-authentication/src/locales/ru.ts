@@ -2,6 +2,8 @@ export default [
   ['authentication_login_dialog_title', 'Авторизация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
+  ['authentication_identity_provider_search_placeholder', 'Поиск по имени или описанию конфигурации...'],
+  ['authentication_identity_provider_dialog_subtitle', 'Выберите конфигурацию с помощью которой вы хотите войти'],
   ['authentication_administration_user_connections_user_add', 'Создание пользователя'],
   ['authentication_administration_user_connections_user_new', 'Новый пользователь'],
   ['authentication_administration_user_connections_access_load_fail', 'Не удалось загрузить доступные пользователю коннекшены'],

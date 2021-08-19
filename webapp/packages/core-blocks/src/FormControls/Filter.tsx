@@ -25,6 +25,9 @@ const styles = css`
   InputFieldNew {
     display: none;
     width: 300px;
+    &[|max] {
+      width: 100%;
+    }
     &[|toggled] {
       display: block;
     }
@@ -67,6 +70,7 @@ interface BaseProps {
   toggleMode?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  max?: boolean;
   className?: string;
   onToggle?: (status: boolean) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -93,6 +97,7 @@ export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observ
   toggleMode,
   placeholder,
   disabled,
+  max,
   className,
   onFilter,
   onToggle,
@@ -152,7 +157,7 @@ export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observ
         value={value}
         onChange={filter}
         onKeyDown={onKeyDown}
-        {...use({ toggled })}
+        {...use({ toggled, max })}
       />
       <IconButton
         name='search'

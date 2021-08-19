@@ -4,6 +4,8 @@ export default [
   ['authentication_logout', 'Logout'],
   ['authentication_authenticate', 'Authenticate'],
   ['authentication_request_token', 'Additional authentication is required'],
+  ['authentication_identity_provider_search_placeholder', 'Search for configuration name or description...'],
+  ['authentication_identity_provider_dialog_subtitle', 'Choose configuration you want to sign in with'],
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
   ['authentication_administration_user_connections_access_load_fail', 'User\'s granted connections loading failed'],
