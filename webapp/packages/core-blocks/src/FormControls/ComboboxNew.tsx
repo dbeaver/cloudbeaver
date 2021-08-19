@@ -20,6 +20,7 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
@@ -148,6 +149,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
   onSwitch,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
+  rest = filterLayoutFakeProps(rest);
   const context = useContext(FormContext);
   const ref = useRef<HTMLInputElement>(null);
   const menu = useMenuState({

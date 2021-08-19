@@ -49,5 +49,5 @@ export function useLogViewer() {
       props.logViewerService.clearLog();
       this.selectItem(null);
     },
-  }, {});
+  }, null);
 }

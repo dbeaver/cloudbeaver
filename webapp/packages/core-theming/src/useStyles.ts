@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObserver } from 'mobx-react-lite';
-import { useMemo, useRef, useState } from 'react';
+import { autorun } from 'mobx';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -36,9 +36,19 @@ export function useStyles(
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
-  const currentThemeId = useObserver(() => themeService.currentThemeId);
+  const [currentThemeId, setCurrentThemeId] = useState(themeService.currentThemeId);
   const lastThemeRef = useRef<string>(currentThemeId);
   const filteredStyles = flat(componentStyles).filter(Boolean) as Style[];
+
+  useEffect(() => {
+    const dispose = autorun(() => {
+      if (currentThemeId !== themeService.currentThemeId) {
+        setCurrentThemeId(themeService.currentThemeId);
+      }
+    });
+
+    return dispose;
+  }, [currentThemeId, themeService]);
 
   let changed = lastThemeRef.current !== currentThemeId || componentStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < componentStyles.length; i++) {

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -64,15 +64,17 @@ function NestedDialog({
   const dialogState = useDialogState({ visible });
   const styles = useStyles(dialogStyles);
 
-  if (!dialogState.visible
+  useEffect(() => {
+    if (!dialogState.visible
     && dialogState.visible !== lastVisibility.current
     && !dialog.options?.persistent
-  ) {
-    rejectDialog(dialog);
-  } else {
-    lastVisibility.current = visible;
-    dialogState.setVisible(visible);
-  }
+    ) {
+      rejectDialog(dialog);
+    } else {
+      lastVisibility.current = visible;
+      dialogState.setVisible(visible);
+    }
+  });
 
   const handleReject = useCallback(() => rejectDialog(dialog), [dialog, rejectDialog]);
   const handleResolve = useCallback(

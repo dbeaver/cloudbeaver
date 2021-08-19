@@ -85,18 +85,34 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     return this.selectedElements.get(ResultSetDataKeysUtils.serialize(row)) || [];
   }
 
-  set(key: IResultSetPartialKey, selected: boolean): void {
+  set(key: IResultSetPartialKey, selected: boolean, silent?: boolean): void {
     if (key.row === undefined) {
       for (const row of this.data.rowKeys) {
-        this.set({ row, column: key.column }, selected);
+        this.set({ row, column: key.column }, selected, true);
       }
 
+      if (!silent) {
+        this.actions.execute({
+          type: 'select',
+          resultId: this.result.id,
+          key,
+          selected,
+        });
+      }
       return;
     }
 
     if (key.column === undefined) {
       for (const column of this.data.columnKeys) {
-        this.set({ row: key.row, column }, selected);
+        this.set({ row: key.row, column }, selected, true);
+      }
+      if (!silent) {
+        this.actions.execute({
+          type: 'select',
+          resultId: this.result.id,
+          key,
+          selected,
+        });
       }
       return;
     }
@@ -123,12 +139,14 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
         }
       }
     } finally {
-      this.actions.execute({
-        type: 'select',
-        resultId: this.result.id,
-        key,
-        selected,
-      });
+      if (!silent) {
+        this.actions.execute({
+          type: 'select',
+          resultId: this.result.id,
+          key,
+          selected,
+        });
+      }
     }
   }
 

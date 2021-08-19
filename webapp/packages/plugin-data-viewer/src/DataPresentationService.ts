@@ -82,12 +82,18 @@ export class DataPresentationService {
     resultIndex: number,
   ): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
+      if (
+        presentation.dataFormat !== undefined
+        && supportedDataFormats.includes(presentation.dataFormat)
+      ) {
+        return false;
+      }
+
       if (presentation.type !== type || presentation.hidden?.(dataFormat, model, resultIndex)) {
         return false;
       }
 
-      return presentation.dataFormat === undefined
-        || supportedDataFormats.includes(presentation.dataFormat);
+      return true;
     });
   }
 

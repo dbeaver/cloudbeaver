@@ -13,6 +13,9 @@ const fetchingSettings = {
 };
 
 export function getDefaultRowsCount(count?: number): number {
+  if (typeof count === 'number' && Number.isNaN(count)) {
+    count = 0;
+  }
   return count !== undefined
     ? Math.max(
       fetchingSettings.fetchMin,

@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import { getDefaultRowsCount } from '../../getDefaultRowsCount';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(
@@ -77,16 +78,19 @@ export const TableFooter = observer(function TableFooter({
   model,
 }: TableFooterProps) {
   const ref = useRef<HTMLInputElement>(null);
+  const [limit, setLimit] = useState(model.countGain + '');
+
   const handleChange = useCallback(
     () => {
       if (!ref.current) {
         return;
       }
-      const value = parseInt(ref.current.value, 10);
 
+      const value = getDefaultRowsCount(parseInt(ref.current.value, 10));
+
+      setLimit(value + '');
       if (model.countGain !== value) {
-        model.setCountGain(value)
-          .reload();
+        model.setCountGain(value).reload();
       }
     },
     [model]
@@ -104,8 +108,9 @@ export const TableFooter = observer(function TableFooter({
           <input
             ref={ref}
             type="number"
-            value={model.countGain}
+            value={limit}
             disabled={disabled}
+            onChange={e => setLimit(e.target.value)}
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
           />

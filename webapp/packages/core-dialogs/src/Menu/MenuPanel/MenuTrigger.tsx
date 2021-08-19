@@ -7,10 +7,8 @@
  */
 
 import { computed } from 'mobx';
-import { observer, useObserver } from 'mobx-react-lite';
-import {
-  forwardRef, Ref, useCallback, useEffect, useMemo
-} from 'react';
+import { observer } from 'mobx-react-lite';
+import { Ref, useCallback, useEffect, useMemo } from 'react';
 import {
   MenuButton,
   Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio
@@ -204,7 +202,7 @@ type MenuInnerTriggerProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
   style?: Style[];
 };
 
-export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
+export const MenuInnerTrigger = observer(function MenuInnerTrigger(
   props: MenuInnerTriggerProps,
   ref: Ref<HTMLButtonElement>
 ) {
@@ -212,7 +210,6 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
     menuItem, style = [], ...rest
   } = props;
   const menu = useMenuState();
-  const panel = useObserver(() => menuItem.panel);
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -226,7 +223,7 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
           <MenuPanelItem menuItem={menuItem} style={style} />
         </box>
       </MenuButton>
-      <MenuPanel panel={panel!} menu={menu} style={style} onItemClose={handleItemClose} />
+      <MenuPanel panel={menuItem.panel!} menu={menu} style={style} onItemClose={handleItemClose} />
     </>
   );
-});
+}, { forwardRef: true });

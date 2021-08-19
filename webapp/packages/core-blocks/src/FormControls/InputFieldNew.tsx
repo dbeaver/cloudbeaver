@@ -105,9 +105,11 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   className,
   description,
   mod,
+  fill,
   small,
   medium,
   large,
+  tiny,
   autoHide,
   onChange,
   ...rest
@@ -156,7 +158,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
 
   return styled(styles)(
-    <field className={className} {...use({ small, medium, large })}>
+    <field className={className} {...use({ small, medium, large, tiny })}>
       <field-label title={rest.title}>{children}{required && ' *'}</field-label>
       <input-container>
         <input

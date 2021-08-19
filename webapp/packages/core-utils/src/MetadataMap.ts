@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, untracked } from 'mobx';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
 export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, TValue>) => TValue;
@@ -59,9 +59,11 @@ export class MetadataMap<TKey, TValue> {
       throw new Error('MetadataMap: defaultValue should be provided if defaultValueGetter not set');
     }
 
-    const value = provider(key, this);
-    this.data.set(key, value);
-    this.length++;
+    untracked(() => {
+      const value = provider(key, this);
+      this.data.set(key, value);
+      this.length++;
+    });
     return this.data.get(key)!;
   }
 

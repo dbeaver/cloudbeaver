@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
@@ -65,6 +66,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
+  rest = filterLayoutFakeProps(rest);
   const checkboxState = useCheckboxState({
     value,
     defaultValue,

@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
 import { baseFormControlStylesNew } from '../baseFormControlStylesNew';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
@@ -117,6 +118,7 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
     name,
     onChange,
   });
+  rest = filterLayoutFakeProps(rest);
   const styles = useStyles(
     baseFormControlStylesNew,
     switchStyles,
@@ -130,12 +132,12 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
   }
 
   return styled(styles)(
-    <field as="div" className={className}>
-      <switch-body as='div'>
-        <switch-control as='div'>
-          <switch-control-track as='div' />
-          <switch-control-underlay as='div'>
-            <switch-control-thumb as='div' />
+    <field className={className}>
+      <switch-body>
+        <switch-control>
+          <switch-control-track />
+          <switch-control-underlay>
+            <switch-control-thumb />
             <switch-input
               as='input'
               {...rest}
@@ -151,7 +153,7 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
         </switch-control>
         <field-label as="label" htmlFor={value || name}>{children}</field-label>
       </switch-body>
-      <field-description as='div'>{description}</field-description>
+      <field-description>{description}</field-description>
     </field>
   );
 });

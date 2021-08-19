@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObserver } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { Checkbox, Icon, IconOrImage, Radio } from '@cloudbeaver/core-blocks';
@@ -22,41 +22,32 @@ interface MenuPanelItemProps {
   style?: ComponentStyle;
 }
 
-export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelItem({
+export const MenuPanelItem: React.FC<MenuPanelItemProps> = observer(function MenuPanelItem({
   menuItem,
   style = [],
 }) {
-  const { title, panel, icon, isChecked, controlType, separator } = useObserver(() => ({ // TODO: provide title and panel via props
-    title: menuItem.title,
-    panel: menuItem.panel,
-    icon: menuItem.icon,
-    isChecked: menuItem.isChecked,
-    controlType: menuItem.type,
-    separator: menuItem.separator,
-  }));
-
   let control = null;
 
-  if (controlType === 'radio') {
-    control = <Radio checked={isChecked} mod={['primary', 'small']} ripple={false} />;
-  } else if (controlType === 'checkbox') {
-    control = <Checkbox checked={isChecked} mod={['primary', 'small']} style={style} ripple={false} />;
+  if (menuItem.type === 'radio') {
+    control = <Radio checked={menuItem.isChecked} mod={['primary', 'small']} ripple={false} />;
+  } else if (menuItem.type === 'checkbox') {
+    control = <Checkbox checked={menuItem.isChecked} mod={['primary', 'small']} style={style} ripple={false} />;
   }
 
   return styled(useStyles(menuPanelStyles, style))(
-    <menu-panel-item {...use({ separator })}>
+    <menu-panel-item {...use({ separator: menuItem.separator })}>
       <menu-item-content>
-        {icon ? (
-          <IconOrImage icon={icon} />
+        {menuItem.icon ? (
+          <IconOrImage icon={menuItem.icon} />
         ) : control}
       </menu-item-content>
       <menu-item-text>
-        <Translate token={title} />
+        <Translate token={menuItem.title} />
       </menu-item-text>
       <menu-item-content>
-        {panel && <Icon name="arrow" viewBox="0 0 16 16" />}
+        {menuItem.panel && <Icon name="arrow" viewBox="0 0 16 16" />}
       </menu-item-content>
     </menu-panel-item>
 
   );
-};
+});
