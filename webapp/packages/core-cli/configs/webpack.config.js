@@ -105,10 +105,12 @@ module.exports = (env, argv) => {
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
       alias: {
-        react: 'preact/compat',
-        react$: 'preact/compat',
-        'react-dom': 'preact/compat',
-        'react-dom$': 'preact/compat',
+        "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
+        "react/jsx-runtime": "react/jsx-runtime.js",
+        // react: 'preact/compat',
+        // react$: 'preact/compat',
+        // 'react-dom': 'preact/compat',
+        // 'react-dom$': 'preact/compat',
       },
       fallback: {
         path: require.resolve("path-browserify"),
