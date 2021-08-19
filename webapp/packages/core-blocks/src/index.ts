@@ -143,6 +143,7 @@ export * from './useFormValidator';
 export * from './useMapResource';
 export * from './useMouse';
 export * from './useObjectRef';
+export * from './useObservableRef';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useAppLoadingScreen';

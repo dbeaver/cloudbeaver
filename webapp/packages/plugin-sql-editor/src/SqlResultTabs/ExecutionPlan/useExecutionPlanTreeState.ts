@@ -8,7 +8,7 @@
 
 import { computed, observable } from 'mobx';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionPlanNode, IExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
@@ -20,9 +20,7 @@ export function isVisibleProperty(property: ObjectPropertyInfo): boolean {
 export function useExecutionPlanTreeState(
   nodeList: SqlExecutionPlanNode[], onNodeSelect: (nodeId: string) => void
 ): IExecutionPlanTreeContext {
-  return useObjectRef({
-    nodeList,
-    onNodeSelect,
+  return useObservableRef(() => ({
     selectedNodes: new Map(),
     get columns() {
       const columns: ObjectPropertyInfo[] = [];
@@ -64,10 +62,10 @@ export function useExecutionPlanTreeState(
       this.selectedNodes.set(nodeId, true);
       this.onNodeSelect(nodeId);
     },
-  }, { nodeList, onNodeSelect }, {
+  }), {
     selectedNodes: observable,
-    nodeList: observable,
+    nodeList: observable.ref,
     columns: computed,
     nodes: computed,
-  }, ['selectNode']);
+  }, { nodeList, onNodeSelect }, ['selectNode']);
 }

@@ -50,16 +50,11 @@ export function useDataResource<
 
   const outdated = resource.isOutdated(key);
 
-  const refObj = useObjectRef({
+  const refObj = useObjectRef(() => ({
     loading: false,
-    resource,
-    key,
-    exception,
-    includes,
-    actions,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     load: () => {},
-  }, {
+  }), {
     resource,
     key,
     exception,

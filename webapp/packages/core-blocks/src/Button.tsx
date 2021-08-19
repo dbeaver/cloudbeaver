@@ -15,7 +15,7 @@ import { useStyles, composes, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
 import { Loader } from './Loader/Loader';
-import { useObjectRef } from './useObjectRef';
+import { useObservableRef } from './useObservableRef';
 
 const buttonStyles = composes(
   css`
@@ -129,9 +129,10 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
   className,
   ...rest
 }) {
-  const state = useObjectRef({
+  const state = useObservableRef(() => ({
     loading: false,
-    click: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) => {},
+  }), {
+    loading: observable.ref,
   }, {
     click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) {
       const returnValue = onClick?.(e);
@@ -145,7 +146,7 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
         }
       }
     },
-  }, { loading: observable.ref }, ['click']);
+  }, ['click']);
 
   loading = state.loading || loading;
 

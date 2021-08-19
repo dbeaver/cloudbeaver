@@ -13,6 +13,7 @@ import styled, { use } from 'reshadow';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useObjectRef } from '../../useObjectRef';
+import { useObservableRef } from '../../useObservableRef';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
 import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
@@ -51,13 +52,8 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
     }
   }
 
-  const nodeContext = useObjectRef<ITreeNodeContext>({
+  const nodeContext = useObservableRef<ITreeNodeContext>(() => ({
     processing: false,
-    loading,
-    selected,
-    expanded,
-    leaf,
-    filterValue,
     async expand() {
       await processAction(async () => {
         await handlersRef.onExpand?.();
@@ -78,19 +74,19 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
         await handlersRef.onOpen?.();
       });
     },
-  }, {
-    loading,
-    selected,
-    expanded,
-    leaf,
-    filterValue,
-  }, {
+  }), {
     processing: observable.ref,
     loading: observable.ref,
     selected: observable.ref,
     expanded: observable.ref,
     leaf: observable.ref,
     filterValue: observable.ref,
+  }, {
+    loading,
+    selected,
+    expanded,
+    leaf,
+    filterValue,
   });
 
   return styled(useStyles(TREE_NODE_STYLES))(

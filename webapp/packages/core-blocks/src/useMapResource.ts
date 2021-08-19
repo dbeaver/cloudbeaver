@@ -81,13 +81,8 @@ export function useMapResource<
     includes = keyObj.includes;
   }
 
-  const refObj = useObjectRef({
+  const refObj = useObjectRef(() => ({
     loading: false,
-    resource,
-    key,
-    exception,
-    includes,
-    actions,
     prevData: undefined as CachedMapResourceLoader<
     TKeyArg,
     CachedMapResourceKey<TResource>,
@@ -95,7 +90,7 @@ export function useMapResource<
     TIncludes
     > | undefined,
     load: () => {},
-  }, {
+  }), {
     resource,
     key,
     exception,

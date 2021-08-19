@@ -57,7 +57,7 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
     }
   }
 
-  return useObjectRef<ICheckboxState>({
+  return useObjectRef<ICheckboxState>(() => ({
     checked,
     change(event: React.ChangeEvent<HTMLInputElement>) {
       const { state, name, value, onChange, count, context } = optionsRef;
@@ -87,5 +87,5 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
 
       refresh(count + 1);
     },
-  }, { checked });
+  }), { checked });
 }

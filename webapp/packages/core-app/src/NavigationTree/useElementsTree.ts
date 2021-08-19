@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { useState } from 'react';
 
-import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -186,7 +186,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     await options.onSelect?.(node, selected);
   }
 
-  const elementsTree = useObjectRef<IElementsTree>({
+  const elementsTree = useObservableRef<IElementsTree>(() => ({
     root: options.root,
     renderers: options.renderers || [],
     state,
@@ -236,7 +236,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       await setSelection(node.id, !treeNodeState.selected);
     },
-  }, undefined, { root: observable.ref, renderers: observable.ref });
+  }), { root: observable.ref, renderers: observable.ref }, false);
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,

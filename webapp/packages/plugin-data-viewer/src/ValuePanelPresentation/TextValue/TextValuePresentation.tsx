@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TabList, TabsState, TextareaNew, UNDERLINE_TAB_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TabList, TabsState, TextareaNew, UNDERLINE_TAB_STYLES, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
@@ -76,7 +76,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 }) {
   const textValuePresentationService = useService(TextValuePresentationService);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES);
-  const state = useObjectRef({
+  const state = useObservableRef(() => ({
     currentContentType: 'text/plain',
     lastContentType: 'text/plain',
 
@@ -87,10 +87,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       this.currentContentType = type;
       this.lastContentType = type;
     },
-  }, {}, {
-    currentContentType: observable,
-    lastContentType: observable,
-  }, ['setContentType', 'setDefaultContentType']);
+  }), {
+    currentContentType: observable.ref,
+    lastContentType: observable.ref,
+  }, false, ['setContentType', 'setDefaultContentType']);
 
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);

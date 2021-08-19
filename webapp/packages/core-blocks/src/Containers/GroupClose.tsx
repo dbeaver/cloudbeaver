@@ -16,5 +16,5 @@ export const GroupClose: React.FC<IProps & React.HTMLAttributes<HTMLDivElement>>
   onClick,
   ...rest
 }) {
-  return <close {...rest}><Icon name="cross" viewBox="0 0 16 16" onClick={onClick} /></close>;
+  return <div {...rest}><Icon name="cross" viewBox="0 0 16 16" onClick={onClick} /></div>;
 };

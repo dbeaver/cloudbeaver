@@ -38,7 +38,7 @@ export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
   rtl,
   ...props
 }) {
-  const propsRef = useObjectRef({ onVisibleSwitch, visible }, { onVisibleSwitch });
+  const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
 
   const handleItemClose = useCallback(() => {

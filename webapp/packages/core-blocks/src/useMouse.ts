@@ -7,9 +7,10 @@
  */
 
 import { observable } from 'mobx';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 import { useObjectRef } from './useObjectRef';
+import { useObservableRef } from './useObservableRef';
 
 interface IOptions {
   onMouseEnter?: (event: MouseEvent) => void;
@@ -28,7 +29,7 @@ export interface IMouseHook<T> {
 export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T> {
   const handlersRef = useObjectRef(options);
   const reference = useRef<T>(null);
-  const state = useObjectRef({ mouseEnter: false }, null, { mouseEnter: observable.ref });
+  const state = useObservableRef(() => ({ mouseEnter: false }), { mouseEnter: observable.ref }, false);
 
   useEffect(() => { // performance heavy
     if (!reference.current) {

@@ -12,7 +12,7 @@ import { useContext, useMemo } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
-import { useMouse, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
 
@@ -20,7 +20,7 @@ import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
-import { CellContext, ICellContext } from './CellContext';
+import { CellContext } from './CellContext';
 
 export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = observer(function CellRenderer(props) {
   const { rowIdx, row, column, isCellSelected } = props;
@@ -30,15 +30,17 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
   const editingContext = useContext(EditingContext);
   const mouse = useMouse<HTMLDivElement>({});
 
-  const position: CellPosition = useMemo(() => ({ idx: column.idx, rowIdx }), [column.idx, rowIdx]);
-  const cellKey: IResultSetElementKey | undefined = useMemo(() => column.columnDataIndex !== null
-    ? { row, column: column.columnDataIndex }
-    : undefined, [column.columnDataIndex, row]);
-
-  const cellContext = useObjectRef<ICellContext>({
+  const cellContext = useObservableRef(() => ({
     mouse,
-    cell: cellKey,
-    position,
+    get position(): CellPosition {
+      return { idx: this.column.idx, rowIdx: this.rowIdx };
+    },
+    get cell(): IResultSetElementKey | undefined {
+      if (this.column.columnDataIndex === null) {
+        return undefined;
+      }
+      return { row: this.row, column: this.column.columnDataIndex };
+    },
     get isEditing(): boolean {
       return editingContext?.isEditing(this.position) || false;
     },
@@ -52,13 +54,16 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
 
       return tableDataContext.getEditionState(this.cell);
     },
-  }, { cell: cellKey, position }, {
-    cell: observable.ref,
-    position: observable.ref,
+  }), {
+    row: observable.ref,
+    column: observable.ref,
+    rowIdx: observable.ref,
+    position: computed,
+    cell: computed,
     isEditing: computed,
     isSelected: computed,
     editionState: computed,
-  });
+  }, { row, column, rowIdx });
 
   const classes = useMemo(() => computed(() => {
     let classes = '';
@@ -85,16 +90,7 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
     return classes;
   }), []).get();
 
-  const state = useObjectRef({
-    column,
-    rowIdx,
-    cellKey,
-    position,
-    isCellSelected,
-    selectionContext,
-    dataGridContext,
-    editingContext,
-    tableDataContext,
+  const state = useObjectRef(() => ({
     mouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       if (EventContext.has(event, EventStopPropagationFlag)) {
         return;
@@ -103,7 +99,7 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
       const dataGridApi = this.dataGridContext?.getDataGridApi();
 
       if (dataGridApi && !this.isCellSelected) {
-        dataGridApi.selectCell(this.position);
+        dataGridApi.selectCell(cellContext.position);
       }
 
       this.selectionContext?.select(
@@ -140,13 +136,13 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
         !this.editingContext
         || !this.tableDataContext
         || EventContext.has(event, EventStopPropagationFlag)
-        || !this.cellKey
+        || !cellContext.cell
       ) {
         return;
       }
 
-      const resultColumn = this.tableDataContext.getColumnInfo(this.cellKey.column);
-      const value = this.tableDataContext.getCellValue(this.cellKey);
+      const resultColumn = this.tableDataContext.getColumnInfo(cellContext.cell.column);
+      const value = this.tableDataContext.getCellValue(cellContext.cell);
 
       if (!resultColumn || value === undefined) {
         return;
@@ -157,24 +153,22 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
       if (
         !this.column.editable
         || handleByBooleanFormatter
-        || this.tableDataContext.format.isReadOnly(this.cellKey)
+        || this.tableDataContext.format.isReadOnly(cellContext.cell)
       ) {
         return;
       }
 
-      this.editingContext.edit(this.position);
+      this.editingContext.edit(cellContext.position);
     },
-  }, {
+  }), {
     column,
-    position,
     rowIdx,
-    cellKey,
     isCellSelected,
     selectionContext,
     dataGridContext,
     editingContext,
     tableDataContext,
-  }, undefined, ['doubleClick', 'mouseUp', 'mouseDown']);
+  }, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   return (
     <CellContext.Provider value={cellContext}>

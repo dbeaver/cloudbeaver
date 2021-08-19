@@ -247,7 +247,7 @@ export function useGridSelectionContext(
     }
   }
 
-  return useObjectRef<IDataGridSelectionContext>({
+  return useObjectRef<IDataGridSelectionContext>(() => ({
     get selectedCells() {
       return props.selectionAction.selectedElements;
     },
@@ -256,5 +256,5 @@ export function useGridSelectionContext(
     selectTable,
     isSelected,
     selectRange,
-  }, {});
+  }), false);
 }

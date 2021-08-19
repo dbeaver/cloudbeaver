@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { Button, IconOrImage, useErrorDetails, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -90,7 +90,7 @@ export const TableError: React.FC<Props> = observer(function TableViewer({
   className,
 }) {
   const translate = useTranslate();
-  const errorInfo = useObjectRef<ErrorInfo>({
+  const errorInfo = useObservableRef<ErrorInfo>(() => ({
     error: null,
     display: false,
     hide() {
@@ -99,9 +99,9 @@ export const TableError: React.FC<Props> = observer(function TableViewer({
     show() {
       this.display = true;
     },
-  }, {}, {
+  }), {
     display: observable.ref,
-  });
+  }, false);
 
   if (errorInfo.error !== model.source.error) {
     errorInfo.error = model.source.error || null;

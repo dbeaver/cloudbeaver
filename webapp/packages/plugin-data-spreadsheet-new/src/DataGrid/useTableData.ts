@@ -9,9 +9,9 @@
 import { computed, observable } from 'mobx';
 import type { Column } from 'react-data-grid';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools, uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
@@ -36,37 +36,11 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  const props = useObjectRef({
-    format,
-    data,
-    editor,
-    view,
-  },
-  undefined,
-  {
-    format: observable.ref,
-    data: observable.ref,
-    editor: observable.ref,
-    view: observable.ref,
-  });
-
-  return useObjectRef({
-    get format() {
-      return props.format;
-    },
-    get data() {
-      return props.data;
-    },
-    get editor() {
-      return props.editor;
-    },
-    get view() {
-      return props.view;
-    },
-    get columnKeys() {
+  return useObservableRef<ITableData>(() => ({
+    get columnKeys(): IResultSetColumnKey[] {
       return this.view.columnKeys;
     },
-    get rows() {
+    get rows(): IResultSetRowKey[] {
       return this.view.rowKeys;
     },
     get columns() {
@@ -156,9 +130,18 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
     isReadOnly() {
       return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
     },
-  }, null, {
+  }), {
     columns: computed,
     rows: computed,
     columnKeys: computed,
+    format: observable.ref,
+    data: observable.ref,
+    editor: observable.ref,
+    view: observable.ref,
+  }, {
+    format,
+    data,
+    editor,
+    view,
   });
 }

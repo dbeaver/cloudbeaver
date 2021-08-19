@@ -26,7 +26,7 @@ export function useNode(navNodeId: string): IUseNodeHook {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(navNodeId);
 
-  return useObjectRef<IUseNodeHook>({
+  return useObjectRef<IUseNodeHook>(() => ({
     navNodeId,
     node,
     isLoading() {
@@ -38,8 +38,8 @@ export function useNode(navNodeId: string): IUseNodeHook {
     isOutdated() {
       return navNodeInfoResource.isOutdated(this.navNodeId);
     },
-  }, {
+  }), {
     navNodeId,
     node,
-  }, undefined, bindActions);
+  }, bindActions);
 }

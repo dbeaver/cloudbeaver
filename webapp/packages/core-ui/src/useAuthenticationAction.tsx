@@ -9,7 +9,7 @@
 import { computed, observable } from 'mobx';
 
 import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
@@ -43,11 +43,8 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
     subType = options.subType;
   }
 
-  return useObjectRef({
+  return useObservableRef(() => ({
     authenticating: false,
-    type,
-    subType,
-    onAuthenticate: options.onAuthenticate,
     get authorized() {
       return !this.authenticating && userInfoService.hasToken(this.type, this.subType);
     },
@@ -60,12 +57,12 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
         this.authenticating = false;
       }
     },
+  }), {
+    authorized: computed,
+    authenticating: observable.ref,
   }, {
     type,
     subType,
     onAuthenticate: options.onAuthenticate,
-  }, {
-    authorized: computed,
-    authenticating: observable,
   }, ['auth']);
 }

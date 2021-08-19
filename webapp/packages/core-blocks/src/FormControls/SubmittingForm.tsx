@@ -37,14 +37,14 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
     props.onSubmit?.(e);
   }, []);
 
-  const context = useObjectRef<IFormContext>({
+  const context = useObjectRef<IFormContext>(() => ({
     changeExecutor,
     change(value, name) {
       props.onChange(value, name);
       props.parentContext?.change(value, name);
       changeExecutor.execute({ value, name });
     },
-  }, {});
+  }), false);
 
   return (
     <form {...rest} ref={ref} onSubmit={handleSubmit}>

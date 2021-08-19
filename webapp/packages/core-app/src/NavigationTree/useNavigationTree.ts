@@ -23,7 +23,7 @@ const bindActions: Array<keyof INavigationTree> = ['handleOpen', 'handleSelect']
 export function useNavigationTree(): INavigationTree {
   const navigationTreeService = useService(NavigationTreeService);
 
-  return useObjectRef<INavigationTree>({
+  return useObjectRef<INavigationTree>(() => ({
     navigationTreeService,
     handleOpen(node: NavNode) {
       return this.navigationTreeService.navToNode(node.id, node.parentId);
@@ -31,5 +31,5 @@ export function useNavigationTree(): INavigationTree {
     handleSelect(node: NavNode, state: boolean) {
       return this.navigationTreeService.selectNode(node.id, state);
     },
-  }, { navigationTreeService }, undefined, bindActions);
+  }), { navigationTreeService }, bindActions);
 }

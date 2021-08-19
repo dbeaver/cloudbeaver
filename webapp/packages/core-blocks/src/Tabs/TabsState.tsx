@@ -68,15 +68,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     manual,
   });
 
-  const dynamic = useObjectRef({
-    open: onOpen,
-    close: onClose,
-    props,
-    tabsState,
-    container,
-    state,
+  const dynamic = useObjectRef(() => ({
     selectedId: selectedId || currentTabId,
-  }, {
+  }), {
     open: onOpen,
     close: onClose,
     props,

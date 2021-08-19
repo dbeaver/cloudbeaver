@@ -16,10 +16,9 @@ import type { IConnectionFormState } from '../IConnectionFormProps';
 const MAX_HOST_LENGTH = 20;
 
 export function useOptions(state: IConnectionFormState) {
-  const refObject = useObjectRef({
+  const refObject = useObjectRef(() => ({
     prevName: null as string | null,
-    state,
-  }, {
+  }), {
     state,
   });
 

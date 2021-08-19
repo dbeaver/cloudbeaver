@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { ILogEntry } from './ILogEntry';
@@ -22,13 +22,13 @@ interface Props {
 export function useLogViewer() {
   const logViewerService = useService(LogViewerService);
 
-  const props: Props = useObjectRef(
-    { selectedItem: null, logViewerService },
+  const props: Props = useObservableRef(
+    () => ({ selectedItem: null }),
+    { selectedItem: observable.ref },
     { logViewerService },
-    { selectedItem: observable.ref }
   );
 
-  return useObjectRef({
+  return useObjectRef(() => ({
     get selectedItem() {
       return props.selectedItem;
     },
@@ -49,5 +49,5 @@ export function useLogViewer() {
       props.logViewerService.clearLog();
       this.selectItem(null);
     },
-  }, null);
+  }), false);
 }

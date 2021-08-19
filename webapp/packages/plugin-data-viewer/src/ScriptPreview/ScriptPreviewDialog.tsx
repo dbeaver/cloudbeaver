@@ -8,10 +8,10 @@
 
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, useClipboard, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Button, useClipboard, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -62,9 +62,7 @@ export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = obse
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const connectionId = payload.model.source.executionContext?.context?.connectionId;
 
-  const dialect = useObjectRef({
-    connectionId,
-    sqlDialectInfoService,
+  const dialect = useObservableRef(() => ({
     get dialect(): SqlDialectInfo | undefined {
       if (!this.connectionId) {
         return undefined;
@@ -72,7 +70,10 @@ export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = obse
       return this.sqlDialectInfoService.getDialectInfo(this.connectionId);
     },
 
-  }, { connectionId, sqlDialectInfoService }, { connectionId: observable.ref, dialect: computed });
+  }), {
+    connectionId: observable.ref,
+    dialect: computed,
+  }, { connectionId, sqlDialectInfoService });
 
   useEffect(() => {
     if (!connectionId) {

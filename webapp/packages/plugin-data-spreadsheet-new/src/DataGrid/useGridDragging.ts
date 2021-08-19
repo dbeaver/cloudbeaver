@@ -88,13 +88,13 @@ function isDraggingStarted(delta: number | null, threshold: number) {
 export function useGridDragging(props: IDraggingCallbacks) {
   const callbacks = useObjectRef(props);
 
-  const state = useObjectRef<IDraggingState>({
+  const state = useObjectRef<IDraggingState>(() => ({
     startDraggingCell: null,
     currentDraggingCell: null,
     startMousePosition: null,
     dragging: false,
     mouseDown: false,
-  }, {});
+  }), false);
 
   const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const position = getCellPositionFromEvent(event);

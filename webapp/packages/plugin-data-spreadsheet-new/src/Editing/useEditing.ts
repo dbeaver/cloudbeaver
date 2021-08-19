@@ -27,16 +27,14 @@ interface IEditingOptions {
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
-  const optionsRef = useObjectRef(options);
-  const state = useObjectRef({
-    options,
+  const state = useObjectRef(() => ({
     editingCells: new MetadataMap<string, IEditingState>(() => ({ editing: false })),
-  }, { options });
+  }), { options });
 
   const [context] = useState<IEditingContext>({
-    readonly: !!optionsRef.readonly,
+    readonly: !!state.options.readonly,
     edit(position: CellPosition, key?: string) {
-      if (optionsRef.readonly) {
+      if (state.options.readonly) {
         return;
       }
       // TODO: not works yet
@@ -46,7 +44,7 @@ export function useEditing(options: IEditingOptions): IEditingContext {
           break;
       }
 
-      if (!optionsRef.onEdit(position, key)) {
+      if (!state.options.onEdit(position, key)) {
         return;
       }
 

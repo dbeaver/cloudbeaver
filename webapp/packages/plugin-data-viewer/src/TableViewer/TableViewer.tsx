@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -119,15 +119,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
   const loading = dataModel?.isLoading() ?? true;
   const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
-  const dataTableActions = useObjectRef<IDataTableActionsPrivate>({
-    presentationId,
-    valuePresentationId,
-    dataModel,
-    resultIndex,
-    dataFormat,
-    onPresentationChange,
-    onValuePresentationChange,
-
+  const dataTableActions = useObservableRef<IDataTableActionsPrivate>(() => ({
     setPresentation(id: string) {
       const presentation = dataPresentationService.get(id);
 
@@ -164,6 +156,12 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
         this.onValuePresentationChange(presentation.id);
       }
     },
+  }), {
+    presentationId: observable,
+    valuePresentationId: observable,
+    dataFormat: observable,
+    resultIndex: observable,
+    dataModel: observable.ref,
   }, {
     presentationId,
     valuePresentationId,
@@ -172,12 +170,6 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
     dataFormat,
     onPresentationChange,
     onValuePresentationChange,
-  }, {
-    presentationId: observable,
-    valuePresentationId: observable,
-    dataFormat: observable,
-    resultIndex: observable,
-    dataModel: observable.ref,
   }, ['setPresentation', 'setValuePresentation']);
 
   useEffect(() => {
