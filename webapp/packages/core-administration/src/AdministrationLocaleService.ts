@@ -25,6 +25,8 @@ export class AdministrationLocaleService extends Bootstrap {
     switch (locale) {
       case 'ru':
         return (await import('./locales/ru')).default;
+      case 'it':
+        return (await import('./locales/it')).default;
       default:
         return (await import('./locales/en')).default;
     }

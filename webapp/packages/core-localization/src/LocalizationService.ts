@@ -16,6 +16,7 @@ import { SettingsService } from '@cloudbeaver/core-settings';
 
 import type { ILocaleProvider } from './ILocaleProvider';
 import { defaultENLocale } from './locales/en';
+import { defaultITLocale } from './locales/it';
 import { defaultRULocale } from './locales/ru';
 import type { TLocalizationToken } from './TLocalizationToken';
 
@@ -118,6 +119,8 @@ export class LocalizationService extends Bootstrap {
     switch (locale) {
       case 'ru':
         return defaultRULocale;
+      case 'it':
+        return defaultITLocale;
       default:
         return defaultENLocale;
     }
