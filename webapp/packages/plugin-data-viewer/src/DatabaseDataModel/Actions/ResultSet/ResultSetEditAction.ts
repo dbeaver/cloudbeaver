@@ -15,23 +15,16 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
-import type { IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
-import type { IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
+import { DatabaseEditChangeType, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
-// order is matter, used for sorting and changes diff
-export enum ResultSetChangeType {
-  update,
-  add,
-  delete
-}
-
 export interface IResultSetUpdate {
   row: IResultSetRowKey;
-  type: ResultSetChangeType;
+  type: DatabaseEditChangeType;
   update: IResultSetValue[];
   source?: IResultSetValue[];
 }
@@ -53,7 +46,7 @@ export class ResultSetEditAction
     this.features = ['add', 'delete'];
 
     makeObservable<this, 'editorData'>(this, {
-      editorData: observable.shallow,
+      editorData: observable,
       addRows: computed,
       updates: computed,
     });
@@ -61,7 +54,7 @@ export class ResultSetEditAction
 
   get addRows(): IResultSetRowKey[] {
     return Array.from(this.editorData.values())
-      .filter(update => update.type === ResultSetChangeType.add)
+      .filter(update => update.type === DatabaseEditChangeType.add)
       .map(update => update.row);
   }
 
@@ -69,11 +62,11 @@ export class ResultSetEditAction
     return Array.from(this.editorData.values())
       .sort((a, b) => {
         if (a.type !== b.type) {
-          if (a.type === ResultSetChangeType.update) {
+          if (a.type === DatabaseEditChangeType.update) {
             return -1;
           }
 
-          if (b.type === ResultSetChangeType.update) {
+          if (b.type === DatabaseEditChangeType.update) {
             return 1;
           }
         }
@@ -93,7 +86,7 @@ export class ResultSetEditAction
       return false;
     }
 
-    if (update.source === undefined || update.type === ResultSetChangeType.delete) {
+    if (update.source === undefined || update.type === DatabaseEditChangeType.delete) {
       return true;
     }
 
@@ -110,14 +103,14 @@ export class ResultSetEditAction
     return true;
   }
 
-  getElementState(key: IResultSetElementKey): ResultSetChangeType | null {
+  getElementState(key: IResultSetElementKey): DatabaseEditChangeType | null {
     const update = this.editorData.get(ResultSetDataKeysUtils.serialize(key.row));
 
     if (!update) {
       return null;
     }
 
-    if (update.source === undefined || update.type !== ResultSetChangeType.update) {
+    if (update.source === undefined || update.type !== DatabaseEditChangeType.update) {
       return update.type;
     }
 
@@ -135,7 +128,7 @@ export class ResultSetEditAction
   }
 
   set(key: IResultSetElementKey, value: IResultSetValue): void {
-    const update = this.getOrCreateUpdate(key.row, ResultSetChangeType.update);
+    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
 
     if (isResultSetContentValue(prevValue) && value !== null) {
@@ -152,7 +145,8 @@ export class ResultSetEditAction
 
     this.action.execute({
       resultId: this.result.id,
-      type: 'edit',
+      type: update.type,
+      revert: false,
       value: {
         key,
         prevValue,
@@ -163,32 +157,84 @@ export class ResultSetEditAction
     this.removeEmptyUpdate(update);
   }
 
-  add(key: IResultSetElementKey): void {
-    this.addRow(key.row);
+  add(key?: IResultSetElementKey): void {
+    let row = key?.row;
+    let column = key?.column;
+
+    if (!row) {
+      row = this.data.getDefaultKey().row;
+    }
+
+    if (!column) {
+      column = this.data.getDefaultKey().column;
+    }
+
+    this.addRow(row, undefined, column);
   }
 
-  addRow(key: IResultSetRowKey, value?: IResultSetValue[]): void {
+  addRow(row: IResultSetRowKey, value?: IResultSetValue[], column?: IResultSetColumnKey): void {
     if (value === undefined) {
       value = this.data.columns.map(() => null);
     }
 
-    this.getOrCreateUpdate({ ...key, key: uuid() }, ResultSetChangeType.add, value);
+    row = { ...row, key: uuid() };
+
+    if (!column) {
+      column = this.data.getDefaultKey().column;
+    }
+
+    const [update, created] = this.getOrCreateUpdate(row, DatabaseEditChangeType.add, value);
+
+    if (created) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: update.type,
+        revert: false,
+        value: {
+          key: { column, row },
+        },
+      });
+    }
   }
 
   delete(key: IResultSetElementKey): void {
-    this.deleteRow(key.row);
+    this.deleteRow(key.row, key.column);
   }
 
-  deleteRow(key: IResultSetRowKey): void {
+  deleteRow(key: IResultSetRowKey, column?: IResultSetColumnKey): void {
     const serializedKey = ResultSetDataKeysUtils.serialize(key);
     const update = this.editorData.get(serializedKey);
 
-    if (update && update.type !== ResultSetChangeType.delete) {
+    if (update && update.type !== DatabaseEditChangeType.delete) {
       this.editorData.delete(serializedKey);
     }
 
-    if (update?.type !== ResultSetChangeType.add) {
-      this.getOrCreateUpdate(key, ResultSetChangeType.delete);
+    if (!column) {
+      column = this.data.getDefaultKey().column;
+    }
+
+    if (update?.type !== DatabaseEditChangeType.add) {
+      const [update, created] = this.getOrCreateUpdate(key, DatabaseEditChangeType.delete);
+
+      if (created) {
+        this.action.execute({
+          resultId: this.result.id,
+          type: update.type,
+          revert: false,
+          value: {
+            key: { column, row: key },
+          },
+        });
+      }
+    } else {
+      this.action.execute({
+        resultId: this.result.id,
+        type: update.type,
+        revert: true,
+        value: {
+          key: { column, row: key },
+        },
+      });
     }
   }
 
@@ -202,7 +248,7 @@ export class ResultSetEditAction
 
     for (const update of this.updates) {
       switch (update.type) {
-        case ResultSetChangeType.update: {
+        case DatabaseEditChangeType.update: {
           const value = result.data?.rows?.[rowIndex];
 
           if (value !== undefined) {
@@ -213,7 +259,7 @@ export class ResultSetEditAction
           break;
         }
 
-        case ResultSetChangeType.add: {
+        case DatabaseEditChangeType.add: {
           const value = result.data?.rows?.[rowIndex];
 
           if (value !== undefined) {
@@ -225,7 +271,7 @@ export class ResultSetEditAction
           break;
         }
 
-        case ResultSetChangeType.delete: {
+        case DatabaseEditChangeType.delete: {
           this.data.removeRow(update.row, shift);
           shift--;
           break;
@@ -246,7 +292,7 @@ export class ResultSetEditAction
     let prevValue: IResultSetValue | undefined;
     let value: IResultSetValue | undefined;
 
-    if (update.type === ResultSetChangeType.delete) {
+    if (update.type === DatabaseEditChangeType.delete) {
       this.editorData.delete(row);
     } else {
       prevValue = update.update[key.column.index];
@@ -256,7 +302,8 @@ export class ResultSetEditAction
 
     this.action.execute({
       resultId: this.result.id,
-      type: 'revert',
+      type: update.type,
+      revert: true,
       value: {
         key,
         prevValue,
@@ -272,14 +319,14 @@ export class ResultSetEditAction
 
     this.action.execute({
       resultId: this.result.id,
-      type: 'revert',
+      revert: true,
     });
   }
 
   fillBatch(batch: UpdateResultsDataBatchMutationVariables): void {
     for (const update of this.updates) {
       switch (update.type) {
-        case ResultSetChangeType.update: {
+        case DatabaseEditChangeType.update: {
           if (batch.updatedRows === undefined) {
             batch.updatedRows = [];
           }
@@ -299,7 +346,7 @@ export class ResultSetEditAction
           break;
         }
 
-        case ResultSetChangeType.add: {
+        case DatabaseEditChangeType.add: {
           if (batch.addedRows === undefined) {
             batch.addedRows = [];
           }
@@ -309,7 +356,7 @@ export class ResultSetEditAction
           break;
         }
 
-        case ResultSetChangeType.delete: {
+        case DatabaseEditChangeType.delete: {
           if (batch.deletedRows === undefined) {
             batch.deletedRows = [];
           }
@@ -323,6 +370,10 @@ export class ResultSetEditAction
   }
 
   private removeEmptyUpdate(update: IResultSetUpdate) {
+    if (update.type === DatabaseEditChangeType.add) {
+      return;
+    }
+
     if (update.source && !update.source.some(
       (value, i) => !this.compareCellValue(value, update.update[i])
     )) {
@@ -332,27 +383,31 @@ export class ResultSetEditAction
 
   private getOrCreateUpdate(
     row: IResultSetRowKey,
-    type: ResultSetChangeType,
+    type: DatabaseEditChangeType,
     update?: IResultSetValue[]
-  ): IResultSetUpdate {
+  ): [IResultSetUpdate, boolean] {
     const key = ResultSetDataKeysUtils.serialize(row);
+    let created = false;
 
     if (!this.editorData.has(key)) {
       let source: IResultSetValue[] | undefined;
 
-      if (type !== ResultSetChangeType.add) {
+      if (type !== DatabaseEditChangeType.add) {
         source = this.data.getRowValue(row);
+      } else {
+        source = [...update || []];
       }
 
       this.editorData.set(key, {
         row,
         type,
         source,
-        update: observable([...(source || update || [])]),
+        update: observable([...source || update || []]),
       });
+      created = true;
     }
 
-    return this.editorData.get(key)!;
+    return [this.editorData.get(key)!, created];
   }
 
   private compareCellValue(valueA: any, valueB: any) {

@@ -41,6 +41,17 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     });
   }
 
+  getDefaultKey(): IResultSetElementKey {
+    return {
+      row: {
+        index: 0,
+      },
+      column: {
+        index: 0,
+      },
+    };
+  }
+
   insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
     if (this.result.data?.rows) {
       this.result.data.rows.splice(row.index + shift + 1, 0, value);

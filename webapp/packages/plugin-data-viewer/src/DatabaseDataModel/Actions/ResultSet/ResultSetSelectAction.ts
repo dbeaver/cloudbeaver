@@ -6,51 +6,109 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable } from 'mobx';
+import { computed, IReactionDisposer, makeObservable, observable, observe, toJS } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
+import { DatabaseSelectAction } from '../DatabaseSelectAction';
+import { DatabaseEditChangeType, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
+import type { DatabaseDataSelectActionsData } from '../IDatabaseDataSelectAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
+import { ResultSetEditAction } from './ResultSetEditAction';
+import type { IResultSetValue } from './ResultSetFormatAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
 @databaseDataAction()
-export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataSelectAction<IResultSetPartialKey, IDatabaseResultSet> {
+export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
+
+  get elements(): IResultSetElementKey[] {
+    return Array.from(this.selectedElements.values()).flat();
+  }
 
   readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
   private view: ResultSetViewAction;
-
-  get elements(): IResultSetElementKey[] {
-    return Array.from(this.selectedElements.values()).flat();
-  }
+  private edit: ResultSetEditAction;
+  private validationDisposer: () => void;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.view = this.getAction(ResultSetViewAction);
+    this.edit = this.getAction(ResultSetEditAction);
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
 
     makeObservable<ResultSetSelectAction, 'focusedElement'>(this, {
       selectedElements: observable,
-      focusedElement: observable,
+      focusedElement: observable.ref,
       elements: computed,
     });
+
+    this.validationDisposer = observe(this.view, 'rowKeys', change => {
+      const previous = change.oldValue as IResultSetRowKey[] | undefined;
+      const current = change.newValue as IResultSetRowKey[];
+
+      if (!previous) {
+        return;
+      }
+
+      if (this.focusedElement) {
+        const focus = this.focusedElement;
+        const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+
+        if (focusIndex === -1 || current.length === 0) {
+          this.focus(null);
+          return;
+        }
+
+        if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
+          for (let index = focusIndex; index >= 0; index--) {
+            const previousElement = previous[index];
+            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
+
+            if (row) {
+              this.focus({ ...this.focusedElement, row });
+              return;
+            }
+          }
+          for (let index = focusIndex; index <= previous.length; index++) {
+            const nextElement = previous[index];
+            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
+
+            if (row) {
+              this.focus({ ...this.focusedElement, row });
+              return;
+            }
+          }
+
+          this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+        }
+      }
+    });
+    this.edit.action.addHandler(this.syncFocus.bind(this));
   }
 
   isSelected(): boolean {
     return this.selectedElements.size > 0;
+  }
+
+  isFocused(key: IResultSetElementKey): boolean {
+    if (!this.focusedElement) {
+      return false;
+    }
+    return (
+      ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column)
+      && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row)
+    );
   }
 
   isElementSelected(key: IResultSetPartialKey): boolean {
@@ -83,6 +141,10 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   getRowSelection(row: IResultSetRowKey): IResultSetElementKey[] {
     return this.selectedElements.get(ResultSetDataKeysUtils.serialize(row)) || [];
+  }
+
+  getSelectedElements(): IResultSetElementKey[] {
+    return Array.from(this.selectedElements.values()).flat();
   }
 
   set(key: IResultSetPartialKey, selected: boolean, silent?: boolean): void {
@@ -151,7 +213,19 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
   }
 
   focus(key: IResultSetElementKey | null): void {
+    if (
+      (key && this.isFocused(key))
+      || key === this.focusedElement
+    ) {
+      return;
+    }
+
     this.focusedElement = key;
+    this.actions.execute({
+      type: 'focus',
+      resultId: this.result.id,
+      key,
+    });
   }
 
   clear(): void {
@@ -163,24 +237,62 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
   }
 
   updateResult(): void {
-    action(() => {
-      if (this.focusedElement && !this.view.has(this.focusedElement)) {
-        this.focusedElement = null;
+    this.validateSelection();
+  }
+
+  dispose(): void {
+    this.validationDisposer();
+  }
+
+  private validateSelection() {
+    let focusedElement = this.focusedElement;
+
+    if (focusedElement && !this.view.has(focusedElement)) {
+      focusedElement = null;
+    }
+
+    const removeKeys: string[] = [];
+    const selectedElements = this.selectedElements.entries();
+
+    for (const [key, rowSelection] of selectedElements) {
+      const element = rowSelection[0];
+      if (element && !this.view.has(element)) {
+        removeKeys.push(key);
       }
+    }
 
-      const removeKeys: string[] = [];
+    this.focus(focusedElement);
 
-      for (const [key, rowSelection] of this.selectedElements) {
-        const element = rowSelection[0];
-        if (element && !this.view.has(element)) {
-          removeKeys.push(key);
+    for (const key of removeKeys) {
+      this.selectedElements.delete(key);
+    }
+  }
+
+  private syncFocus(data: IDatabaseDataEditActionData<IResultSetElementKey, IResultSetValue>) {
+    switch (data.type) {
+      case DatabaseEditChangeType.add:
+        if (data.value) {
+          if (data.revert) {
+            // this.focus({ ...data.value.key, row: this.view.getShift(data.value.key.row) });
+          } else {
+            this.focus(data.value.key);
+          }
+          this.clear();
         }
-      }
+        break;
 
-      for (const key of removeKeys) {
-        this.selectedElements.delete(key);
-      }
-    });
+      case DatabaseEditChangeType.delete:
+        if (data.value) {
+          this.focus(data.value.key);
+          this.clear();
+        }
+        break;
+      case DatabaseEditChangeType.update:
+        if (data.value) {
+          this.focus(data.value.key);
+        }
+        break;
+    }
   }
 
   private isColumnSelected(list: IResultSetElementKey[], key: IResultSetColumnKey) {

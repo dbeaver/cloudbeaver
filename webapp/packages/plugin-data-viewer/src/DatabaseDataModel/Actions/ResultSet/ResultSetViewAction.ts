@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { computed, extendObservable, IComputedValue, makeObservable, observe } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
@@ -34,6 +34,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
 
     rows.push(...this.editor.addRows);
     rows.sort((a, b) => a.index - b.index);
+
     return rows;
   }
 
@@ -58,31 +59,78 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     this.editor = this.getAction(ResultSetEditAction);
 
     makeObservable(this, {
+      rowKeys: computed,
+      columnKeys: computed,
       rows: computed,
       columns: computed,
     });
   }
 
   has(cell: IResultSetElementKey): boolean {
-    if (!this.columnKeys.some(column => ResultSetDataKeysUtils.isEqual(column, cell.column))) {
+    if (!this.hasColumn(cell.column)) {
       return false;
     }
 
-    return !this.rowKeys.some(row => ResultSetDataKeysUtils.isEqual(row, cell.row));
+    return !this.hasRow(cell.row);
+  }
+
+  hasRow(key: IResultSetRowKey): boolean {
+    return this.rowIndex(key) !== -1;
+  }
+
+  hasColumn(key: IResultSetColumnKey): boolean {
+    return this.columnIndex(key) !== -1;
+  }
+
+  rowIndex(key: IResultSetRowKey): number {
+    return this.rowKeys.findIndex(row => ResultSetDataKeysUtils.isEqual(row, key));
+  }
+
+  columnIndex(key: IResultSetColumnKey): number {
+    return this.columnKeys.findIndex(column => ResultSetDataKeysUtils.isEqual(column, key));
+  }
+
+  nextKey(key: IResultSetElementKey): IResultSetElementKey | null {
+    let row: IResultSetRowKey | undefined = key.row;
+    let column: IResultSetColumnKey | undefined = key.column;
+
+    const rowKeyIndex = this.rowIndex(row);
+    const columnKeyIndex = this.columnIndex(column);
+
+    if (rowKeyIndex === -1 && row) {
+      row = this.rowKeys.find(key => key.index >= row!.index);
+
+      if (!row && this.rowKeys.length > 0) {
+        row = this.rowKeys[this.rowKeys.length - 1];
+      }
+    }
+    if (columnKeyIndex === -1 && column) {
+      column = this.columnKeys.find(key => key.index >= column!.index);
+
+      if (!column && this.columnKeys.length > 0) {
+        column = this.columnKeys[this.columnKeys.length - 1];
+      }
+    }
+
+    if (!row || !column) {
+      return null;
+    }
+
+    return { row, column };
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
+    const edited = this.editor.get(cell);
+
+    if (edited !== undefined) {
+      return edited;
+    }
+
     if (
       cell.row.index >= this.rows.length
       || cell.column.index >= this.columns.length
     ) {
       return undefined;
-    }
-
-    const edited = this.editor.get(cell);
-
-    if (edited !== undefined) {
-      return edited;
     }
 
     return this.rows[cell.row.index][cell.column.index];

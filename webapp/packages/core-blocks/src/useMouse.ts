@@ -29,7 +29,7 @@ export interface IMouseHook<T> {
 export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T> {
   const handlersRef = useObjectRef(options);
   const reference = useRef<T>(null);
-  const state = useObservableRef(() => ({ mouseEnter: false }), { mouseEnter: observable.ref }, false);
+  const state = useObservableRef(() => ({ mouseEnter: false }), { mouseEnter: observable.ref }, false, 'useMouse');
 
   useEffect(() => { // performance heavy
     if (!reference.current) {

@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { useState } from 'react';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { CellPosition, IEditingContext } from './EditingContext';
@@ -27,9 +28,12 @@ interface IEditingOptions {
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
-  const state = useObjectRef(() => ({
+  const state = useObservableRef(() => ({
     editingCells: new MetadataMap<string, IEditingState>(() => ({ editing: false })),
-  }), { options });
+    editorOpened: false,
+  }), {
+    editorOpened: observable.ref,
+  }, { options });
 
   const [context] = useState<IEditingContext>({
     readonly: !!state.options.readonly,
@@ -51,13 +55,19 @@ export function useEditing(options: IEditingOptions): IEditingContext {
       state.editingCells.clear();
       const info = state.editingCells.get(getPositionHash(position));
       info.editing = true;
+      state.editorOpened = true;
     },
     closeEditor(position: CellPosition) {
       const info = state.editingCells.get(getPositionHash(position));
       info.editing = false;
+      state.editorOpened = false;
     },
     close() {
       state.editingCells.clear();
+      state.editorOpened = false;
+    },
+    isEditorActive() {
+      return state.editorOpened;
     },
     isEditing(position: CellPosition) {
       return state.editingCells

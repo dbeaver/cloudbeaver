@@ -156,6 +156,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       </content-type>
       {useCodeEditor ? (
         <CodeEditorLoader
+          key={readonly ? '1' : '0'}
           readonly={readonly}
           value={stringValue}
           options={{

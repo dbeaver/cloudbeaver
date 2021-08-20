@@ -24,18 +24,18 @@ export class ActiveViewService {
 
   constructor() {
     makeObservable<ActiveViewService, 'activeView'>(this, {
-      activeView: observable,
+      activeView: observable.ref,
     });
   }
 
-  get view() {
+  get view(): IActiveView<any> | null {
     if (this.activeView) {
       return this.activeView();
     }
     return null;
   }
 
-  setActive<T>(provider: IActiveItemProvider<T>) {
+  setActive<T>(provider: IActiveItemProvider<T>): void {
     this.activeView = provider;
   }
 

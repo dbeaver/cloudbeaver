@@ -13,7 +13,10 @@ import {
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
+import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction';
+import { DatabaseEditChangeType } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataResult } from '../../../DatabaseDataModel/IDatabaseDataResult';
 import { ScriptPreviewService } from '../../../ScriptPreview/ScriptPreviewService';
 
 export interface ITableFooterMenuContext {
@@ -32,6 +35,159 @@ export class TableFooterMenuService {
   ) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
+    this.registerMenuItem({
+      id: 'table_add',
+      order: 0.5,
+      title: 'data_viewer_action_edit_add',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        return (
+          context.data.model.isReadonly()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !editor?.hasFeature('add')
+        );
+      },
+      isDisabled(context) {
+        if (context.data.model.isLoading()) {
+          return true;
+        }
+
+        return false;
+      },
+      onClick(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        if (!editor) {
+          return;
+        }
+
+        const select = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseSelectAction
+        );
+
+        editor.add(select?.getFocusedElement());
+      },
+    });
+    this.registerMenuItem({
+      id: 'table_delete',
+      order: 0.6,
+      title: 'data_viewer_action_edit_delete',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        return (
+          context.data.model.isReadonly()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !editor?.hasFeature('delete')
+          || selectedElements.length === 0
+        );
+      },
+      isDisabled(context) {
+        if (context.data.model.isLoading()) {
+          return true;
+        }
+
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        if (!editor) {
+          return true;
+        }
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        if (selectedElements.length === 0) {
+          return true;
+        }
+
+        return !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
+      },
+      onClick(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        for (const key of selectedElements) {
+          editor?.delete(key);
+        }
+      },
+    });
+    this.registerMenuItem({
+      id: 'table_revert',
+      order: 0.7,
+      title: 'data_viewer_action_edit_revert',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        if (
+          context.data.model.isReadonly()
+          || context.data.model.isDisabled(context.data.resultIndex)
+        ) {
+          return true;
+        }
+
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        if (!editor || selectedElements.length === 0) {
+          return true;
+        }
+
+        return !selectedElements.some(key => {
+          const state = editor.getElementState(key);
+
+          if (state === DatabaseEditChangeType.add) {
+            return editor.isElementEdited(key);
+          }
+
+          return state !== null;
+        });
+      },
+      isDisabled(context) {
+        return context.data.model.isLoading();
+      },
+      onClick(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        for (const element of selectedElements) {
+          editor?.revert(element);
+        }
+      },
+    });
     this.registerMenuItem({
       id: 'save ',
       isPresent(context) {
@@ -138,4 +294,20 @@ export class TableFooterMenuService {
   registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
   }
+}
+
+function getActiveElements(model: IDatabaseDataModel<any, IDatabaseDataResult>, resultIndex: number): unknown[] {
+  const select = model.source.getActionImplementation(
+    resultIndex,
+    DatabaseSelectAction
+  );
+
+  const selectedElements = select?.getSelectedElements() || [];
+  const focus = select?.getFocusedElement();
+
+  if (selectedElements.length === 0 && focus) {
+    selectedElements.push(focus);
+  }
+
+  return selectedElements;
 }

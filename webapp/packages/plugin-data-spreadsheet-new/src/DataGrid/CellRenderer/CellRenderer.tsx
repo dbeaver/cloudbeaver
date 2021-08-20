@@ -14,7 +14,7 @@ import { Cell } from 'react-data-grid';
 
 import { useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
@@ -47,7 +47,7 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
     get isSelected(): boolean {
       return selectionContext?.isSelected(this.position.rowIdx, this.position.idx) || false;
     },
-    get editionState(): ResultSetChangeType | null {
+    get editionState(): DatabaseEditChangeType | null {
       if (!this.cell || !tableDataContext) {
         return null;
       }
@@ -77,13 +77,13 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
 
     if (cellContext.editionState !== null) {
       switch (cellContext.editionState) {
-        case ResultSetChangeType.add:
+        case DatabaseEditChangeType.add:
           classes += ' rdg-cell-custom-added';
           break;
-        case ResultSetChangeType.delete:
+        case DatabaseEditChangeType.delete:
           classes += ' rdg-cell-custom-deleted';
           break;
-        case ResultSetChangeType.update:
+        case DatabaseEditChangeType.update:
           classes += ' rdg-cell-custom-edited';
       }
     }

@@ -13,6 +13,7 @@ export interface IEditingContext {
   edit: (position: CellPosition, key?: string) => void;
   closeEditor: (position: CellPosition) => void;
   close: () => void;
+  isEditorActive: () => boolean;
   isEditing: (position: CellPosition) => boolean;
 }
 

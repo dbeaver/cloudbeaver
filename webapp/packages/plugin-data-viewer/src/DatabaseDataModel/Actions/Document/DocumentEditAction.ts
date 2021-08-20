@@ -14,6 +14,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
+import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import { DocumentDataAction } from './DocumentDataAction';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 import type { IDocumentElementKey } from './IDocumentElementKey';
@@ -50,6 +51,14 @@ export class DocumentEditAction
     return !this.compare(value, this.get(key));
   }
 
+  getElementState(key: IDocumentElementKey): DatabaseEditChangeType | null {
+    if (this.isElementEdited(key)) {
+      return DatabaseEditChangeType.update;
+    }
+
+    return null;
+  }
+
   get(key: IDocumentElementKey): IDatabaseDataDocument | undefined {
     return this.editedElements.get(key.index);
   }
@@ -66,7 +75,8 @@ export class DocumentEditAction
     this.editedElements.set(key.index, value);
 
     this.action.execute({
-      type: 'edit',
+      type: DatabaseEditChangeType.update,
+      revert: false,
       resultId: this.result.id,
       value: {
         key: key,
@@ -125,7 +135,7 @@ export class DocumentEditAction
     this.editedElements.delete(key.index);
 
     this.action.execute({
-      type: 'revert',
+      revert: true,
       resultId: this.result.id,
       value: { key: key },
     });
@@ -134,7 +144,7 @@ export class DocumentEditAction
   clear(): void {
     this.editedElements.clear();
     this.action.execute({
-      type: 'revert',
+      revert: true,
       resultId: this.result.id,
     });
   }

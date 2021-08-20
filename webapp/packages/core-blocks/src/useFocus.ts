@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  useRef, useEffect, useState, useLayoutEffect
-} from 'react';
+import { observable } from 'mobx';
+import { useRef, useEffect, useLayoutEffect } from 'react';
+
+import { useObjectRef } from './useObjectRef';
+import { useObservableRef } from './useObservableRef';
 
 interface FocusOptions {
   focusFirstChild?: boolean;
@@ -16,16 +18,24 @@ interface FocusOptions {
   onBlur?: () => void;
 }
 
+interface IState {
+  focus: boolean;
+}
+
 export function useFocus<T extends HTMLElement>({
   focusFirstChild,
   onFocus,
   onBlur,
-}: FocusOptions): [React.RefObject<T>, boolean] {
-  const handlersRef = useRef({ onFocus, onBlur });
+}: FocusOptions): [React.RefObject<T>, IState] {
+  const handlersRef = useObjectRef({ onFocus, onBlur });
   // TODO: seems can be inconsistent when element changes
-  const [focus, setFocus] = useState(false);
+  const state = useObservableRef<IState>(
+    () => ({ focus: false }),
+    { focus: observable.ref },
+    false,
+    'useFocus'
+  );
   const reference = useRef<T>(null);
-  handlersRef.current = { onFocus, onBlur };
 
   useLayoutEffect(() => {
     if (reference.current !== null && focusFirstChild) {
@@ -44,19 +54,19 @@ export function useFocus<T extends HTMLElement>({
     }
 
     const focusHandler = () => {
-      if (handlersRef.current.onFocus) {
-        handlersRef.current.onFocus();
+      if (handlersRef.onFocus) {
+        handlersRef.onFocus();
       }
 
-      setFocus(true);
+      state.focus = true;
     };
 
     const blurHandler = () => {
-      if (handlersRef.current.onBlur) {
-        handlersRef.current.onBlur();
+      if (handlersRef.onBlur) {
+        handlersRef.onBlur();
       }
 
-      setFocus(false);
+      state.focus = false;
     };
 
     const element = reference.current;
@@ -70,5 +80,5 @@ export function useFocus<T extends HTMLElement>({
     };
   });
 
-  return [reference, focus];
+  return [reference, state];
 }

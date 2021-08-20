@@ -13,7 +13,7 @@ import { DatabaseDataAction } from '../DatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 import type { IDatabaseDataSource } from '../IDatabaseDataSource';
 import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IDatabaseDataEditAction, IDatabaseDataEditActionData } from './IDatabaseDataEditAction';
+import type { DatabaseEditChangeType, IDatabaseDataEditAction, IDatabaseDataEditActionData } from './IDatabaseDataEditAction';
 
 @databaseDataAction()
 export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabaseDataResult>
@@ -36,9 +36,10 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
 
   abstract isEdited(): boolean;
   abstract isElementEdited(key: TKey): boolean;
+  abstract getElementState(key: TKey): DatabaseEditChangeType | null;
   abstract get(key: TKey): TValue | undefined;
   abstract set(key: TKey, value: TValue): void;
-  abstract add(key: TKey): void;
+  abstract add(key?: TKey): void;
   abstract delete(key: TKey): void;
   abstract applyUpdate(result: TResult): void;
   abstract revert(key: TKey): void;

@@ -17,6 +17,10 @@ export type DatabaseDataSelectActionsData<TKey> = {
   key: TKey;
   selected: boolean;
 } | {
+  type: 'focus';
+  resultId: string;
+  key: TKey | null;
+} | {
   type: 'clear';
   resultId: string;
 };

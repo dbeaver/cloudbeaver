@@ -9,7 +9,7 @@
 import { createContext } from 'react';
 
 import type { IMouseHook } from '@cloudbeaver/core-blocks';
-import type { IResultSetElementKey, ResultSetChangeType } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetElementKey, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
 import type { CellPosition } from '../../Editing/EditingContext';
 
@@ -19,7 +19,7 @@ export interface ICellContext {
   position: CellPosition;
   isEditing: boolean;
   isSelected: boolean;
-  editionState: ResultSetChangeType | null;
+  editionState: DatabaseEditChangeType | null;
 }
 
 export const CellContext = createContext<ICellContext | null>(null);

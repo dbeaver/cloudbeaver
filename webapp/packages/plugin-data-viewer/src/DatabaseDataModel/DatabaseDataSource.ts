@@ -93,7 +93,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   ): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
-        throw new Error('Result index out of range');
+        return undefined;
       }
       return this.actions.tryGet(this.results[resultIndex], action);
     }
@@ -137,7 +137,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   ): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
-        throw new Error('Result index out of range');
+        return undefined;
       }
       return this.actions.getImplementation(this.results[resultIndex], action);
     }

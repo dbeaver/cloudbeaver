@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import type { EditorProps } from 'react-data-grid';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
@@ -39,6 +40,8 @@ const styles = css`
 export interface IEditorRef {
   focus: () => void;
 }
+
+const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
 
 export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
   row,
@@ -103,8 +106,27 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
     onClose(false);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (lockNavigation.includes(event.key)) {
+      event.stopPropagation();
+    }
+  };
+
+  const preventClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    EventContext.set(event, EventStopPropagationFlag); // better but not works
+    event.stopPropagation();
+  };
+
   return styled(styles)(
-    <box ref={setElementRef} as='div'>
+    <box
+      ref={setElementRef}
+      as='div'
+      onKeyDown={handleKeyDown}
+      onClick={preventClick}
+      onDoubleClick={preventClick}
+      onMouseDown={preventClick}
+      onMouseUp={preventClick}
+    >
       {createPortal((
         <editor ref={setPopperRef} as="div" style={popper.styles.popper} {...popper.attributes.popper}>
           <InlineEditor

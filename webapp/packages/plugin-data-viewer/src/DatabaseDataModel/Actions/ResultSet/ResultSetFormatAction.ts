@@ -12,10 +12,11 @@ import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
+import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
-import { ResultSetChangeType, ResultSetEditAction } from './ResultSetEditAction';
+import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
 export type IResultSetValue =
@@ -68,21 +69,23 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
       readonly = this.view.getColumn(key.column)?.readOnly || false;
     }
 
-    if (!readonly && key.row) {
-      const value = this.view.getCellValue(key as IResultSetElementKey);
-
-      if (isResultSetContentValue(value)) {
-        readonly = (
-          value.binary !== undefined
-        || value.contentLength !== value.text?.length
-        );
-      } else if (value !== null && typeof value === 'object') {
-        readonly = true;
+    if (key.column && key.row) {
+      if (!readonly) {
+        readonly = this.edit.getElementState(key as IResultSetElementKey) === DatabaseEditChangeType.delete;
       }
-    }
 
-    if (!readonly && key.column && key.row) {
-      return this.edit.getElementState(key as IResultSetElementKey) === ResultSetChangeType.delete;
+      if (!readonly) {
+        const value = this.view.getCellValue(key as IResultSetElementKey);
+
+        if (isResultSetContentValue(value)) {
+          readonly = (
+            value.binary !== undefined
+            || value.contentLength !== value.text?.length
+          );
+        } else if (value !== null && typeof value === 'object') {
+          readonly = true;
+        }
+      }
     }
 
     return readonly;
