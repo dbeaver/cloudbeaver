@@ -4,6 +4,7 @@ export default [
   ['data_grid_table_editing_open_inline_editor', 'Open inline editor'],
   ['data_grid_table_editing_row_add', 'Add row'],
   ['data_grid_table_editing_row_delete', 'Delete current row'],
+  ['data_grid_table_editing_row_revert', 'Revert value'],
   ['data_grid_table_order', 'Sorting'],
   ['data_grid_table_open_value_panel', 'Show in value panel'],
   ['data_grid_table_filter', 'Filters'],

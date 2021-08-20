@@ -50,6 +50,10 @@ export class DocumentEditAction
     return !this.compare(value, this.get(key));
   }
 
+  get(key: IDocumentElementKey): IDatabaseDataDocument | undefined {
+    return this.editedElements.get(key.index);
+  }
+
   set(key: IDocumentElementKey, value: IDatabaseDataDocument, prevValue?: IDatabaseDataDocument): void {
     if (!prevValue) {
       prevValue = this.get(key);
@@ -74,6 +78,14 @@ export class DocumentEditAction
     this.removeUnchanged(key);
   }
 
+  add(key: IDocumentElementKey): void {
+    throw new Error('Not implemented');
+  }
+
+  delete(key: IDocumentElementKey): void {
+    throw new Error('Not implemented');
+  }
+
   setData(key: IDocumentElementKey, value: string): void {
     let previousValue = this.get(key);
 
@@ -93,10 +105,6 @@ export class DocumentEditAction
       },
       previousValue
     );
-  }
-
-  get(key: IDocumentElementKey): IDatabaseDataDocument | undefined {
-    return this.editedElements.get(key.index);
   }
 
   applyUpdate(result: IDatabaseResultSet): void {

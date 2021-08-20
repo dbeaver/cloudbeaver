@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable, toJS } from 'mobx';
 
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -50,6 +50,7 @@ export class ResultSetEditAction
     super(source, result);
     this.editorData = new Map();
     this.data = this.getAction(ResultSetDataAction);
+    this.features = ['add', 'delete'];
 
     makeObservable<this, 'editorData'>(this, {
       editorData: observable.shallow,
@@ -67,8 +68,14 @@ export class ResultSetEditAction
   get updates(): IResultSetUpdate[] {
     return Array.from(this.editorData.values())
       .sort((a, b) => {
-        if (a.row.index === b.row.index) {
-          return a.type - b.type;
+        if (a.type !== b.type) {
+          if (a.type === ResultSetChangeType.update) {
+            return -1;
+          }
+
+          if (b.type === ResultSetChangeType.update) {
+            return 1;
+          }
         }
 
         return a.row.index - b.row.index;
@@ -110,7 +117,7 @@ export class ResultSetEditAction
       return null;
     }
 
-    if (update.source === undefined || update.type === ResultSetChangeType.delete) {
+    if (update.source === undefined || update.type !== ResultSetChangeType.update) {
       return update.type;
     }
 
@@ -119,6 +126,12 @@ export class ResultSetEditAction
     }
 
     return null;
+  }
+
+  get(key: IResultSetElementKey): IResultSetValue | undefined {
+    return this.editorData
+      .get(ResultSetDataKeysUtils.serialize(key.row))
+      ?.update[key.column.index];
   }
 
   set(key: IResultSetElementKey, value: IResultSetValue): void {
@@ -150,13 +163,11 @@ export class ResultSetEditAction
     this.removeEmptyUpdate(update);
   }
 
-  get(key: IResultSetElementKey): IResultSetValue | undefined {
-    return this.editorData
-      .get(ResultSetDataKeysUtils.serialize(key.row))
-      ?.update[key.column.index];
+  add(key: IResultSetElementKey): void {
+    this.addRow(key.row);
   }
 
-  add(key: IResultSetRowKey, value?: IResultSetValue[]): void {
+  addRow(key: IResultSetRowKey, value?: IResultSetValue[]): void {
     if (value === undefined) {
       value = this.data.columns.map(() => null);
     }
@@ -164,7 +175,11 @@ export class ResultSetEditAction
     this.getOrCreateUpdate({ ...key, key: uuid() }, ResultSetChangeType.add, value);
   }
 
-  delete(key: IResultSetRowKey): void {
+  delete(key: IResultSetElementKey): void {
+    this.deleteRow(key.row);
+  }
+
+  deleteRow(key: IResultSetRowKey): void {
     const serializedKey = ResultSetDataKeysUtils.serialize(key);
     const update = this.editorData.get(serializedKey);
 
@@ -181,25 +196,30 @@ export class ResultSetEditAction
     let rowIndex = 0;
     let shift = 0;
 
+    if (result.data?.rows?.length !== this.updates.length) {
+      console.warn('ResultSetEditAction: returned data differs from performed update');
+    }
+
     for (const update of this.updates) {
       switch (update.type) {
         case ResultSetChangeType.update: {
-          if (update.source) {
-            const value = result.data?.rows?.[rowIndex];
+          const value = result.data?.rows?.[rowIndex];
 
-            if (value !== undefined) {
-              this.data.setRowValue(update.row, value, shift);
-            }
-            rowIndex++;
+          if (value !== undefined) {
+            this.data.setRowValue(update.row, value, shift);
           }
+
+          rowIndex++;
           break;
         }
 
         case ResultSetChangeType.add: {
           const value = result.data?.rows?.[rowIndex];
+
           if (value !== undefined) {
             this.data.insertRow(update.row, value, shift);
           }
+
           rowIndex++;
           shift++;
           break;
@@ -223,9 +243,16 @@ export class ResultSetEditAction
       return;
     }
 
-    const prevValue = update.update[key.column.index];
-    const value = update.source?.[key.column.index] ?? null;
-    update.update[key.column.index] = value;
+    let prevValue: IResultSetValue | undefined;
+    let value: IResultSetValue | undefined;
+
+    if (update.type === ResultSetChangeType.delete) {
+      this.editorData.delete(row);
+    } else {
+      prevValue = update.update[key.column.index];
+      value = update.source?.[key.column.index] ?? null;
+      update.update[key.column.index] = value;
+    }
 
     this.action.execute({
       resultId: this.result.id,

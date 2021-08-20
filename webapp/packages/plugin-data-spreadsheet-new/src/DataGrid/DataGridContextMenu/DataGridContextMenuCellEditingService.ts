@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvailable, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, ResultSetChangeType, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -28,42 +28,41 @@ export class DataGridContextMenuCellEditingService {
       this.dataGridContextMenuService.getMenuToken(),
       {
         id: this.getMenuEditingToken(),
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        isHidden(context) {
-          const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-          return format.isReadOnly(context.data.key)
-            || context.data.model.isDisabled(context.data.resultIndex)
-            || context.data.model.isReadonly();
-        },
         order: 4,
         title: 'data_grid_table_editing',
         icon: 'edit',
         isPanel: true,
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          return context.data.model.isDisabled(context.data.resultIndex)
+            || context.data.model.isReadonly();
+        },
       }
     );
     this.dataGridContextMenuService.add(
       this.getMenuEditingToken(),
       {
         id: 'open_inline_editor',
+        order: 0,
+        title: 'data_grid_table_editing_open_inline_editor',
+        icon: 'edit',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
+          const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
           const view = context.data.model.source.getAction(context.data.resultIndex, ResultSetViewAction);
           const cellValue = view.getCellValue(context.data.key);
           const column = view.getColumn(context.data.key.column);
 
-          if (!column || cellValue === undefined) {
+          if (!column || cellValue === undefined || format.isReadOnly(context.data.key)) {
             return true;
           }
 
           return isBooleanValuePresentationAvailable(cellValue, column);
         },
-        order: 0,
-        title: 'data_grid_table_editing_open_inline_editor',
-        icon: 'edit',
         onClick(context) {
           context.data.spreadsheetActions.edit(context.data.key);
         },
@@ -73,6 +72,8 @@ export class DataGridContextMenuCellEditingService {
       this.getMenuEditingToken(),
       {
         id: 'set_to_null',
+        order: 1,
+        title: 'data_grid_table_editing_set_to_null',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -84,8 +85,6 @@ export class DataGridContextMenuCellEditingService {
 
           return cellValue === undefined || data.getColumn(key.column)?.required || format.isNull(cellValue);
         },
-        order: 1,
-        title: 'data_grid_table_editing_set_to_null',
         onClick(context) {
           context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction)
             .set(context.data.key, null);
@@ -96,14 +95,14 @@ export class DataGridContextMenuCellEditingService {
       this.getMenuEditingToken(),
       {
         id: 'row_add',
+        order: 5,
+        title: 'data_grid_table_editing_row_add',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
-        order: 5,
-        title: 'data_grid_table_editing_row_add',
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
-          editor.add(context.data.key.row);
+          editor.addRow(context.data.key.row);
         },
       }
     );
@@ -111,14 +110,41 @@ export class DataGridContextMenuCellEditingService {
       this.getMenuEditingToken(),
       {
         id: 'row_delete',
+        order: 6,
+        title: 'data_grid_table_editing_row_delete',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
-        order: 6,
-        title: 'data_grid_table_editing_row_delete',
+        isHidden(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
+          return (
+            format.isReadOnly(context.data.key)
+            || editor.getElementState(context.data.key) === ResultSetChangeType.delete
+          );
+        },
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
-          editor.delete(context.data.key.row);
+          editor.deleteRow(context.data.key.row);
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
+        id: 'row_revert',
+        order: 7,
+        title: 'data_grid_table_editing_row_revert',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          return editor.getElementState(context.data.key) === null;
+        },
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          editor.revert(context.data.key);
         },
       }
     );

@@ -19,6 +19,7 @@ import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
@@ -62,11 +63,17 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     });
   }
 
+  has(cell: IResultSetElementKey): boolean {
+    if (!this.columnKeys.some(column => ResultSetDataKeysUtils.isEqual(column, cell.column))) {
+      return false;
+    }
+
+    return !this.rowKeys.some(row => ResultSetDataKeysUtils.isEqual(row, cell.row));
+  }
+
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
     if (
-      cell.row === undefined
-      || cell.column === undefined
-      || cell.row.index >= this.rows.length
+      cell.row.index >= this.rows.length
       || cell.column.index >= this.columns.length
     ) {
       return undefined;

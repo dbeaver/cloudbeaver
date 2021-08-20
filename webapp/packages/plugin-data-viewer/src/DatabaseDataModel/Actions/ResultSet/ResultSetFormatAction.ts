@@ -15,6 +15,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { ResultSetChangeType, ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
 export type IResultSetValue =
@@ -26,10 +27,12 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   static dataFormat = ResultDataFormat.Resultset;
 
   private view: ResultSetViewAction;
+  private edit: ResultSetEditAction;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.view = this.getAction(ResultSetViewAction);
+    this.edit = this.getAction(ResultSetEditAction);
   }
 
   getHeaders(): string[] {
@@ -59,27 +62,30 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   }
 
   isReadOnly(key: IResultSetPartialKey): boolean {
-    let columnReadonly = false;
-    let cellReadonly = false;
+    let readonly = false;
 
-    if (key.column !== undefined) {
-      columnReadonly = this.view.getColumn(key.column)?.readOnly || false;
+    if (key.column) {
+      readonly = this.view.getColumn(key.column)?.readOnly || false;
+    }
 
-      if (key.row) {
-        const value = this.view.getCellValue(key as IResultSetElementKey);
+    if (!readonly && key.row) {
+      const value = this.view.getCellValue(key as IResultSetElementKey);
 
-        if (isResultSetContentValue(value)) {
-          cellReadonly = (
-            value.binary !== undefined
+      if (isResultSetContentValue(value)) {
+        readonly = (
+          value.binary !== undefined
         || value.contentLength !== value.text?.length
-          );
-        } else if (value !== null && typeof value === 'object') {
-          cellReadonly = true;
-        }
+        );
+      } else if (value !== null && typeof value === 'object') {
+        readonly = true;
       }
     }
 
-    return columnReadonly || cellReadonly;
+    if (!readonly && key.column && key.row) {
+      return this.edit.getElementState(key as IResultSetElementKey) === ResultSetChangeType.delete;
+    }
+
+    return readonly;
   }
 
   isNull(value: IResultSetValue): boolean {

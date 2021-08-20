@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -29,7 +29,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
-  private data: ResultSetViewAction;
+  private view: ResultSetViewAction;
 
   get elements(): IResultSetElementKey[] {
     return Array.from(this.selectedElements.values()).flat();
@@ -37,7 +37,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
-    this.data = this.getAction(ResultSetViewAction);
+    this.view = this.getAction(ResultSetViewAction);
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
@@ -55,7 +55,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   isElementSelected(key: IResultSetPartialKey): boolean {
     if (key.row === undefined) {
-      for (const row of this.data.rowKeys) {
+      for (const row of this.view.rowKeys) {
         if (!this.isElementSelected({ row, column: key.column })) {
           return false;
         }
@@ -74,7 +74,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
       return this.isColumnSelected(row, key.column);
     }
 
-    return row.length === this.data.columnKeys.length;
+    return row.length === this.view.columnKeys.length;
   }
 
   getFocusedElement(): IResultSetElementKey | null {
@@ -87,7 +87,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
 
   set(key: IResultSetPartialKey, selected: boolean, silent?: boolean): void {
     if (key.row === undefined) {
-      for (const row of this.data.rowKeys) {
+      for (const row of this.view.rowKeys) {
         this.set({ row, column: key.column }, selected, true);
       }
 
@@ -103,7 +103,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     }
 
     if (key.column === undefined) {
-      for (const column of this.data.columnKeys) {
+      for (const column of this.view.columnKeys) {
         this.set({ row: key.row, column }, selected, true);
       }
       if (!silent) {
@@ -159,6 +159,27 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
     this.actions.execute({
       type: 'clear',
       resultId: this.result.id,
+    });
+  }
+
+  updateResult(): void {
+    action(() => {
+      if (this.focusedElement && !this.view.has(this.focusedElement)) {
+        this.focusedElement = null;
+      }
+
+      const removeKeys: string[] = [];
+
+      for (const [key, rowSelection] of this.selectedElements) {
+        const element = rowSelection[0];
+        if (element && !this.view.has(element)) {
+          removeKeys.push(key);
+        }
+      }
+
+      for (const key of removeKeys) {
+        this.selectedElements.delete(key);
+      }
     });
   }
 

@@ -28,8 +28,11 @@ export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabase
   readonly action: IExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
   isEdited: () => boolean;
   isElementEdited: (key: TKey) => boolean;
-  set: (key: TKey, value: TValue) => void;
+  hasFeature: (feature: keyof this) => boolean;
   get: (key: TKey) => TValue | undefined;
+  set: (key: TKey, value: TValue) => void;
+  add: (key: TKey) => void;
+  delete: (key: TKey) => void;
   applyUpdate: (result: TResult) => void;
   revert: (key: TKey) => void;
   clear: () => void;

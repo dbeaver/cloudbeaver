@@ -4,6 +4,7 @@ export default [
   ['data_grid_table_editing_open_inline_editor', 'Открыть встроенный редактор'],
   ['data_grid_table_editing_row_add', 'Добавить строку'],
   ['data_grid_table_editing_row_delete', 'Удалить текущую строку'],
+  ['data_grid_table_editing_row_revert', 'Отменить изменение'],
   ['data_grid_table_order', 'Сортировка'],
   ['data_grid_table_open_value_panel', 'Показать в панели значений'],
   ['data_grid_table_filter', 'Фильтры'],

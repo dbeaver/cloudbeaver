@@ -22,16 +22,24 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   static dataFormat: ResultDataFormat | null = null;
 
   readonly action: IExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
+  protected features: Array<keyof this>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
     super(source, result);
     this.action = new Executor();
+    this.features = [];
+  }
+
+  hasFeature(feature: keyof this): boolean {
+    return this.features.includes(feature);
   }
 
   abstract isEdited(): boolean;
   abstract isElementEdited(key: TKey): boolean;
-  abstract set(key: TKey, value: TValue): void;
   abstract get(key: TKey): TValue | undefined;
+  abstract set(key: TKey, value: TValue): void;
+  abstract add(key: TKey): void;
+  abstract delete(key: TKey): void;
   abstract applyUpdate(result: TResult): void;
   abstract revert(key: TKey): void;
   abstract clear(): void;
