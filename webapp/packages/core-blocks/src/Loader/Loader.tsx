@@ -50,7 +50,6 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
-// @ts-expect-error wtf error
 export const Loader: React.FC<Props> = observer(function Loader({
   cancelDisabled,
   overlay,
@@ -102,7 +101,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
 
   if (children) {
     if (loaded) {
-      return children();
+      return <>{children()}</>;
     }
 
     if (!loading) {
