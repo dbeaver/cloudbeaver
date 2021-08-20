@@ -19,6 +19,7 @@ export type SessionState = SessionStateFragment;
 
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null, void> {
+  private defaultLocale: string | undefined;
   constructor(
     private graphQLService: GraphQLService,
     serverConfiguration: ServerConfigResource
@@ -28,8 +29,12 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     this.sync(serverConfiguration);
   }
 
+  setDefaultLocale(defaultLocale?: string): void {
+    this.defaultLocale = defaultLocale;
+  }
+
   async refreshSilent(): Promise<void> {
-    const { session } = await this.graphQLService.sdk.openSession();
+    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
 
     this.data = session;
   }
@@ -38,6 +43,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
+      this.defaultLocale = locale;
       if (this.data) {
         this.data.locale = locale;
       }
@@ -45,7 +51,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
   }
 
   protected async loader(): Promise<SessionState> {
-    const { session } = await this.graphQLService.sdk.openSession();
+    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
 
     return session;
   }

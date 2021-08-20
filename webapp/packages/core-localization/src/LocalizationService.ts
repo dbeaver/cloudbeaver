@@ -87,6 +87,7 @@ export class LocalizationService extends Bootstrap {
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
     this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
+    this.sessionResource.setDefaultLocale(this.settings.language);
   }
 
   async load(): Promise<void> {

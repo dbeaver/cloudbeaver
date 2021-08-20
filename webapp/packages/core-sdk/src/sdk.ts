@@ -390,6 +390,10 @@ export interface MutationOpenConnectionArgs {
   config: ConnectionConfig;
 }
 
+export interface MutationOpenSessionArgs {
+  defaultLocale?: Maybe<Scalars['String']>;
+}
+
 export interface MutationSetConnectionNavigatorSettingsArgs {
   id: Scalars['ID'];
   settings: NavigatorSettingsInput;
@@ -1744,7 +1748,9 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
-export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
+export type OpenSessionMutationVariables = Exact<{
+  defaultLocale?: Maybe<Scalars['String']>;
+}>;
 
 export interface OpenSessionMutation { session: SessionStateFragment }
 
@@ -2748,8 +2754,8 @@ export const ChangeSessionLanguageDocument = `
 }
     `;
 export const OpenSessionDocument = `
-    mutation openSession {
-  session: openSession {
+    mutation openSession($defaultLocale: String) {
+  session: openSession(defaultLocale: $defaultLocale) {
     ...SessionState
   }
 }
