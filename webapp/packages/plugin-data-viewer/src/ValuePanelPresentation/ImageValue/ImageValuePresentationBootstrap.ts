@@ -32,7 +32,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
       order: 1,
       panel: () => ImageValuePresentation,
       isHidden: (_, context) => {
-        if (!context || !context.model.source.hasResult(context.resultIndex)) {
+        if (!context?.model.source.hasResult(context.resultIndex)) {
           return true;
         }
 
@@ -47,11 +47,10 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
           const cellValue = view.getCellValue(firstSelectedCell);
 
-          if (!this.isImageUrl(cellValue)) {
-            return true;
-          }
-
-          return !isResultSetContentValue(cellValue) || !this.isImage(cellValue);
+          return !(
+            this.isImageUrl(cellValue)
+            || (isResultSetContentValue(cellValue) && this.isImage(cellValue))
+          );
         }
 
         return true;
