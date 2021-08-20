@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { PlaceholderContainer, TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -130,12 +132,20 @@ export class ConnectionFormService {
 
     const config = contexts.getContext(connectionConfigContext);
 
-    if (config.credentials === undefined && credentialsState.authModelId) {
-      config.credentials = {};
+    if (credentialsState.authModelId) {
+      if (config.credentials === undefined) {
+        config.credentials = {};
+      }
+
+      config.credentials = observable(config.credentials);
     }
 
-    if (config.networkHandlersConfig === undefined && credentialsState.networkHandlers.length > 0) {
-      config.networkHandlersConfig = [];
+    if (credentialsState.networkHandlers.length > 0) {
+      if (config.networkHandlersConfig === undefined) {
+        config.networkHandlersConfig = [];
+      }
+
+      config.networkHandlersConfig = observable(config.networkHandlersConfig);
     }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
