@@ -84,7 +84,7 @@ export class DataPresentationService {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
       if (
         presentation.dataFormat !== undefined
-        && supportedDataFormats.includes(presentation.dataFormat)
+        && !supportedDataFormats.includes(presentation.dataFormat)
       ) {
         return false;
       }
