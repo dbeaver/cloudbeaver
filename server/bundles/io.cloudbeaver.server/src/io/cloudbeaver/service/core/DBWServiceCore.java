@@ -64,7 +64,7 @@ public interface DBWServiceCore extends DBWService {
     // Session
 
     @WebAction(requirePermissions = {})
-    WebSession openSession(@NotNull WebSession webSession) throws DBWebException;
+    WebSession openSession(@NotNull WebSession webSession, @Nullable String defaultLocale) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException;

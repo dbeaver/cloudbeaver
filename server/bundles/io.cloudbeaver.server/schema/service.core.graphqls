@@ -416,7 +416,7 @@ extend type Query {
 
 extend type Mutation {
     # Initialize session
-    openSession: SessionInfo!
+    openSession(defaultLocale: String): SessionInfo!
 
     # Destroy session
     closeSession: Boolean

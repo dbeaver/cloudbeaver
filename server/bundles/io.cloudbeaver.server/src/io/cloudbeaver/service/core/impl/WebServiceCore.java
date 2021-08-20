@@ -152,7 +152,8 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebSession openSession(@NotNull WebSession webSession) {
+    public WebSession openSession(@NotNull WebSession webSession, @Nullable String defaultLocale) {
+        webSession.setLocale(defaultLocale);
         return webSession;
     }
 

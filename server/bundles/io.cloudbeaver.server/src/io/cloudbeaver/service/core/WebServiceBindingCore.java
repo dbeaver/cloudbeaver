@@ -80,7 +80,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
         model.getMutationType()
             .dataFetcher("openSession", env -> getService(env).openSession(
-                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env), false)))
+                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env), false),
+                env.getArgument("defaultLocale")))
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
