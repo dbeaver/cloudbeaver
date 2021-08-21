@@ -16,8 +16,8 @@
  */
 package io.cloudbeaver.model.user;
 
-import io.cloudbeaver.DBWAuthProvider;
-import io.cloudbeaver.DBWAuthProviderFederated;
+import io.cloudbeaver.auth.DBWAuthProvider;
+import io.cloudbeaver.auth.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.DBException;

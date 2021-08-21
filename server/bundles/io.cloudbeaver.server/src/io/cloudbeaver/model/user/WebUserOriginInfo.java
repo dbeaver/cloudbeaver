@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.model.user;
 
-import io.cloudbeaver.DBWAuthProvider;
-import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.DBWAuthProvider;
+import io.cloudbeaver.auth.DBWAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;

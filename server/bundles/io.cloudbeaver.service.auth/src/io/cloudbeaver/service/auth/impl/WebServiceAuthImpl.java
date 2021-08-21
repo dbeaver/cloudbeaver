@@ -16,7 +16,12 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.DBWAuthProvider;
+import io.cloudbeaver.auth.DBWAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;

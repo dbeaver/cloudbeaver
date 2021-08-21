@@ -16,8 +16,8 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;

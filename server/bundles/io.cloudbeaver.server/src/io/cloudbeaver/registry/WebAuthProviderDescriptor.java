@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.registry;
 
-import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.auth.DBWAuthProvider;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;

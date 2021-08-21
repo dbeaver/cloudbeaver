@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.auth.provider;
 
-import io.cloudbeaver.DBWAuthProviderExternal;
+import io.cloudbeaver.auth.DBWAuthProviderExternal;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.utils.CommonUtils;

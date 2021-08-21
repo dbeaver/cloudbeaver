@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
-import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
