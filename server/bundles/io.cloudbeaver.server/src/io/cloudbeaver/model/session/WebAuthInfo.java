@@ -18,12 +18,14 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.meta.Property;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -38,6 +40,7 @@ public class WebAuthInfo {
     private final WebSession session;
     private final WebUser user;
     private WebAuthProviderDescriptor authProvider;
+    private WebAuthProviderConfiguration authProviderConfiguration;
     private DBASession authSession;
     private OffsetDateTime loginTime;
     private DBWUserIdentity userIdentity;
@@ -61,6 +64,46 @@ public class WebAuthInfo {
         this.loginTime = loginTime;
     }
 
+    @Property
+    public OffsetDateTime getLoginTime() {
+        return loginTime;
+    }
+
+    @Property
+    public String getMessage() {
+        return message;
+    }
+
+    @Property
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Property
+    public WebUserOriginInfo getOrigin() {
+        return new WebUserOriginInfo(session, user, authProvider);
+    }
+
+    @Property
+    public String getUserId() {
+        return userIdentity.getId();
+    }
+
+    @Property
+    public String getDisplayName() {
+        return userIdentity.getDisplayName();
+    }
+
+    @Property
+    public String getAuthProvider() {
+        return authProvider.getId();
+    }
+
+    @Property
+    public String getAuthConfiguration() {
+        return authProviderConfiguration.getId();
+    }
+
     public WebUser getUser() {
         return user;
     }
@@ -69,40 +112,20 @@ public class WebAuthInfo {
         return userIdentity;
     }
 
-    public String getUserId() {
-        return userIdentity.getId();
-    }
-
-    public String getDisplayName() {
-        return userIdentity.getDisplayName();
-    }
-
-    public String getAuthProvider() {
-        return authProvider.getId();
-    }
-
     public WebAuthProviderDescriptor getAuthProviderDescriptor() {
         return authProvider;
     }
 
+    public WebAuthProviderConfiguration getAuthProviderConfiguration() {
+        return authProviderConfiguration;
+    }
+
+    public void setAuthProviderConfiguration(WebAuthProviderConfiguration authProviderConfiguration) {
+        this.authProviderConfiguration = authProviderConfiguration;
+    }
+
     public DBASession getAuthSession() {
         return authSession;
-    }
-
-    public OffsetDateTime getLoginTime() {
-        return loginTime;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authProvider);
     }
 
     void closeAuth() {
