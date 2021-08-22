@@ -37,4 +37,7 @@ public interface DBWAuthProviderFederated {
     @NotNull
     String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
+    @NotNull
+    String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+
 }

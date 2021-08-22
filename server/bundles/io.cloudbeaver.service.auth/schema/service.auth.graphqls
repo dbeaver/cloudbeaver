@@ -32,6 +32,7 @@ type AuthProviderConfiguration {
     # Otherwise authLogin function must be called.
     signInLink: String
     signOutLink: String
+    metadataLink: String
 }
 
 type AuthProviderInfo {

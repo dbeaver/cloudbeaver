@@ -22,6 +22,7 @@ import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.Map;
 
@@ -62,16 +63,23 @@ public class WebAuthProviderConfiguration {
         return config.getParameters();
     }
 
+    @Property
     public String getSignInLink() throws DBException {
         DBWAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
     }
 
+    @Property
     public String getSignOutLink() throws DBException {
         DBWAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
     }
 
+    @Property
+    public String getMetadataLink() throws DBException {
+        DBWAuthProvider<?> instance = providerDescriptor.getInstance();
+        return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
+    }
 
     @Override
     public String toString() {
