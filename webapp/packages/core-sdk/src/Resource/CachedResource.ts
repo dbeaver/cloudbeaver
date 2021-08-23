@@ -9,7 +9,7 @@
 import { observable, makeObservable, action } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export interface ICachedResourceMetadata {
@@ -61,21 +61,15 @@ export abstract class CachedResource<
 
   protected scheduler: TaskScheduler<TParam>;
   protected paramAliases: Array<IParamAlias<TParam>>;
+  protected logActivity: boolean;
 
   constructor(defaultValue: TData) {
     super();
-    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader'>(this, {
-      data: observable,
-      loader: action,
-      markDataLoading: action,
-      markDataLoaded: action,
-      markDataError: action,
-      markOutdated: action,
-      markUpdated: action,
-    });
 
     this.includes = this.includes.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
+
+    this.logActivity = false;
 
     this.paramAliases = [];
     this.metadata = new MetadataMap(() => ({ outdated: true, loading: false, exception: null }));
@@ -86,34 +80,51 @@ export abstract class CachedResource<
     this.onDataUpdate = new Executor(null, this.includes);
     this.onDataError = new Executor<IDataError<TParam>>(null, (a, b) => this.includes(a.param, b.param));
 
-    // const logName = (action: string) => () => console.log(this.constructor.name + ': ' + action);
-    // const logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
-    //   if (ExecutorInterrupter.isInterrupted(contexts)) {
-    //     console.log(this.constructor.name + ': ' + action + 'interrupted');
-    //   }
-    // };
+    if (this.logActivity) {
+      this.spy(this.beforeLoad, 'beforeLoad');
+      this.spy(this.onDataOutdated, 'onDataOutdated');
+      this.spy(this.onDataUpdate, 'onDataUpdate');
+      this.spy(this.onDataError, 'onDataError');
+    }
 
-    // this.beforeLoad
-    //   .addHandler(logName('beforeLoad'))
-    //   .addPostHandler(logInterrupted('beforeLoad'));
-    // this.onDataOutdated
-    //   .addHandler(logName('onDataOutdated'))
-    //   .addPostHandler(logInterrupted('onDataOutdated'));
-    // this.onDataUpdate
-    //   .addHandler(logName('onDataUpdate'))
-    //   .addPostHandler(logInterrupted('onDataUpdate'));
-    // this.onDataError
-    //   .addHandler(logName('onDataError'))
-    //   .addPostHandler(logInterrupted('onDataError'));
+    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader'>(this, {
+      data: observable,
+      loader: action,
+      markDataLoading: action,
+      markDataLoaded: action,
+      markDataError: action,
+      markOutdated: action,
+      markUpdated: action,
+    });
   }
 
   sync(
     resource: CachedResource<any, TParam, TParam, void>,
     context: TContext
   ): void {
+    if (this.logActivity) {
+      resource.onDataOutdated.addHandler(resource.logLock('onDataOutdated > ' + this.getName()));
+    }
+
     resource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+
+    if (this.logActivity) {
+      resource.onDataOutdated.addHandler(resource.logLock('onDataOutdated < ' + this.getName()));
+      resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate > ' + this.getName()));
+    }
+
     resource.onDataUpdate.addHandler(param => this.load(param, context));
+
+    if (this.logActivity) {
+      resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate < ' + this.getName()));
+      this.beforeLoad.addHandler(this.logLock('> ' + resource.getName()));
+    }
+
     this.beforeLoad.addHandler(param => resource.load(param));
+
+    if (this.logActivity) {
+      this.beforeLoad.addHandler(this.logLock('< ' + resource.getName()));
+    }
   }
 
   abstract isLoaded(param: TParam, context: TContext): boolean;
@@ -308,5 +319,29 @@ export abstract class CachedResource<
     const value = await promise(param, context);
     this.markUpdated(param);
     return value;
+  }
+
+  protected getName(): string {
+    return this.constructor.name;
+  }
+
+  protected logLock = (action: string): IExecutorHandler<any> => () => {
+    console.log(this.constructor.name + ': ' + action);
+  };
+
+  private logName = (action: string): IExecutorHandler<any> => () => {
+    console.log(this.constructor.name + ': ' + action);
+  };
+
+  private logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      console.log(this.constructor.name + ': ' + action + 'interrupted');
+    }
+  };
+
+  private spy(executor: IExecutor<any>, action: string): void {
+    executor
+      .addHandler(this.logName(action))
+      .addPostHandler(this.logInterrupted(action));
   }
 }
