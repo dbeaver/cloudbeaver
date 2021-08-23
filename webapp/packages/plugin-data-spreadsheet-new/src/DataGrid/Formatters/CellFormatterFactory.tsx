@@ -28,7 +28,7 @@ export const CellFormatterFactory: React.FC<IProps> = observer(function CellForm
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
 
-  if (!props.isEditing || formatterRef === null) {
+  if (!props.isEditing || formatterRef.current === null) {
     formatterRef.current = TextFormatter;
 
     if (tableDataContext && context && cellContext?.cell) {

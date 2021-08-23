@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -49,6 +49,13 @@ export class ResultSetEditAction
       editorData: observable,
       addRows: computed,
       updates: computed,
+      set: action,
+      add: action,
+      addRow: action,
+      delete: action,
+      deleteRow: action,
+      revert: action,
+      applyUpdate: action,
     });
   }
 
@@ -69,6 +76,8 @@ export class ResultSetEditAction
           if (b.type === DatabaseEditChangeType.update) {
             return 1;
           }
+
+          return a.type - b.type;
         }
 
         return a.row.index - b.row.index;
@@ -240,7 +249,10 @@ export class ResultSetEditAction
 
   applyUpdate(result: IDatabaseResultSet): void {
     let rowIndex = 0;
-    let shift = 0;
+    let addShift = 0;
+    let deleteShift = 0;
+
+    const insertedRows: IResultSetRowKey[] = [];
 
     if (result.data?.rows?.length !== this.updates.length) {
       console.warn('ResultSetEditAction: returned data differs from performed update');
@@ -252,7 +264,7 @@ export class ResultSetEditAction
           const value = result.data?.rows?.[rowIndex];
 
           if (value !== undefined) {
-            this.data.setRowValue(update.row, value, shift);
+            this.data.setRowValue(update.row, value);
           }
 
           rowIndex++;
@@ -263,17 +275,19 @@ export class ResultSetEditAction
           const value = result.data?.rows?.[rowIndex];
 
           if (value !== undefined) {
-            this.data.insertRow(update.row, value, shift);
+            this.data.insertRow(update.row, value, addShift);
           }
 
+          insertedRows.push(update.row);
           rowIndex++;
-          shift++;
+          addShift++;
           break;
         }
 
         case DatabaseEditChangeType.delete: {
-          this.data.removeRow(update.row, shift);
-          shift--;
+          const insertShift = insertedRows.filter(row => row.index < update.row.index).length;
+          this.data.removeRow(update.row, deleteShift + insertShift);
+          deleteShift--;
           break;
         }
       }

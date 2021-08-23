@@ -36,6 +36,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 }
 
 const rowHeight = 25;
+const headerHeight = 28;
 
 export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResultSet>> = observer(function DataGridTable({ model, actions, resultIndex, className }) {
   const gridContainerRef = useRef<HTMLDivElement>(null);
@@ -115,14 +116,16 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
 
         if (
           gridDiv instanceof HTMLDivElement
-          && (
-            rowTop > gridDiv.clientHeight + gridDiv.scrollTop
-            || rowTop < gridDiv.scrollTop
-          )
         ) {
-          gridDiv.scrollTo({
-            top: rowIdx * rowHeight,
-          });
+          if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
+            gridDiv.scrollTo({
+              top: rowTop,
+            });
+          } else if (rowTop > gridDiv.scrollTop + gridDiv.clientHeight - headerHeight - rowHeight) {
+            gridDiv.scrollTo({
+              top: rowTop - gridDiv.clientHeight + headerHeight + rowHeight,
+            });
+          }
         }
         return;
       }
@@ -221,7 +224,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
                 }}
                 rows={tableData.rows}
                 rowKeyGetter={ResultSetDataKeysUtils.serialize}
-                headerRowHeight={28}
+                headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
                 rowRenderer={RowRenderer}
                 onSelectedCellChange={handleFocusChange}

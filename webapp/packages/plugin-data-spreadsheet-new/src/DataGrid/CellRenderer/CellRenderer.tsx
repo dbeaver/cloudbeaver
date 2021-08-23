@@ -8,7 +8,7 @@
 
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
@@ -169,6 +169,8 @@ export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = obser
     editingContext,
     tableDataContext,
   }, ['doubleClick', 'mouseUp', 'mouseDown']);
+
+  useEffect(() => () => editingContext?.closeEditor(cellContext.position), []);
 
   return (
     <CellContext.Provider value={cellContext}>

@@ -29,13 +29,10 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   static dataFormat = ResultDataFormat.Resultset;
 
   get rowKeys(): IResultSetRowKey[] {
-    const rows = this.data.rows
-      .map((c, index) => ({ index }));
-
-    rows.push(...this.editor.addRows);
-    rows.sort((a, b) => a.index - b.index);
-
-    return rows;
+    return [
+      ...this.data.rows.map((c, index) => ({ index })),
+      ...this.editor.addRows,
+    ].sort((a, b) => a.index - b.index);
   }
 
   get columnKeys(): IResultSetColumnKey[] {
