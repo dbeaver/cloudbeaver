@@ -19,6 +19,12 @@ declare module 'react-data-grid' {
   }
 }
 
+interface IColumnMetrics {
+  width: number;
+  left: number;
+  right: number;
+}
+
 export interface ITableData {
   format: ResultSetFormatAction;
   data: ResultSetDataAction;
@@ -27,6 +33,8 @@ export interface ITableData {
   columns: Array<Column<IResultSetRowKey, any>>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];
+  gridDiv: HTMLDivElement | null;
+  getMetrics: (columnIndex: number) => IColumnMetrics;
   getRow: (rowIndex: number) => IResultSetRowKey;
   getColumn: (columnIndex: number) => Column<IResultSetRowKey, any>;
   getColumnByDataIndex: (key: IResultSetColumnKey) => Column<IResultSetRowKey, any>;

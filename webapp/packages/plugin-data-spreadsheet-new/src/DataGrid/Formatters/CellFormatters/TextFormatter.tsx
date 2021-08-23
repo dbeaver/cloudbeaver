@@ -20,7 +20,7 @@ import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
 
-export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ row, rowIdx, column, isCellSelected }) {
+export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);

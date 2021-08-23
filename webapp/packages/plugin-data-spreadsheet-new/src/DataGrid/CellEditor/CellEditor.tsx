@@ -55,6 +55,9 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
   const [popperRef, setPopperRef] = useState<HTMLDivElement | null>(null);
   const popper = usePopper(elementRef, popperRef, {
     placement: 'right',
+    modifiers: [
+      { name: 'flip', enabled: false },
+    ],
   });
 
   if (!dataGridContext || !tableDataContext || column.columnDataIndex === null) {
@@ -132,6 +135,7 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
           <InlineEditor
             ref={inputRef}
             value={value}
+            controlsPosition="inside"
             edited
             hideSave
             hideCancel

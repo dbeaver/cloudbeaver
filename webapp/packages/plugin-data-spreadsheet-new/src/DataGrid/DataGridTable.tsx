@@ -39,15 +39,16 @@ const rowHeight = 25;
 const headerHeight = 28;
 
 export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResultSet>> = observer(function DataGridTable({ model, actions, resultIndex, className }) {
-  const gridContainerRef = useRef<HTMLDivElement>(null);
-  const dataGridRef = useRef<DataGridHandle>(null);
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const dataGridDivRef = useRef<HTMLDivElement | null>(null);
+  const dataGridRef = useRef<DataGridHandle>(null);
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
 
-  const tableData = useTableData(model, resultIndex);
+  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const focusSyncRef = useRef<CellPosition | null>(null);
 
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
@@ -78,6 +79,18 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
       return true;
     },
   });
+
+  function setContainersRef(element: HTMLDivElement) {
+    gridContainerRef.current = element;
+
+    const gridDiv = gridContainerRef.current?.firstChild;
+
+    if (gridDiv instanceof HTMLDivElement) {
+      dataGridDivRef.current = gridDiv;
+    } else {
+      dataGridDivRef.current = null;
+    }
+  }
 
   const { onKeydownHandler } = useGridSelectedCellsCopy(tableData, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
@@ -110,13 +123,11 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
       }
 
       if (selectionAction.isFocused(data.value.key)) {
-        const gridDiv = gridContainerRef.current?.firstChild;
         const rowTop = rowIdx * rowHeight;
+        const gridDiv = dataGridDivRef.current;
         dataGridRef.current?.scrollToColumn(idx);
 
-        if (
-          gridDiv instanceof HTMLDivElement
-        ) {
+        if (gridDiv) {
           if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
             gridDiv.scrollTo({
               top: rowTop,
@@ -205,7 +216,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
         <EditingContext.Provider value={editingContext}>
           <TableDataContext.Provider value={tableData}>
             <grid-container
-              ref={gridContainerRef}
+              ref={setContainersRef}
               className="cb-react-grid-container"
               tabIndex={-1}
               onKeyDown={onKeydownHandler}

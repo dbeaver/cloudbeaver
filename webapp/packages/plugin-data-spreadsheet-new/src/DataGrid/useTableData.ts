@@ -19,7 +19,7 @@ import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHead
 import type { ITableData } from './TableDataContext';
 
 export const indexColumn: Column<IResultSetRowKey, any> = {
-  key: '#',
+  key: 'index',
   columnDataIndex: null,
   name: '#',
   minWidth: 60,
@@ -30,13 +30,20 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   formatter: IndexFormatter,
 };
 
-export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): ITableData {
+export function useTableData(
+  model: IDatabaseDataModel<any, IDatabaseResultSet>,
+  resultIndex: number,
+  gridDIVElement: React.RefObject<HTMLDivElement | null>
+): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
   return useObservableRef<ITableData>(() => ({
+    get gridDiv(): HTMLDivElement | null {
+      return gridDIVElement.current;
+    },
     get columnKeys(): IResultSetColumnKey[] {
       return this.view.columnKeys;
     },
@@ -74,6 +81,21 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
       columns.unshift(indexColumn);
 
       return columns;
+    },
+    getMetrics(columnIndex) {
+      let left = 0;
+      for (let i = 0; i < columnIndex; i++) {
+        const column = this.columns[i];
+        left += column.width as number;
+      }
+
+      const column = this.getColumn(columnIndex);
+
+      return {
+        left,
+        right: left + (column.width as number),
+        width: column.width as number,
+      };
     },
     getRow(rowIndex) {
       return this.rows[rowIndex];
