@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -79,11 +79,16 @@ export class DataGridContextMenuCellEditingService {
         },
         isHidden(context) {
           const { key, model, resultIndex } = context.data;
-          const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const view = model.source.getAction(resultIndex, ResultSetViewAction);
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-          const cellValue = data.getCellValue(key);
+          const cellValue = view.getCellValue(key);
 
-          return cellValue === undefined || data.getColumn(key.column)?.required || format.isNull(cellValue);
+          return (
+            cellValue === undefined
+            || format.isReadOnly(context.data.key)
+            || view.getColumn(key.column)?.required
+            || format.isNull(cellValue)
+          );
         },
         onClick(context) {
           context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction)

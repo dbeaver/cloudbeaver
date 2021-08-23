@@ -8,12 +8,12 @@
 
 /* eslint-disable import/first */
 // Must be the first import
-if (process.env.NODE_ENV === 'development') {
-  // Must use require here as import statements are only allowed
-  // to exist at the top of a file.
-  // eslint-disable-next-line global-require
-  require('preact/debug');
-}
+// if (process.env.NODE_ENV === 'development') {
+//   // Must use require here as import statements are only allowed
+//   // to exist at the top of a file.
+//   // eslint-disable-next-line global-require
+//   require('preact/debug');
+// }
 
 import React from 'react';
 import ReactDOM from 'react-dom';
