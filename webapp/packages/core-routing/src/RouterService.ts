@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, runInAction } from 'mobx';
 import createRouter, {
   State, Router, SubscribeFn, SubscribeState
 } from 'router5';
@@ -49,17 +49,17 @@ export class RouterService extends Bootstrap {
   constructor() {
     super();
 
-    makeObservable<RouterService, 'currentState' | 'currentRoute' | 'currentParams'>(this, {
-      currentState: observable,
-      currentRoute: observable,
-      currentParams: observable,
-    });
-
     this.transitionTask = new Executor();
     this.router = createRouter();
     this.currentState = this.router.getState();
 
     this.configure();
+
+    makeObservable<RouterService, 'currentState' | 'currentRoute' | 'currentParams'>(this, {
+      currentState: observable,
+      currentRoute: observable,
+      currentParams: observable,
+    });
   }
 
   start(): void {
@@ -100,8 +100,10 @@ export class RouterService extends Bootstrap {
   }
 
   private onRouteChange(state: SubscribeState) {
-    this.currentState = state.route;
-    this.currentRoute = state.route.name;
-    this.currentParams = state.route.params;
+    runInAction(() => {
+      this.currentState = state.route;
+      this.currentRoute = state.route.name;
+      this.currentParams = state.route.params;
+    });
   }
 }

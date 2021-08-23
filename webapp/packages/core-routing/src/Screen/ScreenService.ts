@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -30,6 +31,10 @@ export class ScreenService {
   ) {
     this.routeChange = new Executor();
     this.routerService.subscribe(this.onRouteChange.bind(this));
+
+    makeObservable(this, {
+      screen: computed,
+    });
   }
 
   navigateToRoot(): void {

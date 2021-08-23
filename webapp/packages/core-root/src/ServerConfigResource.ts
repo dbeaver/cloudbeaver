@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
@@ -35,9 +35,11 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       showUtilityObjects: false,
     };
 
-    makeObservable(this, {
+    makeObservable<this, 'syncUpdateData'>(this, {
       update: observable,
       navigatorSettingsUpdate: observable,
+      unlinkUpdate: action,
+      syncUpdateData: action,
     });
   }
 
@@ -158,6 +160,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       await this.graphQLService.sdk.configureServer({
         configuration: !this.isChanged() && onlyRestart ? {} : this.update,
       });
+
       this.data = await this.loader();
     }, () => !this.isChanged() && !onlyRestart);
   }
@@ -171,7 +174,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   private syncUpdateData(serverConfig: ServerConfig) {
-    if (this.configurationMode) {
+    if (serverConfig.configurationMode) {
       return;
     }
 

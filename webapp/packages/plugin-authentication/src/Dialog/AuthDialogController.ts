@@ -36,7 +36,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
       }
     }
 
-    return providers.sort(this.compareProviders);
+    return providers.filter(Boolean).sort(this.compareProviders);
   }
 
   readonly error = new GQLErrorCatcher();
