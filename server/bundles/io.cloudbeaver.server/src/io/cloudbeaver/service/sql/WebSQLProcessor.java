@@ -300,6 +300,11 @@ public class WebSQLProcessor {
                 if (txnManager != null && txnManager.isSupportsTransactions()) {
                     txnManager.commit(session);
                 }
+            } catch (Exception e) {
+                if (txnManager != null && txnManager.isSupportsTransactions()) {
+                    txnManager.rollback(session, null);
+                }
+                throw new DBCException("Error persisting data changes", e);
             } finally {
                 if (revertToAutoCommit) {
                     txnManager.setAutoCommit(monitor, true);
