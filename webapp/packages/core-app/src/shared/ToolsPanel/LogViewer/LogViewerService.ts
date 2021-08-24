@@ -72,6 +72,7 @@ export class LogViewerService {
     const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout');
     this.maxFailedRequests = this.coreSettingsService.settings.getValue('app.logViewer.maxFailedRequests');
 
+    await this.updateLog();
     this.runInterval(refreshInterval);
   }
 
