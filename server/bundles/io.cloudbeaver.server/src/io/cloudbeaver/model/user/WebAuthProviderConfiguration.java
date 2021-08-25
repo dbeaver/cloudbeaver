@@ -43,6 +43,10 @@ public class WebAuthProviderConfiguration {
         this.config = config;
     }
 
+    public String getProviderId() {
+        return providerDescriptor.getId();
+    }
+
     public String getId() {
         return id;
     }
