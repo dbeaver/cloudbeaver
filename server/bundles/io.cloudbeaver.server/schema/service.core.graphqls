@@ -24,10 +24,27 @@ type ObjectPropertyInfo {
     validValues: [ Object ]
     # Default property value
     defaultValue: Object
+
+    # Property value length
+    length: ObjectPropertyLength!
+
     # Supported features (system, hidden, inherited, foreign, expensive, etc)
     features: [ String! ]!
     # Order position
     order: Int!
+}
+
+enum ObjectPropertyLength {
+    # 1 character
+    TINY,
+    # 20 characters
+    SHORT,
+    # <= 64 characters
+    MEDIUM,
+    # Full line length. The default
+    LONG,
+    # Multi-line long text
+    MULTILINE
 }
 
 # Async types

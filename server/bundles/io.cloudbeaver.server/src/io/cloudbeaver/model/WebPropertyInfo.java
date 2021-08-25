@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
@@ -104,6 +105,11 @@ public class WebPropertyInfo {
     public String getDataType() {
         Class<?> dataType = property.getDataType();
         return dataType == null ? null : dataType.getSimpleName();
+    }
+
+    @Property
+    public PropertyLength getLength() {
+        return property.getLength();
     }
 
     @Property
