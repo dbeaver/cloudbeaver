@@ -131,7 +131,7 @@ extend type Query {
         iconURL: String
         description: String
         parameters: Object): Boolean!
-    deleteAuthProviderConfiguration(id: ID!): Boolean!
+    deleteAuthProviderConfiguration(id: ID!): AdminAuthProviderConfiguration!
 
     #### Global configuration
 

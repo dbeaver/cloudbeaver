@@ -102,7 +102,7 @@ public interface DBWServiceAdmin extends DBWService {
     List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean saveAuthProviderConfiguration(
+    WebAuthProviderConfiguration saveAuthProviderConfiguration(
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @NotNull String id,
