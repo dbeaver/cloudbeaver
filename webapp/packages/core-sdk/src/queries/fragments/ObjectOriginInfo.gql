@@ -13,6 +13,7 @@ fragment ObjectOriginInfo on ObjectOrigin {
     defaultValue
     validValues
     value
+    length
     features
     order
   }

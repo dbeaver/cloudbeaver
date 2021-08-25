@@ -91,6 +91,12 @@ export function useOptions(state: IConnectionFormState) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete config.credentials[property];
         }
+
+        for (const property of Object.keys(config.providerProperties)) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete config.providerProperties[property];
+        }
+
         config.authModelId = driver?.defaultAuthModel;
       }
     },
