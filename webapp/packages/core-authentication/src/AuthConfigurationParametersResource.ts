@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
@@ -20,9 +21,12 @@ export class AuthConfigurationParametersResource
   GetAuthProviderConfigurationParametersQueryVariables
   > {
   constructor(
-    private readonly graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService,
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super();
+
+    this.sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
   }
 
   protected async loader(key: ResourceKey<string>) {

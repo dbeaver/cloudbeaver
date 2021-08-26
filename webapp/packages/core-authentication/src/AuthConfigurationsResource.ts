@@ -29,7 +29,7 @@ export class AuthConfigurationsResource
 
     this.loadedKeyMetadata = new MetadataMap(() => false);
 
-    this.permissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
+    this.permissionsResource.onDataOutdated.addHandler(this.markAllOutdated.bind(this));
   }
 
   has(id: string): boolean {
@@ -73,6 +73,11 @@ export class AuthConfigurationsResource
     this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
 
     return key;
+  }
+
+  private markAllOutdated() {
+    this.markOutdated();
+    this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.mark, false);
   }
 
   async refreshAll(): Promise<AdminAuthProviderConfiguration[]> {
