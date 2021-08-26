@@ -11,17 +11,17 @@ import { useState } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
-import { ConfigurationFormService } from './ConfigurationFormService';
-import { ConfigurationFormState } from './ConfigurationFormState';
-import type { IConfigurationFormState } from './IConfigurationFormProps';
+import { AuthConfigurationFormService } from './AuthConfigurationFormService';
+import { AuthConfigurationFormState } from './AuthConfigurationFormState';
+import type { IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
 
-export function useConfigurationFormState(
+export function useAuthConfigurationFormState(
   resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>,
-  configure?: (state: IConfigurationFormState) => any
-): IConfigurationFormState {
-  const service = useService(ConfigurationFormService);
-  const [state] = useState<IConfigurationFormState>(() => {
-    const state = new ConfigurationFormState(
+  configure?: (state: IAuthConfigurationFormState) => any
+): IAuthConfigurationFormState {
+  const service = useService(AuthConfigurationFormService);
+  const [state] = useState<IAuthConfigurationFormState>(() => {
+    const state = new AuthConfigurationFormState(
       service,
       resource,
     );

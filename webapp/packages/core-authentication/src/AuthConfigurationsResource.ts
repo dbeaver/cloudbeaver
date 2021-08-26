@@ -7,7 +7,6 @@
  */
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -17,7 +16,7 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 @injectable()
-export class AuthProviderConfigurationsResource
+export class AuthConfigurationsResource
   extends CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables> {
   static keyAll = resourceKeyList(['all'], 'all');
   private loadedKeyMetadata: MetadataMap<string, boolean>;
@@ -25,11 +24,20 @@ export class AuthProviderConfigurationsResource
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly permissionsResource: PermissionsResource,
-    private readonly authProvidersResource: AuthProvidersResource
   ) {
     super([]);
 
     this.loadedKeyMetadata = new MetadataMap(() => false);
+
+    this.permissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
+  }
+
+  has(id: string): boolean {
+    if (this.loadedKeyMetadata.has(id)) {
+      return this.loadedKeyMetadata.get(id);
+    }
+
+    return this.data.has(id);
   }
 
   async loader(key: ResourceKey<string>): Promise<Map<string, AdminAuthProviderConfiguration>> {
@@ -37,9 +45,9 @@ export class AuthProviderConfigurationsResource
       return this.data;
     }
 
-    const all = ResourceKeyUtils.hasMark(key, AuthProviderConfigurationsResource.keyAll.mark);
+    const all = ResourceKeyUtils.hasMark(key, AuthConfigurationsResource.keyAll.mark);
 
-    await ResourceKeyUtils.forEachAsync(all ? AuthProviderConfigurationsResource.keyAll : key, async key => {
+    await ResourceKeyUtils.forEachAsync(all ? AuthConfigurationsResource.keyAll : key, async key => {
       const { configurations } = await this.graphQLService.sdk.getAuthProviderConfigurations({
         providerId: !all ? key : undefined,
       });
@@ -51,7 +59,7 @@ export class AuthProviderConfigurationsResource
       this.updateConfiguration(...configurations);
 
       if (all) {
-        this.loadedKeyMetadata.set(AuthProviderConfigurationsResource.keyAll.list[0], true);
+        this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.list[0], true);
       }
     });
 
@@ -68,7 +76,7 @@ export class AuthProviderConfigurationsResource
   }
 
   async refreshAll(): Promise<AdminAuthProviderConfiguration[]> {
-    await this.refresh(AuthProviderConfigurationsResource.keyAll);
+    await this.refresh(AuthConfigurationsResource.keyAll);
     return this.values;
   }
 
@@ -78,8 +86,6 @@ export class AuthProviderConfigurationsResource
 
       this.updateConfiguration(configuration);
     });
-
-    this.authProvidersResource.markOutdated();
 
     return this.get(config.id)!;
   }
@@ -91,8 +97,6 @@ export class AuthProviderConfigurationsResource
       });
       this.delete(key);
     });
-
-    this.authProvidersResource.markOutdated();
   }
 }
 

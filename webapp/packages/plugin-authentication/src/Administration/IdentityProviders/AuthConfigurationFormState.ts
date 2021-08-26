@@ -11,13 +11,13 @@ import { computed, makeObservable, observable } from 'mobx';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
-import type { ConfigurationFormService } from './ConfigurationFormService';
-import { configurationFormConfigureContext } from './Contexts/configurationFormConfigureContext';
-import { configurationFormStateContext, IConfigurationFormStateInfo } from './Contexts/configurationFormStateContext';
-import type { ConfigurationFormMode, IConfigurationFormState, IConfigurationFormSubmitData } from './IConfigurationFormProps';
+import type { AuthConfigurationFormService } from './AuthConfigurationFormService';
+import { authConfigurationFormConfigureContext } from './Contexts/authConfigurationFormConfigureContext';
+import { authConfigurationFormStateContext, IAuthConfigurationFormStateInfo } from './Contexts/authConfigurationFormStateContext';
+import type { AuthConfigurationFormMode, IAuthConfigurationFormState, IAuthConfigurationFormSubmitData } from './IAuthConfigurationFormProps';
 
-export class ConfigurationFormState implements IConfigurationFormState {
-  mode: ConfigurationFormMode;
+export class AuthConfigurationFormState implements IAuthConfigurationFormState {
+  mode: AuthConfigurationFormMode;
   config: AdminAuthProviderConfiguration;
   statusMessage: string | null;
   configured: boolean;
@@ -48,25 +48,17 @@ export class ConfigurationFormState implements IConfigurationFormState {
     GetAuthProviderConfigurationsQueryVariables
   >;
 
-  readonly service: ConfigurationFormService;
-  readonly submittingTask: IExecutor<IConfigurationFormSubmitData>;
+  readonly service: AuthConfigurationFormService;
+  readonly submittingTask: IExecutor<IAuthConfigurationFormSubmitData>;
 
-  private stateInfo: IConfigurationFormStateInfo | null;
-  private loadConfigurationTask: IExecutor<IConfigurationFormState>;
-  private formStateTask: IExecutor<IConfigurationFormState>;
+  private stateInfo: IAuthConfigurationFormStateInfo | null;
+  private loadConfigurationTask: IExecutor<IAuthConfigurationFormState>;
+  private formStateTask: IExecutor<IAuthConfigurationFormState>;
 
   constructor(
-    service: ConfigurationFormService,
+    service: AuthConfigurationFormService,
     resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>
   ) {
-    makeObservable<IConfigurationFormState>(this, {
-      mode: observable,
-      config: observable,
-      statusMessage: observable,
-      info: computed,
-      readonly: computed,
-    });
-
     this.resource = resource;
     this.config = {
       displayName: '',
@@ -79,12 +71,20 @@ export class ConfigurationFormState implements IConfigurationFormState {
 
     this.stateInfo = null;
     this.service = service;
-    this.formStateTask = new Executor<IConfigurationFormState>(this, () => true);
-    this.loadConfigurationTask = new Executor<IConfigurationFormState>(this, () => true);
+    this.formStateTask = new Executor<IAuthConfigurationFormState>(this, () => true);
+    this.loadConfigurationTask = new Executor<IAuthConfigurationFormState>(this, () => true);
     this.submittingTask = new Executor();
     this.statusMessage = null;
     this.configured = false;
     this.mode = 'create';
+
+    makeObservable<IAuthConfigurationFormState>(this, {
+      mode: observable,
+      config: observable,
+      statusMessage: observable,
+      info: computed,
+      readonly: computed,
+    });
 
     this.save = this.save.bind(this);
     this.loadInfo = this.loadInfo.bind(this);
@@ -98,7 +98,7 @@ export class ConfigurationFormState implements IConfigurationFormState {
       .before(service.configureTask)
       .addPostHandler(this.loadInfo)
       .next(service.fillConfigTask, (state, contexts) => {
-        const configuration = contexts.getContext(configurationFormConfigureContext);
+        const configuration = contexts.getContext(authConfigurationFormConfigureContext);
 
         return {
           state,
@@ -119,7 +119,7 @@ export class ConfigurationFormState implements IConfigurationFormState {
   }
 
   setOptions(
-    mode: ConfigurationFormMode,
+    mode: AuthConfigurationFormMode,
   ): this {
     this.mode = mode;
     return this;
@@ -140,10 +140,10 @@ export class ConfigurationFormState implements IConfigurationFormState {
   }
 
   private updateFormState(
-    data: IConfigurationFormState,
-    contexts: IExecutionContextProvider<IConfigurationFormState>
+    data: IAuthConfigurationFormState,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormState>
   ): void {
-    const context = contexts.getContext(configurationFormStateContext);
+    const context = contexts.getContext(authConfigurationFormStateContext);
 
     this.statusMessage = context.statusMessage;
 
@@ -151,7 +151,10 @@ export class ConfigurationFormState implements IConfigurationFormState {
     this.configured = true;
   }
 
-  private async loadInfo(data: IConfigurationFormState, contexts: IExecutionContextProvider<IConfigurationFormState>) {
+  private async loadInfo(
+    data: IAuthConfigurationFormState,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormState>
+  ) {
     if (!data.config.id) {
       return;
     }

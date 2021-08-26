@@ -11,9 +11,9 @@ import { observer } from 'mobx-react-lite';
 import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import type { IConfigurationFormProps } from './IConfigurationFormProps';
+import type { IAuthConfigurationFormProps } from './IAuthConfigurationFormProps';
 
-export const ConfigurationFormBaseActions: PlaceholderComponent<IConfigurationFormProps> = observer(function ConfigurationFormBaseActions({
+export const AuthConfigurationFormBaseActions: PlaceholderComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationFormBaseActions({
   state,
   onCancel,
 }) {

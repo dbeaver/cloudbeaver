@@ -14,8 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConfigurationForm } from './ConfigurationForm';
-import { CreateConfigurationService } from './CreateConfigurationService';
+import { AuthConfigurationForm } from './AuthConfigurationForm';
+import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 
 const styles = composes(
   css`
@@ -59,9 +59,9 @@ const styles = composes(
   `
 );
 
-export const CreateConfiguration: React.FC = observer(function CreateConfiguration() {
+export const CreateAuthConfiguration: React.FC = observer(function CreateAuthConfiguration() {
   const style = useStyles(styles);
-  const service = useService(CreateConfigurationService);
+  const service = useService(CreateAuthConfigurationService);
 
   if (!service.data) {
     return null;
@@ -75,7 +75,7 @@ export const CreateConfiguration: React.FC = observer(function CreateConfigurati
         <IconButton name="cross" viewBox="0 0 16 16" onClick={service.cancelCreate} />
       </title-bar>
       <configuration-create-content>
-        <ConfigurationForm state={service.data} onCancel={service.cancelCreate} onSave={service.cancelCreate} />
+        <AuthConfigurationForm state={service.data} onCancel={service.cancelCreate} onSave={service.cancelCreate} />
       </configuration-create-content>
     </configuration-create>
   );

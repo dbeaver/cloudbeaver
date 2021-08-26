@@ -10,7 +10,7 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()
-export class ConfigurationsAdministrationNavService {
+export class AuthConfigurationsAdministrationNavService {
   constructor(
     private administrationScreenService: AdministrationScreenService
   ) { }

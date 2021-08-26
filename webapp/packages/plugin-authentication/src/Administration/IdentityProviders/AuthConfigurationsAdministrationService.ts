@@ -7,31 +7,30 @@
  */
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
+import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
-import { AuthProviderConfigurationsResource } from './AuthProviderConfigurationsResource';
-import { ConfigurationsAdministration } from './ConfigurationsAdministration';
-import { ConfigurationsDrawerItem } from './ConfigurationsDrawerItem';
-import { CreateConfigurationService } from './CreateConfigurationService';
+import { AuthConfigurationsAdministration } from './AuthConfigurationsAdministration';
+import { AuthConfigurationsDrawerItem } from './AuthConfigurationsDrawerItem';
+import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 
-export interface IConfigurationDetailsPlaceholderProps {
+export interface IAuthConfigurationDetailsPlaceholderProps {
   configuration: AdminAuthProviderConfiguration;
 }
 
 @injectable()
-export class ConfigurationsAdministrationService extends Bootstrap {
-  readonly configurationDetailsPlaceholder = new PlaceholderContainer<IConfigurationDetailsPlaceholderProps>();
+export class AuthConfigurationsAdministrationService extends Bootstrap {
+  readonly configurationDetailsPlaceholder = new PlaceholderContainer<IAuthConfigurationDetailsPlaceholderProps>();
 
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly notificationService: NotificationService,
     private readonly authProvidersResource: AuthProvidersResource,
-    private readonly authProviderConfigurationsResource: AuthProviderConfigurationsResource,
-    private readonly createConfigurationService: CreateConfigurationService,
+    private readonly authProviderConfigurationsResource: AuthConfigurationsResource,
+    private readonly createConfigurationService: CreateAuthConfigurationService,
   ) {
     super();
   }
@@ -42,7 +41,6 @@ export class ConfigurationsAdministrationService extends Bootstrap {
       type: AdministrationItemType.Default,
       order: 4,
       configurationWizardOptions: {
-        defaultRoute: { sub: 'create' },
         description: 'administration_identity_providers_wizard_description',
       },
       sub: [
@@ -52,8 +50,8 @@ export class ConfigurationsAdministrationService extends Bootstrap {
         },
       ],
       isHidden: () => !this.authProvidersResource.values.some(provider => provider.configurable),
-      getContentComponent: () => ConfigurationsAdministration,
-      getDrawerComponent: () => ConfigurationsDrawerItem,
+      getContentComponent: () => AuthConfigurationsAdministration,
+      getDrawerComponent: () => AuthConfigurationsDrawerItem,
       onActivate: this.loadConfigurations.bind(this),
     });
   }
@@ -62,7 +60,7 @@ export class ConfigurationsAdministrationService extends Bootstrap {
 
   private async loadConfigurations() {
     try {
-      await this.authProviderConfigurationsResource.load(AuthProviderConfigurationsResource.keyAll);
+      await this.authProviderConfigurationsResource.load(AuthConfigurationsResource.keyAll);
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading configurations');
     }

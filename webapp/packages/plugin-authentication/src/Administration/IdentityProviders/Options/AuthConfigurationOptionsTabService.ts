@@ -6,42 +6,42 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { AuthProviderConfigurationsResource } from '../AuthProviderConfigurationsResource';
-import { ConfigurationFormService } from '../ConfigurationFormService';
-import { configurationContext } from '../Contexts/configurationContext';
-import type { IConfigurationFormFillConfigData, IConfigurationFormSubmitData } from '../IConfigurationFormProps';
-import { ConfigurationOptions } from './ConfigurationOptions';
+import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
+import { authConfigurationContext } from '../Contexts/authConfigurationContext';
+import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormSubmitData } from '../IAuthConfigurationFormProps';
+import { AuthConfigurationOptions } from './AuthConfigurationOptions';
 
 @injectable()
-export class ConfigurationOptionsTabService extends Bootstrap {
+export class AuthConfigurationOptionsTabService extends Bootstrap {
   constructor(
-    private readonly configurationFormService: ConfigurationFormService,
-    private readonly authProviderConfigurationsResource: AuthProviderConfigurationsResource,
+    private readonly authConfigurationFormService: AuthConfigurationFormService,
+    private readonly authConfigurationsResource: AuthConfigurationsResource,
   ) {
     super();
   }
 
   register(): void {
-    this.configurationFormService.tabsContainer.add({
+    this.authConfigurationFormService.tabsContainer.add({
       key: 'options',
       name: 'Options',
       order: 1,
-      panel: () => ConfigurationOptions,
+      panel: () => AuthConfigurationOptions,
     });
 
-    this.configurationFormService.prepareConfigTask
+    this.authConfigurationFormService.prepareConfigTask
       .addHandler(this.prepareConfig.bind(this));
 
-    this.configurationFormService.formValidationTask
+    this.authConfigurationFormService.formValidationTask
       .addHandler(this.validate.bind(this));
 
-    this.configurationFormService.formSubmittingTask
+    this.authConfigurationFormService.formSubmittingTask
       .addHandler(this.save.bind(this));
 
-    this.configurationFormService.fillConfigTask
+    this.authConfigurationFormService.fillConfigTask
       .addHandler(this.fillConfig.bind(this));
   }
 
@@ -50,10 +50,10 @@ export class ConfigurationOptionsTabService extends Bootstrap {
   private async prepareConfig(
     {
       state,
-    }: IConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IConfigurationFormSubmitData>
+    }: IAuthConfigurationFormSubmitData,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
   ) {
-    const config = contexts.getContext(configurationContext);
+    const config = contexts.getContext(authConfigurationContext);
 
     config.id = state.config.id;
     config.providerId = state.config.providerId;
@@ -75,10 +75,10 @@ export class ConfigurationOptionsTabService extends Bootstrap {
   private async validate(
     {
       state,
-    }: IConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IConfigurationFormSubmitData>
+    }: IAuthConfigurationFormSubmitData,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
   ) {
-    const validation = contexts.getContext(this.configurationFormService.configurationValidationContext);
+    const validation = contexts.getContext(this.authConfigurationFormService.configurationValidationContext);
 
     if (!state.config.providerId) {
       validation.error("Field 'Provider' can't be empty");
@@ -96,14 +96,14 @@ export class ConfigurationOptionsTabService extends Bootstrap {
   private async save(
     {
       state,
-    }: IConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IConfigurationFormSubmitData>
+    }: IAuthConfigurationFormSubmitData,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
   ) {
-    const status = contexts.getContext(this.configurationFormService.configurationStatusContext);
-    const config = contexts.getContext(configurationContext);
+    const status = contexts.getContext(this.authConfigurationFormService.configurationStatusContext);
+    const config = contexts.getContext(authConfigurationContext);
 
     try {
-      const configuration = await this.authProviderConfigurationsResource.saveConfiguration(config);
+      const configuration = await this.authConfigurationsResource.saveConfiguration(config);
 
       if (state.mode === 'create') {
         status.info('Configuration is created');
@@ -118,8 +118,8 @@ export class ConfigurationOptionsTabService extends Bootstrap {
   }
 
   private fillConfig(
-    { state, updated }: IConfigurationFormFillConfigData,
-    contexts: IExecutionContextProvider<IConfigurationFormFillConfigData>
+    { state, updated }: IAuthConfigurationFormFillConfigData,
+    contexts: IExecutionContextProvider<IAuthConfigurationFormFillConfigData>
   ) {
     if (!updated) {
       return;

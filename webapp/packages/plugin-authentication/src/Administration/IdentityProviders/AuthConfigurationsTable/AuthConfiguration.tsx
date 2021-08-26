@@ -18,8 +18,8 @@ import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConfigurationsAdministrationService } from '../ConfigurationsAdministrationService';
-import { ConfigurationEdit } from './ConfigurationEdit';
+import { AuthConfigurationsAdministrationService } from '../AuthConfigurationsAdministrationService';
+import { AuthConfigurationEdit } from './AuthConfigurationEdit';
 
 const styles = css`
   StaticImage {
@@ -42,14 +42,14 @@ interface Props {
   configuration: AdminAuthProviderConfiguration;
 }
 
-export const Configuration: React.FC<Props> = observer(function Configuration({ configuration }) {
-  const service = useService(ConfigurationsAdministrationService);
+export const AuthConfiguration: React.FC<Props> = observer(function AuthConfiguration({ configuration }) {
+  const service = useService(AuthConfigurationsAdministrationService);
   const resource = useMapResource(AuthProvidersResource, configuration.providerId);
 
   const icon = configuration.iconURL || resource.data?.icon;
 
   return styled(useStyles(styles))(
-    <TableItem item={configuration.id} expandElement={ConfigurationEdit}>
+    <TableItem item={configuration.id} expandElement={AuthConfigurationEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
       </TableColumnValue>

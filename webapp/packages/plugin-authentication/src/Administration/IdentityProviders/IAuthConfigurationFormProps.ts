@@ -9,10 +9,10 @@
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
-export type ConfigurationFormMode = 'edit' | 'create';
+export type AuthConfigurationFormMode = 'edit' | 'create';
 
-export interface IConfigurationFormState {
-  mode: ConfigurationFormMode;
+export interface IAuthConfigurationFormState {
+  mode: AuthConfigurationFormMode;
   config: AdminAuthProviderConfiguration;
 
   readonly info: AdminAuthProviderConfiguration | undefined;
@@ -21,7 +21,7 @@ export interface IConfigurationFormState {
   readonly readonly: boolean;
   readonly loading: boolean;
 
-  readonly submittingTask: IExecutorHandlersCollection<IConfigurationFormSubmitData>;
+  readonly submittingTask: IExecutorHandlersCollection<IAuthConfigurationFormSubmitData>;
   readonly resource: CachedMapResource<
     string,
     AdminAuthProviderConfiguration,
@@ -32,20 +32,20 @@ export interface IConfigurationFormState {
   readonly loadConfigurationInfo: () => Promise<AdminAuthProviderConfiguration | undefined>;
   readonly save: () => Promise<void>;
   readonly setOptions: (
-    mode: ConfigurationFormMode,
+    mode: AuthConfigurationFormMode,
   ) => this;
 }
 
-export interface IConfigurationFormProps {
-  state: IConfigurationFormState;
+export interface IAuthConfigurationFormProps {
+  state: IAuthConfigurationFormState;
   onCancel?: () => void;
 }
 
-export interface IConfigurationFormFillConfigData {
+export interface IAuthConfigurationFormFillConfigData {
   updated: boolean;
-  state: IConfigurationFormState;
+  state: IAuthConfigurationFormState;
 }
 
-export interface IConfigurationFormSubmitData {
-  state: IConfigurationFormState;
+export interface IAuthConfigurationFormSubmitData {
+  state: IAuthConfigurationFormState;
 }

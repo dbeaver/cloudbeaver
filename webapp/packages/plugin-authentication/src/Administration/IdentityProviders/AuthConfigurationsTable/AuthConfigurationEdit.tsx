@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { AuthProviderConfigurationsResource } from '../AuthProviderConfigurationsResource';
-import { ConfigurationForm } from '../ConfigurationForm';
-import { useConfigurationFormState } from '../useConfigurationFormState';
+import { AuthConfigurationForm } from '../AuthConfigurationForm';
+import { useAuthConfigurationFormState } from '../useAuthConfigurationFormState';
 
 const styles = composes(
   css`
@@ -38,10 +38,10 @@ interface Props {
   item: string;
 }
 
-export const ConfigurationEdit = observer(function ConfigurationEdit({
+export const AuthConfigurationEdit = observer(function AuthConfigurationEdit({
   item,
 }: Props) {
-  const resource = useService(AuthProviderConfigurationsResource);
+  const resource = useService(AuthConfigurationsResource);
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const ConfigurationEdit = observer(function ConfigurationEdit({
     });
   }, []);
 
-  const data = useConfigurationFormState(
+  const data = useAuthConfigurationFormState(
     resource,
     state => state.setOptions('edit')
   );
@@ -60,7 +60,7 @@ export const ConfigurationEdit = observer(function ConfigurationEdit({
 
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>
-      <ConfigurationForm
+      <AuthConfigurationForm
         state={data}
       />
     </box>

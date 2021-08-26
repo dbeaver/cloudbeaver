@@ -174,15 +174,11 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!searchable) {
-        return;
-      }
-
       const value = event.target.value;
       onChange(value, name);
       setSearchValue(value);
     },
-    [name, onChange, searchable]
+    [name, onChange]
   );
 
   const handleRemove = useCallback(

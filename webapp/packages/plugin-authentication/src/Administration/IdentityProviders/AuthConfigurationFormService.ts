@@ -11,8 +11,8 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import { ConfigurationFormBaseActions } from './ConfigurationFormBaseActions';
-import type { IConfigurationFormFillConfigData, IConfigurationFormProps, IConfigurationFormSubmitData, IConfigurationFormState } from './IConfigurationFormProps';
+import { AuthConfigurationFormBaseActions } from './AuthConfigurationFormBaseActions';
+import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormProps, IAuthConfigurationFormSubmitData, IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
 
 export interface IConfigurationFormValidation {
   valid: boolean;
@@ -30,16 +30,16 @@ export interface IConfigurationFormStatus {
 }
 
 @injectable()
-export class ConfigurationFormService {
-  readonly tabsContainer: TabsContainer<IConfigurationFormProps>;
-  readonly actionsContainer: PlaceholderContainer<IConfigurationFormProps>;
+export class AuthConfigurationFormService {
+  readonly tabsContainer: TabsContainer<IAuthConfigurationFormProps>;
+  readonly actionsContainer: PlaceholderContainer<IAuthConfigurationFormProps>;
 
-  readonly configureTask: IExecutorHandlersCollection<IConfigurationFormState>;
-  readonly fillConfigTask: IExecutorHandlersCollection<IConfigurationFormFillConfigData>;
-  readonly prepareConfigTask: IExecutorHandlersCollection<IConfigurationFormSubmitData>;
-  readonly formValidationTask: IExecutorHandlersCollection<IConfigurationFormSubmitData>;
-  readonly formSubmittingTask: IExecutorHandlersCollection<IConfigurationFormSubmitData>;
-  readonly formStateTask: IExecutorHandlersCollection<IConfigurationFormState>;
+  readonly configureTask: IExecutorHandlersCollection<IAuthConfigurationFormState>;
+  readonly fillConfigTask: IExecutorHandlersCollection<IAuthConfigurationFormFillConfigData>;
+  readonly prepareConfigTask: IExecutorHandlersCollection<IAuthConfigurationFormSubmitData>;
+  readonly formValidationTask: IExecutorHandlersCollection<IAuthConfigurationFormSubmitData>;
+  readonly formSubmittingTask: IExecutorHandlersCollection<IAuthConfigurationFormSubmitData>;
+  readonly formStateTask: IExecutorHandlersCollection<IAuthConfigurationFormState>;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -58,12 +58,12 @@ export class ConfigurationFormService {
       .before(this.prepareConfigTask);
 
     this.formStateTask
-      .before<IConfigurationFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
+      .before<IAuthConfigurationFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
-    this.actionsContainer.add(ConfigurationFormBaseActions);
+    this.actionsContainer.add(AuthConfigurationFormBaseActions);
   }
 
   configurationValidationContext = (): IConfigurationFormValidation => ({
@@ -92,7 +92,7 @@ export class ConfigurationFormService {
     },
   });
 
-  private showSubmittingStatusMessage: IExecutorHandler<IConfigurationFormSubmitData> = (data, contexts) => {
+  private showSubmittingStatusMessage: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
     const status = contexts.getContext(this.configurationStatusContext);
 
     if (!status.saved) {
@@ -115,7 +115,7 @@ export class ConfigurationFormService {
     }
   };
 
-  private ensureValidation: IExecutorHandler<IConfigurationFormSubmitData> = (data, contexts) => {
+  private ensureValidation: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
     const validation = contexts.getContext(this.configurationValidationContext);
 
     if (!validation.valid) {

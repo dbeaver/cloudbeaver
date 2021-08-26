@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
+import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, Group, GroupTitle,
   InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent, useMapResource
@@ -19,8 +19,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfigurationParametersFragment } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AuthProviderConfigurationParametersResource } from '../AuthProviderConfigurationParametersResource';
-import type { IConfigurationFormProps } from '../IConfigurationFormProps';
+import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';
 
 const styles = css`
   SubmittingForm {
@@ -29,7 +28,7 @@ const styles = css`
   }
 `;
 
-export const ConfigurationOptions: TabContainerPanelComponent<IConfigurationFormProps> = observer(function ConfigurationOptions({
+export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationOptions({
   state,
 }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -38,7 +37,7 @@ export const ConfigurationOptions: TabContainerPanelComponent<IConfigurationForm
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
   const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
-  const parameters = useMapResource(AuthProviderConfigurationParametersResource, state.config.providerId || null);
+  const parameters = useMapResource(AuthConfigurationParametersResource, state.config.providerId || null);
 
   const identityProviders = providers.resource.values.filter(provider => provider.configurable);
   const edit = state.mode === 'edit';
@@ -56,7 +55,6 @@ export const ConfigurationOptions: TabContainerPanelComponent<IConfigurationForm
             placeholder={translate('administration_identity_providers_choose_provider_placeholder')}
             readOnly={state.readonly || edit}
             disabled={state.disabled}
-            searchable={false}
             tiny
             fill
           >

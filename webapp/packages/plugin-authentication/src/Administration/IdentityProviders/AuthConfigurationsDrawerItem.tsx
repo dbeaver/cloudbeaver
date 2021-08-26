@@ -13,7 +13,7 @@ import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-export const ConfigurationsDrawerItem: React.FC<AdministrationItemDrawerProps> = function ConfigurationsDrawerItem({
+export const AuthConfigurationsDrawerItem: React.FC<AdministrationItemDrawerProps> = function AuthConfigurationsDrawerItem({
   item, onSelect, style, disabled,
 }) {
   return styled(useStyles(...style))(

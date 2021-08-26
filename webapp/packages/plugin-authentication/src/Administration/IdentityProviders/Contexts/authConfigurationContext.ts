@@ -8,7 +8,7 @@
 
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
-export function configurationContext(): AdminAuthProviderConfiguration {
+export function authConfigurationContext(): AdminAuthProviderConfiguration {
   return {
     id: '',
     providerId: '',

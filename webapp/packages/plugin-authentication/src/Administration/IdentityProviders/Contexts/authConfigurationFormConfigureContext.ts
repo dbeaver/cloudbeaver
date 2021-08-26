@@ -9,17 +9,17 @@
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
-import type { IConfigurationFormState } from '../IConfigurationFormProps';
+import type { IAuthConfigurationFormState } from '../IAuthConfigurationFormProps';
 
-export interface IConfigurationFormConfigureContext {
+export interface IAuthConfigurationFormConfigureContext {
   readonly providerId: string | undefined;
   readonly info: AdminAuthProviderConfiguration | undefined;
 }
 
-export function configurationFormConfigureContext(
-  contexts: IExecutionContextProvider<IConfigurationFormState>,
-  state: IConfigurationFormState
-): IConfigurationFormConfigureContext {
+export function authConfigurationFormConfigureContext(
+  contexts: IExecutionContextProvider<IAuthConfigurationFormState>,
+  state: IAuthConfigurationFormState
+): IAuthConfigurationFormConfigureContext {
   return {
     info: state.info,
     providerId: state.config.providerId,

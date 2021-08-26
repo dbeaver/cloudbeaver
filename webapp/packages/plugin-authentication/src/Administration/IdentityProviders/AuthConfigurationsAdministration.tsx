@@ -10,15 +10,15 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel, useTable } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ConfigurationsAdministrationController } from './ConfigurationsAdministrationController';
-import { ConfigurationsTable } from './ConfigurationsTable/ConfigurationsTable';
-import { CreateConfiguration } from './CreateConfiguration';
-import { CreateConfigurationService } from './CreateConfigurationService';
+import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
+import { CreateAuthConfiguration } from './CreateAuthConfiguration';
+import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
+import { useConfigurationsTable } from './useConfigurationsTable';
 
 const styles = composes(
   css`
@@ -45,14 +45,15 @@ const styles = composes(
     }
 `);
 
-export const ConfigurationsAdministration: AdministrationItemContentComponent = observer(function ConfigurationsAdministration({
+export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({
   sub,
 }) {
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
+  const service = useService(CreateAuthConfigurationService);
 
-  const service = useService(CreateConfigurationService);
-  const controller = useController(ConfigurationsAdministrationController);
+  const tableState = useTable();
+  const configurationsTableState = useConfigurationsTable(tableState);
 
   return styled(style)(
     <>
@@ -61,7 +62,7 @@ export const ConfigurationsAdministration: AdministrationItemContentComponent = 
           title={translate('administration_identity_providers_add_tooltip')}
           icon="add"
           viewBox="0 0 24 24"
-          disabled={!!sub || controller.isProcessing}
+          disabled={!!sub || configurationsTableState.processing}
           onClick={service.create}
         >
           {translate('ui_add')}
@@ -70,8 +71,8 @@ export const ConfigurationsAdministration: AdministrationItemContentComponent = 
           title={translate('administration_identity_providers_refresh_tooltip')}
           icon="refresh"
           viewBox="0 0 24 24"
-          disabled={controller.isProcessing}
-          onClick={controller.update}
+          disabled={configurationsTableState.processing}
+          onClick={configurationsTableState.update}
         >
           {translate('ui_refresh')}
         </ToolsAction>
@@ -79,8 +80,8 @@ export const ConfigurationsAdministration: AdministrationItemContentComponent = 
           title={translate('administration_identity_providers_delete_tooltip')}
           icon="trash"
           viewBox="0 0 24 24"
-          disabled={!controller.itemsSelected || controller.isProcessing}
-          onClick={controller.delete}
+          disabled={!tableState.itemsSelected || configurationsTableState.processing}
+          onClick={configurationsTableState.delete}
         >
           {translate('ui_delete')}
         </ToolsAction>
@@ -90,14 +91,14 @@ export const ConfigurationsAdministration: AdministrationItemContentComponent = 
           <layout-grid-cell {...use({ span: 12 })}>
             <>
               {sub && (
-                <CreateConfiguration />
+                <CreateAuthConfiguration />
               )}
-              <ConfigurationsTable
-                configurations={controller.configurations}
-                selectedItems={controller.selectedItems}
-                expandedItems={controller.expandedItems}
+              <AuthConfigurationsTable
+                configurations={configurationsTableState.configurations}
+                selectedItems={tableState.selected}
+                expandedItems={tableState.expanded}
               />
-              <Loader loading={controller.isProcessing} overlay />
+              <Loader loading={configurationsTableState.processing} overlay />
             </>
           </layout-grid-cell>
         </layout-grid-inner>

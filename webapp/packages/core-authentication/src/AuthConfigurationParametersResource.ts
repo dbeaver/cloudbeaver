@@ -9,11 +9,11 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
-  GraphQLService, ResourceKey, ResourceKeyUtils
+  GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class AuthProviderConfigurationParametersResource
+export class AuthConfigurationParametersResource
   extends CachedMapResource<
   string,
   AuthProviderConfigurationParametersFragment[],
@@ -26,10 +26,14 @@ export class AuthProviderConfigurationParametersResource
   }
 
   protected async loader(key: ResourceKey<string>) {
+    const values: AuthProviderConfigurationParametersFragment[][] = [];
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { parameters } = await this.graphQLService.sdk.getAuthProviderConfigurationParameters({ providerId: key });
-      this.set(key, parameters);
+
+      values.push(parameters);
     });
+
+    this.set(key, isResourceKeyList(key) ? values : values[0]);
 
     return this.data;
   }

@@ -19,9 +19,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConfigurationFormService } from './ConfigurationFormService';
-import { configurationContext } from './Contexts/configurationContext';
-import type { IConfigurationFormState } from './IConfigurationFormProps';
+import { AuthConfigurationFormService } from './AuthConfigurationFormService';
+import { authConfigurationContext } from './Contexts/authConfigurationContext';
+import type { IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
 
 const tabsStyles = css`
   TabList {
@@ -113,13 +113,13 @@ const formStyles = composes(
 );
 
 interface Props {
-  state: IConfigurationFormState;
+  state: IAuthConfigurationFormState;
   onCancel?: () => void;
   onSave?: (configuration: AdminAuthProviderConfiguration) => void;
   className?: string;
 }
 
-export const ConfigurationForm: React.FC<Props> = observer(function ConfigurationForm({
+export const AuthConfigurationForm: React.FC<Props> = observer(function AuthConfigurationForm({
   state,
   onCancel,
   onSave = () => {},
@@ -129,14 +129,14 @@ export const ConfigurationForm: React.FC<Props> = observer(function Configuratio
   const props = useObjectRef({ onSave });
   const style = [tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
-  const service = useService(ConfigurationFormService);
+  const service = useService(AuthConfigurationFormService);
 
   useExecutor({
     executor: state.submittingTask,
     postHandlers: [function save(data, contexts) {
       const validation = contexts.getContext(service.configurationValidationContext);
       const state = contexts.getContext(service.configurationStatusContext);
-      const config = contexts.getContext(configurationContext);
+      const config = contexts.getContext(authConfigurationContext);
 
       if (validation.valid && state.saved) {
         props.onSave(config);

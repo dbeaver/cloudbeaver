@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IConfigurationFormStateInfo {
+export interface IAuthConfigurationFormStateInfo {
   edited: boolean;
   disabled: boolean;
   readonly: boolean;
   statusMessage: string | null;
 }
 
-export interface IConfigurationFormStateContext extends IConfigurationFormStateInfo {
+export interface IAuthConfigurationFormStateContext extends IAuthConfigurationFormStateInfo {
   setStatusMessage: (message: string | null) => void;
 }
 
-export function configurationFormStateContext(): IConfigurationFormStateContext {
+export function authConfigurationFormStateContext(): IAuthConfigurationFormStateContext {
   return {
     edited: false,
     disabled: false,

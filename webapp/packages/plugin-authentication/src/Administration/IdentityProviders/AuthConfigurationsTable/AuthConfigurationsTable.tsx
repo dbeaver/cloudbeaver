@@ -14,7 +14,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Configuration } from './Configuration';
+import { AuthConfiguration } from './AuthConfiguration';
 
 const styles = css`
   Table {
@@ -28,7 +28,7 @@ interface Props {
   expandedItems: Map<string, boolean>;
 }
 
-export const ConfigurationsTable: React.FC<Props> = observer(function ConfigurationsTable({ configurations, selectedItems, expandedItems }) {
+export const AuthConfigurationsTable: React.FC<Props> = observer(function AuthConfigurationsTable({ configurations, selectedItems, expandedItems }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
@@ -43,7 +43,7 @@ export const ConfigurationsTable: React.FC<Props> = observer(function Configurat
       </TableHeader>
       <TableBody>
         {configurations.map(configuration => (
-          <Configuration key={configuration.id} configuration={configuration} />
+          <AuthConfiguration key={configuration.id} configuration={configuration} />
         ))}
       </TableBody>
     </Table>

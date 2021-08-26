@@ -8,13 +8,11 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AuthProviderConfigurationParametersResource } from './Administration/IdentityProviders/AuthProviderConfigurationParametersResource';
-import { AuthProviderConfigurationsResource } from './Administration/IdentityProviders/AuthProviderConfigurationsResource';
-import { ConfigurationFormService } from './Administration/IdentityProviders/ConfigurationFormService';
-import { ConfigurationsAdministrationNavService } from './Administration/IdentityProviders/ConfigurationsAdministrationNavService';
-import { ConfigurationsAdministrationService } from './Administration/IdentityProviders/ConfigurationsAdministrationService';
-import { CreateConfigurationService } from './Administration/IdentityProviders/CreateConfigurationService';
-import { ConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/ConfigurationOptionsTabService';
+import { AuthConfigurationFormService } from './Administration/IdentityProviders/AuthConfigurationFormService';
+import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
+import { AuthConfigurationsAdministrationService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationService';
+import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
+import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
 import { CreateUserService } from './Administration/Users/CreateUserService';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
@@ -44,12 +42,10 @@ export const manifest: PluginManifest = {
     UserFormService,
     UserFormBaseBootstrap,
     UserMenuService,
-    ConfigurationsAdministrationService,
-    AuthProviderConfigurationsResource,
-    CreateConfigurationService,
-    ConfigurationsAdministrationNavService,
-    ConfigurationFormService,
-    ConfigurationOptionsTabService,
-    AuthProviderConfigurationParametersResource,
+    AuthConfigurationsAdministrationService,
+    CreateAuthConfigurationService,
+    AuthConfigurationsAdministrationNavService,
+    AuthConfigurationFormService,
+    AuthConfigurationOptionsTabService,
   ],
 };
