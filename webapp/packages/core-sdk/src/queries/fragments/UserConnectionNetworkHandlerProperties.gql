@@ -8,5 +8,6 @@ fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
   validValues
   defaultValue
   order
+  length
   features
 }

@@ -1,0 +1,10 @@
+query getAuthProviderConfigurations($providerId: ID) {
+  configurations: listAuthProviderConfigurations(providerId: $providerId) {
+    providerId
+    id
+    displayName
+    iconURL
+    description
+    parameters
+  }
+}

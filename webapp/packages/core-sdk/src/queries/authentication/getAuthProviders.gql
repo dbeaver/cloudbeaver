@@ -26,6 +26,7 @@ query getAuthProviders {
       description
       signInLink
       signOutLink
+      metadataLink
     }
 
     credentialParameters {

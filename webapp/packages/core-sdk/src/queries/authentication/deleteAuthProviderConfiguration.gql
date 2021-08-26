@@ -1,0 +1,3 @@
+query deleteAuthProviderConfiguration($id: ID!) {
+  deleteAuthProviderConfiguration(id: $id)
+}

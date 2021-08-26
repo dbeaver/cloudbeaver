@@ -48,6 +48,7 @@ export * from './Table/TableItemContext';
 export * from './Table/TableItemExpand';
 export * from './Table/TableItemSelect';
 export * from './Table/TableItemSeparator';
+export * from './Table/useTable';
 
 export * from './Tabs/ITab';
 export * from './Tabs/TabContext';

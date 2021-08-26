@@ -1,4 +1,4 @@
-fragment UserConnectionAuthProperties on ObjectPropertyInfo {
+fragment AuthProviderConfigurationParameters on ObjectPropertyInfo {
   id
   displayName
   description
