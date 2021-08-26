@@ -16,10 +16,10 @@ export class AuthConfigurationsAdministrationNavService {
   ) { }
 
   navToRoot() {
-    this.administrationScreenService.navigateToItem('configurations');
+    this.administrationScreenService.navigateToItem('auth-configurations');
   }
 
   navToCreate() {
-    this.administrationScreenService.navigateToItemSub('configurations', 'create');
+    this.administrationScreenService.navigateToItemSub('auth-configurations', 'create');
   }
 }

@@ -37,7 +37,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
 
   register(): void {
     this.administrationItemService.create({
-      name: 'configurations',
+      name: 'auth-configurations',
       type: AdministrationItemType.Default,
       order: 4,
       configurationWizardOptions: {
