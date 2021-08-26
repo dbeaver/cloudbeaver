@@ -11,6 +11,8 @@ import { useState, useEffect } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { ErrorBoundary } from './ErrorBoundary';
+
 interface IComplexLoaderData<T> {
   promise: Promise<T> | undefined;
   data: T | undefined;
@@ -49,7 +51,15 @@ export const ComplexLoader: React.FC<ComplexLoaderProps<any>> = function Complex
     return props.placeholder;
   }
 
-  return props.children(content);
+  function refresh() {
+    setContent(null);
+  }
+
+  return (
+    <ErrorBoundary onRefresh={refresh}>
+      {props.children(content)}
+    </ErrorBoundary>
+  );
 };
 
 export function createComplexLoader<T>(loader: () => Promise<T>): IComplexLoaderData<T> {

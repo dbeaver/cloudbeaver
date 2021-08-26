@@ -9,6 +9,7 @@
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
+import { ErrorBoundary } from '../ErrorBoundary';
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
@@ -33,19 +34,23 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
 
   if (typeof children === 'function') {
     return (
-      <TabContext.Provider value={tabContext}>
-        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-          {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-        </BaseTabPanel>
-      </TabContext.Provider>
+      <ErrorBoundary>
+        <TabContext.Provider value={tabContext}>
+          <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+            {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
+          </BaseTabPanel>
+        </TabContext.Provider>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <TabContext.Provider value={tabContext}>
-      <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-        {children}
-      </BaseTabPanel>
-    </TabContext.Provider>
+    <ErrorBoundary>
+      <TabContext.Provider value={tabContext}>
+        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+          {children}
+        </BaseTabPanel>
+      </TabContext.Provider>
+    </ErrorBoundary>
   );
 };

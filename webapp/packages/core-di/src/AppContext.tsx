@@ -6,14 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext, PropsWithChildren } from 'react';
+import { createContext } from 'react';
 
 import type { IServiceInjector } from './IApp';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 
-type AppContextProps = PropsWithChildren<{ app: IServiceInjector }>;
-
-export function AppContext({ app, children }: AppContextProps) {
-  return <appContext.Provider value={app}>{children}</appContext.Provider>;
+interface IProps {
+  app: IServiceInjector;
 }
+
+export const AppContext: React.FC<IProps> = function AppContext({ app, children }) {
+  return <appContext.Provider value={app}>{children}</appContext.Provider>;
+};

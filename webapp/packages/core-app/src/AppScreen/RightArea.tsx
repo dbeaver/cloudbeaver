@@ -10,7 +10,16 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Pane, ResizerControls, SlideBox, SlideElement, slideBoxStyles, Split, splitHorizontalStyles, splitStyles, SlideOverlay
+  Pane,
+  ResizerControls,
+  SlideBox,
+  SlideElement,
+  slideBoxStyles,
+  Split,
+  splitHorizontalStyles,
+  splitStyles,
+  SlideOverlay,
+  ErrorBoundary
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -52,16 +61,20 @@ export const RightArea = observer(function RightArea() {
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active}>
       <SlideElement>
-        <OptionsPanel />
+        <ErrorBoundary><OptionsPanel /></ErrorBoundary>
       </SlideElement>
       <SlideElement>
         <Split sticky={30} split="horizontal" mode={logViewerService.isActive ? undefined : 'minimize'} keepRatio>
           <Pane>
-            <NavigationTabsBar />
+            <ErrorBoundary>
+              <NavigationTabsBar />
+            </ErrorBoundary>
           </Pane>
           {logViewerService.isActive && <ResizerControls />}
           <Pane main>
-            <LogViewer />
+            <ErrorBoundary>
+              <LogViewer />
+            </ErrorBoundary>
           </Pane>
         </Split>
         <SlideOverlay onClick={() => optionsPanelService.close()} />
