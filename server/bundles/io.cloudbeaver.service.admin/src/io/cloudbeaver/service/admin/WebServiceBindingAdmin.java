@@ -109,7 +109,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env.getArgument("providerId"),
                 env.getArgument("id"),
                 env.getArgument("displayName"),
-                CommonUtils.getBoolean(env.getArgument("disabled")),
+                CommonUtils.toBoolean((Boolean)env.getArgument("disabled")),
                 env.getArgument("iconURL"),
                 env.getArgument("description"),
                 env.getArgument("parameters")))
