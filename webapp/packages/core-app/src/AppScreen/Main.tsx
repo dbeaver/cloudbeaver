@@ -47,7 +47,7 @@ export const Main: React.FC = function Main() {
     <space as="main">
       <Split sticky={30}>
         <Pane main>
-          <ErrorBoundary>
+          <ErrorBoundary remount>
             <NavigationTree />
           </ErrorBoundary>
         </Pane>
