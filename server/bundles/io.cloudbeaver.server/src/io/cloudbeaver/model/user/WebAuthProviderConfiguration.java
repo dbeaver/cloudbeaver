@@ -55,7 +55,7 @@ public class WebAuthProviderConfiguration {
         return config.getDisplayName();
     }
 
-    public boolean isEnabled() {
+    public boolean isDisabled() {
         return config.isDisabled();
     }
 
