@@ -129,6 +129,7 @@ extend type Query {
         providerId: ID!,
         id: ID!,
         displayName: String,
+        disabled: Boolean,
         iconURL: String
         description: String
         parameters: Object): AdminAuthProviderConfiguration!
