@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
@@ -95,6 +95,12 @@ export const TableFooter = observer(function TableFooter({
     },
     [model]
   );
+
+  useEffect(() => {
+    if (limit !== model.countGain + '') {
+      setLimit(model.countGain + '');
+    }
+  }, [model.countGain]);
 
   const disabled = model.isLoading() || model.isDisabled(resultIndex);
 

@@ -30,13 +30,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
-    makeObservable(this, {
-      countGain: observable,
-    });
-
     this.id = uuid();
     this.source = source;
     this.countGain = 0;
+
+    makeObservable(this, {
+      countGain: observable,
+    });
   }
 
   isLoading(): boolean {
