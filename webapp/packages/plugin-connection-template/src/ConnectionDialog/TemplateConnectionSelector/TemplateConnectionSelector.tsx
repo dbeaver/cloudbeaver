@@ -36,16 +36,18 @@ export const TemplateConnectionSelector = observer(function TemplateConnectionSe
   }, [search, templateConnections]);
 
   return (
-    <ItemList className={className}>
+    <>
       <ItemListSearch onChange={setSearch} />
-      {filteredTemplateConnections.map(template => (
-        <TemplateConnectionItem
-          key={template.id}
-          template={template}
-          dbDriver={dbDrivers.get(template.driverId)}
-          onSelect={onSelect}
-        />
-      ))}
-    </ItemList>
+      <ItemList className={className}>
+        {filteredTemplateConnections.map(template => (
+          <TemplateConnectionItem
+            key={template.id}
+            template={template}
+            dbDriver={dbDrivers.get(template.driverId)}
+            onSelect={onSelect}
+          />
+        ))}
+      </ItemList>
+    </>
   );
 });

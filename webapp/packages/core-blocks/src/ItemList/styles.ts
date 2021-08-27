@@ -13,6 +13,9 @@ import { Style, composes } from '@cloudbeaver/core-theming';
 
 export const ITEM_LIST_STYLES = composes(
   css`
+    item-list {
+      composes: theme-background-surface from global;
+    }
     list-item {
       composes: theme-ripple theme-background-surface theme-border-color-secondary from global;
     }
@@ -25,12 +28,24 @@ export const ITEM_LIST_STYLES = composes(
     ListSearchButton {
       composes: theme-ripple theme-background-primary theme-text-on-primary from global;
     }
+    item-list-overflow {
+      composes: branding-overflow from global;
+    }
   `,
   css`
     item-list {
       box-sizing: border-box;
       border-collapse: collapse;
       z-index: 0;
+      overflow: auto;
+    }
+    item-list-overflow {
+      position: sticky;
+      flex-shrink: 0;
+      bottom: 0;
+      width: 100%;
+      height: 24px;
+      pointer-events: none;
     }
     list-search {
       position: sticky;
@@ -58,7 +73,7 @@ export const ITEM_LIST_STYLES = composes(
         }
       }
     }
-    list-item {
+    list-item:not(:nth-last-child(2)) {
       border-bottom: 1px solid;
     }
     list-item {

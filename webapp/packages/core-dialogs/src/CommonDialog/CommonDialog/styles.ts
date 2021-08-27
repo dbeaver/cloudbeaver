@@ -30,6 +30,9 @@ export const commonDialogBaseStyle = composes(
     dialog {
       composes: theme-background-surface theme-text-on-surface from global;
     }
+    dialog-body-overflow {
+      composes: branding-overflow from global;
+    }
   `,
   css`
     dialog {

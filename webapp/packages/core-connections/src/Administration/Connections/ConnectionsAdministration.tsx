@@ -27,20 +27,18 @@ const styles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
 
-    layout-grid-cell, message-box {
+    layout-grid-cell {
       composes: theme-border-color-background from global;
     }
   `,
   css`
     message-box {
       padding: 16px 24px;
-      border-bottom: solid 1px;
     }
 
     layout-grid {
       overflow: auto;
       width: 100%;
-      flex: 1;
     }
 
     layout-grid-inner {
@@ -108,16 +106,20 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
       </ToolsPanel>
       <layout-grid>
         <layout-grid-inner>
-          <layout-grid-cell {...use({ span: 12 })}>
-            {configurationWizard && (
+          {configurationWizard && (
+            <layout-grid-cell {...use({ span: 12 })}>
               <message-box>
                 <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
                 <p><Translate token='connections_administration_configuration_wizard_message' /></p>
               </message-box>
-            )}
-            {sub && (
+            </layout-grid-cell>
+          )}
+          {sub && (
+            <layout-grid-cell {...use({ span: 12 })}>
               <CreateConnection method={param} configurationWizard={configurationWizard} />
-            )}
+            </layout-grid-cell>
+          )}
+          <layout-grid-cell {...use({ span: 12 })}>
             <ConnectionsTable
               connections={controller.connections}
               selectedItems={controller.selectedItems}

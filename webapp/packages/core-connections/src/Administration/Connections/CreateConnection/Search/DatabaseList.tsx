@@ -30,6 +30,7 @@ const styles = composes(
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: auto;
     }
   `
 );
@@ -62,8 +63,8 @@ export const DatabaseList = observer(function DatabaseList({
 
   return styled(useStyles(styles))(
     <SubmittingForm className={className} onSubmit={onSearch}>
+      <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} disabled={disabled} onChange={onChange} onSearch={searchHandler} />
       <ItemList>
-        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} disabled={disabled} onChange={onChange} onSearch={searchHandler} />
         {databases.map(database => (
           <Database key={database.host + database.port} database={database} onSelect={onSelect} />
         ))}

@@ -27,3 +27,9 @@
     border-bottom: none;
   }
 }
+
+@mixin branding-overflow() {
+  .branding-overflow {
+    background-image: linear-gradient(to top, $mdc-theme-surface, rgba($mdc-theme-surface, 0));
+  }
+}

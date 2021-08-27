@@ -31,6 +31,7 @@ export const defaultRULocale = [
   ['ui_clipboard_access_denied_title', 'Доступ к буферу обмена запрещен'],
   ['ui_clipboard_access_denied_message', 'Чтобы использовать некоторые функции приложения, необходим доступ к буферу обмена'],
   ['ui_reveal_password', 'Показать или скрыть пароль'],
+  ['ui_page_not_found', 'Страница не найдена'],
   ['root_permission_denied', 'Отказано в доступе'],
   ['app_root_session_expire_warning_title', 'Ваша сессия скоро закончится'],
   ['app_root_session_expire_warning_message', 'Ваша сессия закончится меньше чем через 5 минут. Чтобы продолжить работать, закройте этот диалог.'],
