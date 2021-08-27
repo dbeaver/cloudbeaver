@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, Group, GroupTitle,
-  InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent, useMapResource
+  InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent, TextareaNew, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfigurationParametersFragment } from '@cloudbeaver/core-sdk';
@@ -82,14 +82,14 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           >
             {translate('administration_identity_providers_provider_configuration_name')}
           </InputFieldNew>
-          <InputFieldNew
+          <TextareaNew
             name='description'
             state={state.config}
             disabled={state.disabled}
             readOnly={state.readonly}
           >
             {translate('administration_identity_providers_provider_configuration_description')}
-          </InputFieldNew>
+          </TextareaNew>
           <InputFieldNew
             name='iconURL'
             state={state.config}
