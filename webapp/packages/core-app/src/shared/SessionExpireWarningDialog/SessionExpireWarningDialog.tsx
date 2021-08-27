@@ -51,6 +51,8 @@ export const SessionExpireWarningDialog = observer(function SessionExpireWarning
           </Button>
         </controls>
       )}
+      noOverflow
+      noBodyPadding
       onReject={rejectDialog}
     >
       <p>{translate('app_root_session_expire_warning_message')}</p>
