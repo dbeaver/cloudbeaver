@@ -34,7 +34,7 @@ const styles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
 
-    connection-create-footer, connection-create-content {
+    connection-create-content {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
@@ -44,11 +44,6 @@ const styles = composes(
       flex-direction: column;
       height: 700px;
       overflow: hidden;
-    }
-
-    connection-create-footer {
-      padding-bottom: 48px;
-      flex: auto 0 0;
     }
 
     connection-create-content {
@@ -120,28 +115,27 @@ export const CreateConnection = observer(function CreateConnection({
 
   if (createConnectionService.data) {
     return styled(style)(
-      <connection-create as='div'>
-        <title-bar as='div'>
-          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} /></back-button>
+      <connection-create>
+        <title-bar>
+          <back-button><Icon name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} /></back-button>
           {driver.data?.icon && <StaticImage icon={driver.data.icon} />}
           {driver.data?.name ?? translate('connections_administration_connection_create')}
-          <fill as="div" />
+          <fill />
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
-        <connection-create-content as='div'>
+        <connection-create-content>
           <ConnectionForm
             state={createConnectionService.data}
             onCancel={createConnectionService.clearConnectionTemplate}
             onSave={createConnectionService.clearConnectionTemplate}
           />
         </connection-create-content>
-        <connection-create-footer as='div' />
       </connection-create>
     );
   }
 
   return styled(style, BORDER_TAB_STYLES)(
-    <connection-create as='div'>
+    <connection-create>
       <TabsState
         currentTabId={method}
         container={createConnectionService.tabsContainer}
@@ -149,17 +143,16 @@ export const CreateConnection = observer(function CreateConnection({
         lazy
         onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
       >
-        <title-bar as='div'>
+        <title-bar>
           {translate('connections_administration_connection_create')}
-          <fill as="div" />
+          <fill />
           <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <TabList style={[style, BORDER_TAB_STYLES]} />
-        <connection-create-content as='div'>
+        <connection-create-content>
           <TabPanelList style={[style, BORDER_TAB_STYLES]} />
           {createConnectionService.disabled && <Loader overlay />}
         </connection-create-content>
-        <connection-create-footer as='div' />
       </TabsState>
     </connection-create>
   );

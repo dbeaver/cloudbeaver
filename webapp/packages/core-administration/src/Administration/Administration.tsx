@@ -40,9 +40,6 @@ const administrationStyles = composes(
     container {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-    drawer {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    }
   `,
   css`
     container {
@@ -51,9 +48,7 @@ const administrationStyles = composes(
       flex: 1;
       overflow: hidden;
     }
-    drawer {
-      position: relative;
-      flex: auto 0 0;
+    TabList {
       width: 250px;
       padding-top: 16px;
       border-right: 2px solid;
@@ -86,22 +81,20 @@ export const Administration: React.FC<Props> = observer(function Administration(
   }, [activeScreen?.item]);
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
-    <container as='div'>
+    <container>
       <TabsState currentTabId={activeScreen?.item} orientation='vertical'>
-        <drawer as='div'>
-          <TabList aria-label="Administration items">
-            {items.map(item => (
-              <DrawerItem
-                key={item.name}
-                item={item}
-                configurationWizard={configurationWizard}
-                style={[verticalTabStyles, tabsStyles]}
-                disabled={hasOnlyActive}
-                onSelect={onItemSelect}
-              />
-            ))}
-          </TabList>
-        </drawer>
+        <TabList aria-label="Administration items">
+          {items.map(item => (
+            <DrawerItem
+              key={item.name}
+              item={item}
+              configurationWizard={configurationWizard}
+              style={[verticalTabStyles, tabsStyles]}
+              disabled={hasOnlyActive}
+              onSelect={onItemSelect}
+            />
+          ))}
+        </TabList>
         <content ref={contentRef} as='div'>
           {children}
           <ItemContent
