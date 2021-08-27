@@ -8,6 +8,8 @@
 
 import { useMemo } from 'react';
 
+import { isValidUrl } from '@cloudbeaver/core-utils';
+
 import { Icon } from './Icon';
 import { StaticImage } from './StaticImage';
 
@@ -19,13 +21,13 @@ export interface IconOrImageProps {
   viewBox?: string;
 }
 
-export const IconOrImage = function IconOrImage({ icon, className, title, onClick, viewBox }: IconOrImageProps) {
+export const IconOrImage: React.FC<IconOrImageProps> = function IconOrImage({ icon, className, title, onClick, viewBox }) {
   const isStaticIcon = useMemo(
     () => icon && (icon.startsWith('platform:') || icon.startsWith('/')),
     [icon]
   );
 
-  if (isStaticIcon) {
+  if (isStaticIcon || isValidUrl(icon)) {
     return <StaticImage title={title} icon={icon} className={className} onClick={onClick} />;
   }
 

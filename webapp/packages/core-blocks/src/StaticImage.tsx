@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GlobalConstants } from '@cloudbeaver/core-utils';
+import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 interface Props {
   icon?: string;
@@ -22,7 +22,7 @@ export const StaticImage: React.FC<Props> = function StaticImage({
     return null;
   }
 
-  const url = GlobalConstants.absoluteUrl(icon);
+  const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
 
   return <img className={className} src={url} title={title} onClick={onClick} />;
 };

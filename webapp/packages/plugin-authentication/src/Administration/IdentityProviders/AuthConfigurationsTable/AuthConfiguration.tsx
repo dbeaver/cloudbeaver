@@ -57,7 +57,7 @@ export const AuthConfiguration: React.FC<Props> = observer(function AuthConfigur
         <TableItemExpand />
       </TableColumnValue>
       <TableColumnValue centerContent flex expand>
-        <StaticImage icon={icon} />
+        <StaticImage icon={icon} title={`${configuration.displayName} icon`} />
       </TableColumnValue>
       <TableColumnValue expand>{configuration.displayName}</TableColumnValue>
       <TableColumnValue>{configuration.providerId}</TableColumnValue>
