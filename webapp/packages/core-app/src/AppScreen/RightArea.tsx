@@ -61,18 +61,18 @@ export const RightArea = observer(function RightArea() {
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active}>
       <SlideElement>
-        <ErrorBoundary><OptionsPanel /></ErrorBoundary>
+        <ErrorBoundary remount><OptionsPanel /></ErrorBoundary>
       </SlideElement>
       <SlideElement>
         <Split sticky={30} split="horizontal" mode={logViewerService.isActive ? undefined : 'minimize'} keepRatio>
           <Pane>
-            <ErrorBoundary>
+            <ErrorBoundary remount>
               <NavigationTabsBar />
             </ErrorBoundary>
           </Pane>
           {logViewerService.isActive && <ResizerControls />}
           <Pane main>
-            <ErrorBoundary>
+            <ErrorBoundary remount>
               <LogViewer />
             </ErrorBoundary>
           </Pane>

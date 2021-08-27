@@ -34,7 +34,7 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
 
   if (typeof children === 'function') {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary remount>
         <TabContext.Provider value={tabContext}>
           <BaseTabPanel {...state.state} tabId={tabId} className={className}>
             {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
@@ -45,7 +45,7 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary remount>
       <TabContext.Provider value={tabContext}>
         <BaseTabPanel {...state.state} tabId={tabId} className={className}>
           {children}

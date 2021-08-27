@@ -19,13 +19,13 @@ export interface ObjectPageTabProps<T = unknown> {
   onSelect: () => void;
   style: DynamicStyle | DynamicStyle[];
 }
-export type ObjectPageTabComponent<T> = React.FunctionComponent<ObjectPageTabProps<T>>;
+export type ObjectPageTabComponent<T = unknown> = React.FunctionComponent<ObjectPageTabProps<T>>;
 
 export interface ObjectPagePanelProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage<T>;
 }
-export type ObjectPagePanelComponent<T> = React.FunctionComponent<ObjectPagePanelProps<T>>;
+export type ObjectPagePanelComponent<T = unknown> = React.FunctionComponent<ObjectPagePanelProps<T>>;
 
 export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void;
 export type ObjectPageRestoreCallback<T> = (

@@ -22,6 +22,7 @@ const style = css`
 interface IProps {
   onRefresh?: () => any;
   root?: boolean;
+  remount?: boolean;
 }
 
 interface IState {
@@ -36,6 +37,9 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
       error: null,
       errorInfo: null,
     };
+
+    this.remount = this.remount.bind(this);
+    this.refresh = this.refresh.bind(this);
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -47,13 +51,14 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
 
   render(): React.ReactNode {
     const { errorInfo, error } = this.state;
-    const { root, onRefresh } = this.props;
+    const { remount, root, onRefresh } = this.props;
 
     if (errorInfo) {
       return styled(style)(
         <DisplayError root={root}>
           {root && <action><AppRefreshButton /></action>}
-          {onRefresh && <action><Button onClick={onRefresh}>Refresh</Button></action>}
+          {onRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
+          {remount && <action><Button onClick={this.remount}>Refresh</Button></action>}
           <details style={{ whiteSpace: 'pre-wrap' }}>
             {error?.toString() ?? ''}
             <br />
@@ -64,5 +69,17 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
     }
 
     return this.props.children;
+  }
+
+  private remount() {
+    this.setState({
+      error: null,
+      errorInfo: null,
+    });
+  }
+
+  private refresh() {
+    this.props.onRefresh?.();
+    this.remount();
   }
 }
