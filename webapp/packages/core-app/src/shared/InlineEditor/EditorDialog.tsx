@@ -56,7 +56,7 @@ export const EditorDialog: DialogComponent<string, string> = observer(
       <CommonDialogWrapper
         title={translate('app_shared_inlineEditor_dialog_title')}
         footer={(
-          <controls as="div">
+          <controls>
             <Button type="button" mod={['unelevated']} onClick={handleApply}>
               {translate('app_shared_inlineEditor_dialog_apply')}
             </Button>

@@ -15,6 +15,9 @@ export const PROPERTIES_TABLE_STYLES = composes(
     properties-header {
       composes: theme-background-surface theme-text-on-surface theme-border-color-secondary from global;
     }
+    properties-list-overflow {
+      composes: branding-overflow from global;
+    }
   `,
   css`
     properties {
@@ -50,6 +53,15 @@ export const PROPERTIES_TABLE_STYLES = composes(
       overflow: auto;
       max-height: 600px;
       padding: 4px 0px;
+    }
+
+    properties-list-overflow {
+      position: sticky;
+      flex-shrink: 0;
+      bottom: -4px;
+      width: 100%;
+      height: 24px;
+      pointer-events: none;
     }
   `
 );

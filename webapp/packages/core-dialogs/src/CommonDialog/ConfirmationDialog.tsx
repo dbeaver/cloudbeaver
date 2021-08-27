@@ -65,11 +65,12 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
         </header-title>
         {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body>
-        <dialog-body-content>
-          <Translate token={message} />
-        </dialog-body-content>
-        <dialog-body-overflow />
+      <dialog-body {...use({ 'no-overflow': true })}>
+        <dialog-body-overflow-box>
+          <dialog-body-content>
+            <Translate token={message} />
+          </dialog-body-content>
+        </dialog-body-overflow-box>
       </dialog-body>
       <footer>
         <Button
@@ -79,7 +80,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
         >
           <Translate token='ui_processing_cancel' />
         </Button>
-        <fill as="div" />
+        <fill />
         <Button
           type="button"
           mod={['unelevated']}

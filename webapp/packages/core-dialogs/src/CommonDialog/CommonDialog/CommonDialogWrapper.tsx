@@ -19,6 +19,8 @@ export interface CommonDialogWrapperProps {
   icon?: string;
   viewBox?: string;
   bigIcon?: boolean;
+  noBodyPadding?: boolean;
+  noOverflow?: boolean;
   onReject?: () => void;
   className?: string;
   footer?: JSX.Element | boolean;
@@ -32,6 +34,8 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   viewBox,
   bigIcon,
   footer,
+  noBodyPadding,
+  noOverflow,
   className,
   onReject,
   children,
@@ -52,11 +56,13 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
         </header-title>
         {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body>
-        <dialog-body-content>
-          {children}
-        </dialog-body-content>
-        <dialog-body-overflow />
+      <dialog-body {...use({ 'no-padding': noBodyPadding, 'no-overflow': noOverflow })}>
+        <dialog-body-overflow-box>
+          <dialog-body-content>
+            {children}
+          </dialog-body-content>
+          {!noOverflow && <dialog-body-overflow />}
+        </dialog-body-overflow-box>
       </dialog-body>
       <footer>
         {footer}

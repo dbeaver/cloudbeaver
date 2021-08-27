@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { ConnectionAuthenticationForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -52,9 +52,9 @@ const styles = composes(
     }
 `);
 
-export const ConnectionDialog = observer(function ConnectionDialog({
+export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({
   rejectDialog,
-}: DialogComponentProps<null, null>) {
+}) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const controller = useController(ConnectionController, rejectDialog);
   const translate = useTranslate();
@@ -83,6 +83,8 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           onConnect={controller.onConnect}
         />
       )}
+      noBodyPadding
+      noOverflow
       onReject={rejectDialog}
     >
       {controller.isLoading && <Loader />}

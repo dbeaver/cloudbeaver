@@ -32,7 +32,8 @@ const styles = composes(
       min-height: 500px;
     }
     PropertiesTable {
-      flex: 1 0 auto;
+      flex: 1;
+      overflow: hidden;
     }
     message {
       margin: auto;
@@ -83,6 +84,8 @@ export const ProcessorConfigureDialog = observer(
             onCancel={onClose}
           />
         )}
+        noOverflow
+        noBodyPadding
         onReject={onClose}
       >
         <PropertiesTable

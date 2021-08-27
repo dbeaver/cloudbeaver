@@ -83,6 +83,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
             )}
           </controls>
         )}
+        noOverflow
         onReject={rejectDialog}
       >
         <InputFieldNew

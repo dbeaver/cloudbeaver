@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES, TabPanelList, useMapResource
+  TabsState, TabList, IconButton, Loader, StaticImage, Icon, UNDERLINE_TAB_STYLES, TabPanelList, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -31,7 +31,7 @@ const styles = composes(
     }
 
     TabList {
-      composes: theme-background-surface theme-text-on-surface from global;
+      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     }
 
     connection-create-content {
@@ -52,6 +52,28 @@ const styles = composes(
       flex-direction: column;
       flex: 1;
       overflow: auto;
+    }
+
+    Tab {
+      height: 46px!important;
+      text-transform: uppercase;
+      font-weight: 500 !important;
+    }
+
+    TabList {
+      border-top: solid 1px;
+      position: relative;
+      flex-shrink: 0;
+      align-items: center;
+
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-bottom: solid 2px;
+        border-color: inherit;
+      }
     }
 
     TabPanel, CustomConnection, SearchDatabase {
@@ -100,6 +122,8 @@ const styles = composes(
   `
 );
 
+const componentStyle = [styles, UNDERLINE_TAB_STYLES];
+
 interface Props {
   method: string | null | undefined;
   configurationWizard: boolean;
@@ -108,7 +132,7 @@ interface Props {
 export const CreateConnection = observer(function CreateConnection({
   method,
 }: Props) {
-  const style = useStyles(styles);
+  const style = useStyles(componentStyle);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
   const driver = useMapResource(DBDriverResource, createConnectionService.data?.config.driverId || null);
@@ -134,7 +158,7 @@ export const CreateConnection = observer(function CreateConnection({
     );
   }
 
-  return styled(style, BORDER_TAB_STYLES)(
+  return styled(style)(
     <connection-create>
       <TabsState
         currentTabId={method}
@@ -148,9 +172,9 @@ export const CreateConnection = observer(function CreateConnection({
           <fill />
           <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
         </title-bar>
-        <TabList style={[style, BORDER_TAB_STYLES]} />
+        <TabList style={componentStyle} />
         <connection-create-content>
-          <TabPanelList style={[style, BORDER_TAB_STYLES]} />
+          <TabPanelList style={componentStyle} />
           {createConnectionService.disabled && <Loader overlay />}
         </connection-create-content>
       </TabsState>
