@@ -12,16 +12,16 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../../IconOrImage';
 
-interface TabIconProps {
+interface IProps {
   icon?: string;
   viewBox?: string;
   className?: string;
 }
 
-export function TabIcon({ icon, viewBox, className }: TabIconProps) {
+export const TabIcon: React.FC<IProps> = function TabIcon({ icon, viewBox, className }) {
   return styled(useStyles())(
-    <tab-icon as="div" className={className}>
-      {icon ? <IconOrImage icon={icon} viewBox={viewBox} /> : <placeholder as="div" />}
+    <tab-icon className={className}>
+      {icon ? <IconOrImage icon={icon} viewBox={viewBox} /> : <placeholder />}
     </tab-icon>
   );
-}
+};

@@ -46,11 +46,11 @@ const styles = composes(
   `
 );
 
-interface ObjectFoldersProps {
+interface IProps {
   tab: ITab<IObjectViewerTabState>;
 }
 
-export const ObjectFolders = observer(function ObjectFolders({ tab }: ObjectFoldersProps) {
+export const ObjectFolders: React.FC<IProps> = observer(function ObjectFolders({ tab }) {
   const controller = useController(ObjectFoldersController, tab);
 
   return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={[styles]} />);
