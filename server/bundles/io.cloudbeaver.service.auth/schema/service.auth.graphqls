@@ -23,6 +23,7 @@ type AuthCredentialInfo {
 type AuthProviderConfiguration {
     id: ID!
     displayName: String!
+    disabled: Boolean!
 
     iconURL: String
     description: String

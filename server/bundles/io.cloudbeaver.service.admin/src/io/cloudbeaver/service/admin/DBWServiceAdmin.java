@@ -107,7 +107,7 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull String providerId,
         @NotNull String id,
         @NotNull String displayName,
-        @Nullable String iconURL,
+        boolean disabled, @Nullable String iconURL,
         @Nullable String description,
         @Nullable Map<String, Object> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)

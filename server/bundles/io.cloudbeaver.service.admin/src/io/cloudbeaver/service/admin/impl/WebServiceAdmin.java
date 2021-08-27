@@ -399,7 +399,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public WebAuthProviderConfiguration saveAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String providerId, @NotNull String id, @NotNull String displayName, @Nullable String iconURL, @Nullable String description, @Nullable Map<String, Object> parameters) throws DBWebException {
+    public WebAuthProviderConfiguration saveAuthProviderConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @NotNull String id,
+        @NotNull String displayName,
+        boolean disabled,
+        @Nullable String iconURL,
+        @Nullable String description,
+        @Nullable Map<String, Object> parameters) throws DBWebException {
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
@@ -408,10 +416,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         AuthProviderConfig providerConfig = new AuthProviderConfig();
         providerConfig.setProvider(providerId);
         providerConfig.setDisplayName(displayName);
+        providerConfig.setDisabled(disabled);
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
         providerConfig.setParameters(parameters);
         CBApplication.getInstance().getAppConfiguration().setAuthProviderConfiguration(id, providerConfig);
+        try {
+            CBApplication.getInstance().flushConfiguration();
+        } catch (DBException e) {
+            throw new DBWebException("Error saving server configuration", e);
+        }
         return new WebAuthProviderConfiguration(authProvider, id, providerConfig);
     }
 
