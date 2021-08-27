@@ -65,12 +65,11 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
         </header-title>
         {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body>
+      <dialog-body {...use({ 'no-overflow': true })}>
         <dialog-body-overflow-box>
           <dialog-body-content>
             <Translate token={message} />
           </dialog-body-content>
-          <dialog-body-overflow />
         </dialog-body-overflow-box>
       </dialog-body>
       <footer>
