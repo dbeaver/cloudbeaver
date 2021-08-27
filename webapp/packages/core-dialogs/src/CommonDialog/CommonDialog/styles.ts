@@ -94,7 +94,6 @@ export const commonDialogBaseStyle = composes(
       display: flex;
       flex-direction: row;
       flex: 1;
-      min-height: 80px;
       max-width: 748px;
       max-height: 100%;
       overflow: auto;
