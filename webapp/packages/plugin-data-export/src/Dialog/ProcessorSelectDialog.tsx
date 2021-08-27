@@ -63,9 +63,11 @@ export const ProcessorSelectDialog = observer(
     return styled(styles)(
       <CommonDialogWrapper
         title={translate('data_transfer_dialog_title')}
+        noBodyPadding
+        noOverflow
         onReject={onClose}
       >
-        <export-object as="div">
+        <export-object>
           {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
           <pre title={context.sourceName}>{context.sourceName}</pre>
         </export-object>

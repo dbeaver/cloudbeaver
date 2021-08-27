@@ -19,8 +19,8 @@ import type { DBDriver } from '../../../../DBDriverResource';
 const styles = css`
   StaticImage {
     box-sizing: border-box;
-    width: 32px;
-    max-height: 32px;
+    width: 24px;
+    max-height: 24px;
   }
 `;
 

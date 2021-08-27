@@ -17,18 +17,18 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { IconButton } from '../IconButton';
 import { Styles } from './styles';
 
-type Props = React.PropsWithChildren<{
+interface IProps {
   value?: string;
   placeholder?: string;
   disabled?: boolean;
   onChange?: (value: string) => void;
   onSearch?: (value: string) => void;
   className?: string;
-}>;
+}
 
-export function ItemListSearch({
+export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
   value, placeholder, disabled, onChange, onSearch, className,
-}: Props) {
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const styles = useContext(Styles);
   const [search, setSearch] = useState(value ?? '');
@@ -58,18 +58,20 @@ export function ItemListSearch({
   const ListSearchButton = IconButton;
 
   return styled(useStyles(...(styles || [])))(
-    <list-search as="div" className={className}>
-      <input
-        ref={inputRef}
-        name='search'
-        placeholder={translate(placeholder || 'ui_search')}
-        value={value ?? search}
-        autoComplete="off"
-        disabled={disabled}
-        onChange={changeHandler}
-        {...use({ mod: 'surface' })}
-      />
-      <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>
+    <list-search className={className}>
+      <input-box>
+        <input
+          ref={inputRef}
+          name='search'
+          placeholder={translate(placeholder || 'ui_search')}
+          value={value ?? search}
+          autoComplete="off"
+          disabled={disabled}
+          onChange={changeHandler}
+          {...use({ mod: 'surface' })}
+        />
+        <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>
+      </input-box>
     </list-search>
   );
-}
+};

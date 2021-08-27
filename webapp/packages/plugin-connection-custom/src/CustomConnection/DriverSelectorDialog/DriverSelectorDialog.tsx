@@ -25,7 +25,7 @@ const styles = css`
   }
 `;
 
-interface DriverSelectorDialogProps {
+interface IProps {
   title: string;
   drivers: IDriver[];
   isLoading: boolean;
@@ -33,22 +33,23 @@ interface DriverSelectorDialogProps {
   onClose: () => void;
 }
 
-export const DriverSelectorDialog = observer(
-  function DriverSelectorDialog({
-    title,
-    drivers,
-    isLoading,
-    onSelect,
-    onClose,
-  }: DriverSelectorDialogProps) {
-    return styled(styles)(
-      <CommonDialogWrapper
-        title={title}
-        onReject={onClose}
-      >
-        {isLoading && <Loader />}
-        {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
-      </CommonDialogWrapper>
-    );
-  }
+export const DriverSelectorDialog: React.FC<IProps> = observer(function DriverSelectorDialog({
+  title,
+  drivers,
+  isLoading,
+  onSelect,
+  onClose,
+}) {
+  return styled(styles)(
+    <CommonDialogWrapper
+      title={title}
+      noBodyPadding
+      noOverflow
+      onReject={onClose}
+    >
+      {isLoading && <Loader />}
+      {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
+    </CommonDialogWrapper>
+  );
+}
 );
