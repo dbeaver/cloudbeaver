@@ -43,7 +43,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const dataGridRef = useRef<DataGridHandle>(null);
-  const lastCountGain = useRef<number>(0);
+  const lastCount = useRef<number>(0);
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
@@ -168,13 +168,20 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
   }, [tableData.editor, editingContext, selectionAction]);
 
   useEffect(() => {
-    if (lastCountGain.current > model.countGain) {
-      dataGridDivRef.current?.scrollTo({
-        top: 0,
+    const gridDiv = dataGridDivRef.current;
+
+    if (
+      gridDiv
+      && lastCount.current > model.source.count
+      && model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
+    ) {
+      gridDiv.scrollTo({
+        top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
       });
     }
-    lastCountGain.current = model.countGain;
-  }, [model.countGain]);
+
+    lastCount.current = model.source.count;
+  }, [model.source.count]);
 
   const handleFocusChange = (position: CellPosition) => {
     if (
