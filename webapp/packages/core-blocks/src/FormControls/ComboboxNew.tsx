@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import {
-  useLayoutEffect, useCallback, useState, useRef, useContext
+  useLayoutEffect, useCallback, useState, useRef, useContext, useEffect
 } from 'react';
 import {
   useMenuState,
@@ -157,7 +157,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
     currentId: null,
     gutter: 4,
   });
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState<string | null>(null);
   let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
   if (state && name !== undefined && name in state) {
@@ -166,9 +166,9 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
 
   const selectedItem = items.find(item => keySelector(item) === value);
 
-  let inputValue = selectedItem ? valueSelector(selectedItem) : searchValue;
+  let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
 
-  if (searchValue && selectedItem && valueSelector(selectedItem) !== searchValue) {
+  if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
     inputValue = searchValue;
   }
 
@@ -193,7 +193,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
       if (context) {
         context.change(null, name);
       }
-      setSearchValue('');
+      setSearchValue(null);
     },
     [value, state, name, menu, context, onSelect]
   );
@@ -211,14 +211,16 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
       if (context) {
         context.change(id, name);
       }
-      setSearchValue('');
+      setSearchValue(null);
     },
     [value, state, name, menu, context, onSelect]
   );
 
-  if (ref.current === document.activeElement && inputValue === searchValue) {
-    menu.show();
-  }
+  useEffect(() => {
+    if (ref.current === document.activeElement && inputValue === searchValue) {
+      menu.show();
+    }
+  });
 
   useLayoutEffect(() => onSwitch?.(menu.visible), [onSwitch, menu.visible]);
 
@@ -227,9 +229,9 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
   );
 
   return styled(useStyles(baseFormControlStylesNew, styles))(
-    <field as="div" className={className}>
+    <field className={className}>
       <field-label title={title} as='label'>{children}</field-label>
-      <input-box as="div">
+      <input-box>
         <input
           ref={ref}
           role='new'

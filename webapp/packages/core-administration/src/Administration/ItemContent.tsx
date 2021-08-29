@@ -8,8 +8,9 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
@@ -23,16 +24,17 @@ export const ItemContent: React.FC<Props> = observer(function ItemContent({
   activeScreen,
   configurationWizard,
 }) {
+  const translate = useTranslate();
   const administrationItemService = useService(AdministrationItemService);
 
   if (!activeScreen?.item) {
-    return null;
+    return <TextPlaceholder>{translate('ui_page_not_found')}</TextPlaceholder>;
   }
 
   const item = administrationItemService.getItem(activeScreen.item, configurationWizard);
 
   if (!item) {
-    return null;
+    return <TextPlaceholder>{translate('ui_page_not_found')}</TextPlaceholder>;
   }
 
   if (administrationItemService.itemActivating) {

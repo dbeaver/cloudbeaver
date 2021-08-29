@@ -14,9 +14,12 @@ import {
   CachedMapResource,
   ResourceKey,
   resourceKeyList,
-  ResourceKeyUtils
+  ResourceKeyUtils,
+  isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
+
+import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 
 export type AuthProvider = AuthProviderInfo;
 
@@ -26,8 +29,9 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(
-    private graphQLService: GraphQLService,
-    private serverConfigResource: ServerConfigResource
+    private readonly graphQLService: GraphQLService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly authConfigurationsResource: AuthConfigurationsResource
   ) {
     super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
@@ -40,6 +44,9 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
       }
       return AuthProvidersResource.keyAll;
     });
+
+    this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
+    this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
   }
 
   has(id: string): boolean {
@@ -94,5 +101,31 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
       this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.list[0], true);
     }
     return this.data;
+  }
+
+  private updateConfigurations(key: ResourceKey<string>) {
+    this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.mark, false);
+
+    const configurations = isResourceKeyList(key)
+      ? this.authConfigurationsResource.get(key) : [this.authConfigurationsResource.get(key)];
+
+    const providerIds = resourceKeyList(
+      configurations.filter(Boolean).map(configuration => configuration!.providerId)
+    );
+
+    this.markOutdated(providerIds);
+  }
+
+  private deleteConfigurations(key: ResourceKey<string>) {
+    this.values.forEach(provider => {
+      if (provider.configurable && provider.configurations?.length) {
+        ResourceKeyUtils.forEach(key, id => {
+          const index = provider.configurations!.findIndex(configuration => configuration.id === id);
+          if (index >= 0) {
+            provider.configurations!.splice(index, 1);
+          }
+        });
+      }
+    });
   }
 }

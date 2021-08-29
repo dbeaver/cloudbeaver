@@ -8,6 +8,11 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { AuthConfigurationFormService } from './Administration/IdentityProviders/AuthConfigurationFormService';
+import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
+import { AuthConfigurationsAdministrationService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationService';
+import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
+import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
 import { CreateUserService } from './Administration/Users/CreateUserService';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
@@ -37,5 +42,10 @@ export const manifest: PluginManifest = {
     UserFormService,
     UserFormBaseBootstrap,
     UserMenuService,
+    AuthConfigurationsAdministrationService,
+    CreateAuthConfigurationService,
+    AuthConfigurationsAdministrationNavService,
+    AuthConfigurationFormService,
+    AuthConfigurationOptionsTabService,
   ],
 };

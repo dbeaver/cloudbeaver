@@ -15,6 +15,7 @@ import { ComboboxNew } from '../../FormControls/ComboboxNew';
 import { FormFieldDescriptionNew } from '../../FormControls/FormFieldDescriptionNew';
 import { InputFieldNew } from '../../FormControls/InputFieldNew';
 import { isControlPresented } from '../../FormControls/isControlPresented';
+import { TextareaNew } from '../../FormControls/TextareaNew';
 import { Link } from '../../Link';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
@@ -32,7 +33,7 @@ interface RenderFieldProps {
   className?: string;
 }
 
-type ControlType = 'checkbox' | 'combobox' | 'link' | 'input';
+type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea';
 
 function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
   const dataType = property.dataType?.toLowerCase();
@@ -43,6 +44,8 @@ function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
     return 'combobox';
   } else if (property.features.includes('href')) {
     return 'link';
+  } else if (dataType === 'string' && property.length === 'MULTILINE') {
+    return 'textarea';
   }
 
   return 'input';
@@ -167,6 +170,38 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
       >
         {property.displayName ?? ''}
       </ComboboxNew>
+    );
+  }
+
+  if (controltype === 'textarea') {
+    if (state !== undefined) {
+      return (
+        <TextareaNew
+          title={property.description}
+          name={property.id!}
+          state={state}
+          disabled={disabled}
+          readOnly={readOnly}
+          mod='surface'
+          className={className}
+        >
+          {property.displayName ?? ''}
+        </TextareaNew>
+      );
+    }
+
+    return (
+      <TextareaNew
+        title={property.description}
+        name={property.id!}
+        value={value}
+        disabled={disabled}
+        readOnly={readOnly}
+        mod='surface'
+        className={className}
+      >
+        {property.displayName ?? ''}
+      </TextareaNew>
     );
   }
 

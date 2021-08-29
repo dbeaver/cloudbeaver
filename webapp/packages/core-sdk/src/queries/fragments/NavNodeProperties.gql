@@ -4,6 +4,7 @@ fragment NavNodeProperties on ObjectPropertyInfo {
   dataType
   description
   displayName
+  length
   features
   value
   order

@@ -30,13 +30,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
-    makeObservable(this, {
-      countGain: observable,
-    });
-
     this.id = uuid();
     this.source = source;
     this.countGain = 0;
+
+    makeObservable(this, {
+      countGain: observable,
+    });
   }
 
   isLoading(): boolean {
@@ -103,14 +103,16 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   async reload(): Promise<void> {
-    this.setSlice(0, this.countGain);
-    await this.requestData();
+    await this
+      .setSlice(0, this.countGain)
+      .requestData();
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
     if (!this.isDataAvailable(offset, count)) {
-      this.source.setSlice(offset, count);
-      await this.source.requestData();
+      await this.source
+        .setSlice(offset, count)
+        .requestData();
     }
   }
 

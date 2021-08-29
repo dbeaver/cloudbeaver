@@ -170,7 +170,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
     const all = ResourceKeyUtils.hasMark(key, ConnectionExecutionContextResource.keyAll.mark);
 
-    await ResourceKeyUtils.forEachAsync(key, async contextId => {
+    await ResourceKeyUtils.forEachAsync(all ? ConnectionExecutionContextResource.keyAll : key, async contextId => {
       const context = this.get(contextId);
       const { contexts } = await this.graphQLService.sdk.executionContextList({
         contextId: all ? undefined : (context?.id ?? contextId),

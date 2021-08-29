@@ -241,7 +241,7 @@ public class WebServiceUtils {
         dataSourceContainer.setSavePassword(saveCredentials);
         if (!saveCredentials) {
             // Reset credentials
-            authProperties = new LinkedHashMap<>();
+            //authProperties = new LinkedHashMap<>();
         } else {
             if (authProperties == null) {
                 // No changes

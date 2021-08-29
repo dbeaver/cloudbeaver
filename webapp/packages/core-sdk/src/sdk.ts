@@ -17,7 +17,7 @@ export interface Scalars {
 }
 
 export interface AdminAuthProviderConfiguration {
-  provider: Scalars['ID'];
+  providerId: Scalars['ID'];
   id: Scalars['ID'];
   displayName: Scalars['String'];
   iconURL?: Maybe<Scalars['String']>;
@@ -104,6 +104,7 @@ export interface AuthProviderConfiguration {
   description?: Maybe<Scalars['String']>;
   signInLink?: Maybe<Scalars['String']>;
   signOutLink?: Maybe<Scalars['String']>;
+  metadataLink?: Maybe<Scalars['String']>;
 }
 
 export interface AuthProviderInfo {
@@ -569,8 +570,17 @@ export interface ObjectPropertyInfo {
   value?: Maybe<Scalars['Object']>;
   validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
   defaultValue?: Maybe<Scalars['Object']>;
+  length: ObjectPropertyLength;
   features: Array<Scalars['String']>;
   order: Scalars['Int'];
+}
+
+export enum ObjectPropertyLength {
+  Tiny = 'TINY',
+  Short = 'SHORT',
+  Medium = 'MEDIUM',
+  Long = 'LONG',
+  Multiline = 'MULTILINE'
 }
 
 export interface ProductInfo {
@@ -624,7 +634,7 @@ export interface Query {
   networkHandlers: NetworkHandlerDescriptor[];
   readSessionLog: LogEntry[];
   revokeUserRole?: Maybe<Scalars['Boolean']>;
-  saveAuthProviderConfiguration: Scalars['Boolean'];
+  saveAuthProviderConfiguration: AdminAuthProviderConfiguration;
   searchConnections: AdminConnectionSearchInfo[];
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
@@ -1117,6 +1127,12 @@ export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AuthLogoutQuery = Pick<Query, 'authLogout'>;
 
+export type DeleteAuthProviderConfigurationQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteAuthProviderConfigurationQuery = Pick<Query, 'deleteAuthProviderConfiguration'>;
+
 export type GetActiveUserQueryVariables = Exact<{
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -1128,14 +1144,37 @@ export interface GetActiveUserQuery {
   )>;
 }
 
+export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
+  providerId: Scalars['ID'];
+}>;
+
+export interface GetAuthProviderConfigurationParametersQuery { parameters: AuthProviderConfigurationParametersFragment[] }
+
+export type GetAuthProviderConfigurationsQueryVariables = Exact<{
+  providerId?: Maybe<Scalars['ID']>;
+}>;
+
+export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'iconURL' | 'description' | 'parameters'>> }
+
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetAuthProvidersQuery {
   providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider' | 'configurable'>
-    & { configurations?: Maybe<Array<Pick<AuthProviderConfiguration, 'id' | 'displayName' | 'iconURL' | 'description' | 'signInLink' | 'signOutLink'>>>; credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
+    & { configurations?: Maybe<Array<Pick<AuthProviderConfiguration, 'id' | 'displayName' | 'iconURL' | 'description' | 'signInLink' | 'signOutLink' | 'metadataLink'>>>; credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
   )>;
 }
+
+export type SaveAuthProviderConfigurationQueryVariables = Exact<{
+  providerId: Scalars['ID'];
+  id: Scalars['ID'];
+  displayName?: Maybe<Scalars['String']>;
+  iconURL?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  parameters?: Maybe<Scalars['Object']>;
+}>;
+
+export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'iconURL' | 'description' | 'parameters'> }
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1364,7 +1403,7 @@ export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthModelsQuery {
   models: Array<(
     Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
-    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'features' | 'order'>> }
+    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>> }
   )>;
 }
 
@@ -1474,7 +1513,7 @@ export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: nev
 export interface GetDataTransferProcessorsQuery {
   processors: Array<(
     Pick<DataTransferProcessorInfo, 'id' | 'name' | 'description' | 'fileExtension' | 'appFileExtension' | 'appName' | 'order' | 'icon' | 'isBinary' | 'isHTML'>
-    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>>> }
+    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'length' | 'features' | 'order'>>>> }
   )>;
 }
 
@@ -1498,6 +1537,8 @@ export type AdminUserInfoFragment = (
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
 
+export type AuthProviderConfigurationParametersFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>;
+
 export type AuthTokenFragment = (
   Pick<UserAuthToken, 'authProvider' | 'loginTime' | 'message'>
   & { origin: ObjectOriginInfoFragment }
@@ -1510,7 +1551,7 @@ export type DatabaseConnectionFragment = (
 
 export type DatabaseDriverFragment = (
   MakeOptional<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers' | 'driverParameters'>, 'driverParameters'>
-  & { providerProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>>; driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
+  & { providerProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'length' | 'features' | 'order'>>>; driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
 );
 
 export type NavNodeInfoFragment = (
@@ -1518,18 +1559,18 @@ export type NavNodeInfoFragment = (
   & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<NavNodePropertiesFragment[]> }
 );
 
-export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>;
+export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'length' | 'features' | 'value' | 'order'>;
 
 export type ObjectOriginInfoFragment = (
   Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>
-  & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> }
+  & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'length' | 'features' | 'order'>>> }
 );
 
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
 
-export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
+export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>;
 
-export type UserConnectionNetworkHandlerPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'order' | 'features'>;
+export type UserConnectionNetworkHandlerPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'order' | 'length' | 'features'>;
 
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
@@ -1625,7 +1666,7 @@ export interface GetSqlExecutionPlanResultMutation {
     Pick<SqlExecutionPlan, 'query'>
     & { nodes: Array<(
       Pick<SqlExecutionPlanNode, 'id' | 'parentId' | 'kind' | 'name' | 'type' | 'condition' | 'description'>
-      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
+      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'length' | 'features' | 'value' | 'order'>> }
     )>; }
   );
 }
@@ -1805,6 +1846,7 @@ export const ObjectOriginInfoFragmentDoc = `
     defaultValue
     validValues
     value
+    length
     features
     order
   }
@@ -1820,6 +1862,21 @@ export const AdminUserInfoFragmentDoc = `
   }
 }
     ${ObjectOriginInfoFragmentDoc}`;
+export const AuthProviderConfigurationParametersFragmentDoc = `
+    fragment AuthProviderConfigurationParameters on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  length
+  features
+  order
+}
+    `;
 export const AuthTokenFragmentDoc = `
     fragment AuthToken on UserAuthToken {
   authProvider
@@ -1840,6 +1897,7 @@ export const UserConnectionAuthPropertiesFragmentDoc = `
   value
   validValues
   defaultValue
+  length
   features
   order
 }
@@ -1922,6 +1980,7 @@ export const DatabaseDriverFragmentDoc = `
     dataType
     defaultValue
     validValues
+    length
     features
     order
   }
@@ -1944,6 +2003,7 @@ export const NavNodePropertiesFragmentDoc = `
   dataType
   description
   displayName
+  length
   features
   value
   order
@@ -1987,6 +2047,7 @@ export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
   validValues
   defaultValue
   order
+  length
   features
 }
     `;
@@ -2016,6 +2077,11 @@ export const AuthLogoutDocument = `
   authLogout
 }
     `;
+export const DeleteAuthProviderConfigurationDocument = `
+    query deleteAuthProviderConfiguration($id: ID!) {
+  deleteAuthProviderConfiguration(id: $id)
+}
+    `;
 export const GetActiveUserDocument = `
     query getActiveUser($customIncludeOriginDetails: Boolean!) {
   user: activeUser {
@@ -2028,6 +2094,25 @@ export const GetActiveUserDocument = `
   }
 }
     ${AuthTokenFragmentDoc}`;
+export const GetAuthProviderConfigurationParametersDocument = `
+    query getAuthProviderConfigurationParameters($providerId: ID!) {
+  parameters: listAuthProviderConfigurationParameters(providerId: $providerId) {
+    ...AuthProviderConfigurationParameters
+  }
+}
+    ${AuthProviderConfigurationParametersFragmentDoc}`;
+export const GetAuthProviderConfigurationsDocument = `
+    query getAuthProviderConfigurations($providerId: ID) {
+  configurations: listAuthProviderConfigurations(providerId: $providerId) {
+    providerId
+    id
+    displayName
+    iconURL
+    description
+    parameters
+  }
+}
+    `;
 export const GetAuthProvidersDocument = `
     query getAuthProviders {
   providers: authProviders {
@@ -2044,6 +2129,7 @@ export const GetAuthProvidersDocument = `
       description
       signInLink
       signOutLink
+      metadataLink
     }
     credentialParameters {
       id
@@ -2055,6 +2141,25 @@ export const GetAuthProvidersDocument = `
       possibleValues
       encryption
     }
+  }
+}
+    `;
+export const SaveAuthProviderConfigurationDocument = `
+    query saveAuthProviderConfiguration($providerId: ID!, $id: ID!, $displayName: String, $iconURL: String, $description: String, $parameters: Object) {
+  configuration: saveAuthProviderConfiguration(
+    providerId: $providerId
+    id: $id
+    displayName: $displayName
+    iconURL: $iconURL
+    description: $description
+    parameters: $parameters
+  ) {
+    providerId
+    id
+    displayName
+    iconURL
+    description
+    parameters
   }
 }
     `;
@@ -2288,6 +2393,7 @@ export const GetAuthModelsDocument = `
       dataType
       validValues
       defaultValue
+      length
       features
       order
     }
@@ -2419,6 +2525,7 @@ export const GetDataTransferProcessorsDocument = `
       dataType
       defaultValue
       validValues
+      length
       features
       order
     }
@@ -2605,6 +2712,7 @@ export const GetSqlExecutionPlanResultDocument = `
         dataType
         description
         displayName
+        length
         features
         value
         order
@@ -2856,11 +2964,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     authLogout(variables?: AuthLogoutQueryVariables): Promise<AuthLogoutQuery> {
       return withWrapper(() => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables));
     },
+    deleteAuthProviderConfiguration(variables: DeleteAuthProviderConfigurationQueryVariables): Promise<DeleteAuthProviderConfigurationQuery> {
+      return withWrapper(() => client.request<DeleteAuthProviderConfigurationQuery>(DeleteAuthProviderConfigurationDocument, variables));
+    },
     getActiveUser(variables: GetActiveUserQueryVariables): Promise<GetActiveUserQuery> {
       return withWrapper(() => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables));
     },
+    getAuthProviderConfigurationParameters(variables: GetAuthProviderConfigurationParametersQueryVariables): Promise<GetAuthProviderConfigurationParametersQuery> {
+      return withWrapper(() => client.request<GetAuthProviderConfigurationParametersQuery>(GetAuthProviderConfigurationParametersDocument, variables));
+    },
+    getAuthProviderConfigurations(variables?: GetAuthProviderConfigurationsQueryVariables): Promise<GetAuthProviderConfigurationsQuery> {
+      return withWrapper(() => client.request<GetAuthProviderConfigurationsQuery>(GetAuthProviderConfigurationsDocument, variables));
+    },
     getAuthProviders(variables?: GetAuthProvidersQueryVariables): Promise<GetAuthProvidersQuery> {
       return withWrapper(() => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables));
+    },
+    saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables): Promise<SaveAuthProviderConfigurationQuery> {
+      return withWrapper(() => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables));
     },
     createUser(variables: CreateUserQueryVariables): Promise<CreateUserQuery> {
       return withWrapper(() => client.request<CreateUserQuery>(CreateUserDocument, variables));

@@ -30,6 +30,9 @@ export const commonDialogBaseStyle = composes(
     dialog {
       composes: theme-background-surface theme-text-on-surface from global;
     }
+    dialog-body-overflow {
+      composes: branding-overflow from global;
+    }
   `,
   css`
     dialog {
@@ -38,19 +41,31 @@ export const commonDialogBaseStyle = composes(
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      padding: 24px;
       margin: 0;
       border: none;
       height: auto;
       min-width: 748px;
       max-height: 100%;
       border-radius: 0.25rem;
+      padding: 0px;
+    }
+    header, dialog-body, footer {
+      padding: 24px;
+
+      &[|no-padding] {
+        padding: 0px;
+      }
+    }
+    dialog-body {
+      padding-top: 0px;
+    }
+    footer {
+      padding-top: 0px;
     }
     header {
       position: relative;
       display: grid;
       grid-template-columns: max-content 1fr;
-      margin-bottom: 24px;
     }
     header-title {
       display: flex;
@@ -79,7 +94,16 @@ export const commonDialogBaseStyle = composes(
       display: flex;
       flex-direction: row;
       flex: 1;
+      max-width: 748px;
+      max-height: 100%;
       overflow: auto;
+    }
+    dialog-body-overflow-box {
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      flex: 1;
     }
     dialog-body-content {
       position: relative;
@@ -88,10 +112,13 @@ export const commonDialogBaseStyle = composes(
       flex-direction: column;
       box-sizing: border-box;
       overflow: auto;
-      min-height: 80px;
-      max-width: 748px;
-      max-height: 100%;
       padding-bottom: 24px;
+    }
+    dialog-body[|no-padding] + footer {
+      padding-top: 24px;
+    }
+    dialog-body[|no-overflow] dialog-body-content {
+      padding-bottom: 0;
     }
     dialog-body-overflow {
       position: absolute;
@@ -117,7 +144,6 @@ export const commonDialogBaseStyle = composes(
       display: flex;
       z-index: 0;
       box-sizing: border-box;
-      margin-top: 16px;
 
       &:empty {
         display: none;

@@ -104,6 +104,8 @@ export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = obse
           <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
         </controls>
       )}
+      noBodyPadding
+      noOverflow
       onReject={rejectDialog}
     >
       <wrapper>

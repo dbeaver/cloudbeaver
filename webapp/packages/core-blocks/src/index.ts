@@ -1,4 +1,7 @@
+export * from './AppRefreshButton';
 export * from './ComplexLoader';
+export * from './DisplayError';
+export * from './ErrorBoundary';
 export * from './Icon';
 
 export * from './ItemList/ItemList';
@@ -48,6 +51,7 @@ export * from './Table/TableItemContext';
 export * from './Table/TableItemExpand';
 export * from './Table/TableItemSelect';
 export * from './Table/TableItemSeparator';
+export * from './Table/useTable';
 
 export * from './Tabs/ITab';
 export * from './Tabs/TabContext';

@@ -12,19 +12,20 @@ import { useStyles, Style } from '@cloudbeaver/core-theming';
 
 import { Styles, ITEM_LIST_STYLES_ARRAY } from './styles';
 
-type ItemListProps = React.PropsWithChildren<{
+interface IProps {
   className?: string;
   styles?: Style[];
-}>;
+}
 
-export function ItemList({
+export const ItemList: React.FC<IProps> = function ItemList({
   children, className, styles,
-}: ItemListProps) {
+}) {
   return styled(useStyles(...(styles || ITEM_LIST_STYLES_ARRAY)))(
-    <item-list as="div" className={className}>
+    <item-list className={className}>
       <Styles.Provider value={styles || ITEM_LIST_STYLES_ARRAY}>
         {children}
       </Styles.Provider>
+      <item-list-overflow />
     </item-list>
   );
-}
+};

@@ -1,0 +1,5 @@
+query getAuthProviderConfigurationParameters($providerId: ID!) {
+  parameters: listAuthProviderConfigurationParameters(providerId: $providerId) {
+    ...AuthProviderConfigurationParameters
+  }
+}

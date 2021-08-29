@@ -213,6 +213,7 @@ export abstract class CachedMapResource<
 
   set(key: TKey, value: TValue): void;
   set(key: ResourceKeyList<TKey>, value: TValue[]): void;
+  set(key: ResourceKey<TKey>, value: TValue | TValue[]): void;
   set(key: ResourceKey<TKey>, value: TValue | TValue[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, (key, i) => {

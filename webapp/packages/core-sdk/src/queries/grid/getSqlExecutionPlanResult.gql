@@ -19,6 +19,7 @@ mutation getSqlExecutionPlanResult(
             dataType
             description
             displayName
+            length
             features
             value
             order

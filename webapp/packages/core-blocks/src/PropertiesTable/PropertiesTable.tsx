@@ -141,6 +141,7 @@ export const PropertiesTable = observer(function PropertiesTable(props: Props) {
             onRemove={removeProperty}
           />
         ))}
+        <properties-list-overflow />
       </properties-list>
     </properties>
   );

@@ -8,7 +8,7 @@
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-export function getValue(value: string | { displayName: string }) {
+export function getValue(value: string | { displayName: string }): string {
   if (value === null || value === undefined) {
     return '';
   }
@@ -36,6 +36,6 @@ export function additionalProps(property: ObjectPropertyInfo) {
   return { disabled: true, checked: property.value === 'true' };
 }
 
-export function filterProperty(property: ObjectPropertyInfo) {
+export function filterProperty(property: ObjectPropertyInfo): boolean {
   return true;
 }

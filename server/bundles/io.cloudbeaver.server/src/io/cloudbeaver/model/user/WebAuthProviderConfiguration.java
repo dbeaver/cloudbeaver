@@ -55,6 +55,10 @@ public class WebAuthProviderConfiguration {
         return config.getDisplayName();
     }
 
+    public boolean isDisabled() {
+        return config.isDisabled();
+    }
+
     public String getIconURL() {
         return config.getIconURL();
     }

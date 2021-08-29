@@ -24,6 +24,7 @@ fragment DatabaseDriver on DriverInfo {
     dataType
     defaultValue
     validValues
+    length
     features
     order
   }

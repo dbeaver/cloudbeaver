@@ -19,13 +19,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Body } from '@cloudbeaver/core-app';
+import { ErrorBoundary } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 export function renderLayout(serviceInjector: IServiceInjector): void {
   ReactDOM.render(
-    <AppContext app={serviceInjector}>
-      <Body />
-    </AppContext>,
+    <ErrorBoundary root>
+      <AppContext app={serviceInjector}>
+        <Body />
+      </AppContext>
+    </ErrorBoundary>,
     document.getElementById('root')
   );
 }

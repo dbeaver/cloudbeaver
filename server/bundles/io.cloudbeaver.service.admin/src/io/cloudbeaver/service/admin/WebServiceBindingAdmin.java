@@ -27,6 +27,7 @@ import io.cloudbeaver.service.admin.impl.WebAdminLogsServlet;
 import io.cloudbeaver.service.admin.impl.WebServiceAdmin;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.jkiss.utils.CommonUtils;
 
 /**
  * Web service implementation
@@ -108,6 +109,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env.getArgument("providerId"),
                 env.getArgument("id"),
                 env.getArgument("displayName"),
+                CommonUtils.toBoolean((Boolean)env.getArgument("disabled")),
                 env.getArgument("iconURL"),
                 env.getArgument("description"),
                 env.getArgument("parameters")))

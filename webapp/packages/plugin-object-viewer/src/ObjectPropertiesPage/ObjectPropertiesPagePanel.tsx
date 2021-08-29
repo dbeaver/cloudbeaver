@@ -11,10 +11,10 @@ import styled, { css } from 'reshadow';
 
 import { useChildren } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { ObjectPagePanelProps } from '../ObjectPage/ObjectPage';
+import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
 
 const viewerStyles = composes(
@@ -33,10 +33,11 @@ const viewerStyles = composes(
   `
 );
 
-export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPagePanel({
+export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({
   tab,
-}: ObjectPagePanelProps) {
+}) {
   const style = useStyles(viewerStyles);
+  const translate = useTranslate();
   const { children, isLoading } = useChildren(tab.handlerState.objectId);
 
   if (!children && isLoading()) {
@@ -44,7 +45,7 @@ export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPageP
   }
 
   if (!children) {
-    return <TextPlaceholder><Translate token='plugin_object_viewer_table_no_items' /></TextPlaceholder>;
+    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
   return styled(style)(

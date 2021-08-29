@@ -13,6 +13,7 @@ query getAuthModels {
       dataType
       validValues
       defaultValue
+      length
       features
       order
     }

@@ -10,17 +10,19 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ObjectPageTabProps } from '../ObjectPage/ObjectPage';
+import type { ObjectPageTabComponent } from '../ObjectPage/ObjectPage';
 
-export const ObjectPropertiesPageTab = observer(function ObjectPropertiesPageTab({
+export const ObjectPropertiesPageTab: ObjectPageTabComponent = observer(function ObjectPropertiesPageTab({
   page, onSelect, style,
-}: ObjectPageTabProps) {
+}) {
+  const translate = useTranslate();
   return styled(useStyles(style))(
     <Tab tabId={page.key} style={style} onOpen={onSelect}>
       <TabIcon icon='/icons/properties.svg' viewBox="0 0 16 16" />
-      <TabTitle>Properties</TabTitle>
+      <TabTitle>{translate('plugin_object_viewer_properties_tab')}</TabTitle>
     </Tab>
   );
 });

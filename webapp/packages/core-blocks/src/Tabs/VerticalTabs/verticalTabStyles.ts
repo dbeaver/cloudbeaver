@@ -10,6 +10,7 @@ import { css } from 'reshadow';
 
 export const verticalTabStyles = css`
   Tab {
+    overflow: auto;
     border: none !important;
     flex-shrink: 0;
     height: 36px !important;

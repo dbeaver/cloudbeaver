@@ -26,6 +26,7 @@ public class AuthProviderConfig {
 
     private String provider;
     private String displayName;
+    private boolean disabled;
     private String iconURL;
 
     private String description;
@@ -46,6 +47,14 @@ public class AuthProviderConfig {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
     public String getIconURL() {
@@ -75,4 +84,5 @@ public class AuthProviderConfig {
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
+
 }
