@@ -10,10 +10,17 @@ import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import {
-  AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables,
+  AdminAuthProviderConfiguration, AuthProviderConfiguration,
+  CachedMapResource, GetAuthProviderConfigurationsQueryVariables,
   GraphQLService, ResourceKey, ResourceKeyList, resourceKeyList, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
+
+const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
+
+type NewConfiguration = AdminAuthProviderConfiguration & {
+  [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number;
+};
 
 @injectable()
 export class AuthConfigurationsResource
@@ -87,7 +94,17 @@ export class AuthConfigurationsResource
 
   async saveConfiguration(config: AdminAuthProviderConfiguration): Promise<AdminAuthProviderConfiguration> {
     await this.performUpdate(config.id, [], async () => {
-      const { configuration } = await this.graphQLService.sdk.saveAuthProviderConfiguration(config);
+      const response = await this.graphQLService.sdk.saveAuthProviderConfiguration(config);
+
+      let configuration: AdminAuthProviderConfiguration | NewConfiguration = response.configuration;
+
+      if (!this.data.has(config.id)) {
+        configuration = {
+          ...configuration,
+          [NEW_CONFIGURATION_SYMBOL]: true,
+          timestamp: Date.now(),
+        };
+      }
 
       this.updateConfiguration(configuration);
     });
@@ -103,8 +120,38 @@ export class AuthConfigurationsResource
       this.delete(key);
     });
   }
+
+  cleanNewFlags(): void {
+    for (const configuration of this.data.values()) {
+      (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL] = false;
+    }
+  }
 }
 
-export function compareConfigurations(a: AdminAuthProviderConfiguration, b: AdminAuthProviderConfiguration): number {
-  return (a.providerId).localeCompare(b.providerId) || (a.displayName).localeCompare(b.displayName);
+function isNewConfiguration(
+  configuration: AdminAuthProviderConfiguration | NewConfiguration
+): configuration is NewConfiguration {
+  return (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL];
+}
+
+export function compareAuthConfigurations(
+  a: AdminAuthProviderConfiguration, b: AdminAuthProviderConfiguration
+): number {
+  if (isNewConfiguration(a) && isNewConfiguration(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isNewConfiguration(b)) {
+    return 1;
+  }
+
+  if (isNewConfiguration(a)) {
+    return -1;
+  }
+
+  return a.displayName.localeCompare(b.displayName);
+}
+
+export function comparePublicAuthConfigurations(a: AuthProviderConfiguration, b: AuthProviderConfiguration): number {
+  return a.displayName.localeCompare(b.displayName);
 }

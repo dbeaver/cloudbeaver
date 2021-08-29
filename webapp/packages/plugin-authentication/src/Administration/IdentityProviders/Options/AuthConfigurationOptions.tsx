@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, Group, GroupTitle,
+  BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, FieldCheckboxNew, Group, GroupTitle,
   InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent, TextareaNew, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -55,6 +55,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             placeholder={translate('administration_identity_providers_choose_provider_placeholder')}
             readOnly={state.readonly || edit}
             disabled={state.disabled}
+            required
             tiny
             fill
           >
@@ -65,6 +66,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             state={state.config}
             readOnly={state.readonly || edit}
             disabled={state.disabled}
+            required
             tiny
             fill
           >
@@ -98,6 +100,15 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           >
             {translate('administration_identity_providers_provider_configuration_icon_url')}
           </InputFieldNew>
+          <FieldCheckboxNew
+            id={edit ? state.config.id : 'AuthConfigurationDisabled'}
+            name='disabled'
+            state={state.config}
+            disabled={state.disabled}
+            readOnly={state.readonly}
+          >
+            {translate('administration_identity_providers_provider_configuration_disabled')}
+          </FieldCheckboxNew>
         </Group>
         {parameters.isLoaded() && parameters.data && (
           <Group small gap vertical>

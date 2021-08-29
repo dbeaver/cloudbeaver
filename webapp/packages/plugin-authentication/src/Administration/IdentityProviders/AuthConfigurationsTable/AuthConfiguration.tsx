@@ -62,6 +62,9 @@ export const AuthConfiguration: React.FC<Props> = observer(function AuthConfigur
       <TableColumnValue expand>{configuration.displayName}</TableColumnValue>
       <TableColumnValue>{configuration.providerId}</TableColumnValue>
       <TableColumnValue>{configuration.description || ''}</TableColumnValue>
+      <TableColumnValue>
+        <TableItemSelect checked={configuration.disabled} disabled />
+      </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={service.configurationDetailsPlaceholder} configuration={configuration} />
       </TableColumnValue>

@@ -47,6 +47,7 @@ export default [
   ['administration_identity_providers_provider', 'Провайдер'],
   ['administration_identity_providers_provider_id', 'Идентификатор'],
   ['administration_identity_providers_provider_configuration_name', 'Название конфигурации'],
+  ['administration_identity_providers_provider_configuration_disabled', 'Отключена'],
   ['administration_identity_providers_provider_configuration_description', 'Описание'],
   ['administration_identity_providers_provider_configuration_icon_url', 'URL Иконки'],
   ['administration_identity_providers_provider_configuration_parameters', 'Параметры'],

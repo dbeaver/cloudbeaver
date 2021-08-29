@@ -13,6 +13,7 @@ export function authConfigurationContext(): AdminAuthProviderConfiguration {
     id: '',
     providerId: '',
     displayName: '',
+    disabled: false,
     parameters: {},
     description: '',
     iconURL: '',

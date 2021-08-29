@@ -52,8 +52,8 @@ export const TableItemSelect: React.FC<Props> = observer(function TableItemSelec
   return styled(styles, checkboxStyles)(
     <Checkbox
       className={className}
-      disabled={context.selectDisabled || disabled}
-      checked={checked || context.isSelected()}
+      disabled={disabled ?? context.selectDisabled}
+      checked={checked ?? context.isSelected()}
       onClick={handleClick}
     />
   );
