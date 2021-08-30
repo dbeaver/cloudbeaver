@@ -38,7 +38,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 const rowHeight = 25;
 const headerHeight = 28;
 
-export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResultSet>> = observer(function DataGridTable({ model, actions, resultIndex, className }) {
+export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, className }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);

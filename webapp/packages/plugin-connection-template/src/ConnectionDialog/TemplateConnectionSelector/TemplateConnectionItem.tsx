@@ -29,11 +29,11 @@ const styles = css`
   }
 `;
 
-export const TemplateConnectionItem = observer(function TemplateConnectionItem({
+export const TemplateConnectionItem = observer<Props>(function TemplateConnectionItem({
   template,
   dbDriver,
   onSelect,
-}: Props) {
+}) {
   const select = useCallback(() => onSelect(template.id), [template]);
 
   return styled(styles)(

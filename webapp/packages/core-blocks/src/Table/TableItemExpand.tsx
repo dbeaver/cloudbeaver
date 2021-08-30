@@ -25,7 +25,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export const TableItemExpand: React.FC<Props> = observer(function TableItemExpand({
+export const TableItemExpand = observer<Props>(function TableItemExpand({
   onExpand,
   className,
   disabled,

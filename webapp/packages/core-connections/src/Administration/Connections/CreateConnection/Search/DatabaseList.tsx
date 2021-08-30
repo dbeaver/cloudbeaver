@@ -45,9 +45,9 @@ interface Props {
   onSearch?: () => Promise<void>;
 }
 
-export const DatabaseList = observer(function DatabaseList({
+export const DatabaseList = observer<Props>(function DatabaseList({
   databases, hosts, disabled, className, onSelect, onChange, onSearch,
-}: Props) {
+}) {
   const translate = useTranslate();
   const [isSearched, setIsSearched] = useState(false);
 

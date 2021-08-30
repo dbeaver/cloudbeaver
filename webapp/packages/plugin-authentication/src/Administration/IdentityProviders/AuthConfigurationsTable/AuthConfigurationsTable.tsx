@@ -28,7 +28,7 @@ interface Props {
   expandedItems: Map<string, boolean>;
 }
 
-export const AuthConfigurationsTable: React.FC<Props> = observer(function AuthConfigurationsTable({ configurations, selectedItems, expandedItems }) {
+export const AuthConfigurationsTable = observer<Props>(function AuthConfigurationsTable({ configurations, selectedItems, expandedItems }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>

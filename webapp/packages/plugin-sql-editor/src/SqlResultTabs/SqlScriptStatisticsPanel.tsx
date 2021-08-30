@@ -45,7 +45,7 @@ const styles = css`
   }
 `;
 
-export const SqlScriptStatisticsPanel: React.FC<IProps> = observer(function SqlScriptStatisticsPanel({
+export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStatisticsPanel({
   tab,
 }) {
   const sqlQueryService = useService(SqlQueryService);

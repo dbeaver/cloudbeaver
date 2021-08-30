@@ -65,7 +65,7 @@ interface Props {
   onEdit: () => void;
 }
 
-export const ConnectionAccessGrantedList: React.FC<Props> = observer(function ConnectionAccessGrantedList({
+export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAccessGrantedList({
   grantedUsers,
   grantedRoles,
   disabled,

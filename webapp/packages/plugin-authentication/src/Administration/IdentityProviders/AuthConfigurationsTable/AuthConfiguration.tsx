@@ -42,7 +42,7 @@ interface Props {
   configuration: AdminAuthProviderConfiguration;
 }
 
-export const AuthConfiguration: React.FC<Props> = observer(function AuthConfiguration({ configuration }) {
+export const AuthConfiguration = observer<Props>(function AuthConfiguration({ configuration }) {
   const service = useService(AuthConfigurationsAdministrationService);
   const resource = useMapResource(AuthProvidersResource, configuration.providerId);
 

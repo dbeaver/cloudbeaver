@@ -57,7 +57,7 @@ interface Props {
   onFilter?: (node: NavNode, value: string) => void;
 }
 
-export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
+export const ElementsTree = observer<Props>(function ElementsTree({
   root = ROOT_NODE_PATH,
   control,
   localState,

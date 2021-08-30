@@ -15,7 +15,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-interface ProcessorItemProps {
+interface Props {
   processor: DataTransferProcessorInfo;
   onSelect: (processorId: string) => void;
 }
@@ -28,10 +28,10 @@ const styles = css`
     }
   `;
 
-export const ProcessorItem = observer(function ProcessorItem({
+export const ProcessorItem = observer<Props>(function ProcessorItem({
   processor,
   onSelect,
-}: ProcessorItemProps) {
+}) {
   const select = useCallback(() => onSelect(processor.id), [processor]);
 
   return styled(styles)(

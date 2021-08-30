@@ -32,7 +32,7 @@ interface IProps {
   style?: ComponentStyle;
 }
 
-export const TabsBoxFromArray: React.FC<IProps> = observer(function TabsBoxFromArray({
+export const TabsBoxFromArray = observer<IProps>(function TabsBoxFromArray({
   currentTabId,
   tabIdList,
   tab: TabData,

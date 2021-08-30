@@ -44,7 +44,7 @@ interface Props {
   className?: string;
 }
 
-export const OrderButton: React.FC<Props> = observer(function OrderButton({
+export const OrderButton = observer<Props>(function OrderButton({
   model,
   resultIndex,
   attribute,

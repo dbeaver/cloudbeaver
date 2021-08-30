@@ -26,12 +26,12 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const PresentationTab = observer(function PresentationTab({
+export const PresentationTab = observer<Props>(function PresentationTab({
   model,
   presentation,
   className,
   style,
-}: Props) {
+}) {
   const translate = useTranslate();
   const styles = useStyles(verticalRotatedTabStyles, style);
 

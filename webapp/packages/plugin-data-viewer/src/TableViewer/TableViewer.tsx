@@ -102,7 +102,7 @@ interface Props {
   onValuePresentationChange: (id: string | null) => void;
 }
 
-export const TableViewer: React.FC<Props> = observer(function TableViewer({
+export const TableViewer = observer<Props>(function TableViewer({
   tableId,
   resultIndex = 0,
   presentationId,

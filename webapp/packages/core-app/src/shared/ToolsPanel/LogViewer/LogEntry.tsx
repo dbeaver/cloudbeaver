@@ -58,7 +58,7 @@ const style = css`
   }
 `;
 
-export const LogEntry: React.FC<Props> = observer(function LogEntry({
+export const LogEntry = observer<Props>(function LogEntry({
   item,
   onSelect,
   selected = false,

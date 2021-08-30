@@ -41,7 +41,7 @@ const styles = css`
   }
 `;
 
-interface ProcessorSelectDialogProps {
+interface Props {
   context: IExportContext;
   processors: DataTransferProcessorInfo[];
   isLoading: boolean;
@@ -49,31 +49,30 @@ interface ProcessorSelectDialogProps {
   onClose: () => void;
 }
 
-export const ProcessorSelectDialog = observer(
-  function ProcessorSelectDialog({
-    context,
-    processors,
-    isLoading,
-    onSelect,
-    onClose,
-  }: ProcessorSelectDialogProps) {
-    const translate = useTranslate();
-    const { node } = useNode(context.containerNodePath || '');
+export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({
+  context,
+  processors,
+  isLoading,
+  onSelect,
+  onClose,
+}) {
+  const translate = useTranslate();
+  const { node } = useNode(context.containerNodePath || '');
 
-    return styled(styles)(
-      <CommonDialogWrapper
-        title={translate('data_transfer_dialog_title')}
-        noBodyPadding
-        noOverflow
-        onReject={onClose}
-      >
-        <export-object>
-          {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
-          <pre title={context.sourceName}>{context.sourceName}</pre>
-        </export-object>
-        {isLoading && <Loader />}
-        {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
-      </CommonDialogWrapper>
-    );
-  }
+  return styled(styles)(
+    <CommonDialogWrapper
+      title={translate('data_transfer_dialog_title')}
+      noBodyPadding
+      noOverflow
+      onReject={onClose}
+    >
+      <export-object>
+        {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
+        <pre title={context.sourceName}>{context.sourceName}</pre>
+      </export-object>
+      {isLoading && <Loader />}
+      {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
+    </CommonDialogWrapper>
+  );
+}
 );

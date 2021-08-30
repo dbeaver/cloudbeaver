@@ -29,7 +29,7 @@ interface Props {
   onSelect: (driverId: string) => void;
 }
 
-export const Driver = observer(function Driver({ driver, onSelect }: Props) {
+export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
 
   return styled(styles)(

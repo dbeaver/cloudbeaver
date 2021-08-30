@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import React from 'react';
+import { forwardRef } from 'react';
 
 type ShadowInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'children'> & {
   onChange?: (value: string) => any;
@@ -14,11 +14,11 @@ type ShadowInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onCha
   className?: string;
 };
 
-export const ShadowInput = React.forwardRef(function ShadowInput({
+export const ShadowInput = forwardRef<HTMLInputElement, ShadowInputProps>(function ShadowInput({
   onChange,
   children,
   ...rest
-}: ShadowInputProps, ref: React.Ref<HTMLInputElement>) {
+}, ref) {
   return (
     <input
       ref={ref}

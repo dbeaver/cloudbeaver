@@ -22,7 +22,7 @@ interface MenuPanelItemProps {
   style?: ComponentStyle;
 }
 
-export const MenuPanelItem: React.FC<MenuPanelItemProps> = observer(function MenuPanelItem({
+export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({
   menuItem,
   style = [],
 }) {

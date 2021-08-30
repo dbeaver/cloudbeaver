@@ -42,9 +42,9 @@ interface Props {
   item: string;
 }
 
-export const UserEdit = observer(function UserEdit({
+export const UserEdit = observer<Props>(function UserEdit({
   item,
-}: Props) {
+}) {
   const boxRef = useRef<HTMLDivElement>(null);
   const controller = useController(UserEditController, item);
   const tableContext = useContext(TableContext);

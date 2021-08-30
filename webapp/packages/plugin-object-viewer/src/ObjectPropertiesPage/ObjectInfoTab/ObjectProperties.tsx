@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import type { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
@@ -17,15 +16,15 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-type ObjectPropertiesProps = PropsWithChildren<{
+interface Props {
   objectId: string;
-}>;
+}
 
 const emptyArray: ObjectPropertyInfo[] = [];
 
-export const ObjectProperties = observer(function ObjectProperties({
+export const ObjectProperties = observer<Props>(function ObjectProperties({
   objectId,
-}: ObjectPropertiesProps) {
+}) {
   const translate = useTranslate();
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);

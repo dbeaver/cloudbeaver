@@ -9,17 +9,17 @@
 import { observer } from 'mobx-react-lite';
 
 import { useController } from '@cloudbeaver/core-di';
-import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import type { IExportContext } from '../IExportContext';
 import { DataExportController, DataExportStep } from './DataExportController';
 import { ProcessorConfigureDialog } from './ProcessorConfigureDialog';
 import { ProcessorSelectDialog } from './ProcessorSelectDialog';
 
-export const DataExportDialog = observer(function DataExportDialog({
+export const DataExportDialog: DialogComponent<IExportContext> = observer(function DataExportDialog({
   payload,
   rejectDialog,
-}: DialogComponentProps<IExportContext, null>) {
+}) {
   const controller = useController(DataExportController, payload, rejectDialog);
 
   if (controller.step === DataExportStep.Configure && controller.processor) {

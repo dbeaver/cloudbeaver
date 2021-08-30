@@ -44,9 +44,9 @@ const styles = css`
   }
 `;
 
-export const ObjectPropertyCheckbox = observer(function ObjectPropertyCheckbox({
+export const ObjectPropertyCheckbox = observer<ObjectPropertyProps>(function ObjectPropertyCheckbox({
   objectProperty,
-}: ObjectPropertyProps) {
+}) {
   const style = useStyles(styles);
   if (!objectProperty) {
     return null;

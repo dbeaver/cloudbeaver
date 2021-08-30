@@ -32,7 +32,7 @@ const styles = composes(
   `
 );
 
-export const ConnectionAccessTableInnerHeader: React.FC<Props> = observer(function ConnectionAccessTableInnerHeader({ className }) {
+export const ConnectionAccessTableInnerHeader = observer<Props>(function ConnectionAccessTableInnerHeader({ className }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <TableHeader className={className}>

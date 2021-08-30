@@ -70,7 +70,7 @@ interface Props {
   onClear: () => void;
   className?: string;
 }
-export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
+export const LogViewerTable = observer<Props>(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
   const style = useStyles(styles);
 

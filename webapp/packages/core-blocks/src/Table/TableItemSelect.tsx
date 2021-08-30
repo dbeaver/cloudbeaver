@@ -31,7 +31,7 @@ const checkboxStyles = css`
   }
 `;
 
-export const TableItemSelect: React.FC<Props> = observer(function TableItemSelect({ checked, disabled, className }) {
+export const TableItemSelect = observer<Props>(function TableItemSelect({ checked, disabled, className }) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const styles = useStyles();

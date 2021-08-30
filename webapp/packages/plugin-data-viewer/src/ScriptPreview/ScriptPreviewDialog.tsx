@@ -52,7 +52,7 @@ interface Payload {
   model: IDatabaseDataModel<any, IDatabaseDataResult>;
 }
 
-export const ScriptPreviewDialog: React.FC<DialogComponentProps<Payload>> = observer(function ScriptPreviewDialog({
+export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({
   rejectDialog,
   payload,
 }) {

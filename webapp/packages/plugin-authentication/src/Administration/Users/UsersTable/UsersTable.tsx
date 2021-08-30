@@ -31,7 +31,7 @@ interface Props {
   selectable?: boolean;
 }
 
-export const UsersTable = observer(function UsersTable({ users, selectedItems, expandedItems, selectable }: Props) {
+export const UsersTable = observer<Props>(function UsersTable({ users, selectedItems, expandedItems, selectable }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>

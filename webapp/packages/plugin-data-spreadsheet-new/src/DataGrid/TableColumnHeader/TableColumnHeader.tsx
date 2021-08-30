@@ -59,7 +59,7 @@ const headerStyles = css`
   }
 `;
 
-export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeader({
+export const TableColumnHeader = observer<HeaderRendererProps<any>>(function TableColumnHeader({
   column: calculatedColumn,
 }) {
   const dataGridContext = useContext(DataGridContext);

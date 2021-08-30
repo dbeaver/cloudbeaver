@@ -34,7 +34,7 @@ const styles = css`
   }
 `;
 
-export const BooleanFormatter: React.FC<FormatterProps<IResultSetRowKey>> = observer(function BooleanFormatter({ column, row }) {
+export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(function BooleanFormatter({ column, row }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);

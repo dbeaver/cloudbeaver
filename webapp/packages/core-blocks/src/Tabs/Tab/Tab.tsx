@@ -19,7 +19,7 @@ import { TabContext } from '../TabContext';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab: React.FC<TabProps> = observer(function Tab({
+export const Tab = observer<TabProps>(function Tab({
   tabId,
   title,
   disabled,

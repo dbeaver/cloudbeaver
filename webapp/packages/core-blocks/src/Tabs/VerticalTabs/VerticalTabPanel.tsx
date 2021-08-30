@@ -20,7 +20,7 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style: ComponentStyle;
 }
 
-export const VerticalTabPanel: React.FC<IProps> = observer(function VerticalTabPanel({ tab, style }) {
+export const VerticalTabPanel = observer<IProps>(function VerticalTabPanel({ tab, style }) {
   const Panel = tab.panel;
 
   return styled(useStyles(verticalTabStyles, style))(

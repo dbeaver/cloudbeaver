@@ -21,12 +21,12 @@ interface Props {
   onSelect: (dbSourceId: string) => void;
 }
 
-export const TemplateConnectionSelector = observer(function TemplateConnectionSelector({
+export const TemplateConnectionSelector = observer<Props>(function TemplateConnectionSelector({
   templateConnections,
   dbDrivers,
   className,
   onSelect,
-}: Props) {
+}) {
   const [search, setSearch] = useState('');
   const filteredTemplateConnections = useMemo(() => {
     if (!search) {

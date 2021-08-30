@@ -46,7 +46,7 @@ const styles = composes(
   `
 );
 
-interface ProcessorSelectDialogProps {
+interface Props {
   processor: DataTransferProcessorInfo;
   properties: IProperty[];
   processorProperties: any;
@@ -58,48 +58,47 @@ interface ProcessorSelectDialogProps {
   onExport: () => void;
 }
 
-export const ProcessorConfigureDialog = observer(
-  function ProcessorConfigureDialog({
-    processor,
-    properties,
-    processorProperties,
-    error,
-    isExporting,
-    onShowDetails,
-    onClose,
-    onBack,
-    onExport,
-  }: ProcessorSelectDialogProps) {
-    const translate = useTranslate();
-    const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
+export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfigureDialog({
+  processor,
+  properties,
+  processorProperties,
+  error,
+  isExporting,
+  onShowDetails,
+  onClose,
+  onBack,
+  onExport,
+}) {
+  const translate = useTranslate();
+  const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
 
-    return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={title}
-        footer={(
-          <ProcessorConfigureDialogFooter
-            isExporting={isExporting}
-            onExport={onExport}
-            onBack={onBack}
-            onCancel={onClose}
-          />
-        )}
-        noOverflow
-        noBodyPadding
-        onReject={onClose}
-      >
-        <PropertiesTable
-          properties={properties}
-          propertiesState={processorProperties}
+  return styled(useStyles(styles))(
+    <CommonDialogWrapper
+      title={title}
+      footer={(
+        <ProcessorConfigureDialogFooter
+          isExporting={isExporting}
+          onExport={onExport}
+          onBack={onBack}
+          onCancel={onClose}
         />
-        {error.responseMessage && (
-          <ErrorMessage
-            text={error.responseMessage}
-            hasDetails={error.hasDetails}
-            onShowDetails={onShowDetails}
-          />
-        )}
-      </CommonDialogWrapper>
-    );
-  }
+      )}
+      noOverflow
+      noBodyPadding
+      onReject={onClose}
+    >
+      <PropertiesTable
+        properties={properties}
+        propertiesState={processorProperties}
+      />
+      {error.responseMessage && (
+        <ErrorMessage
+          text={error.responseMessage}
+          hasDetails={error.hasDetails}
+          onShowDetails={onShowDetails}
+        />
+      )}
+    </CommonDialogWrapper>
+  );
+}
 );

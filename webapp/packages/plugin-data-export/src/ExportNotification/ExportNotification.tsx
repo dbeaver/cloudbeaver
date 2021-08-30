@@ -39,7 +39,7 @@ type Props = NotificationComponentProps<{
   source: string;
 }>;
 
-export const ExportNotification: React.FC<Props> = observer(function ExportNotification({
+export const ExportNotification = observer<Props>(function ExportNotification({
   notification,
 }) {
   const controller = useController(ExportNotificationController, notification);

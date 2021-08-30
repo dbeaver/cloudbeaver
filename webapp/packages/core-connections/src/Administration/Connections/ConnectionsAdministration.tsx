@@ -62,7 +62,7 @@ const styles = composes(
   `
 );
 
-export const ConnectionsAdministration: React.FC<AdministrationItemContentProps> = observer(function ConnectionsAdministration({
+export const ConnectionsAdministration = observer<AdministrationItemContentProps>(function ConnectionsAdministration({
   sub,
   param,
   configurationWizard,

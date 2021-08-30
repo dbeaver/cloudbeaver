@@ -22,7 +22,7 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style: ComponentStyle;
 }
 
-export const VerticalTabHeader: React.FC<IProps> = observer(function VerticalTabHeader({ tab, style, ...props }) {
+export const VerticalTabHeader = observer<IProps>(function VerticalTabHeader({ tab, style, ...props }) {
   return styled(useStyles(verticalTabStyles, style))(
     <Tab
       tabId={tab.tabId}

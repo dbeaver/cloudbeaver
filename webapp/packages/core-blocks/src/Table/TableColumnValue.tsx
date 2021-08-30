@@ -28,7 +28,7 @@ type Props = {
   onDoubleClick?: () => void;
 } & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
 
-export const TableColumnValue: React.FC<Props> = observer(function TableColumnValue({
+export const TableColumnValue = observer<Props>(function TableColumnValue({
   align,
   children,
   centerContent,

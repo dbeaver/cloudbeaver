@@ -14,7 +14,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-interface ParametersFormProps {
+interface Props {
   config: ConnectionConfig;
   disabled?: boolean;
   embedded?: boolean;
@@ -22,13 +22,13 @@ interface ParametersFormProps {
   originLocal?: boolean;
 }
 
-export const ParametersFormNew = observer(function ParametersFormNew({
+export const ParametersFormNew = observer<Props>(function ParametersFormNew({
   config,
   embedded,
   disabled,
   readOnly,
   originLocal,
-}: ParametersFormProps) {
+}) {
   const translate = useTranslate();
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(

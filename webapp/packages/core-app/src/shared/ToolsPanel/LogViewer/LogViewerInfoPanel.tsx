@@ -64,7 +64,7 @@ interface Props {
   className?: string;
 }
 
-export const LogViewerInfoPanel: React.FC<Props> = observer(function LogViewerInfoPanel({
+export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({
   selectedItem,
   onClose,
   className,

@@ -18,7 +18,7 @@ interface Props {
   onDoubleClick?: () => void;
 }
 
-export const TableItemSeparator: React.FC<Props> = observer(function TableItemSeparator({
+export const TableItemSeparator = observer<Props>(function TableItemSeparator({
   colSpan,
   children,
   className,

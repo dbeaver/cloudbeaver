@@ -50,7 +50,7 @@ const styles = composes(
     }
 `);
 
-export const ConfigurationsList: React.FC<Props> = observer(function ConfigurationsList({ configurations, providerIcon, className }) {
+export const ConfigurationsList = observer<Props>(function ConfigurationsList({ configurations, providerIcon, className }) {
   const translate = useTranslate();
 
   const [search, setSearch] = useState('');

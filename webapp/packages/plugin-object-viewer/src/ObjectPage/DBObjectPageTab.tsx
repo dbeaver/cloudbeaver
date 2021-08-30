@@ -22,7 +22,7 @@ interface IProps {
   style: ComponentStyle;
 }
 
-export const DBObjectPageTab: React.FC<IProps> = observer(function DBObjectPageTab({
+export const DBObjectPageTab = observer<IProps>(function DBObjectPageTab({
   tab, page, onSelect, style,
 }) {
   const handleSelect = useCallback(() => onSelect(tab, page), [tab, page, onSelect]);

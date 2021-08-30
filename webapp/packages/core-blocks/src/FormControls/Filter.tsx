@@ -90,7 +90,7 @@ type ObjectsProps<TKey extends keyof TState, TState> = BaseProps & {
   onFilter?: (value: TState[TKey], name: TKey) => void;
 };
 
-export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observer(function Filter({
+export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(function Filter({
   state,
   name,
   value: valueControlled,

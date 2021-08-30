@@ -16,7 +16,7 @@ interface Props {
   fallback?: TLocalizationToken;
 }
 
-export const Translate: React.FC<Props> = observer(function Translate({ token, fallback }) {
+export const Translate = observer<Props>(function Translate({ token, fallback }) {
   const translate = useTranslate();
 
   return <>{translate(token, fallback)}</>;

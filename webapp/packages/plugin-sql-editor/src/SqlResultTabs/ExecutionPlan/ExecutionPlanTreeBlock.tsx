@@ -59,7 +59,7 @@ interface Props {
   className?: string;
 }
 
-export const ExecutionPlanTreeBlock: React.FC<Props> = observer(function ExecutionPlanTreeBlock({
+export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTreeBlock({
   nodeList, query, onNodeSelect, className,
 }) {
   const style = useStyles(styles, splitStyles);

@@ -23,7 +23,7 @@ interface IProps extends Omit<React.DOMAttributes<HTMLDivElement>, 'style'> {
   style: ComponentStyle;
 }
 
-export const VerticalTabs: React.FC<IProps> = observer(function VerticalTabs({ tabContainer, style, ...props }) {
+export const VerticalTabs = observer<IProps>(function VerticalTabs({ tabContainer, style, ...props }) {
   return styled(useStyles(verticalTabStyles, style))(
     <TabsState currentTabId={tabContainer.currentTabId} orientation='vertical'>
       <vertical-tabs as="div" {...props}>

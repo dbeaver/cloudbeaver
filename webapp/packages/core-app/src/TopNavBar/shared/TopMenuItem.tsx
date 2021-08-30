@@ -23,7 +23,7 @@ interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
 }
 
-export const TopMenuItem: React.FC<IProps> = observer(function TopMenuItem({ menuItem, style, ...props }) {
+export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, style, ...props }) {
   const translate = useTranslate();
   const styles = useStyles(style, topMenuStyles);
 

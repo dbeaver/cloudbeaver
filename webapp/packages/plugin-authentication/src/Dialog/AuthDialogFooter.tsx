@@ -33,7 +33,7 @@ export interface Props {
   onLogin: () => void;
 }
 
-export const AuthDialogFooter: React.FC<Props> = observer(function AuthDialogFooter({
+export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({
   isAuthenticating,
   onLogin,
   children,

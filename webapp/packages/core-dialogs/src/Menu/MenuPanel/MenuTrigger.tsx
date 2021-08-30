@@ -82,7 +82,7 @@ interface MenuPanelProps {
   style?: ComponentStyle;
 }
 
-const MenuPanel: React.FC<MenuPanelProps> = observer(function MenuPanel({
+const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
   panel,
   menu,
   rtl,
@@ -117,7 +117,7 @@ interface IMenuPanelElementProps extends Omit<React.ButtonHTMLAttributes<any>, '
   style?: ComponentStyle;
 }
 
-const MenuPanelElement: React.FC<IMenuPanelElementProps> = observer(function MenuPanelElement({
+const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElement({
   item, menu, onItemClose, style,
 }) {
   const styles = useStyles(menuPanelStyles, style);

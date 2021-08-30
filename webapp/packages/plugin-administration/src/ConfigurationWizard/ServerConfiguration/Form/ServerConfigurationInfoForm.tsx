@@ -20,7 +20,7 @@ interface Props {
   state: IServerConfigurationPageState;
 }
 
-export const ServerConfigurationInfoForm: React.FC<Props> = observer(function ServerConfigurationInfoForm({
+export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({
   state,
 }) {
   const translate = useTranslate();

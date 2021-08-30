@@ -44,7 +44,7 @@ interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
 }
 
-export const TopMenuButton: React.FC<IProps> = observer(function TopMenuItem({ style, children, ...props }) {
+export const TopMenuButton = observer<IProps>(function TopMenuItem({ style, children, ...props }) {
   return styled(useStyles(buttonStyle, style))(
     <Button as="button" {...props}>
       <div>{children}</div>

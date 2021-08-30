@@ -70,7 +70,7 @@ interface Props {
   node: NavNode;
 }
 
-export const NavigationNodeControl: React.FC<Props> = observer(function NavigationNodeControl({
+export const NavigationNodeControl = observer<Props>(function NavigationNodeControl({
   node,
 }) {
   const context = useContext(TreeNodeContext);

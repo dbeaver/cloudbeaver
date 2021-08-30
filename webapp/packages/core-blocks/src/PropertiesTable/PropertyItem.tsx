@@ -115,7 +115,7 @@ interface Props {
   readOnly?: boolean;
 }
 
-export const PropertyItem = observer(function PropertyItem({
+export const PropertyItem = observer<Props>(function PropertyItem({
   property,
   value,
   onNameChange,
@@ -123,7 +123,7 @@ export const PropertyItem = observer(function PropertyItem({
   onRemove,
   error,
   readOnly,
-}: Props) {
+}) {
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const propertyValue = value !== undefined ? value : property.defaultValue;

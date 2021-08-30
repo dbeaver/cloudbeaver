@@ -43,14 +43,14 @@ const itemStyles = css`
     }
   `;
 
-interface ItemProps {
+interface Props {
   objectId: string;
   columns: number;
 }
 
-export const Item = observer(function Item({
+export const Item = observer<Props>(function Item({
   objectId, columns,
-}: ItemProps) {
+}) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const { node } = useNode(objectId);
   const { dbObject } = useDatabaseObjectInfo(objectId);
@@ -62,15 +62,15 @@ export const Item = observer(function Item({
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
-          <icon as="div">
-            <placeholder as="div" />
+          <icon>
+            <placeholder />
           </icon>
         </TableColumnValue>
         {Array(columns)
           .fill(0)
           .map((_, i) => (
             <TableColumnValue key={i} onDoubleClick={handleOpen}>
-              <placeholder as="div" />
+              <placeholder />
             </TableColumnValue>
           ))}
       </TableItem>
@@ -82,7 +82,7 @@ export const Item = observer(function Item({
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
-          <icon as="div">
+          <icon>
             <StaticImage icon={node.icon} />
           </icon>
         </TableColumnValue>
@@ -95,7 +95,7 @@ export const Item = observer(function Item({
     <TableItem item={objectId}>
       <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>
-        <icon as="div">
+        <icon>
           <StaticImage icon={node.icon} />
         </icon>
       </TableColumnValue>

@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -33,9 +33,9 @@ const styles = css`
   }
 `;
 
-export const SessionExpiredDialog = observer(function SessionExpiredDialog({
+export const SessionExpiredDialog: DialogComponent<null, null> = observer(function SessionExpiredDialog({
   rejectDialog,
-}: DialogComponentProps<null, null>) {
+}) {
   const translate = useTranslate();
   const title = translate('app_root_session_expired_title');
   const reload = useCallback(() => window.location.reload(), []);

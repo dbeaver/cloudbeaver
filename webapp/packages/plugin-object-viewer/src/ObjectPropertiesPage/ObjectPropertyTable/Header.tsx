@@ -34,7 +34,7 @@ interface HeaderProps {
   >>;
 }
 
-export const Header = observer(function Header({ properties }: HeaderProps) {
+export const Header = observer<HeaderProps>(function Header({ properties }) {
   const translate = useTranslate();
   const style = useStyles(styles);
 

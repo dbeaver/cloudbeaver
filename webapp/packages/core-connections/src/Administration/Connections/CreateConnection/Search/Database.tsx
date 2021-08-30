@@ -47,12 +47,13 @@ const styles = composes(
     }
   `
 );
+
 interface Props {
   database: AdminConnectionSearchInfo;
   onSelect: (database: AdminConnectionSearchInfo) => void;
 }
 
-export const Database = observer(function Database({ database, onSelect }: Props) {
+export const Database = observer<Props>(function Database({ database, onSelect }) {
   const drivers = useService(DBDriverResource);
   const select = useCallback(() => onSelect(database), [database]);
   const orderedDrivers = useMemo(() => (

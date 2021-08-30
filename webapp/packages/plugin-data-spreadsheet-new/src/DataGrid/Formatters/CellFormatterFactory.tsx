@@ -22,7 +22,7 @@ interface IProps extends FormatterProps<IResultSetRowKey> {
   isEditing: boolean;
 }
 
-export const CellFormatterFactory: React.FC<IProps> = observer(function CellFormatterFactory(props) {
+export const CellFormatterFactory = observer<IProps>(function CellFormatterFactory(props) {
   const formatterRef = useRef<React.FC<FormatterProps<IResultSetRowKey>> | null>(null);
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);

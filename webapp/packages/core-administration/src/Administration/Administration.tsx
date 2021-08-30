@@ -62,11 +62,11 @@ const administrationStyles = composes(
   `
 );
 
-type Props = React.PropsWithChildren<{
+interface Props {
   configurationWizard: boolean;
   activeScreen: IAdministrationItemRoute | null;
   onItemSelect: (name: string) => void;
-}>;
+}
 
 export const Administration = observer<Props>(function Administration({
   configurationWizard, activeScreen, onItemSelect, children,

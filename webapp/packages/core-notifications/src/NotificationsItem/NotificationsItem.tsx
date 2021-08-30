@@ -18,7 +18,7 @@ interface Props {
   notification: INotification<any>;
 }
 
-export const NotificationsItem: React.FC<Props> = observer(function Notification({ notification }) {
+export const NotificationsItem = observer<Props>(function Notification({ notification }) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {

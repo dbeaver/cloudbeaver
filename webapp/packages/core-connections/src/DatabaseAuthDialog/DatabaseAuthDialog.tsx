@@ -17,7 +17,7 @@ import {
   ErrorMessage,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -58,11 +58,11 @@ interface Payload {
   networkHandlers: string[];
 }
 
-export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
+export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({
   payload,
   options,
   rejectDialog,
-}: DialogComponentProps<Payload>) {
+}) {
   const translate = useTranslate();
   const connection = useConnectionInfo(payload.connectionId);
   const controller = useController(DBAuthDialogController, payload.connectionId, rejectDialog);

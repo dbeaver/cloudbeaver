@@ -29,7 +29,7 @@ const style = css`
   }
 `;
 
-export const ConnectionAccessTableItem: React.FC<Props> = observer(function ConnectionAccessTableItem({
+export const ConnectionAccessTableItem = observer<Props>(function ConnectionAccessTableItem({
   id, name, description, icon, iconTooltip, disabled, className,
 }) {
   const translate = useTranslate();

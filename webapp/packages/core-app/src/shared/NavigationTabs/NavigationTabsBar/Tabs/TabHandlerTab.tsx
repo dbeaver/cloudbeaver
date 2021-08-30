@@ -20,7 +20,7 @@ interface IProps {
   style: ComponentStyle;
 }
 
-export const TabHandlerTab: React.FC<IProps> = observer(function TabHandlerTab({
+export const TabHandlerTab = observer<IProps>(function TabHandlerTab({
   tabId, onSelect, onClose, style,
 }) {
   const tab = useTab(tabId);

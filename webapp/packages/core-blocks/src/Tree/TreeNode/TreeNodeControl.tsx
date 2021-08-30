@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
@@ -25,7 +25,7 @@ interface Props {
   big?: boolean;
 }
 
-export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeControl({
+export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   onClick,
   className,
   children,

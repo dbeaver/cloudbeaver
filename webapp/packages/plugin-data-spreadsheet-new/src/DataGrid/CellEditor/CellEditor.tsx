@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import type { EditorProps } from 'react-data-grid';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';

@@ -15,13 +15,13 @@ import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResour
 import { TreeContext } from '../TreeContext';
 import { NavigationNode } from './NavigationNode';
 
-interface NavigationTreeNodeProps {
+interface Props {
   nodeId: string;
 }
 
-export const NavigationNodeElement = observer(function NavigationNodeElement({
+export const NavigationNodeElement = observer<Props>(function NavigationNodeElement({
   nodeId,
-}: NavigationTreeNodeProps) {
+}) {
   const context = useContext(TreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
 

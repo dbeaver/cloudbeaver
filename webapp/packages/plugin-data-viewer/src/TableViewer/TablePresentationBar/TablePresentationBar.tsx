@@ -58,7 +58,7 @@ interface Props {
   onPresentationChange: (id: string) => void;
 }
 
-export const TablePresentationBar = observer(function TablePresentationBar({
+export const TablePresentationBar = observer<Props>(function TablePresentationBar({
   type,
   presentationId,
   supportedDataFormat,
@@ -67,7 +67,7 @@ export const TablePresentationBar = observer(function TablePresentationBar({
   resultIndex,
   className,
   onPresentationChange,
-}: Props) {
+}) {
   const style = useStyles(styles, verticalRotatedTabStyles);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(

@@ -24,7 +24,7 @@ interface Props {
   onSelect?: (item: any, state: boolean) => void;
 }
 
-export const Table: React.FC<Props> = observer(function Table({
+export const Table = observer<Props>(function Table({
   selectedItems, expandedItems, className, size, children, onSelect,
 }) {
   const props = useObjectRef({ onSelect });

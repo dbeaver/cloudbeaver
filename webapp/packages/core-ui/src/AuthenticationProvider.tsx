@@ -34,7 +34,7 @@ export type Props = {
   subType?: string;
 });
 
-export const AuthenticationProvider: React.FC<Props> = observer(function AuthenticationProvider(props) {
+export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
   const translate = useTranslate();
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const action = useAuthenticationAction(props);

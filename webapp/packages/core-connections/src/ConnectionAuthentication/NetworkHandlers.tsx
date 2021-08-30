@@ -23,7 +23,7 @@ interface Props {
   allowSaveCredentials?: boolean;
 }
 
-export const NetworkHandlers: React.FC<Props> = observer(function NetworkHandlers({ networkHandlers, networkHandlersConfig, allowSaveCredentials, disabled }) {
+export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networkHandlers, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES);
 
   if (!networkHandlers.length) {

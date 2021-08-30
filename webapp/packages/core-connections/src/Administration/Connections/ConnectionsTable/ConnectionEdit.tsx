@@ -38,9 +38,9 @@ interface Props {
   item: string;
 }
 
-export const ConnectionEdit = observer(function ConnectionEditNew({
+export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
   item,
-}: Props) {
+}) {
   const connectionsResource = useService(ConnectionsResource);
   const boxRef = useRef<HTMLDivElement>(null);
   // const tableContext = useContext(TableContext);

@@ -47,19 +47,19 @@ const styles = css`
   }
 `;
 
-interface ErrorMessageProps {
+interface Props {
   hasDetails?: boolean;
   text: string;
   className?: string;
   onShowDetails?: () => void;
 }
 
-export const ErrorMessage = observer(function ErrorMessage({
+export const ErrorMessage = observer<Props>(function ErrorMessage({
   text,
   className,
   hasDetails,
   onShowDetails,
-}: ErrorMessageProps) {
+}) {
   const translate = useTranslate();
 
   return styled(useStyles(styles))(

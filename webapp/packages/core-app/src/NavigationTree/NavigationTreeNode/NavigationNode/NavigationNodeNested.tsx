@@ -24,7 +24,7 @@ interface Props {
   root?: boolean;
 }
 
-export const NavigationNodeNested: React.FC<Props> = observer(function NavigationNodeNested({
+export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
   nodeId,
   component,
   root,

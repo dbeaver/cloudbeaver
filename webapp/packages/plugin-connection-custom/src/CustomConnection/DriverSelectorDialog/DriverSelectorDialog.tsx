@@ -33,7 +33,7 @@ interface IProps {
   onClose: () => void;
 }
 
-export const DriverSelectorDialog: React.FC<IProps> = observer(function DriverSelectorDialog({
+export const DriverSelectorDialog = observer<IProps>(function DriverSelectorDialog({
   title,
   drivers,
   isLoading,

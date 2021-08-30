@@ -29,12 +29,12 @@ const styles = css`
   }
 `;
 
-interface DriverProps {
+interface Props {
   driver: IDriver;
   onSelect: (driverId: string) => void;
 }
 
-export const Driver = observer(function Driver({ driver, onSelect }: DriverProps) {
+export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
 
   return styled(styles)(

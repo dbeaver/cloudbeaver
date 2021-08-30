@@ -29,7 +29,7 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionAuthenticationForm: React.FC<Props> = observer(function ConnectionAuthenticationForm({
+export const ConnectionAuthenticationForm = observer<Props>(function ConnectionAuthenticationForm({
   config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
 }) {
   const translate = useTranslate();

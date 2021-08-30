@@ -65,7 +65,7 @@ interface Props {
   disabled: boolean;
 }
 
-export const ConnectionAccessList: React.FC<Props> = observer(function ConnectionAccessList({
+export const ConnectionAccessList = observer<Props>(function ConnectionAccessList({
   userList,
   roleList,
   grantedSubjects,

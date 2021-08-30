@@ -42,7 +42,7 @@ const productInfoDialogStyles = css`
     }
 `;
 
-export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
+export const ProductInfoDialog = observer<DialogComponentProps<null>>(
   function ProductInfoDialog(props) {
     const translate = useTranslate();
     const styles = useStyles(BASE_CONTAINERS_STYLES, productInfoDialogStyles);

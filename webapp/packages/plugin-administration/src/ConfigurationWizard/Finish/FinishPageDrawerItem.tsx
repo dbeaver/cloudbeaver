@@ -14,7 +14,7 @@ import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-export const FinishPageDrawerItem: React.FC<AdministrationItemDrawerProps> = observer(function FinishPageDrawerItem({
+export const FinishPageDrawerItem = observer<AdministrationItemDrawerProps>(function FinishPageDrawerItem({
   item,
   onSelect,
   style,

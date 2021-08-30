@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, SwitchNew } from '@cloudbeaver/core-blocks';
@@ -21,7 +21,7 @@ interface Props {
   configs: IServerConfigurationPageState;
 }
 
-export const ServerConfigurationNavigatorViewForm: React.FC<Props> = observer(function ServerConfigurationNavigatorViewForm({
+export const ServerConfigurationNavigatorViewForm = observer<Props>(function ServerConfigurationNavigatorViewForm({
   configs,
 }) {
   const translate = useTranslate();

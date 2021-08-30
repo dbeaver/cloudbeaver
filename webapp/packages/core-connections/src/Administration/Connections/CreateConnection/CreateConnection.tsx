@@ -129,9 +129,9 @@ interface Props {
   configurationWizard: boolean;
 }
 
-export const CreateConnection = observer(function CreateConnection({
+export const CreateConnection = observer<Props>(function CreateConnection({
   method,
-}: Props) {
+}) {
   const style = useStyles(componentStyle);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();

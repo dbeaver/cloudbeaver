@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { Link } from '@cloudbeaver/core-blocks';
