@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand,
-  Placeholder, StaticImage, useMapResource
+  Placeholder, StaticImage, useMapResource, FieldCheckboxNew
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
@@ -63,7 +63,7 @@ export const AuthConfiguration: React.FC<Props> = observer(function AuthConfigur
       <TableColumnValue>{configuration.providerId}</TableColumnValue>
       <TableColumnValue>{configuration.description || ''}</TableColumnValue>
       <TableColumnValue>
-        <TableItemSelect checked={configuration.disabled} disabled />
+        <FieldCheckboxNew checked={configuration.disabled} disabled />
       </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={service.configurationDetailsPlaceholder} configuration={configuration} />

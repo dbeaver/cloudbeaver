@@ -18,9 +18,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
-type NewConfiguration = AdminAuthProviderConfiguration & {
-  [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number;
-};
+type NewConfiguration = AdminAuthProviderConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class AuthConfigurationsResource
@@ -73,20 +71,6 @@ export class AuthConfigurationsResource
     return this.data;
   }
 
-  private updateConfiguration(...configurations: AdminAuthProviderConfiguration[]): ResourceKeyList<string> {
-    const key = resourceKeyList(configurations.map(configuration => configuration.id));
-
-    const oldConfiguration = this.get(key);
-    this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
-
-    return key;
-  }
-
-  private markAllOutdated() {
-    this.markOutdated();
-    this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.mark, false);
-  }
-
   async refreshAll(): Promise<AdminAuthProviderConfiguration[]> {
     await this.refresh(AuthConfigurationsResource.keyAll);
     return this.values;
@@ -125,6 +109,20 @@ export class AuthConfigurationsResource
     for (const configuration of this.data.values()) {
       (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL] = false;
     }
+  }
+
+  private updateConfiguration(...configurations: AdminAuthProviderConfiguration[]): ResourceKeyList<string> {
+    const key = resourceKeyList(configurations.map(configuration => configuration.id));
+
+    const oldConfiguration = this.get(key);
+    this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
+
+    return key;
+  }
+
+  private markAllOutdated() {
+    this.markOutdated();
+    this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.mark, false);
   }
 }
 
