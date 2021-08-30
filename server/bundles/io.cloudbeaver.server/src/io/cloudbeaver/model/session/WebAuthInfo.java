@@ -39,11 +39,11 @@ public class WebAuthInfo {
 
     private final WebSession session;
     private final WebUser user;
-    private WebAuthProviderDescriptor authProvider;
+    private final WebAuthProviderDescriptor authProvider;
     private WebAuthProviderConfiguration authProviderConfiguration;
     private DBASession authSession;
-    private OffsetDateTime loginTime;
-    private DBWUserIdentity userIdentity;
+    private final OffsetDateTime loginTime;
+    private final DBWUserIdentity userIdentity;
     private String message;
 
     private transient Map<String, Object> userCredentials;
@@ -132,7 +132,7 @@ public class WebAuthInfo {
         if (authProvider != null && authSession != null) {
             try {
                 DBWAuthProvider authProviderInstance = this.authProvider.getInstance();
-                authProviderInstance.closeSession(authSession);
+                authProviderInstance.closeSession(session, authSession);
             } catch (Exception e) {
                 log.error(e);
             } finally {

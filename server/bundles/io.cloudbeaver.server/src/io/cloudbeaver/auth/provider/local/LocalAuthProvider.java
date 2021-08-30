@@ -64,12 +64,12 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
     }
 
     @Override
-    public void closeSession(LocalAuthSession localAuthSession) throws DBException {
+    public void closeSession(@NotNull WebSession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 
     @Override
-    public void refreshSession(LocalAuthSession localAuthSession) throws DBException {
+    public void refreshSession(@NotNull WebSession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 

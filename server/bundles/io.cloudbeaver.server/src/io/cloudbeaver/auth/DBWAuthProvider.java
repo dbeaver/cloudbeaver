@@ -34,8 +34,8 @@ public interface DBWAuthProvider<AUTH_SESSION extends DBASession> {
         @NotNull Map<String, Object> userCredentials // Saved user credentials (e.g. associated 3rd party provider user name or realm)
     ) throws DBException;
 
-    void closeSession(AUTH_SESSION session) throws DBException;
+    void closeSession(@NotNull WebSession mainSession, AUTH_SESSION session) throws DBException;
 
-    void refreshSession(AUTH_SESSION session) throws DBException;
+    void refreshSession(@NotNull WebSession mainSession, AUTH_SESSION session) throws DBException;
 
 }

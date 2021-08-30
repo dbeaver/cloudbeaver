@@ -38,7 +38,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
-import org.jkiss.dbeaver.model.access.DBASessionFederated;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -241,6 +240,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthInfo tryFederatedLogin(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
+        return null;
+/*
         try {
             DBASession spaceSession = webSession.getSessionContext().getSpaceSession(webSession.getProgressMonitor(), webSession.getSessionSpace());
             if (spaceSession instanceof DBASessionFederated) {
@@ -251,6 +252,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (DBException e) {
             throw new DBWebException("Error while discovering federated session", e);
         }
+*/
     }
 
     @Override

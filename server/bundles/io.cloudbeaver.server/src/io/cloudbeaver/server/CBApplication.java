@@ -713,11 +713,8 @@ public class CBApplication extends BaseApplicationImpl {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
                     }
                     if (!CommonUtils.isEmpty(appConfig.getAuthProviderConfigurations())) {
-                        //JSONUtils.serializeProperties(json, "authConfiguration", appConfig.getAuthProviderConfigurations());
                         json.name("authConfiguration");
-                        //json.beginObject();
                         gson.toJson(appConfig.getAuthProviderConfigurations(), Map.class, json);
-                        //json.endObject();
                     }
 
                     json.endObject();

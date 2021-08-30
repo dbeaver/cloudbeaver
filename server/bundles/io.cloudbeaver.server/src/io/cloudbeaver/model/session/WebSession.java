@@ -503,6 +503,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             log.error(e);
         }
         clearAuthTokens();
+        this.sessionAuthContext.close();
         this.user = null;
 
         if (this.sessionProject != null) {
@@ -699,17 +700,9 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         synchronized (authTokens) {
             authTokens.add(authInfo);
         }
-        DBASession authSession = authInfo.getAuthSession();
-        if (authSession != null) {
-            this.sessionProject.getSessionContext().addSession(authSession);
-        }
     }
 
     private void removeAuthInfo(WebAuthInfo oldAuthInfo) {
-        DBASession oldAuthSession = oldAuthInfo.getAuthSession();
-        if (oldAuthSession != null && sessionProject != null) {
-            sessionProject.getSessionContext().removeSession(oldAuthSession);
-        }
         oldAuthInfo.closeAuth();
         synchronized (authTokens) {
             authTokens.remove(oldAuthInfo);
