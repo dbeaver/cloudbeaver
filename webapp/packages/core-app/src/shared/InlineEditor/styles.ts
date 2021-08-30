@@ -118,7 +118,7 @@ export const InlineEditorStyles = composes(
     padding: 4px;
     cursor: pointer;
 
-    & Icon {
+    & IconOrImage {
       display: block;
       width: 100%;
     }

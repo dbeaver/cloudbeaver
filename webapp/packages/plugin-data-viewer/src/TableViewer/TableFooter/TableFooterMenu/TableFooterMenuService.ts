@@ -38,7 +38,8 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_add',
       order: 0.5,
-      title: 'data_viewer_action_edit_add',
+      icon: '/icons/data_add.svg',
+      tooltip: 'data_viewer_action_edit_add',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -82,7 +83,8 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_delete',
       order: 0.6,
-      title: 'data_viewer_action_edit_delete',
+      icon: '/icons/data_delete.svg',
+      tooltip: 'data_viewer_action_edit_delete',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -139,7 +141,8 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_revert',
       order: 0.7,
-      title: 'data_viewer_action_edit_revert',
+      icon: '/icons/data_revert.svg',
+      tooltip: 'data_viewer_action_edit_revert',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -190,6 +193,9 @@ export class TableFooterMenuService {
     });
     this.registerMenuItem({
       id: 'save ',
+      order: 1,
+      title: 'ui_processing_save',
+      icon: 'table-save',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -209,14 +215,15 @@ export class TableFooterMenuService {
 
         return !editor?.isEdited();
       },
-      order: 1,
-      title: 'ui_processing_save',
-      icon: 'table-save',
       onClick: context => context.data.model.source.saveData(),
     });
 
     this.registerMenuItem({
       id: 'cancel ',
+      order: 2,
+      title: 'data_viewer_value_revert',
+      tooltip: 'data_viewer_value_revert_title',
+      icon: '/icons/data_revert_all.svg',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -236,10 +243,6 @@ export class TableFooterMenuService {
 
         return !editor?.isEdited();
       },
-      order: 2,
-      title: 'data_viewer_value_revert',
-      tooltip: 'data_viewer_value_revert_title',
-      icon: 'table-revert',
       onClick: context => {
         const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
@@ -251,6 +254,10 @@ export class TableFooterMenuService {
 
     this.registerMenuItem({
       id: 'script',
+      order: 3,
+      title: 'data_viewer_script_preview',
+      tooltip: 'data_viewer_script_preview',
+      icon: 'sql-script-preview',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -271,10 +278,6 @@ export class TableFooterMenuService {
         );
         return !editor?.isEdited();
       },
-      order: 3,
-      title: 'data_viewer_script_preview',
-      tooltip: 'data_viewer_script_preview',
-      icon: 'sql-script-preview',
       onClick: async context => {
         await this.scriptPreviewService.open(context.data.model, context.data.resultIndex);
       },

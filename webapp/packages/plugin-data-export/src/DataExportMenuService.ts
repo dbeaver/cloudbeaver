@@ -27,6 +27,10 @@ export class DataExportMenuService {
   register(): void {
     this.tableFooterMenuService.registerMenuItem({
       id: 'export ',
+      order: 5,
+      title: 'data_transfer_dialog_export',
+      tooltip: 'data_transfer_dialog_export_tooltip',
+      icon: 'table-export',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
@@ -36,10 +40,6 @@ export class DataExportMenuService {
           || context.data.model.isDisabled(context.data.resultIndex)
           || !context.data.model.getResult(context.data.resultIndex);
       },
-      order: 5,
-      title: 'data_transfer_dialog_export',
-      tooltip: 'data_transfer_dialog_export_tooltip',
-      icon: 'table-export',
       onClick: this.exportData.bind(this),
     });
 
@@ -47,13 +47,13 @@ export class DataExportMenuService {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'export',
+        order: 2,
+        title: 'data_transfer_dialog_export',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
         isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
-        order: 2,
-        title: 'data_transfer_dialog_export',
         onClick: context => {
           const node = context.data;
           const connectionId = NodeManagerUtils.nodeIdToConnectionId(node.id);

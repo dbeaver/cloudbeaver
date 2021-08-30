@@ -101,6 +101,7 @@ export class DataGridContextMenuCellEditingService {
       {
         id: 'row_add',
         order: 5,
+        icon: '/icons/data_add_sm.svg',
         title: 'data_grid_table_editing_row_add',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
@@ -116,6 +117,7 @@ export class DataGridContextMenuCellEditingService {
       {
         id: 'row_delete',
         order: 6,
+        icon: '/icons/data_delete_sm.svg',
         title: 'data_grid_table_editing_row_delete',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
@@ -139,6 +141,7 @@ export class DataGridContextMenuCellEditingService {
       {
         id: 'row_revert',
         order: 7,
+        icon: '/icons/data_revert.svg',
         title: 'data_grid_table_editing_row_revert',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;

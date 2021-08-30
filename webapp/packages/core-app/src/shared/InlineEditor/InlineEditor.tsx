@@ -13,7 +13,7 @@ import {
 import { useImperativeHandle } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Icon, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -121,7 +121,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
             onClick={edited ? onUndo : undefined}
             {...use({ disabled: !edited })}
           >
-            <Icon name="table-revert-sm" viewBox="0 0 16 16" />
+            <IconOrImage icon="/icons/data_revert.svg" />
           </editor-action>
         )}
         {!simple && <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>}
