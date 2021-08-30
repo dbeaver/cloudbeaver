@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { ITab } from '@cloudbeaver/core-app';
-import { VerticalTabs } from '@cloudbeaver/core-blocks';
+import { Tab, TabIcon, TabList, TabPanel, TabsState, TabTitle, verticalTabStyles } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -22,7 +22,7 @@ const styles = composes(
     TabList {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     }
-    VerticalTabs {
+    vertical-tabs {
       composes: theme-border-color-background from global;
     }
     Tab {
@@ -33,7 +33,7 @@ const styles = composes(
     Tab {
       color: inherit;
     }
-    VerticalTabs {
+    vertical-tabs {
       border-top: 1px solid;
       flex: 1;
     }
@@ -53,5 +53,30 @@ interface IProps {
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const controller = useController(ObjectFoldersController, tab);
 
-  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={styles} />);
+  const tabContainer = controller.getTabContainer();
+
+  return styled(useStyles(verticalTabStyles, styles))(
+    <TabsState currentTabId={tabContainer.currentTabId} orientation='vertical'>
+      <vertical-tabs>
+        <TabList aria-label="Object folders">
+          {tabContainer.tabs.map(tab => (
+            <Tab
+              key={tab.tabId}
+              tabId={tab.tabId}
+              onOpen={tab.onActivate}
+              onClose={tab.onClose}
+            >
+              {tab.icon && <TabIcon icon={tab.icon} />}
+              <TabTitle>{tab.title}</TabTitle>
+            </Tab>
+          ))}
+        </TabList>
+        {tabContainer.tabs.map(tab => (
+          <TabPanel key={tab.tabId} tabId={tab.tabId}>
+            <tab.panel />
+          </TabPanel>
+        ))}
+      </vertical-tabs>
+    </TabsState>
+  );
 });

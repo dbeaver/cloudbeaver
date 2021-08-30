@@ -28,13 +28,13 @@ implements ITabsContainer<TProps, TOptions> {
   private currentTabId: string | null;
 
   constructor() {
+    this.tabInfoMap = new Map();
+    this.currentTabId = null;
+
     makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,
       currentTabId: observable,
     });
-
-    this.tabInfoMap = new Map();
-    this.currentTabId = null;
   }
 
   has(tabId: string): boolean {

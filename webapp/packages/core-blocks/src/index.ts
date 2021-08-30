@@ -74,12 +74,10 @@ export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
 export * from './Tabs/Tab/verticalRotatedTabStyles';
 export * from './Tabs/Tab/UnderlineTabStyles';
+export * from './Tabs/Tab/verticalTabStyles';
 
 export * from './Tabs/TabsBox/TabsBox';
 export * from './Tabs/TabsBox/TabsBoxFromArray';
-
-export * from './Tabs/VerticalTabs/VerticalTabs';
-export * from './Tabs/VerticalTabs/verticalTabStyles';
 
 export * from './Tree/TreeNode/EventTreeNodeExpandFlag';
 export * from './Tree/TreeNode/EventTreeNodeSelectFlag';
