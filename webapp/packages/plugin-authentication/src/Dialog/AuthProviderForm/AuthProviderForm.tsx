@@ -20,11 +20,11 @@ interface Props {
   authenticate: boolean;
 }
 
-export const AuthProviderForm = observer(function AuthProviderForm({
+export const AuthProviderForm = observer<Props>(function AuthProviderForm({
   provider,
   credentials,
   authenticate,
-}: Props) {
+}) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const handleChange = useCallback((key: string, value: string | number) => {
     credentials[key] = value;

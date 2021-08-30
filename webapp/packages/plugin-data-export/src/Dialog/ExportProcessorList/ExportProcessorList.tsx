@@ -13,17 +13,17 @@ import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { ProcessorItem } from './ProcessorItem';
 
-interface ExportProcessorListProps {
+interface Props {
   processors: DataTransferProcessorInfo[];
   onSelect: (processorId: string) => void;
   className?: string;
 }
 
-export const ExportProcessorList = observer(function ExportProcessorList({
+export const ExportProcessorList = observer<Props>(function ExportProcessorList({
   processors,
   onSelect,
   className,
-}: ExportProcessorListProps) {
+}) {
   return (
     <ItemList className={className}>
       {processors.map(processor => <ProcessorItem key={processor.id} processor={processor} onSelect={onSelect} />)}

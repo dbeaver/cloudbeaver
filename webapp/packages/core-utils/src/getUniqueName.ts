@@ -7,17 +7,17 @@
  */
 
 /**
- * Help to create unique name for connection
+ * Help to create unique name
  * @param  {string} baseName
- * @param  {string[]} connectionNames
+ * @param  {string[]} names
  * @returns string
  */
-export function getUniqueConnectionName(baseName: string, connectionNames: string[]): string {
+export function getUniqueName(baseName: string, names: string[]): string {
   let index = 1;
   let name = baseName;
 
   while (true) {
-    if (!connectionNames.includes(name)) {
+    if (!names.includes(name)) {
       break;
     }
     name = `${baseName} (${index})`;

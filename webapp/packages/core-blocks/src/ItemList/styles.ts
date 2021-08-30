@@ -9,7 +9,7 @@
 import { createContext } from 'react';
 import { css } from 'reshadow';
 
-import { Style, composes } from '@cloudbeaver/core-theming';
+import { ComponentStyle, composes } from '@cloudbeaver/core-theming';
 
 export const ITEM_LIST_STYLES = composes(
   css`
@@ -137,6 +137,4 @@ export const ITEM_LIST_STYLES = composes(
   `
 );
 
-export const ITEM_LIST_STYLES_ARRAY = [ITEM_LIST_STYLES];
-
-export const Styles = createContext<Style[]>(ITEM_LIST_STYLES_ARRAY);
+export const Styles = createContext<ComponentStyle>(ITEM_LIST_STYLES);

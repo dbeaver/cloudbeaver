@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerProps> = function ServerConfigurationDrawerItem({
   item, onSelect, style, disabled,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/cog-outline.svg' />
       <TabTitle><Translate token='administration_configuration_wizard_configuration' /></TabTitle>

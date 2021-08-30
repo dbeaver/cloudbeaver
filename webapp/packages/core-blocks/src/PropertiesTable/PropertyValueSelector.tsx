@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   useMenuState,
   Menu,
@@ -64,7 +64,7 @@ interface Props {
   onSwitch: (state: boolean) => void;
 }
 
-export const PropertyValueSelector: React.FC<Props> = observer(function PropertyValueSelector({
+export const PropertyValueSelector = observer<Props>(function PropertyValueSelector({
   propertyName,
   values,
   children,

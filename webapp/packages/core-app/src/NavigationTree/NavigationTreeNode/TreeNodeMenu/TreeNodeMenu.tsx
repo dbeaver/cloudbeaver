@@ -19,15 +19,15 @@ import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { NavigationTreeContextMenuService } from '../../NavigationTreeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
-interface TreeNodeMenuProps {
+interface Props {
   node: NavNode;
   selected?: boolean;
 }
 
-export const TreeNodeMenu = observer(function TreeNodeMenu({
+export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   node,
   selected,
-}: TreeNodeMenuProps) {
+}) {
   const navigationTreeContextMenuService = useService(NavigationTreeContextMenuService);
 
   const menuPanel = useMemo(

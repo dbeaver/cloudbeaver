@@ -28,7 +28,7 @@ interface Props {
   onStateSwitch?: (state: boolean) => void;
 }
 
-export const CellMenu: React.FC<Props> = observer(function CellMenu({
+export const CellMenu = observer<Props>(function CellMenu({
   model,
   actions,
   spreadsheetActions,

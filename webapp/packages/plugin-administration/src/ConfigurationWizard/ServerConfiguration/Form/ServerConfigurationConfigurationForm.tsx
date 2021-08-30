@@ -19,7 +19,7 @@ interface Props {
   serverConfig: ServerConfigInput;
 }
 
-export const ServerConfigurationConfigurationForm: React.FC<Props> = observer(function ServerConfigurationConfigurationForm({
+export const ServerConfigurationConfigurationForm = observer<Props>(function ServerConfigurationConfigurationForm({
   serverConfig,
 }) {
   const translate = useTranslate();

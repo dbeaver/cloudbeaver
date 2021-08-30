@@ -9,21 +9,21 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITab } from '../ITab';
 import { TabPanel } from '../TabPanel';
 import { verticalTabStyles } from './verticalTabStyles';
 
-type VerticalTabPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
+interface IProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   tab: ITab;
-  style: Style[];
-};
+  style: ComponentStyle;
+}
 
-export const VerticalTabPanel = observer(function VerticalTabPanel({ tab, style }: VerticalTabPanelProps) {
+export const VerticalTabPanel = observer<IProps>(function VerticalTabPanel({ tab, style }) {
   const Panel = tab.panel;
 
-  return styled(useStyles(verticalTabStyles, ...style))(
+  return styled(useStyles(verticalTabStyles, style))(
     <TabPanel tabId={tab.tabId}>
       <Panel />
     </TabPanel>

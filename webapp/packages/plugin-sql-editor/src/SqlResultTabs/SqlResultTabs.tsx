@@ -49,11 +49,11 @@ const styles = composes(
   `
 );
 
-interface SqlDataResultProps {
+interface Props {
   tab: TabClass<ISqlEditorTabState>;
 }
 
-export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataResultProps) {
+export const SqlResultTabs = observer<Props>(function SqlDataResult({ tab }) {
   const style = useStyles(styles);
   const translate = useTranslate();
   const navigatorService = useService(SqlEditorNavigatorService);

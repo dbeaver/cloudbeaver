@@ -49,7 +49,7 @@ const styles = composes(
   `
 );
 
-export const ConnectionAccessTableHeader: React.FC<Props> = observer(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
+export const ConnectionAccessTableHeader = observer<Props>(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <header className={className}>

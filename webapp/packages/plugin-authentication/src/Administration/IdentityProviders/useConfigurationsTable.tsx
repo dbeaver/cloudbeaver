@@ -8,7 +8,7 @@
 
 import { computed, observable } from 'mobx';
 
-import { AuthConfigurationsResource, compareConfigurations } from '@cloudbeaver/core-authentication';
+import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
 import { ITableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -32,7 +32,7 @@ export function useConfigurationsTable(tableState: ITableState): State {
     processing: false,
     tableState,
     get configurations() {
-      return resource.values.slice().sort(compareConfigurations);
+      return resource.values.slice().sort(compareAuthConfigurations);
     },
     async update() {
       if (this.processing) {

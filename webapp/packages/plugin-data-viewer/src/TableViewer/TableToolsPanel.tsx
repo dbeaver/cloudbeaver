@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
@@ -18,13 +17,13 @@ import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel
 import type { IDataPresentationOptions } from '../DataPresentationService';
 import type { IDataTableActions } from './IDataTableActions';
 
-type TableGridProps = PropsWithChildren<{
+interface Props {
   model: IDatabaseDataModel<any, any>;
   actions: IDataTableActions;
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions | null;
   resultIndex: number;
-}>;
+}
 
 const styles = css`
   Presentation {
@@ -33,13 +32,13 @@ const styles = css`
   }
 `;
 
-export const TableToolsPanel = observer(function TableToolsPanel({
+export const TableToolsPanel = observer<Props>(function TableToolsPanel({
   model,
   actions,
   dataFormat,
   presentation,
   resultIndex,
-}: TableGridProps) {
+}) {
   const translate = useTranslate();
 
   const result = model.getResult(resultIndex);

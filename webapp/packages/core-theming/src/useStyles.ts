@@ -90,3 +90,7 @@ export function useStyles(
 
   return create(styles); // todo this method is called in each rerender
 }
+
+export function joinStyles(...styles: ComponentStyle[]): ComponentStyle {
+  return styles.flat();
+}

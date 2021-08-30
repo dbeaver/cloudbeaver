@@ -20,10 +20,6 @@ import type { DatabaseConnection } from '../../ConnectionsResource';
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import { ConnectionEdit } from './ConnectionEdit';
 
-interface Props {
-  connection: DatabaseConnection;
-}
-
 const styles = css`
   StaticImage {
     display: flex;
@@ -42,7 +38,11 @@ const styles = css`
   }
 `;
 
-export const Connection = observer(function Connection({ connection }: Props) {
+interface Props {
+  connection: DatabaseConnection;
+}
+
+export const Connection = observer<Props>(function Connection({ connection }) {
   const driversResource = useService(DBDriverResource);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;

@@ -115,7 +115,7 @@ type ButtonProps = (
   download?: boolean;
 };
 
-export const Button: React.FC<ButtonProps> = observer(function Button({
+export const Button = observer<ButtonProps>(function Button({
   children,
   icon,
   viewBox,

@@ -63,6 +63,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
     this.config = {
       displayName: '',
       id: '',
+      disabled: false,
       parameters: {},
       providerId: '',
       description: '',

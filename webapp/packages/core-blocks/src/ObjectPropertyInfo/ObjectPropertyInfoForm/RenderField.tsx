@@ -65,7 +65,7 @@ function getValue(value: any, controlType: ControlType) {
   return value.displayName || value.value || JSON.stringify(value);
 }
 
-export const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
+export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
   editable = true,

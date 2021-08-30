@@ -40,11 +40,11 @@ interface Props {
   expandedItems: Map<string, boolean>;
 }
 
-export const ConnectionsTable = observer(function ConnectionsTable({
+export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   connections,
   selectedItems,
   expandedItems,
-}: Props) {
+}) {
   const translate = useTranslate();
 
   return styled(useStyles(styles))(

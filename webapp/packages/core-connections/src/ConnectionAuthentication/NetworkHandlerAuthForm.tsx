@@ -23,7 +23,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export const NetworkHandlerAuthForm: React.FC<Props> = observer(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
+export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const translate = useTranslate();
   const handler = useMapResource(NetworkHandlerResource, id);
 

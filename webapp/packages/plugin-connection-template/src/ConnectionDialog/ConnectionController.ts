@@ -8,13 +8,14 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName } from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig } from '@cloudbeaver/core-connections';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DatabaseAuthModel, DetailsError } from '@cloudbeaver/core-sdk';
+import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
@@ -113,7 +114,7 @@ export class ConnectionController
     this.clearError();
     try {
       const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
-      const uniqueConnectionName = getUniqueConnectionName(this.template.name || 'Template connection', connectionNames);
+      const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(this.template.id, uniqueConnectionName);
 
       try {

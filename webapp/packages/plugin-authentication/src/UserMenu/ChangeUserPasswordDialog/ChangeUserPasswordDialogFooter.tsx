@@ -36,7 +36,7 @@ export interface Props {
   className?: string;
 }
 
-export const ChangeUserPasswordDialogFooter: React.FC<Props> = observer(function ChangeUserPasswordDialogFooter({
+export const ChangeUserPasswordDialogFooter = observer<Props>(function ChangeUserPasswordDialogFooter({
   onChange,
   onCancel,
   formFilled,

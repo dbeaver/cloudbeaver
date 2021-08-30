@@ -55,10 +55,10 @@ export const tableFooterMenuStyles = composes(
   `
 );
 
-export const TableFooterMenuItem = observer(function TableFooterMenuItem({
+export const TableFooterMenuItem = observer<Props>(function TableFooterMenuItem({
   menuItem,
   ...props
-}: Props) {
+}) {
   const translate = useTranslate();
   const styles = useStyles(tableFooterMenuStyles);
 

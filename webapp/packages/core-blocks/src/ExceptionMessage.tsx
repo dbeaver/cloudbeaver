@@ -46,7 +46,7 @@ interface Props {
   onRetry?: () => void;
 }
 
-export const ExceptionMessage: React.FC<Props> = observer(function ExceptionMessage({
+export const ExceptionMessage = observer<Props>(function ExceptionMessage({
   name, message, exception = null, onRetry,
 }) {
   const translate = useTranslate();

@@ -28,10 +28,10 @@ interface ObjectPropertyTableProps {
   parentId: string;
 }
 
-export const ObjectPropertyTable = observer(function ObjectPropertyTable({
+export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({
   objectId,
   parentId,
-}: ObjectPropertyTableProps) {
+}) {
   const translate = useTranslate();
   const children = useChildren(objectId);
   const { isLoading } = useObjectFolder(objectId);

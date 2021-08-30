@@ -84,7 +84,7 @@ interface ErrorInfo {
   show: () => void;
 }
 
-export const TableError: React.FC<Props> = observer(function TableViewer({
+export const TableError = observer<Props>(function TableViewer({
   model,
   loading,
   className,

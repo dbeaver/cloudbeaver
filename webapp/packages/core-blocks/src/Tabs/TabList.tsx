@@ -15,12 +15,12 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { TabDefault } from './Tab/TabDefault';
 import { TabsContext } from './TabsContext';
 
-type Props = React.PropsWithChildren<Omit<TabListOptions, keyof TabStateReturn>> & {
+interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   style?: ComponentStyle;
   childrenFirst?: boolean;
-};
+}
 
-export const TabList: React.FC<Props> = observer(function TabList({
+export const TabList = observer<Props>(function TabList({
   style,
   children,
   childrenFirst,

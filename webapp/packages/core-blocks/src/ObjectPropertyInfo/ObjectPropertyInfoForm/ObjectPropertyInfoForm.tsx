@@ -37,7 +37,7 @@ interface RenderFieldProps {
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
+const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
   editable = true,
@@ -139,7 +139,7 @@ interface ObjectPropertyFormProps {
   onFocus?: (name: string) => void;
 }
 
-export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoForm({
+export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoForm({
   properties,
   state,
   editable = true,

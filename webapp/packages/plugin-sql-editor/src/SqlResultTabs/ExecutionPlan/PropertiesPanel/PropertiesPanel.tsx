@@ -40,7 +40,7 @@ interface Props {
   className?: string;
 }
 
-export const PropertiesPanel: React.FC<Props> = observer(function PropertiesPanel({ selectedNode, nodeList, className }) {
+export const PropertiesPanel = observer<Props>(function PropertiesPanel({ selectedNode, nodeList, className }) {
   const style = useStyles(styles);
   const translate = useTranslate();
 

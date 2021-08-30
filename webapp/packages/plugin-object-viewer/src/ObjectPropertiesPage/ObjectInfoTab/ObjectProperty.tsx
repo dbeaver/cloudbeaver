@@ -13,10 +13,10 @@ import { FieldCheckboxNew, InputFieldNew } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyProps } from '../formControls';
 import { additionalProps, filterProperty, getValue, matchType } from '../helpers';
 
-export const ObjectProperty = observer(function ObjectProperty({
+export const ObjectProperty = observer<ObjectPropertyProps>(function ObjectProperty({
   objectProperty,
   className,
-}: ObjectPropertyProps) {
+}) {
   if (!objectProperty || !filterProperty(objectProperty)) {
     return null;
   }

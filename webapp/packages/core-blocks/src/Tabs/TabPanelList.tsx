@@ -20,7 +20,7 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const TabPanelList: React.FC<Props> = observer(function TabPanelList({
+export const TabPanelList = observer<Props>(function TabPanelList({
   style,
   children,
 }) {

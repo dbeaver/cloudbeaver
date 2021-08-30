@@ -14,7 +14,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-interface ParametersFormProps {
+interface Props {
   config: ConnectionConfig;
   disabled?: boolean;
   embedded?: boolean;
@@ -27,12 +27,12 @@ const parametersFormStyles = css`
     line-height: 14px;
   }`;
 
-export const ParametersForm = observer(function ParametersForm({
+export const ParametersForm = observer<Props>(function ParametersForm({
   config,
   embedded,
   disabled,
   readOnly,
-}: ParametersFormProps) {
+}) {
   const translate = useTranslate();
 
   return styled(useStyles(parametersFormStyles))(

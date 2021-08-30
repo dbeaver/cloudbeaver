@@ -18,7 +18,7 @@ interface Props {
   serverConfig: ServerConfigInput;
 }
 
-export const ServerConfigurationSecurityForm: React.FC<Props> = observer(function ServerConfigurationSecurityForm({
+export const ServerConfigurationSecurityForm = observer<Props>(function ServerConfigurationSecurityForm({
   serverConfig,
 }) {
   const translate = useTranslate();

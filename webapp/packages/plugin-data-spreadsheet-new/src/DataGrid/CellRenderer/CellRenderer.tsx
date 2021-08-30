@@ -22,7 +22,7 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
-export const CellRenderer: React.FC<CellRendererProps<IResultSetRowKey>> = observer(function CellRenderer(props) {
+export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(function CellRenderer(props) {
   const { rowIdx, row, column, isCellSelected } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);

@@ -14,13 +14,13 @@ import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import type { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
+import type { ObjectPageTabComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 
-export const DataViewerTab = observer(function DataViewerTab({
+export const DataViewerTab: ObjectPageTabComponent<IDataViewerPageState> = observer(function DataViewerTab({
   tab, page, onSelect, style,
-}: ObjectPageTabProps<IDataViewerPageState>) {
+}) {
   const styles = useStyles(style);
   const navNodeManagerService = useService(NavNodeManagerService);
 

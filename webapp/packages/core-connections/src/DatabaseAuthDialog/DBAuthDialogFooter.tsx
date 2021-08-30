@@ -34,7 +34,7 @@ export interface Props {
   className?: string;
 }
 
-export const DBAuthDialogFooter: React.FC<Props> = observer(function DBAuthDialogFooter({
+export const DBAuthDialogFooter = observer<Props>(function DBAuthDialogFooter({
   isAuthenticating,
   onLogin,
   className,

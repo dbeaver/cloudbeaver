@@ -50,7 +50,7 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
-export const Loader: React.FC<Props> = observer(function Loader({
+export const Loader = observer<Props>(function Loader({
   cancelDisabled,
   overlay,
   message,

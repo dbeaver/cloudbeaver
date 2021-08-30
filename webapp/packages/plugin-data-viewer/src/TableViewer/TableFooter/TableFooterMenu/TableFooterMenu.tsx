@@ -22,17 +22,17 @@ const styles = css`
   }
 `;
 
-interface TableFooterMenuProps {
+interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
   className?: string;
 }
 
-export const TableFooterMenu = observer(function TableFooterMenu({
+export const TableFooterMenu = observer<Props>(function TableFooterMenu({
   resultIndex,
   model,
   className,
-}: TableFooterMenuProps) {
+}) {
   const mainMenuService = useService(TableFooterMenuService);
 
   return styled(styles)(

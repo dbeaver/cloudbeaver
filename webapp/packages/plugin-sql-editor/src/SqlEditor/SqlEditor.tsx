@@ -70,7 +70,7 @@ const styles = composes(
   `
 );
 
-export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor({ tab, className }) {
+export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, className }) {
   const translate = useTranslate();
   const style = useStyles(styles);
   const editor = useRef<SQLCodeEditorController>(null);

@@ -14,13 +14,13 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Driver, IDriver } from './Driver';
 
-interface DriverSelectorProps {
+interface Props {
   drivers: IDriver[];
   className?: string;
   onSelect: (driverId: string) => void;
 }
 
-export const DriverSelector = observer(function DriverSelector({ drivers, className, onSelect }: DriverSelectorProps) {
+export const DriverSelector = observer<Props>(function DriverSelector({ drivers, className, onSelect }) {
   const translate = useTranslate();
   const [search, setSearch] = useState('');
   const filteredDrivers = useMemo(() => {

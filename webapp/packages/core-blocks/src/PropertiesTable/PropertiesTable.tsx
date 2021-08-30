@@ -33,7 +33,7 @@ interface Props {
   className?: string;
 }
 
-export const PropertiesTable = observer(function PropertiesTable(props: Props) {
+export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const { className, onAdd, readOnly, propertiesState } = props;
   const translate = useTranslate();
   const propsRef = useObjectRef({ ...props });

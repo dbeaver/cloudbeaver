@@ -21,7 +21,7 @@ interface Props {
   onSelect: (driverId: string) => void;
 }
 
-export const DriverList = observer(function DriverList({ drivers, className, onSelect }: Props) {
+export const DriverList = observer<Props>(function DriverList({ drivers, className, onSelect }) {
   const translate = useTranslate();
   const [search, setSearch] = useState('');
   const filteredDrivers = useMemo(() => {

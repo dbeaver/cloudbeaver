@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITab } from '../ITab';
 import { Tab } from '../Tab/Tab';
@@ -17,13 +17,13 @@ import { TabIcon } from '../Tab/TabIcon';
 import { TabTitle } from '../Tab/TabTitle';
 import { verticalTabStyles } from './verticalTabStyles';
 
-type VerticalTabHeaderProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
+interface IProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   tab: ITab;
-  style: Style[];
-};
+  style: ComponentStyle;
+}
 
-export const VerticalTabHeader = observer(function VerticalTabHeader({ tab, style, ...props }: VerticalTabHeaderProps) {
-  return styled(useStyles(verticalTabStyles, ...style))(
+export const VerticalTabHeader = observer<IProps>(function VerticalTabHeader({ tab, style, ...props }) {
+  return styled(useStyles(verticalTabStyles, style))(
     <Tab
       tabId={tab.tabId}
       onOpen={tab.onActivate}

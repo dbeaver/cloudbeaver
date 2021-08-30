@@ -9,15 +9,15 @@
 import { observer } from 'mobx-react-lite';
 
 import { useController } from '@cloudbeaver/core-di';
-import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { CustomConnectionController } from './CustomConnectionController';
 import { DriverSelectorDialog } from './DriverSelectorDialog/DriverSelectorDialog';
 
-export const CustomConnectionDialog = observer(function CustomConnectionDialog({
+export const CustomConnectionDialog: DialogComponent<null, null> = observer(function CustomConnectionDialog({
   rejectDialog,
-}: DialogComponentProps<null, null>) {
+}) {
   const controller = useController(CustomConnectionController, rejectDialog);
   const translate = useTranslate();
 

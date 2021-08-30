@@ -34,7 +34,7 @@ interface Props {
   selectable?: boolean;
 }
 
-export const User: React.FC<Props> = observer(function User({ user, selectable }) {
+export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
 
   return styled(useStyles(styles))(

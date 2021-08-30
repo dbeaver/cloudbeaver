@@ -37,43 +37,42 @@ interface Props {
   onBack: () => void;
 }
 
-export const ProcessorConfigureDialogFooter = observer(
-  function ProcessorConfigureDialogFooter({
-    isExporting,
-    onCancel,
-    onExport,
-    onBack,
-  }: Props) {
-    const translate = useTranslate();
+export const ProcessorConfigureDialogFooter = observer<Props>(function ProcessorConfigureDialogFooter({
+  isExporting,
+  onCancel,
+  onExport,
+  onBack,
+}) {
+  const translate = useTranslate();
 
-    return styled(styles)(
-      <controls as="div">
-        <Button
-          type="button"
-          mod={['outlined']}
-          disabled={isExporting}
-          onClick={onBack}
-        >
-          {translate('ui_stepper_back')}
-        </Button>
-        <fill as="div" />
-        <Button
-          type="button"
-          mod={['outlined']}
-          disabled={isExporting}
-          onClick={onCancel}
-        >
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button
-          type="button"
-          mod={['unelevated']}
-          disabled={isExporting}
-          onClick={onExport}
-        >
-          {translate('data_transfer_dialog_export')}
-        </Button>
-      </controls>
-    );
-  }
+  return styled(styles)(
+    <controls as="div">
+      <Button
+        type="button"
+        mod={['outlined']}
+        disabled={isExporting}
+        onClick={onBack}
+      >
+        {translate('ui_stepper_back')}
+      </Button>
+      <fill as="div" />
+      <Button
+        type="button"
+        mod={['outlined']}
+        disabled={isExporting}
+        onClick={onCancel}
+      >
+        {translate('ui_processing_cancel')}
+      </Button>
+      <Button
+        type="button"
+        mod={['unelevated']}
+        disabled={isExporting}
+        onClick={onExport}
+      >
+        {translate('data_transfer_dialog_export')}
+      </Button>
+    </controls>
+  );
+}
 );

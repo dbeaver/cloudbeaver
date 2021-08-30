@@ -32,7 +32,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand({
+export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   leaf,
   big,
   className,

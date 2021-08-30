@@ -14,13 +14,13 @@ import { TableHeader, TableBody, Table } from '@cloudbeaver/core-blocks';
 import { Header } from './Header';
 import { Item } from './Item';
 
-interface ObjectChildrenPropertyTableProps {
+interface Props {
   nodeIds: string[];
 }
 
-export const ObjectChildrenPropertyTable = observer(function ObjectPropertyTable({
+export const ObjectChildrenPropertyTable = observer<Props>(function ObjectPropertyTable({
   nodeIds,
-}: ObjectChildrenPropertyTableProps) {
+}) {
   const firstChild = nodeIds[0] || '';
   const properties = useDatabaseObjectInfo(firstChild).dbObject?.properties;
 

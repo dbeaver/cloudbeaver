@@ -40,22 +40,22 @@ const styles = css`
   }
 `;
 
-export const ObjectPropertyInput = observer(function ObjectPropertyInput({ objectProperty }: ObjectPropertyProps) {
+export const ObjectPropertyInput = observer<ObjectPropertyProps>(function ObjectPropertyInput({ objectProperty }) {
   const style = useStyles(styles);
   if (!objectProperty) {
     return null;
   }
 
   return styled(style)(
-    <form-input as="div">
-      <label-wrapper as="div">
+    <form-input>
+      <label-wrapper>
         <label
           htmlFor={objectProperty.id}
           title={objectProperty.displayName}
         >{objectProperty.displayName}
         </label>
       </label-wrapper>
-      <input-wrapper as="div">
+      <input-wrapper>
         <input
           type={matchType(objectProperty.dataType)}
           value={getValue(objectProperty.value)}

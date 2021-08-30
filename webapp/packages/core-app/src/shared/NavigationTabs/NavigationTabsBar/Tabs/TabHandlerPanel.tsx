@@ -13,9 +13,9 @@ import type { TabElementProps } from '@cloudbeaver/core-blocks';
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';
 
-export const TabHandlerPanel = observer(function TabHandlerPanel({
+export const TabHandlerPanel = observer<TabElementProps>(function TabHandlerPanel({
   tabId,
-}: TabElementProps) {
+}) {
   const tab = useTab(tabId);
   const handler = useTabHandler(tab.handlerId);
 

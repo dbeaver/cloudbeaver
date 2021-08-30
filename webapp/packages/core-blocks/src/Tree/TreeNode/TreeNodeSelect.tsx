@@ -23,7 +23,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect({
+export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   onSelect,
   group,
   selected,

@@ -120,7 +120,7 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionForm: React.FC<Props> = observer(function ConnectionForm({
+export const ConnectionForm = observer<Props>(function ConnectionForm({
   state,
   onCancel,
   onSave = () => {},

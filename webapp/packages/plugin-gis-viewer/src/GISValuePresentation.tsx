@@ -22,7 +22,7 @@ interface Props {
   resultIndex: number;
 }
 
-export const GISValuePresentation: React.FC<Props> = observer(function GISValuePresentation({
+export const GISValuePresentation = observer<Props>(function GISValuePresentation({
   model,
   resultIndex,
 }) {

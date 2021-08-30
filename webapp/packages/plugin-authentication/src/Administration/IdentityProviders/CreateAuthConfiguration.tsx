@@ -31,7 +31,7 @@ const styles = composes(
     configuration-create {
       display: flex;
       flex-direction: column;
-      height: 540px;
+      height: 660px;
       overflow: hidden;
     }
 

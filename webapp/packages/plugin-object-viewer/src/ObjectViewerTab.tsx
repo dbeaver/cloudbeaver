@@ -9,15 +9,15 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { TabHandlerTabProps, useNode } from '@cloudbeaver/core-app';
+import { TabHandlerTabComponent, useNode } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
-export const ObjectViewerTab = observer(function ObjectViewerTab({
+export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({
   tab, handler, onSelect, onClose, style,
-}: TabHandlerTabProps<IObjectViewerTabState>) {
+}) {
   const { node } = useNode(tab.handlerState.objectId);
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;

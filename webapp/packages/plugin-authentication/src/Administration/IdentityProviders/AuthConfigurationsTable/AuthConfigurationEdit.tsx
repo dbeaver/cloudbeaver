@@ -38,9 +38,9 @@ interface Props {
   item: string;
 }
 
-export const AuthConfigurationEdit = observer(function AuthConfigurationEdit({
+export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationEdit({
   item,
-}: Props) {
+}) {
   const resource = useService(AuthConfigurationsResource);
   const boxRef = useRef<HTMLDivElement>(null);
 

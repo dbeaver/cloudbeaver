@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { SubmittingForm, useFocus, Button } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -45,11 +45,11 @@ interface Payload {
   driverId?: string;
 }
 
-export const ConnectionAuthenticationDialog = observer(function ConnectionAuthenticationDialog({
+export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer(function ConnectionAuthenticationDialog({
   payload,
   rejectDialog,
   resolveDialog,
-}: DialogComponentProps<Payload>) {
+}) {
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(payload.driverId || '');

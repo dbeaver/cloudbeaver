@@ -10,15 +10,15 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import type { ObjectPagePanelProps } from '@cloudbeaver/plugin-object-viewer';
+import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewer } from '../TableViewer/TableViewer';
 
-export const DataViewerPanel = observer(function DataViewerPanel({
+export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({
   tab,
   page,
-}: ObjectPagePanelProps<IDataViewerPageState>) {
+}) {
   const pageState = page.getState(tab);
 
   const handlePresentationChange = useCallback((presentationId: string) => {

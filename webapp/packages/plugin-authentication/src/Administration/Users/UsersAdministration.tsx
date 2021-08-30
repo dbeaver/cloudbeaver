@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
+import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -52,9 +52,9 @@ const styles = composes(
   `
 );
 
-export const UsersAdministration = observer(function UsersAdministration({
+export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({
   sub,
-}: AdministrationItemContentProps) {
+}) {
   const translate = useTranslate();
   const service = useService(CreateUserService);
   const controller = useController(UsersAdministrationController);

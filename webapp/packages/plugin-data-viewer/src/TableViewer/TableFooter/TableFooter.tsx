@@ -68,15 +68,15 @@ const tableFooterStyles = composes(
   `
 );
 
-interface TableFooterProps {
+interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
 }
 
-export const TableFooter = observer(function TableFooter({
+export const TableFooter = observer<Props>(function TableFooter({
   resultIndex,
   model,
-}: TableFooterProps) {
+}) {
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
 

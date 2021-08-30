@@ -24,12 +24,12 @@ const style = css`
   }
 `;
 
-interface SqlResultPanelProps {
+interface Props {
   tab: ITab<ISqlEditorTabState>;
   id: string;
 }
 
-export const SqlResultPanel = observer(function SqlResultPanel({ tab, id }: SqlResultPanelProps) {
+export const SqlResultPanel = observer<Props>(function SqlResultPanel({ tab, id }) {
   const resultTab = tab.handlerState.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {

@@ -31,7 +31,7 @@ interface SnackbarProps {
   onShowDetails?: () => void;
 }
 
-export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
+export const Snackbar = observer<SnackbarProps>(function Snackbar({
   type,
   message,
   title,

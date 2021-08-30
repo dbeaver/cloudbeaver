@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Style } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IRouteParams } from './IRouteParams';
 
@@ -25,7 +25,7 @@ export interface AdministrationItemDrawerProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
   onSelect: (id: string) => void;
-  style: Style[];
+  style: ComponentStyle;
   disabled?: boolean;
 }
 export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>;

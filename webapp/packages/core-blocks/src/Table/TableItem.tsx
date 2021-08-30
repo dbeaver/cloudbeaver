@@ -34,7 +34,7 @@ interface Props {
   onDoubleClick?: () => void;
 }
 
-export const TableItem: React.FC<Props> = observer(function TableItem({
+export const TableItem = observer<Props>(function TableItem({
   item,
   expandElement,
   selectDisabled = false,

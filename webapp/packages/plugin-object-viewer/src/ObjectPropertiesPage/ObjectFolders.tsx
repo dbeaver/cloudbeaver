@@ -50,8 +50,8 @@ interface IProps {
   tab: ITab<IObjectViewerTabState>;
 }
 
-export const ObjectFolders: React.FC<IProps> = observer(function ObjectFolders({ tab }) {
+export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const controller = useController(ObjectFoldersController, tab);
 
-  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={[styles]} />);
+  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={styles} />);
 });

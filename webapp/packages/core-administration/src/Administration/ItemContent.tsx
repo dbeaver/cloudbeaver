@@ -20,7 +20,7 @@ interface Props {
   configurationWizard: boolean;
 }
 
-export const ItemContent: React.FC<Props> = observer(function ItemContent({
+export const ItemContent = observer<Props>(function ItemContent({
   activeScreen,
   configurationWizard,
 }) {

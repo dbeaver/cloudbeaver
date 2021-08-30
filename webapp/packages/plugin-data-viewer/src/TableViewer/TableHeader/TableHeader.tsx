@@ -29,10 +29,10 @@ interface Props {
   resultIndex: number;
 }
 
-export const TableHeader = observer(function TableHeader({
+export const TableHeader = observer<Props>(function TableHeader({
   model,
   resultIndex,
-}: Props) {
+}) {
   const service = useService(TableHeaderService);
 
   return styled(styles)(

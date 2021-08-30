@@ -29,7 +29,7 @@ const styles = css`
   }
 `;
 
-export const TableStatistics: React.FC<Props> = observer(function TableStatistics({
+export const TableStatistics = observer<Props>(function TableStatistics({
   model,
   resultIndex,
 }) {

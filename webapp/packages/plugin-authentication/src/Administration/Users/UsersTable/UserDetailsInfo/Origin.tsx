@@ -27,7 +27,7 @@ interface IOriginIconProps {
   origin: ObjectOrigin;
 }
 
-export const OriginIcon: React.FC<IOriginIconProps> = observer(function Origin({ origin }) {
+export const OriginIcon = observer<IOriginIconProps>(function Origin({ origin }) {
   const isLocal = origin.type === AUTH_PROVIDER_LOCAL_ID;
   const icon = isLocal ? '/icons/local_connection.svg' : origin.icon;
   const title = isLocal ? 'Local user' : origin.displayName;

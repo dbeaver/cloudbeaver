@@ -43,7 +43,7 @@ const styles = css`
   }
 `;
 
-export const StatusMessage: React.FC<Props> = observer(function StatusMessage({ status, message, onShowDetails, className }) {
+export const StatusMessage = observer<Props>(function StatusMessage({ status, message, onShowDetails, className }) {
   const translate = useTranslate();
   message = message ? translate(message) : message;
   let icon = '/icons/info_icon.svg';

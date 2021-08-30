@@ -13,20 +13,19 @@ import styled from 'reshadow';
 import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle, joinStyles } from '@cloudbeaver/core-theming';
 
 import { TopMenuButton } from './TopMenuButton';
 import { topMenuStyles } from './topMenuStyles';
 
-type TopMenuItemProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
+interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   menuItem: IMenuItem;
-  style?: Style[];
-};
+  style?: ComponentStyle;
+}
 
-export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [], ...props }: TopMenuItemProps) {
+export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, style, ...props }) {
   const translate = useTranslate();
-  style = [...style, topMenuStyles];
-  const styles = useStyles(!menuItem.panel ? [] : style);
+  const styles = useStyles(style, topMenuStyles);
 
   if (!menuItem.panel) {
     return (
@@ -45,7 +44,7 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
       {...props}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
-      style={style}
+      style={joinStyles(style, topMenuStyles)}
       placement="bottom-end"
       modal
       onClick={() => menuItem.onClick?.()}

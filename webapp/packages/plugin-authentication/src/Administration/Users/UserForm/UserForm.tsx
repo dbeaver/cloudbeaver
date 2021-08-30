@@ -109,11 +109,11 @@ interface Props {
   onCancel: () => void;
 }
 
-export const UserForm = observer(function UserForm({
+export const UserForm = observer<Props>(function UserForm({
   user,
   editing = false,
   onCancel,
-}: Props) {
+}) {
   const style = [tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const translate = useTranslate();

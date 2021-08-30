@@ -14,9 +14,9 @@ import { filterOnlyActive } from '../AdministrationItem/AdministrationItemServic
 import type { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
 import { ConfigurationWizardService } from '../AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 
-export const DrawerItem = observer(function DrawerItem({
+export const DrawerItem = observer<AdministrationItemDrawerProps>(function DrawerItem({
   item, onSelect, style, configurationWizard, disabled,
-}: AdministrationItemDrawerProps) {
+}) {
   const configurationWizardService = useService(ConfigurationWizardService);
   const Component = item.getDrawerComponent();
 

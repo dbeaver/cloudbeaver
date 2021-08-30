@@ -18,7 +18,7 @@ interface Props {
   resultTab: IResultTab;
 }
 
-export const SqlResultSetPanel: React.FC<Props> = observer(function SqlResultSetPanel({
+export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({
   group,
   resultTab,
 }) {

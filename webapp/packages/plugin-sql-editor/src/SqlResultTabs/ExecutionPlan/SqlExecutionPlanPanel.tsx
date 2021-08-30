@@ -41,7 +41,7 @@ interface Props {
   executionPlanTab: IExecutionPlanTab;
 }
 
-export const SqlExecutionPlanPanel: React.FC<Props> = observer(function SqlExecutionPlanPanel({
+export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({
   executionPlanTab,
 }) {
   const style = useStyles(styles, splitStyles);

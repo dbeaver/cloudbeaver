@@ -38,7 +38,7 @@ const styles = css`
   }
 `;
 
-export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ className, ...rest }) {
+export const CellFormatter = observer<Props>(function CellFormatter({ className, ...rest }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);

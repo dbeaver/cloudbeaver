@@ -119,7 +119,7 @@ interface Props {
   className?: string;
 }
 
-export const AuthConfigurationForm: React.FC<Props> = observer(function AuthConfigurationForm({
+export const AuthConfigurationForm = observer<Props>(function AuthConfigurationForm({
   state,
   onCancel,
   onSave = () => {},

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
@@ -29,7 +29,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   onFocus?: (name: string) => void;
 }
 
-export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoFormNew({
+export const ObjectPropertyInfoFormNew = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoFormNew({
   properties,
   state,
   category,

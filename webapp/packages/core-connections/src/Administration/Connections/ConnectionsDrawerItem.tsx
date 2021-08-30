@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 export const ConnectionsDrawerItem: React.FC<AdministrationItemDrawerProps> = function ConnectionsDrawerItem({
   item, onSelect, style, disabled, configurationWizard,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/connection.svg' />
       <TabTitle><Translate token={configurationWizard ? 'connections_administration_configuration_wizard_step_title' : 'connections_administration_item'} /></TabTitle>
