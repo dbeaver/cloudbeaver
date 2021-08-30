@@ -3,6 +3,7 @@ query getAuthProviderConfigurations($providerId: ID) {
     providerId
     id
     displayName
+    disabled
     iconURL
     description
     parameters

@@ -230,7 +230,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
 
   return styled(useStyles(baseFormControlStylesNew, styles))(
     <field className={className}>
-      <field-label title={title} as='label'>{children}</field-label>
+      <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>
       <input-box>
         <input
           ref={ref}

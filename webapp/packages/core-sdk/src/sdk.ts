@@ -20,6 +20,7 @@ export interface AdminAuthProviderConfiguration {
   providerId: Scalars['ID'];
   id: Scalars['ID'];
   displayName: Scalars['String'];
+  disabled: Scalars['Boolean'];
   iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   parameters: Scalars['Object'];
@@ -100,6 +101,7 @@ export interface AuthCredentialInfo {
 export interface AuthProviderConfiguration {
   id: Scalars['ID'];
   displayName: Scalars['String'];
+  disabled: Scalars['Boolean'];
   iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   signInLink?: Maybe<Scalars['String']>;
@@ -812,6 +814,7 @@ export interface QuerySaveAuthProviderConfigurationArgs {
   providerId: Scalars['ID'];
   id: Scalars['ID'];
   displayName?: Maybe<Scalars['String']>;
+  disabled?: Maybe<Scalars['Boolean']>;
   iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   parameters?: Maybe<Scalars['Object']>;
@@ -1154,7 +1157,7 @@ export type GetAuthProviderConfigurationsQueryVariables = Exact<{
   providerId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'iconURL' | 'description' | 'parameters'>> }
+export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters'>> }
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1169,12 +1172,13 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   providerId: Scalars['ID'];
   id: Scalars['ID'];
   displayName?: Maybe<Scalars['String']>;
+  disabled?: Maybe<Scalars['Boolean']>;
   iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   parameters?: Maybe<Scalars['Object']>;
 }>;
 
-export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'iconURL' | 'description' | 'parameters'> }
+export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters'> }
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2107,6 +2111,7 @@ export const GetAuthProviderConfigurationsDocument = `
     providerId
     id
     displayName
+    disabled
     iconURL
     description
     parameters
@@ -2145,11 +2150,12 @@ export const GetAuthProvidersDocument = `
 }
     `;
 export const SaveAuthProviderConfigurationDocument = `
-    query saveAuthProviderConfiguration($providerId: ID!, $id: ID!, $displayName: String, $iconURL: String, $description: String, $parameters: Object) {
+    query saveAuthProviderConfiguration($providerId: ID!, $id: ID!, $displayName: String, $disabled: Boolean, $iconURL: String, $description: String, $parameters: Object) {
   configuration: saveAuthProviderConfiguration(
     providerId: $providerId
     id: $id
     displayName: $displayName
+    disabled: $disabled
     iconURL: $iconURL
     description: $description
     parameters: $parameters
@@ -2157,6 +2163,7 @@ export const SaveAuthProviderConfigurationDocument = `
     providerId
     id
     displayName
+    disabled
     iconURL
     description
     parameters

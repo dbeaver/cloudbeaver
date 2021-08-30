@@ -2,6 +2,7 @@ query saveAuthProviderConfiguration(
   $providerId: ID!,
   $id: ID!,
   $displayName: String,
+  $disabled: Boolean,
   $iconURL: String
   $description: String
   $parameters: Object
@@ -10,6 +11,7 @@ query saveAuthProviderConfiguration(
     providerId: $providerId,
     id: $id,
     displayName: $displayName,
+    disabled: $disabled,
     iconURL: $iconURL,
     description: $description,
     parameters: $parameters
@@ -17,6 +19,7 @@ query saveAuthProviderConfiguration(
     providerId
     id
     displayName
+    disabled
     iconURL
     description
     parameters

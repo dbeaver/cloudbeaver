@@ -9,6 +9,7 @@
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
 import { authConfigurationContext } from '../Contexts/authConfigurationContext';
@@ -57,7 +58,13 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
 
     config.id = state.config.id;
     config.providerId = state.config.providerId;
-    config.displayName = state.config.displayName;
+    config.disabled = state.config.disabled;
+    config.displayName = state.config.displayName.trim();
+
+    if (state.mode === 'create') {
+      const configurationNames = this.authConfigurationsResource.values.map(configuration => configuration.displayName);
+      config.displayName = getUniqueName(config.displayName, configurationNames);
+    }
 
     if (Object.keys(state.config.parameters).length) {
       config.parameters = state.config.parameters;
@@ -80,16 +87,22 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   ) {
     const validation = contexts.getContext(this.authConfigurationFormService.configurationValidationContext);
 
-    if (!state.config.providerId) {
-      validation.error("Field 'Provider' can't be empty");
-    }
-
-    if (!state.config.id.trim()) {
-      validation.error("Field 'ID' can't be empty");
-    }
-
-    if (!state.config.displayName?.length) {
+    if (!state.config.displayName.trim()) {
       validation.error("Field 'Name' can't be empty");
+    }
+
+    if (state.mode === 'create') {
+      if (!state.config.providerId) {
+        validation.error("Field 'Provider' can't be empty");
+      }
+
+      if (!state.config.id.trim()) {
+        validation.error("Field 'ID' can't be empty");
+      }
+
+      if (this.authConfigurationsResource.has(state.config.id)) {
+        validation.error(`A configuration with ID "${state.config.id}" already exists`);
+      }
     }
   }
 
@@ -138,13 +151,15 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     if (state.info.displayName) {
       state.config.displayName = state.info.displayName;
     }
+    if (state.info.disabled !== undefined) {
+      state.config.disabled = state.info.disabled;
+    }
     if (state.info.iconURL) {
       state.config.iconURL = state.info.iconURL;
     }
     if (state.info.description) {
       state.config.description = state.info.description;
     }
-
     if (state.info.parameters) {
       state.config.parameters = { ...state.info.parameters };
     }

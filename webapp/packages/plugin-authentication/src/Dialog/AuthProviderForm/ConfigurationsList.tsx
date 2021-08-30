@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useState, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
+import { comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
 import { Filter, IconOrImage, Link, Cell } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
@@ -55,11 +56,12 @@ export const ConfigurationsList: React.FC<Props> = observer(function Configurati
   const [search, setSearch] = useState('');
 
   const filteredConfigurations = useMemo(() => computed(() => {
+    const sortedConfigurations = configurations.slice().sort(comparePublicAuthConfigurations);
     if (!search) {
-      return configurations;
+      return sortedConfigurations;
     }
 
-    return configurations.filter(configuration => {
+    return sortedConfigurations.filter(configuration => {
       const target = `${configuration.displayName}${configuration.description || ''}`;
       return target.toUpperCase().includes(search.toUpperCase());
     });

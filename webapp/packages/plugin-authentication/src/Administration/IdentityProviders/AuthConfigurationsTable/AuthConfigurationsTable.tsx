@@ -39,6 +39,7 @@ export const AuthConfigurationsTable: React.FC<Props> = observer(function AuthCo
         <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
         <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
+        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
         <TableColumnHeader />
       </TableHeader>
       <TableBody>

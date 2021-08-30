@@ -29,7 +29,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     private readonly administrationItemService: AdministrationItemService,
     private readonly notificationService: NotificationService,
     private readonly authProvidersResource: AuthProvidersResource,
-    private readonly authProviderConfigurationsResource: AuthConfigurationsResource,
+    private readonly authConfigurationsResource: AuthConfigurationsResource,
     private readonly createConfigurationService: CreateAuthConfigurationService,
   ) {
     super();
@@ -39,7 +39,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: 'auth-configurations',
       type: AdministrationItemType.Default,
-      order: 4,
+      order: 5,
       configurationWizardOptions: {
         description: 'administration_identity_providers_wizard_description',
       },
@@ -53,6 +53,11 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
       getContentComponent: () => AuthConfigurationsAdministration,
       getDrawerComponent: () => AuthConfigurationsDrawerItem,
       onActivate: this.loadConfigurations.bind(this),
+      onDeActivate: (configurationWizard, outside) => {
+        if (outside) {
+          this.authConfigurationsResource.cleanNewFlags();
+        }
+      },
     });
   }
 
@@ -60,7 +65,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
 
   private async loadConfigurations() {
     try {
-      await this.authProviderConfigurationsResource.load(AuthConfigurationsResource.keyAll);
+      await this.authConfigurationsResource.load(AuthConfigurationsResource.keyAll);
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading configurations');
     }

@@ -88,18 +88,18 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
       </ToolsPanel>
       <layout-grid>
         <layout-grid-inner>
+          {sub && (
+            <layout-grid-cell {...use({ span: 12 })}>
+              <CreateAuthConfiguration />
+            </layout-grid-cell>
+          )}
           <layout-grid-cell {...use({ span: 12 })}>
-            <>
-              {sub && (
-                <CreateAuthConfiguration />
-              )}
-              <AuthConfigurationsTable
-                configurations={configurationsTableState.configurations}
-                selectedItems={tableState.selected}
-                expandedItems={tableState.expanded}
-              />
-              <Loader loading={configurationsTableState.processing} overlay />
-            </>
+            <AuthConfigurationsTable
+              configurations={configurationsTableState.configurations}
+              selectedItems={tableState.selected}
+              expandedItems={tableState.expanded}
+            />
+            <Loader loading={configurationsTableState.processing} overlay />
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>

@@ -9,13 +9,12 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { isValuesEqual } from '@cloudbeaver/core-utils';
+import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource, DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
-import { getUniqueConnectionName } from '../../getUniqueConnectionName';
 import { isJDBCConnection } from '../../isJDBCConnection';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -214,10 +213,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
       if (state.type === 'admin') {
         await this.connectionsResource.loadAll();
         const connectionNames = this.connectionsResource.values.map(connection => connection.name);
-        config.name = getUniqueConnectionName(config.name, connectionNames);
+        config.name = getUniqueName(config.name, connectionNames);
       } else {
         const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
-        config.name = getUniqueConnectionName(config.name, connectionNames);
+        config.name = getUniqueName(config.name, connectionNames);
       }
     }
 

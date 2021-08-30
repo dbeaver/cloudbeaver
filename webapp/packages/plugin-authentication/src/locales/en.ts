@@ -58,6 +58,7 @@ export default [
   ['administration_identity_providers_provider', 'Provider'],
   ['administration_identity_providers_provider_id', 'ID'],
   ['administration_identity_providers_provider_configuration_name', 'Configuration name'],
+  ['administration_identity_providers_provider_configuration_disabled', 'Disabled'],
   ['administration_identity_providers_provider_configuration_description', 'Description'],
   ['administration_identity_providers_provider_configuration_icon_url', 'Icon URL'],
   ['administration_identity_providers_provider_configuration_parameters', 'Parameters'],
