@@ -11,7 +11,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import { Button } from 'reakit/Button';
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles, Style } from '@cloudbeaver/core-theming';
+import { composes, useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 const buttonStyle = composes(
   css`
@@ -40,16 +40,13 @@ const buttonStyle = composes(
   `
 );
 
-type Props = Omit<ButtonHTMLAttributes<any>, 'style'> & {
-  style?: Style[];
-};
+interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
+  style?: ComponentStyle;
+}
 
-export const TopMenuButton = observer(function TopMenuItem({ style = [], children, ...props }: Props) {
+export const TopMenuButton: React.FC<IProps> = observer(function TopMenuItem({ style, children, ...props }) {
   return styled(useStyles(buttonStyle, style))(
-    <Button
-      as="button"
-      {...props}
-    >
+    <Button as="button" {...props}>
       <div>{children}</div>
     </Button>
   );

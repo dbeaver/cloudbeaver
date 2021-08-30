@@ -34,7 +34,6 @@ const styles = composes(
     layout-grid {
       width: 100%;
       overflow: auto;
-      flex: 1;
     }
     layout-grid-inner {
       min-height: 100%;

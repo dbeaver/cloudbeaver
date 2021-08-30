@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITabContainer } from '../ITab';
 import { TabList } from '../TabList';
@@ -18,13 +18,13 @@ import { VerticalTabHeader } from './VerticalTabHeader';
 import { VerticalTabPanel } from './VerticalTabPanel';
 import { verticalTabStyles } from './verticalTabStyles';
 
-type VerticalTabsProps = Omit<React.DOMAttributes<HTMLDivElement>, 'style'> & {
+interface IProps extends Omit<React.DOMAttributes<HTMLDivElement>, 'style'> {
   tabContainer: ITabContainer;
-  style: Style[];
-};
+  style: ComponentStyle;
+}
 
-export const VerticalTabs = observer(function VerticalTabs({ tabContainer, style, ...props }: VerticalTabsProps) {
-  return styled(useStyles(verticalTabStyles, ...style))(
+export const VerticalTabs: React.FC<IProps> = observer(function VerticalTabs({ tabContainer, style, ...props }) {
+  return styled(useStyles(verticalTabStyles, style))(
     <TabsState currentTabId={tabContainer.currentTabId} orientation='vertical'>
       <vertical-tabs as="div" {...props}>
         <TabList aria-label="My tabs">

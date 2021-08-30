@@ -10,21 +10,21 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
 import type { ITab } from '@cloudbeaver/core-app';
-import type { Style } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage';
 
-export interface DBObjectPageTabProps {
+interface IProps {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage;
   onSelect: (tab: ITab<IObjectViewerTabState>, page: ObjectPage) => void;
-  style: Style[];
+  style: ComponentStyle;
 }
 
-export const DBObjectPageTab = observer(function DBObjectPageTab({
+export const DBObjectPageTab: React.FC<IProps> = observer(function DBObjectPageTab({
   tab, page, onSelect, style,
-}: DBObjectPageTabProps) {
+}) {
   const handleSelect = useCallback(() => onSelect(tab, page), [tab, page, onSelect]);
   const TabComponent = page.getTabComponent();
   return <TabComponent tab={tab} page={page} style={style} onSelect={handleSelect} />;

@@ -19,7 +19,7 @@ export const UsersDrawerItem: React.FC<AdministrationItemDrawerProps> = function
   style,
   disabled,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab
       tabId={item.name}
       disabled={disabled}

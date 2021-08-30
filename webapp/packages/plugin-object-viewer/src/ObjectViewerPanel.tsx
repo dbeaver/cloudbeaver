@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useChildren, TabHandlerPanelProps } from '@cloudbeaver/core-app';
+import { useChildren, TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import { Loader, TabsBox, TabPanel, TextPlaceholder, Button } from '@cloudbeaver/core-blocks';
 import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -37,11 +37,10 @@ const styles = composes(
     }
   `
 );
-const stylesArray = [styles];
 
-export const ObjectViewerPanel = observer(function ObjectViewerPanel({
+export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({
   tab,
-}: TabHandlerPanelProps<IObjectViewerTabState>) {
+}) {
   const translate = useTranslate();
   const [connecting, setConnecting] = useState(false);
   const connection = useConnectionInfo(tab.handlerState.connectionId || '');
@@ -93,11 +92,11 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
           key={page.key}
           tab={tab}
           page={page}
-          style={stylesArray}
+          style={styles}
           onSelect={dbObjectPagesService.selectPage}
         />
       ))}
-      style={stylesArray}
+      style={styles}
     >
       {pages.map(page => (
         <TabPanel key={page.key} tabId={page.key} lazy>

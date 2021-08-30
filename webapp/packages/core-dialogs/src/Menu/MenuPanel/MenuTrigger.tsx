@@ -8,18 +8,18 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { Ref, useCallback, useEffect, useMemo } from 'react';
+import { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
 import {
   MenuButton,
-  Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio
+  Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio, MenuInitialState
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type {
-  IMenuItem, IMenuPanel, MenuTriggerProps
+  IMenuItem, IMenuPanel
 } from '../IMenuPanel';
 import { MenuPanelItem } from './MenuPanelItem';
 import { menuPanelStyles } from './menuPanelStyles';
@@ -27,10 +27,21 @@ import { menuPanelStyles } from './menuPanelStyles';
 /**
  * MenuTrigger
  */
-export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
+
+interface IMenuTriggerProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
+  panel: IMenuPanel;
+  style?: ComponentStyle;
+  placement?: MenuInitialState['placement'];
+  modal?: boolean;
+  visible?: boolean;
+  rtl?: boolean;
+  onVisibleSwitch?: (visible: boolean) => void;
+}
+
+export const MenuTrigger: React.FC<IMenuTriggerProps> = function MenuTrigger({
   panel,
   children,
-  style = [],
+  style,
   placement,
   visible,
   onVisibleSwitch,
@@ -49,7 +60,7 @@ export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
     propsRef.onVisibleSwitch?.(menu.visible);
   }, [menu.visible]);
 
-  return styled(useStyles(menuPanelStyles, ...style))(
+  return styled(useStyles(menuPanelStyles, style))(
     <>
       <MenuButton {...menu} {...props}>
         <box>{children}</box>
@@ -68,17 +79,17 @@ interface MenuPanelProps {
   menu: MenuStateReturn; // from reakit useMenuState
   onItemClose?: () => void;
   rtl?: boolean;
-  style?: Style[];
+  style?: ComponentStyle;
 }
 
-const MenuPanel = observer(function MenuPanel({
+const MenuPanel: React.FC<MenuPanelProps> = observer(function MenuPanel({
   panel,
   menu,
   rtl,
   onItemClose,
-  style = [],
-}: MenuPanelProps) {
-  const styles = useStyles(menuPanelStyles, ...style);
+  style,
+}) {
+  const styles = useStyles(menuPanelStyles, style);
 
   if (!menu.visible) {
     return null;
@@ -99,17 +110,17 @@ const MenuPanel = observer(function MenuPanel({
  * MenuPanelElement
  */
 
-type MenuPanelElementProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
+interface IMenuPanelElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   item: IMenuItem;
   menu: MenuStateReturn; // from reakit useMenuState
   onItemClose?: () => void;
-  style?: Style[];
-};
+  style?: ComponentStyle;
+}
 
-const MenuPanelElement = observer(function MenuPanelElement({
-  item, menu, onItemClose, style = [],
-}: MenuPanelElementProps) {
-  const styles = useStyles(menuPanelStyles, ...style);
+const MenuPanelElement: React.FC<IMenuPanelElementProps> = observer(function MenuPanelElement({
+  item, menu, onItemClose, style,
+}) {
+  const styles = useStyles(menuPanelStyles, style);
   const onClick = useCallback(() => {
     if (item.onClick) {
       item.onClick();
@@ -196,18 +207,18 @@ const MenuPanelElement = observer(function MenuPanelElement({
  * MenuInnerTrigger
  */
 
-type MenuInnerTriggerProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
+interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuItem: IMenuItem;
   onItemClose?: () => void;
-  style?: Style[];
-};
+  style?: ComponentStyle;
+}
 
-export const MenuInnerTrigger = observer(function MenuInnerTrigger(
-  props: MenuInnerTriggerProps,
-  ref: Ref<HTMLButtonElement>
+export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(function MenuInnerTrigger(
+  props,
+  ref
 ) {
   const {
-    menuItem, style = [], ...rest
+    menuItem, style, ...rest
   } = props;
   const menu = useMenuState();
 
@@ -216,7 +227,7 @@ export const MenuInnerTrigger = observer(function MenuInnerTrigger(
     props.onItemClose?.();
   }, [menu.hide, props.onItemClose]);
 
-  return styled(useStyles(menuPanelStyles, ...style))(
+  return styled(useStyles(menuPanelStyles, style))(
     <>
       <MenuButton ref={ref} {...menu} {...rest}>
         <box>

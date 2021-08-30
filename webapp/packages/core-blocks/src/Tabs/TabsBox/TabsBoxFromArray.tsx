@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Tab } from '../Tab/Tab';
 import { TabPanel } from '../TabPanel';
@@ -20,7 +20,7 @@ export interface TabElementProps {
   tabId: string;
 }
 
-interface TabsBoxControllerProps {
+interface IProps {
   currentTabId: string;
   tabIdList: string[];
   tab: React.ElementType<TabElementProps>;
@@ -29,10 +29,10 @@ interface TabsBoxControllerProps {
   onOpen: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
   className?: string;
-  style?: Style[];
+  style?: ComponentStyle;
 }
 
-export const TabsBoxFromArray = observer(function TabsBoxFromArray({
+export const TabsBoxFromArray: React.FC<IProps> = observer(function TabsBoxFromArray({
   currentTabId,
   tabIdList,
   tab: TabData,
@@ -41,9 +41,9 @@ export const TabsBoxFromArray = observer(function TabsBoxFromArray({
   onOpen,
   onClose,
   className,
-  style = [],
-}: TabsBoxControllerProps) {
-  return styled(useStyles(...style))(
+  style,
+}) {
+  return styled(useStyles(style))(
     <TabsBox
       currentTabId={currentTabId}
       tabs={!hideTabs && tabIdList.map(tabId => (

@@ -20,7 +20,7 @@ export const FinishPageDrawerItem: React.FC<AdministrationItemDrawerProps> = obs
   style,
   disabled,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab
       tabId={item.name}
       disabled={disabled

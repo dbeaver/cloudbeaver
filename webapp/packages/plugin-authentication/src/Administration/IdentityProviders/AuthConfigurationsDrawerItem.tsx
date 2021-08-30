@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 export const AuthConfigurationsDrawerItem: React.FC<AdministrationItemDrawerProps> = function AuthConfigurationsDrawerItem({
   item, onSelect, style, disabled,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/account.svg' />
       <TabTitle><Translate token='administration_identity_providers_tab_title' /></TabTitle>

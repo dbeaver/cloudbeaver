@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 export const WelcomeDrawerItem: React.FC<AdministrationItemDrawerProps> = function WelcomeDrawerItem({
   item, onSelect, style, disabled,
 }) {
-  return styled(useStyles(...style))(
+  return styled(useStyles(style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/welcome_bold.svg' viewBox='0 0 16 16' />
       <TabTitle><Translate token='administration_configuration_wizard_welcome' /></TabTitle>

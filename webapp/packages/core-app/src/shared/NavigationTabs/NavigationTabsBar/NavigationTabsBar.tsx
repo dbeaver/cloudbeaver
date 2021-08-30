@@ -38,7 +38,6 @@ const styles = composes(
     }
   `
 );
-const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const sessionDataResource = useService(SessionDataResource);
@@ -75,9 +74,9 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
       ref={ref}
       currentTabId={navigation.currentTabId}
       tabs={navigation.tabIdList.map(tabId => (
-        <TabHandlerTab key={tabId} tabId={tabId} style={stylesArray} onSelect={handleSelect} onClose={handleClose} />
+        <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
       ))}
-      style={stylesArray}
+      style={styles}
       tabIndex={0}
     >
       {navigation.tabIdList.map(tabId => (

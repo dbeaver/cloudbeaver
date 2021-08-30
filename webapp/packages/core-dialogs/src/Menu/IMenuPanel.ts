@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ButtonHTMLAttributes, PropsWithChildren } from 'react';
-import type { MenuInitialState } from 'reakit/Menu';
-
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { Style } from '@cloudbeaver/core-theming';
 
 import type { MenuItemType } from './models/MenuOptionsStore';
 
@@ -36,13 +32,3 @@ export interface IMenuItem {
   separator?: boolean;
   isChecked?: boolean;
 }
-
-export type MenuTriggerProps = PropsWithChildren<{
-  panel: IMenuPanel;
-  style?: Style[];
-  placement?: MenuInitialState['placement'];
-  modal?: boolean;
-  visible?: boolean;
-  rtl?: boolean;
-  onVisibleSwitch?: (visible: boolean) => void;
-}> & Omit<ButtonHTMLAttributes<any>, 'style'>;

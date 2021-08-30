@@ -68,7 +68,7 @@ type Props = React.PropsWithChildren<{
   onItemSelect: (name: string) => void;
 }>;
 
-export const Administration: React.FC<Props> = observer(function Administration({
+export const Administration = observer<Props>(function Administration({
   configurationWizard, activeScreen, onItemSelect, children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);

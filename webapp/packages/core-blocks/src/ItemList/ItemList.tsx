@@ -8,22 +8,22 @@
 
 import styled from 'reshadow';
 
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { Styles, ITEM_LIST_STYLES_ARRAY } from './styles';
+import { Styles, ITEM_LIST_STYLES } from './styles';
 
 interface IProps {
   className?: string;
-  styles?: Style[];
+  styles?: ComponentStyle;
 }
 
 export const ItemList: React.FC<IProps> = function ItemList({
   children, className, styles,
 }) {
-  return styled(useStyles(styles || ITEM_LIST_STYLES_ARRAY))(
+  return styled(useStyles(styles || ITEM_LIST_STYLES))(
     <item-list className={className}>
       <item-list-overflow-top />
-      <Styles.Provider value={styles || ITEM_LIST_STYLES_ARRAY}>
+      <Styles.Provider value={styles || ITEM_LIST_STYLES}>
         {children}
       </Styles.Provider>
       <item-list-overflow />
