@@ -57,7 +57,7 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
 
   const ListSearchButton = IconButton;
 
-  return styled(useStyles(...(styles || [])))(
+  return styled(useStyles(styles || []))(
     <list-search className={className}>
       <input-box>
         <input

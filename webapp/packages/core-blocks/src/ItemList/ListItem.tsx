@@ -13,21 +13,21 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Styles } from './styles';
 
-type Props = React.PropsWithChildren<{
+interface IProps {
   onClick: () => void;
   className?: string;
-}>;
+}
 
-export function ListItem({
+export const ListItem: React.FC<IProps> = function ListItem({
   children,
   onClick,
   className,
-}: Props) {
+}) {
   const styles = useContext(Styles);
 
-  return styled(useStyles(...styles))(
+  return styled(useStyles(styles))(
     <list-item as="div" className={className} onClick={onClick}>
       {children}
     </list-item>
   );
-}
+};

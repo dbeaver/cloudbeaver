@@ -31,6 +31,9 @@ export const ITEM_LIST_STYLES = composes(
     item-list-overflow {
       composes: branding-overflow from global;
     }
+    item-list-overflow-top {
+      composes: branding-overflow-inverse from global;
+    }
   `,
   css`
     item-list {
@@ -39,13 +42,19 @@ export const ITEM_LIST_STYLES = composes(
       z-index: 0;
       overflow: auto;
     }
-    item-list-overflow {
+    item-list-overflow, item-list-overflow-top {
       position: sticky;
       flex-shrink: 0;
-      bottom: 0;
       width: 100%;
-      height: 24px;
+      height: 8px;
       pointer-events: none;
+    }
+    item-list-overflow {
+      bottom: 0;
+    }
+    item-list-overflow-top {
+      top: 0;
+      z-index: 1;
     }
     list-search {
       position: sticky;

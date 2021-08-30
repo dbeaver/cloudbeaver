@@ -13,19 +13,19 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Styles } from './styles';
 
-type Props = React.PropsWithChildren<{
+interface IProps {
   title?: string;
   className?: string;
-}>;
+}
 
-export function ListItemDescription({
+export const ListItemDescription: React.FC<IProps> = function ListItemDescription({
   title,
   children,
   className,
-}: Props) {
+}) {
   const styles = useContext(Styles);
 
-  return styled(useStyles(...styles))(
-    <list-item-description as="div" title={title} className={className}>{children}</list-item-description>
+  return styled(useStyles(styles))(
+    <list-item-description title={title} className={className}>{children}</list-item-description>
   );
-}
+};

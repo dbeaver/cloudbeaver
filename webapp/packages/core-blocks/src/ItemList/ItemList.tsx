@@ -20,8 +20,9 @@ interface IProps {
 export const ItemList: React.FC<IProps> = function ItemList({
   children, className, styles,
 }) {
-  return styled(useStyles(...(styles || ITEM_LIST_STYLES_ARRAY)))(
+  return styled(useStyles(styles || ITEM_LIST_STYLES_ARRAY))(
     <item-list className={className}>
+      <item-list-overflow-top />
       <Styles.Provider value={styles || ITEM_LIST_STYLES_ARRAY}>
         {children}
       </Styles.Provider>

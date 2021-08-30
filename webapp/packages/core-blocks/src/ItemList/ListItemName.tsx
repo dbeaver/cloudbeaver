@@ -13,17 +13,17 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Styles } from './styles';
 
-type Props = React.PropsWithChildren<{
+interface IProps {
   className?: string;
-}>;
+}
 
-export function ListItemName({
+export const ListItemName: React.FC<IProps> = function ListItemName({
   children,
   className,
-}: Props) {
+}) {
   const styles = useContext(Styles);
 
-  return styled(useStyles(...styles))(
-    <list-item-name as="div" className={className}>{children}</list-item-name>
+  return styled(useStyles(styles))(
+    <list-item-name className={className}>{children}</list-item-name>
   );
-}
+};
