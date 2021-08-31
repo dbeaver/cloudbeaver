@@ -449,7 +449,8 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
                     dbStat.setString(1, role.getRoleId());
                     dbStat.setString(2, CommonUtils.notEmpty(role.getName()));
                     dbStat.setString(3, CommonUtils.notEmpty(role.getDescription()));
@@ -476,7 +477,9 @@ class CBSecurityController implements DBWSecurityController {
                     dbStat.setString(1, CommonUtils.notEmpty(role.getName()));
                     dbStat.setString(2, CommonUtils.notEmpty(role.getDescription()));
                     dbStat.setString(3, role.getRoleId());
-                    dbStat.execute();
+                    if (dbStat.executeUpdate() <= 0) {
+                        throw new DBCException("Role '" + role.getRoleId() + "' doesn't exist");
+                    }
                 }
                 txn.commit();
             }
@@ -490,7 +493,13 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, roleId);
-                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE WHERE ROLE_ID=?", roleId);
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "DELETE FROM CB_ROLE WHERE ROLE_ID=?")) {
+                    dbStat.setString(1, roleId);
+                    if (dbStat.executeUpdate() <= 0) {
+                        throw new DBCException("Role '" + roleId + "' doesn't exist");
+                    }
+                }
                 txn.commit();
             }
         } catch (SQLException e) {

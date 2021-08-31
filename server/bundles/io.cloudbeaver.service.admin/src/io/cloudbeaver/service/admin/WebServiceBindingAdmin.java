@@ -60,7 +60,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     env.getArgument("roleName"),
                     env.getArgument("description")))
             .dataFetcher("updateRole",
-                env -> getService(env).createRole(
+                env -> getService(env).updateRole(
                     getWebSession(env),
                     env.getArgument("roleId"),
                     env.getArgument("roleName"),
