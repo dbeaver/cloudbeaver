@@ -22,6 +22,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 21.1.3 - 2021-08-30
+- Table rows can be created and deleted from the Data Editor.
+- It is possible to preview scripts in the Data Editor.
+- The dialog to enter the credentials appears when you test connections.
+- Different UI bugs have been fixed.
+
+
 ### CloudBeaver 21.1.2 - 2021-08-11
 - Option to run SQL Scripts is implemented.
 - Radio buttons are added to the Value panel to edit Boolean values.
