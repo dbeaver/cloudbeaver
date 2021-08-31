@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, forwardRef, useState, useContext } from 'react';
+import { forwardRef, useContext } from 'react';
 
 import { Executor } from '@cloudbeaver/core-executor';
 
@@ -28,26 +28,28 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   },
   ref
 ) {
-  const parentContext = useContext(FormContext);
-  const props = useObjectRef({ parentContext, onChange, onSubmit });
-  const [changeExecutor] = useState(() => new Executor<IChangeData>());
-
-  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    props.onSubmit?.(e);
-  }, []);
+  const props = useObjectRef(() => ({
+    handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+      e.preventDefault();
+      this.onSubmit?.(e);
+    },
+  }), {
+    parentContext: useContext(FormContext),
+    onChange,
+    onSubmit,
+  }, ['handleSubmit']);
 
   const context = useObjectRef<IFormContext>(() => ({
-    changeExecutor,
+    changeExecutor: new Executor<IChangeData>(),
     change(value, name) {
       props.onChange(value, name);
       props.parentContext?.change(value, name);
-      changeExecutor.execute({ value, name });
+      this.changeExecutor.execute({ value, name });
     },
-  }), false);
+  }), false, ['change']);
 
   return (
-    <form {...rest} ref={ref} onSubmit={handleSubmit}>
+    <form {...rest} ref={ref} onSubmit={props.handleSubmit}>
       <fieldset disabled={disabled} className={rest.className}>
         <FormContext.Provider value={context}>
           {children}
