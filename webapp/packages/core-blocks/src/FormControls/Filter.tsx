@@ -107,7 +107,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   const [toggled, setToggled] = useState(!toggleMode);
 
   const filter = useCallback((value: string | number, name?: string) => {
-    value = String(value).trim();
+    value = String(value);
 
     if (state && name) {
       state[name] = value;

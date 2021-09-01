@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { isLocalUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { DatabaseConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -16,7 +16,7 @@ import { ENotificationType, NotificationService } from '@cloudbeaver/core-events
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
-  GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, AdminRoleInfo
+  GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo
 } from '@cloudbeaver/core-sdk';
 
 interface IStatusMessage {
@@ -45,7 +45,7 @@ export class UserFormController implements IInitializableController, IDestructib
     return Array.from(this.connectionsResource.data.values());
   }
 
-  get roles(): AdminRoleInfo[] {
+  get roles(): RoleInfo[] {
     return Array.from(this.rolesResource.data.values());
   }
 

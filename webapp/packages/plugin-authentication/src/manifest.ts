@@ -13,6 +13,13 @@ import { AuthConfigurationsAdministrationNavService } from './Administration/Ide
 import { AuthConfigurationsAdministrationService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationService';
 import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
 import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
+import { CreateRoleService } from './Administration/Roles/CreateRoleService';
+import { GrantedConnectionsTabService } from './Administration/Roles/GrantedConnections/GrantedConnectionsTabService';
+import { GrantedUsersTabService } from './Administration/Roles/GrantedUsers/GrantedUsersTabService';
+import { RoleOptionsTabService } from './Administration/Roles/Options/RoleOptionsTabService';
+import { RoleFormService } from './Administration/Roles/RoleFormService';
+import { RolesAdministrationNavService } from './Administration/Roles/RolesAdministrationNavService';
+import { RolesAdministrationService } from './Administration/Roles/RolesAdministrationService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
 import { CreateUserService } from './Administration/Users/CreateUserService';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
@@ -47,5 +54,12 @@ export const manifest: PluginManifest = {
     AuthConfigurationsAdministrationNavService,
     AuthConfigurationFormService,
     AuthConfigurationOptionsTabService,
+    RolesAdministrationService,
+    CreateRoleService,
+    RolesAdministrationNavService,
+    RoleFormService,
+    RoleOptionsTabService,
+    GrantedUsersTabService,
+    GrantedConnectionsTabService,
   ],
 };

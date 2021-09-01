@@ -3,6 +3,6 @@ query getRolesList($roleId: ID) {
     roleId
     roleName
     description
-    #rolePermissions
+   # rolePermissions
   } 
 }

@@ -57,7 +57,7 @@
     }
 
     &[use|disabled] {
-      opacity: .85;
+      opacity: 0.85;
     }
   }
 
@@ -88,6 +88,12 @@
     height: 28px;
     padding: 0 16px;
     transition: padding ease-in-out 0.24s;
+
+    &[use|ellipsis] {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     &[use|centerContent] > td-flex {
       align-items: center;

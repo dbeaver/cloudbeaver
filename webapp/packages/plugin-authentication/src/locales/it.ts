@@ -35,7 +35,7 @@ export default [
   ['authentication_user_login_not_set', 'Login non può esser vuoto'],
   ['authentication_user_role_not_set', 'Selezionare almeno un ruolo'],
   ['authentication_user_password_not_set', 'La Password è obbligatoria'],
-  ['authentication_user_passwords_not_match', "Le Passwords non coincidono"],
+  ['authentication_user_passwords_not_match', 'Le Passwords non coincidono'],
   ['authentication_user_login_already_exists', 'Esiste già un utente con quel nome'],
   ['authentication_user_login_cant_be_used', 'Quel nome non può essere usato'],
   ['authentication_user_password_change_dialog_title', 'Modifica la password (locale)'],

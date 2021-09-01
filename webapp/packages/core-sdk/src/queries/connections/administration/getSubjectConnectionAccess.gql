@@ -1,0 +1,7 @@
+query getSubjectConnectionAccess($subjectId: ID) {
+  grantInfo: getSubjectConnectionAccess(subjectId: $subjectId) {
+    connectionId,
+    subjectId,
+    subjectType,
+  }
+}

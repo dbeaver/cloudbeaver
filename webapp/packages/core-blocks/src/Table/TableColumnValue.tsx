@@ -22,6 +22,7 @@ type Props = {
   align?: 'left' | 'center' | 'right' | 'justify' | 'char';
   className?: string;
   centerContent?: boolean;
+  ellipsis?: boolean;
   flex?: boolean;
   expand?: boolean;
   onClick?: () => void;
@@ -32,6 +33,7 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
   align,
   children,
   centerContent,
+  ellipsis,
   flex,
   expand,
   className,
@@ -74,7 +76,7 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
     <td
       align={align}
       className={className}
-      {...use({ centerContent })}
+      {...use({ centerContent, ellipsis })}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       {...rest}

@@ -72,4 +72,28 @@ export default [
   ['administration_identity_providers_provider_create_error', 'Create configuration error'],
   ['administration_identity_providers_configuration_list_update_success', 'Configuration list was refreshed'],
   ['administration_identity_providers_configuration_list_update_fail', 'Configuration list refresh failed'],
+
+  ['administration_roles_tab_title', 'Roles'],
+  ['administration_roles_tab_description', 'Role management'],
+  ['administration_roles_role_creation', 'Role creation'],
+  ['administration_roles_role_id', 'Role ID'],
+  ['administration_roles_role_name', 'Role name'],
+  ['administration_roles_role_description', 'Description'],
+  ['administration_roles_role_create_error', 'Create role error'],
+  ['administration_roles_role_save_error', 'Save role error'],
+  ['administration_roles_role_list_update_success', 'Role list was refreshed'],
+  ['administration_roles_role_list_update_fail', 'Role list refresh failed'],
+  ['administration_roles_add_tooltip', 'Add new role'],
+  ['administration_roles_refresh_tooltip', 'Refresh role list'],
+  ['administration_roles_delete_tooltip', 'Delete selected roles'],
+
+  ['administration_roles_role_granted_users_tab_title', 'Granted users'],
+  ['administration_roles_role_granted_users_search_placeholder', 'Search for user ID...'],
+  ['administration_roles_role_granted_users_user_id', 'User ID'],
+  ['administration_roles_role_granted_users_user_name', 'User name'],
+  ['administration_roles_role_granted_users_empty', 'No available users'],
+
+  ['administration_roles_role_granted_connections_tab_title', 'Granted connections'],
+  ['administration_roles_role_granted_connections_search_placeholder', 'Search for connection name...'],
+  ['administration_roles_role_granted_connections_empty', 'No available connections'],
 ];
