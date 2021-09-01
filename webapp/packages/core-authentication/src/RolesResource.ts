@@ -9,18 +9,18 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
-  AdminRoleInfo,
   CachedMapResource,
   ResourceKey,
   resourceKeyList,
   ResourceKeyList,
-  ResourceKeyUtils
+  ResourceKeyUtils,
+  AdminRoleInfoFragment
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 const NEW_ROLE_SYMBOL = Symbol('new-role');
 
-export type RoleInfo = Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>;
+export type RoleInfo = AdminRoleInfoFragment;
 type NewRole = RoleInfo & { [NEW_ROLE_SYMBOL]: boolean; timestamp: number };
 
 @injectable()

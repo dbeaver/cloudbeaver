@@ -12,8 +12,7 @@ export function isMapsEqual(map1: Map<any, any>, map2: Map<any, any>): boolean {
   }
 
   for (const [key, value] of map1) {
-    const val = map2.get(key);
-    if (val !== value || (val === undefined && !map2.has(key))) {
+    if (!map2.has(key) || map2.get(key) !== value) {
       return false;
     }
   }

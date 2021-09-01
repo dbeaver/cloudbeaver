@@ -1116,7 +1116,7 @@ export type CreateRoleQueryVariables = Exact<{
   description?: Maybe<Scalars['String']>;
 }>;
 
-export interface CreateRoleQuery { role: Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'> }
+export interface CreateRoleQuery { role: AdminRoleInfoFragment }
 
 export type DeleteRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1128,7 +1128,7 @@ export type GetRolesListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>>> }
+export interface GetRolesListQuery { roles: Array<Maybe<AdminRoleInfoFragment>> }
 
 export type UpdateRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1136,7 +1136,7 @@ export type UpdateRoleQueryVariables = Exact<{
   description?: Maybe<Scalars['String']>;
 }>;
 
-export interface UpdateRoleQuery { role: Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'> }
+export interface UpdateRoleQuery { role: AdminRoleInfoFragment }
 
 export type AuthChangeLocalPasswordQueryVariables = Exact<{
   oldPassword: Scalars['String'];
@@ -1569,6 +1569,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
+export type AdminRoleInfoFragment = Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>;
+
 export type AdminUserInfoFragment = (
   Pick<AdminUserInfo, 'userId' | 'grantedRoles' | 'linkedAuthProviders'>
   & { origins: ObjectOriginInfoFragment[] }
@@ -1870,6 +1872,13 @@ export type SqlResultCloseMutationVariables = Exact<{
 
 export interface SqlResultCloseMutation { result: Mutation['sqlResultClose'] }
 
+export const AdminRoleInfoFragmentDoc = `
+    fragment AdminRoleInfo on AdminRoleInfo {
+  roleId
+  roleName
+  description
+}
+    `;
 export const ObjectOriginInfoFragmentDoc = `
     fragment ObjectOriginInfo on ObjectOrigin {
   type
@@ -2102,12 +2111,10 @@ export const CreateRoleDocument = `
     roleName: $roleName
     description: $description
   ) {
-    roleId
-    roleName
-    description
+    ...AdminRoleInfo
   }
 }
-    `;
+    ${AdminRoleInfoFragmentDoc}`;
 export const DeleteRoleDocument = `
     query deleteRole($roleId: ID!) {
   deleteRole(roleId: $roleId)
@@ -2116,12 +2123,10 @@ export const DeleteRoleDocument = `
 export const GetRolesListDocument = `
     query getRolesList($roleId: ID) {
   roles: listRoles(roleId: $roleId) {
-    roleId
-    roleName
-    description
+    ...AdminRoleInfo
   }
 }
-    `;
+    ${AdminRoleInfoFragmentDoc}`;
 export const UpdateRoleDocument = `
     query updateRole($roleId: ID!, $roleName: String, $description: String) {
   role: updateRole(
@@ -2129,12 +2134,10 @@ export const UpdateRoleDocument = `
     roleName: $roleName
     description: $description
   ) {
-    roleId
-    roleName
-    description
+    ...AdminRoleInfo
   }
 }
-    `;
+    ${AdminRoleInfoFragmentDoc}`;
 export const AuthChangeLocalPasswordDocument = `
     query authChangeLocalPassword($oldPassword: String!, $newPassword: String!) {
   authChangeLocalPassword(oldPassword: $oldPassword, newPassword: $newPassword)
