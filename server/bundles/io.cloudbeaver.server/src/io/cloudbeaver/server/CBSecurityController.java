@@ -471,7 +471,6 @@ class CBSecurityController implements DBWSecurityController {
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "UPDATE CB_ROLE SET ROLE_NAME=?,ROLE_DESCRIPTION=? WHERE ROLE_ID=?")) {
                     dbStat.setString(1, CommonUtils.notEmpty(role.getName()));
