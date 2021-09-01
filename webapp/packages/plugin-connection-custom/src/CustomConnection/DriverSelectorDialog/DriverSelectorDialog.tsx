@@ -16,10 +16,6 @@ import type { IDriver } from './Driver';
 import { DriverSelector } from './DriverSelector';
 
 const styles = css`
-  CommonDialogWrapper {
-    max-height: 550px;
-    min-height: 550px;
-  }
   DriverSelector {
     flex: 1;
   }
@@ -42,7 +38,9 @@ export const DriverSelectorDialog = observer<IProps>(function DriverSelectorDial
 }) {
   return styled(styles)(
     <CommonDialogWrapper
+      size='large'
       title={title}
+      fixedSize
       noBodyPadding
       noOverflow
       onReject={onClose}

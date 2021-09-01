@@ -14,10 +14,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
 
 export interface CommonDialogWrapperProps {
+  size?: 'small' | 'medium' | 'large';
   title?: string;
   subTitle?: string;
   icon?: string;
   viewBox?: string;
+  fixedSize?: boolean;
   bigIcon?: boolean;
   noBodyPadding?: boolean;
   noOverflow?: boolean;
@@ -28,6 +30,8 @@ export interface CommonDialogWrapperProps {
 }
 
 export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function CommonDialogWrapper({
+  size = 'medium',
+  fixedSize,
   title,
   subTitle,
   icon,
@@ -41,7 +45,7 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   children,
 }) {
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle))(
-    <dialog className={className}>
+    <dialog className={className} {...use({ size, fixedSize })}>
       <header>
         <icon-container>
           {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}

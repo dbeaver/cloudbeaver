@@ -35,10 +35,6 @@ const styles = composes(
     }
   `,
   css`
-    CommonDialogWrapper {
-      max-height: 600px;
-      min-height: 500px;
-    }
     SubmittingForm, center {
       display: flex;
       flex: 1;
@@ -73,6 +69,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
+      size='large'
       title={translate('basicConnection_connectionDialog_newConnection')}
       subTitle={subtitle}
       icon={controller.dbDriver?.icon}
@@ -83,7 +80,8 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
           onConnect={controller.onConnect}
         />
       )}
-      noBodyPadding
+      noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect}
+      fixedSize
       noOverflow
       onReject={rejectDialog}
     >

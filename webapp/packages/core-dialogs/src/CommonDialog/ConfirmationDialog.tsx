@@ -50,7 +50,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText } = payload;
 
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, style))(
-    <dialog className={className}>
+    <dialog className={className} {...use({ size: 'small' })}>
       <header>
         <icon-container>
           {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
@@ -65,7 +65,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
         </header-title>
         {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body {...use({ 'no-overflow': true })}>
+      <dialog-body>
         <dialog-body-overflow-box>
           <dialog-body-content>
             <Translate token={message} />

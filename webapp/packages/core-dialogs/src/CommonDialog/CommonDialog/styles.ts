@@ -44,12 +44,43 @@ export const commonDialogBaseStyle = composes(
       margin: 0;
       border: none;
       height: auto;
-      min-width: 748px;
       max-height: 100%;
       border-radius: 0.25rem;
       padding: 0px;
+
+      &[|size=small] {
+        min-width: 404px;
+        min-height: 262px;
+        max-height: max(100vh - 48px, 262px);
+
+        &[|fixedSize] {
+          width: 404px;
+          height: 262px;
+        }
+      }
+      &[|size=medium] {
+        min-width: 576px;
+        min-height: 374px;
+        max-height: max(100vh - 48px, 374px);
+
+        &[|fixedSize] {
+          width: 576px;
+          height: 374px;
+        }
+      }
+      &[|size=large] {
+        min-width: 720px;
+        min-height: 468px;
+        max-height: max(100vh - 48px, 468px);
+
+        &[|fixedSize] {
+          width: 720px;
+          height: 468px;
+        }
+      }
     }
     header, dialog-body, footer {
+      flex-shrink: 0;
       padding: 24px;
 
       &[|no-padding] {
@@ -58,6 +89,7 @@ export const commonDialogBaseStyle = composes(
     }
     dialog-body {
       padding-top: 0px;
+      padding-right: 0px;
     }
     footer {
       padding-top: 0px;
@@ -89,41 +121,42 @@ export const commonDialogBaseStyle = composes(
       }
     }
     dialog-body {
-      position: relative;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: row;
       flex: 1;
+      box-sizing: content-box;
+      display: flex;
       max-width: 748px;
       max-height: 100%;
       overflow: auto;
     }
     dialog-body-overflow-box {
       position: relative;
+      flex: 1;
       box-sizing: border-box;
       display: flex;
-      flex-direction: row;
-      flex: 1;
+      flex-direction: column;
+      overflow: auto;
+      padding-right: 24px;
     }
     dialog-body-content {
-      position: relative;
       flex: 1;
+      position: relative;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      overflow: auto;
-      padding-bottom: 24px;
     }
     dialog-body[|no-padding] + footer {
       padding-top: 24px;
     }
+    dialog-body[|no-padding] dialog-body-overflow-box {
+      padding-right: 0;
+    }
     dialog-body[|no-overflow] dialog-body-content {
-      padding-bottom: 0;
+      overflow: auto;
     }
     dialog-body-overflow {
-      position: absolute;
-      flex-shrink: 0;
+      position: sticky;
       bottom: 0;
+      flex-shrink: 0;
       width: 100%;
       height: 24px;
       pointer-events: none;

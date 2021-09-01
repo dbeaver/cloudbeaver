@@ -22,10 +22,6 @@ import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 
 const styles = css`
-  CommonDialogWrapper {
-    min-height: 400px;
-    min-width: 650px;
-  }
   wrapper {
     display: flex;
     align-items: center;
@@ -94,6 +90,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
 
   return styled(styles)(
     <CommonDialogWrapper
+      size='large'
       title={translate('data_viewer_script_preview_dialog_title')}
       icon='sql-script'
       footer={(

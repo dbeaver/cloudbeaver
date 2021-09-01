@@ -54,6 +54,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
+        size='large'
         title={translate('core_eventsLog_dbeaverErrorDetails')}
         icon='/icons/error_icon.svg'
         footer={(

@@ -34,10 +34,6 @@ const styles = composes(
     }
   `,
   css`
-    CommonDialogWrapper {
-      min-height: 400px;
-      min-width: 500px;
-    }
     SubmittingForm {
       overflow: auto;
       margin: auto;
@@ -79,6 +75,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
+      size='large'
       title={translate('connections_database_authentication')}
       subTitle={connection.connectionInfo?.name}
       icon={driver?.icon}

@@ -21,15 +21,20 @@ export const dialogStyles = css`
       left: 0px;
       z-index: 999;
       display: flex;
+      overflow: auto;
+    }
+
+    inner-box {
+      display: flex;
+      margin: auto;
+      padding: 24px;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
     Dialog {
       box-sizing: border-box;
       display: flex;
-      max-height: calc(100vh);
-      z-index: 999;
       outline: none;
     }
   `;

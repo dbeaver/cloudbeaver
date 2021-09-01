@@ -15,10 +15,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
-  CommonDialogWrapper {
-    width: 400px;
-    min-width: auto;
-  }
   controls {
     display: flex;
     flex: 1;
@@ -39,6 +35,7 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
+      size='small'
       title={translate('app_root_session_expire_warning_title')}
       footer={(
         <controls>
@@ -51,6 +48,7 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
           </Button>
         </controls>
       )}
+      fixedSize
       noOverflow
       onReject={rejectDialog}
     >

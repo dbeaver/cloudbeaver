@@ -19,10 +19,6 @@ import { useDBDriver } from '../useDBDriver';
 import { ConnectionAuthenticationForm } from './ConnectionAuthenticationForm';
 
 const styles = css`
-  CommonDialogWrapper {
-    min-height: 400px;
-    min-width: 500px;
-  }
   SubmittingForm {
     overflow: auto;
     margin: auto;
@@ -56,6 +52,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
+      size='large'
       title={translate('connections_connection_credentials_provisioning')}
       subTitle={translate('connections_connection_credentials_provisioning_description')}
       icon={driver?.icon}
