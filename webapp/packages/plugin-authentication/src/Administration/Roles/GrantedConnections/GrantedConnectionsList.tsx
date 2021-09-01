@@ -27,9 +27,8 @@ import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { IFilterState } from '../GrantedUsers/GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { getFilteredConnections } from './getFilteredConnections';
-import { GrantedConnectionsTableHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
+import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
