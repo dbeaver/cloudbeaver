@@ -141,7 +141,7 @@ export class DataGridContextMenuCellEditingService {
       {
         id: 'row_revert',
         order: 7,
-        icon: '/icons/data_revert.svg',
+        icon: '/icons/data_revert_sm.svg',
         title: 'data_grid_table_editing_row_revert',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
