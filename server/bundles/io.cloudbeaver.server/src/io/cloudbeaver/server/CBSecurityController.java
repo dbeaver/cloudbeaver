@@ -496,9 +496,7 @@ class CBSecurityController implements DBWSecurityController {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "DELETE FROM CB_ROLE WHERE ROLE_ID=?")) {
                     dbStat.setString(1, roleId);
-                    if (dbStat.executeUpdate() <= 0) {
-                        throw new DBCException("Role '" + roleId + "' doesn't exist");
-                    }
+                    dbStat.execute();
                 }
                 txn.commit();
             }
