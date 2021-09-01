@@ -26,7 +26,7 @@ export const RolesDrawerItem: React.FC<AdministrationItemDrawerProps> = function
       title='administration_roles_tab_title'
       onOpen={() => onSelect(item.name)}
     >
-      <TabIcon icon='/icons/account.svg' />
+      <TabIcon icon='/icons/tab_role.svg' />
       <TabTitle><Translate token='administration_roles_tab_title' /></TabTitle>
     </Tab>
   );
