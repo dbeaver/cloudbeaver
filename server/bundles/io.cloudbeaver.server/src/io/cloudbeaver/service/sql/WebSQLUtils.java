@@ -47,6 +47,12 @@ public class WebSQLUtils {
     private static final Log log = Log.getLog(WebSQLUtils.class);
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
+        if (type instanceof DBDAttributeBinding &&
+            (cellValue instanceof Date || cellValue instanceof Number))
+        {
+            return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
+        }
+
         if (cellValue instanceof Date) {
             return CBConstants.ISO_DATE_FORMAT.format(cellValue);
         } else if (cellValue instanceof Number) {
