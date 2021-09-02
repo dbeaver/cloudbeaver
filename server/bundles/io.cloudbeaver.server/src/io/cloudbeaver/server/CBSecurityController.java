@@ -434,6 +434,26 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @NotNull
+    @Override
+    public String[] getRoleSubjects(String roleId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT USER_ID FROM CB_USER_ROLE WHERE ROLE_ID")) {
+                dbStat.setString(1, roleId);
+                List<String> subjects = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        subjects.add(dbResult.getString(1));
+                    }
+                }
+                return subjects.toArray(new String[0]);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while reading role subjects", e);
+        }
+    }
+
+    @NotNull
     private WebRole fetchRole(ResultSet dbResult) throws SQLException {
         WebRole role = new WebRole(dbResult.getString("ROLE_ID"));
         role.setName(dbResult.getString("ROLE_NAME"));
