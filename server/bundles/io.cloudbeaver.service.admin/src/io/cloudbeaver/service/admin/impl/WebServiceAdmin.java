@@ -85,9 +85,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<AdminRoleInfo> listRoles(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
             List<AdminRoleInfo> roles = new ArrayList<>();
-            WebRole role = CBPlatform.getInstance().getApplication().getSecurityController().findRole(roleId);
-            if (role != null) {
-                roles.add(new AdminRoleInfo(role));
+            if (CommonUtils.isEmpty(roleId)) {
+                for (WebRole role : CBPlatform.getInstance().getApplication().getSecurityController().readAllRoles()) {
+                    roles.add(new AdminRoleInfo(role));
+                }
+            } else {
+                WebRole role = CBPlatform.getInstance().getApplication().getSecurityController().findRole(roleId);
+                if (role != null) {
+                    roles.add(new AdminRoleInfo(role));
+                }
             }
             return roles;
         } catch (Exception e) {
