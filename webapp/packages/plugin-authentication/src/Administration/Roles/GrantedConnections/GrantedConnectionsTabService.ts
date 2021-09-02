@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { RolesResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -24,6 +25,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
 
   constructor(
     private readonly roleFormService: RoleFormService,
+    private readonly rolesResource: RolesResource,
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService
   ) {
@@ -73,9 +75,16 @@ export class GrantedConnectionsTabService extends Bootstrap {
       { state: data.state }
     );
 
-    const changed = !isArraysEqual(state.initialGrantedSubjects, state.grantedSubjects);
+    if (!config.roleId || !state.loaded) {
+      return;
+    }
 
-    if (!config.roleId || !state.loaded || !changed) {
+    const grantInfo = await this.rolesResource.getSubjectConnectionAccess(config.roleId);
+    const initial = grantInfo.map(info => info.connectionId);
+
+    const changed = !isArraysEqual(initial, state.grantedSubjects);
+
+    if (!changed) {
       return;
     }
 
@@ -84,10 +93,10 @@ export class GrantedConnectionsTabService extends Bootstrap {
         subjectId: config.roleId,
         connections: state.grantedSubjects,
       });
+
+      state.loaded = false;
     } catch (exception) {
       this.notificationService.logException(exception);
     }
-
-    state.initialGrantedSubjects = state.grantedSubjects.slice();
   }
 }

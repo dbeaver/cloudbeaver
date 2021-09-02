@@ -49,7 +49,7 @@ export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): IConnection
 
       if (mode === 'edit') {
         const grantedUsers = await resource.loadGrantedUsers(role.roleId);
-        state.grantedUsers.push(...grantedUsers);
+        state.grantedUsers = grantedUsers;
 
         state.initialGrantedUsers = state.grantedUsers.slice();
       }

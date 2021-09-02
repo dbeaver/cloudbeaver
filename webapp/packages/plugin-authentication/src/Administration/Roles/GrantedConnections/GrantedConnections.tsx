@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -65,7 +65,7 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
 
   const { state, edit, grant, load, revoke } = useGrantedConnections(formState.config, formState.mode);
 
-  const { selected } = useTab(tabId, load);
+  const { selected } = useTab(tabId);
 
   const dbDriverResource = useMapResource(DBDriverResource, selected ? 'all' : null);
   const connections = useMapResource(ConnectionsResource, selected ? ConnectionsResource.keyAll : null);
@@ -73,6 +73,12 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   const grantedConnections = useMemo(() => computed(() => connections.resource.values
     .filter(connection => state.grantedSubjects.includes(connection.id))
   ), [state.grantedSubjects, connections.resource]);
+
+  useEffect(() => {
+    if (selected && !state.loaded) {
+      load();
+    }
+  }, [selected, state.loaded, load]);
 
   if (!selected) {
     return null;

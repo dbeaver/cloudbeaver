@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
@@ -65,13 +65,19 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
 
   const { state, edit, grant, load, revoke } = useGrantedUsers(formState.config, formState.mode);
 
-  const users = useMapResource(UsersResource, UsersResource.keyAll);
+  const { selected } = useTab(tabId);
+
+  const users = useMapResource(UsersResource, selected ? UsersResource.keyAll : null);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.grantedUsers.includes(user.userId))
   ), [state.grantedUsers, users.resource]);
 
-  const { selected } = useTab(tabId, load);
+  useEffect(() => {
+    if (selected && !state.loaded) {
+      load();
+    }
+  }, [selected, state.loaded, load]);
 
   if (!selected) {
     return null;

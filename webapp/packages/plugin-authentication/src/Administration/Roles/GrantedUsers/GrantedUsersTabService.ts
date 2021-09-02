@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -25,6 +25,7 @@ export class GrantedUsersTabService extends Bootstrap {
   constructor(
     private readonly roleFormService: RoleFormService,
     private readonly usersResource: UsersResource,
+    private readonly rolesResource: RolesResource,
     private readonly notificationService: NotificationService
   ) {
     super();
@@ -73,16 +74,22 @@ export class GrantedUsersTabService extends Bootstrap {
       { state: data.state }
     );
 
-    const changed = !isArraysEqual(state.initialGrantedUsers, state.grantedUsers);
+    if (!config.roleId || !state.loaded) {
+      return;
+    }
 
-    if (!config.roleId || !state.loaded || !changed) {
+    const initial = await this.rolesResource.loadGrantedUsers(config.roleId);
+
+    const changed = !isArraysEqual(initial, state.grantedUsers);
+
+    if (!changed) {
       return;
     }
 
     const granted: string[] = [];
     const revoked: string[] = [];
 
-    const revokedUsers = state.initialGrantedUsers.filter(user => !state.grantedUsers.includes(user));
+    const revokedUsers = initial.filter(user => !state.grantedUsers.includes(user));
 
     try {
       for (const user of revokedUsers) {
@@ -91,11 +98,13 @@ export class GrantedUsersTabService extends Bootstrap {
       }
 
       for (const user of state.grantedUsers) {
-        if (!state.initialGrantedUsers.includes(user)) {
+        if (!initial.includes(user)) {
           await this.usersResource.grantRole(user, config.roleId);
           granted.push(user);
         }
       }
+
+      state.loaded = false;
     } catch (exception) {
       this.notificationService.logException(exception);
     }
@@ -106,10 +115,6 @@ export class GrantedUsersTabService extends Bootstrap {
 
     if (revoked.length) {
       status.info(`Revoked users: "${revoked.join(', ')}"`);
-    }
-
-    if (granted.length || revoked.length) {
-      state.initialGrantedUsers = state.grantedUsers.slice();
     }
   }
 }
