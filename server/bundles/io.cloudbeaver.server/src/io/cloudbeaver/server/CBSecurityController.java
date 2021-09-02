@@ -429,8 +429,10 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
-    public WebRole[] findRoles(String roleName) throws DBCException {
-        return readAllRoles();
+    public WebRole findRole(String roleId) throws DBCException {
+        return Arrays.stream(readAllRoles())
+            .filter(r -> r.getRoleId().equals(roleId))
+            .findFirst().orElse(null);
     }
 
     @NotNull
