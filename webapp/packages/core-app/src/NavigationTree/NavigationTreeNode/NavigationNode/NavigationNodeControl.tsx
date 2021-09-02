@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -75,12 +75,12 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
 }) {
   const context = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const outdated = navNodeInfoResource.isOutdated(node.id) && !context?.loading;
+  const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !context.loading);
 
   const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    context?.select(event.ctrlKey || event.metaKey);
+    context.select(event.ctrlKey || event.metaKey);
   }, [context]);
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
@@ -91,7 +91,7 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
       </TreeNodeIcon>
       <TreeNodeName>{node.name}</TreeNodeName>
       <portal>
-        <TreeNodeMenu node={node} selected={context?.selected} />
+        <TreeNodeMenu node={node} selected={context.selected} />
       </portal>
     </TreeNodeControl>
   );

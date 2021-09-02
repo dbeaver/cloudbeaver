@@ -6,36 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
 import { CellContext } from '../../CellRenderer/CellContext';
-import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
 
 export const TextFormatter = observer<FormatterProps>(function TextFormatter({ row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
-  const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
 
-  if (!context || !tableDataContext || !editingContext || !cellContext?.cell) {
+  if (!cellContext.cell) {
     throw new Error('Contexts required');
   }
 
   const formatter = tableDataContext.format;
-  const rawValue = useMemo(
-    () => computed(() => formatter.get(tableDataContext.getCellValue(cellContext!.cell!)!)),
-    [tableDataContext, cellContext.cell, formatter]
-  ).get();
+  const rawValue = getComputed(() => formatter.get(tableDataContext.getCellValue(cellContext.cell!)!));
 
   let classes = 'text-formatter';
   if (rawValue === null) {

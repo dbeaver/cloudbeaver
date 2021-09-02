@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 import { css } from 'reshadow';
 
-import { Icon, Loader } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, Loader } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { useStateDelay } from '../../useStateDelay';
@@ -39,10 +39,6 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
 }) {
   const context = useContext(TreeNodeContext);
 
-  if (!context) {
-    throw new Error('Context not provided');
-  }
-
   const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
@@ -55,7 +51,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     EventContext.set(event, EventTreeNodeExpandFlag);
   };
 
-  const loading = useStateDelay(context.loading || context.processing, 300);
+  const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
 
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>

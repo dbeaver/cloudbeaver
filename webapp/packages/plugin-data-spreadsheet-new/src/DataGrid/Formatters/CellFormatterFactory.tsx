@@ -13,7 +13,6 @@ import type { FormatterProps } from 'react-data-grid';
 import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext';
-import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
 import { TextFormatter } from './CellFormatters/TextFormatter';
@@ -24,14 +23,13 @@ interface IProps extends FormatterProps<IResultSetRowKey> {
 
 export const CellFormatterFactory = observer<IProps>(function CellFormatterFactory(props) {
   const formatterRef = useRef<React.FC<FormatterProps<IResultSetRowKey>> | null>(null);
-  const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
 
   if (!props.isEditing || formatterRef.current === null) {
     formatterRef.current = TextFormatter;
 
-    if (tableDataContext && context && cellContext?.cell) {
+    if (cellContext.cell) {
       const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
       const value = tableDataContext.getCellValue(cellContext.cell);
 

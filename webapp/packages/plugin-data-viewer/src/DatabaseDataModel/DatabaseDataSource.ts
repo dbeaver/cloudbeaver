@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, action } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -76,6 +76,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       activeRequest: observable.ref,
       activeSave: observable.ref,
       activeTask: observable.ref,
+      setSupportedDataFormats: action,
     });
   }
 
