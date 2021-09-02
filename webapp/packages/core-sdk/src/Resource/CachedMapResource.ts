@@ -17,24 +17,25 @@ import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from 
 
 export type CachedMapResourceKey<
   TResource extends CachedMapResource<any, any, any>
-> = TResource extends CachedMapResource<infer T, any, any> ? T : never;
+> = TResource extends CachedResource<Map<infer T, any>, any, any, any> ? T : never;
 
-export type CachedMapResourceValue<
-  TResource extends CachedMapResource<any, any, any>
-> = TResource extends CachedMapResource<any, infer T, any> ? T : never;
+export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any>
+  ? T
+  : never;
 
 export type CachedMapResourceArguments<
   TResource extends CachedMapResource<any, any, any>
 > = TResource extends CachedMapResource<any, any, infer T> ? T : never;
 
-export type CachedMapResourceGetter<
-  TRealKey extends ResourceKey<TKey>,
-  TKey,
+export type CachedMapResourceListGetter<
   TValue,
   TIncludes
-> = TRealKey extends ResourceKeyList<TKey>
-  ? Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>
-  : CachedResourceValueIncludes<TValue, TIncludes> | undefined;
+> = Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>;
+
+export type CachedMapResourceGetter<
+  TValue,
+  TIncludes
+> = CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
 export type CachedMapResourceLoader<
   TRealKey extends ResourceKey<TKey>,

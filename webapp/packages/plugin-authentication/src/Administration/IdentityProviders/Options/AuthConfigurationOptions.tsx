@@ -42,9 +42,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
   const parameters = useMapResource(AuthConfigurationParametersResource, state.config.providerId || null);
 
-  const { categories, isUncategorizedExists } = useObjectPropertyCategories(
-    (parameters.data as AuthProviderConfigurationParametersFragment[] | undefined) ?? emptyArray
-  );
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);
 
   const identityProviders = providers.resource.values.filter(provider => provider.configurable);
   const edit = state.mode === 'edit';
@@ -124,7 +122,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
                 <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
                 <ObjectPropertyInfoFormNew
                   state={state.config.parameters}
-                  properties={parameters.data as AuthProviderConfigurationParametersFragment[]}
+                  properties={parameters.data}
                   category={null}
                   disabled={state.disabled}
                   readOnly={state.readonly}
@@ -136,7 +134,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
                 <GroupTitle>{category}</GroupTitle>
                 <ObjectPropertyInfoFormNew
                   state={state.config.parameters}
-                  properties={parameters.data as AuthProviderConfigurationParametersFragment[]}
+                  properties={parameters.data!}
                   category={category}
                   disabled={state.disabled}
                   readOnly={state.readonly}
