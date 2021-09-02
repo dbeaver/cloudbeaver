@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
-import { StaticImage } from '@cloudbeaver/core-blocks';
+import { getComputed, StaticImage } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { DataGridContext } from '../DataGridContext';
@@ -66,15 +66,11 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   const tableDataContext = useContext(TableDataContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
 
-  if (!tableDataContext || !dataGridContext || !gridSelectionContext) {
-    throw new Error('One of the following contexts are missed(data grid context, grid selection context, table data context)');
-  }
-
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
   let icon = calculatedColumn.icon;
   let columnName = calculatedColumn.name as string;
-  const dataReadonly = tableDataContext.isReadOnly() || model.isReadonly();
+  const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
   let columnReadOnly = !calculatedColumn.editable;
   let columnTooltip: string = columnName;
 

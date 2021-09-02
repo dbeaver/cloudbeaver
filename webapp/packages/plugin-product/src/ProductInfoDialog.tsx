@@ -18,9 +18,6 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 
 const productInfoDialogStyles = css`
-    CommonDialogWrapper {
-      min-width: 600px;
-    }
     controls {
       display: flex;
       flex: 1;
@@ -56,6 +53,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(
 
     return styled(styles)(
       <CommonDialogWrapper
+        size='large'
         title={translate('app_product_info')}
         footer={(
           <controls as='div'>

@@ -51,4 +51,4 @@ export interface ITableData {
   isReadOnly: () => boolean;
 }
 
-export const TableDataContext = createContext<ITableData | null>(null);
+export const TableDataContext = createContext<ITableData>(undefined as any);

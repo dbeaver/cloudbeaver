@@ -29,9 +29,6 @@ const styles = composes(
     }
 `,
   css`
-    CommonDialogWrapper {
-      min-width: 500px;
-    }
     ErrorMessage {
       flex: 1;
     }
@@ -93,6 +90,7 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
 
     return styled(style)(
       <CommonDialogWrapper
+        size='medium'
         title={translate('authentication_user_password_change_dialog_title')}
         footer={(
           <ChangeUserPasswordDialogFooter

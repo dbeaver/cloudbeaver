@@ -40,6 +40,13 @@ function sortManageable(connectionInfoResource: ConnectionInfoResource): (nodeA:
     const connectionA = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(nodeA.id));
     const connectionB = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(nodeB.id));
 
+    if (!connectionA || !connectionB) {
+      if (connectionA === connectionB) {
+        return 0;
+      }
+      return connectionA ? 1 : -1;
+    }
+
     const nodeAManageable = connectionA?.features.includes(EConnectionFeature.manageable);
     const nodeBManageable = connectionB?.features.includes(EConnectionFeature.manageable);
 
@@ -71,7 +78,7 @@ export function navigationTreeConnectionGroupFilter(
 
     for (const node of nodes) {
       const connection = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(node.id));
-      const manageable = connection?.features.includes(EConnectionFeature.manageable);
+      const manageable = !!connection?.features.includes(EConnectionFeature.manageable);
 
       let nextGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unsorted;
 

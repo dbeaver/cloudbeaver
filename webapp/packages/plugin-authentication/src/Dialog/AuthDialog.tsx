@@ -33,11 +33,6 @@ const styles = composes(
     }
 `,
   css`
-    CommonDialogWrapper {
-      min-height: 400px;
-      min-width: 500px;
-      max-width: min-content;
-    }
     SubmittingForm {
       overflow: auto;
       &[|form] {
@@ -119,6 +114,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
+        size='large'
         title={dialogTitle}
         icon={controller.provider?.icon}
         subTitle={subTitle}
@@ -136,6 +132,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
             )}
           </AuthDialogFooter>
         )}
+        noBodyPadding
         onReject={options?.persistent ? undefined : rejectDialog}
       >
         {showTabs && (

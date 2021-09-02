@@ -25,8 +25,9 @@ export const styles = css`
     margin-left: 24px;
   }
   textarea {
-    width: 100% !important;
+    width: 100%;
     min-height: 270px;
+    resize: vertical;
   }
   message {
     overflow: auto;

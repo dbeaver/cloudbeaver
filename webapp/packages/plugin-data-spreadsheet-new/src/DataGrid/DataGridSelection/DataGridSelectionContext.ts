@@ -26,4 +26,4 @@ export interface IDataGridSelectionContext {
   ) => void;
 }
 
-export const DataGridSelectionContext = createContext<IDataGridSelectionContext | null>(null);
+export const DataGridSelectionContext = createContext<IDataGridSelectionContext>(undefined as any);

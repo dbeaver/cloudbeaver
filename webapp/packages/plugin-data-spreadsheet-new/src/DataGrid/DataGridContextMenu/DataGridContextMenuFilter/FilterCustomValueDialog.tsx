@@ -17,9 +17,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
 const styles = css`
-  CommonDialogWrapper {
-    min-width: 400px;
-  }
   controls {
     display: flex;
     flex: 1;
@@ -67,6 +64,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
 
     return styled(styles)(
       <CommonDialogWrapper
+        size='small'
         title={translate('data_grid_table_context_menu_filter_dialog_title')}
         footer={(
           <controls as="div">

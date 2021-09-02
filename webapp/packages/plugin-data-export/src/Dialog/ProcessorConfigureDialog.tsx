@@ -27,10 +27,6 @@ const styles = composes(
     }
   `,
   css`
-    CommonDialogWrapper {
-      max-height: 500px;
-      min-height: 500px;
-    }
     PropertiesTable {
       flex: 1;
       overflow: hidden;
@@ -74,6 +70,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
+      size='large'
       title={title}
       footer={(
         <ProcessorConfigureDialogFooter
@@ -83,6 +80,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           onCancel={onClose}
         />
       )}
+      fixedSize
       noOverflow
       noBodyPadding
       onReject={onClose}

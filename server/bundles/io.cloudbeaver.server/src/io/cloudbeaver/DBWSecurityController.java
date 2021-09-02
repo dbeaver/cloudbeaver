@@ -83,6 +83,9 @@ public interface DBWSecurityController {
 
     WebRole[] findRoles(String roleName) throws DBCException;
 
+    @NotNull
+    String[] getRoleSubjects(String roleId) throws DBCException;
+
     void createRole(WebRole role) throws DBCException;
 
     void updateRole(WebRole role) throws DBCException;

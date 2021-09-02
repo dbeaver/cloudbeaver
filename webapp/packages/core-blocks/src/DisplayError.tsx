@@ -9,7 +9,8 @@
 import type React from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ENotificationType } from '../../core-events/src';
+import { ENotificationType } from '@cloudbeaver/core-events';
+
 import { NotificationMark } from './Snackbars/NotificationMark';
 
 const style = css`
@@ -17,7 +18,6 @@ const style = css`
     width: 100%;
     height: 100%;
     display: flex;
-    justify-content: center;
     overflow: auto;
 
     &[|root] {

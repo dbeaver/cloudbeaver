@@ -30,10 +30,12 @@ module.exports = {
         modules: false,
         targets: {
           browsers: [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 edge version",
-            "last 1 safari version"
+            "defaults",
+            "not IE 11",
+            // "last 1 chrome version",
+            // "last 1 firefox version",
+            // "last 1 edge version",
+            // "last 1 safari version"
           ]
         },
         exclude: ["transform-async-to-generator", "transform-regenerator"],

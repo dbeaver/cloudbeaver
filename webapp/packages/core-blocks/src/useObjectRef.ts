@@ -13,6 +13,9 @@ export function useObjectRef<T extends Record<any, any>>(
   update: false,
   bind?: Array<keyof T>
 ): T;
+export function useObjectRef<T extends Record<any, any>>(
+  init: () => T & ThisType<T>
+): T;
 export function useObjectRef<T extends Record<any, any>, U extends Record<any, any>>(
   init: () => (T & ThisType<T & U>),
   update: U & ThisType<T & U>,
@@ -37,7 +40,7 @@ export function useObjectRef<T extends Record<any, any>, U extends Record<any, a
     update = undefined;
   }
 
-  if (update === undefined) {
+  if (update === undefined && arguments.length === 1) {
     update = typeof init === 'function' ? init() : init;
   }
 

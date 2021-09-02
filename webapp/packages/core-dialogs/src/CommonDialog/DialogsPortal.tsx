@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -15,6 +15,7 @@ import {
 } from 'reakit/Dialog';
 import styled from 'reshadow';
 
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -22,87 +23,85 @@ import { CommonDialogService, DialogInternal } from './CommonDialogService';
 import { dialogStyles } from './styles';
 
 export const DialogsPortal = observer(function DialogsPortal() {
+  const styles = useStyles(dialogStyles);
   const commonDialogService = useService(CommonDialogService);
-  const handleReject = useCallback(
-    (dialog: DialogInternal<any>) => commonDialogService.rejectDialog(dialog.promise),
-    [commonDialogService]
-  );
-  const handleResolve = useCallback(
-    (dialog: DialogInternal<any>, result: any) => commonDialogService.resolveDialog(dialog.promise, result),
-    [commonDialogService]
-  );
 
-  return (
-    <>
-      {commonDialogService.dialogs.map((dialog, i, arr) => (
-        <NestedDialog
-          key={i}
-          visible={i === arr.length - 1}
-          dialog={dialog}
-          resolveDialog={handleResolve}
-          rejectDialog={handleReject}
-        />
-      ))}
-    </>
+  let activeDialog: DialogInternal<any> | undefined;
+
+  if (commonDialogService.dialogs.length > 0) {
+    activeDialog = commonDialogService.dialogs[commonDialogService.dialogs.length - 1];
+  }
+
+  const state = useObjectRef(() => ({
+    reject() {
+      if (this.dialog) {
+        commonDialogService.rejectDialog(this.dialog.promise);
+      }
+    },
+    resolve(result: any) {
+      if (this.dialog) {
+        commonDialogService.resolveDialog(this.dialog.promise, result);
+      }
+    },
+    backdropClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+      if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
+        this.reject();
+      }
+    },
+  }), {
+    dialog: activeDialog,
+  }, ['reject', 'resolve', 'backdropClick']);
+
+  return styled(styles)(
+    <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
+      <inner-box>
+        {commonDialogService.dialogs.map((dialog, i, arr) => (
+          <NestedDialog
+            key={i}
+            visible={i === arr.length - 1}
+            dialog={dialog}
+            resolveDialog={state.resolve}
+            rejectDialog={state.reject}
+          />
+        ))}
+      </inner-box>
+    </DialogBackdrop>
   );
 });
 
 interface NestedDialogType {
   dialog: DialogInternal<any>;
-  resolveDialog: (dialog: DialogInternal<any>, result: any) => void;
-  rejectDialog: (dialog: DialogInternal<any>) => void;
+  resolveDialog: (result: any) => void;
+  rejectDialog: () => void;
   visible: boolean;
 }
 
-function NestedDialog({
+const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({
   dialog,
   resolveDialog,
   rejectDialog,
   visible,
-}: NestedDialogType) {
-  const lastVisibility = useRef(visible);
-  const dialogState = useDialogState({ visible });
+}) {
+  const dialogState = useDialogState({ visible: true });
   const styles = useStyles(dialogStyles);
 
   useEffect(() => {
-    if (!dialogState.visible
-    && dialogState.visible !== lastVisibility.current
-    && !dialog.options?.persistent
-    ) {
-      rejectDialog(dialog);
-    } else {
-      lastVisibility.current = visible;
-      dialogState.setVisible(visible);
+    if (!dialogState.visible && !dialog.options?.persistent) {
+      rejectDialog();
     }
   });
 
-  const handleReject = useCallback(() => rejectDialog(dialog), [dialog, rejectDialog]);
-  const handleResolve = useCallback(
-    (result: any) => resolveDialog(dialog, result),
-    [dialog, resolveDialog]
-  );
-
   const DialogComponent = dialog.component;
-
-  const backdropClickHandler = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!dialog.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
-      rejectDialog(dialog);
-    }
-  };
 
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
-    <>
-      <DialogBackdrop {...dialogState} onMouseDown={backdropClickHandler}>
-        <Dialog {...dialogState} hideOnClickOutside={false}>
-          <DialogComponent
-            payload={dialog.payload}
-            options={dialog.options}
-            resolveDialog={handleResolve}
-            rejectDialog={handleReject}
-          />
-        </Dialog>
-      </DialogBackdrop>
-    </>
+    <Dialog {...dialogState} visible={visible} hideOnClickOutside={false} modal={false}>
+      <DialogComponent
+        payload={dialog.payload}
+        options={dialog.options}
+        resolveDialog={resolveDialog}
+        rejectDialog={rejectDialog}
+      />
+    </Dialog>
   );
-}
+};

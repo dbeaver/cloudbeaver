@@ -36,6 +36,9 @@ type AdminRoleInfo {
     roleName: String
     description: String
 
+    grantedUsers: [ID!]!
+    grantedConnections: [AdminConnectionGrantInfo!]!
+
     rolePermissions: [ID]!
 }
 

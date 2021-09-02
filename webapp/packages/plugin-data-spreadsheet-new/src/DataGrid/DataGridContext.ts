@@ -27,4 +27,4 @@ export interface IDataGridContext {
   getDataGridApi: () => DataGridHandle | null;
 }
 
-export const DataGridContext = createContext<IDataGridContext | null>(null);
+export const DataGridContext = createContext<IDataGridContext>(undefined as any);

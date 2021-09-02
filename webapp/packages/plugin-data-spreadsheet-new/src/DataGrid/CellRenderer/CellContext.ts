@@ -22,4 +22,4 @@ export interface ICellContext {
   editionState: DatabaseEditChangeType | null;
 }
 
-export const CellContext = createContext<ICellContext | null>(null);
+export const CellContext = createContext<ICellContext>(undefined as any);

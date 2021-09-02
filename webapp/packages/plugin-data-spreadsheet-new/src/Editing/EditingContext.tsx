@@ -22,4 +22,4 @@ export interface CellPosition {
   rowIdx: number;
 }
 
-export const EditingContext = createContext<IEditingContext | null>(null);
+export const EditingContext = createContext<IEditingContext>(undefined as any);

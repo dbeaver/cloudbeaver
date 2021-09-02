@@ -133,6 +133,7 @@ export * from './Cell';
 export * from './ErrorMessage';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
+export * from './getComputed';
 export * from './IconButton';
 export * from './IconOrImage';
 export * from './StaticImage';

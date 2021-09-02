@@ -19,10 +19,6 @@ import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
 
 const styles = css`
-  CommonDialogWrapper {
-    max-height: 500px;
-    min-height: 500px;
-  }
   ExportProcessorList {
     flex: 1;
   }
@@ -61,7 +57,9 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
 
   return styled(styles)(
     <CommonDialogWrapper
+      size='large'
       title={translate('data_transfer_dialog_title')}
+      fixedSize
       noBodyPadding
       noOverflow
       onReject={onClose}

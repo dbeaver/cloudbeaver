@@ -32,10 +32,6 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
 }) {
   const context = useContext(TreeNodeContext);
 
-  if (!context) {
-    throw new Error('Context not provided');
-  }
-
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
       return;
@@ -44,7 +40,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
     EventContext.set(event, EventTreeNodeSelectFlag);
     switch ((event as unknown as KeyboardEvent).code) {
       case KEY.ENTER:
-        context?.select(event.ctrlKey || event.metaKey);
+        context.select(event.ctrlKey || event.metaKey);
         break;
     }
     return true;

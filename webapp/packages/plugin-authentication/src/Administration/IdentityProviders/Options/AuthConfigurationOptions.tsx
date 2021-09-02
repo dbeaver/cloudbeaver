@@ -13,7 +13,8 @@ import styled, { css } from 'reshadow';
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, FieldCheckboxNew, Group, GroupTitle,
-  InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent, TextareaNew, useMapResource
+  InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent,
+  TextareaNew, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfigurationParametersFragment } from '@cloudbeaver/core-sdk';
@@ -28,6 +29,8 @@ const styles = css`
   }
 `;
 
+const emptyArray: AuthProviderConfigurationParametersFragment[] = [];
+
 export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationOptions({
   state,
 }) {
@@ -38,6 +41,10 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
 
   const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
   const parameters = useMapResource(AuthConfigurationParametersResource, state.config.providerId || null);
+
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(
+    (parameters.data as AuthProviderConfigurationParametersFragment[] | undefined) ?? emptyArray
+  );
 
   const identityProviders = providers.resource.values.filter(provider => provider.configurable);
   const edit = state.mode === 'edit';
@@ -111,15 +118,32 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           </FieldCheckboxNew>
         </Group>
         {parameters.isLoaded() && parameters.data && (
-          <Group small gap vertical>
-            <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
-            <ObjectPropertyInfoFormNew
-              state={state.config.parameters}
-              properties={parameters.data as AuthProviderConfigurationParametersFragment[]}
-              disabled={state.disabled}
-              readOnly={state.readonly}
-            />
-          </Group>
+          <>
+            {isUncategorizedExists && (
+              <Group small gap vertical>
+                <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
+                <ObjectPropertyInfoFormNew
+                  state={state.config.parameters}
+                  properties={parameters.data as AuthProviderConfigurationParametersFragment[]}
+                  category={null}
+                  disabled={state.disabled}
+                  readOnly={state.readonly}
+                />
+              </Group>
+            )}
+            {categories.map(category => (
+              <Group key={category} small gap vertical>
+                <GroupTitle>{category}</GroupTitle>
+                <ObjectPropertyInfoFormNew
+                  state={state.config.parameters}
+                  properties={parameters.data as AuthProviderConfigurationParametersFragment[]}
+                  category={category}
+                  disabled={state.disabled}
+                  readOnly={state.readonly}
+                />
+              </Group>
+            ))}
+          </>
         )}
       </ColoredContainer>
     </SubmittingForm>

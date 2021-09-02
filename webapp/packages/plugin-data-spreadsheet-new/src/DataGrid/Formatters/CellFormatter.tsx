@@ -11,7 +11,7 @@ import { useContext, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 import type { IDataPresentationActions, IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
@@ -44,19 +44,15 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
   const cellContext = useContext(CellContext);
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
-  const isEditing = cellContext?.isEditing ?? false;
-  const showCellMenu = !isEditing && (
+  const isEditing = cellContext.isEditing;
+  const showCellMenu = getComputed(() => !isEditing && (
     rest.isCellSelected
     || cellContext?.mouse.state.mouseEnter
     || menuVisible
-  );
+  ));
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
-      if (!tableDataContext || !editingContext) {
-        return;
-      }
-
       const idx = tableDataContext.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
 
@@ -71,7 +67,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && context && cellContext?.cell && (
+      {showCellMenu && cellContext.cell && (
         <menu-container>
           <CellMenu
             cellKey={cellContext.cell}

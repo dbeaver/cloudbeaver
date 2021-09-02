@@ -21,4 +21,4 @@ export interface ITreeNodeContext {
   open: () => Promise<void>;
 }
 
-export const TreeNodeContext = createContext<ITreeNodeContext | null>(null);
+export const TreeNodeContext = createContext<ITreeNodeContext>(undefined as any);
