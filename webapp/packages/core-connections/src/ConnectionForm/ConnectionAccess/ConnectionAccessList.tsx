@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
+import type { RoleInfo } from '@cloudbeaver/core-authentication';
 import {
   Table,
   TableBody,
@@ -22,7 +23,7 @@ import {
   useObjectRef,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { AdminRoleInfo, AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
+import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
@@ -59,7 +60,7 @@ const styles = composes(
 
 interface Props {
   userList: AdminUserInfoFragment[];
-  roleList: AdminRoleInfo[];
+  roleList: RoleInfo[];
   grantedSubjects: string[];
   onGrant: (subjectIds: string[]) => void;
   disabled: boolean;

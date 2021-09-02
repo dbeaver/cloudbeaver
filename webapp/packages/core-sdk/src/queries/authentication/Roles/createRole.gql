@@ -1,0 +1,5 @@
+query createRole($roleId: ID!, $roleName: String, $description: String ) {
+  role: createRole(roleId: $roleId, roleName: $roleName, description: $description) {
+    ...AdminRoleInfo
+  }
+}

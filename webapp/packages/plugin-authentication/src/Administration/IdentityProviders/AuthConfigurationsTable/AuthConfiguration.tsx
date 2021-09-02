@@ -59,9 +59,9 @@ export const AuthConfiguration = observer<Props>(function AuthConfiguration({ co
       <TableColumnValue centerContent flex expand>
         <StaticImage icon={icon} title={`${configuration.displayName} icon`} />
       </TableColumnValue>
-      <TableColumnValue expand>{configuration.displayName}</TableColumnValue>
+      <TableColumnValue title={configuration.displayName} expand ellipsis>{configuration.displayName}</TableColumnValue>
       <TableColumnValue>{configuration.providerId}</TableColumnValue>
-      <TableColumnValue>{configuration.description || ''}</TableColumnValue>
+      <TableColumnValue title={configuration.description} ellipsis>{configuration.description || ''}</TableColumnValue>
       <TableColumnValue>
         <FieldCheckboxNew checked={configuration.disabled} disabled />
       </TableColumnValue>

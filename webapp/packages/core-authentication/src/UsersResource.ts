@@ -182,6 +182,10 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.loadedKeyMetadata.set(UsersResource.keyAll, false);
   }
 
+  isActiveUser(userId: string): boolean {
+    return this.authInfoService.userInfo?.userId === userId;
+  }
+
   protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, AdminUser>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { users } = await this.graphQLService.sdk.getUsersList({
@@ -204,10 +208,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
 
     return this.data;
-  }
-
-  private isActiveUser(userId: string) {
-    return this.authInfoService.userInfo?.userId === userId;
   }
 
   private getDefaultIncludes(): UserResourceIncludes {

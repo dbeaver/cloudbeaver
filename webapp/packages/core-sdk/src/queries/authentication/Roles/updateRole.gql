@@ -1,0 +1,5 @@
+query updateRole($roleId: ID!, $roleName: String, $description: String ) {
+  role: updateRole(roleId: $roleId, roleName: $roleName, description: $description) {
+    ...AdminRoleInfo
+  }
+}

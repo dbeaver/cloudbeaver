@@ -16,9 +16,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
+import { useConfigurationsTable } from './AuthConfigurationsTable/useConfigurationsTable';
 import { CreateAuthConfiguration } from './CreateAuthConfiguration';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
-import { useConfigurationsTable } from './useConfigurationsTable';
 
 const styles = composes(
   css`

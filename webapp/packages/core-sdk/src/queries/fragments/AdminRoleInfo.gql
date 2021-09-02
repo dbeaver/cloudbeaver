@@ -1,0 +1,5 @@
+fragment AdminRoleInfo on AdminRoleInfo {
+  roleId
+  roleName
+  description
+}

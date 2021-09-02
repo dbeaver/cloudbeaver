@@ -61,4 +61,28 @@ export default [
   ['administration_identity_providers_provider_create_error', 'Ошибка при создании конфигурации'],
   ['administration_identity_providers_configuration_list_update_success', 'Список конфигураций успешно обновлен'],
   ['administration_identity_providers_configuration_list_update_fail', 'Не удалось обновить список конфигураций'],
+
+  ['administration_roles_tab_title', 'Роли'],
+  ['administration_roles_tab_description', 'Управление ролями'],
+  ['administration_roles_role_creation', 'Создание роли'],
+  ['administration_roles_role_id', 'ID Роли'],
+  ['administration_roles_role_name', 'Название роли'],
+  ['administration_roles_role_description', 'Описание'],
+  ['administration_roles_role_create_error', 'Не удалось создать роль'],
+  ['administration_roles_role_save_error', 'Не удалось обновить роль'],
+  ['administration_roles_role_list_update_success', 'Список ролей обновлен'],
+  ['administration_roles_role_list_update_fail', 'Не удалось обновить список ролей'],
+  ['administration_roles_add_tooltip', 'Создать новую роль'],
+  ['administration_roles_refresh_tooltip', 'Обновить список ролей'],
+  ['administration_roles_delete_tooltip', 'Уадлить выбранные роли'],
+
+  ['administration_roles_role_granted_users_tab_title', 'Связанные пользователи'],
+  ['administration_roles_role_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
+  ['administration_roles_role_granted_users_user_id', 'ID пользователя'],
+  ['administration_roles_role_granted_users_user_name', 'Имя пользователя'],
+  ['administration_roles_role_granted_users_empty', 'Нет доступных пользователей'],
+
+  ['administration_roles_role_granted_connections_tab_title', 'Связанные подключения'],
+  ['administration_roles_role_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
+  ['administration_roles_role_granted_connections_empty', 'Нет доступных подключений'],
 ];
