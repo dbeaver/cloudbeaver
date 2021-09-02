@@ -438,7 +438,7 @@ class CBSecurityController implements DBWSecurityController {
     public String[] getRoleSubjects(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID FROM CB_USER_ROLE WHERE ROLE_ID")) {
+                "SELECT USER_ID FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
                 dbStat.setString(1, roleId);
                 List<String> subjects = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
