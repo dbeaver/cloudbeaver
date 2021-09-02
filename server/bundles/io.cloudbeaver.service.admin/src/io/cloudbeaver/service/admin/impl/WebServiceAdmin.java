@@ -82,15 +82,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public List<AdminRoleInfo> listRoles(@NotNull WebSession webSession, String roleName) throws DBWebException {
+    public List<AdminRoleInfo> listRoles(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
-            List<AdminRoleInfo> webUsers = new ArrayList<>();
-            for (WebRole role : CBPlatform.getInstance().getApplication().getSecurityController().findRoles(roleName)) {
-                webUsers.add(new AdminRoleInfo(role));
+            List<AdminRoleInfo> roles = new ArrayList<>();
+            WebRole role = CBPlatform.getInstance().getApplication().getSecurityController().findRole(roleId);
+            if (role != null) {
+                roles.add(new AdminRoleInfo(role));
             }
-            return webUsers;
+            return roles;
         } catch (Exception e) {
-            throw new DBWebException("Error reading users", e);
+            throw new DBWebException("Error reading roles", e);
         }
     }
 

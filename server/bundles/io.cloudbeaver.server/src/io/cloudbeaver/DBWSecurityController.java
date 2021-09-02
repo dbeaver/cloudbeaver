@@ -81,7 +81,7 @@ public interface DBWSecurityController {
     @NotNull
     WebRole[] readAllRoles() throws DBCException;
 
-    WebRole[] findRoles(String roleName) throws DBCException;
+    WebRole findRole(String roleId) throws DBCException;
 
     @NotNull
     String[] getRoleSubjects(String roleId) throws DBCException;
