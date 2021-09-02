@@ -16,7 +16,7 @@ import {
   IconOrImage, Loader, TabContainerPanelComponent,
   TextPlaceholder, useMapResource, useTab,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionsResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionsResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -65,13 +65,14 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
 
   const { state, edit, grant, load, revoke } = useGrantedConnections(formState.config, formState.mode);
 
-  const connections = useMapResource(ConnectionsResource, ConnectionsResource.keyAll);
+  const { selected } = useTab(tabId, load);
+
+  const dbDriverResource = useMapResource(DBDriverResource, selected ? 'all' : null);
+  const connections = useMapResource(ConnectionsResource, selected ? ConnectionsResource.keyAll : null);
 
   const grantedConnections = useMemo(() => computed(() => connections.resource.values
     .filter(connection => state.grantedSubjects.includes(connection.id))
   ), [state.grantedSubjects, connections.resource]);
-
-  const { selected } = useTab(tabId, load);
 
   if (!selected) {
     return null;
@@ -79,8 +80,8 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
 
   let infoItem: IInfoItem | null = null;
 
-  const unsaved = state.initialGrantedSubjects.length !== state.grantedSubjects.length
-  || state.initialGrantedSubjects.some(subject => !state.grantedSubjects.includes(subject));
+  const unsaved = (formState.mode === 'edit' && (state.initialGrantedSubjects.length !== state.grantedSubjects.length
+    || state.initialGrantedSubjects.some(subject => !state.grantedSubjects.includes(subject))));
   const cloudExists = connections.resource.values.some(isCloudConnection);
 
   if (cloudExists) {
@@ -98,7 +99,7 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   }
 
   return styled(style)(
-    <Loader state={[connections, state]}>
+    <Loader state={[connections, dbDriverResource, state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
           {!connections.resource.values.length ? (

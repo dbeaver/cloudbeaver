@@ -9,7 +9,7 @@
 export interface IGrantedUsersTabState {
   loading: boolean;
   loaded: boolean;
-  grantedUsers: Map<string, boolean>;
-  initialGrantedUsers: Map<string, boolean>;
+  grantedUsers: string[];
+  initialGrantedUsers: string[];
   editing: boolean;
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { RoleInfo, UsersResource } from '@cloudbeaver/core-authentication';
+import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
 import { useObjectRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,7 +23,7 @@ interface IConnectionAccessState {
 }
 
 export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): IConnectionAccessState {
-  const resource = useService(UsersResource);
+  const resource = useService(RolesResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IGrantedUsersTabState>();
 
@@ -32,32 +32,26 @@ export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): IConnection
   };
 
   const revoke = (subjectIds: string[]): void => {
-    for (const subject of subjectIds) {
-      state.grantedUsers.set(subject, false);
-    }
+    state.grantedUsers = state.grantedUsers.filter(subject => !subjectIds.includes(subject));
   };
 
   const grant = (subjectIds: string[]): void => {
-    for (const subject of subjectIds) {
-      state.grantedUsers.set(subject, true);
-    }
+    state.grantedUsers.push(...subjectIds);
   };
 
   const load = async () => {
-    if (state.loaded) {
+    if (state.loaded || state.loading) {
       return;
     }
 
     try {
       state.loading = true;
 
-      if (role) {
-        await resource.loadAll();
-        for (const user of resource.values) {
-          const granted = mode === 'edit' && user.grantedRoles.includes(role.roleId);
-          state.grantedUsers.set(user.userId, granted);
-        }
-        state.initialGrantedUsers = new Map(state.grantedUsers);
+      if (mode === 'edit') {
+        const grantedUsers = await resource.loadGrantedUsers(role.roleId);
+        state.grantedUsers.push(...grantedUsers);
+
+        state.initialGrantedUsers = state.grantedUsers.slice();
       }
 
       state.loaded = true;

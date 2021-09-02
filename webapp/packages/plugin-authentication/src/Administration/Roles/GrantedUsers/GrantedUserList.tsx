@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
@@ -20,7 +20,8 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   Button,
-  useObjectRef
+  useObjectRef,
+  getComputed
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
@@ -80,21 +81,19 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const selectedList = useMemo(() => computed(
-    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
-  ), [selectedSubjects]);
+
+  const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const revoke = useCallback(() => {
-    props.onRevoke(selectedList.get());
+    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
+    props.onRevoke(selectedList);
     selectedSubjects.clear();
   }, []);
 
-  const users = useMemo(() => computed(() => getFilteredUsers(
-    grantedUsers, filterState.filterValue
-  )), [filterState, grantedUsers]);
+  const users = getFilteredUsers(grantedUsers, filterState.filterValue);
 
   let tableInfoText: TLocalizationToken | null = null;
-  if (!users.get().length) {
+  if (!users.length) {
     if (filterState.filterValue) {
       tableInfoText = 'connections_connection_access_filter_no_result';
     } else {
@@ -106,7 +105,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
     <Group box medium overflow>
       <container>
         <GrantedUsersTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['outlined']} onClick={revoke}>{translate('ui_revoke')}</Button>
+          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>{translate('ui_revoke')}</Button>
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
@@ -120,7 +119,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
                   </TableColumnValue>
                 )}
               </TableItem>
-              {users.get().map(user => (
+              {users.map(user => (
                 <GrantedUsersTableItem
                   key={user.userId}
                   id={user.userId}

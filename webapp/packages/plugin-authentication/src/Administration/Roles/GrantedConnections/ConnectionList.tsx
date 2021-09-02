@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -20,6 +20,7 @@ import {
   Group,
   Button,
   useObjectRef,
+  getComputed,
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -80,37 +81,35 @@ export const ConnectionList = observer<Props>(function ConnectionList({
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const selectedList = useMemo(() => computed(
-    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
-  ), [selectedSubjects]);
+
+  const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const grant = useCallback(() => {
-    props.onGrant(selectedList.get());
+    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
+    props.onGrant(selectedList);
     selectedSubjects.clear();
   }, []);
 
-  const connections = useMemo(() => computed(
-    () => getFilteredConnections(connectionList, filterState.filterValue)
-  ), [filterState, connectionList]);
+  const connections = getFilteredConnections(connectionList, filterState.filterValue);
 
   return styled(style)(
     <Group box medium overflow>
       <container>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('ui_grant')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_grant')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
           <Table selectedItems={selectedSubjects}>
             <GrantedConnectionsTableInnerHeader />
             <TableBody>
-              {!connections.get().length && filterState.filterValue && (
+              {!connections.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate('connections_connection_access_filter_no_result')}
                   </TableColumnValue>
                 </TableItem>
               )}
-              {connections.get().map(connection => {
+              {connections.map(connection => {
                 const driver = driversResource.get(connection.driverId);
                 return (
                   <GrantedConnectionsTableItem

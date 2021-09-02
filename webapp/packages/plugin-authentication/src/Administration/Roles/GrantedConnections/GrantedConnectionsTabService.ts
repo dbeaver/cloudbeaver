@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -25,9 +24,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
 
   constructor(
     private readonly roleFormService: RoleFormService,
-    private readonly connectionsResource: ConnectionsResource,
     private readonly graphQLService: GraphQLService,
-    private readonly dbDriverResource: DBDriverResource,
     private readonly notificationService: NotificationService
   ) {
     super();
@@ -40,10 +37,6 @@ export class GrantedConnectionsTabService extends Bootstrap {
       name: 'administration_roles_role_granted_connections_tab_title',
       title: 'administration_roles_role_granted_connections_tab_title',
       order: 3,
-      onOpen: () => {
-        this.connectionsResource.loadAll();
-        this.dbDriverResource.loadAll();
-      },
       stateGetter: context => this.stateGetter(context),
       panel: () => GrantedConnections,
     });
@@ -68,6 +61,11 @@ export class GrantedConnectionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IRoleFormSubmitData>
   ) {
     const config = contexts.getContext(roleContext);
+    const status = contexts.getContext(this.roleFormService.configurationStatusContext);
+
+    if (!status.saved) {
+      return;
+    }
 
     const state = this.roleFormService.tabsContainer.getTabState<IGrantedConnectionsTabState>(
       data.state.partsState,

@@ -52,6 +52,8 @@ export interface AdminRoleInfo {
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  grantedUsers: Array<Scalars['ID']>;
+  grantedConnections: AdminConnectionGrantInfo[];
   rolePermissions: Array<Maybe<Scalars['ID']>>;
 }
 
@@ -1124,6 +1126,12 @@ export type DeleteRoleQueryVariables = Exact<{
 
 export type DeleteRoleQuery = Pick<Query, 'deleteRole'>;
 
+export type GetRoleGrantedUsersQueryVariables = Exact<{
+  roleId: Scalars['ID'];
+}>;
+
+export interface GetRoleGrantedUsersQuery { role: Array<Maybe<Pick<AdminRoleInfo, 'grantedUsers'>>> }
+
 export type GetRolesListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
@@ -2120,6 +2128,13 @@ export const DeleteRoleDocument = `
   deleteRole(roleId: $roleId)
 }
     `;
+export const GetRoleGrantedUsersDocument = `
+    query getRoleGrantedUsers($roleId: ID!) {
+  role: listRoles(roleId: $roleId) {
+    grantedUsers
+  }
+}
+    `;
 export const GetRolesListDocument = `
     query getRolesList($roleId: ID) {
   roles: listRoles(roleId: $roleId) {
@@ -3050,6 +3065,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteRole(variables: DeleteRoleQueryVariables): Promise<DeleteRoleQuery> {
       return withWrapper(() => client.request<DeleteRoleQuery>(DeleteRoleDocument, variables));
+    },
+    getRoleGrantedUsers(variables: GetRoleGrantedUsersQueryVariables): Promise<GetRoleGrantedUsersQuery> {
+      return withWrapper(() => client.request<GetRoleGrantedUsersQuery>(GetRoleGrantedUsersDocument, variables));
     },
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));

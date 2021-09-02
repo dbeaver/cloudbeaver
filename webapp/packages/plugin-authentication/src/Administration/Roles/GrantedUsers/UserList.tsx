@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
@@ -21,6 +21,7 @@ import {
   Group,
   Button,
   useObjectRef,
+  getComputed,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -61,7 +62,7 @@ const styles = composes(
 
 interface Props {
   userList: AdminUserInfoFragment[];
-  grantedUsers: Map<string, boolean>;
+  grantedUsers: string[];
   onGrant: (subjectIds: string[]) => void;
   disabled: boolean;
 }
@@ -80,44 +81,42 @@ export const UserList = observer<Props>(function UserList({
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const selectedList = useMemo(() => computed(
-    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
-  ), [selectedSubjects]);
+
+  const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const grant = useCallback(() => {
-    props.onGrant(selectedList.get());
+    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
+    props.onGrant(selectedList);
     selectedSubjects.clear();
   }, []);
 
-  const users = useMemo(() => computed(() => getFilteredUsers(
-    userList, filterState.filterValue
-  )), [filterState, userList]);
+  const users = getFilteredUsers(userList, filterState.filterValue);
 
   return styled(style)(
     <Group box medium overflow>
       <container>
         <GrantedUsersTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('ui_grant')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_grant')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
           <Table selectedItems={selectedSubjects}>
             <GrantedUsersTableInnerHeader />
             <TableBody>
-              {!users.get().length && filterState.filterValue && (
+              {!users.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate('connections_connection_access_filter_no_result')}
                   </TableColumnValue>
                 </TableItem>
               )}
-              {users.get().map(user => (
+              {users.map(user => (
                 <GrantedUsersTableItem
                   key={user.userId}
                   id={user.userId}
                   name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ' (you)' : ''}`}
                   icon='/icons/user.svg'
                   iconTooltip={translate('connections_connection_access_user_tooltip')}
-                  disabled={disabled || !!grantedUsers.get(user.userId)}
+                  disabled={disabled || !!grantedUsers.includes(user.userId)}
                 />
               ))}
             </TableBody>

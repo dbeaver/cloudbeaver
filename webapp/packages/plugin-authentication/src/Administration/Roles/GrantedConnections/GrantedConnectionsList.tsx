@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -21,6 +21,7 @@ import {
   Button,
   useObjectRef
 } from '@cloudbeaver/core-blocks';
+import { getComputed } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
@@ -80,21 +81,19 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const selectedList = useMemo(() => computed(
-    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
-  ), [selectedSubjects]);
+
+  const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const revoke = useCallback(() => {
-    props.onRevoke(selectedList.get());
+    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
+    props.onRevoke(selectedList);
     selectedSubjects.clear();
   }, []);
 
-  const connections = useMemo(() => computed(() => getFilteredConnections(
-    grantedConnections, filterState.filterValue
-  )), [filterState, grantedConnections]);
+  const connections = getFilteredConnections(grantedConnections, filterState.filterValue);
 
   let tableInfoText: TLocalizationToken | null = null;
-  if (!connections.get().length) {
+  if (!connections.length) {
     if (filterState.filterValue) {
       tableInfoText = 'connections_connection_access_filter_no_result';
     } else {
@@ -106,7 +105,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
     <Group box medium overflow>
       <container>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['outlined']} onClick={revoke}>{translate('ui_revoke')}</Button>
+          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>{translate('ui_revoke')}</Button>
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
@@ -120,7 +119,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
                   </TableColumnValue>
                 )}
               </TableItem>
-              {connections.get().map(connection => {
+              {connections.map(connection => {
                 const driver = driversResource.get(connection.driverId);
                 return (
                   <GrantedConnectionsTableItem

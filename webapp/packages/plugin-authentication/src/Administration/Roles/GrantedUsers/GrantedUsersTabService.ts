@@ -10,7 +10,7 @@ import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { roleContext } from '../Contexts/roleContext';
 import type { IRoleFormProps, IRoleFormSubmitData } from '../IRoleFormProps';
@@ -51,8 +51,8 @@ export class GrantedUsersTabService extends Bootstrap {
       loading: false,
       loaded: false,
       editing: false,
-      grantedUsers: new Map(),
-      initialGrantedUsers: new Map(),
+      grantedUsers: [],
+      initialGrantedUsers: [],
     });
   }
 
@@ -63,52 +63,53 @@ export class GrantedUsersTabService extends Bootstrap {
     const config = contexts.getContext(roleContext);
     const status = contexts.getContext(this.roleFormService.configurationStatusContext);
 
+    if (!status.saved) {
+      return;
+    }
+
     const state = this.roleFormService.tabsContainer.getTabState<IGrantedUsersTabState>(
       data.state.partsState,
       this.key,
       { state: data.state }
     );
 
-    if (!config.roleId || !state.loaded) {
+    const changed = !isArraysEqual(state.initialGrantedUsers, state.grantedUsers);
+
+    if (!config.roleId || !state.loaded || !changed) {
       return;
     }
 
-    const grantedIds: string[] = [];
-    const revokedIds: string[] = [];
+    const granted: string[] = [];
+    const revoked: string[] = [];
 
-    for (const [userId, granted] of state.grantedUsers) {
-      try {
-        const changed = state.initialGrantedUsers.has(userId) && state.initialGrantedUsers.get(userId) !== granted;
-        if (!changed) {
-          continue;
-        }
+    const revokedUsers = state.initialGrantedUsers.filter(user => !state.grantedUsers.includes(user));
 
-        if (granted) {
-          await this.usersResource.grantRole(userId, config.roleId);
-          grantedIds.push(userId);
-        } else {
-          await this.usersResource.revokeRole(userId, config.roleId);
-          revokedIds.push(userId);
-        }
-      } catch (exception) {
-        this.notificationService.logException(
-          exception,
-          `The role "${config.roleId}" wasn't ${granted ? 'granted to' : 'revoked from'} "${userId}"`,
-        );
-        break;
+    try {
+      for (const user of revokedUsers) {
+        await this.usersResource.revokeRole(user, config.roleId);
+        revoked.push(user);
       }
+
+      for (const user of state.grantedUsers) {
+        if (!state.initialGrantedUsers.includes(user)) {
+          await this.usersResource.grantRole(user, config.roleId);
+          granted.push(user);
+        }
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception);
     }
 
-    if (grantedIds.length) {
-      status.info(`Granted users: "${grantedIds.join(', ')}"`);
+    if (granted.length) {
+      status.info(`Granted users: "${granted.join(', ')}"`);
     }
 
-    if (revokedIds.length) {
-      status.info(`Revoked users: "${revokedIds.join(', ')}"`);
+    if (revoked.length) {
+      status.info(`Revoked users: "${revoked.join(', ')}"`);
     }
 
-    if (grantedIds.length || revokedIds.length) {
-      state.initialGrantedUsers = new Map(state.grantedUsers);
+    if (granted.length || revoked.length) {
+      state.initialGrantedUsers = state.grantedUsers.slice();
     }
   }
 }

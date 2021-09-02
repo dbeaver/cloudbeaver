@@ -19,7 +19,6 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { isMapsEqual } from '@cloudbeaver/core-utils';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
 import { GrantedUserList } from './GrantedUserList';
@@ -69,7 +68,7 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
   const users = useMapResource(UsersResource, UsersResource.keyAll);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
-    .filter(user => state.grantedUsers.get(user.userId))
+    .filter(user => state.grantedUsers.includes(user.userId))
   ), [state.grantedUsers, users.resource]);
 
   const { selected } = useTab(tabId, load);
@@ -80,7 +79,8 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
 
   let infoItem: IInfoItem | null = null;
 
-  const unsaved = !isMapsEqual(state.initialGrantedUsers, state.grantedUsers);
+  const unsaved = (formState.mode === 'edit' && (state.initialGrantedUsers.length !== state.grantedUsers.length
+    || state.initialGrantedUsers.some(subject => !state.grantedUsers.includes(subject))));
 
   if (unsaved) {
     infoItem = {

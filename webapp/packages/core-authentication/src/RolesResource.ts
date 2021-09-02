@@ -14,7 +14,8 @@ import {
   resourceKeyList,
   ResourceKeyList,
   ResourceKeyUtils,
-  AdminRoleInfoFragment
+  AdminRoleInfoFragment,
+  AdminConnectionGrantInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -82,6 +83,16 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
     });
 
     return this.data;
+  }
+
+  async loadGrantedUsers(roleId: string): Promise<string[]> {
+    const { role } = await this.graphQLService.sdk.getRoleGrantedUsers({ roleId });
+    return role[0].grantedUsers;
+  }
+
+  async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {
+    const { grantInfo } = await this.graphQLService.sdk.getSubjectConnectionAccess({ subjectId });
+    return grantInfo;
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, RoleInfo>> {

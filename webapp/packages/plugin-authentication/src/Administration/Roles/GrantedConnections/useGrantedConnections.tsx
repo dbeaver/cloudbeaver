@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { RoleInfo } from '@cloudbeaver/core-authentication';
+import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
 import { useObjectRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { RoleFormMode } from '../IRoleFormProps';
 import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
@@ -24,7 +23,7 @@ interface IConnectionAccessState {
 }
 
 export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): IConnectionAccessState {
-  const gql = useService(GraphQLService);
+  const resource = useService(RolesResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IGrantedConnectionsTabState>();
 
@@ -41,15 +40,15 @@ export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): IConn
   };
 
   const load = async () => {
-    if (state.loaded) {
+    if (state.loaded || state.loading) {
       return;
     }
 
     try {
       state.loading = true;
 
-      if (role && mode === 'edit') {
-        const { grantInfo } = await gql.sdk.getSubjectConnectionAccess({ subjectId: role.roleId });
+      if (mode === 'edit') {
+        const grantInfo = await resource.getSubjectConnectionAccess(role.roleId);
         state.grantedSubjects = grantInfo.map(subject => subject.connectionId);
         state.initialGrantedSubjects = state.grantedSubjects.slice();
       }
