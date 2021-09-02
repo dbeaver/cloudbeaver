@@ -7,12 +7,8 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
-import {
-  Dialog,
-  DialogBackdrop,
-  useDialogState
-} from 'reakit/Dialog';
+import { useMemo } from 'react';
+import { DialogBackdrop } from 'reakit/Dialog';
 import styled from 'reshadow';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -20,6 +16,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { CommonDialogService, DialogInternal } from './CommonDialogService';
+import { DialogContext, IDialogContext } from './DialogContext';
 import { dialogStyles } from './styles';
 
 export const DialogsPortal = observer(function DialogsPortal() {
@@ -82,26 +79,23 @@ const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({
   rejectDialog,
   visible,
 }) {
-  const dialogState = useDialogState({ visible: true });
-  const styles = useStyles(dialogStyles);
-
-  useEffect(() => {
-    if (!dialogState.visible && !dialog.options?.persistent) {
-      rejectDialog();
-    }
-  });
-
   const DialogComponent = dialog.component;
 
-  // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
-  return styled(styles)(
-    <Dialog {...dialogState} visible={visible} hideOnClickOutside={false} modal={false}>
+  const context = useMemo<IDialogContext>(() => ({
+    dialog,
+    visible,
+    reject: rejectDialog,
+  }), [dialog, visible, rejectDialog]);
+
+  return (
+    <DialogContext.Provider value={context}>
       <DialogComponent
+        visible={visible}
         payload={dialog.payload}
         options={dialog.options}
         resolveDialog={resolveDialog}
         rejectDialog={rejectDialog}
       />
-    </Dialog>
+    </DialogContext.Provider>
   );
 };

@@ -18,7 +18,6 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
@@ -59,7 +58,6 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   options,
   rejectDialog,
 }) {
-  const translate = useTranslate();
   const connection = useConnectionInfo(payload.connectionId);
   const controller = useController(DBAuthDialogController, payload.connectionId, rejectDialog);
 
@@ -76,7 +74,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       size='large'
-      title={translate('connections_database_authentication')}
+      title="connections_database_authentication"
       subTitle={connection.connectionInfo?.name}
       icon={driver?.icon}
       footer={(

@@ -17,14 +17,14 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 
+const dialogStyles = css`
+  footer {
+    align-items: center;
+    justify-content: flex-end;
+  }
+`;
+
 const productInfoDialogStyles = css`
-    controls {
-      display: flex;
-      flex: 1;
-      height: 100%;
-      align-items: center;
-      justify-content: flex-end;
-    }
     contacts-info {
       display: flex;
       white-space: pre-wrap;
@@ -54,14 +54,15 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(
     return styled(styles)(
       <CommonDialogWrapper
         size='large'
-        title={translate('app_product_info')}
+        title="app_product_info"
         footer={(
-          <controls as='div'>
+          <>
             <Button type="button" mod={['outlined']} onClick={props.rejectDialog}>
               {translate('ui_processing_ok')}
             </Button>
-          </controls>
+          </>
         )}
+        style={dialogStyles}
         onReject={props.rejectDialog}
       >
         <ColoredContainer>

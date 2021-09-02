@@ -57,6 +57,9 @@ export const commonDialogBaseStyle = composes(
           width: 404px;
           height: 262px;
         }
+        &[|fixedWidth] {
+          width: 404px;
+        }
       }
       &[|size=medium] {
         min-width: 576px;
@@ -67,6 +70,9 @@ export const commonDialogBaseStyle = composes(
           width: 576px;
           height: 374px;
         }
+        &[|fixedWidth] {
+          width: 576px;
+        }
       }
       &[|size=large] {
         min-width: 720px;
@@ -76,6 +82,9 @@ export const commonDialogBaseStyle = composes(
         &[|fixedSize] {
           width: 720px;
           height: 468px;
+        }
+        &[|fixedWidth] {
+          width: 720px;
         }
       }
     }

@@ -11,23 +11,22 @@ import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { useClipboard, Button, SanitizedHTML } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ErrorModel, IErrorInfo } from './ErrorModel';
-import { styles } from './styles';
+import { dialogStyle, styles } from './styles';
 
 function DisplayErrorInfo({ error }: {error: IErrorInfo}) {
   return styled(useStyles(styles))(
     <>
-      <property as="div">
-        <message as="div">
+      <property>
+        <message>
           {error.message}
         </message>
       </property>
       {error.stackTrace && (
-        <property as="div">
+        <property>
           <textarea readOnly>{error.stackTrace}</textarea>
         </property>
       )}
@@ -35,50 +34,48 @@ function DisplayErrorInfo({ error }: {error: IErrorInfo}) {
   );
 }
 
-export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observer(
-  function ErrorDetailsDialog(props: DialogComponentProps<Error | string, null>) {
-    const error = useMemo(
-      () => (props.payload instanceof Error
-        ? new ErrorModel({ error: props.payload })
-        : new ErrorModel({ reason: props.payload })),
-      [props.payload]
-    );
+export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observer(function ErrorDetailsDialog(props) {
+  const error = useMemo(
+    () => (props.payload instanceof Error
+      ? new ErrorModel({ error: props.payload })
+      : new ErrorModel({ reason: props.payload })),
+    [props.payload]
+  );
 
-    const translate = useTranslate();
+  const copy = useClipboard();
+  const copyHandler = useCallback(
+    () => copy(error.textToCopy, true),
+    []
+  );
 
-    const copy = useClipboard();
-    const copyHandler = useCallback(
-      () => copy(error.textToCopy, true),
-      []
-    );
-
-    return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        size='large'
-        title={translate('core_eventsLog_dbeaverErrorDetails')}
-        icon='/icons/error_icon.svg'
-        footer={(
-          <controls as="div">
-            <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
-            {error.textToCopy && (
-              <Button type="button" mod={['outlined']} onClick={copyHandler}>Copy</Button>
-            )}
-          </controls>
-        )}
-        bigIcon
-        onReject={props.rejectDialog}
-      >
-        {error.reason && <property as="div">{error.reason}</property>}
-        {error.htmlBody && (<SanitizedHTML html={error.htmlBody} />)}
-        {error.errors.map(
-          (error, id) => (
-            <>
-              {id > 0 && <hr />}
-              <DisplayErrorInfo key={id} error={error} />
-            </>
-          )
-        )}
-      </CommonDialogWrapper>
-    );
-  }
+  return styled(useStyles(styles))(
+    <CommonDialogWrapper
+      size='large'
+      title="core_eventsLog_dbeaverErrorDetails"
+      icon='/icons/error_icon.svg'
+      footer={(
+        <>
+          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
+          {error.textToCopy && (
+            <Button type="button" mod={['outlined']} onClick={copyHandler}>Copy</Button>
+          )}
+        </>
+      )}
+      style={dialogStyle}
+      bigIcon
+      onReject={props.rejectDialog}
+    >
+      {error.reason && <property>{error.reason}</property>}
+      {error.htmlBody && (<SanitizedHTML html={error.htmlBody} />)}
+      {error.errors.map(
+        (error, id) => (
+          <>
+            {id > 0 && <hr />}
+            <DisplayErrorInfo key={id} error={error} />
+          </>
+        )
+      )}
+    </CommonDialogWrapper>
+  );
+}
 );

@@ -104,11 +104,11 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   let subTitle: string | undefined;
 
   if (configurable) {
-    subTitle = translate('authentication_identity_provider_dialog_subtitle');
+    subTitle = 'authentication_identity_provider_dialog_subtitle';
   }
 
   if (additional) {
-    subTitle = translate('authentication_request_token');
+    subTitle = 'authentication_request_token';
   }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(

@@ -53,8 +53,8 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       size='large'
-      title={translate('connections_connection_credentials_provisioning')}
-      subTitle={translate('connections_connection_credentials_provisioning_description')}
+      title="connections_connection_credentials_provisioning"
+      subTitle="connections_connection_credentials_provisioning_description"
       icon={driver?.icon}
       footer={(
         <Button mod={['unelevated']} onClick={() => resolveDialog()}>

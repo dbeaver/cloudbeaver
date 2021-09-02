@@ -21,6 +21,12 @@ import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 
+export const dialogStyle = css`
+  footer {
+    gap: 24px;
+  }
+`;
+
 const styles = css`
   wrapper {
     display: flex;
@@ -31,11 +37,6 @@ const styles = css`
   }
   SQLCodeEditorLoader {
     height: 100%;
-    width: 100%;
-  }
-  controls {
-    display: flex;
-    gap: 24px;
     width: 100%;
   }
   fill {
@@ -91,16 +92,17 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   return styled(styles)(
     <CommonDialogWrapper
       size='large'
-      title={translate('data_viewer_script_preview_dialog_title')}
+      title="data_viewer_script_preview_dialog_title"
       icon='sql-script'
       footer={(
-        <controls>
+        <>
           <Button mod={['unelevated']} onClick={apply}>{translate('ui_apply')}</Button>
           <fill />
           <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>{translate('ui_copy_to_clipboard')}</Button>
           <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
-        </controls>
+        </>
       )}
+      style={dialogStyle}
       noBodyPadding
       noOverflow
       onReject={rejectDialog}

@@ -15,6 +15,7 @@ export interface DialogOptions {
 }
 
 export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
+  visible: boolean;
   payload: TPayload;
   options?: DialogOptions;
   resolveDialog: (result?: TResult) => void;

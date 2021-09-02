@@ -70,7 +70,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       size='large'
-      title={translate('basicConnection_connectionDialog_newConnection')}
+      title="basicConnection_connectionDialog_newConnection"
       subTitle={subtitle}
       icon={controller.dbDriver?.icon}
       footer={controller.step === ConnectionStep.Connection && (

@@ -8,18 +8,17 @@
 
 import { css } from 'reshadow';
 
+export const dialogStyle = css`
+  footer {
+    align-items: center;
+    flex-direction: row-reverse;
+  }
+`;
+
 export const styles = css`
   code, message {
     display: block;
     white-space: pre-wrap;
-  }
-  controls {
-    display: flex;
-    flex: 1;
-    height: 100%;
-    align-items: center;
-    margin: auto;
-    flex-direction: row-reverse;
   }
   Button {
     margin-left: 24px;

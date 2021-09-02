@@ -16,15 +16,14 @@ import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@clo
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
-const styles = css`
-  controls {
-    display: flex;
-    flex: 1;
-    height: 100%;
+export const dialogStyle = css`
+  footer {
     align-items: center;
-    margin: auto;
     flex-direction: row-reverse;
   }
+`;
+
+const styles = css`
   Button {
     margin-left: 24px;
   }
@@ -65,9 +64,9 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
     return styled(styles)(
       <CommonDialogWrapper
         size='small'
-        title={translate('data_grid_table_context_menu_filter_dialog_title')}
+        title="data_grid_table_context_menu_filter_dialog_title"
         footer={(
-          <controls as="div">
+          <>
             <Button type="button" mod={['unelevated']} onClick={handleApply}>
               {translate('ui_processing_ok')}
             </Button>
@@ -79,8 +78,9 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
                 {translate('ui_clipboard')}
               </Button>
             )}
-          </controls>
+          </>
         )}
+        style={dialogStyle}
         noOverflow
         onReject={rejectDialog}
       >

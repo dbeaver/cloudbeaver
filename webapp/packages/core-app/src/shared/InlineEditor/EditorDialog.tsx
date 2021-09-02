@@ -17,15 +17,14 @@ import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@clo
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = css`
-  controls {
-    display: flex;
-    flex: 1;
-    height: 100%;
+const dialogStyle = css`
+  footer {
     align-items: center;
-    margin: auto;
     flex-direction: row-reverse;
   }
+`;
+
+const styles = css`
   Button {
     margin-left: 24px;
   }
@@ -54,17 +53,18 @@ export const EditorDialog: DialogComponent<string, string> = observer(
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
-        title={translate('app_shared_inlineEditor_dialog_title')}
+        title="app_shared_inlineEditor_dialog_title"
         footer={(
-          <controls>
+          <>
             <Button type="button" mod={['unelevated']} onClick={handleApply}>
               {translate('app_shared_inlineEditor_dialog_apply')}
             </Button>
             <Button type="button" mod={['outlined']} onClick={rejectDialog}>
               {translate('app_shared_inlineEditor_dialog_cancel')}
             </Button>
-          </controls>
+          </>
         )}
+        style={dialogStyle}
         onReject={rejectDialog}
       >
         <textarea ref={textareaRef} value={value} onChange={handleChange} />

@@ -58,7 +58,7 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
   return styled(styles)(
     <CommonDialogWrapper
       size='large'
-      title={translate('data_transfer_dialog_title')}
+      title="data_transfer_dialog_title"
       fixedSize
       noBodyPadding
       noOverflow
