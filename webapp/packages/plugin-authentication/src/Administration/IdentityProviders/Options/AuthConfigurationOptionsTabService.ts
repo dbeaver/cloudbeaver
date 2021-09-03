@@ -119,10 +119,10 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
       const configuration = await this.authConfigurationsResource.saveConfiguration(config);
 
       if (state.mode === 'create') {
-        status.info('Configuration is created');
+        status.info('Configuration created');
         status.info(configuration.displayName);
       } else {
-        status.info('Configuration is updated');
+        status.info('Configuration updated');
         status.info(configuration.displayName);
       }
     } catch (exception) {

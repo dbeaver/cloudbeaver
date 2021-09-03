@@ -105,11 +105,11 @@ export class RoleOptionsTabService extends Bootstrap {
     try {
       if (create) {
         const role = await this.roleResource.createRole(config);
-        status.info('Role is created');
+        status.info('Role created');
         status.info(role.roleId);
       } else {
         const role = await this.roleResource.updateRole(config);
-        status.info('Role is updated');
+        status.info('Role updated');
         status.info(role.roleId);
       }
     } catch (exception) {
