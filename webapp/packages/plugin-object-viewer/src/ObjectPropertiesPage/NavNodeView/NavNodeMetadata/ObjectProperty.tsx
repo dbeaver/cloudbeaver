@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 
 import { FieldCheckboxNew, InputFieldNew } from '@cloudbeaver/core-blocks';
 
-import type { ObjectPropertyProps } from '../formControls';
-import { additionalProps, filterProperty, getValue, matchType } from '../helpers';
+import type { ObjectPropertyProps } from '../../formControls';
+import { additionalProps, filterProperty, getValue, matchType } from '../../helpers';
 
 export const ObjectProperty = observer<ObjectPropertyProps>(function ObjectProperty({
   objectProperty,

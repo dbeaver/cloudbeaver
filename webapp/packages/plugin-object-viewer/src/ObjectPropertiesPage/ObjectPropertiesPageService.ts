@@ -57,11 +57,6 @@ export class ObjectPropertiesPageService {
 
     try {
       const tabContext = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
-
-      if (tabContext.tab && !tabContext.tab.handlerState.folderId) {
-        tabContext.tab.handlerState.folderId = 'infoTab';
-      }
-
       tabContext.trySwitchPage(this.page);
     } catch (exception) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');

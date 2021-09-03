@@ -10,7 +10,6 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DdlViewerBootstrap } from './DdlViewerBootstrap';
 import { DdlViewerService } from './DdlViewerService';
-import { DdlViewerTabService } from './DdlViewerTabService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -19,7 +18,6 @@ export const manifest: PluginManifest = {
 
   providers: [
     DdlViewerBootstrap,
-    DdlViewerTabService,
     DdlViewerService,
   ],
 };

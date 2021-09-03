@@ -80,7 +80,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
       tabIndex={0}
     >
       {navigation.tabIdList.map(tabId => (
-        <TabPanel key={tabId} tabId={tabId}>
+        <TabPanel key={tabId} tabId={tabId} lazy>
           <TabHandlerPanel tabId={tabId} />
         </TabPanel>
       ))}

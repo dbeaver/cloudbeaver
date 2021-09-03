@@ -29,11 +29,9 @@ export const NavigationNodeElement = observer<Props>(function NavigationNodeElem
     for (const renderer of context.tree.renderers) {
       const CustomRenderer = renderer(nodeId);
 
-      if (CustomRenderer === undefined) {
-        continue;
+      if (CustomRenderer) {
+        return <CustomRenderer nodeId={nodeId} component={NavigationNodeElement} />;
       }
-
-      return <CustomRenderer nodeId={nodeId} component={NavigationNodeElement} />;
     }
   }
 

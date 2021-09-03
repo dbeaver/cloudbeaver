@@ -8,9 +8,9 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
+import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { ResourceKeyUtils } from '../../../core-sdk/src';
 import { ConnectionExecutionContext } from './ConnectionExecutionContext';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource';
 

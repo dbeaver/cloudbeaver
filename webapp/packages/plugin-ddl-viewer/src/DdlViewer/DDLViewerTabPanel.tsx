@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
+import { Loader, useTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
@@ -18,22 +19,20 @@ import { DdlViewerController } from './DdlViewerController';
 const styles = css`
   wrapper {
     flex: 1;
+    display: flex;
     overflow: auto;
     composes: theme-typography--body1 from global;
   }
   SQLCodeEditorLoader {
     height: 100%;
+    flex: 1;
+    overflow: auto;
   }
 `;
 
-export interface DdlViewerTabPanelProps {
-  nodeId: string;
-}
-
-export const ddlViewer = (nodeId: string) => (<DdlViewerTabPanel nodeId={nodeId} />);
-
-const DdlViewerTabPanel = observer<DdlViewerTabPanelProps>(function DdlViewerTabPanel({ nodeId }) {
+export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
   const controller = useController(DdlViewerController, nodeId);
+  useTab(folderId, () => controller.load());
 
   if (controller.isLoading) {
     return <Loader />;
@@ -41,16 +40,14 @@ const DdlViewerTabPanel = observer<DdlViewerTabPanelProps>(function DdlViewerTab
 
   return styled(styles)(
     <wrapper>
-      {controller.metadata && (
-        <SQLCodeEditorLoader
-          bindings={{
-            autoCursor: false,
-          }}
-          value={controller.metadata}
-          dialect={controller.dialect}
-          readonly
-        />
-      )}
+      <SQLCodeEditorLoader
+        bindings={{
+          autoCursor: false,
+        }}
+        value={controller.metadata}
+        dialect={controller.dialect}
+        readonly
+      />
     </wrapper>
   );
 });

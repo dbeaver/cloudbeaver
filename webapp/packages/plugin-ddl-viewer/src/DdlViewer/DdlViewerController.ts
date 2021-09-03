@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, when, makeObservable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
@@ -37,12 +37,12 @@ export class DdlViewerController implements IInitializableController, IDestructi
     });
   }
 
-  init(nodeId: string) {
+  init(nodeId: string): void {
     this.nodeId = nodeId;
-    when(
-      () => !!this.ddlViewerService.getMetadata(nodeId),
-      () => this.showMetadata(nodeId)
-    );
+  }
+
+  async load(): Promise<void> {
+    await this.showMetadata(this.nodeId);
   }
 
   destruct(): void {
@@ -51,7 +51,7 @@ export class DdlViewerController implements IInitializableController, IDestructi
 
   private async showMetadata(nodeId: string): Promise<void> {
     try {
-      this.metadata = await this.ddlViewerService.getMetadata(nodeId)!;
+      this.metadata = await this.ddlViewerService.loadDdlMetadata(nodeId)!;
       await this.loadDialect(nodeId);
     } catch (error) {
       this.notificationService.logException(error, 'Failed to load DDL');

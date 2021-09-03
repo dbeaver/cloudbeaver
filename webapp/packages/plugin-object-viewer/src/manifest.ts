@@ -10,11 +10,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
-import { ObjectFoldersService } from './ObjectPropertiesPage/ObjectFoldersService';
-import { ObjectFoldersTabService } from './ObjectPropertiesPage/ObjectFoldersTab/ObjectFoldersTabService';
-import { ObjectInfoTabService } from './ObjectPropertiesPage/ObjectInfoTab/ObjectInfoTabService';
+import { NavNodeMetadataViewBootstrap } from './ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap';
+import { VirtualFolderViewBootstrap } from './ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap';
 import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
-import { VirtualFolderTabService } from './ObjectPropertiesPage/VirtualFolderTab/VirtualFolderTabService';
 import { ObjectViewerBootstrap } from './ObjectViewerBootstrap';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
 
@@ -23,12 +21,10 @@ export const manifest: PluginManifest = {
 
   providers: [
     ObjectViewerBootstrap,
+    NavNodeMetadataViewBootstrap,
+    VirtualFolderViewBootstrap,
     ObjectPropertiesPageService,
-    ObjectFoldersService,
     ObjectViewerTabService,
-    ObjectInfoTabService,
-    ObjectFoldersTabService,
-    VirtualFolderTabService,
     DBObjectPageService,
     LocaleService,
   ],

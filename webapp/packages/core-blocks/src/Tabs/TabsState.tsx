@@ -107,9 +107,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, []);
 
   useEffect(() => {
-    if (currentTabId !== undefined) {
-      return;
-    }
+    // prevent from initial render handlers execution
+    // if (currentTabId !== undefined) {
+    //   return;
+    // }
 
     openExecutor.execute({
       tabId: state.selectedId!,

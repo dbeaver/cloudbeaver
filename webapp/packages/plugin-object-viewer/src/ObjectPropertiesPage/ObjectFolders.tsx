@@ -7,15 +7,17 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { ITab } from '@cloudbeaver/core-app';
-import { Tab, TabIcon, TabList, TabPanel, TabsState, TabTitle, verticalTabStyles } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
+import { ITabData, TabList, TabPanel, TabsState, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { ObjectFoldersController } from './ObjectFoldersController';
+import { FolderPanelRenderer } from './FolderPanelRenderer';
+import { FolderTabRenderer } from './FolderTabRenderer';
 
 const styles = composes(
   css`
@@ -46,34 +48,55 @@ const styles = composes(
   `
 );
 
+const tabStyles = [verticalTabStyles, styles];
+
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
 }
 
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
-  const controller = useController(ObjectFoldersController, tab);
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const navNodeViewService = useService(NavNodeViewService);
 
-  const tabContainer = controller.getTabContainer();
+  const nodeId = tab.handlerState.objectId;
+  const parentId = tab.handlerState.parentId;
+  let folderId = tab.handlerState.folderId;
+
+  useMapResource(NavTreeResource, nodeId, {
+    onLoad: async resource => {
+      for (const nodeId of tab.handlerState.parents) {
+        await resource.load(nodeId);
+      }
+    },
+  });
+
+  const folders = navNodeViewService.getFolders(nodeId) || [];
+
+  function openFolder(tabData: ITabData) {
+    navNodeManagerService.navToNode(nodeId, parentId, tabData.tabId);
+  }
+
+  useEffect(() => {
+    if (!folders.includes(folderId) && folders.length > 0) {
+      navNodeManagerService.navToNode(nodeId, parentId, folders[0]);
+    }
+  });
+
+  if (!folders.includes(folderId) && folders.length > 0) {
+    folderId = folders[0];
+  }
 
   return styled(useStyles(verticalTabStyles, styles))(
-    <TabsState currentTabId={tabContainer.currentTabId} orientation='vertical'>
+    <TabsState currentTabId={folderId} orientation='vertical' onChange={openFolder}>
       <vertical-tabs>
         <TabList aria-label="Object folders">
-          {tabContainer.tabs.map(tab => (
-            <Tab
-              key={tab.tabId}
-              tabId={tab.tabId}
-              onOpen={tab.onActivate}
-              onClose={tab.onClose}
-            >
-              {tab.icon && <TabIcon icon={tab.icon} />}
-              <TabTitle>{tab.title}</TabTitle>
-            </Tab>
+          {folders.map(folderId => (
+            <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
           ))}
         </TabList>
-        {tabContainer.tabs.map(tab => (
-          <TabPanel key={tab.tabId} tabId={tab.tabId}>
-            <tab.panel />
+        {folders.map(folderId => (
+          <TabPanel key={folderId} tabId={folderId}>
+            <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
           </TabPanel>
         ))}
       </vertical-tabs>

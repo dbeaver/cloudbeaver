@@ -6,16 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
+import { ENodeFeature, NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { DDLViewerTab } from './DdlViewer/DDLViewerTab';
-import { DDLViewerTabPanel } from './DdlViewer/DDLViewerTabPanel';
+import { NavNodeMetadataPanel } from './NavNodeMetadataPanel';
+import { NavNodeMetadataTab } from './NavNodeMetadataTab';
 
-const navNodeDDLId = 'object-viewer://ddl';
+const navNodeMetadataId = 'object-viewer://metadata';
 
 @injectable()
-export class DdlViewerBootstrap extends Bootstrap {
+export class NavNodeMetadataViewBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,
     private readonly navNodeInfoResource: NavNodeInfoResource
@@ -26,28 +26,32 @@ export class DdlViewerBootstrap extends Bootstrap {
   register(): void {
     this.navNodeViewService.addTransform({
       tab: (nodeId, folderId) => {
-        if (folderId.startsWith(navNodeDDLId)) {
-          return DDLViewerTab;
+        if (folderId.startsWith(navNodeMetadataId)) {
+          return NavNodeMetadataTab;
         }
         return undefined;
       },
       panel: (nodeId, folderId) => {
-        if (folderId.startsWith(navNodeDDLId)) {
-          return DDLViewerTabPanel;
+        if (folderId.startsWith(navNodeMetadataId)) {
+          return NavNodeMetadataPanel;
         }
         return undefined;
       },
       transformer: (nodeId, children) => {
         const node = this.navNodeInfoResource.get(nodeId);
+        const isDatabaseObject = (
+          node?.features?.includes(ENodeFeature.item)
+          || node?.features?.includes(ENodeFeature.container)
+        );
 
-        if (!node?.objectFeatures?.includes(EObjectFeature.script)) {
+        if (!isDatabaseObject) {
           return children;
         }
 
-        return [...children || [], navNodeDDLId];
+        return [navNodeMetadataId, ...children || []];
       },
     });
   }
 
-  load(): void {}
+  load(): void { }
 }

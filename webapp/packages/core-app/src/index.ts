@@ -7,11 +7,13 @@ export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerServic
 export * from './TopNavBar/TopNavBarService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
 export * from './TopNavBar/shared/topMenuStyles';
-export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';
 export * from './shared/NodesManager/extensions/IObjectSchemaProvider';
 export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
+export * from './shared/NodesManager/NavNodeView/IFolderTransform';
+export * from './shared/NodesManager/NavNodeView/NavNodeViewService';
+export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/DBObjectService';
 export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';
