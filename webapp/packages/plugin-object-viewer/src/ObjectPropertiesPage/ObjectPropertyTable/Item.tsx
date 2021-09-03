@@ -7,14 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import { useState } from 'react';
+import styled, { css, use } from 'reshadow';
 
-import { NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@cloudbeaver/core-app';
+import { NavNode, NavNodeContextMenuService, NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@cloudbeaver/core-app';
 import {
-  StaticImage, TableItem, TableColumnValue, TableItemSelect
+  StaticImage, TableItem, TableColumnValue, TableItemSelect, useMouse, getComputed, Icon, useStateDelay
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { MenuTrigger } from '@cloudbeaver/core-dialogs';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { getValue } from '../helpers';
@@ -37,6 +39,27 @@ const itemStyles = css`
     TableItem {
       position: relative;
     }
+    menu-box {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      
+      & menu-name {
+        padding-left: 16px;
+      }
+
+      & Icon {
+        width: 16px;
+      }
+    }
+    TableColumnValue:not(:hover):not([|menuOpened]) {
+      & Icon {
+        opacity: 0;
+      }
+    }
+    TableColumnValue[|menuAvailable][|isMenuEmpty] menu-box {
+      padding-left: 32px;
+    }
     TableColumnValue:nth-child(3) {
       cursor: pointer;
       user-select: none;
@@ -51,28 +74,20 @@ interface Props {
 export const Item = observer<Props>(function Item({
   objectId, columns,
 }) {
-  const navNodeManagerService = useService(NavNodeManagerService);
   const { node } = useNode(objectId);
   const { dbObject } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(itemStyles);
-  const handleOpen = useCallback(() => navNodeManagerService.navToNode(node!.id, node!.parentId), [node]);
 
   if (!node) {
     return styled(styles)(
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
-          <icon>
-            <placeholder />
-          </icon>
+          <icon><placeholder /></icon>
         </TableColumnValue>
         {Array(columns)
           .fill(0)
-          .map((_, i) => (
-            <TableColumnValue key={i} onDoubleClick={handleOpen}>
-              <placeholder />
-            </TableColumnValue>
-          ))}
+          .map((_, i) => <TableColumnValue key={i}><placeholder /></TableColumnValue>)}
       </TableItem>
     );
   }
@@ -86,7 +101,7 @@ export const Item = observer<Props>(function Item({
             <StaticImage icon={node.icon} />
           </icon>
         </TableColumnValue>
-        <TableColumnValue onDoubleClick={handleOpen}>{node.name}</TableColumnValue>
+        <ItemName node={node} index={0} />
       </TableItem>
     );
   }
@@ -99,9 +114,70 @@ export const Item = observer<Props>(function Item({
           <StaticImage icon={node.icon} />
         </icon>
       </TableColumnValue>
-      {dbObject.properties.map(property => (
-        <TableColumnValue key={property.id} onDoubleClick={handleOpen}>{getValue(property.value)}</TableColumnValue>
+      {dbObject.properties.map((property, index) => (
+        <ItemName key={property.id} node={node} property={property} index={index} />
       ))}
     </TableItem>
+  );
+});
+
+interface IItemNameProps {
+  index: number;
+  node: NavNode;
+  property?: ObjectPropertyInfo;
+}
+
+const ItemName = observer<IItemNameProps>(function ItemName({
+  index,
+  node,
+  property,
+}) {
+  const navNodeContextMenuService = useService(NavNodeContextMenuService);
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const styles = useStyles(itemStyles);
+  const [menuOpened, switchState] = useState(false);
+  const mouse = useMouse<HTMLTableDataCellElement>();
+
+  function getPanel() {
+    return navNodeContextMenuService.constructMenuWithContext(node);
+  }
+
+  function openNode() {
+    navNodeManagerService.navToNode(node.id, node.parentId);
+  }
+
+  const name = property ? getValue(property.value) : node.name;
+  const menuAvailable = index === 0;
+  const mouseEnter = useStateDelay(menuAvailable && mouse.state.mouseEnter, 33); // track mouse update only 30 times per second
+
+  const isMenuEmpty = !menuOpened && menuAvailable && getComputed(() => {
+    if (!mouseEnter) {
+      return true;
+    }
+
+    const panel = getPanel();
+
+    return !panel.menuItems.length || panel.menuItems.every(item => item.isHidden);
+  });
+
+  return styled(styles)(
+    <TableColumnValue
+      ref={mouse.reference}
+      onDoubleClick={openNode}
+      {...use({ menuAvailable, isMenuEmpty, menuOpened })}
+    >
+      {!isMenuEmpty && menuAvailable ? (
+        <MenuTrigger getPanel={getPanel} modal disclosure onVisibleSwitch={switchState}>
+          <menu-box>
+            <Icon name="snack" viewBox="0 0 16 10" />
+            <menu-name>{name}</menu-name>
+          </menu-box>
+        </MenuTrigger>
+      ) : (
+        <menu-box>
+          {name}
+        </menu-box>
+      )}
+    </TableColumnValue>
   );
 });

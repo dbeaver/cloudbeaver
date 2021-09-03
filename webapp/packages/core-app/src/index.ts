@@ -15,6 +15,7 @@ export * from './shared/NodesManager/NavNodeView/IFolderTransform';
 export * from './shared/NodesManager/NavNodeView/NavNodeViewService';
 export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/DBObjectService';
+export * from './shared/NodesManager/NavNodeContextMenuService';
 export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NavTreeResource';
@@ -31,7 +32,6 @@ export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogSer
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/NavigationTreeService';
-export * from './NavigationTree/NavigationTreeContextMenuService';
 export * from './NavigationTree/useElementsTree';
 export * from './AppLocaleService';
 

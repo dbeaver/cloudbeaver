@@ -55,7 +55,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
 
   return styled(style)(
     <>
-      <TableItem key={`${node.id}_${depth}`} className={className} item={node.id}>
+      <TableItem key={`${node.id}_${depth}`} className={className} item={node.id} selectOnItem>
         {columns.map((column, idx) => {
           const property = node.properties.find(property => property.id === column.id);
           const value = property ? getPropertyValue(property) : '';

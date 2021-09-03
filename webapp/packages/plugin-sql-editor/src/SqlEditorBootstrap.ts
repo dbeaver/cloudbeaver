@@ -8,7 +8,7 @@
 
 import {
   MainMenuService,
-  NavigationTreeContextMenuService,
+  NavNodeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
   NavNode, ConnectionSchemaManagerService,
@@ -47,7 +47,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
       id: 'open-sql-editor',
       isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType
+        return context.contextType === NavNodeContextMenuService.nodeContextType
           && context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'SQL',

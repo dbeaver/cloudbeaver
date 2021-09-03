@@ -27,6 +27,7 @@ interface ExpandProps {
 interface Props {
   item: any;
   expandElement?: React.FunctionComponent<ExpandProps>;
+  selectOnItem?: boolean;
   selectDisabled?: boolean;
   disabled?: boolean;
   className?: string;
@@ -37,6 +38,7 @@ interface Props {
 export const TableItem = observer<Props>(function TableItem({
   item,
   expandElement,
+  selectOnItem,
   selectDisabled = false,
   disabled,
   children,
@@ -46,6 +48,7 @@ export const TableItem = observer<Props>(function TableItem({
 }) {
   const styles = useStyles();
   const context = useContext(TableContext);
+  const props = useObjectRef({ selectOnItem });
   if (!context) {
     throw new Error('TableContext must be provided');
   }
@@ -66,7 +69,7 @@ export const TableItem = observer<Props>(function TableItem({
     (event: React.MouseEvent<HTMLTableRowElement>) => {
       const { isSelected, itemContext, context, onClick } = ref;
 
-      if (!itemContext.selectDisabled && !EventContext.has(event, EventTableItemSelectionFlag)) {
+      if (props.selectOnItem && !itemContext.selectDisabled && !EventContext.has(event, EventTableItemSelectionFlag)) {
         context.setItemSelect(itemContext.item, !isSelected);
       }
 

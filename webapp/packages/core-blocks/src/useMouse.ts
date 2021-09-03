@@ -7,7 +7,9 @@
  */
 
 import { observable } from 'mobx';
-import { useRef, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+import { throttle } from '@cloudbeaver/core-utils';
 
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
@@ -23,21 +25,26 @@ interface IState {
 
 export interface IMouseHook<T> {
   state: IState;
-  reference: React.RefObject<T>;
+  reference: (obj: T) => void;
 }
 
-export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T> {
+export function useMouse<T extends HTMLElement>(options: IOptions = {}): IMouseHook<T> {
   const handlersRef = useObjectRef(options);
-  const reference = useRef<T>(null);
-  const state = useObservableRef(() => ({ mouseEnter: false }), { mouseEnter: observable.ref }, false, 'useMouse');
+  const [reference, setReference] = useState<T | null>(null);
+  const state = useObservableRef(() => ({
+    mouseEnter: false,
+  }), {
+    mouseEnter: observable.ref,
+  }, false, 'useMouse');
 
   useEffect(() => { // performance heavy
-    if (!reference.current) {
-      state.mouseEnter = false;
+    state.mouseEnter = false;
+
+    if (!reference) {
       return;
     }
 
-    const mouseOverHandler = (event: MouseEvent) => {
+    const mouseOverHandler = throttle((event: MouseEvent) => {
       if (handlersRef.onMouseEnter) {
         handlersRef.onMouseEnter(event);
       }
@@ -45,9 +52,9 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
       if (!state.mouseEnter) {
         state.mouseEnter = true;
       }
-    };
+    }, 33);
 
-    const mouseOutHandler = (event: MouseEvent) => {
+    const mouseOutHandler = throttle((event: MouseEvent) => {
       if (handlersRef.onMouseLeave) {
         handlersRef.onMouseLeave(event);
       }
@@ -55,18 +62,16 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
       if (state.mouseEnter) {
         state.mouseEnter = false;
       }
-    };
+    }, 40);
 
-    const element = reference.current;
-
-    element.addEventListener('mouseenter', mouseOverHandler);
-    element.addEventListener('mouseleave', mouseOutHandler);
+    reference.addEventListener('mouseenter', mouseOverHandler);
+    reference.addEventListener('mouseleave', mouseOutHandler);
 
     return () => {
-      element.removeEventListener('mouseenter', mouseOverHandler);
-      element.removeEventListener('mouseleave', mouseOutHandler);
+      reference.removeEventListener('mouseenter', mouseOverHandler);
+      reference.removeEventListener('mouseleave', mouseOutHandler);
     };
-  }, []);
+  }, [reference]);
 
-  return { state, reference };
+  return { state, reference: setReference };
 }

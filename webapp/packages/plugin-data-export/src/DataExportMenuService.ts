@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature } from '@cloudbeaver/core-app';
+import { NavNodeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { IMenuContext, CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
@@ -50,7 +50,7 @@ export class DataExportMenuService {
         order: 2,
         title: 'data_transfer_dialog_export',
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          return context.contextType === NavNodeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
         isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),

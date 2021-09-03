@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
+import React, { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
 import {
   MenuButton,
   Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio, MenuInitialState
@@ -28,9 +28,9 @@ import { menuPanelStyles } from './menuPanelStyles';
  * MenuTrigger
  */
 
-interface IMenuTriggerProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
-  panel: IMenuPanel;
+interface IMenuTriggerBaseProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
+  disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   modal?: boolean;
   visible?: boolean;
@@ -38,8 +38,20 @@ interface IMenuTriggerProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const MenuTrigger: React.FC<IMenuTriggerProps> = function MenuTrigger({
+interface IMenuTriggerLazyProps extends IMenuTriggerBaseProps {
+  getPanel: () => IMenuPanel;
+  panel?: IMenuPanel;
+}
+
+interface IMenuTriggerProps extends IMenuTriggerBaseProps {
+  panel: IMenuPanel;
+  getPanel?: () => IMenuPanel;
+}
+
+export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger({
   panel,
+  getPanel,
+  disclosure,
   children,
   style,
   placement,
@@ -48,9 +60,10 @@ export const MenuTrigger: React.FC<IMenuTriggerProps> = function MenuTrigger({
   modal,
   rtl,
   ...props
-}) {
+}, ref) {
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
+  const styles = useStyles(menuPanelStyles, style);
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -60,15 +73,30 @@ export const MenuTrigger: React.FC<IMenuTriggerProps> = function MenuTrigger({
     propsRef.onVisibleSwitch?.(menu.visible);
   }, [menu.visible]);
 
-  return styled(useStyles(menuPanelStyles, style))(
+  if (menu.visible && getPanel) {
+    panel = getPanel();
+  }
+
+  if (React.isValidElement(children) && disclosure) {
+    return (
+      <>
+        <MenuButton ref={ref} {...menu} {...props} {...children.props}>
+          {disclosureProps => React.cloneElement(children, disclosureProps)}
+        </MenuButton>
+        {panel && <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />}
+      </>
+    );
+  }
+
+  return styled(styles)(
     <>
       <MenuButton {...menu} {...props}>
         <box>{children}</box>
       </MenuButton>
-      <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />
+      {panel && <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />}
     </>
   );
-};
+});
 
 /**
  * MenuPanel

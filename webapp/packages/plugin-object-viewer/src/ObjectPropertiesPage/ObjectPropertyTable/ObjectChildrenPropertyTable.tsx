@@ -7,12 +7,29 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
 import { TableHeader, TableBody, Table } from '@cloudbeaver/core-blocks';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Header } from './Header';
 import { Item } from './Item';
+
+const style = composes(
+  css`
+    TableHeader {
+      composes: theme-background-surface from global;
+    }
+  `,
+  css`
+    TableHeader {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+  `,
+);
 
 interface Props {
   nodeIds: string[];
@@ -24,7 +41,7 @@ export const ObjectChildrenPropertyTable = observer<Props>(function ObjectProper
   const firstChild = nodeIds[0] || '';
   const properties = useDatabaseObjectInfo(firstChild).dbObject?.properties;
 
-  return (
+  return styled(useStyles(style))(
     <Table>
       <TableHeader>
         <Header properties={properties || []} />

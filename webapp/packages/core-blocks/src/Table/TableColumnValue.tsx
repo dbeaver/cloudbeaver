@@ -13,6 +13,7 @@ import styled, { use } from 'reshadow';
 import { EventContext } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useObjectRef } from '../useObjectRef';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
@@ -29,7 +30,7 @@ type Props = {
   onDoubleClick?: () => void;
 } & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
 
-export const TableColumnValue = observer<Props>(function TableColumnValue({
+export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(function TableColumnValue({
   align,
   children,
   centerContent,
@@ -40,10 +41,11 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
   onClick,
   onDoubleClick,
   ...rest
-}) {
+}, ref) {
   const styles = useStyles();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+  const props = useObjectRef({ onClick, onDoubleClick });
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
     if (!context) {
@@ -57,16 +59,12 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
       tableContext?.setItemExpand(context.item, state);
     }
 
-    if (onClick) {
-      onClick();
-    }
-  }, [tableContext, context, expand, onClick]);
+    props.onClick?.();
+  }, [tableContext, context, expand]);
 
   const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement>) => {
-    if (onDoubleClick) {
-      onDoubleClick();
-    }
-  }, [onDoubleClick]);
+    props.onDoubleClick?.();
+  }, []);
 
   if (!context) {
     return null;
@@ -77,6 +75,7 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
       align={align}
       className={className}
       {...use({ centerContent, ellipsis })}
+      ref={ref}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       {...rest}
@@ -85,4 +84,4 @@ export const TableColumnValue = observer<Props>(function TableColumnValue({
       {!flex && children}
     </td>
   );
-});
+}, { forwardRef: true });

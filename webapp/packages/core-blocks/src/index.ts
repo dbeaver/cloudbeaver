@@ -138,6 +138,7 @@ export * from './IconButton';
 export * from './IconOrImage';
 export * from './StaticImage';
 export * from './TextPlaceholder';
+export * from './useClickEvents';
 export * from './useClipboard';
 export * from './useDataResource';
 export * from './useExecutor';

@@ -12,13 +12,13 @@ import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNavigatorViewSettingsEqual, CONNECTION_NAVIGATOR_VIEW_SETTINGS, NavigatorViewSettings } from '@cloudbeaver/core-root';
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
-import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
-import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
+import type { NavNode } from './EntityTypes';
+import { EObjectFeature } from './EObjectFeature';
+import { NavNodeManagerService } from './NavNodeManagerService';
+import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
-export class NavigationTreeContextMenuService extends Bootstrap {
+export class NavNodeContextMenuService extends Bootstrap {
   static nodeContextType = 'NodeWithParent';
   private static nodeViewMenuItemToken = 'nodeView';
   private static menuToken = 'navTreeMenu';
@@ -33,18 +33,18 @@ export class NavigationTreeContextMenuService extends Bootstrap {
   }
 
   getMenuToken(): string {
-    return NavigationTreeContextMenuService.menuToken;
+    return NavNodeContextMenuService.menuToken;
   }
 
   getNodeViewMenuItemToken(): string {
-    return NavigationTreeContextMenuService.nodeViewMenuItemToken;
+    return NavNodeContextMenuService.nodeViewMenuItemToken;
   }
 
   constructMenuWithContext(node: NavNode): IMenuPanel {
     return this.contextMenuService.createContextMenu<NavNode>({
       menuId: this.getMenuToken(),
       contextId: node.id,
-      contextType: NavigationTreeContextMenuService.nodeContextType,
+      contextType: NavNodeContextMenuService.nodeContextType,
       data: node,
     });
   }
@@ -80,7 +80,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
       {
         id: this.getNodeViewMenuItemToken(),
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          return context.contextType === NavNodeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
         isHidden: context => {
@@ -100,7 +100,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
         type: 'radio',
         isChecked: context => this.isSimpleNavigatorView(context.data.id),
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          return context.contextType === NavNodeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context =>
@@ -117,7 +117,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
         isChecked: context => !this.isSimpleNavigatorView(context.data.id),
         separator: true,
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          return context.contextType === NavNodeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context =>
@@ -133,7 +133,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
         type: 'checkbox',
         isChecked: context => !!this.getConnectionFromNodeId(context.data.id)?.navigatorSettings.showSystemObjects,
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          return context.contextType === NavNodeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context => {
@@ -157,7 +157,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
       {
         id: 'openNodeTab',
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType;
+          return context.contextType === NavNodeContextMenuService.nodeContextType;
         },
         order: 1,
         title: 'app_navigationTree_openNodeTab',
@@ -173,7 +173,7 @@ export class NavigationTreeContextMenuService extends Bootstrap {
       {
         id: 'refreshNode',
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType;
+          return context.contextType === NavNodeContextMenuService.nodeContextType;
         },
         order: Number.MAX_SAFE_INTEGER,
         title: 'app_navigationTree_refreshNode',

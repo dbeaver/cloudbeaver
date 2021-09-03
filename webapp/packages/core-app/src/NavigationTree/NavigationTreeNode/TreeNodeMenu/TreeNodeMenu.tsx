@@ -16,7 +16,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
-import { NavigationTreeContextMenuService } from '../../NavigationTreeContextMenuService';
+import { NavNodeContextMenuService } from '../../../shared/NodesManager/NavNodeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
 interface Props {
@@ -28,10 +28,10 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   node,
   selected,
 }) {
-  const navigationTreeContextMenuService = useService(NavigationTreeContextMenuService);
+  const navNodeContextMenuService = useService(NavNodeContextMenuService);
 
   const menuPanel = useMemo(
-    () => navigationTreeContextMenuService.constructMenuWithContext(node),
+    () => navNodeContextMenuService.constructMenuWithContext(node),
     [node]
   );
   const isHidden = useMemo(

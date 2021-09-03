@@ -7,7 +7,7 @@
  */
 
 import {
-  NavigationTreeContextMenuService,
+  NavNodeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
   NavNode
@@ -30,7 +30,7 @@ export class PublicConnectionFormBootstrap extends Bootstrap {
     this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
       id: 'connection-edit',
       isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType
+        return context.contextType === NavNodeContextMenuService.nodeContextType
           && context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'connections_public_connection_edit_menu_item_title',

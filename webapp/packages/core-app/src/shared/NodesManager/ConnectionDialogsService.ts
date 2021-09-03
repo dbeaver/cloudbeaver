@@ -11,10 +11,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
 import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
+import { NavNodeContextMenuService } from './NavNodeContextMenuService';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
@@ -46,7 +46,7 @@ export class ConnectionDialogsService extends Bootstrap {
       {
         id: 'closeConnection',
         isPresent:
-          (context: IMenuContext<NavNode>) => context.contextType === NavigationTreeContextMenuService.nodeContextType,
+          (context: IMenuContext<NavNode>) => context.contextType === NavNodeContextMenuService.nodeContextType,
         isHidden: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
@@ -69,7 +69,7 @@ export class ConnectionDialogsService extends Bootstrap {
       {
         id: 'deleteConnection',
         isPresent:
-          (context: IMenuContext<NavNode>) => context.contextType === NavigationTreeContextMenuService.nodeContextType,
+          (context: IMenuContext<NavNode>) => context.contextType === NavNodeContextMenuService.nodeContextType,
         isHidden: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
