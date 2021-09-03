@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckboxNew, Group, GroupTitle, InputFieldNew, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -16,6 +16,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IUserFormProps } from './UserFormService';
+
+const styles = css`
+  Group {
+    height: 100%;
+  }
+`;
 
 export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({
   controller,
@@ -28,10 +34,10 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
     []
   );
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return styled(useStyles(BASE_CONTAINERS_STYLES, styles))(
     <ColoredContainer parent gap overflow>
-      <Group small gap vertical>
-        <GroupTitle>{translate('authentication_user_credentials')}</GroupTitle>
+      <Group small gap vertical overflow>
+        <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
         <InputFieldNew
           type='text'
           name='login'
@@ -39,6 +45,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           disabled={controller.isSaving}
           readOnly={editing}
           mod='surface'
+          keepSize
           tiny
           required
         >
@@ -54,6 +61,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               placeholder={editing ? '••••••' : ''}
               disabled={controller.isSaving}
               mod='surface'
+              keepSize
               tiny
               required
             >
@@ -66,6 +74,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               placeholder={editing ? '••••••' : ''}
               disabled={controller.isSaving}
               mod='surface'
+              keepSize
               tiny
               required
             >
@@ -74,20 +83,25 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           </>
         )}
       </Group>
-      <Group small gap>
+      <Group small gap overflow>
         <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
-        {controller.roles.map(role => (
-          <FieldCheckboxNew
-            key={role.roleId}
-            id={uuid()}
-            name='role'
-            checked={!!controller.credentials.roles.get(role.roleId)}
-            disabled={controller.isSaving}
-            onChange={checked => handleRoleChange(role.roleId, checked)}
-          >
-            {role.roleName || role.roleId}
-          </FieldCheckboxNew>
-        ))}
+        {controller.roles.map(role => {
+          const label = `${role.roleId}${role.roleName && role.roleName !== role.roleId ? ' (' + role.roleName + ')' : ''}`;
+          const tooltip = `${label}${role.description ? '\n' + role.description : ''}`;
+          return (
+            <FieldCheckboxNew
+              key={role.roleId}
+              id={uuid()}
+              title={tooltip}
+              name='role'
+              checked={!!controller.credentials.roles.get(role.roleId)}
+              disabled={controller.isSaving}
+              onChange={checked => handleRoleChange(role.roleId, checked)}
+            >
+              {label}
+            </FieldCheckboxNew>
+          );
+        })}
       </Group>
     </ColoredContainer>
   );

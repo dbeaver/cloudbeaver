@@ -36,7 +36,6 @@ export class RolesAdministrationService extends Bootstrap {
   register(): void {
     this.administrationItemService.create({
       name: 'roles',
-      type: AdministrationItemType.Default,
       order: 3.1,
       configurationWizardOptions: {
         description: 'administration_roles_tab_description',
