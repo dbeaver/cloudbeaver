@@ -42,7 +42,7 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
         }
 
         const virtualFolders: string[] = [];
-        const nextChildren = [];
+        const nextChildren: string[] = [];
 
         for (const child of children) {
           const node = this.navNodeInfoResource.get(child);

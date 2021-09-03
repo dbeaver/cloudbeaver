@@ -6,7 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { untracked } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import { NavTreeResource } from '../NavTreeResource';
 import type { NavNodeTransformView, INavNodeFolderTransform, NavNodeFolderTransformFn } from './IFolderTransform';
@@ -14,11 +17,15 @@ import type { NavNodeTransformView, INavNodeFolderTransform, NavNodeFolderTransf
 @injectable()
 export class NavNodeViewService {
   get tabs(): NavNodeTransformView[] {
-    return this.transformers.map(transform => transform.tab);
+    return this.transformers
+      .filter(transform => transform.tab)
+      .map(transform => transform.tab!);
   }
 
   get panels(): NavNodeTransformView[] {
-    return this.transformers.map(transform => transform.panel);
+    return this.transformers
+      .filter(transform => transform.panel)
+      .map(transform => transform.panel!);
   }
 
   get transformations(): NavNodeFolderTransformFn[] {
@@ -26,11 +33,42 @@ export class NavNodeViewService {
   }
 
   private transformers: INavNodeFolderTransform[];
+  private duplicationNotify: Set<string>;
 
   constructor(
-    private navTreeResource: NavTreeResource
+    private navTreeResource: NavTreeResource,
+    private notificationService: NotificationService
   ) {
     this.transformers = [];
+    this.duplicationNotify = new Set();
+
+    this.addTransform({
+      transformer: (nodeId, children) => {
+        if (!children) {
+          return children;
+        }
+
+        const nextChildren: string[] = [];
+        const duplicates: string[] = [];
+
+        for (const child of children) {
+          if (nextChildren.includes(child)) {
+            if (!duplicates.includes(child)) {
+              duplicates.push(child);
+              nextChildren.splice(nextChildren.indexOf(child), 1);
+            }
+          } else {
+            nextChildren.push(child);
+          }
+        }
+
+        untracked(() => {
+          this.logDuplicates(nodeId, duplicates);
+        });
+
+        return nextChildren;
+      },
+    });
   }
 
   getFolders(nodeId: string): string[] | undefined {
@@ -44,5 +82,17 @@ export class NavNodeViewService {
 
   addTransform(transform: INavNodeFolderTransform): void {
     this.transformers.push(transform);
+  }
+
+  private logDuplicates(nodeId: string, duplicates: string[]) {
+    if (duplicates.length > 0 && !this.duplicationNotify.has(nodeId)) {
+      this.duplicationNotify.add(nodeId);
+      this.notificationService.logError({
+        title: 'Node key duplication',
+        message: 'Duplicate elements were hidden.',
+        details: duplicates.join('\n'),
+        onClose: () => this.duplicationNotify.delete(nodeId),
+      });
+    }
   }
 }
