@@ -17,6 +17,8 @@ export interface IDataTableActions {
 
   setPresentation: (id: string) => void;
   setValuePresentation: (id: string | null) => void;
+  switchValuePresentation: (id: string | null) => void;
+  closeValuePresentation: () => void;
 }
 
 export interface IDataTableActionsPrivate extends IDataTableActions {

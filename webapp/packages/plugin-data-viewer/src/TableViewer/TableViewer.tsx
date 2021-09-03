@@ -135,7 +135,11 @@ export const TableViewer = observer<Props>(function TableViewer({
     },
 
     setValuePresentation(id: string | null) {
-      if (id === this.valuePresentationId || id === null) {
+      if (id === this.valuePresentationId) {
+        return;
+      }
+
+      if (id === null) {
         this.onValuePresentationChange(null);
         return;
       }
@@ -156,6 +160,17 @@ export const TableViewer = observer<Props>(function TableViewer({
         this.onValuePresentationChange(presentation.id);
       }
     },
+    switchValuePresentation(id: string | null) {
+      if (id === this.valuePresentationId) {
+        this.onValuePresentationChange(null);
+        return;
+      }
+
+      this.setValuePresentation(id);
+    },
+    closeValuePresentation() {
+      this.onValuePresentationChange(null);
+    },
   }), {
     presentationId: observable,
     valuePresentationId: observable,
@@ -170,7 +185,7 @@ export const TableViewer = observer<Props>(function TableViewer({
     dataFormat,
     onPresentationChange,
     onValuePresentationChange,
-  }, ['setPresentation', 'setValuePresentation']);
+  }, ['setPresentation', 'setValuePresentation', 'switchValuePresentation', 'closeValuePresentation']);
 
   useEffect(() => {
     if (!presentationId || !dataModel) {
@@ -275,6 +290,7 @@ export const TableViewer = observer<Props>(function TableViewer({
           model={dataModel}
           resultIndex={resultIndex}
           onPresentationChange={dataTableActions.setValuePresentation}
+          onClose={dataTableActions.closeValuePresentation}
         />
       </table-content>
       <TableFooter model={dataModel} resultIndex={resultIndex} />

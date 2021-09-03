@@ -28,10 +28,11 @@ export const Tab = observer<TabProps>(function Tab({
   style,
   onOpen,
   onClose,
+  onClick,
 }) {
   const translate = useTranslate();
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
-  const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose);
+  const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose, onClick);
   const info = getInfo();
 
   return styled(useStyles(style))(

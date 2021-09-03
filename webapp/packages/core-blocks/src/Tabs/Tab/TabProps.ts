@@ -20,4 +20,5 @@ export type TabProps = PropsWithChildren<{
   style?: ComponentStyle;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
+  onClick?: (tabId: string) => void;
 }>;

@@ -56,6 +56,7 @@ interface Props {
   resultIndex: number;
   className?: string;
   onPresentationChange: (id: string) => void;
+  onClose?: () => void;
 }
 
 export const TablePresentationBar = observer<Props>(function TablePresentationBar({
@@ -67,6 +68,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   resultIndex,
   className,
   onPresentationChange,
+  onClose,
 }) {
   const style = useStyles(styles, verticalRotatedTabStyles);
   const dataPresentationService = useService(DataPresentationService);
@@ -78,7 +80,13 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     resultIndex
   );
   const Tab = PresentationTab; // alias for styles matching
-  const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
+  const handleClick = (tabId: string) => {
+    if (tabId === presentationId) {
+      onClose?.();
+    } else {
+      onPresentationChange(tabId);
+    }
+  };
 
   if (presentations.length <= 1 && type === DataPresentationType.main) {
     return null;
@@ -86,7 +94,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
 
   return styled(style)(
     <table-left-bar className={className}>
-      <TabsState currentTabId={presentationId} onChange={changePresentation}>
+      <TabsState currentTabId={presentationId}>
         <TabList {...use({ flexible: type === DataPresentationType.main })}>
           {presentations.map(presentation => (
             <Tab
@@ -95,6 +103,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
               model={model}
               resultIndex={resultIndex}
               style={styles}
+              onClick={handleClick}
             />
           ))}
         </TabList>

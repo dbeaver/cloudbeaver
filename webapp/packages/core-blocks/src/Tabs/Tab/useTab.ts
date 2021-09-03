@@ -18,7 +18,8 @@ import { TabsContext } from '../TabsContext';
 export function useTab(
   tabId: string,
   onOpen?: (tab: ITabData<any>) => void,
-  onClose?: (tab: ITabData<any>) => void
+  onClose?: (tab: ITabData<any>) => void,
+  onClick?: (tabId: string) => void,
 ) {
   const state = useContext(TabsContext);
   if (!state) {
@@ -53,6 +54,7 @@ export function useTab(
       if (EventContext.has(e, EventStopPropagationFlag)) {
         return;
       }
+      onClick?.(tabId);
       state.open(tabId);
     },
     handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

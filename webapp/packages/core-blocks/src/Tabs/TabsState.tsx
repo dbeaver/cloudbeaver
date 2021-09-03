@@ -107,16 +107,24 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, []);
 
   useEffect(() => {
-    // prevent from initial render handlers execution
-    // if (currentTabId !== undefined) {
-    //   return;
-    // }
+    if (currentTabId !== undefined) {
+      return;
+    }
 
     openExecutor.execute({
       tabId: state.selectedId!,
       props,
     });
   }, [state.selectedId]);
+
+  useEffect(() => {
+    if (state.selectedId) {
+      openExecutor.execute({
+        tabId: state.selectedId!,
+        props,
+      });
+    }
+  }, []);
 
   const handleOpen = useCallback((tabId: string) => openExecutor.execute({
     tabId,

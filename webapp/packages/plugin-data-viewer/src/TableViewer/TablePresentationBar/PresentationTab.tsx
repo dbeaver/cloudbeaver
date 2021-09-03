@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import {
-  verticalRotatedTabStyles, Tab, TabIcon, TabTitle
+  verticalRotatedTabStyles, Tab, TabIcon, TabTitle, ITabData
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
@@ -24,6 +24,7 @@ interface Props {
   presentation: IDataPresentationOptions;
   className?: string;
   style?: ComponentStyle;
+  onClick: (tabId: string) => void;
 }
 
 export const PresentationTab = observer<Props>(function PresentationTab({
@@ -31,6 +32,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
   presentation,
   className,
   style,
+  onClick,
 }) {
   const translate = useTranslate();
   const styles = useStyles(verticalRotatedTabStyles, style);
@@ -46,6 +48,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
         model={model}
         presentation={presentation}
         disabled={model.isLoading()}
+        onClick={onClick}
       />
     );
   }
@@ -55,6 +58,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
       tabId={presentation.id}
       style={[verticalRotatedTabStyles, style]}
       disabled={model.isLoading()}
+      onClick={onClick}
     >
       {presentation.icon && <TabIcon icon={presentation.icon} />}
       {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
