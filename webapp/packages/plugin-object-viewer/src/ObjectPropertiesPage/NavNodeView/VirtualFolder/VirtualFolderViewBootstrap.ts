@@ -24,6 +24,7 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
 
   register(): void {
     this.navNodeViewService.addTransform({
+      order: 2,
       tab: (nodeId, folderId) => {
         if (VirtualFolderUtils.isVirtualFolder(folderId)) {
           return VirtualFolderTab;

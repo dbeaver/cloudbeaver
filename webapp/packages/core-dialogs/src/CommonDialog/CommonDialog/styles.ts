@@ -144,7 +144,7 @@ export const commonDialogBaseStyle = composes(
       display: flex;
       flex-direction: column;
       overflow: auto;
-      word-break: break-all;
+      word-break: break-word;
       white-space: pre-wrap;
       padding-right: 24px;
     }

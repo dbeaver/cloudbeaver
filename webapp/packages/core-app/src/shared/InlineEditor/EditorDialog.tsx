@@ -20,14 +20,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 const dialogStyle = css`
   footer {
     align-items: center;
-    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;
 
 const styles = css`
-  Button {
-    margin-left: 24px;
-  }
   textarea {
     width: 100% !important;
     min-height: 250px;
@@ -56,11 +54,11 @@ export const EditorDialog: DialogComponent<string, string> = observer(
         title="app_shared_inlineEditor_dialog_title"
         footer={(
           <>
-            <Button type="button" mod={['unelevated']} onClick={handleApply}>
-              {translate('app_shared_inlineEditor_dialog_apply')}
-            </Button>
             <Button type="button" mod={['outlined']} onClick={rejectDialog}>
               {translate('app_shared_inlineEditor_dialog_cancel')}
+            </Button>
+            <Button type="button" mod={['unelevated']} onClick={handleApply}>
+              {translate('app_shared_inlineEditor_dialog_apply')}
             </Button>
           </>
         )}

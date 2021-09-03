@@ -19,6 +19,7 @@ export type NavNodeTransformView = (nodeId: string, folderId: string) => NavNode
 export type NavNodeFolderTransformFn = (nodeId: string, children: string[] | undefined) => string[] | undefined;
 
 export interface INavNodeFolderTransform {
+  order?: number;
   tab?: NavNodeTransformView;
   panel?: NavNodeTransformView;
   transformer: NavNodeFolderTransformFn;

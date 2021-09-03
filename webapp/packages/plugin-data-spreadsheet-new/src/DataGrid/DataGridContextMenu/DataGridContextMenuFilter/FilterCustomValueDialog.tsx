@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import { css } from 'reshadow';
 
 import { Button, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -19,13 +19,8 @@ import { ClipboardService } from '@cloudbeaver/core-ui';
 export const dialogStyle = css`
   footer {
     align-items: center;
-    flex-direction: row-reverse;
-  }
-`;
-
-const styles = css`
-  Button {
-    margin-left: 24px;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;
 
@@ -61,23 +56,23 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
       inputRef.current?.focus();
     }, []);
 
-    return styled(styles)(
+    return (
       <CommonDialogWrapper
         size='small'
         title="data_grid_table_context_menu_filter_dialog_title"
         footer={(
           <>
-            <Button type="button" mod={['unelevated']} onClick={handleApply}>
-              {translate('ui_processing_ok')}
-            </Button>
-            <Button type="button" mod={['outlined']} onClick={rejectDialog}>
-              {translate('ui_processing_cancel')}
-            </Button>
             {clipboardService.clipboardAvailable && clipboardService.state !== 'denied' && (
               <Button type="button" mod={['outlined']} onClick={getValueFromClipboard}>
                 {translate('ui_clipboard')}
               </Button>
             )}
+            <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+              {translate('ui_processing_cancel')}
+            </Button>
+            <Button type="button" mod={['unelevated']} onClick={handleApply}>
+              {translate('ui_processing_ok')}
+            </Button>
           </>
         )}
         style={dialogStyle}

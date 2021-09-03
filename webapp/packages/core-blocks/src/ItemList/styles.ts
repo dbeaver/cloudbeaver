@@ -59,7 +59,7 @@ export const ITEM_LIST_STYLES = composes(
     list-search {
       position: sticky;
       top: 0;
-      padding: 16px;
+      padding: 16px 24px;
       z-index: 1;
 
       & input-box {
@@ -99,7 +99,7 @@ export const ITEM_LIST_STYLES = composes(
       display: flex;
       box-sizing: border-box;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 16px;
     }
     list-item-icon {
       display: flex;

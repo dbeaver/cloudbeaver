@@ -19,17 +19,21 @@ export class NavNodeViewService {
   get tabs(): NavNodeTransformView[] {
     return this.transformers
       .filter(transform => transform.tab)
+      .sort(sortTransformations)
       .map(transform => transform.tab!);
   }
 
   get panels(): NavNodeTransformView[] {
     return this.transformers
       .filter(transform => transform.panel)
+      .sort(sortTransformations)
       .map(transform => transform.panel!);
   }
 
   get transformations(): NavNodeFolderTransformFn[] {
-    return this.transformers.map(transform => transform.transformer);
+    return this.transformers
+      .sort(sortTransformations)
+      .map(transform => transform.transformer);
   }
 
   private transformers: INavNodeFolderTransform[];
@@ -43,6 +47,7 @@ export class NavNodeViewService {
     this.duplicationNotify = new Set();
 
     this.addTransform({
+      order: 0,
       transformer: (nodeId, children) => {
         if (!children) {
           return children;
@@ -95,4 +100,23 @@ export class NavNodeViewService {
       });
     }
   }
+}
+
+function sortTransformations(
+  { order: orderA }: INavNodeFolderTransform,
+  { order: orderB }: INavNodeFolderTransform
+): number {
+  if (orderA === orderB) {
+    return 0;
+  }
+
+  if (orderA === undefined) {
+    return 1;
+  }
+
+  if (orderB === undefined) {
+    return -1;
+  }
+
+  return orderA - orderB;
 }

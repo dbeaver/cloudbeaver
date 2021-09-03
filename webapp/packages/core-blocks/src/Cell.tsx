@@ -26,10 +26,10 @@ const styles = composes(
     main {
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 8px;
     }
     before {
-      margin-right: 12px;
+      margin-right: 16px;
       width: 24px;
       height: 24px;
       flex-shrink: 0;

@@ -17,7 +17,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 const dialogStyle = css`
   footer {
     align-items: center;
-    flex-direction: flex-end;
+    justify-content: flex-end;
   }
 `;
 

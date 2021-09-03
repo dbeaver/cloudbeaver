@@ -43,6 +43,7 @@ const styles = composes(
     }
     Cell {
       border-bottom: 1px solid;
+      padding: 0 16px;
     }
     IconOrImage {
       width: 100%;

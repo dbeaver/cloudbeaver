@@ -43,21 +43,23 @@ const itemStyles = css`
       display: flex;
       height: 100%;
       align-items: center;
-      
-      & menu-name {
-        padding-left: 16px;
-      }
 
       & Icon {
         width: 16px;
       }
+    }
+    menu-icon {
+      padding-right: 8px;
     }
     TableColumnValue:not(:hover):not([|menuOpened]) {
       & Icon {
         opacity: 0;
       }
     }
-    TableColumnValue[|menuAvailable][|isMenuEmpty] menu-box {
+    TableColumnValue[|menuAvailable]:not([|isMenuEmpty]) menu-box menu-name {
+      padding-left: 8px;
+    }
+    TableColumnValue[|menuAvailable][|isMenuEmpty] menu-box menu-name {
       padding-left: 32px;
     }
     TableColumnValue:nth-child(3) {
@@ -166,18 +168,14 @@ const ItemName = observer<IItemNameProps>(function ItemName({
       onDoubleClick={openNode}
       {...use({ menuAvailable, isMenuEmpty, menuOpened })}
     >
-      {!isMenuEmpty && menuAvailable ? (
-        <MenuTrigger getPanel={getPanel} modal disclosure onVisibleSwitch={switchState}>
-          <menu-box>
-            <Icon name="snack" viewBox="0 0 16 10" />
-            <menu-name>{name}</menu-name>
-          </menu-box>
-        </MenuTrigger>
-      ) : (
-        <menu-box>
-          {name}
-        </menu-box>
-      )}
+      <menu-box>
+        {!isMenuEmpty && menuAvailable && (
+          <MenuTrigger getPanel={getPanel} modal disclosure onVisibleSwitch={switchState}>
+            <menu-icon><Icon name="snack" viewBox="0 0 16 10" /></menu-icon>
+          </MenuTrigger>
+        )}
+        <menu-name>{name}</menu-name>
+      </menu-box>
     </TableColumnValue>
   );
 });

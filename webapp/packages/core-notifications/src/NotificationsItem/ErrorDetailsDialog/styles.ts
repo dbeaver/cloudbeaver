@@ -11,7 +11,8 @@ import { css } from 'reshadow';
 export const dialogStyle = css`
   footer {
     align-items: center;
-    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;
 
@@ -19,9 +20,6 @@ export const styles = css`
   code, message {
     display: block;
     white-space: pre-wrap;
-  }
-  Button {
-    margin-left: 24px;
   }
   textarea {
     width: 100%;

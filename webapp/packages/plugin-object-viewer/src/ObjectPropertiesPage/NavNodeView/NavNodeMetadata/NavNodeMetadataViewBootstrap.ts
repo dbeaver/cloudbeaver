@@ -25,6 +25,7 @@ export class NavNodeMetadataViewBootstrap extends Bootstrap {
 
   register(): void {
     this.navNodeViewService.addTransform({
+      order: 1,
       tab: (nodeId, folderId) => {
         if (folderId.startsWith(navNodeMetadataId)) {
           return NavNodeMetadataTab;

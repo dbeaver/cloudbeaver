@@ -55,10 +55,10 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       icon='/icons/error_icon.svg'
       footer={(
         <>
-          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
           {error.textToCopy && (
             <Button type="button" mod={['outlined']} onClick={copyHandler}>Copy</Button>
           )}
+          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
         </>
       )}
       style={dialogStyle}

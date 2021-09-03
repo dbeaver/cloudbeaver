@@ -103,7 +103,7 @@ export const TREE_NODE_STYLES = composes(
 
     node TreeNodeControl[big] {
       height: 46px;
-      padding: 0;
+      padding: 0 16px;
 
       & TreeNodeSelect {
         margin: 3px;
