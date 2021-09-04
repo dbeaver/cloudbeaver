@@ -482,7 +482,7 @@ class CBSecurityController implements DBWSecurityController {
                 }
 
                 insertPermissions(dbCon, role.getRoleId(),
-                    new String[] {DBWConstants.PERMISSION_PUBLIC, DBWConstants.PERMISSION_USER} , grantor);
+                    new String[] {DBWConstants.PERMISSION_PUBLIC} , grantor);
 
                 txn.commit();
             }
