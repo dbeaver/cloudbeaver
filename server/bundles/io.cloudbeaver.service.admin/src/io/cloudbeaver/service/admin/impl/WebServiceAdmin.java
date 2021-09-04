@@ -155,7 +155,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             WebRole newRole = new WebRole(roleId);
             newRole.setName(roleName);
             newRole.setDescription(description);
-            CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole);
+            CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole, webSession.getUser().getUserId());
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);

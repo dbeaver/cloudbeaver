@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWConnectionGrant;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWSecuritySubjectType;
 import io.cloudbeaver.model.session.WebSession;
@@ -464,7 +465,7 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
-    public void createRole(WebRole role) throws DBCException {
+    public void createRole(WebRole role, String grantor) throws DBCException {
         if (isSubjectExists(role.getRoleId())) {
             throw new DBCException("User or role '" + role.getRoleId() + "' already exists");
         }
@@ -479,6 +480,10 @@ class CBSecurityController implements DBWSecurityController {
                     dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
+
+                insertPermissions(dbCon, role.getRoleId(),
+                    new String[] {DBWConstants.PERMISSION_PUBLIC, DBWConstants.PERMISSION_USER} , grantor);
+
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -534,21 +539,25 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
-                if (!ArrayUtils.isEmpty(permissionIds)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
-                        for (String permission : permissionIds) {
-                            dbStat.setString(1, subjectId);
-                            dbStat.setString(2, permission);
-                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                            dbStat.setString(4, grantorId);
-                            dbStat.execute();
-                        }
-                    }
-                }
+                insertPermissions(dbCon, subjectId, permissionIds, grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving role permissions in database", e);
+        }
+    }
+
+    private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
+        if (!ArrayUtils.isEmpty(permissionIds)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                for (String permission : permissionIds) {
+                    dbStat.setString(1, subjectId);
+                    dbStat.setString(2, permission);
+                    dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(4, grantorId);
+                    dbStat.execute();
+                }
+            }
         }
     }
 

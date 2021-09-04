@@ -24,4 +24,6 @@ public class DBWConstants {
     public static final String PERMISSION_PUBLIC = "public";
 
     public static final String PERMISSION_ADMIN = "admin";
+    public static final String PERMISSION_USER = "user";
+
 }
