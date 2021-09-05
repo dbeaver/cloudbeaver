@@ -81,7 +81,7 @@ public class WebAuthInfo {
 
     @Property
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authProvider);
+        return new WebUserOriginInfo(session, user, authProvider, true);
     }
 
     @Property

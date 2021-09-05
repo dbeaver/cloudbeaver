@@ -64,11 +64,18 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
         @NotNull Map<String, Object> providerConfig,
         @NotNull Map<String, Object> credentials) throws DBException;
 
+    /**
+     * Get specified user details.
+     * @param user          user
+     * @param selfIdentity  true if users tries to get information about itself.
+     *                      Otherwise it is information for supervisor.
+     */
     @Nullable
     DBPObject getUserDetails(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSession webSession,
         @NotNull AUTH_SESSION session,
-        @NotNull WebUser user) throws DBException;
+        @NotNull WebUser user,
+        boolean selfIdentity) throws DBException;
 
 }

@@ -88,7 +88,7 @@ public class AdminUserInfo {
             if (authProvider == null) {
                 log.error("Auth provider '" + provider + "' not found");
             } else {
-                result.add(new WebUserOriginInfo(session, user, authProvider));
+                result.add(new WebUserOriginInfo(session, user, authProvider, false));
             }
         }
         return result.toArray(new WebUserOriginInfo[0]);

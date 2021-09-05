@@ -56,7 +56,7 @@ public class WebUserAuthToken {
 
     @NotNull
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authInfo.getAuthProviderDescriptor());
+        return new WebUserOriginInfo(session, user, authInfo.getAuthProviderDescriptor(), true);
     }
 
 }

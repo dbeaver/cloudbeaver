@@ -49,11 +49,13 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     private final WebSession session;
     private final WebUser user;
     private final WebAuthProviderDescriptor authProvider;
+    private boolean selfIdentity;
 
-    public WebUserOriginInfo(WebSession session, WebUser user, WebAuthProviderDescriptor authProvider) {
+    public WebUserOriginInfo(WebSession session, WebUser user, WebAuthProviderDescriptor authProvider, boolean selfIdentity) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
+        this.selfIdentity = selfIdentity;
     }
 
     @NotNull
@@ -104,7 +106,12 @@ public class WebUserOriginInfo implements WebObjectOrigin {
                 if (!isValidSessionType(authSession, authProvider)) {
                     return new WebPropertyInfo[0];
                 }
-                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), session, authSession, user);
+                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(
+                    session.getProgressMonitor(),
+                    session,
+                    authSession,
+                    user,
+                    selfIdentity);
                 if (userDetails != null) {
                     return WebServiceUtils.getObjectProperties(session, userDetails);
                 }
