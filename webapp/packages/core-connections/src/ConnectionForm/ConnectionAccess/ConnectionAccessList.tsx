@@ -99,7 +99,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
     <Group box medium overflow>
       <container>
         <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('connections_connection_access_grant')}</Button>
+          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </ConnectionAccessTableHeader>
         <table-container>
           <Table selectedItems={selectedSubjects}>

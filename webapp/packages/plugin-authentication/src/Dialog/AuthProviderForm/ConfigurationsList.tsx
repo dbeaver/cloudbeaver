@@ -36,7 +36,7 @@ const styles = composes(
       overflow: auto;
     }
     Filter {
-      margin-bottom: 12px;
+      margin: 0 24px 12px 24px;
     }
     list {
       overflow: auto;
