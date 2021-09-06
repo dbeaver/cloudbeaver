@@ -94,13 +94,10 @@ export class TableFooterMenuService {
           DatabaseEditAction
         );
 
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
         return (
           context.data.model.isReadonly()
           || context.data.model.isDisabled(context.data.resultIndex)
           || !editor?.hasFeature('delete')
-          || selectedElements.length === 0
         );
       },
       isDisabled(context) {
@@ -159,24 +156,30 @@ export class TableFooterMenuService {
           DatabaseEditAction
         );
 
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
-        if (!editor || selectedElements.length === 0) {
-          return true;
-        }
-
-        return !selectedElements.some(key => {
-          const state = editor.getElementState(key);
-
-          if (state === DatabaseEditChangeType.add) {
-            return editor.isElementEdited(key);
-          }
-
-          return state !== null;
-        });
+        return !editor;
       },
       isDisabled(context) {
-        return context.data.model.isLoading();
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        return (
+          context.data.model.isLoading()
+          || !editor
+          || selectedElements.length === 0
+          || !selectedElements.some(key => {
+            const state = editor.getElementState(key);
+
+            if (state === DatabaseEditChangeType.add) {
+              return editor.isElementEdited(key);
+            }
+
+            return state !== null;
+          })
+        );
       },
       onClick(context) {
         const editor = context.data.model.source.getActionImplementation(
