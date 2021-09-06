@@ -87,13 +87,13 @@ export default [
   ['administration_roles_refresh_tooltip', 'Refresh role list'],
   ['administration_roles_delete_tooltip', 'Delete selected roles'],
 
-  ['administration_roles_role_granted_users_tab_title', 'Granted users'],
+  ['administration_roles_role_granted_users_tab_title', 'Users'],
   ['administration_roles_role_granted_users_search_placeholder', 'Search for user ID...'],
   ['administration_roles_role_granted_users_user_id', 'User ID'],
   ['administration_roles_role_granted_users_user_name', 'User name'],
   ['administration_roles_role_granted_users_empty', 'No available users'],
 
-  ['administration_roles_role_granted_connections_tab_title', 'Granted connections'],
+  ['administration_roles_role_granted_connections_tab_title', 'Connections'],
   ['administration_roles_role_granted_connections_search_placeholder', 'Search for connection name...'],
   ['administration_roles_role_granted_connections_empty', 'No available connections'],
 ];

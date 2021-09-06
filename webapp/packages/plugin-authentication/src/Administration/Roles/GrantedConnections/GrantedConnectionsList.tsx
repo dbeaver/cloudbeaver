@@ -105,7 +105,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
     <Group box medium overflow>
       <container>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>{translate('ui_revoke')}</Button>
+          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>{translate('ui_delete')}</Button>
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>

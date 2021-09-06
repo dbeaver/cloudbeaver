@@ -110,11 +110,11 @@ export class GrantedUsersTabService extends Bootstrap {
     }
 
     if (granted.length) {
-      status.info(`Granted users: "${granted.join(', ')}"`);
+      status.info(`Added users: "${granted.join(', ')}"`);
     }
 
     if (revoked.length) {
-      status.info(`Revoked users: "${revoked.join(', ')}"`);
+      status.info(`Deleted users: "${revoked.join(', ')}"`);
     }
   }
 }

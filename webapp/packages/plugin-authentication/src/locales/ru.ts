@@ -76,13 +76,13 @@ export default [
   ['administration_roles_refresh_tooltip', 'Обновить список ролей'],
   ['administration_roles_delete_tooltip', 'Уадлить выбранные роли'],
 
-  ['administration_roles_role_granted_users_tab_title', 'Связанные пользователи'],
+  ['administration_roles_role_granted_users_tab_title', 'Пользователи'],
   ['administration_roles_role_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
   ['administration_roles_role_granted_users_user_id', 'ID пользователя'],
   ['administration_roles_role_granted_users_user_name', 'Имя пользователя'],
   ['administration_roles_role_granted_users_empty', 'Нет доступных пользователей'],
 
-  ['administration_roles_role_granted_connections_tab_title', 'Связанные подключения'],
+  ['administration_roles_role_granted_connections_tab_title', 'Подключения'],
   ['administration_roles_role_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
   ['administration_roles_role_granted_connections_empty', 'Нет доступных подключений'],
 ];

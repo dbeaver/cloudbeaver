@@ -96,7 +96,7 @@ export const UserList = observer<Props>(function UserList({
     <Group box medium overflow>
       <container>
         <GrantedUsersTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_grant')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
           <Table selectedItems={selectedSubjects}>
