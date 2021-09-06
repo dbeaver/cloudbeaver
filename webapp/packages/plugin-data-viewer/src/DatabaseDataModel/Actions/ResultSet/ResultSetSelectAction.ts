@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, IReactionDisposer, makeObservable, observable, observe, toJS } from 'mobx';
+import { action, computed, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -37,7 +37,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   private focusedElement: IResultSetElementKey | null;
   private view: ResultSetViewAction;
   private edit: ResultSetEditAction;
-  private validationDisposer: () => void;
+  private validationDisposer: IReactionDisposer;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
@@ -51,16 +51,12 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       selectedElements: observable,
       focusedElement: observable.ref,
       elements: computed,
+      set: action,
+      focus: action,
+      clear: action,
     });
 
-    this.validationDisposer = observe(this.view, 'rowKeys', change => {
-      const previous = change.oldValue as IResultSetRowKey[] | undefined;
-      const current = change.newValue as IResultSetRowKey[];
-
-      if (!previous) {
-        return;
-      }
-
+    this.validationDisposer = reaction(() => this.view.rowKeys, (current, previous) => {
       if (this.focusedElement) {
         const focus = this.focusedElement;
         const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
@@ -274,22 +270,22 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
         if (data.value) {
           if (data.revert) {
             // this.focus({ ...data.value.key, row: this.view.getShift(data.value.key.row) });
-          } else {
-            this.focus(data.value.key);
+          } else if (data.value.length > 0) {
+            this.focus(data.value[data.value.length - 1].key);
           }
           this.clear();
         }
         break;
 
       case DatabaseEditChangeType.delete:
-        if (data.value) {
-          this.focus(data.value.key);
+        if (data.value && data.value.length > 0) {
+          this.focus(data.value[data.value.length - 1].key);
           this.clear();
         }
         break;
       case DatabaseEditChangeType.update:
-        if (data.value) {
-          this.focus(data.value.key);
+        if (data.value && data.value.length > 0) {
+          this.focus(data.value[data.value.length - 1].key);
         }
         break;
     }

@@ -14,7 +14,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { DatabaseDataSelectActionsData, IDatabaseResultSet, IDataPresentationProps, IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps, IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -109,12 +109,19 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
-      if (data.resultId !== editor.result.id || !data.value) {
+      if (
+        data.resultId !== editor.result.id
+        || !data.value
+        || data.value.length === 0
+        || data.type === DatabaseEditChangeType.delete
+      ) {
         return;
       }
 
-      const idx = tableData.getColumnIndexFromColumnKey(data.value.key.column);
-      const rowIdx = tableData.getRowIndexFromKey(data.value.key.row);
+      const key = data.value[data.value.length - 1].key;
+
+      const idx = tableData.getColumnIndexFromColumnKey(key.column);
+      const rowIdx = tableData.getRowIndexFromKey(key.row);
 
       if (data.revert) {
         editingContext.closeEditor({
@@ -123,7 +130,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         });
       }
 
-      if (selectionAction.isFocused(data.value.key)) {
+      if (selectionAction.isFocused(key)) {
         const rowTop = rowIdx * rowHeight;
         const gridDiv = dataGridDivRef.current;
         dataGridRef.current?.scrollToColumn(idx);

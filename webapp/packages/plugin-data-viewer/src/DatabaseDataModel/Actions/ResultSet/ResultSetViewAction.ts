@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, extendObservable, IComputedValue, makeObservable, observe } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 

@@ -78,11 +78,11 @@ export class DocumentEditAction
       type: DatabaseEditChangeType.update,
       revert: false,
       resultId: this.result.id,
-      value: {
+      value: [{
         key: key,
         prevValue,
         value,
-      },
+      }],
     });
 
     this.removeUnchanged(key);
@@ -137,7 +137,7 @@ export class DocumentEditAction
     this.action.execute({
       revert: true,
       resultId: this.result.id,
-      value: { key: key },
+      value: [{ key: key }],
     });
   }
 

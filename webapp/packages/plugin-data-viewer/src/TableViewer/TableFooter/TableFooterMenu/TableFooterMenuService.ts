@@ -44,23 +44,23 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
+        if (context.data.model.isReadonly()) {
+          return true;
+        }
+
         const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
         );
 
-        return (
-          context.data.model.isReadonly()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !editor?.hasFeature('add')
-        );
+        return !editor?.hasFeature('add');
       },
       isDisabled(context) {
-        if (context.data.model.isLoading()) {
-          return true;
-        }
-
-        return false;
+        return (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        );
       },
       onClick(context) {
         const editor = context.data.model.source.getActionImplementation(
@@ -89,19 +89,23 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
+        if (context.data.model.isReadonly()) {
+          return true;
+        }
+
         const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
         );
 
-        return (
-          context.data.model.isReadonly()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !editor?.hasFeature('delete')
-        );
+        return !editor?.hasFeature('delete');
       },
       isDisabled(context) {
-        if (context.data.model.isLoading()) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
           return true;
         }
 
@@ -130,9 +134,7 @@ export class TableFooterMenuService {
 
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
-        for (const key of selectedElements) {
-          editor?.delete(key);
-        }
+        editor?.delete(...selectedElements);
       },
     });
     this.registerMenuItem({
@@ -144,10 +146,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        if (
-          context.data.model.isReadonly()
-          || context.data.model.isDisabled(context.data.resultIndex)
-        ) {
+        if (context.data.model.isReadonly()) {
           return true;
         }
 
@@ -159,6 +158,14 @@ export class TableFooterMenuService {
         return !editor;
       },
       isDisabled(context) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
+          return true;
+        }
+
         const editor = context.data.model.source.getActionImplementation(
           context.data.resultIndex,
           DatabaseEditAction
@@ -167,8 +174,7 @@ export class TableFooterMenuService {
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
         return (
-          context.data.model.isLoading()
-          || !editor
+          !editor
           || selectedElements.length === 0
           || !selectedElements.some(key => {
             const state = editor.getElementState(key);
@@ -189,9 +195,7 @@ export class TableFooterMenuService {
 
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
-        for (const element of selectedElements) {
-          editor?.revert(element);
-        }
+        editor?.revert(...selectedElements);
       },
     });
     this.registerMenuItem({
@@ -201,6 +205,9 @@ export class TableFooterMenuService {
       icon: 'table-save',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        return context.data.model.isReadonly();
       },
       isDisabled(context) {
         if (
@@ -229,6 +236,9 @@ export class TableFooterMenuService {
       icon: '/icons/data_revert_all.svg',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        return context.data.model.isReadonly();
       },
       isDisabled(context) {
         if (

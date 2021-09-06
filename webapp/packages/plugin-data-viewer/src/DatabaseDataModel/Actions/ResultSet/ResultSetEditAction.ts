@@ -15,7 +15,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
-import { DatabaseEditChangeType, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
+import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditActionValue } from '../IDatabaseDataEditAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -156,11 +156,11 @@ export class ResultSetEditAction
       resultId: this.result.id,
       type: update.type,
       revert: false,
-      value: {
+      value: [{
         key,
         prevValue,
         value,
-      },
+      }],
     });
 
     this.removeEmptyUpdate(update);
@@ -199,18 +199,50 @@ export class ResultSetEditAction
         resultId: this.result.id,
         type: update.type,
         revert: false,
-        value: {
+        value: [{
           key: { column, row },
-        },
+        }],
       });
     }
   }
 
-  delete(key: IResultSetElementKey): void {
-    this.deleteRow(key.row, key.column);
+  delete(...keys: IResultSetElementKey[]): void {
+    const reverted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+    const deleted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+
+    for (const key of keys) {
+      const serializedKey = ResultSetDataKeysUtils.serialize(key.row);
+      const update = this.editorData.get(serializedKey);
+
+      if (update?.type === DatabaseEditChangeType.add) {
+        reverted.push({ key });
+        this.editorData.delete(serializedKey);
+      } else {
+        this.deleteRow(key.row, key.column, true);
+        deleted.push({ key });
+      }
+    }
+
+    if (reverted.length > 0) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: DatabaseEditChangeType.add,
+        revert: true,
+        value: reverted,
+      });
+    }
+
+    if (deleted.length > 0) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: DatabaseEditChangeType.delete,
+        revert: false,
+        value: deleted,
+      });
+    }
   }
 
-  deleteRow(key: IResultSetRowKey, column?: IResultSetColumnKey): void {
+  deleteRow(key: IResultSetRowKey, column?: IResultSetColumnKey, silent?: boolean): void {
     const serializedKey = ResultSetDataKeysUtils.serialize(key);
     const update = this.editorData.get(serializedKey);
 
@@ -225,24 +257,24 @@ export class ResultSetEditAction
     if (update?.type !== DatabaseEditChangeType.add) {
       const [update, created] = this.getOrCreateUpdate(key, DatabaseEditChangeType.delete);
 
-      if (created) {
+      if (created && !silent) {
         this.action.execute({
           resultId: this.result.id,
           type: update.type,
           revert: false,
-          value: {
+          value: [{
             key: { column, row: key },
-          },
+          }],
         });
       }
-    } else {
+    } else if (!silent) {
       this.action.execute({
         resultId: this.result.id,
         type: update.type,
         revert: true,
-        value: {
+        value: [{
           key: { column, row: key },
-        },
+        }],
       });
     }
   }
@@ -318,11 +350,11 @@ export class ResultSetEditAction
       resultId: this.result.id,
       type: update.type,
       revert: true,
-      value: {
+      value: [{
         key,
         prevValue,
         value,
-      },
+      }],
     });
 
     this.removeEmptyUpdate(update);
