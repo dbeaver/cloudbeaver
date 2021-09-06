@@ -59,8 +59,8 @@ export class MetadataMap<TKey, TValue> {
       throw new Error('MetadataMap: defaultValue should be provided if defaultValueGetter not set');
     }
 
+    const value = provider(key, this);
     untracked(() => {
-      const value = provider(key, this);
       this.data.set(key, value);
       this.length++;
     });

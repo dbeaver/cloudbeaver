@@ -15,13 +15,21 @@ type AbstractConstructorFunction<
   TOptions,
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>
-> = abstract new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult) => TAction;
+> = abstract new (
+  source: IDatabaseDataSource<TOptions, TResult>,
+  result: TResult,
+  ...actions: any[]
+) => TAction;
 
 type ConstructorFunction<
   TOptions,
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>
-> = new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult) => TAction;
+> = new (
+  source: IDatabaseDataSource<TOptions, TResult>,
+  result: TResult,
+  ...actions: any[]
+) => TAction;
 
 export type IDatabaseDataActionInterface<
   TOptions,

@@ -39,10 +39,14 @@ export class ResultSetEditAction
   private editorData: Map<string, IResultSetUpdate>;
   private data: ResultSetDataAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    result: IDatabaseResultSet,
+    data: ResultSetDataAction
+  ) {
     super(source, result);
     this.editorData = new Map();
-    this.data = this.getAction(ResultSetDataAction);
+    this.data = data;
     this.features = ['add', 'delete'];
 
     makeObservable<this, 'editorData'>(this, {

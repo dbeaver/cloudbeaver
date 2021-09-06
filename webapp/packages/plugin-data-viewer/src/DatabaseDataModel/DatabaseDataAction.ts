@@ -49,3 +49,7 @@ implements IDatabaseDataAction<TOptions, TResult> {
 
   dispose(): void {}
 }
+
+export function isDatabaseDataAction(action: any): action is IDatabaseDataActionClass<any, any, any> {
+  return action.prototype instanceof DatabaseDataAction;
+}

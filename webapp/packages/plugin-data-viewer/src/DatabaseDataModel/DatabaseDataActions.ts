@@ -8,6 +8,8 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
+import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
+import { isDatabaseDataAction } from './DatabaseDataAction';
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
@@ -19,11 +21,9 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataActions<TOptions, TResult> {
   private actions: Map<string, ActionsList<TOptions, TResult>>;
   private source: IDatabaseDataSource<TOptions, TResult>;
-  private unCommittedActions: Map<string, ActionsList<TOptions, TResult>>;
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.actions = new Map();
-    this.unCommittedActions = new Map();
     this.source = source;
 
     makeObservable<DatabaseDataActions<TOptions, TResult>, 'actions'>(this, {
@@ -55,7 +55,18 @@ implements IDatabaseDataActions<TOptions, TResult> {
     let action = actions.find(action => action instanceof Action);
 
     if (!action) {
-      action = new Action(this.source, result);
+      const allDeps = getDependingDataActions(Action)
+        .slice(2); // skip source and result arguments
+
+      const depends = allDeps
+        .filter(isDatabaseDataAction)
+        .map(action => this.get<IDatabaseDataAction<TOptions, TResult>>(result, action));
+
+      if (allDeps.length !== depends.length) {
+        throw new Error('Unsupported inject in: ' + Action.name);
+      }
+
+      action = new Action(this.source, result, ...depends);
       this.addActionToList(result.id, actions, action);
     }
 
@@ -66,8 +77,8 @@ implements IDatabaseDataActions<TOptions, TResult> {
     result: TResult,
     Action: IDatabaseDataActionInterface<TOptions, TResult, T>
   ): T | undefined {
-    const actions = this.getOrCreateActionsList(result.id);
-    const action = actions.find(action => action instanceof Action);
+    const actions = this.getActionsList(result.id);
+    const action = actions?.find(action => action instanceof Action);
 
     return action as T | undefined;
   }
@@ -96,10 +107,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     actions: ActionsList<TOptions, TResult>,
     action: IDatabaseDataAction<TOptions, TResult>
   ) {
-    actions = observable.array([...actions, action]);
-
-    this.unCommittedActions.set(resultId, actions);
-    this.scheduleCommit(resultId);
+    actions.push(action);
   }
 
   private getOrCreateActionsList(resultId: string): ActionsList<TOptions, TResult> {
@@ -113,28 +121,12 @@ implements IDatabaseDataActions<TOptions, TResult> {
   }
 
   private createActionsList(resultId: string): ActionsList<TOptions, TResult> {
-    const actions: ActionsList<TOptions, TResult> = observable.array(undefined, { deep: false });
-
-    this.unCommittedActions.set(resultId, actions);
-    this.scheduleCommit(resultId);
-
+    const actions: ActionsList<TOptions, TResult> = observable.array([], { deep: false });
+    this.actions.set(resultId, actions);
     return actions;
   }
 
   private getActionsList(resultId: string): ActionsList<TOptions, TResult> | undefined {
-    const committed = this.actions.get(resultId);
-    const unCommitted = this.unCommittedActions.get(resultId);
-    return unCommitted ?? committed;
-  }
-
-  private scheduleCommit(resultId: string) {
-    setTimeout(() => {
-      const actions = this.unCommittedActions.get(resultId);
-
-      if (actions) {
-        this.actions.set(resultId, actions);
-        this.unCommittedActions.delete(resultId);
-      }
-    }, 1);
+    return this.actions.get(resultId);
   }
 }

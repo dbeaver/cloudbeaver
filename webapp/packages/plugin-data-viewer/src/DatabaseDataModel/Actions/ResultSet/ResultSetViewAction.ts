@@ -50,10 +50,15 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   private data: ResultSetDataAction;
   private editor: ResultSetEditAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    result: IDatabaseResultSet,
+    data: ResultSetDataAction,
+    editor: ResultSetEditAction
+  ) {
     super(source, result);
-    this.data = this.getAction(ResultSetDataAction);
-    this.editor = this.getAction(ResultSetEditAction);
+    this.data = data;
+    this.editor = editor;
 
     makeObservable(this, {
       rowKeys: computed,

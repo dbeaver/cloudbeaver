@@ -30,10 +30,15 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   private view: ResultSetViewAction;
   private edit: ResultSetEditAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    result: IDatabaseResultSet,
+    view: ResultSetViewAction,
+    edit: ResultSetEditAction
+  ) {
     super(source, result);
-    this.view = this.getAction(ResultSetViewAction);
-    this.edit = this.getAction(ResultSetEditAction);
+    this.view = view;
+    this.edit = edit;
   }
 
   getHeaders(): string[] {

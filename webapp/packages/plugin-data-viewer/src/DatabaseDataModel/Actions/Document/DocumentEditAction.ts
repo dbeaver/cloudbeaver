@@ -27,10 +27,14 @@ export class DocumentEditAction
   readonly editedElements: Map<number, IDatabaseDataDocument>;
   private data: DocumentDataAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    result: IDatabaseResultSet,
+    data: DocumentDataAction
+  ) {
     super(source, result);
     this.editedElements = new Map();
-    this.data = this.getAction(DocumentDataAction);
+    this.data = data;
 
     makeObservable(this, {
       editedElements: observable,

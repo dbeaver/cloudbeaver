@@ -39,15 +39,20 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   private edit: ResultSetEditAction;
   private validationDisposer: IReactionDisposer;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    result: IDatabaseResultSet,
+    view: ResultSetViewAction,
+    edit: ResultSetEditAction
+  ) {
     super(source, result);
-    this.view = this.getAction(ResultSetViewAction);
-    this.edit = this.getAction(ResultSetEditAction);
+    this.view = view;
+    this.edit = edit;
     this.actions = new Executor();
     this.selectedElements = new Map();
     this.focusedElement = null;
 
-    makeObservable<ResultSetSelectAction, 'focusedElement'>(this, {
+    makeObservable<this, 'focusedElement'>(this, {
       selectedElements: observable,
       focusedElement: observable.ref,
       elements: computed,
@@ -90,6 +95,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
         }
       }
     });
+
     this.edit.action.addHandler(this.syncFocus.bind(this));
   }
 
