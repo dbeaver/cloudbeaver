@@ -279,7 +279,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
 
       case DatabaseEditChangeType.delete:
         if (data.value && data.value.length > 0) {
-          this.focus(data.value[data.value.length - 1].key);
+          this.focus(data.value[0].key);
           this.clear();
         }
         break;
