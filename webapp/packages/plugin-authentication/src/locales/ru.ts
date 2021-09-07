@@ -61,6 +61,7 @@ export default [
   ['administration_identity_providers_provider_create_error', 'Ошибка при создании конфигурации'],
   ['administration_identity_providers_configuration_list_update_success', 'Список конфигураций успешно обновлен'],
   ['administration_identity_providers_configuration_list_update_fail', 'Не удалось обновить список конфигураций'],
+  ['administration_identity_providers_service_link', 'Настроить'],
 
   ['administration_roles_tab_title', 'Роли'],
   ['administration_roles_tab_description', 'Управление ролями'],

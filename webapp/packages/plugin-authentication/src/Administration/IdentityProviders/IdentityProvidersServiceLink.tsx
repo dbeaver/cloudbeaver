@@ -9,6 +9,7 @@
 import type { ServiceDescriptionComponent } from '@cloudbeaver/core-authentication';
 import { Link } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 
 import { AuthConfigurationsAdministrationNavService } from './AuthConfigurationsAdministrationNavService';
 
@@ -21,5 +22,9 @@ export const IdentityProvidersServiceLink: ServiceDescriptionComponent = functio
     return null;
   }
 
-  return <Link onClick={() => authConfigurationsAdministrationNavService.navToRoot()}>Configure</Link>;
+  return (
+    <Link onClick={() => authConfigurationsAdministrationNavService.navToRoot()}>
+      <Translate token="administration_identity_providers_service_link" />
+    </Link>
+  );
 };
