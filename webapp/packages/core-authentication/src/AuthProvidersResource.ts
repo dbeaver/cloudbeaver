@@ -20,6 +20,7 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
+import { AuthSettingsService } from './AuthSettingsService';
 
 export type AuthProvider = AuthProviderInfo;
 
@@ -29,6 +30,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(
+    private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authConfigurationsResource: AuthConfigurationsResource
@@ -61,7 +63,27 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     return this.get(resourceKeyList(this.serverConfigResource.enabledAuthProviders)) as AuthProvider[];
   }
 
+  getBase(): string | undefined {
+    return this.authSettingsService.settings.getValue('baseAuthProvider');
+  }
+
+  getPrimary(): string {
+    return this.authSettingsService.settings.getValue('primaryAuthProvider');
+  }
+
   isEnabled(id: string): boolean {
+    return this.isAuthEnabled(id);
+  }
+
+  isBase(id: string): boolean {
+    return id === this.getBase();
+  }
+
+  isPrimary(id: string): boolean {
+    return id === this.getPrimary();
+  }
+
+  isAuthEnabled(id: string): boolean {
     return this.serverConfigResource.enabledAuthProviders.includes(id);
   }
 

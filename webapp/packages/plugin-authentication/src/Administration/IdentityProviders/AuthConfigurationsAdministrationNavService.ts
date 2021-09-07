@@ -15,11 +15,11 @@ export class AuthConfigurationsAdministrationNavService {
     private administrationScreenService: AdministrationScreenService
   ) { }
 
-  navToRoot() {
+  navToRoot(): void {
     this.administrationScreenService.navigateToItem('auth-configurations');
   }
 
-  navToCreate() {
+  navToCreate(): void {
     this.administrationScreenService.navigateToItemSub('auth-configurations', 'create');
   }
 }

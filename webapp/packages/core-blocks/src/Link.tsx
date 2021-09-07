@@ -13,6 +13,9 @@ interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 const styles = css`
+  a {
+    cursor: pointer;
+  }
   a[|wrapper] {
     &, &:hover, &:focus, &:active {
       color: inherit;

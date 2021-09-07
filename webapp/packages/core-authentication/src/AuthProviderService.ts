@@ -9,17 +9,47 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
-import { md5 } from '@cloudbeaver/core-utils';
+import { md5, uuid } from '@cloudbeaver/core-utils';
 
-import { AuthProvidersResource } from './AuthProvidersResource';
+import { AuthProvider, AuthProvidersResource } from './AuthProvidersResource';
+
+interface IServiceDescriptionProps {
+  configurationWizard: boolean;
+}
+
+export type ServiceDescriptionComponent = React.FC<IServiceDescriptionProps>;
+
+interface IServiceDescriptionLinkOptions {
+  isSupported: (service: AuthProvider) => boolean;
+  description: () => ServiceDescriptionComponent;
+}
+
+interface IServiceDescriptionLink extends IServiceDescriptionLinkOptions {
+  id: string;
+}
 
 @injectable()
 export class AuthProviderService {
   readonly requestAuthProvider: IExecutor<ObjectOrigin>;
+
+  private serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
+
   constructor(
     private readonly authProvidersResource: AuthProvidersResource
   ) {
     this.requestAuthProvider = new Executor();
+    this.serviceDescriptionLinker = [];
+  }
+
+  getServiceDescriptionLinks(service: AuthProvider): IServiceDescriptionLink[] {
+    return this.serviceDescriptionLinker.filter(link => link.isSupported(service));
+  }
+
+  addServiceDescriptionLink(link: IServiceDescriptionLinkOptions): void {
+    this.serviceDescriptionLinker.push({
+      id: uuid(),
+      ...link,
+    });
   }
 
   async requireProvider(type: string, subType?: string): Promise<boolean>

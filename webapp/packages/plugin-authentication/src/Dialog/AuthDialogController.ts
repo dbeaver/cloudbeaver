@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AuthInfoService, AuthProvidersResource, AuthProvider, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -27,20 +27,23 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   get providers(): AuthProvider[] {
     const providers = this.authProvidersResource.getEnabledProviders();
+    const primaryId = this.authProvidersResource.getPrimary();
 
-    if (this.admin && !this.authProvidersResource.isEnabled(AUTH_PROVIDER_LOCAL_ID)) {
-      const local = this.authProvidersResource.get(AUTH_PROVIDER_LOCAL_ID);
+    if (this.admin && !this.authProvidersResource.isAuthEnabled(primaryId)) {
+      const primary = this.authProvidersResource.get(primaryId);
 
-      if (local) {
-        providers.push(local);
+      if (primary) {
+        providers.push(primary);
       }
     }
 
-    return providers.filter(Boolean).sort(this.compareProviders);
+    return providers
+      .filter(Boolean)
+      .sort(compareProviders);
   }
 
   readonly error = new GQLErrorCatcher();
-  private isDistructed = false;
+  private isDestructed = false;
   private link!: boolean;
   private admin: boolean;
   private close!: () => void;
@@ -77,10 +80,10 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   destruct(): void {
-    this.isDistructed = true;
+    this.isDestructed = true;
   }
 
-  login = async () => {
+  login = async (): Promise<void> => {
     if (!this.provider || this.isAuthenticating) {
       return;
     }
@@ -90,7 +93,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
       await this.authInfoService.login(this.provider.id, this.credentials, this.link);
       this.close();
     } catch (exception) {
-      if (!this.error.catch(exception) || this.isDistructed) {
+      if (!this.error.catch(exception) || this.isDestructed) {
         this.notificationService.logException(exception, 'Login failed');
       }
     } finally {
@@ -98,7 +101,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     }
   };
 
-  selectProvider = (providerId: string) => {
+  selectProvider = (providerId: string): void => {
     if (providerId === this.provider?.id) {
       return;
     }
@@ -106,7 +109,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     this.credentials = {};
   };
 
-  showDetails = () => {
+  showDetails = (): void => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
@@ -127,15 +130,15 @@ export class AuthDialogController implements IInitializableController, IDestruct
       this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
     }
   }
+}
 
-  private compareProviders = (providerA: AuthProvider, providerB: AuthProvider): number => {
-    if (providerA.defaultProvider === providerB.defaultProvider) {
-      return providerA.label.localeCompare(providerB.label);
-    }
+function compareProviders(providerA: AuthProvider, providerB: AuthProvider): number {
+  if (providerA.defaultProvider === providerB.defaultProvider) {
+    return providerA.label.localeCompare(providerB.label);
+  }
 
-    if (providerA.defaultProvider) {
-      return -1;
-    }
-    return 1;
-  };
+  if (providerA.defaultProvider) {
+    return -1;
+  }
+  return 1;
 }

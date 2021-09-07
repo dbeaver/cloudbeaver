@@ -7,7 +7,7 @@
  */
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
-import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
+import { AuthConfigurationsResource, AuthProviderService, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,6 +16,7 @@ import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { AuthConfigurationsAdministration } from './AuthConfigurationsAdministration';
 import { AuthConfigurationsDrawerItem } from './AuthConfigurationsDrawerItem';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
+import { IdentityProvidersServiceLink } from './IdentityProvidersServiceLink';
 
 export interface IAuthConfigurationDetailsPlaceholderProps {
   configuration: AdminAuthProviderConfiguration;
@@ -31,11 +32,16 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly authConfigurationsResource: AuthConfigurationsResource,
     private readonly createConfigurationService: CreateAuthConfigurationService,
+    private readonly authProviderService: AuthProviderService
   ) {
     super();
   }
 
   register(): void {
+    this.authProviderService.addServiceDescriptionLink({
+      isSupported: provider => provider.configurable,
+      description: () => IdentityProvidersServiceLink,
+    });
     this.administrationItemService.create({
       name: 'auth-configurations',
       type: AdministrationItemType.Default,
