@@ -6,21 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext, useState } from 'react';
 
 import { Executor } from '@cloudbeaver/core-executor';
 
 import { useObjectRef } from '../useObjectRef';
 import { FormContext, IChangeData, IFormContext } from './FormContext';
 
-type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange'> & {
+type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange' | 'onSubmit'> & {
   disabled?: boolean;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => Promise<void> | void;
   onChange?: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
 };
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
   {
-    disabled,
+    disabled: disabledProp,
     children,
     onSubmit,
     onChange = () => {},
@@ -28,10 +29,21 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   },
   ref
 ) {
+  let [disabled, setDisabled] = useState(false);
+
+  disabled = disabled || disabledProp || false;
+
   const props = useObjectRef(() => ({
     handleSubmit(e: React.FormEvent<HTMLFormElement>) {
       e.preventDefault();
-      this.onSubmit?.(e);
+      e.stopPropagation();
+
+      setDisabled(true);
+      const result = this.onSubmit?.(e);
+
+      if (result instanceof Promise) {
+        result.finally(() => { setDisabled(false); });
+      }
     },
   }), {
     parentContext: useContext(FormContext),
