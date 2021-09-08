@@ -72,7 +72,7 @@ export default [
   ['administration_identity_providers_provider_create_error', 'Create configuration error'],
   ['administration_identity_providers_configuration_list_update_success', 'Configuration list was refreshed'],
   ['administration_identity_providers_configuration_list_update_fail', 'Configuration list refresh failed'],
-  ['administration_identity_providers_service_link', 'Configure'],
+  ['administration_identity_providers_service_link', 'Edit configurations'],
 
   ['administration_roles_tab_title', 'Roles'],
   ['administration_roles_tab_description', 'Role management'],
