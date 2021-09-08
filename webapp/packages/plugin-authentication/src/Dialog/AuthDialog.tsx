@@ -8,13 +8,13 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, getComputed
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
@@ -66,13 +66,13 @@ const styles = composes(
 `);
 
 interface IAuthPayload {
-  provider: string | null;
+  providerId: string | null;
   link?: boolean;
 }
 
 export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
   payload: {
-    provider,
+    providerId,
     link = false,
   },
   options,
@@ -80,12 +80,10 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 }) {
   const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, link, rejectDialog);
+  const controller = useController(AuthDialogController, link, providerId, rejectDialog);
   const translate = useTranslate();
 
-  if (provider) {
-    controller.selectProvider(provider);
-  } else {
+  if (!providerId) {
     controller.setAdminMode(administrationScreenService.activeScreen !== null);
   }
 
@@ -93,11 +91,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     && controller.provider?.id !== undefined
     && !userInfo.hasToken(controller.provider.id);
 
-  const providers = useMemo(() => computed(() =>
-    controller.providers.filter(provider => !provider.configurable || !!provider.configurations?.length)
-  ), [controller.providers]).get();
-
-  const showTabs = !provider && providers.length > 1;
+  const showTabs = controller.providers.length > 1;
   const configurable = !!controller.provider?.configurable;
 
   const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
@@ -112,7 +106,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
-    <TabsState currentTabId={controller.provider?.id}>
+    <TabsState currentTabId={controller.provider?.id} onChange={tabData => controller.selectProvider(tabData.tabId)}>
       <CommonDialogWrapper
         size='large'
         title={dialogTitle}
@@ -137,13 +131,12 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       >
         {showTabs && (
           <TabList aria-label='Auth providers'>
-            {providers.map(provider => (
+            {controller.providers.map(provider => (
               <Tab
                 key={provider.id}
                 tabId={provider.id}
                 title={provider.description || provider.label}
                 disabled={controller.isAuthenticating}
-                onOpen={() => controller.selectProvider(provider.id)}
               >
                 <TabTitle>{provider.label}</TabTitle>
               </Tab>

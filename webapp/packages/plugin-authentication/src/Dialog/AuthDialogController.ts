@@ -38,7 +38,13 @@ export class AuthDialogController implements IInitializableController, IDestruct
     }
 
     return providers
-      .filter(Boolean)
+      .filter(provider => (
+        provider && (
+          provider.configurable
+            ? !!provider.configurations?.length
+            : (this.defaultProviderId === null || provider.id === this.defaultProviderId)
+        )
+      ))
       .sort(compareProviders);
   }
 
@@ -47,6 +53,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
   private link!: boolean;
   private admin: boolean;
   private close!: () => void;
+  private defaultProviderId!: string | null;
 
   constructor(
     private notificationService: NotificationService,
@@ -54,7 +61,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
-    makeObservable<AuthDialogController, 'admin'>(this, {
+    makeObservable<this, 'admin'>(this, {
       provider: observable,
       isAuthenticating: observable,
       credentials: observable,
@@ -65,8 +72,9 @@ export class AuthDialogController implements IInitializableController, IDestruct
     this.admin = false;
   }
 
-  init(link: boolean, onClose: () => void): void {
+  init(link: boolean, providerId: string | null, onClose: () => void): void {
     this.link = link;
+    this.defaultProviderId = providerId;
     this.close = onClose;
     this.loadProviders();
   }
@@ -127,7 +135,11 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   private selectFirstAvailable(): void {
     if (this.providers.length > 0) {
-      this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
+      this.provider = this.providers.find(provider => (
+        this.defaultProviderId !== null
+          ? provider.id === this.defaultProviderId
+          : provider.defaultProvider
+      )) ?? this.providers[0];
     }
   }
 }
