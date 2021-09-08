@@ -39,9 +39,11 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const hasResult = model.source.hasResult(resultIndex);
   let filterValue = model.source.options?.whereFilter || '';
+  let supported = false;
 
   if (hasResult) {
     const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+    supported = constraints?.supported || false;
     if (constraints && constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
       filterValue = model.source.requestInfo.requestFilter;
     }
@@ -86,7 +88,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
-      disabled={model.isLoading() || model.source.results.length > 1 || model.isDisabled(resultIndex)}
+      disabled={!supported || model.isLoading() || model.isDisabled(resultIndex)}
       simple
       onSave={handleApply}
       onUndo={resetFilter}

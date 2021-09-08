@@ -86,6 +86,7 @@ export class DataGridContextMenuFilterService {
       .filter(operation => !nullOperationsFilter(operation))
       .map(operation => ({
         id: operation.id,
+        icon,
         isPresent: () => true,
         isDisabled(context) {
           return context.data.model.isLoading();
@@ -100,7 +101,6 @@ export class DataGridContextMenuFilterService {
           const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
           return `${columnLabel} ${operation.expression} ${clippedValue}`;
         },
-        icon,
         onClick: async () => {
           const val = typeof value === 'function' ? value() : value;
           const wrappedValue = wrapOperationArgument(operation.id, val);
@@ -114,33 +114,44 @@ export class DataGridContextMenuFilterService {
       this.dataGridContextMenuService.getMenuToken(),
       {
         id: this.getMenuFilterToken(),
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        isHidden(context) {
-          return context.data.model.isDisabled(context.data.resultIndex)
-            || context.data.model.source.results.length > 1;
-        },
         order: 2,
         title: 'data_grid_table_filter',
         icon: 'filter',
         isPanel: true,
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          if (context.data.model.isDisabled(context.data.resultIndex)) {
+            return true;
+          }
+
+          const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+          return !constraints.supported;
+        },
       }
     );
     this.dataGridContextMenuService.add(
       this.dataGridContextMenuService.getMenuToken(),
       {
         id: 'deleteFiltersAndOrders',
+        order: 3,
+        title: 'data_grid_table_delete_filters_and_orders',
+        icon: 'erase',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
+          if (context.data.model.isDisabled(context.data.resultIndex)) {
+            return true;
+          }
+
           const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
-          return constraints.orderConstraints.length === 0 && constraints.filterConstraints.length === 0;
+          return (
+            constraints.orderConstraints.length === 0
+            && constraints.filterConstraints.length === 0
+          );
         },
-        order: 3,
-        title: 'data_grid_table_delete_filters_and_orders',
-        icon: 'erase',
         onClick: async context => {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
@@ -154,6 +165,9 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'clipboardValue',
+        order: 0,
+        title: 'ui_clipboard',
+        icon: 'filter-clipboard',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -167,9 +181,6 @@ export class DataGridContextMenuFilterService {
 
           return supportedOperations.length === 0;
         },
-        order: 0,
-        title: 'ui_clipboard',
-        icon: 'filter-clipboard',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'clipboardValuePanel',
           menuItemsGetter: context => {
@@ -209,6 +220,9 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'cellValue',
+        order: 1,
+        title: 'data_grid_table_filter_cell_value',
+        icon: 'filter',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -221,9 +235,6 @@ export class DataGridContextMenuFilterService {
 
           return value === undefined || supportedOperations.length === 0 || format.isNull(value);
         },
-        order: 1,
-        title: 'data_grid_table_filter_cell_value',
-        icon: 'filter',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'cellValuePanel',
           menuItemsGetter: context => {
@@ -240,6 +251,9 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'customValue',
+        order: 2,
+        title: 'data_grid_table_filter_custom_value',
+        icon: 'filter-custom',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -251,9 +265,6 @@ export class DataGridContextMenuFilterService {
 
           return cellValue === undefined || supportedOperations.length === 0;
         },
-        order: 2,
-        title: 'data_grid_table_filter_custom_value',
-        icon: 'filter-custom',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'customValuePanel',
           menuItemsGetter: context => {
@@ -316,6 +327,8 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'isNullValue',
+        order: 3,
+        icon: 'filter',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -325,8 +338,6 @@ export class DataGridContextMenuFilterService {
 
           return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
         },
-        order: 3,
-        icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.key.column)?.label || '';
@@ -342,6 +353,8 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'isNotNullValue',
+        order: 4,
+        icon: 'filter',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -351,8 +364,6 @@ export class DataGridContextMenuFilterService {
 
           return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
         },
-        order: 4,
-        icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.key.column)?.label || '';
@@ -367,6 +378,8 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'deleteFilter',
+        order: 5,
+        icon: 'filter-reset',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -380,8 +393,6 @@ export class DataGridContextMenuFilterService {
 
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         },
-        order: 5,
-        icon: 'filter-reset',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.key.column)?.name || '';
@@ -402,6 +413,9 @@ export class DataGridContextMenuFilterService {
       this.getMenuFilterToken(),
       {
         id: 'deleteAllFilters',
+        order: 6,
+        icon: 'filter-reset-all',
+        title: 'data_grid_table_filter_reset_all_filters',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -411,9 +425,6 @@ export class DataGridContextMenuFilterService {
 
           return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         },
-        order: 6,
-        icon: 'filter-reset-all',
-        title: 'data_grid_table_filter_reset_all_filters',
         onClick: async context => {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);

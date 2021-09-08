@@ -42,22 +42,25 @@ export class DataGridContextMenuOrderService {
       this.dataGridContextMenuService.getMenuToken(),
       {
         id: this.getMenuOrderToken(),
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        isHidden(context) {
-          return context.data.model.isDisabled(context.data.resultIndex);
-        },
         order: 1,
         title: 'data_grid_table_order',
         icon: 'order-arrow-unknown',
         isPanel: true,
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+          return !constraints.supported || context.data.model.isDisabled(context.data.resultIndex);
+        },
       }
     );
     this.dataGridContextMenuService.add(
       this.getMenuOrderToken(),
       {
         id: 'asc',
+        type: 'radio',
+        title: 'ASC',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -65,7 +68,6 @@ export class DataGridContextMenuOrderService {
         onClick: async context => {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.asc);
         },
-        type: 'radio',
         isChecked: context => {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -74,13 +76,14 @@ export class DataGridContextMenuOrderService {
 
           return constraints.getOrder(columnLabel) === EOrder.asc;
         },
-        title: 'ASC',
       }
     );
     this.dataGridContextMenuService.add(
       this.getMenuOrderToken(),
       {
         id: 'desc',
+        type: 'radio',
+        title: 'DESC',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -88,7 +91,6 @@ export class DataGridContextMenuOrderService {
         onClick: async context => {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.desc);
         },
-        type: 'radio',
         isChecked: context => {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -97,13 +99,14 @@ export class DataGridContextMenuOrderService {
 
           return constraints.getOrder(columnLabel) === EOrder.desc;
         },
-        title: 'DESC',
       }
     );
     this.dataGridContextMenuService.add(
       this.getMenuOrderToken(),
       {
         id: 'disableOrder',
+        type: 'radio',
+        title: 'data_grid_table_disable_order',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -111,7 +114,6 @@ export class DataGridContextMenuOrderService {
         onClick: async context => {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, null);
         },
-        type: 'radio',
         isChecked: context => {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -120,13 +122,13 @@ export class DataGridContextMenuOrderService {
 
           return constraints.getOrder(columnLabel) === null;
         },
-        title: 'data_grid_table_disable_order',
       }
     );
     this.dataGridContextMenuService.add(
       this.getMenuOrderToken(),
       {
         id: 'disableOrders',
+        title: 'data_grid_table_disable_all_orders',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -140,7 +142,6 @@ export class DataGridContextMenuOrderService {
           constraints.deleteOrders();
           await context.data.model.refresh();
         },
-        title: 'data_grid_table_disable_all_orders',
       }
     );
   }

@@ -10,7 +10,7 @@ import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutation, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
@@ -40,8 +40,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   isDisabled(resultIndex: number): boolean {
-    return (!this.getResult(resultIndex)?.data && this.error === null)
-    || !this.executionContext?.context;
+    return (
+      (!this.getResult(resultIndex)?.data && this.error === null)
+      || !this.executionContext?.context
+    );
   }
 
   async cancel(): Promise<void> {

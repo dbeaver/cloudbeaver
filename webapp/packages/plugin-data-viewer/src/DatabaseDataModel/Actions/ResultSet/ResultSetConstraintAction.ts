@@ -26,6 +26,10 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
+  get supported(): boolean {
+    return this.source.results.length < 2;
+  }
+
   get orderConstraints(): SqlDataFilterConstraint[] {
     if (!this.source.options) {
       throw new Error('Options must be provided');

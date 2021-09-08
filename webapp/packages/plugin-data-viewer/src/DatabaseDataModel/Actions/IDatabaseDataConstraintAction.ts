@@ -16,6 +16,7 @@ export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResu
   extends IDatabaseDataAction<any, TResult> {
   readonly filterConstraints: SqlDataFilterConstraint[];
   readonly orderConstraints: SqlDataFilterConstraint[];
+  readonly supported: boolean;
   setFilter: (attribute: string, operator: string, value?: any) => void;
   setOrder: (attribute: string, order: Order, multiple: boolean) => void;
   deleteAll: () => void;
