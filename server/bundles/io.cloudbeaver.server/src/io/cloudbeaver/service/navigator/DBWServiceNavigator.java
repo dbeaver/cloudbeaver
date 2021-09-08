@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 
 import java.util.List;
 
@@ -30,14 +31,26 @@ import java.util.List;
 public interface DBWServiceNavigator extends DBWService {
 
     @WebAction
-    List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException;
+    List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
+        @NotNull WebSession session,
+        String parentPath,
+        Integer offset,
+        Integer limit,
+        Boolean onlyFolders) throws DBWebException;
 
     @WebAction
-    WebNavigatorNodeInfo getNavigatorNodeInfo(WebSession session, String nodePath) throws DBWebException;
+    WebNavigatorNodeInfo getNavigatorNodeInfo(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
     @WebAction
-    boolean refreshNavigatorNode(WebSession session, String nodePath) throws DBWebException;
+    boolean refreshNavigatorNode(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
     @WebAction
     WebStructContainers getStructContainers(WebConnectionInfo connectionInfo, String catalog) throws DBWebException;
+
+    @WebAction
+    String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;
+
+    @WebAction
+    String deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
+
 }

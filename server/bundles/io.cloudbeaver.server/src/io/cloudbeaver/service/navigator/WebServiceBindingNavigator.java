@@ -53,6 +53,16 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 getWebConnection(env),
                 env.getArgument("catalog")
             ));
+        model.getMutationType()
+            .dataFetcher("navRenameNode", env -> getService(env).renameNode(
+                getWebSession(env),
+                env.getArgument("nodePath"),
+                env.getArgument("newName")
+            ))
+            .dataFetcher("navDeleteNodes", env -> getService(env).deleteNodes(
+                getWebSession(env),
+                env.getArgument("nodePaths")
+            ));
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")
             .dataFetcher("properties", env -> {

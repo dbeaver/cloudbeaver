@@ -106,3 +106,13 @@ extend type Query {
     navGetStructContainers( connectionId: ID!, catalog: ID ): DatabaseStructContainers!
 
 }
+
+extend type Mutation {
+
+    # Rename node and returns new node name
+    navRenameNode( nodePath: ID!, newName: String! ): String
+
+    # Deletes nodes with specified IDs and returns number of deleted nodes
+    navDeleteNodes( nodePaths: [ID!]! ): Int
+
+}

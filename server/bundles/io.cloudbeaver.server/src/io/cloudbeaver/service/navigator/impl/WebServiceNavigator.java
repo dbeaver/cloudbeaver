@@ -52,7 +52,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private static final boolean SHOW_EXTRA_NODES = false;
 
     @Override
-    public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
+    public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(@NotNull WebSession session, @NotNull String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -107,7 +107,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     @NotNull
-    public WebNavigatorNodeInfo getNavigatorNodeInfo(WebSession session, String nodePath) throws DBWebException {
+    public WebNavigatorNodeInfo getNavigatorNodeInfo(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -122,7 +122,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public boolean refreshNavigatorNode(WebSession session, String nodePath) throws DBWebException {
+    public boolean refreshNavigatorNode(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -169,6 +169,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
         }
         return structContainers;
+    }
+
+    @Override
+    public String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException {
+        throw new DBWebException("Not implemented yet");
+    }
+
+    @Override
+    public String deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException {
+        throw new DBWebException("Not implemented yet");
     }
 
 }
