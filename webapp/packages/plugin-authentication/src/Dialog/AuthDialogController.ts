@@ -17,9 +17,20 @@ import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {
-  provider: AuthProvider | null = null;
+  selectedProvider: AuthProvider | null = null;
   isAuthenticating = false;
   credentials = {};
+
+  get provider(): AuthProvider | null {
+    return (
+      this.selectedProvider
+      || (
+        this.providers.length > 0
+          ? this.providers[0]
+          : null
+      )
+    );
+  }
 
   get isLoading(): boolean {
     return this.authProvidersResource.isLoading();
@@ -61,11 +72,13 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
-    makeObservable<this, 'admin'>(this, {
-      provider: observable,
-      isAuthenticating: observable,
+    makeObservable<this, 'admin' | 'defaultProviderId' | 'selectedProvider'>(this, {
+      selectedProvider: observable.ref,
+      provider: computed,
+      isAuthenticating: observable.ref,
       credentials: observable,
-      admin: observable,
+      admin: observable.ref,
+      defaultProviderId: observable.ref,
       providers: computed,
     });
 
@@ -110,10 +123,10 @@ export class AuthDialogController implements IInitializableController, IDestruct
   };
 
   selectProvider = (providerId: string): void => {
-    if (providerId === this.provider?.id) {
+    if (providerId === this.selectedProvider?.id) {
       return;
     }
-    this.provider = this.authProvidersResource.get(providerId) || null;
+    this.selectedProvider = this.authProvidersResource.get(providerId) || null;
     this.credentials = {};
   };
 
@@ -135,7 +148,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   private selectFirstAvailable(): void {
     if (this.providers.length > 0) {
-      this.provider = this.providers.find(provider => (
+      this.selectedProvider = this.providers.find(provider => (
         this.defaultProviderId !== null
           ? provider.id === this.defaultProviderId
           : provider.defaultProvider

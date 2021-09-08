@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, getComputed
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
