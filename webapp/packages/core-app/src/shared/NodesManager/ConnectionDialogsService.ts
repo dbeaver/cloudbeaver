@@ -44,8 +44,8 @@ export class ConnectionDialogsService extends Bootstrap {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'closeConnection',
-        isPresent:
-          context => context.contextType === NavNodeContextMenuService.nodeContextType,
+        title: 'app_navigationTree_context_disconnect',
+        isPresent: context => context.contextType === NavNodeContextMenuService.nodeContextType,
         isHidden: context => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.node.id);
           const connection = this.connectionInfoResource.get(connectionId);
@@ -53,7 +53,6 @@ export class ConnectionDialogsService extends Bootstrap {
           return !context.data.node.objectFeatures.includes(EObjectFeature.dataSource)
             || !connection?.connected;
         },
-        title: 'app_navigationTree_context_disconnect',
         onClick: context => {
           const node = context.data.node;
           this.connectionsManagerService.closeConnectionAsync(
@@ -67,8 +66,8 @@ export class ConnectionDialogsService extends Bootstrap {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'deleteConnection',
-        isPresent:
-          context => context.contextType === NavNodeContextMenuService.nodeContextType,
+        title: 'ui_delete',
+        isPresent: context => context.contextType === NavNodeContextMenuService.nodeContextType,
         isHidden: context => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.node.id);
           const connection = this.connectionInfoResource.get(connectionId);
@@ -76,7 +75,6 @@ export class ConnectionDialogsService extends Bootstrap {
           return !context.data.node.objectFeatures.includes(EObjectFeature.dataSource)
             || !connection?.features.includes(EConnectionFeature.manageable);
         },
-        title: 'ui_delete',
         onClick: async context => {
           const node = context.data.node;
           try {

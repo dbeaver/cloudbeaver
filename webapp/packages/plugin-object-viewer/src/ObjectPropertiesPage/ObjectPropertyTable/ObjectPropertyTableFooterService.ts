@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import type { ITableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
@@ -53,7 +55,8 @@ export class ObjectPropertyTableFooterService {
         return !selectedNodes.some(node => node.features?.includes(ENodeFeature.canDelete));
       },
       onClick: async context => {
-        const nodes = this.getSelectedNodes(context.data.tableState.selectedList);
+        const nodes = this.getSelectedNodes(context.data.tableState.selectedList)
+          .filter(node => node.features?.includes(ENodeFeature.canDelete));
         const nodeNames = nodes.map(getNodeName);
 
         const result = await this.commonDialogService.open(ConfirmationDialog, {
@@ -67,21 +70,15 @@ export class ObjectPropertyTableFooterService {
           return;
         }
 
-        const deleted: string[] = [];
-
         try {
-          for (const path of context.data.tableState.selectedList) {
-            await this.navTreeResource.deleteNode(path);
-            deleted.push(path);
-          }
+          await runInAction(async () => {
+            for (const node of nodes) {
+              await this.navTreeResource.deleteNode(node.id);
+              context.data.tableState.unselect(node.id);
+            }
+          });
         } catch (exception) {
           this.notificationService.logException(exception, 'Failed to delete item');
-        }
-
-        if (deleted.length) {
-          context.data.tableState.unselect(deleted);
-          const title = deleted.length > 1 ? 'Items were deleted' : 'Item was deleted';
-          this.notificationService.logSuccess({ title });
         }
       },
     });
