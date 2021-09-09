@@ -12,11 +12,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNavigatorViewSettingsEqual, CONNECTION_NAVIGATOR_VIEW_SETTINGS, NavigatorViewSettings } from '@cloudbeaver/core-root';
-import type { INodeActions } from '@cloudbeaver/plugin-object-viewer';
 
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
+import type { INodeActions } from './INodeActions';
 import { getNodeName } from './NavNodeInfoResource';
 import { NavNodeManagerService } from './NavNodeManagerService';
 import { NavTreeResource } from './NavTreeResource';

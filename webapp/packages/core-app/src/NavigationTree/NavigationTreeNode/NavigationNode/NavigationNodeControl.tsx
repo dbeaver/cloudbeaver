@@ -13,10 +13,10 @@ import styled, { css, use } from 'reshadow';
 import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import type { INodeActions } from '@cloudbeaver/plugin-object-viewer';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';

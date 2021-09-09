@@ -42,6 +42,7 @@ export * from './shared/TabEntity/TabEntity';
 // Enums
 export * from './shared/NodesManager/ENodeFeature';
 export * from './shared/NodesManager/EObjectFeature';
+export * from './shared/NodesManager/INodeActions';
 
 // hooks
 export * from './shared/useChildren';

@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
-
 import { ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import type { ITableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
@@ -62,7 +60,8 @@ export class ObjectPropertyTableFooterService {
         const result = await this.commonDialogService.open(ConfirmationDialog, {
           title: 'ui_data_delete_confirmation',
           message: `You're going to delete following items: "${nodeNames.join(', ')}". Are you sure?`,
-          icon: '/icons/error_icon_sm.svg',
+          icon: '/icons/error_icon.svg',
+          bigIcon: true,
           confirmActionText: 'ui_delete',
         });
 
@@ -70,15 +69,19 @@ export class ObjectPropertyTableFooterService {
           return;
         }
 
+        const deleted: string[] = [];
+
         try {
-          await runInAction(async () => {
-            for (const node of nodes) {
-              await this.navTreeResource.deleteNode(node.id);
-              context.data.tableState.unselect(node.id);
-            }
-          });
+          for (const node of nodes) {
+            await this.navTreeResource.deleteNode(node.id);
+            deleted.push(node.id);
+          }
         } catch (exception) {
           this.notificationService.logException(exception, 'Failed to delete item');
+        }
+
+        if (deleted.length) {
+          context.data.tableState.unselect(deleted);
         }
       },
     });

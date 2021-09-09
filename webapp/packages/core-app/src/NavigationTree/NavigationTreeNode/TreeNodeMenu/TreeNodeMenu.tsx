@@ -14,9 +14,9 @@ import styled, { use } from 'reshadow';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
-import type { INodeActions } from '@cloudbeaver/plugin-object-viewer';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
 import { NavNodeContextMenuService } from '../../../shared/NodesManager/NavNodeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
