@@ -110,6 +110,22 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
   }
 
+  async deleteNode(key: ResourceKey<string>): Promise<void> {
+    const nodePaths = isResourceKeyList(key) ? key.list : [key];
+
+    await this.performUpdate(key, [], async () => {
+      await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
+    });
+
+    for (const path of nodePaths) {
+      const node = this.navNodeInfoResource.get(path);
+
+      if (node) {
+        this.deleteInNode(node.parentId, [path]);
+      }
+    }
+  }
+
   deleteInNode(key: string, value: string[]): void;
   deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
   deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {

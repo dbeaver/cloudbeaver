@@ -35,6 +35,10 @@ export const defaultRULocale = [
   ['ui_revoke', 'Запретить'],
   ['ui_grant', 'Разрешить'],
   ['ui_edit', 'Редактировать'],
+  ['ui_rename', 'Переименовать'],
+  ['ui_rename_processing', 'Переименование...'],
+  ['ui_name', 'Название'],
+  ['ui_cant_delete_item', 'Этот элемент нельзя удалить'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['app_root_session_expire_warning_title', 'Ваша сессия скоро закончится'],

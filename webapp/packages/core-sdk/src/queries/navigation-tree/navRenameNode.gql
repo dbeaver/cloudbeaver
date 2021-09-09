@@ -1,0 +1,3 @@
+mutation navRenameNode($nodePath: ID!, $newName: String!) {
+  navRenameNode(nodePath: $nodePath, newName: $newName)
+}

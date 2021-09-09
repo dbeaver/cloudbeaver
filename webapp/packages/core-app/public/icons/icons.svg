@@ -294,4 +294,9 @@
         <rect width="24" height="24" fill="white"/>
       </clipPath>
     </defs>
+  </symbol>
+  <symbol id="delete" viewBox="0 0 32 32">
+    <rect width="32" height="32" fill="transparent"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1H22V3H29.077H30V5H28.9229L27.1346 28.2216C27.0186 29.7882 25.7137 31 24.1428 31H7.85748C6.28661 31 4.98172 29.7882 4.86568 28.2216L3.07736 5H2V3H2.92334H10V1ZM5.07697 5L6.86022 28.0739C6.8989 28.5961 7.33386 29 7.85748 29H24.1428C24.6664 29 25.1014 28.5961 25.1401 28.0739L26.9233 5H5.07697ZM14 26L14 8H12L12 26H14ZM21 8L21 26H19V8H21Z" fill="#338ECC"/>
+  </symbol>
   </svg>

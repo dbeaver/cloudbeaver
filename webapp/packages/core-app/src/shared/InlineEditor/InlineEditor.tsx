@@ -13,7 +13,7 @@ import {
 import { useImperativeHandle } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -32,6 +32,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   edited?: boolean;
   autofocus?: boolean;
   active?: boolean;
+  loading?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
   onReject?: () => void;
@@ -48,6 +49,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   edited = false,
   autofocus,
   active,
+  loading,
+  disabled,
   onChange,
   onSave,
   onUndo,
@@ -107,24 +110,49 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
           lang="en"
           value={value}
           autoComplete="off"
+          disabled={disabled}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           {...rest}
         />
       </editor-container>
       <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
-        {!hideSave && <editor-action as="div" onClick={onSave}><Icon name="apply" viewBox="0 0 12 10" /></editor-action>}
-        {!hideCancel && onReject && <editor-action as="div" onClick={onReject}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>}
+        {!hideSave && (
+          <editor-action
+            as="button"
+            disabled={disabled}
+            onClick={onSave}
+          >
+            {loading ? <Loader small fullSize /> : <Icon name="apply" viewBox="0 0 12 10" />}
+          </editor-action>
+        )}
+        {!hideCancel && onReject && (
+          <editor-action
+            as="button"
+            disabled={disabled}
+            onClick={onReject}
+          >
+            <Icon name="reject" viewBox="0 0 11 11" />
+          </editor-action>
+        )}
         {onUndo && (
           <editor-action
-            as="div"
+            as="button"
+            disabled={!edited || disabled}
             onClick={edited ? onUndo : undefined}
-            {...use({ disabled: !edited })}
           >
             <IconOrImage icon="/icons/data_revert.svg" />
           </editor-action>
         )}
-        {!simple && <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>}
+        {!simple && (
+          <editor-action
+            as="button"
+            disabled={disabled}
+            onClick={handlePopup}
+          >
+            <Icon name="edit" viewBox="0 0 13 13" />
+          </editor-action>
+        )}
       </editor-actions>
     </editor>
   );

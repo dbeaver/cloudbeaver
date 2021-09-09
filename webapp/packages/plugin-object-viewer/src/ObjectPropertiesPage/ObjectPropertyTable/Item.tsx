@@ -10,12 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { NavNode, NavNodeContextMenuService, NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@cloudbeaver/core-app';
+import { ENodeFeature, NavNode, NavNodeContextMenuService, NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@cloudbeaver/core-app';
 import {
   StaticImage, TableItem, TableColumnValue, TableItemSelect, useMouse, getComputed, Icon, useStateDelay
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -76,14 +77,21 @@ interface Props {
 export const Item = observer<Props>(function Item({
   objectId, columns,
 }) {
+  const translate = useTranslate();
+  const styles = useStyles(itemStyles);
+
   const { node } = useNode(objectId);
   const { dbObject } = useDatabaseObjectInfo(objectId);
-  const styles = useStyles(itemStyles);
+
+  const deletable = node?.features?.includes(ENodeFeature.canDelete);
+  const tooltip = deletable ? undefined : translate('ui_cant_delete_item');
 
   if (!node) {
     return styled(styles)(
       <TableItem item={objectId}>
-        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+        <TableColumnValue centerContent>
+          <TableItemSelect disabled />
+        </TableColumnValue>
         <TableColumnValue>
           <icon><placeholder /></icon>
         </TableColumnValue>
@@ -97,7 +105,9 @@ export const Item = observer<Props>(function Item({
   if (!dbObject?.properties || dbObject.properties.length === 0) {
     return styled(styles)(
       <TableItem item={objectId}>
-        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+        <TableColumnValue centerContent>
+          <TableItemSelect disabled={!deletable} tooltip={tooltip} />
+        </TableColumnValue>
         <TableColumnValue>
           <icon>
             <StaticImage icon={node.icon} />
@@ -110,7 +120,9 @@ export const Item = observer<Props>(function Item({
 
   return styled(styles)(
     <TableItem item={objectId}>
-      <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+      <TableColumnValue centerContent>
+        <TableItemSelect disabled={!deletable} tooltip={tooltip} />
+      </TableColumnValue>
       <TableColumnValue>
         <icon>
           <StaticImage icon={node.icon} />

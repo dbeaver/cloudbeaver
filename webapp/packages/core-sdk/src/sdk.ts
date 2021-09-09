@@ -297,6 +297,8 @@ export interface Mutation {
   createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
   initConnection: ConnectionInfo;
+  navDeleteNodes?: Maybe<Scalars['Int']>;
+  navRenameNode?: Maybe<Scalars['String']>;
   /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
@@ -389,6 +391,15 @@ export interface MutationInitConnectionArgs {
   credentials?: Maybe<Scalars['Object']>;
   networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
+}
+
+export interface MutationNavDeleteNodesArgs {
+  nodePaths: Array<Scalars['ID']>;
+}
+
+export interface MutationNavRenameNodeArgs {
+  nodePath: Scalars['ID'];
+  newName: Scalars['String'];
 }
 
 export interface MutationOpenConnectionArgs {
@@ -1783,6 +1794,12 @@ export interface GetDbObjectInfoQuery {
   )>; };
 }
 
+export type NavDeleteNodesMutationVariables = Exact<{
+  nodePaths: Array<Scalars['ID']> | Scalars['ID'];
+}>;
+
+export type NavDeleteNodesMutation = Pick<Mutation, 'navDeleteNodes'>;
+
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
   withDetails: Scalars['Boolean'];
@@ -1802,6 +1819,13 @@ export type NavRefreshNodeQueryVariables = Exact<{
 }>;
 
 export type NavRefreshNodeQuery = Pick<Query, 'navRefreshNode'>;
+
+export type NavRenameNodeMutationVariables = Exact<{
+  nodePath: Scalars['ID'];
+  newName: Scalars['String'];
+}>;
+
+export type NavRenameNodeMutation = Pick<Mutation, 'navRenameNode'>;
 
 export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -2890,6 +2914,11 @@ export const GetDbObjectInfoDocument = `
   }
 }
     ${NavNodePropertiesFragmentDoc}`;
+export const NavDeleteNodesDocument = `
+    mutation navDeleteNodes($nodePaths: [ID!]!) {
+  navDeleteNodes(nodePaths: $nodePaths)
+}
+    `;
 export const NavNodeChildrenDocument = `
     query navNodeChildren($parentPath: ID!, $withDetails: Boolean!) {
   navNodeChildren(parentPath: $parentPath) {
@@ -2910,6 +2939,11 @@ export const NavNodeInfoDocument = `
 export const NavRefreshNodeDocument = `
     query navRefreshNode($nodePath: ID!) {
   navRefreshNode(nodePath: $nodePath)
+}
+    `;
+export const NavRenameNodeDocument = `
+    mutation navRenameNode($nodePath: ID!, $newName: String!) {
+  navRenameNode(nodePath: $nodePath, newName: $newName)
 }
     `;
 export const QuerySqlCompletionProposalsDocument = `
@@ -3267,6 +3301,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getDBObjectInfo(variables: GetDbObjectInfoQueryVariables): Promise<GetDbObjectInfoQuery> {
       return withWrapper(() => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables));
     },
+    navDeleteNodes(variables: NavDeleteNodesMutationVariables): Promise<NavDeleteNodesMutation> {
+      return withWrapper(() => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables));
+    },
     navNodeChildren(variables: NavNodeChildrenQueryVariables): Promise<NavNodeChildrenQuery> {
       return withWrapper(() => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables));
     },
@@ -3275,6 +3312,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navRefreshNode(variables: NavRefreshNodeQueryVariables): Promise<NavRefreshNodeQuery> {
       return withWrapper(() => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables));
+    },
+    navRenameNode(variables: NavRenameNodeMutationVariables): Promise<NavRenameNodeMutation> {
+      return withWrapper(() => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables));
     },
     querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables): Promise<QuerySqlCompletionProposalsQuery> {
       return withWrapper(() => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables));

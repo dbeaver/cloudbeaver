@@ -6,16 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialog, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNavigatorViewSettingsEqual, CONNECTION_NAVIGATOR_VIEW_SETTINGS, NavigatorViewSettings } from '@cloudbeaver/core-root';
+import type { INodeActions } from '@cloudbeaver/plugin-object-viewer';
 
+import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
 import { NavNodeManagerService } from './NavNodeManagerService';
+import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
+
+export interface INodeMenuData {
+  node: NavNode;
+  actions?: INodeActions;
+}
 
 @injectable()
 export class NavNodeContextMenuService extends Bootstrap {
@@ -24,10 +33,12 @@ export class NavNodeContextMenuService extends Bootstrap {
   private static menuToken = 'navTreeMenu';
 
   constructor(
-    private contextMenuService: ContextMenuService,
-    private navNodeManagerService: NavNodeManagerService,
-    private notificationService: NotificationService,
-    private connectionInfoResource: ConnectionInfoResource
+    private readonly contextMenuService: ContextMenuService,
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
   }
@@ -40,12 +51,15 @@ export class NavNodeContextMenuService extends Bootstrap {
     return NavNodeContextMenuService.nodeViewMenuItemToken;
   }
 
-  constructMenuWithContext(node: NavNode): IMenuPanel {
-    return this.contextMenuService.createContextMenu<NavNode>({
+  constructMenuWithContext(node: NavNode, actions?: INodeActions): IMenuPanel {
+    return this.contextMenuService.createContextMenu<INodeMenuData>({
       menuId: this.getMenuToken(),
       contextId: node.id,
       contextType: NavNodeContextMenuService.nodeContextType,
-      data: node,
+      data: {
+        node,
+        actions,
+      },
     });
   }
 
@@ -74,75 +88,75 @@ export class NavNodeContextMenuService extends Bootstrap {
     }
   }
 
-  registerNodeViewMenuItem() {
-    this.contextMenuService.addMenuItem<NavNode>(
+  registerNodeViewMenuItem(): void {
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.contextMenuService.getRootMenuToken(),
       {
         id: this.getNodeViewMenuItemToken(),
-        isPresent(context) {
-          return context.contextType === NavNodeContextMenuService.nodeContextType
-            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
-        },
-        isHidden: context => {
-          const connection = this.getConnectionFromNodeId(context.data.id);
-          return !connection?.connected;
-        },
         order: 2,
         title: 'app_navigationTree_connection_view',
         isPanel: true,
+        isPresent(context) {
+          return context.contextType === NavNodeContextMenuService.nodeContextType
+            && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
+        },
+        isHidden: context => {
+          const connection = this.getConnectionFromNodeId(context.data.node.id);
+          return !connection?.connected;
+        },
       }
     );
-    this.contextMenuService.addMenuItem<NavNode>(
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.getNodeViewMenuItemToken(),
       {
         id: 'simple',
         title: 'app_navigationTree_connection_view_option_simple',
         type: 'radio',
-        isChecked: context => this.isSimpleNavigatorView(context.data.id),
+        isChecked: context => this.isSimpleNavigatorView(context.data.node.id),
         isPresent(context) {
           return context.contextType === NavNodeContextMenuService.nodeContextType
-            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+            && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context =>
-          await this.changeConnectionView(context.data.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple),
+          await this.changeConnectionView(context.data.node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple),
 
       }
     );
-    this.contextMenuService.addMenuItem<NavNode>(
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.getNodeViewMenuItemToken(),
       {
         id: 'advanced',
         title: 'app_navigationTree_connection_view_option_advanced',
         type: 'radio',
-        isChecked: context => !this.isSimpleNavigatorView(context.data.id),
         separator: true,
+        isChecked: context => !this.isSimpleNavigatorView(context.data.node.id),
         isPresent(context) {
           return context.contextType === NavNodeContextMenuService.nodeContextType
-            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+            && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context =>
-          await this.changeConnectionView(context.data.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced),
+          await this.changeConnectionView(context.data.node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced),
       }
     );
 
-    this.contextMenuService.addMenuItem<NavNode>(
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.getNodeViewMenuItemToken(),
       {
         id: 'systemObjects',
         title: 'app_navigationTree_connection_view_option_showSystemObjects',
         type: 'checkbox',
-        isChecked: context => !!this.getConnectionFromNodeId(context.data.id)?.navigatorSettings.showSystemObjects,
+        isChecked: context => !!this.getConnectionFromNodeId(context.data.node.id)?.navigatorSettings.showSystemObjects,
         isPresent(context) {
           return context.contextType === NavNodeContextMenuService.nodeContextType
-            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+            && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
         },
         onClick: async context => {
-          const currentSettings = this.getConnectionFromNodeId(context.data.id)?.navigatorSettings;
+          const currentSettings = this.getConnectionFromNodeId(context.data.node.id)?.navigatorSettings;
           if (!currentSettings) {
             return;
           }
 
-          return await this.changeConnectionView(context.data.id, {
+          return await this.changeConnectionView(context.data.node.id, {
             ...currentSettings,
             showSystemObjects: !currentSettings.showSystemObjects,
           });
@@ -152,37 +166,111 @@ export class NavNodeContextMenuService extends Bootstrap {
   }
 
   register(): void {
-    this.contextMenuService.addMenuItem<NavNode>(
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'openNodeTab',
+        order: 1,
+        title: 'app_navigationTree_openNodeTab',
         isPresent(context) {
           return context.contextType === NavNodeContextMenuService.nodeContextType;
         },
-        order: 1,
-        title: 'app_navigationTree_openNodeTab',
         onClick: context => {
-          const node = context.data;
+          const node = context.data.node;
           this.navNodeManagerService.navToNode(node.id, node.parentId);
         },
       }
     );
 
-    this.contextMenuService.addMenuItem<NavNode>(
+    this.contextMenuService.addMenuItem<INodeMenuData>(
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'refreshNode',
+        order: Number.MAX_SAFE_INTEGER,
+        title: 'app_navigationTree_refreshNode',
         isPresent(context) {
           return context.contextType === NavNodeContextMenuService.nodeContextType;
         },
-        order: Number.MAX_SAFE_INTEGER,
-        title: 'app_navigationTree_refreshNode',
         onClick: async context => {
-          const node = context.data;
+          const node = context.data.node;
           try {
             await this.navNodeManagerService.refreshTree(node.id);
           } catch (exception) {
             this.notificationService.logException(exception, 'Failed to refresh node');
+          }
+        },
+      }
+    );
+
+    this.contextMenuService.addMenuItem<INodeMenuData>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'rename',
+        icon: 'edit',
+        title: 'ui_rename',
+        isPresent: context => context.contextType === NavNodeContextMenuService.nodeContextType,
+        isHidden: context => !context.data.node.features?.includes(ENodeFeature.canRename),
+        onClick: async context => {
+          const node = context.data.node;
+
+          if (context.data.actions?.rename) {
+            context.data.actions.rename();
+          } else {
+            const name = node.name || '';
+            const result = await this.commonDialogService.open(RenameDialog, {
+              value: name,
+              subTitle: name,
+              objectName: node.nodeType || 'Object',
+              icon: node.icon,
+            });
+
+            if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              if (name !== result) {
+                const notification = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'ui_rename_processing' });
+                try {
+                  await this.navNodeManagerService.changeName(result, node);
+
+                  const message = `prev: ${name}\nnew: ${result}`;
+                  notification.controller.resolve(`${node.nodeType} was renamed`, message);
+                } catch (exception) {
+                  notification.controller.reject(exception, 'Error occured while renaming');
+                }
+              }
+            }
+          }
+        },
+      }
+    );
+
+    this.contextMenuService.addMenuItem<INodeMenuData>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'deleteNode',
+        title: 'ui_delete',
+        isPresent: context => context.contextType === NavNodeContextMenuService.nodeContextType,
+        isHidden: context => !context.data.node.features?.includes(ENodeFeature.canDelete)
+          || context.data.node.objectFeatures.includes(EObjectFeature.dataSource),
+        onClick: async context => {
+          const node = context.data.node;
+          const nodeName = `${node.nodeType || 'Object'}${node.name ? ' (' + node.name + ')' : ''}`;
+
+          const result = await this.commonDialogService.open(ConfirmationDialog, {
+            title: 'ui_data_delete_confirmation',
+            subTitle: node.name,
+            message: `You're going to delete "${nodeName}". Are you sure?`,
+            confirmActionText: 'ui_delete',
+            icon: node.icon,
+          });
+
+          if (result === DialogueStateResult.Rejected) {
+            return;
+          }
+
+          try {
+            await this.navTreeResource.deleteNode(node.id);
+            this.notificationService.logSuccess({ title: 'Object was deleted', message: nodeName });
+          } catch (exception) {
+            this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
           }
         },
       }

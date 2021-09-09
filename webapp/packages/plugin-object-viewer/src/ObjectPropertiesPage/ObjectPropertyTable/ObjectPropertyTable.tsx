@@ -20,6 +20,7 @@ import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
 const styles = css`
   div {
     flex: auto;
+    overflow: hidden;
   }
 `;
 

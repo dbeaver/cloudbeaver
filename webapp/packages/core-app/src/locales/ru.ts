@@ -20,6 +20,7 @@ export default [
   ['app_navigationTree_connection_view_option_custom', 'Настраиваемое'],
   ['app_navigationTree_connection_view_option_showSystemObjects', 'Показывать системные объекты'],
   ['app_navigationTree_refreshNode', 'Обновить'],
+  ['app_navigationTree_node_change_name_error', 'Не удалось изменить название'],
   ['app_navigationTree_context_disconnect', 'Отключить'],
   ['app_navigationTree_connection_group_user', 'Пользовательские подключения'],
   ['app_navigationTree_connection_group_shared', 'Общие подключения'],

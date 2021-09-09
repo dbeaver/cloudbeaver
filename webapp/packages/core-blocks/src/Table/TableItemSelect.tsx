@@ -21,6 +21,7 @@ import { TableItemContext } from './TableItemContext';
 interface Props {
   checked?: boolean;
   disabled?: boolean;
+  tooltip?: string;
   className?: string;
 }
 
@@ -31,7 +32,7 @@ const checkboxStyles = css`
   }
 `;
 
-export const TableItemSelect = observer<Props>(function TableItemSelect({ checked, disabled, className }) {
+export const TableItemSelect = observer<Props>(function TableItemSelect({ checked, disabled, tooltip, className }) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const styles = useStyles();
@@ -52,6 +53,7 @@ export const TableItemSelect = observer<Props>(function TableItemSelect({ checke
   return styled(styles, checkboxStyles)(
     <Checkbox
       className={className}
+      title={tooltip}
       disabled={context.selectDisabled || disabled}
       checked={checked || context.isSelected()}
       onClick={handleClick}
