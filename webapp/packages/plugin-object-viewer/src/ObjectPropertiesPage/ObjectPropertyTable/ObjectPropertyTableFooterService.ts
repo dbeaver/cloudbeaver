@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DBObjectService, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import type { ITableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -14,10 +14,7 @@ import {
   CommonDialogService, ConfirmationDialog, DialogueStateResult
 } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-
-import { getValue } from '../helpers';
-
-const NAME_PROPERTY_ID = 'name';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface IObjectPropertyTableFooterContext {
   nodeIds: string[];
@@ -35,7 +32,6 @@ export class ObjectPropertyTableFooterService {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly dbObjectService: DBObjectService,
   ) {
     this.contextMenuService.addPanel(this.objectPropertyTableFooterToken);
 
@@ -48,11 +44,17 @@ export class ObjectPropertyTableFooterService {
       isPresent(context) {
         return context.contextType === ObjectPropertyTableFooterService.objectPropertyContextType;
       },
-      isDisabled(context) {
-        return context.data.tableState.selectedList.length === 0;
+      isDisabled: context => {
+        if (context.data.tableState.selectedList.length === 0) {
+          return true;
+        }
+
+        const selectedNodes = this.getSelectedNodes(context.data.tableState.selectedList);
+        return !selectedNodes.some(node => node.features?.includes(ENodeFeature.canDelete));
       },
       onClick: async context => {
-        const nodeNames = this.getNodeNames(context.data.tableState.selectedList);
+        const nodes = this.getSelectedNodes(context.data.tableState.selectedList);
+        const nodeNames = nodes.map(getNodeName);
 
         const result = await this.commonDialogService.open(ConfirmationDialog, {
           title: 'ui_data_delete_confirmation',
@@ -103,19 +105,7 @@ export class ObjectPropertyTableFooterService {
     return this.contextMenuService.createContextMenu(context, this.objectPropertyTableFooterToken).menuItems;
   }
 
-  private getNodeNames(selected: string[]) {
-    return selected.reduce((acc: string[], path) => {
-      const node = this.navNodeInfoResource.get(path);
-      const dbObject = this.dbObjectService.get(path);
-
-      const nameProperty = dbObject?.properties?.find(property => property.id === NAME_PROPERTY_ID);
-
-      if (node) {
-        const name = nameProperty ? getValue(nameProperty.value) : node.name;
-        acc.push(`${node.nodeType || 'Object'}${name ? ' (' + name + ')' : ''}`);
-      }
-
-      return acc;
-    }, []);
+  private getSelectedNodes(list: string[]) {
+    return this.navNodeInfoResource.get(resourceKeyList(list)).filter(Boolean) as NavNode[];
   }
 }

@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 import { InlineEditor } from '../../../shared/InlineEditor/InlineEditor';
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
-import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
+import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 
 interface Props {
   node: NavNode;
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ node, onClose }) {
-  const navNodeManagerService = useService(NavNodeManagerService);
+  const navTreeResource = useService(NavTreeResource);
   const notificationService = useService(NotificationService);
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     try {
       if (node.name !== name) {
         setLoading(true);
-        await navNodeManagerService.changeName(name, node);
+        await navTreeResource.changeName(node, name);
       }
     } catch (exception) {
       notificationService.logException(exception, 'app_navigationTree_node_change_name_error');
@@ -44,7 +44,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       setLoading(false);
       onClose();
     }
-  }, [name, onClose, node, loading, navNodeManagerService, notificationService]);
+  }, [name, onClose, node, loading, navTreeResource, notificationService]);
 
   return (
     <InlineEditor

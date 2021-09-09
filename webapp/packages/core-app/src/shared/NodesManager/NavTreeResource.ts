@@ -26,6 +26,7 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CoreSettingsService } from '../../CoreSettingsService';
+import type { NavNode } from './EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
@@ -54,7 +55,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private navNodeInfoResource: NavNodeInfoResource,
     private coreSettingsService: CoreSettingsService,
     private sessionDataResource: SessionDataResource,
-    private connectionInfo: ConnectionInfoResource
+    private connectionInfo: ConnectionInfoResource,
   ) {
     super();
 
@@ -117,13 +118,26 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
     });
 
-    for (const path of nodePaths) {
-      const node = this.navNodeInfoResource.get(path);
+    runInAction(() => {
+      for (const path of nodePaths) {
+        const node = this.navNodeInfoResource.get(path);
 
-      if (node) {
-        this.deleteInNode(node.parentId, [path]);
+        if (node) {
+          this.deleteInNode(node.parentId, [path]);
+        }
       }
-    }
+    });
+  }
+
+  async changeName(node: NavNode, name: string): Promise<void> {
+    await this.performUpdate(node.id, [], async () => {
+      await this.graphQLService.sdk.navRenameNode({
+        nodePath: node.id,
+        newName: name,
+      });
+    });
+
+    await this.refreshTree(node.parentId);
   }
 
   deleteInNode(key: string, value: string[]): void;

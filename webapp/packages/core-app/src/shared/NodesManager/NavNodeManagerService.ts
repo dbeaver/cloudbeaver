@@ -312,11 +312,6 @@ export class NavNodeManagerService extends Bootstrap {
     };
   };
 
-  async changeName(name: string, node: NavNode): Promise<void> {
-    await this.navNodeInfoResource.changeName(name, node);
-    await this.refreshTree(node.parentId);
-  }
-
   private async navigateHandler(
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>

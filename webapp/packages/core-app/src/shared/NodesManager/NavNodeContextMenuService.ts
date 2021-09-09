@@ -17,6 +17,7 @@ import type { INodeActions } from '@cloudbeaver/plugin-object-viewer';
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
+import { getNodeName } from './NavNodeInfoResource';
 import { NavNodeManagerService } from './NavNodeManagerService';
 import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
@@ -228,7 +229,7 @@ export class NavNodeContextMenuService extends Bootstrap {
               if (name !== result) {
                 const notification = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'ui_rename_processing' });
                 try {
-                  await this.navNodeManagerService.changeName(result, node);
+                  await this.navTreeResource.changeName(node, result);
 
                   const message = `prev: ${name}\nnew: ${result}`;
                   notification.controller.resolve(`${node.nodeType} was renamed`, message);
@@ -252,7 +253,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           || context.data.node.objectFeatures.includes(EObjectFeature.dataSource),
         onClick: async context => {
           const node = context.data.node;
-          const nodeName = `${node.nodeType || 'Object'}${node.name ? ' (' + node.name + ')' : ''}`;
+          const nodeName = getNodeName(node);
 
           const result = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'ui_data_delete_confirmation',
@@ -268,7 +269,6 @@ export class NavNodeContextMenuService extends Bootstrap {
 
           try {
             await this.navTreeResource.deleteNode(node.id);
-            this.notificationService.logSuccess({ title: 'Object was deleted', message: nodeName });
           } catch (exception) {
             this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
           }

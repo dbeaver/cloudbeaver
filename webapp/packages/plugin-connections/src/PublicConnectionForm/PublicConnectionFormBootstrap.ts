@@ -10,7 +10,6 @@ import {
   NavNodeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NavNode,
   INodeMenuData
 } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';

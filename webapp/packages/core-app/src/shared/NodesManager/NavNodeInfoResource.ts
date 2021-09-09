@@ -82,15 +82,6 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     };
   }
 
-  async changeName(name: string, node: NavNodeInfo): Promise<void> {
-    await this.performUpdate(node.id, [], async () => {
-      await this.graphQLService.sdk.navRenameNode({
-        nodePath: node.id,
-        newName: name,
-      });
-    });
-  }
-
   private async loadNodeInfo(nodePath: string): Promise<NavNode> {
     const metadata = this.metadata.get(nodePath);
     const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
@@ -100,4 +91,8 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
 
     return this.navNodeInfoToNavNode(navNodeInfo);
   }
+}
+
+export function getNodeName(node: NavNode): string {
+  return `${node.nodeType || 'Object'}${node.name ? ' (' + node.name + ')' : ''}`;
 }
