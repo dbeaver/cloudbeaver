@@ -51,6 +51,6 @@ public interface DBWServiceNavigator extends DBWService {
     String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;
 
     @WebAction
-    String deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
+    int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
 
 }

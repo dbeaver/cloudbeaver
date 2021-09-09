@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
@@ -28,19 +29,21 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.edit.DBECommandContext;
+import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
+import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Web service implementation
@@ -173,12 +176,86 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException {
-        throw new DBWebException("Not implemented yet");
+        try {
+            DBRProgressMonitor monitor = session.getProgressMonitor();
+
+            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            if (node == null) {
+                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
+            }
+
+            if (node.supportsRename()) {
+                node.rename(session.getProgressMonitor(), newName);
+                return node.getName();
+            }
+            if (node instanceof DBNDatabaseNode) {
+                return renameDatabaseObject(
+                    session,
+                    (DBNDatabaseNode) node,
+                    CommonUtils.trim(CommonUtils.notEmpty(newName)));
+            }
+            throw new DBException("Rename is not supported");
+        } catch (DBException e) {
+            throw new DBWebException("Error renaming navigator node '"  + nodePath + "'", e);
+        }
     }
 
     @Override
-    public String deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException {
-        throw new DBWebException("Not implemented yet");
+    public int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = session.getProgressMonitor();
+
+            Map<DBNDatabaseNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
+            for (String path : nodePaths) {
+                DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
+                if (node == null) {
+                    throw new DBWebException("Navigator node '"  + path + "' not found");
+                }
+                if (node instanceof DBNDatabaseNode) {
+                    DBSObject object = ((DBNDatabaseNode) node).getObject();
+                    DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
+                        object.getClass(), DBEObjectMaker.class);
+                    if (objectDeleter == null || !objectDeleter.canDeleteObject(object)) {
+                        throw new DBException("Object " + object + " delete is not supported");
+                    }
+                    nodes.put((DBNDatabaseNode) node, objectDeleter);
+                } else {
+                    throw new DBWebException("Navigator node '"  + path + "' is not a database node");
+                }
+            }
+
+            Map<String, Object> options = new LinkedHashMap<>();
+            for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
+                DBSObject object = ne.getKey().getObject();
+                DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
+                DBECommandContext commandContext = new WebCommandContext(executionContext, false);
+                ne.getValue().deleteObject(commandContext, object, options);
+                commandContext.saveChanges(session.getProgressMonitor(), options);
+            }
+            return nodes.size();
+
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+        }
+    }
+
+    private String renameDatabaseObject(WebSession session, DBNDatabaseNode node, String newName) throws DBException {
+        if (node.getParentNode() instanceof DBNContainer) {
+            DBSObject object = node.getObject();
+            if (object != null) {
+                DBEObjectRenamer objectRenamer = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
+                    object.getClass(), DBEObjectRenamer.class);
+                if (objectRenamer != null) {
+                    DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
+                    Map<String, Object> options = new LinkedHashMap<>();
+                    DBECommandContext commandContext = new WebCommandContext(executionContext, false);
+                    objectRenamer.renameObject(commandContext, object, options, newName);
+                    commandContext.saveChanges(session.getProgressMonitor(), options);
+                    return node.getName();
+                }
+            }
+        }
+        throw new DBException("Node " + node.getNodeItemPath() + " rename is not supported");
     }
 
 }
