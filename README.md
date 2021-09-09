@@ -23,7 +23,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Changelog
 ### CloudBeaver 21.1.4 - 2021-09-09
 - Role management is added. 
-- Context menu is available the Metadata Editor.
+- Context menu is available in the Metadata Editor.
 - Different UI bugs have been fixed.
 
 ### CloudBeaver 21.1.3 - 2021-08-30
