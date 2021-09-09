@@ -135,7 +135,7 @@ public class WebNavigatorNodeInfo {
             DBSObject object = ((DBNDatabaseNode) node).getObject();
             DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                 object.getClass(), DBEObjectMaker.class);
-            if (objectManager != null && objectManager.canDeleteObject(object.getParentObject())) {
+            if (objectManager != null && objectManager.canDeleteObject(object)) {
                 features.add("canDelete");
             }
             if (objectManager instanceof DBEObjectRenamer && ((DBEObjectRenamer) objectManager).canRenameObject(object)) {
