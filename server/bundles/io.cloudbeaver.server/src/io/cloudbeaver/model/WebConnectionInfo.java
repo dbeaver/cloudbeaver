@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class WebConnectionInfo {
 
     private final WebSession session;
-    private DBPDataSourceContainer dataSourceContainer;
+    private final DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
 
     private String connectTime;
@@ -307,4 +307,8 @@ public class WebConnectionInfo {
         return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
     }
 
+    @Override
+    public String toString() {
+        return "WebConnection:" + dataSourceContainer.toString();
+    }
 }
