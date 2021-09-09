@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.server;singleton:=true
-Bundle-Version: 21.1.3.qualifier
-Bundle-Release-Date: 20210830
+Bundle-Version: 21.1.4.qualifier
+Bundle-Release-Date: 20210920
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.WebPlatformActivator
