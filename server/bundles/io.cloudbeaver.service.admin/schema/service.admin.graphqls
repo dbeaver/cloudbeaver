@@ -61,6 +61,10 @@ type AdminAuthProviderConfiguration {
     description: String
 
     parameters: Object!
+
+    signInLink: String
+    signOutLink: String
+    metadataLink: String
 }
 
 input ServerConfigInput {
