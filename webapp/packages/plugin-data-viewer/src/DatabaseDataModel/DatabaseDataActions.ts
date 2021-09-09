@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
 import { isDatabaseDataAction } from './DatabaseDataAction';
@@ -26,9 +26,10 @@ implements IDatabaseDataActions<TOptions, TResult> {
     this.actions = new Map();
     this.source = source;
 
-    makeObservable<DatabaseDataActions<TOptions, TResult>, 'actions'>(this, {
+    makeObservable<this, 'actions' | 'createActionsList'>(this, {
       actions: observable.shallow,
       updateResults: action,
+      createActionsList: action,
     });
   }
 
@@ -52,25 +53,27 @@ implements IDatabaseDataActions<TOptions, TResult> {
     }
 
     const actions = this.getOrCreateActionsList(result.id);
-    let action = actions.find(action => action instanceof Action);
 
-    if (!action) {
-      const allDeps = getDependingDataActions(Action)
-        .slice(2); // skip source and result arguments
+    return runInAction(() => {
+      let action = actions.find(action => action instanceof Action);
 
-      const depends = allDeps
-        .filter(isDatabaseDataAction)
-        .map(action => this.get<IDatabaseDataAction<TOptions, TResult>>(result, action));
+      if (!action) {
+        const allDeps = getDependingDataActions(Action)
+          .slice(2); // skip source and result arguments
 
-      if (allDeps.length !== depends.length) {
-        throw new Error('Unsupported inject in: ' + Action.name);
+        const depends = allDeps
+          .filter(isDatabaseDataAction)
+          .map(action => this.get<IDatabaseDataAction<TOptions, TResult>>(result, action));
+
+        if (allDeps.length !== depends.length) {
+          throw new Error('Unsupported inject in: ' + Action.name);
+        }
+
+        action = new Action(this.source, result, ...depends);
+        this.addActionToList(result.id, actions, action);
       }
-
-      action = new Action(this.source, result, ...depends);
-      this.addActionToList(result.id, actions, action);
-    }
-
-    return action as T;
+      return action as T;
+    });
   }
 
   getImplementation <T extends IDatabaseDataAction<TOptions, TResult>>(
