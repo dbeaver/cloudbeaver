@@ -37,6 +37,10 @@ export const defaultENLocale = [
   ['ui_revoke', 'Revoke'],
   ['ui_grant', 'Grant'],
   ['ui_edit', 'Edit'],
+  ['ui_rename', 'Rename'],
+  ['ui_rename_processing', 'Renaming...'],
+  ['ui_name', 'Name'],
+  ['ui_cant_delete_item', "This item can't be deleted"],
 
   ['root_permission_denied', 'You have no permissions'],
   ['app_root_session_expire_warning_title', 'Session is about to expire'],

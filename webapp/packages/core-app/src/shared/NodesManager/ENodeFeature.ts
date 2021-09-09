@@ -14,4 +14,6 @@ export enum ENodeFeature {
   'dataContainer' = 'dataContainer',
   'item' = 'item',
   'leaf' = 'leaf',
+  'canDelete' = 'canDelete',
+  'canRename' = 'canRename'
 }

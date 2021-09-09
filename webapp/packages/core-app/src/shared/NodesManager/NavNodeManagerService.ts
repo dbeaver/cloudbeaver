@@ -114,7 +114,7 @@ export class NavNodeManagerService extends Bootstrap {
 
   register(): void { }
 
-  load(): void {}
+  load(): void { }
 
   async navToNode(nodeId: string, parentId: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
@@ -315,7 +315,7 @@ export class NavNodeManagerService extends Bootstrap {
   private async navigateHandler(
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void> {
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 

@@ -10,7 +10,7 @@ import {
   NavNodeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NavNode
+  INodeMenuData
 } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService } from '@cloudbeaver/core-dialogs';
@@ -27,16 +27,16 @@ export class PublicConnectionFormBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
+    this.contextMenuService.addMenuItem<INodeMenuData>(this.contextMenuService.getRootMenuToken(), {
       id: 'connection-edit',
       isPresent(context) {
         return context.contextType === NavNodeContextMenuService.nodeContextType
-          && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+          && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'connections_public_connection_edit_menu_item_title',
       order: 2,
       onClick: context => {
-        const node = context.data;
+        const node = context.data.node;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
         this.publicConnectionFormService.open({ connectionId });
       },

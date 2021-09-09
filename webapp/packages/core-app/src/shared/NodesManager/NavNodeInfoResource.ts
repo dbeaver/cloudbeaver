@@ -92,3 +92,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     return this.navNodeInfoToNavNode(navNodeInfo);
   }
 }
+
+export function getNodeName(node: NavNode): string {
+  return `${node.nodeType || 'Object'}${node.name ? ' (' + node.name + ')' : ''}`;
+}

@@ -11,12 +11,12 @@ import {
   NavNodeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NavNode, ConnectionSchemaManagerService,
-  isObjectCatalogProvider, isObjectSchemaProvider
+  ConnectionSchemaManagerService,
+  isObjectCatalogProvider, isObjectSchemaProvider, INodeMenuData
 } from '@cloudbeaver/core-app';
 import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ActiveViewService } from '@cloudbeaver/core-view';
 
@@ -44,23 +44,23 @@ export class SqlEditorBootstrap extends Bootstrap {
         isDisabled: () => this.isSQLEntryDisabled(),
       }
     );
-    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
+    this.contextMenuService.addMenuItem<INodeMenuData>(this.contextMenuService.getRootMenuToken(), {
       id: 'open-sql-editor',
-      isPresent(context) {
-        return context.contextType === NavNodeContextMenuService.nodeContextType
-          && context.data.objectFeatures.includes(EObjectFeature.dataSource);
-      },
       title: 'SQL',
       order: 2,
-      onClick: (context: IMenuContext<NavNode>) => {
-        const node = context.data;
+      isPresent(context) {
+        return context.contextType === NavNodeContextMenuService.nodeContextType
+          && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
+      },
+      onClick: context => {
+        const node = context.data.node;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
         this.sqlEditorNavigatorService.openNewEditor(connectionId);
       },
     });
   }
 
-  load(): void {}
+  load(): void { }
 
   private isSQLEntryDisabled() {
     const activeView = this.activeViewService.view;

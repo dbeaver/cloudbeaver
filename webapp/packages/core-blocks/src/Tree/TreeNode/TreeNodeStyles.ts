@@ -50,6 +50,10 @@ export const TREE_NODE_STYLES = composes(
           width: 100%;
         }
 
+        &[|editing]::before {
+          display: none;
+        }
+
         & > * {
           margin-right: 4px;
           margin-left: 4px;
@@ -136,5 +140,4 @@ export const TREE_NODE_STYLES = composes(
     node TreeNodeControl[big] + TreeNodeNested {
       padding-left: 46px;
     }
-  `
-);
+`);

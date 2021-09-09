@@ -13,6 +13,7 @@ import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { NavNodeMetadataViewBootstrap } from './ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap';
 import { VirtualFolderViewBootstrap } from './ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap';
 import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
+import { ObjectPropertyTableFooterService } from './ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService';
 import { ObjectViewerBootstrap } from './ObjectViewerBootstrap';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
 
@@ -27,5 +28,6 @@ export const manifest: PluginManifest = {
     ObjectViewerTabService,
     DBObjectPageService,
     LocaleService,
+    ObjectPropertyTableFooterService,
   ],
 };

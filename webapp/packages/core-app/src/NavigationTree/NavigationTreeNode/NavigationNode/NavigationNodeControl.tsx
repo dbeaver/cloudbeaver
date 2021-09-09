@@ -7,17 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
+import { NavigationNodeEditor } from './NavigationNodeEditor';
 
 const styles = composes(
   css`
@@ -77,6 +79,14 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !context.loading);
 
+  const [editing, setEditing] = useState(false);
+
+  const nodeActions = useObjectRef<INodeActions>({
+    rename: () => {
+      setEditing(true);
+    },
+  });
+
   const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -84,15 +94,19 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
   }, [context]);
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl onClick={onClickHandler} {...use({ outdated })}>
+    <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
         <status {...use({ connected })} />
       </TreeNodeIcon>
-      <TreeNodeName>{node.name}</TreeNodeName>
-      <portal>
-        <TreeNodeMenu node={node} selected={context.selected} />
-      </portal>
+      <TreeNodeName>
+        {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
+      </TreeNodeName>
+      {!editing && (
+        <portal>
+          <TreeNodeMenu node={node} actions={nodeActions} selected={context.selected} />
+        </portal>
+      )}
     </TreeNodeControl>
   );
 });

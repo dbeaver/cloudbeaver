@@ -69,7 +69,6 @@ export const InlineEditorStyles = composes(
     height: 100%;
     display: flex;
     flex-direction: row;
-
     border: solid 1px;
   }
 
@@ -114,22 +113,24 @@ export const InlineEditorStyles = composes(
   editor-action {
     box-sizing: border-box;
     display: flex;
+    align-items: center;
     width: 24px;
     padding: 4px;
     cursor: pointer;
+    background: transparent;
+
+    & Loader {
+      width: 100%;
+      height: 100%;
+    }
 
     & IconOrImage {
       display: block;
       width: 100%;
     }
 
-    &[use|disabled] {
-      cursor: default;
-      opacity: 0.65;
-
-      &:before {
-        display: none;
-      }
+    &[disabled]::before {
+      display: none;
     }
   }
 `

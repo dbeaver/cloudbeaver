@@ -76,14 +76,17 @@ interface Props {
 export const Item = observer<Props>(function Item({
   objectId, columns,
 }) {
+  const styles = useStyles(itemStyles);
+
   const { node } = useNode(objectId);
   const { dbObject } = useDatabaseObjectInfo(objectId);
-  const styles = useStyles(itemStyles);
 
   if (!node) {
     return styled(styles)(
       <TableItem item={objectId}>
-        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+        <TableColumnValue centerContent>
+          <TableItemSelect />
+        </TableColumnValue>
         <TableColumnValue>
           <icon><placeholder /></icon>
         </TableColumnValue>
@@ -97,7 +100,9 @@ export const Item = observer<Props>(function Item({
   if (!dbObject?.properties || dbObject.properties.length === 0) {
     return styled(styles)(
       <TableItem item={objectId}>
-        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+        <TableColumnValue centerContent>
+          <TableItemSelect />
+        </TableColumnValue>
         <TableColumnValue>
           <icon>
             <StaticImage icon={node.icon} />
@@ -110,7 +115,9 @@ export const Item = observer<Props>(function Item({
 
   return styled(styles)(
     <TableItem item={objectId}>
-      <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+      <TableColumnValue centerContent>
+        <TableItemSelect />
+      </TableColumnValue>
       <TableColumnValue>
         <icon>
           <StaticImage icon={node.icon} />
