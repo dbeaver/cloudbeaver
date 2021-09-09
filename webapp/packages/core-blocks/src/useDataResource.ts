@@ -12,6 +12,7 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedDataResource, CachedResourceData, CachedResourceParam, isResourceKeyList, ResourceKey } from '@cloudbeaver/core-sdk';
 
+import type { ILoadableState } from './Loader/Loader';
 import { useObjectRef } from './useObjectRef';
 
 interface IActions<TResource extends CachedDataResource<any, any, any>> {
@@ -24,12 +25,10 @@ interface IActions<TResource extends CachedDataResource<any, any, any>> {
   onError?: (exception: Error) => void;
 }
 
-interface IMapResourceResult<TResource extends CachedDataResource<any, any, any>> {
+interface IMapResourceResult<TResource extends CachedDataResource<any, any, any>> extends ILoadableState {
   data: CachedResourceData<TResource>;
   resource: TResource;
   exception: Error | null;
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
   reload: () => void;
 }
 
@@ -55,6 +54,7 @@ export function useDataResource<
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     load: () => {},
   }), {
+    exceptionObserved: false,
     resource,
     key,
     exception,
@@ -79,6 +79,7 @@ export function useDataResource<
       }
 
       const newData = await resource.load(key, includes);
+      setException(null);
 
       try {
         await actions?.onData?.(
@@ -90,9 +91,14 @@ export function useDataResource<
         refObj.prevData = newData;
       }
     } catch (exception) {
-      setException(exception);
+      if (resource.getException(key) === null) {
+        setException(exception);
+      }
       actions?.onError?.(exception);
-      notifications.logException(exception, 'Can\'t load data');
+
+      if (!refObj.exceptionObserved) {
+        notifications.logException(exception, 'Can\'t load data');
+      }
     } finally {
       this.loading = false;
     }
@@ -103,7 +109,8 @@ export function useDataResource<
       return refObj.resource;
     },
     get exception() {
-      return refObj.exception;
+      refObj.exceptionObserved = true;
+      return refObj.exception || resource.getException(key);
     },
     get data() {
       return refObj.resource.data;
@@ -132,7 +139,7 @@ export function useDataResource<
   }));
 
   useEffect(() => {
-    if (exception === null) {
+    if (result.exception === null) {
       refObj.load();
     }
   }, [key, includes, outdated]);

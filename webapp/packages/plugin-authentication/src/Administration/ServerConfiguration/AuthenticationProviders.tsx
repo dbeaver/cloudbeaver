@@ -68,7 +68,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             >
               {translate('administration_configuration_wizard_configuration_anonymous_access')}
             </SwitchNew>
-            <Loader state={providers}>
+            <Loader state={providers} inline>
               {() => localProvider && styled(styles)(
                 <SwitchNew
                   key={localProvider.id}
@@ -93,7 +93,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       {services.length > 0 ? (
         <Group key='services' form gap medium>
           <GroupTitle>{translate('administration_configuration_wizard_configuration_services')}</GroupTitle>
-          <Loader state={providers}>
+          <Loader state={providers} inline>
             {() => styled(styles)(
               <>
                 {services.map(provider => {

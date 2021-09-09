@@ -12,6 +12,7 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter } from '@cloudbeaver/core-sdk';
 
+import type { ILoadableState } from './Loader/Loader';
 import { useObjectRef } from './useObjectRef';
 
 interface IActions<
@@ -47,30 +48,26 @@ interface KeyWithIncludes<TKey, TIncludes> {
 interface IMapResourceListResult<
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
-> {
+> extends ILoadableState {
   data: CachedMapResourceListGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
   resource: TResource;
-  exception: Error | null;
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
+  exception: Error[] | null;
   reload: () => void;
 }
 
 interface IMapResourceResult<
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
-> {
+> extends ILoadableState {
   data: CachedMapResourceGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
   resource: TResource;
   exception: Error | null;
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
   reload: () => void;
 }
 
@@ -142,6 +139,7 @@ export function useMapResource<
     > | undefined,
     load: () => {},
   }), {
+    exceptionObserved: false,
     resource,
     key,
     exception,
@@ -170,6 +168,7 @@ export function useMapResource<
       }
 
       const newData = await resource.load(key, includes as any);
+      setException(null);
 
       try {
         await actions?.onData?.(
@@ -181,20 +180,28 @@ export function useMapResource<
         refObj.prevData = newData;
       }
     } catch (exception) {
-      setException(exception);
+      if (resource.getException(key) === null) {
+        setException(exception);
+      }
       actions?.onError?.(exception);
-      notifications.logException(exception, 'Can\'t load data');
+      if (!refObj.exceptionObserved) {
+        notifications.logException(exception, 'Can\'t load data');
+      }
     } finally {
       this.loading = false;
     }
   };
 
-  const [result] = useState<IMapResourceResult<TResource, TIncludes>>(() => ({
+  const [result] = useState<
+  IMapResourceResult<TResource, TIncludes>
+  | IMapResourceListResult<TResource, TIncludes>
+  >(() => ({
     get resource() {
       return refObj.resource;
     },
     get exception() {
-      return refObj.exception;
+      refObj.exceptionObserved = true;
+      return refObj.exception || resource.getException(key);
     },
     get data() {
       if (refObj.key === null) {
@@ -224,7 +231,7 @@ export function useMapResource<
   }));
 
   useEffect(() => {
-    if (exception === null) {
+    if (result.exception === null || (Array.isArray(result.exception) && !result.exception.some(Boolean))) {
       refObj.load();
     }
   }, [key, includes, outdated]);

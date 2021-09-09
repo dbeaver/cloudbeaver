@@ -57,6 +57,22 @@ export const loaderStyles = css`
     }
   }
 
+  loader[|inline] {
+    height: 32px;
+    flex-direction: row;
+    margin: 0;
+    justify-content: left;
+    
+    & icon {
+      width: 24px;
+      height: 24px;
+    }
+    & message {
+      padding: 0;
+      padding-left: 16px;
+    }
+  }
+
   @keyframes rotation {
     from {
         transform: rotate(0deg);

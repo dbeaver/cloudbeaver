@@ -14,19 +14,25 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
+import { ExceptionMessage } from '../ExceptionMessage';
 import { StaticImage } from '../StaticImage';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
-type LoaderState = {
+export interface ILoadableState {
   isLoading: () => boolean;
   isLoaded: () => boolean;
-} | {
+  exception?: Error[] | Error | null;
+  reload?: () => void;
+}
+
+type LoaderState = ILoadableState | {
   loading: boolean;
 };
 
 interface Props {
   /** if false, nothing will be rendered, by default true */
   loading?: boolean;
+  inlineException?: boolean;
   /** disable cancel button */
   cancelDisabled?: boolean;
   message?: string;
@@ -38,6 +44,8 @@ interface Props {
   secondary?: boolean;
   /** smallest spinner icon and hide loading message */
   small?: boolean;
+  inline?: boolean;
+  loader?: boolean;
   className?: string;
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
@@ -57,13 +65,19 @@ export const Loader = observer<Props>(function Loader({
   hideMessage,
   secondary,
   small,
+  inline,
   fullSize,
   className,
+  loader,
   loading = true,
+  inlineException,
   state,
   children,
   onCancel,
 }) {
+  let exception: Error | null = null;
+  let reload: (() => void) | undefined;
+
   let loaded = !loading;
   if (state) {
     state = Array.isArray(state) ? state : [state];
@@ -78,6 +92,20 @@ export const Loader = observer<Props>(function Loader({
         }
         if ('isLoading' in element) {
           loading = element.isLoading();
+        }
+        if ('exception' in element && element.exception) {
+          if (Array.isArray(element.exception)) {
+            if (element.exception.length === 0) {
+              continue;
+            }
+            exception = element.exception[0];
+          } else {
+            exception = element.exception;
+          }
+
+          if ('reload' in element) {
+            reload = element.reload;
+          }
         }
       }
     }
@@ -99,7 +127,11 @@ export const Loader = observer<Props>(function Loader({
     return () => clearTimeout(id);
   }, [loading]);
 
-  if (children) {
+  if (exception && !loading) {
+    return <ExceptionMessage exception={exception} inline={inline || inlineException} onRetry={reload} />;
+  }
+
+  if (children && (!loader || !loading)) {
     if (loaded) {
       return <>{children()}</>;
     }
@@ -114,11 +146,11 @@ export const Loader = observer<Props>(function Loader({
   }
 
   return styled(style)(
-    <loader as="div" className={className} {...use({ small, fullSize })}>
-      <icon as="div"><StaticImage icon={spinnerURL} /></icon>
-      {!hideMessage && <message as="div"><Translate token={message || 'ui_processing_loading'} /></message>}
+    <loader className={className} {...use({ small, fullSize, inline })}>
+      <icon><StaticImage icon={spinnerURL} /></icon>
+      {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
       {onCancel && (
-        <actions as='div'>
+        <actions>
           <Button
             type="button"
             mod={['unelevated']}
