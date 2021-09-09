@@ -23,12 +23,15 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.DBPObjectWithDetails;
+import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
+import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +130,19 @@ public class WebNavigatorNodeInfo {
         if (isShared) {
             features.add("shared");
         }
+
+        if (node instanceof DBNDatabaseNode) {
+            DBSObject object = ((DBNDatabaseNode) node).getObject();
+            DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
+                object.getClass(), DBEObjectMaker.class);
+            if (objectManager != null && objectManager.canDeleteObject(object.getParentObject())) {
+                features.add("canDelete");
+            }
+            if (objectManager instanceof DBEObjectRenamer && ((DBEObjectRenamer) objectManager).canRenameObject(object)) {
+                features.add("canRename");
+            }
+        }
+
         return features.toArray(new String[0]);
     }
 

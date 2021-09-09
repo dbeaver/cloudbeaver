@@ -45,7 +45,8 @@ type DatabaseObjectInfo {
     uniqueName: String
     state: String
 
-    # Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog
+    # Features: script, scriptExtended, dataContainer, dataManipulator,
+    # entity, schema, catalog
     features: [ String! ]
 
     # Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition
@@ -70,6 +71,7 @@ type NavigatorNodeInfo {
     object: DatabaseObjectInfo
 
     # Supported features: item, container, leaf
+    # canDelete, canRename
     features: [ String! ]
 
     # Object detailed info.
