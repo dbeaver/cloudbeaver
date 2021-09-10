@@ -62,6 +62,7 @@ export default [
   ['administration_identity_providers_provider_configuration_description', 'Description'],
   ['administration_identity_providers_provider_configuration_icon_url', 'Icon URL'],
   ['administration_identity_providers_provider_configuration_parameters', 'Parameters'],
+  ['administration_identity_providers_provider_configuration_links', 'Links'],
   ['administration_identity_providers_wizard_description', 'Add identity providers'],
   ['administration_identity_providers_configuration_add', 'Configuration creation'],
   ['administration_identity_providers_choose_provider_placeholder', 'Select provider...'],

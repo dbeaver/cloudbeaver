@@ -24,6 +24,9 @@ export interface AdminAuthProviderConfiguration {
   iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   parameters: Scalars['Object'];
+  signInLink?: Maybe<Scalars['String']>;
+  signOutLink?: Maybe<Scalars['String']>;
+  metadataLink?: Maybe<Scalars['String']>;
 }
 
 export interface AdminConnectionGrantInfo {
@@ -1204,7 +1207,7 @@ export type GetAuthProviderConfigurationsQueryVariables = Exact<{
   providerId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters'>> }
+export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters' | 'signInLink' | 'signOutLink' | 'metadataLink'>> }
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1225,7 +1228,7 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   parameters?: Maybe<Scalars['Object']>;
 }>;
 
-export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters'> }
+export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters' | 'signInLink' | 'signOutLink' | 'metadataLink'> }
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2232,6 +2235,9 @@ export const GetAuthProviderConfigurationsDocument = `
     iconURL
     description
     parameters
+    signInLink
+    signOutLink
+    metadataLink
   }
 }
     `;
@@ -2284,6 +2290,9 @@ export const SaveAuthProviderConfigurationDocument = `
     iconURL
     description
     parameters
+    signInLink
+    signOutLink
+    metadataLink
   }
 }
     `;

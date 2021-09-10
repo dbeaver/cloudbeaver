@@ -23,5 +23,8 @@ query saveAuthProviderConfiguration(
     iconURL
     description
     parameters
+    signInLink
+    signOutLink
+    metadataLink
   }
 }
