@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, FieldCheckboxNew, Group, GroupTitle,
-  InputFieldNew, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent,
+  InputFieldNew, Link, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent,
   TextareaNew, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -142,6 +142,14 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               </Group>
             ))}
           </>
+        )}
+        {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink) && (
+          <Group small gap>
+            <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
+            {state.config.signInLink && <Link href={state.config.signInLink}>Sign in</Link>}
+            {state.config.signOutLink && <Link href={state.config.signOutLink}>Sign out</Link>}
+            {state.config.metadataLink && <Link href={state.config.metadataLink} target='_blank' rel='noopener noreferrer'>Metadata</Link>}
+          </Group>
         )}
       </ColoredContainer>
     </SubmittingForm>
