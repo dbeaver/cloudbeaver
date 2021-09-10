@@ -4,6 +4,9 @@ const { resolve } = require('path');
 const webpack = require('webpack');
 
 const commonConfig = require('./webpack.config.js')
+const main = resolve('src/index.ts');
+const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
+const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -11,18 +14,19 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const package = require(resolve('package.json'))
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
-  entry: [
-    'webpack-dev-server/client?http://localhost:3100',
-    './src/index.ts',
-  ],
+  entry: {
+    main,
+    sso
+  },
   mode: 'development',
   devServer: {
+    socket: 'socket',
     hot: true,
     proxy: {
       '/api': {
         target: env.server,
       },
-    },
+    }
   },
   devtool: 'eval-source-map',
   optimization: {
@@ -38,7 +42,15 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     new HtmlWebpackPlugin({ 
       template: resolve('src/index.html.ejs'), 
       inject: 'body', 
+      chunks: ['main'],
       version: package.version 
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'sso.html',
+      template: ssoHtmlTemplate,
+      inject: 'body',
+      chunks: ['sso'],
+      version: package.version
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],

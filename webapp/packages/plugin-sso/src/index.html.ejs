@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-version="<%= htmlWebpackPlugin.options.version %>">
+
+<head>
+      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/head.html.ejs') %>
+      <title>CloudBeaver</title>
+</head>
+
+<body class="theme-typography">
+      <div id="root"></div>
+      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/sso.html.ejs') %>
+
+      <!-- Dependencies -->
+      <% if (webpackConfig.mode == 'production') { %>
+      <% } else { %>
+      <% } %>
+</body>
+
+</html>

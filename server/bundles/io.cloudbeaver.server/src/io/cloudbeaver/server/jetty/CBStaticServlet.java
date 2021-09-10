@@ -40,7 +40,8 @@ public class CBStaticServlet extends DefaultServlet {
     private static class ProxyResourceService extends ResourceService {
         @Override
         protected boolean sendData(HttpServletRequest request, HttpServletResponse response, boolean include, HttpContent content, Enumeration<String> reqRanges) throws IOException {
-            if (content.getResource().getName().endsWith("index.html")) {
+            String resourceName = content.getResource().getName();
+            if (resourceName.endsWith("index.html") || resourceName.endsWith("sso.html")) {
                 return patchIndexHtml(response, content);
             }
             return super.sendData(request, response, include, content, reqRanges);

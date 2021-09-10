@@ -11,17 +11,12 @@ import { observer } from 'mobx-react-lite';
 import { useState, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { Filter, IconOrImage, Link, Cell } from '@cloudbeaver/core-blocks';
+import { AuthInfoService, AuthProvider, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import { Filter, IconOrImage, Link, Cell, getComputed } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-
-interface Props {
-  configurations: AuthProviderConfiguration[];
-  providerIcon?: string;
-  className?: string;
-}
 
 const styles = composes(
   css`
@@ -51,13 +46,25 @@ const styles = composes(
     }
 `);
 
-export const ConfigurationsList = observer<Props>(function ConfigurationsList({ configurations, providerIcon, className }) {
+interface Props {
+  provider: AuthProvider;
+  onClose?: () => void;
+  className?: string;
+}
+
+export const ConfigurationsList = observer<Props>(function ConfigurationsList({ provider, onClose, className }) {
+  const authInfoService = useService(AuthInfoService);
   const translate = useTranslate();
 
   const [search, setSearch] = useState('');
+  const configurations = useMemo(() => getComputed(() =>
+    (provider.configurations || [])
+      .filter(configuration => configuration.signInLink)
+  ), [provider.configurations]);
 
   const filteredConfigurations = useMemo(() => computed(() => {
-    const sortedConfigurations = configurations.slice().sort(comparePublicAuthConfigurations);
+    const sortedConfigurations = configurations.slice().sort(comparePublicAuthConfigurations) || [];
+
     if (!search) {
       return sortedConfigurations;
     }
@@ -67,6 +74,14 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
       return target.toUpperCase().includes(search.toUpperCase());
     });
   }), [search, configurations]);
+
+  async function auth(configuration: AuthProviderConfiguration) {
+    const user = await authInfoService.sso(provider.id, configuration);
+
+    if (user) {
+      onClose?.();
+    }
+  }
 
   return styled(useStyles(styles))(
     <container className={className}>
@@ -80,10 +95,15 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
       )}
       <list>
         {filteredConfigurations.get().map(configuration => {
-          const icon = configuration.iconURL || providerIcon;
+          const icon = configuration.iconURL || provider.icon;
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (
-            <Link key={configuration.id} href={configuration.signInLink} title={title} wrapper>
+            <Link
+              key={configuration.id}
+              title={title}
+              wrapper
+              onClick={() => auth(configuration)}
+            >
               <Cell
                 before={icon ? <IconOrImage icon={icon} /> : undefined}
                 description={configuration.description}

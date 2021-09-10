@@ -144,10 +144,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
         <SubmittingForm {...use({ form: !configurable })} onSubmit={controller.login}>
           {controller.provider && (
             configurable ? (
-              <ConfigurationsList
-                configurations={controller.provider.configurations!}
-                providerIcon={controller.provider.icon}
-              />
+              <ConfigurationsList provider={controller.provider} onClose={rejectDialog} />
             ) : (
               <AuthProviderForm
                 provider={controller.provider}
