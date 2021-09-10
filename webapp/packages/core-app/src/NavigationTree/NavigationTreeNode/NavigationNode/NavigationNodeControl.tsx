@@ -44,6 +44,9 @@ const styles = composes(
     TreeNodeIcon {
       position: relative;
     }
+    TreeNodeName {
+      height: 100%;
+    }
     status {
       position: absolute;
       opacity: 0;
