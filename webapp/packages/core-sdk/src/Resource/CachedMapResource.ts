@@ -107,6 +107,9 @@ export abstract class CachedMapResource<
   getException(key: ResourceKeyList<TKey>): Array<Error | null>;
   getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null;
   getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null {
+    if (ResourceKeyUtils.some(key, key => !this.has(key))) { // TODO: metadata isn't properly cleared while rename with opened in Metadata Editor node
+      return null;
+    }
     key = this.transformParam(key);
     return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
   }

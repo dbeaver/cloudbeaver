@@ -130,7 +130,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   async changeName(node: NavNode, name: string): Promise<void> {
-    await this.performUpdate(node.id, [], async () => {
+    await this.performUpdate(resourceKeyList([node.id, node.parentId]), [], async () => {
       await this.graphQLService.sdk.navRenameNode({
         nodePath: node.id,
         newName: name,
@@ -213,10 +213,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     for (const id of items) {
       this.data.delete(id);
     }
+
     const allKeys = resourceKeyList(items);
     this.markUpdated(allKeys);
     this.onItemDelete.execute(allKeys);
-    this.navNodeInfoResource.delete(ResourceKeyUtils.exclude(allKeys, key));
+    this.navNodeInfoResource.delete(allKeys);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
@@ -263,7 +264,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         const connectionInfo = this.connectionInfo.get(key);
 
         if (!connectionInfo?.connected) {
-          this.delete(nodeId);
+          this.delete(resourceKeyList(this.get(nodeId) || []));
         } else {
           await this.markTreeOutdated(nodeId);
         }

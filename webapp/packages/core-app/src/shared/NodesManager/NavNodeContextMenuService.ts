@@ -195,7 +195,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         onClick: async context => {
           const node = context.data.node;
           try {
-            await this.navNodeManagerService.refreshTree(node.id);
+            await this.navNodeManagerService.refreshTree(node.parentId);
           } catch (exception) {
             this.notificationService.logException(exception, 'Failed to refresh node');
           }
@@ -227,14 +227,10 @@ export class NavNodeContextMenuService extends Bootstrap {
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
               if (name !== result) {
-                const notification = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'ui_rename_processing' });
                 try {
                   await this.navTreeResource.changeName(node, result);
-
-                  const message = `prev: ${name}\nnew: ${result}`;
-                  notification.controller.resolve(`${node.nodeType} was renamed`, message);
                 } catch (exception) {
-                  notification.controller.reject(exception, 'Error occured while renaming');
+                  this.notificationService.logException(exception, 'Error occurred while renaming');
                 }
               }
             }

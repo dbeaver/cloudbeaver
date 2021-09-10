@@ -8,7 +8,8 @@
 
 import styled, { css } from 'reshadow';
 
-import { NavNodeInfoResource, NavNodeTransformViewComponent, useChildren } from '@cloudbeaver/core-app';
+import { DBObjectResource, NavNodeInfoResource, NavNodeTransformViewComponent, NavTreeResource } from '@cloudbeaver/core-app';
+import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -29,16 +30,27 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = function Virtua
 }) {
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const children = useChildren(nodeId);
+  const tree = useMapResource(NavTreeResource, nodeId);
+  const key = resourceKeyList([nodeId, ...tree.data || []]);
+  const dbObject = useMapResource(DBObjectResource, key, {
+    async onLoad(resource: DBObjectResource) {
+      await resource.loadChildren(nodeId, key);
+    },
+  });
 
   const nodeIds = navNodeInfoResource
-    .get(resourceKeyList(children.children || []))
+    .get(resourceKeyList(tree.data || []))
     .filter(node => node?.nodeType === nodeType)
     .map(node => node!.id);
 
   return styled(style)(
-    <tab-wrapper>
-      <ObjectChildrenPropertyTable nodeIds={nodeIds} />
-    </tab-wrapper>
+    <Loader state={[tree, dbObject]}>{() => styled(style)(
+      <>
+        <tab-wrapper>
+          <ObjectChildrenPropertyTable nodeIds={nodeIds} />
+        </tab-wrapper>
+      </>
+    )}
+    </Loader>
   );
 };

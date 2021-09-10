@@ -15,7 +15,7 @@ import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 
 @injectable()
-export class DBObjectService extends CachedMapResource<string, DBObject> {
+export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
     private graphQLService: GraphQLService,
     private navNodeInfoResource: NavNodeInfoResource

@@ -77,7 +77,7 @@ export class DataViewerTabService {
       return;
     }
 
-    const node = await this.navNodeManagerService.loadNode({
+    const node = this.navNodeManagerService.getNode({
       nodeId: tab.handlerState.objectId,
       parentId: tab.handlerState.parentId,
     });

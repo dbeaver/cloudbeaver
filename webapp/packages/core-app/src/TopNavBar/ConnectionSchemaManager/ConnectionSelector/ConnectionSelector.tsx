@@ -58,7 +58,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const style = useStyles(styles);
   const controller = useController(ConnectionSelectorController);
   const isEnabled = usePermission(EPermission.public);
-  const driver = useMapResource(DBDriverResource, null, { onLoad: resource => isEnabled && resource.loadAll() });
+  const driver = useMapResource(DBDriverResource, null, { onLoad: resource => { isEnabled && resource.loadAll(); } });
   const ConnectionMenu = TopMenuItem;
   const SchemaOrCatalogMenu = TopMenuItem;
 

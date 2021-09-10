@@ -75,11 +75,11 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
    || state.initialGrantedSubjects.some(subject => !state.grantedSubjects.includes(subject));
 
   const users = useMapResource(UsersResource, null, {
-    onLoad: resource => resource.loadAll(),
+    onLoad: resource => { resource.loadAll(); },
   });
 
   const roles = useMapResource(RolesResource, null, {
-    onLoad: resource => resource.loadAll(),
+    onLoad: resource => { resource.loadAll(); },
   });
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values

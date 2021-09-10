@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
-import { Loader, useTab } from '@cloudbeaver/core-blocks';
+import { Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
@@ -32,7 +33,12 @@ const styles = css`
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
   const controller = useController(DdlViewerController, nodeId);
-  useTab(folderId, () => controller.load());
+
+  useEffect(() => {
+    controller.load();
+  });
+  // TODO: not triggered in switch case with lazy
+  // useTab(folderId, () => controller.load());
 
   if (controller.isLoading) {
     return <Loader />;

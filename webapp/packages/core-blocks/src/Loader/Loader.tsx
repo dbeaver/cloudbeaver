@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
@@ -49,6 +49,7 @@ interface Props {
   className?: string;
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
+  style?: ComponentStyle;
   children?: () => React.ReactNode;
   onCancel?: () => void;
 }
@@ -72,6 +73,7 @@ export const Loader = observer<Props>(function Loader({
   loading = true,
   inlineException,
   state,
+  style,
   children,
   onCancel,
 }) {
@@ -111,7 +113,7 @@ export const Loader = observer<Props>(function Loader({
     }
   }
 
-  const style = useStyles(loaderStyles, overlay && overlayStyles);
+  style = useStyles(loaderStyles, style, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
   const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
 
@@ -128,7 +130,9 @@ export const Loader = observer<Props>(function Loader({
   }, [loading]);
 
   if (exception && !loading) {
-    return <ExceptionMessage exception={exception} inline={inline || inlineException} onRetry={reload} />;
+    return styled(style)(
+      <ExceptionMessage exception={exception} inline={inline || inlineException} onRetry={reload} />
+    );
   }
 
   if (children && (!loader || !loading)) {

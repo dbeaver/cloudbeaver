@@ -14,7 +14,7 @@ export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
 export * from './shared/NodesManager/NavNodeView/IFolderTransform';
 export * from './shared/NodesManager/NavNodeView/NavNodeViewService';
 export * from './shared/NodesManager/ConnectionDialogsService';
-export * from './shared/NodesManager/DBObjectService';
+export * from './shared/NodesManager/DBObjectResource';
 export * from './shared/NodesManager/NavNodeContextMenuService';
 export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';

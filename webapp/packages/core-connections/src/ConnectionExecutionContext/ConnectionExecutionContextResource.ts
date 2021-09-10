@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { EPermission, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -30,6 +30,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   constructor(
     private graphQLService: GraphQLService,
     private connectionInfoResource: ConnectionInfoResource,
+    private permissionsResource: PermissionsResource,
     sessionDataResource: SessionDataResource
   ) {
     super();
@@ -39,6 +40,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     sessionDataResource.onDataUpdate.addHandler(async () => {
       await this.load(ConnectionExecutionContextResource.keyAll);
     });
+    this.permissionsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     connectionInfoResource.onItemAdd.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
 
@@ -168,6 +170,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   protected async loader(
     key: ResourceKey<string>
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
+    if (!this.permissionsResource.has(EPermission.public)) {
+      return this.data;
+    }
+
     const all = ResourceKeyUtils.hasMark(key, ConnectionExecutionContextResource.keyAll.mark);
 
     await ResourceKeyUtils.forEachAsync(all ? ConnectionExecutionContextResource.keyAll : key, async contextId => {

@@ -37,16 +37,6 @@ export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(func
   tab,
 }) {
   const style = useStyles(viewerStyles);
-  const translate = useTranslate();
-  const { children, isLoading } = useChildren(tab.handlerState.objectId);
-
-  if (!children && isLoading()) {
-    return <Loader />;
-  }
-
-  if (!children) {
-    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
-  }
 
   return styled(style)(
     <wrapper>

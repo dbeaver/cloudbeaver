@@ -94,17 +94,18 @@ interface Props {
   message?: string;
   exception?: Error;
   inline?: boolean;
+  className?: string;
   onRetry?: () => void;
 }
 
 export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  name, message, exception = null, inline, onRetry,
+  name, message, exception = null, inline, className, onRetry,
 }) {
   const translate = useTranslate();
   const error = useErrorDetails(exception);
 
   return styled(styles)(
-    <error {...use({ inline })}>
+    <error {...use({ inline })} className={className}>
       <error-icon><IconOrImage icon={inline ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} /></error-icon>
       <error-data>
         <error-name><span>{name || error.details?.name}</span></error-name>

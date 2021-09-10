@@ -8,13 +8,13 @@
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { DBObjectService } from './DBObjectService';
+import { DBObjectResource } from './DBObjectResource';
 
 export function useDatabaseObjectInfo(navNodeId: string) {
-  const dbObjectService = useService(DBObjectService);
-  const dbObject = dbObjectService.get(navNodeId);
-  const isLoading = dbObjectService.isDataLoading(navNodeId);
-  const isLoaded = dbObjectService.isLoaded(navNodeId);
+  const dbObjectResource = useService(DBObjectResource);
+  const dbObject = dbObjectResource.get(navNodeId);
+  const isLoading = dbObjectResource.isDataLoading(navNodeId);
+  const isLoaded = dbObjectResource.isLoaded(navNodeId);
 
   return { dbObject, isLoading, isLoaded };
 }

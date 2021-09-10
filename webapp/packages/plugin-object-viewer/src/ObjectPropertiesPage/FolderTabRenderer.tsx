@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { NavNodeViewService, useNode } from '@cloudbeaver/core-app';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-blocks';
+import { DBObjectResource, NavNodeViewService, useChildren, useNode } from '@cloudbeaver/core-app';
+import { getComputed, Loader, Tab, TabIcon, TabTitle, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 interface IFolderTabRendererProps {
@@ -45,11 +46,23 @@ interface INavNodeTabProps {
 
 const NavNodeTab = observer<INavNodeTabProps>(function NavNodeTab({ nodeId, style }) {
   const nodeInfo = useNode(nodeId);
+  const children = useChildren(nodeId);
+  const dbObjectResource = useService(DBObjectResource);
+  const childrenList = resourceKeyList(children.children || []);
+
+  const loading = useStateDelay(getComputed(() => (
+    nodeInfo.isLoaded() && nodeInfo.isLoading()
+  ) || (
+    children.isLoaded() && children.isLoading()
+  ) || (
+    dbObjectResource.isLoaded(childrenList) && dbObjectResource.isDataLoading(childrenList)
+  )), 300);
 
   return styled(useStyles(style))(
     <Tab tabId={nodeId}>
       {nodeInfo.node?.icon && <TabIcon icon={nodeInfo.node.icon} />}
       <TabTitle>{nodeInfo.node?.name}</TabTitle>
+      <tab-loader><Loader loading={loading} small /></tab-loader>
     </Tab>
   );
 });

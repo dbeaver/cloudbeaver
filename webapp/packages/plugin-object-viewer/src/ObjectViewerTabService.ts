@@ -11,17 +11,15 @@ import {
   INodeNavigationData,
   ITab,
   TabHandler,
-  NodeManagerUtils,
   objectCatalogProvider,
   objectSchemaProvider,
-  NavNodeManagerService,
-  DBObjectService
+  NavNodeManagerService
 } from '@cloudbeaver/core-app';
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -37,7 +35,6 @@ export class ObjectViewerTabService {
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,
-    private dbObjectService: DBObjectService,
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService,
     private navigationTabsService: NavigationTabsService,
@@ -291,50 +288,14 @@ export class ObjectViewerTabService {
         }
       }
 
-      for (const nodeId of tab.handlerState.parents) {
-        await this.navNodeManagerService.loadTree(nodeId);
-      }
-
-      // TODO: must be loaded by info folder?
-      const node = await this.navNodeManagerService.loadNode({
-        nodeId: tab.handlerState.objectId,
-        parentId: tab.handlerState.parentId,
-      });
-
       const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
 
       if (currentPage) {
         await this.dbObjectPageService.selectPage(tab, currentPage);
       }
 
-      if (node) {
-        tab.handlerState.tabIcon = node.icon;
-        tab.handlerState.tabTitle = node.name;
-      }
-
-      await this.dbObjectService.load(tab.handlerState.objectId);
-      const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
-
       if (tab.handlerState.childrenError) {
         return;
-      }
-
-      try {
-        const folderId = tab.handlerState.folderId;
-
-        if (children.length === 0 || !NodeManagerUtils.isDatabaseObject(folderId)) {
-          await this.dbObjectService.loadChildren(tab.handlerState.objectId, resourceKeyList(children));
-          return;
-        }
-        const folderChildren = await this.navNodeManagerService.loadTree(folderId);
-
-        await this.dbObjectService.loadChildren(folderId, resourceKeyList(folderChildren));
-      } catch (exception) {
-        if (tab.handlerState.childrenError) {
-          return;
-        }
-        tab.handlerState.childrenError = true;
-        this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while folder selecting');
       }
     } catch (exception) {
       tab.handlerState.error = true;

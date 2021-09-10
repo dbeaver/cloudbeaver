@@ -31,16 +31,11 @@ interface INavigationNode {
   filterValue: string;
 }
 
-export function useNavigationNode({ id }: NavNode): INavigationNode {
+export function useNavigationNode(node: NavNode): INavigationNode {
   const contextRef = useObjectRef({
     context: useContext(TreeContext),
   });
-  const { node, isLoading } = useNode(id);
-
-  // TODO: hack to provide actual node information
-  if (!node) {
-    throw new Error('Node should exists');
-  }
+  const { isLoading } = useNode(node.id);
 
   const children = useChildren(node.id);
   const loading = isLoading() || children.isLoading();

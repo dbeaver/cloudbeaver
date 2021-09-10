@@ -11,8 +11,9 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
-import { ITabData, TabList, TabPanel, TabsState, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
+import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
@@ -45,6 +46,19 @@ const styles = composes(
     TabList {
       border-right: 1px solid;
     }
+    TabTitle {
+      flex: 1;
+    }
+    tab-loader {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-right: 16px;
+      overflow: hidden;
+    }
+    ExceptionMessage {
+      padding: 24px;
+    }
   `
 );
 
@@ -55,20 +69,16 @@ interface IProps {
 }
 
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
+  const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
+  const style = useStyles(verticalTabStyles, styles);
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
   let folderId = tab.handlerState.folderId;
 
-  useMapResource(NavTreeResource, nodeId, {
-    onLoad: async resource => {
-      for (const nodeId of tab.handlerState.parents) {
-        await resource.load(nodeId);
-      }
-    },
-  });
+  const children = useMapResource(NavTreeResource, nodeId);
 
   const folders = navNodeViewService.getFolders(nodeId) || [];
 
@@ -86,20 +96,29 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
     folderId = folders[0];
   }
 
-  return styled(useStyles(verticalTabStyles, styles))(
-    <TabsState currentTabId={folderId} orientation='vertical' onChange={openFolder}>
-      <vertical-tabs>
-        <TabList aria-label="Object folders">
-          {folders.map(folderId => (
-            <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
-          ))}
-        </TabList>
-        {folders.map(folderId => (
-          <TabPanel key={folderId} tabId={folderId}>
-            <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
-          </TabPanel>
-        ))}
-      </vertical-tabs>
-    </TabsState>
+  return styled(style)(
+    <Loader state={children} style={style}>{() => styled(style)(
+      <>
+        {folders.length > 0 ? (
+          <TabsState currentTabId={folderId} orientation='vertical' lazy onChange={openFolder}>
+            <vertical-tabs>
+              <TabList aria-label="Object folders">
+                {folders.map(folderId => (
+                  <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
+                ))}
+              </TabList>
+              {folders.map(folderId => (
+                <TabPanel key={folderId} tabId={folderId}>
+                  <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
+                </TabPanel>
+              ))}
+            </vertical-tabs>
+          </TabsState>
+        ) : (
+          <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+        )}
+      </>
+    )}
+    </Loader>
   );
 });

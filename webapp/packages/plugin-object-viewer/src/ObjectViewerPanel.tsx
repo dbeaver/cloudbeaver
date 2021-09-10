@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useChildren, TabHandlerPanelComponent } from '@cloudbeaver/core-app';
-import { Loader, TabsBox, TabPanel, TextPlaceholder, Button } from '@cloudbeaver/core-blocks';
-import { useConnectionInfo } from '@cloudbeaver/core-connections';
+import { TabHandlerPanelComponent, NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-app';
+import { Loader, TabsBox, TabPanel, TextPlaceholder, Button, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -35,6 +36,9 @@ const styles = composes(
     tab-outer:only-child {
       display: none;
     }
+    ExceptionMessage {
+      padding: 24px;
+    }
   `
 );
 
@@ -42,26 +46,72 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   tab,
 }) {
   const translate = useTranslate();
-  const [connecting, setConnecting] = useState(false);
-  const connection = useConnectionInfo(tab.handlerState.connectionId || '');
   const style = useStyles(styles);
-  const {
-    children, isOutdated, isLoading, isLoaded,
-  } = useChildren(tab.handlerState.objectId);
   const dbObjectPagesService = useService(DBObjectPageService);
+  const connectionsManagerService = useService(ConnectionsManagerService);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+
+  const state = useObservableRef(() => ({
+    connecting: false,
+    notFound: false,
+  }), {
+    connecting: observable.ref,
+    notFound: observable.ref,
+  }, false);
+
+  const connection = useMapResource(ConnectionInfoResource, tab.handlerState.connectionId || null, {
+    isActive: resource => !tab.handlerState.connectionId || !resource.has(tab.handlerState.connectionId),
+  });
+
+  const children = useMapResource(NavTreeResource, tab.handlerState.parentId, {
+    onLoad: async resource => {
+      if (tab.handlerState.parents.length === 0) {
+        return true;
+      }
+
+      const first = tab.handlerState.parents[0];
+      await resource.load(first);
+
+      for (const nodeId of tab.handlerState.parents) {
+        if (!navNodeInfoResource.has(nodeId)) {
+          state.notFound = true;
+          return true;
+        }
+        await resource.load(nodeId);
+      }
+      state.notFound = false;
+      return false;
+    },
+    isActive: () => connection.data?.connected || false,
+  });
+
+  const dataPreloaded = children.isLoaded() && !!children.data?.includes(tab.handlerState.objectId) && !state.notFound;
+
+  const node = useMapResource(navNodeInfoResource, dataPreloaded ? tab.handlerState.objectId : null, {
+    onData(data) {
+      tab.handlerState.tabIcon = data.icon;
+      tab.handlerState.tabTitle = data.name;
+    },
+  });
+
   const pages = dbObjectPagesService.orderedPages;
 
   const handleConnect = useCallback(async () => {
-    setConnecting(true);
-    try {
-      await connection.connect();
-    } finally {
-      setConnecting(false);
+    if (state.connecting || !connection.data) {
+      return;
     }
-  }, [connection]);
 
-  if (connection.connectionInfo && !connection.connectionInfo.connected) {
-    if (connecting || connection.isLoading()) {
+    state.connecting = true;
+
+    try {
+      await connectionsManagerService.requireConnection(connection.data.id);
+    } finally {
+      state.connecting = false;
+    }
+  }, []);
+
+  if (connection.data && !connection.data.connected) {
+    if (state.connecting || connection.isLoading()) {
       return <Loader />;
     }
 
@@ -72,37 +122,39 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     );
   }
 
-  if (tab.handlerState.error) {
+  if (tab.handlerState.error || state.notFound) {
     return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
   }
 
-  if (!isLoaded() || (!isOutdated() && isLoading())) {
-    return <Loader />;
-  }
-
-  if (!children) {
-    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
-  }
-
   return styled(style)(
-    <TabsBox
-      currentTabId={tab.handlerState.pageId}
-      tabs={pages.map(page => (
-        <DBObjectPageTab
-          key={page.key}
-          tab={tab}
-          page={page}
-          style={styles}
-          onSelect={dbObjectPagesService.selectPage}
-        />
-      ))}
-      style={styles}
-    >
-      {pages.map(page => (
-        <TabPanel key={page.key} tabId={page.key} lazy>
-          <DBObjectPagePanel tab={tab} page={page} />
-        </TabPanel>
-      ))}
-    </TabsBox>
+    <Loader state={[node, children]} style={styles}>
+      {() => styled(style)(
+        <>
+          {node.data ? (
+            <TabsBox
+              currentTabId={tab.handlerState.pageId}
+              tabs={pages.map(page => (
+                <DBObjectPageTab
+                  key={page.key}
+                  tab={tab}
+                  page={page}
+                  style={styles}
+                  onSelect={dbObjectPagesService.selectPage}
+                />
+              ))}
+              style={styles}
+            >
+              {pages.map(page => (
+                <TabPanel key={page.key} tabId={page.key} lazy>
+                  <DBObjectPagePanel tab={tab} page={page} />
+                </TabPanel>
+              ))}
+            </TabsBox>
+          ) : (
+            <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+          )}
+        </>
+      )}
+    </Loader>
   );
 });

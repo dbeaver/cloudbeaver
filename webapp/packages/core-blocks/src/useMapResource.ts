@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
@@ -13,15 +14,15 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter } from '@cloudbeaver/core-sdk';
 
 import type { ILoadableState } from './Loader/Loader';
-import { useObjectRef } from './useObjectRef';
+import { useObservableRef } from './useObservableRef';
 
 interface IActions<
   TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
 > {
-  isActive?: () => Promise<boolean> | boolean;
-  onLoad?: (resource: TResource) => Promise<any> | any;
+  isActive?: (resource: TResource) => Promise<boolean> | boolean;
+  onLoad?: (resource: TResource) => Promise<boolean | void> | boolean | void;
   onData?: (
     data: CachedMapResourceLoader<
     TKeyArg,
@@ -129,7 +130,7 @@ export function useMapResource<
     includes = keyObj.includes;
   }
 
-  const refObj = useObjectRef(() => ({
+  const refObj = useObservableRef(() => ({
     loading: false,
     prevData: undefined as CachedMapResourceLoader<
     TKeyArg,
@@ -137,8 +138,52 @@ export function useMapResource<
     CachedMapResourceValue<TResource>,
     TIncludes
     > | undefined,
-    load: () => {},
+    async load() {
+      const { resource, actions, prevData, key, includes } = this;
+
+      const active = await actions?.isActive?.(resource);
+
+      if (this.loading || active === false) {
+        return;
+      }
+
+      this.loading = true;
+
+      try {
+        const prevent = await actions?.onLoad?.(resource);
+
+        if (key === null || prevent === true) {
+          setException(null);
+          return;
+        }
+
+        const newData = await resource.load(key, includes as any);
+        setException(null);
+
+        try {
+          await actions?.onData?.(
+            newData,
+            resource,
+            prevData
+          );
+        } finally {
+          this.prevData = newData;
+        }
+      } catch (exception) {
+        if (resource.getException(key) === null) {
+          setException(exception);
+        }
+        actions?.onError?.(exception);
+        if (!this.exceptionObserved) {
+          notifications.logException(exception, 'Can\'t load data');
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
   }), {
+    loading: observable.ref,
+  }, {
     exceptionObserved: false,
     resource,
     key,
@@ -148,49 +193,6 @@ export function useMapResource<
   });
 
   const outdated = resource.isOutdated(key);
-
-  refObj.load = async function load() {
-    const { loading, resource, actions, prevData } = refObj;
-
-    const active = await actions?.isActive?.();
-
-    if (loading || active === false) {
-      return;
-    }
-
-    this.loading = true;
-
-    try {
-      await actions?.onLoad?.(resource);
-
-      if (key === null) {
-        return;
-      }
-
-      const newData = await resource.load(key, includes as any);
-      setException(null);
-
-      try {
-        await actions?.onData?.(
-          newData,
-          resource,
-          prevData
-        );
-      } finally {
-        refObj.prevData = newData;
-      }
-    } catch (exception) {
-      if (resource.getException(key) === null) {
-        setException(exception);
-      }
-      actions?.onError?.(exception);
-      if (!refObj.exceptionObserved) {
-        notifications.logException(exception, 'Can\'t load data');
-      }
-    } finally {
-      this.loading = false;
-    }
-  };
 
   const [result] = useState<
   IMapResourceResult<TResource, TIncludes>
@@ -226,7 +228,7 @@ export function useMapResource<
         return false;
       }
 
-      return resource.isDataLoading(refObj.key);
+      return refObj.loading || resource.isDataLoading(refObj.key);
     },
   }));
 

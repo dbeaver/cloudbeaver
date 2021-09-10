@@ -9,18 +9,21 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useChildren } from '@cloudbeaver/core-app';
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { css } from '@reshadow/react';
 
-import { useObjectFolder } from '../../useObjectFolder';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
 
 const styles = css`
   div {
     flex: auto;
     overflow: hidden;
+  }
+  ExceptionMessage {
+    padding: 24px;
   }
 `;
 
@@ -34,21 +37,27 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   parentId,
 }) {
   const translate = useTranslate();
-  const children = useChildren(objectId);
-  const { isLoading } = useObjectFolder(objectId);
-
-  if ((!children.children && children.isLoading()) || isLoading) {
-    return <Loader />;
-  }
-
-  if (!children?.children || !children.children.length) {
-    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
-  }
+  const tree = useMapResource(NavTreeResource, objectId);
+  const key = resourceKeyList([objectId, ...tree.data || []]);
+  const dbObject = useMapResource(DBObjectResource, key, {
+    async onLoad(resource: DBObjectResource) {
+      await resource.loadChildren(objectId, key);
+    },
+  });
 
   return styled(styles)(
-    <div>
-      <ObjectChildrenPropertyTable nodeIds={children.children} />
-    </div>
+    <Loader state={[tree, dbObject]} style={styles}>{() => styled(styles)(
+      <>
+        {!tree.data || tree.data.length === 0 ? (
+          <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+        ) : (
+          <div>
+            <ObjectChildrenPropertyTable nodeIds={tree.data} />
+          </div>
+        )}
+      </>
+    )}
+    </Loader>
   );
 });
 
