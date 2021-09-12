@@ -12,14 +12,15 @@ documents:
 generates:
   src/sdk.ts:
     plugins:
-      - add: '/* eslint-disable max-len */'
-      - add: '// @ts-expect-error uncontrolled'
+      - add:
+          content: '/* eslint-disable max-len */'
       - typescript
       - typescript-operations
       - typescript-graphql-request
     config:
       skipTypename: true
       documentMode : 'string'
+      useTypeImports: true
       avoidOptionals:
         field: false
         inputValue: false

@@ -9,7 +9,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="types.d.ts" />
 
-import type { GraphQLResponse, GraphQLRequestContext, ClientError } from 'graphql-request/dist/src/types';
+import type { ClientError, GraphQLRequestContext, GraphQLResponse } from 'graphql-request/dist/types';
 
 import { DetailsError } from './DetailsError';
 

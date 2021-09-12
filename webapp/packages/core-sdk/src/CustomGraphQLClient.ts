@@ -7,7 +7,9 @@
  */
 
 import { GraphQLClient } from 'graphql-request';
-import { Variables, ClientError } from 'graphql-request/dist/src/types';
+import { ClientError } from 'graphql-request';
+import type { Variables } from 'graphql-request/dist/types';
+import type * as Dom from 'graphql-request/dist/types.dom';
 
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
@@ -25,10 +27,14 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  request<T extends any>(query: string, variables?: Variables): Promise<T> {
+  request<T extends any, V = Variables>(
+    query: string,
+    variables?: V,
+    requestHeaders?: Dom.RequestInit['headers']
+  ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T>(query, variables)
+      this.overrideRequest<T>(query, variables, requestHeaders)
     );
   }
 
@@ -52,10 +58,10 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private async overrideRequest<T>(query: string, variables?: Variables): Promise<T> {
+  private async overrideRequest<T>(query: string, variables?: Variables, requestHeaders?: Dom.RequestInit['headers']): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
-      const response = await this.rawRequest<T>(query, variables);
+      const response = await this.rawRequest<T>(query, variables, requestHeaders);
 
       // TODO: seems here can be undefined
       return response.data as T;

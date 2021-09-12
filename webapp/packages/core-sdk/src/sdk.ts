@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-// @ts-expect-error uncontrolled
-import { GraphQLClient } from 'graphql-request';
+import type { GraphQLClient } from 'graphql-request';
+import type * as Dom from 'graphql-request/dist/types.dom';
 export type Maybe<T> = T;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -17,16 +17,16 @@ export interface Scalars {
 }
 
 export interface AdminAuthProviderConfiguration {
-  providerId: Scalars['ID'];
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  disabled: Scalars['Boolean'];
-  iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  disabled: Scalars['Boolean'];
+  displayName: Scalars['String'];
+  iconURL?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  metadataLink?: Maybe<Scalars['String']>;
   parameters: Scalars['Object'];
+  providerId: Scalars['ID'];
   signInLink?: Maybe<Scalars['String']>;
   signOutLink?: Maybe<Scalars['String']>;
-  metadataLink?: Maybe<Scalars['String']>;
 }
 
 export interface AdminConnectionGrantInfo {
@@ -36,203 +36,203 @@ export interface AdminConnectionGrantInfo {
 }
 
 export interface AdminConnectionSearchInfo {
+  defaultDriver: Scalars['ID'];
   displayName: Scalars['String'];
   host: Scalars['String'];
   port: Scalars['Int'];
   possibleDrivers: Array<Scalars['ID']>;
-  defaultDriver: Scalars['ID'];
 }
 
 export interface AdminPermissionInfo {
+  category?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   label?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
   provider: Scalars['String'];
-  category?: Maybe<Scalars['String']>;
 }
 
 export interface AdminRoleInfo {
+  description?: Maybe<Scalars['String']>;
+  grantedConnections: AdminConnectionGrantInfo[];
+  grantedUsers: Array<Scalars['ID']>;
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  grantedUsers: Array<Scalars['ID']>;
-  grantedConnections: AdminConnectionGrantInfo[];
   rolePermissions: Array<Maybe<Scalars['ID']>>;
 }
 
 export enum AdminSubjectType {
-  User = 'user',
-  Role = 'role'
+  Role = 'role',
+  User = 'user'
 }
 
 export interface AdminUserInfo {
-  userId: Scalars['ID'];
-  metaParameters: Scalars['Object'];
   configurationParameters: Scalars['Object'];
-  grantedRoles: Array<Scalars['ID']>;
   grantedConnections: AdminConnectionGrantInfo[];
-  origins: ObjectOrigin[];
+  grantedRoles: Array<Scalars['ID']>;
   linkedAuthProviders: Array<Scalars['String']>;
+  metaParameters: Scalars['Object'];
+  origins: ObjectOrigin[];
+  userId: Scalars['ID'];
 }
 
 export interface AsyncTaskInfo {
+  error?: Maybe<ServerError>;
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
-  running: Scalars['Boolean'];
-  status?: Maybe<Scalars['String']>;
-  error?: Maybe<ServerError>;
   /** @deprecated Field no longer supported */
   result?: Maybe<SqlExecuteInfo>;
+  running: Scalars['Boolean'];
+  status?: Maybe<Scalars['String']>;
   taskResult?: Maybe<Scalars['Object']>;
 }
 
 export enum AuthCredentialEncryption {
+  Hash = 'hash',
   None = 'none',
-  Plain = 'plain',
-  Hash = 'hash'
+  Plain = 'plain'
 }
 
 export interface AuthCredentialInfo {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
   admin: Scalars['Boolean'];
-  user: Scalars['Boolean'];
+  description?: Maybe<Scalars['String']>;
+  displayName: Scalars['String'];
+  encryption?: Maybe<AuthCredentialEncryption>;
+  id: Scalars['ID'];
   identifying: Scalars['Boolean'];
   possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
-  encryption?: Maybe<AuthCredentialEncryption>;
+  user: Scalars['Boolean'];
 }
 
 export interface AuthProviderConfiguration {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  disabled: Scalars['Boolean'];
-  iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  disabled: Scalars['Boolean'];
+  displayName: Scalars['String'];
+  iconURL?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  metadataLink?: Maybe<Scalars['String']>;
   signInLink?: Maybe<Scalars['String']>;
   signOutLink?: Maybe<Scalars['String']>;
-  metadataLink?: Maybe<Scalars['String']>;
 }
 
 export interface AuthProviderInfo {
-  id: Scalars['ID'];
-  label: Scalars['String'];
-  icon?: Maybe<Scalars['ID']>;
-  description?: Maybe<Scalars['String']>;
-  defaultProvider: Scalars['Boolean'];
   configurable: Scalars['Boolean'];
   configurations?: Maybe<AuthProviderConfiguration[]>;
   credentialParameters: AuthCredentialInfo[];
+  defaultProvider: Scalars['Boolean'];
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
+  label: Scalars['String'];
 }
 
 export interface ConnectionConfig {
+  authModelId?: Maybe<Scalars['ID']>;
   connectionId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
+  credentials?: Maybe<Scalars['Object']>;
+  dataSourceId?: Maybe<Scalars['ID']>;
+  databaseName?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  templateId?: Maybe<Scalars['ID']>;
   driverId?: Maybe<Scalars['ID']>;
   host?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  networkHandlersConfig?: Maybe<NetworkHandlerConfigInput[]>;
   port?: Maybe<Scalars['String']>;
-  databaseName?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
   properties?: Maybe<Scalars['Object']>;
-  template?: Maybe<Scalars['Boolean']>;
+  providerProperties?: Maybe<Scalars['Object']>;
   readOnly?: Maybe<Scalars['Boolean']>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
-  authModelId?: Maybe<Scalars['ID']>;
-  credentials?: Maybe<Scalars['Object']>;
-  providerProperties?: Maybe<Scalars['Object']>;
-  networkHandlersConfig?: Maybe<NetworkHandlerConfigInput[]>;
-  dataSourceId?: Maybe<Scalars['ID']>;
+  template?: Maybe<Scalars['Boolean']>;
+  templateId?: Maybe<Scalars['ID']>;
+  url?: Maybe<Scalars['String']>;
   userName?: Maybe<Scalars['String']>;
   userPassword?: Maybe<Scalars['String']>;
 }
 
 export interface ConnectionInfo {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  host?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  databaseName?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
-  template: Scalars['Boolean'];
-  connected: Scalars['Boolean'];
-  provided: Scalars['Boolean'];
-  readOnly: Scalars['Boolean'];
-  useUrl: Scalars['Boolean'];
-  saveCredentials: Scalars['Boolean'];
-  connectTime?: Maybe<Scalars['String']>;
-  connectionError?: Maybe<ServerError>;
-  serverVersion?: Maybe<Scalars['String']>;
-  clientVersion?: Maybe<Scalars['String']>;
-  origin: ObjectOrigin;
-  authNeeded: Scalars['Boolean'];
   authModel?: Maybe<Scalars['ID']>;
+  authNeeded: Scalars['Boolean'];
   authProperties: ObjectPropertyInfo[];
-  providerProperties: Scalars['Object'];
-  networkHandlersConfig: NetworkHandlerConfig[];
+  clientVersion?: Maybe<Scalars['String']>;
+  connectTime?: Maybe<Scalars['String']>;
+  connected: Scalars['Boolean'];
+  connectionError?: Maybe<ServerError>;
+  databaseName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  driverId: Scalars['ID'];
   features: Array<Scalars['String']>;
+  host?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
   navigatorSettings: NavigatorSettings;
+  networkHandlersConfig: NetworkHandlerConfig[];
+  origin: ObjectOrigin;
+  port?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  provided: Scalars['Boolean'];
+  providerProperties: Scalars['Object'];
+  readOnly: Scalars['Boolean'];
+  saveCredentials: Scalars['Boolean'];
+  serverVersion?: Maybe<Scalars['String']>;
   supportedDataFormats: ResultDataFormat[];
+  template: Scalars['Boolean'];
+  url?: Maybe<Scalars['String']>;
+  useUrl: Scalars['Boolean'];
 }
 
 export interface DataTransferParameters {
-  processorId: Scalars['ID'];
-  settings?: Maybe<Scalars['Object']>;
-  processorProperties: Scalars['Object'];
   filter?: Maybe<SqlDataFilter>;
+  processorId: Scalars['ID'];
+  processorProperties: Scalars['Object'];
+  settings?: Maybe<Scalars['Object']>;
 }
 
 export interface DataTransferProcessorInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  fileExtension?: Maybe<Scalars['String']>;
   appFileExtension?: Maybe<Scalars['String']>;
   appName?: Maybe<Scalars['String']>;
-  order: Scalars['Int'];
+  description?: Maybe<Scalars['String']>;
+  fileExtension?: Maybe<Scalars['String']>;
   icon?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  id: Scalars['ID'];
   isBinary?: Maybe<Scalars['Boolean']>;
   isHTML?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
+  order: Scalars['Int'];
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
 }
 
 export interface DataTypeLogicalOperation {
-  id: Scalars['ID'];
-  expression: Scalars['String'];
   argumentCount?: Maybe<Scalars['Int']>;
+  expression: Scalars['String'];
+  id: Scalars['ID'];
 }
 
 export interface DatabaseAuthModel {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  displayName: Scalars['String'];
   icon?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   properties: ObjectPropertyInfo[];
 }
 
 export interface DatabaseDocument {
-  id?: Maybe<Scalars['String']>;
   contentType?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
   data?: Maybe<Scalars['Object']>;
+  id?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
 }
 
 export interface DatabaseObjectInfo {
-  name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
-  ordinalPosition?: Maybe<Scalars['Int']>;
-  fullyQualifiedName?: Maybe<Scalars['String']>;
-  overloadedName?: Maybe<Scalars['String']>;
-  uniqueName?: Maybe<Scalars['String']>;
-  state?: Maybe<Scalars['String']>;
-  features?: Maybe<Array<Scalars['String']>>;
   editors?: Maybe<Array<Scalars['String']>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  fullyQualifiedName?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  ordinalPosition?: Maybe<Scalars['Int']>;
+  overloadedName?: Maybe<Scalars['String']>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  state?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  uniqueName?: Maybe<Scalars['String']>;
 }
 
 export interface DatabaseObjectInfoPropertiesArgs {
@@ -245,41 +245,41 @@ export interface DatabaseStructContainers {
 }
 
 export interface DriverInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  iconBig?: Maybe<Scalars['String']>;
-  providerId?: Maybe<Scalars['ID']>;
-  driverClassName?: Maybe<Scalars['String']>;
-  defaultPort?: Maybe<Scalars['String']>;
-  defaultDatabase?: Maybe<Scalars['String']>;
-  defaultServer?: Maybe<Scalars['String']>;
-  defaultUser?: Maybe<Scalars['String']>;
-  sampleURL?: Maybe<Scalars['String']>;
-  driverInfoURL?: Maybe<Scalars['String']>;
-  driverPropertiesURL?: Maybe<Scalars['String']>;
-  embedded?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
-  licenseRequired?: Maybe<Scalars['Boolean']>;
-  license?: Maybe<Scalars['String']>;
-  custom?: Maybe<Scalars['Boolean']>;
-  promotedScore?: Maybe<Scalars['Int']>;
-  driverProperties: ObjectPropertyInfo[];
-  driverParameters: Scalars['Object'];
-  providerProperties: ObjectPropertyInfo[];
   anonymousAccess?: Maybe<Scalars['Boolean']>;
-  defaultAuthModel: Scalars['ID'];
   applicableAuthModel: Array<Scalars['ID']>;
   applicableNetworkHandlers: Array<Maybe<Scalars['ID']>>;
+  custom?: Maybe<Scalars['Boolean']>;
+  defaultAuthModel: Scalars['ID'];
+  defaultDatabase?: Maybe<Scalars['String']>;
+  defaultPort?: Maybe<Scalars['String']>;
+  defaultServer?: Maybe<Scalars['String']>;
+  defaultUser?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  driverClassName?: Maybe<Scalars['String']>;
+  driverInfoURL?: Maybe<Scalars['String']>;
+  driverParameters: Scalars['Object'];
+  driverProperties: ObjectPropertyInfo[];
+  driverPropertiesURL?: Maybe<Scalars['String']>;
+  embedded?: Maybe<Scalars['Boolean']>;
+  icon?: Maybe<Scalars['String']>;
+  iconBig?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  license?: Maybe<Scalars['String']>;
+  licenseRequired?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
+  promotedScore?: Maybe<Scalars['Int']>;
+  providerId?: Maybe<Scalars['ID']>;
+  providerProperties: ObjectPropertyInfo[];
+  sampleURL?: Maybe<Scalars['String']>;
 }
 
 export interface LogEntry {
-  time?: Maybe<Scalars['DateTime']>;
-  type: Scalars['String'];
   message?: Maybe<Scalars['String']>;
   stackTrace?: Maybe<Scalars['String']>;
+  time?: Maybe<Scalars['DateTime']>;
+  type: Scalars['String'];
 }
 
 export interface Mutation {
@@ -321,18 +321,18 @@ export interface Mutation {
 
 export interface MutationAsyncReadDataFromContainerArgs {
   connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
-  filter?: Maybe<SqlDataFilter>;
+  contextId: Scalars['ID'];
   dataFormat?: Maybe<ResultDataFormat>;
+  filter?: Maybe<SqlDataFilter>;
 }
 
 export interface MutationAsyncSqlExecuteQueryArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
-  sql: Scalars['String'];
-  filter?: Maybe<SqlDataFilter>;
   dataFormat?: Maybe<ResultDataFormat>;
+  filter?: Maybe<SqlDataFilter>;
+  sql: Scalars['String'];
 }
 
 export interface MutationAsyncSqlExecuteResultsArgs {
@@ -340,10 +340,10 @@ export interface MutationAsyncSqlExecuteResultsArgs {
 }
 
 export interface MutationAsyncSqlExplainExecutionPlanArgs {
+  configuration: Scalars['Object'];
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   query: Scalars['String'];
-  configuration: Scalars['Object'];
 }
 
 export interface MutationAsyncSqlExplainExecutionPlanResultArgs {
@@ -372,8 +372,8 @@ export interface MutationCloseConnectionArgs {
 }
 
 export interface MutationCopyConnectionFromNodeArgs {
-  nodePath: Scalars['String'];
   config?: Maybe<ConnectionConfig>;
+  nodePath: Scalars['String'];
 }
 
 export interface MutationCreateConnectionArgs {
@@ -381,8 +381,8 @@ export interface MutationCreateConnectionArgs {
 }
 
 export interface MutationCreateConnectionFromTemplateArgs {
-  templateId: Scalars['ID'];
   connectionName?: Maybe<Scalars['String']>;
+  templateId: Scalars['ID'];
 }
 
 export interface MutationDeleteConnectionArgs {
@@ -390,8 +390,8 @@ export interface MutationDeleteConnectionArgs {
 }
 
 export interface MutationInitConnectionArgs {
-  id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  id: Scalars['ID'];
   networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }
@@ -401,8 +401,8 @@ export interface MutationNavDeleteNodesArgs {
 }
 
 export interface MutationNavRenameNodeArgs {
-  nodePath: Scalars['ID'];
   newName: Scalars['String'];
+  nodePath: Scalars['ID'];
 }
 
 export interface MutationOpenConnectionArgs {
@@ -455,160 +455,160 @@ export interface MutationUpdateConnectionArgs {
 }
 
 export interface MutationUpdateResultsDataBatchArgs {
+  addedRows?: Maybe<SqlResultRow[]>;
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
+  deletedRows?: Maybe<SqlResultRow[]>;
   resultsId: Scalars['ID'];
   updatedRows?: Maybe<SqlResultRow[]>;
-  deletedRows?: Maybe<SqlResultRow[]>;
-  addedRows?: Maybe<SqlResultRow[]>;
 }
 
 export interface MutationUpdateResultsDataBatchScriptArgs {
+  addedRows?: Maybe<SqlResultRow[]>;
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
+  deletedRows?: Maybe<SqlResultRow[]>;
   resultsId: Scalars['ID'];
   updatedRows?: Maybe<SqlResultRow[]>;
-  deletedRows?: Maybe<SqlResultRow[]>;
-  addedRows?: Maybe<SqlResultRow[]>;
 }
 
 export interface NavigatorNodeInfo {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  nodeType?: Maybe<Scalars['String']>;
-  hasChildren?: Maybe<Scalars['Boolean']>;
-  object?: Maybe<DatabaseObjectInfo>;
   features?: Maybe<Array<Scalars['String']>>;
-  nodeDetails?: Maybe<ObjectPropertyInfo[]>;
   folder?: Maybe<Scalars['Boolean']>;
+  hasChildren?: Maybe<Scalars['Boolean']>;
+  icon?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   inline?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
   navigable?: Maybe<Scalars['Boolean']>;
+  nodeDetails?: Maybe<ObjectPropertyInfo[]>;
+  nodeType?: Maybe<Scalars['String']>;
+  object?: Maybe<DatabaseObjectInfo>;
 }
 
 export interface NavigatorSettings {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
   hideFolders: Scalars['Boolean'];
   hideSchemas: Scalars['Boolean'];
   hideVirtualModel: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
 }
 
 export interface NavigatorSettingsInput {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
   hideFolders: Scalars['Boolean'];
   hideSchemas: Scalars['Boolean'];
   hideVirtualModel: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
 }
 
 export interface NetworkEndpointInfo {
-  message?: Maybe<Scalars['String']>;
   clientVersion?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
   serverVersion?: Maybe<Scalars['String']>;
 }
 
 export interface NetworkHandlerConfig {
-  id: Scalars['ID'];
   enabled: Scalars['Boolean'];
-  userName?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   password?: Maybe<Scalars['String']>;
-  savePassword: Scalars['Boolean'];
   properties: Scalars['Object'];
+  savePassword: Scalars['Boolean'];
+  userName?: Maybe<Scalars['String']>;
 }
 
 export interface NetworkHandlerConfigInput {
-  id: Scalars['ID'];
   enabled?: Maybe<Scalars['Boolean']>;
-  userName?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   password?: Maybe<Scalars['String']>;
-  savePassword?: Maybe<Scalars['Boolean']>;
   properties?: Maybe<Scalars['Object']>;
+  savePassword?: Maybe<Scalars['Boolean']>;
+  userName?: Maybe<Scalars['String']>;
 }
 
 export interface NetworkHandlerDescriptor {
-  id: Scalars['ID'];
   codeName: Scalars['String'];
-  label: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  properties: ObjectPropertyInfo[];
   secured: Scalars['Boolean'];
   type?: Maybe<NetworkHandlerType>;
-  properties: ObjectPropertyInfo[];
 }
 
 export enum NetworkHandlerType {
-  Tunnel = 'TUNNEL',
+  Config = 'CONFIG',
   Proxy = 'PROXY',
-  Config = 'CONFIG'
+  Tunnel = 'TUNNEL'
 }
 
 export interface ObjectDescriptor {
-  id?: Maybe<Scalars['Int']>;
+  description?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
   fullName?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
   uniqueName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
 }
 
 export interface ObjectDetails {
-  id?: Maybe<Scalars['Int']>;
-  displayName?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['Object']>;
 }
 
 export interface ObjectOrigin {
-  type: Scalars['ID'];
-  subType?: Maybe<Scalars['ID']>;
-  displayName: Scalars['String'];
-  icon?: Maybe<Scalars['String']>;
   configuration?: Maybe<Scalars['Object']>;
   details?: Maybe<ObjectPropertyInfo[]>;
+  displayName: Scalars['String'];
+  icon?: Maybe<Scalars['String']>;
+  subType?: Maybe<Scalars['ID']>;
+  type: Scalars['ID'];
 }
 
 export interface ObjectPropertyFilter {
-  ids?: Maybe<Array<Scalars['String']>>;
-  features?: Maybe<Array<Scalars['String']>>;
   categories?: Maybe<Array<Scalars['String']>>;
   dataTypes?: Maybe<Array<Scalars['String']>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  ids?: Maybe<Array<Scalars['String']>>;
 }
 
 export interface ObjectPropertyInfo {
-  id?: Maybe<Scalars['String']>;
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
   category?: Maybe<Scalars['String']>;
   dataType?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
   defaultValue?: Maybe<Scalars['Object']>;
-  length: ObjectPropertyLength;
+  description?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
   features: Array<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
+  length: ObjectPropertyLength;
   order: Scalars['Int'];
+  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  value?: Maybe<Scalars['Object']>;
 }
 
 export enum ObjectPropertyLength {
-  Tiny = 'TINY',
-  Short = 'SHORT',
-  Medium = 'MEDIUM',
   Long = 'LONG',
-  Multiline = 'MULTILINE'
+  Medium = 'MEDIUM',
+  Multiline = 'MULTILINE',
+  Short = 'SHORT',
+  Tiny = 'TINY'
 }
 
 export interface ProductInfo {
-  id: Scalars['ID'];
-  version: Scalars['String'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
   buildTime: Scalars['String'];
-  releaseTime: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   licenseInfo?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  releaseTime: Scalars['String'];
+  version: Scalars['String'];
 }
 
 export interface Query {
@@ -678,20 +678,20 @@ export interface QueryAllConnectionsArgs {
 }
 
 export interface QueryAuthChangeLocalPasswordArgs {
-  oldPassword: Scalars['String'];
   newPassword: Scalars['String'];
+  oldPassword: Scalars['String'];
 }
 
 export interface QueryAuthLoginArgs {
-  provider: Scalars['ID'];
   configuration?: Maybe<Scalars['ID']>;
   credentials: Scalars['Object'];
   linkUser?: Maybe<Scalars['Boolean']>;
+  provider: Scalars['ID'];
 }
 
 export interface QueryAuthLogoutArgs {
-  provider?: Maybe<Scalars['ID']>;
   configuration?: Maybe<Scalars['ID']>;
+  provider?: Maybe<Scalars['ID']>;
 }
 
 export interface QueryConfigureServerArgs {
@@ -707,8 +707,8 @@ export interface QueryConnectionStateArgs {
 }
 
 export interface QueryCopyConnectionConfigurationArgs {
-  nodePath: Scalars['String'];
   config?: Maybe<ConnectionConfig>;
+  nodePath: Scalars['String'];
 }
 
 export interface QueryCreateConnectionConfigurationArgs {
@@ -716,9 +716,9 @@ export interface QueryCreateConnectionConfigurationArgs {
 }
 
 export interface QueryCreateRoleArgs {
+  description?: Maybe<Scalars['String']>;
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
 }
 
 export interface QueryCreateUserArgs {
@@ -734,8 +734,8 @@ export interface QueryDataTransferExportDataFromContainerArgs {
 export interface QueryDataTransferExportDataFromResultsArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
   parameters: DataTransferParameters;
+  resultsId: Scalars['ID'];
 }
 
 export interface QueryDataTransferRemoveDataFileArgs {
@@ -771,8 +771,8 @@ export interface QueryGetSubjectConnectionAccessArgs {
 }
 
 export interface QueryGrantUserRoleArgs {
-  userId: Scalars['ID'];
   roleId: Scalars['ID'];
+  userId: Scalars['ID'];
 }
 
 export interface QueryListAuthProviderConfigurationParametersArgs {
@@ -797,15 +797,15 @@ export interface QueryMetadataGetNodeDdlArgs {
 }
 
 export interface QueryNavGetStructContainersArgs {
-  connectionId: Scalars['ID'];
   catalog?: Maybe<Scalars['ID']>;
+  connectionId: Scalars['ID'];
 }
 
 export interface QueryNavNodeChildrenArgs {
-  parentPath: Scalars['ID'];
-  offset?: Maybe<Scalars['Int']>;
   limit?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
   onlyFolders?: Maybe<Scalars['Boolean']>;
+  parentPath: Scalars['ID'];
 }
 
 export interface QueryNavNodeInfoArgs {
@@ -817,23 +817,23 @@ export interface QueryNavRefreshNodeArgs {
 }
 
 export interface QueryReadSessionLogArgs {
-  maxEntries?: Maybe<Scalars['Int']>;
   clearEntries?: Maybe<Scalars['Boolean']>;
+  maxEntries?: Maybe<Scalars['Int']>;
 }
 
 export interface QueryRevokeUserRoleArgs {
-  userId: Scalars['ID'];
   roleId: Scalars['ID'];
+  userId: Scalars['ID'];
 }
 
 export interface QuerySaveAuthProviderConfigurationArgs {
-  providerId: Scalars['ID'];
-  id: Scalars['ID'];
-  displayName?: Maybe<Scalars['String']>;
-  disabled?: Maybe<Scalars['Boolean']>;
-  iconURL?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  disabled?: Maybe<Scalars['Boolean']>;
+  displayName?: Maybe<Scalars['String']>;
+  iconURL?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   parameters?: Maybe<Scalars['Object']>;
+  providerId: Scalars['ID'];
 }
 
 export interface QuerySearchConnectionsArgs {
@@ -850,27 +850,27 @@ export interface QuerySetDefaultNavigatorSettingsArgs {
 }
 
 export interface QuerySetSubjectConnectionAccessArgs {
-  subjectId: Scalars['ID'];
   connections: Array<Scalars['ID']>;
+  subjectId: Scalars['ID'];
 }
 
 export interface QuerySetSubjectPermissionsArgs {
-  roleId: Scalars['ID'];
   permissions: Array<Scalars['ID']>;
+  roleId: Scalars['ID'];
 }
 
 export interface QuerySetUserCredentialsArgs {
-  userId: Scalars['ID'];
-  providerId: Scalars['ID'];
   credentials: Scalars['Object'];
+  providerId: Scalars['ID'];
+  userId: Scalars['ID'];
 }
 
 export interface QuerySqlCompletionProposalsArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
-  query: Scalars['String'];
-  position: Scalars['Int'];
   maxResults?: Maybe<Scalars['Int']>;
+  position: Scalars['Int'];
+  query: Scalars['String'];
   simpleMode?: Maybe<Scalars['Boolean']>;
 }
 
@@ -884,10 +884,10 @@ export interface QuerySqlListContextsArgs {
 }
 
 export interface QuerySqlSupportedOperationsArgs {
+  attributeIndex: Scalars['Int'];
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  attributeIndex: Scalars['Int'];
 }
 
 export interface QueryTryFederatedLoginArgs {
@@ -895,14 +895,14 @@ export interface QueryTryFederatedLoginArgs {
 }
 
 export interface QueryUpdateConnectionConfigurationArgs {
-  id: Scalars['ID'];
   config: ConnectionConfig;
+  id: Scalars['ID'];
 }
 
 export interface QueryUpdateRoleArgs {
+  description?: Maybe<Scalars['String']>;
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
 }
 
 export interface QueryUserConnectionsArgs {
@@ -910,109 +910,109 @@ export interface QueryUserConnectionsArgs {
 }
 
 export enum ResultDataFormat {
-  Resultset = 'resultset',
   Document = 'document',
   Graph = 'graph',
+  Resultset = 'resultset',
   Timeseries = 'timeseries'
 }
 
 export interface SqlCompletionProposal {
-  displayString: Scalars['String'];
-  type: Scalars['String'];
-  score?: Maybe<Scalars['Int']>;
-  replacementString: Scalars['String'];
-  replacementOffset: Scalars['Int'];
-  replacementLength: Scalars['Int'];
   cursorPosition?: Maybe<Scalars['Int']>;
+  displayString: Scalars['String'];
   icon?: Maybe<Scalars['String']>;
   nodePath?: Maybe<Scalars['String']>;
+  replacementLength: Scalars['Int'];
+  replacementOffset: Scalars['Int'];
+  replacementString: Scalars['String'];
+  score?: Maybe<Scalars['Int']>;
+  type: Scalars['String'];
 }
 
 export interface SqlContextInfo {
-  id: Scalars['ID'];
   connectionId: Scalars['ID'];
   defaultCatalog?: Maybe<Scalars['String']>;
   defaultSchema?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
 }
 
 export interface SqlDataFilter {
-  offset?: Maybe<Scalars['Float']>;
-  limit?: Maybe<Scalars['Int']>;
   constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
-  where?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Float']>;
   orderBy?: Maybe<Scalars['String']>;
+  where?: Maybe<Scalars['String']>;
 }
 
 export interface SqlDataFilterConstraint {
   attribute: Scalars['String'];
-  orderPosition?: Maybe<Scalars['Int']>;
-  orderAsc?: Maybe<Scalars['Boolean']>;
   criteria?: Maybe<Scalars['String']>;
   operator?: Maybe<Scalars['String']>;
+  orderAsc?: Maybe<Scalars['Boolean']>;
+  orderPosition?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['Object']>;
 }
 
 export interface SqlDialectInfo {
-  name: Scalars['String'];
+  catalogSeparator?: Maybe<Scalars['String']>;
   dataTypes: Array<Maybe<Scalars['String']>>;
   functions: Array<Maybe<Scalars['String']>>;
-  reservedWords: Array<Maybe<Scalars['String']>>;
-  quoteStrings: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
-  singleLineComments: Array<Maybe<Scalars['String']>>;
   multiLineComments: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
-  catalogSeparator?: Maybe<Scalars['String']>;
-  structSeparator?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  quoteStrings: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
+  reservedWords: Array<Maybe<Scalars['String']>>;
   scriptDelimiter?: Maybe<Scalars['String']>;
+  singleLineComments: Array<Maybe<Scalars['String']>>;
+  structSeparator?: Maybe<Scalars['String']>;
   supportsExplainExecutionPlan: Scalars['Boolean'];
 }
 
 export interface SqlExecuteInfo {
-  statusMessage?: Maybe<Scalars['String']>;
   duration: Scalars['Int'];
   filterText?: Maybe<Scalars['String']>;
   results: SqlQueryResults[];
+  statusMessage?: Maybe<Scalars['String']>;
 }
 
 export interface SqlExecutionPlan {
-  query: Scalars['String'];
   nodes: SqlExecutionPlanNode[];
+  query: Scalars['String'];
 }
 
 export interface SqlExecutionPlanNode {
-  id: Scalars['ID'];
-  parentId?: Maybe<Scalars['ID']>;
-  kind: Scalars['String'];
-  name?: Maybe<Scalars['String']>;
-  type: Scalars['String'];
   condition?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  kind: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  parentId?: Maybe<Scalars['ID']>;
   properties: ObjectPropertyInfo[];
+  type: Scalars['String'];
 }
 
 export interface SqlQueryResults {
-  title?: Maybe<Scalars['String']>;
-  updateRowCount?: Maybe<Scalars['Float']>;
-  sourceQuery?: Maybe<Scalars['String']>;
   dataFormat?: Maybe<ResultDataFormat>;
   resultSet?: Maybe<SqlResultSet>;
+  sourceQuery?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  updateRowCount?: Maybe<Scalars['Float']>;
 }
 
 export interface SqlResultColumn {
-  position: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
-  label?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  entityName?: Maybe<Scalars['String']>;
   dataKind?: Maybe<Scalars['String']>;
-  typeName?: Maybe<Scalars['String']>;
+  entityName?: Maybe<Scalars['String']>;
   fullTypeName?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  label?: Maybe<Scalars['String']>;
   maxLength?: Maybe<Scalars['Float']>;
-  scale?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  position: Scalars['Int'];
   precision?: Maybe<Scalars['Int']>;
-  required: Scalars['Boolean'];
   readOnly: Scalars['Boolean'];
   readOnlyStatus?: Maybe<Scalars['String']>;
+  required: Scalars['Boolean'];
+  scale?: Maybe<Scalars['Int']>;
   supportedOperations: DataTypeLogicalOperation[];
+  typeName?: Maybe<Scalars['String']>;
 }
 
 export interface SqlResultRow {
@@ -1021,110 +1021,110 @@ export interface SqlResultRow {
 }
 
 export interface SqlResultSet {
-  id: Scalars['ID'];
   columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
-  rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
   hasMoreData?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+  rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
 }
 
 export interface ServerConfig {
-  name: Scalars['String'];
-  version: Scalars['String'];
-  workspaceId: Scalars['ID'];
-  serverURL: Scalars['String'];
-  rootURI: Scalars['String'];
+  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
-  supportsCustomConnections?: Maybe<Scalars['Boolean']>;
-  supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
-  supportsWorkspaces?: Maybe<Scalars['Boolean']>;
-  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
-  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
-  licenseRequired: Scalars['Boolean'];
-  licenseValid: Scalars['Boolean'];
-  sessionExpireTime?: Maybe<Scalars['Int']>;
-  localHostAddress?: Maybe<Scalars['String']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
+  defaultNavigatorSettings: NavigatorSettings;
   developmentMode?: Maybe<Scalars['Boolean']>;
   enabledAuthProviders: Array<Scalars['ID']>;
-  supportedLanguages: ServerLanguage[];
-  services?: Maybe<Array<Maybe<WebServiceConfig>>>;
+  licenseRequired: Scalars['Boolean'];
+  licenseValid: Scalars['Boolean'];
+  localHostAddress?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   productConfiguration: Scalars['Object'];
   productInfo: ProductInfo;
-  defaultNavigatorSettings: NavigatorSettings;
+  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  rootURI: Scalars['String'];
+  serverURL: Scalars['String'];
+  services?: Maybe<Array<Maybe<WebServiceConfig>>>;
+  sessionExpireTime?: Maybe<Scalars['Int']>;
+  supportedLanguages: ServerLanguage[];
+  supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
+  supportsCustomConnections?: Maybe<Scalars['Boolean']>;
+  supportsWorkspaces?: Maybe<Scalars['Boolean']>;
+  version: Scalars['String'];
+  workspaceId: Scalars['ID'];
 }
 
 export interface ServerConfigInput {
-  serverName?: Maybe<Scalars['String']>;
-  serverURL?: Maybe<Scalars['String']>;
+  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   adminName?: Maybe<Scalars['String']>;
   adminPassword?: Maybe<Scalars['String']>;
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
-  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
-  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   enabledAuthProviders?: Maybe<Array<Scalars['ID']>>;
+  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  serverName?: Maybe<Scalars['String']>;
+  serverURL?: Maybe<Scalars['String']>;
   sessionExpireTime?: Maybe<Scalars['Int']>;
 }
 
 export interface ServerError {
-  message?: Maybe<Scalars['String']>;
-  errorCode?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
   causedBy?: Maybe<ServerError>;
+  errorCode?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
 }
 
 export interface ServerLanguage {
-  isoCode: Scalars['String'];
   displayName?: Maybe<Scalars['String']>;
+  isoCode: Scalars['String'];
   nativeName?: Maybe<Scalars['String']>;
 }
 
 export interface ServerMessage {
-  time?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
+  time?: Maybe<Scalars['String']>;
 }
 
 export interface SessionInfo {
+  cacheExpired: Scalars['Boolean'];
+  connections: ConnectionInfo[];
   createTime: Scalars['String'];
   lastAccessTime: Scalars['String'];
   locale: Scalars['String'];
-  cacheExpired: Scalars['Boolean'];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
-  connections: ConnectionInfo[];
 }
 
 export interface UserAuthToken {
-  authProvider: Scalars['ID'];
   authConfiguration?: Maybe<Scalars['ID']>;
-  loginTime: Scalars['DateTime'];
-  userId: Scalars['String'];
+  authProvider: Scalars['ID'];
   displayName: Scalars['String'];
+  loginTime: Scalars['DateTime'];
   message?: Maybe<Scalars['String']>;
   origin: ObjectOrigin;
+  userId: Scalars['String'];
 }
 
 export interface UserInfo {
-  userId: Scalars['ID'];
-  displayName?: Maybe<Scalars['String']>;
   authTokens: UserAuthToken[];
+  displayName?: Maybe<Scalars['String']>;
   linkedAuthProviders: Array<Scalars['String']>;
+  userId: Scalars['ID'];
 }
 
 export interface WebServiceConfig {
+  bundleVersion: Scalars['String'];
+  description: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
-  description: Scalars['String'];
-  bundleVersion: Scalars['String'];
 }
 
 export type AsyncTaskCancelMutationVariables = Exact<{
   taskId: Scalars['String'];
 }>;
 
-export interface AsyncTaskCancelMutation { result: Mutation['asyncTaskCancel'] }
+export interface AsyncTaskCancelMutation { result?: Maybe<boolean> }
 
 export type CreateRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1132,25 +1132,25 @@ export type CreateRoleQueryVariables = Exact<{
   description?: Maybe<Scalars['String']>;
 }>;
 
-export interface CreateRoleQuery { role: AdminRoleInfoFragment }
+export interface CreateRoleQuery { role: { roleId: string; roleName?: Maybe<string>; description?: Maybe<string> } }
 
 export type DeleteRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
 }>;
 
-export type DeleteRoleQuery = Pick<Query, 'deleteRole'>;
+export interface DeleteRoleQuery { deleteRole?: Maybe<boolean> }
 
 export type GetRoleGrantedUsersQueryVariables = Exact<{
   roleId: Scalars['ID'];
 }>;
 
-export interface GetRoleGrantedUsersQuery { role: Array<Maybe<Pick<AdminRoleInfo, 'grantedUsers'>>> }
+export interface GetRoleGrantedUsersQuery { role: Array<Maybe<{ grantedUsers: string[] }>> }
 
 export type GetRolesListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetRolesListQuery { roles: Array<Maybe<AdminRoleInfoFragment>> }
+export interface GetRolesListQuery { roles: Array<Maybe<{ roleId: string; roleName?: Maybe<string>; description?: Maybe<string> }>> }
 
 export type UpdateRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1158,14 +1158,14 @@ export type UpdateRoleQueryVariables = Exact<{
   description?: Maybe<Scalars['String']>;
 }>;
 
-export interface UpdateRoleQuery { role: AdminRoleInfoFragment }
+export interface UpdateRoleQuery { role: { roleId: string; roleName?: Maybe<string>; description?: Maybe<string> } }
 
 export type AuthChangeLocalPasswordQueryVariables = Exact<{
   oldPassword: Scalars['String'];
   newPassword: Scalars['String'];
 }>;
 
-export type AuthChangeLocalPasswordQuery = Pick<Query, 'authChangeLocalPassword'>;
+export interface AuthChangeLocalPasswordQuery { authChangeLocalPassword: boolean }
 
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
@@ -1174,49 +1174,39 @@ export type AuthLoginQueryVariables = Exact<{
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface AuthLoginQuery { authToken: AuthTokenFragment }
+export interface AuthLoginQuery { authToken: { authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } } }
 
 export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AuthLogoutQuery = Pick<Query, 'authLogout'>;
+export interface AuthLogoutQuery { authLogout?: Maybe<boolean> }
 
 export type DeleteAuthProviderConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type DeleteAuthProviderConfigurationQuery = Pick<Query, 'deleteAuthProviderConfiguration'>;
+export interface DeleteAuthProviderConfigurationQuery { deleteAuthProviderConfiguration: boolean }
 
 export type GetActiveUserQueryVariables = Exact<{
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface GetActiveUserQuery {
-  user?: Maybe<(
-    Pick<UserInfo, 'userId' | 'displayName' | 'linkedAuthProviders'>
-    & { authTokens: AuthTokenFragment[] }
-  )>;
-}
+export interface GetActiveUserQuery { user?: Maybe<{ userId: string; displayName?: Maybe<string>; linkedAuthProviders: string[]; authTokens: Array<{ authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }> }> }
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
 }>;
 
-export interface GetAuthProviderConfigurationParametersQuery { parameters: AuthProviderConfigurationParametersFragment[] }
+export interface GetAuthProviderConfigurationParametersQuery { parameters: Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }> }
 
 export type GetAuthProviderConfigurationsQueryVariables = Exact<{
   providerId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetAuthProviderConfigurationsQuery { configurations: Array<Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters' | 'signInLink' | 'signOutLink' | 'metadataLink'>> }
+export interface GetAuthProviderConfigurationsQuery { configurations: Array<{ providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: Maybe<string>; description?: Maybe<string>; parameters: any; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> }> }
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetAuthProvidersQuery {
-  providers: Array<(
-    Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider' | 'configurable'>
-    & { configurations?: Maybe<Array<Pick<AuthProviderConfiguration, 'id' | 'displayName' | 'iconURL' | 'description' | 'signInLink' | 'signOutLink' | 'metadataLink'>>>; credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
-  )>;
-}
+export interface GetAuthProvidersQuery { providers: Array<{ id: string; label: string; icon?: Maybe<string>; description?: Maybe<string>; defaultProvider: boolean; configurable: boolean; configurations?: Maybe<Array<{ id: string; displayName: string; iconURL?: Maybe<string>; description?: Maybe<string>; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> }>>; credentialParameters: Array<{ id: string; displayName: string; description?: Maybe<string>; admin: boolean; user: boolean; identifying: boolean; possibleValues?: Maybe<Array<Maybe<string>>>; encryption?: Maybe<AuthCredentialEncryption> }> }> }
 
 export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -1228,60 +1218,60 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   parameters?: Maybe<Scalars['Object']>;
 }>;
 
-export interface SaveAuthProviderConfigurationQuery { configuration: Pick<AdminAuthProviderConfiguration, 'providerId' | 'id' | 'displayName' | 'disabled' | 'iconURL' | 'description' | 'parameters' | 'signInLink' | 'signOutLink' | 'metadataLink'> }
+export interface SaveAuthProviderConfigurationQuery { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: Maybe<string>; description?: Maybe<string>; parameters: any; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> } }
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface CreateUserQuery { user: AdminUserInfoFragment }
+export interface CreateUserQuery { user: { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> } }
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
 
-export type DeleteUserQuery = Pick<Query, 'deleteUser'>;
+export interface DeleteUserQuery { deleteUser?: Maybe<boolean> }
 
 export type GetPermissionsListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetPermissionsListQuery { permissions: Array<Maybe<Pick<AdminPermissionInfo, 'id' | 'label' | 'description' | 'provider' | 'category'>>> }
+export interface GetPermissionsListQuery { permissions: Array<Maybe<{ id: string; label?: Maybe<string>; description?: Maybe<string>; provider: string; category?: Maybe<string> }>> }
 
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetUserGrantedConnectionsQuery { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
+export interface GetUserGrantedConnectionsQuery { grantedConnections: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> }
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface GetUsersListQuery { users: Array<Maybe<AdminUserInfoFragment>> }
+export interface GetUsersListQuery { users: Array<Maybe<{ userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }>> }
 
 export type GrantUserRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
 }>;
 
-export type GrantUserRoleQuery = Pick<Query, 'grantUserRole'>;
+export interface GrantUserRoleQuery { grantUserRole?: Maybe<boolean> }
 
 export type RevokeUserRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
 }>;
 
-export type RevokeUserRoleQuery = Pick<Query, 'revokeUserRole'>;
+export interface RevokeUserRoleQuery { revokeUserRole?: Maybe<boolean> }
 
 export type SetConnectionsQueryVariables = Exact<{
   userId: Scalars['ID'];
   connections: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
-export interface SetConnectionsQuery { grantedConnections: Query['setSubjectConnectionAccess'] }
+export interface SetConnectionsQuery { grantedConnections?: Maybe<boolean> }
 
 export type SetUserCredentialsQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1289,7 +1279,7 @@ export type SetUserCredentialsQueryVariables = Exact<{
   credentials: Scalars['Object'];
 }>;
 
-export type SetUserCredentialsQuery = Pick<Query, 'setUserCredentials'>;
+export interface SetUserCredentialsQuery { setUserCredentials?: Maybe<boolean> }
 
 export type CreateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
@@ -1299,7 +1289,7 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionConfigurationQuery { connection: DatabaseConnectionFragment }
+export interface CreateConnectionConfigurationQuery { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   nodePath: Scalars['String'];
@@ -1310,19 +1300,19 @@ export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionConfigurationFromNodeQuery { connection: DatabaseConnectionFragment }
+export interface CreateConnectionConfigurationFromNodeQuery { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type DeleteConnectionConfigurationQuery = Pick<Query, 'deleteConnectionConfiguration'>;
+export interface DeleteConnectionConfigurationQuery { deleteConnectionConfiguration?: Maybe<boolean> }
 
 export type GetConnectionAccessQueryVariables = Exact<{
   connectionId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetConnectionAccessQuery { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
+export interface GetConnectionAccessQuery { subjects: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> }
 
 export type GetConnectionsQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
@@ -1332,33 +1322,33 @@ export type GetConnectionsQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface GetConnectionsQuery { connections: DatabaseConnectionFragment[] }
+export interface GetConnectionsQuery { connections: Array<{ id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } }> }
 
 export type GetSubjectConnectionAccessQueryVariables = Exact<{
   subjectId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetSubjectConnectionAccessQuery { grantInfo: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
+export interface GetSubjectConnectionAccessQuery { grantInfo: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> }
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']> | Scalars['String'];
 }>;
 
-export interface SearchDatabasesQuery { databases: Array<Pick<AdminConnectionSearchInfo, 'displayName' | 'host' | 'port' | 'possibleDrivers' | 'defaultDriver'>> }
+export interface SearchDatabasesQuery { databases: Array<{ displayName: string; host: string; port: number; possibleDrivers: string[]; defaultDriver: string }> }
 
 export type SetConnectionAccessQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   subjects: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
-export type SetConnectionAccessQuery = Pick<Query, 'setConnectionSubjectAccess'>;
+export interface SetConnectionAccessQuery { setConnectionSubjectAccess?: Maybe<boolean> }
 
 export type SetSubjectConnectionAccessQueryVariables = Exact<{
   subjectId: Scalars['ID'];
   connections: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
-export type SetSubjectConnectionAccessQuery = Pick<Query, 'setSubjectConnectionAccess'>;
+export interface SetSubjectConnectionAccessQuery { setSubjectConnectionAccess?: Maybe<boolean> }
 
 export type UpdateConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1369,7 +1359,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface UpdateConnectionConfigurationQuery { connection: DatabaseConnectionFragment }
+export interface UpdateConnectionConfigurationQuery { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1379,7 +1369,7 @@ export type CloseConnectionMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CloseConnectionMutation { connection: DatabaseConnectionFragment }
+export interface CloseConnectionMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1389,7 +1379,7 @@ export type CreateConnectionMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionMutation { connection: DatabaseConnectionFragment }
+export interface CreateConnectionMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
@@ -1400,7 +1390,7 @@ export type CreateConnectionFromNodeMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionFromNodeMutation { connection: DatabaseConnectionFragment }
+export interface CreateConnectionFromNodeMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
@@ -1411,13 +1401,13 @@ export type CreateConnectionFromTemplateMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionFromTemplateMutation { connection: DatabaseConnectionFragment }
+export interface CreateConnectionFromTemplateMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
+export interface DeleteConnectionMutation { deleteConnection: boolean }
 
 export type DriverListQueryVariables = Exact<{
   driverId?: Maybe<Scalars['ID']>;
@@ -1426,7 +1416,7 @@ export type DriverListQueryVariables = Exact<{
   includeDriverParameters: Scalars['Boolean'];
 }>;
 
-export interface DriverListQuery { drivers: DatabaseDriverFragment[] }
+export interface DriverListQuery { drivers: Array<{ id: string; name?: Maybe<string>; icon?: Maybe<string>; description?: Maybe<string>; defaultPort?: Maybe<string>; defaultDatabase?: Maybe<string>; defaultServer?: Maybe<string>; defaultUser?: Maybe<string>; sampleURL?: Maybe<string>; embedded?: Maybe<boolean>; anonymousAccess?: Maybe<boolean>; promotedScore?: Maybe<number>; defaultAuthModel: string; applicableNetworkHandlers: Array<Maybe<string>>; driverParameters?: Maybe<any>; providerProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; length: ObjectPropertyLength; features: string[]; order: number }>>; driverProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>> }>> }> }
 
 export type ExecutionContextCreateMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1434,21 +1424,21 @@ export type ExecutionContextCreateMutationVariables = Exact<{
   defaultSchema?: Maybe<Scalars['String']>;
 }>;
 
-export interface ExecutionContextCreateMutation { context: Pick<SqlContextInfo, 'id' | 'connectionId' | 'defaultCatalog' | 'defaultSchema'> }
+export interface ExecutionContextCreateMutation { context: { id: string; connectionId: string; defaultCatalog?: Maybe<string>; defaultSchema?: Maybe<string> } }
 
 export type ExecutionContextDestroyMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
 }>;
 
-export type ExecutionContextDestroyMutation = Pick<Mutation, 'sqlContextDestroy'>;
+export interface ExecutionContextDestroyMutation { sqlContextDestroy: boolean }
 
 export type ExecutionContextListQueryVariables = Exact<{
   connectionId?: Maybe<Scalars['ID']>;
   contextId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface ExecutionContextListQuery { contexts: Array<Maybe<Pick<SqlContextInfo, 'id' | 'connectionId' | 'defaultCatalog' | 'defaultSchema'>>> }
+export interface ExecutionContextListQuery { contexts: Array<Maybe<{ id: string; connectionId: string; defaultCatalog?: Maybe<string>; defaultSchema?: Maybe<string> }>> }
 
 export type ExecutionContextUpdateMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1457,16 +1447,11 @@ export type ExecutionContextUpdateMutationVariables = Exact<{
   defaultSchema?: Maybe<Scalars['ID']>;
 }>;
 
-export interface ExecutionContextUpdateMutation { context: Mutation['sqlContextSetDefaults'] }
+export interface ExecutionContextUpdateMutation { context: boolean }
 
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetAuthModelsQuery {
-  models: Array<(
-    Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
-    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>> }
-  )>;
-}
+export interface GetAuthModelsQuery { models: Array<{ id: string; displayName: string; description?: Maybe<string>; icon?: Maybe<string>; properties: Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }> }> }
 
 export type GetTemplateConnectionsQueryVariables = Exact<{
   includeOrigin: Scalars['Boolean'];
@@ -1475,7 +1460,7 @@ export type GetTemplateConnectionsQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface GetTemplateConnectionsQuery { connections: DatabaseConnectionFragment[] }
+export interface GetTemplateConnectionsQuery { connections: Array<{ id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } }> }
 
 export type GetUserConnectionsQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
@@ -1485,7 +1470,7 @@ export type GetUserConnectionsQueryVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface GetUserConnectionsQuery { connections: DatabaseConnectionFragment[] }
+export interface GetUserConnectionsQuery { connections: Array<{ id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } }> }
 
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1498,11 +1483,11 @@ export type InitConnectionMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface InitConnectionMutation { connection: DatabaseConnectionFragment }
+export interface InitConnectionMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never }>;
 
-export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionConnections'>;
+export interface RefreshSessionConnectionsMutation { refreshSessionConnections?: Maybe<boolean> }
 
 export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1513,24 +1498,19 @@ export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface SetConnectionNavigatorSettingsMutation { connection: DatabaseConnectionFragment }
+export interface SetConnectionNavigatorSettingsMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export interface TestConnectionMutation {
-  connection: (
-    Pick<ConnectionInfo, 'id' | 'connectTime' | 'serverVersion' | 'clientVersion'>
-    & { connectionError?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface TestConnectionMutation { connection: { id: string; connectTime?: Maybe<string>; serverVersion?: Maybe<string>; clientVersion?: Maybe<string>; connectionError?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type TestNetworkHandlerMutationVariables = Exact<{
   config: NetworkHandlerConfigInput;
 }>;
 
-export interface TestNetworkHandlerMutation { info: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
+export interface TestNetworkHandlerMutation { info: { message?: Maybe<string>; clientVersion?: Maybe<string>; serverVersion?: Maybe<string> } }
 
 export type UpdateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1540,7 +1520,7 @@ export type UpdateConnectionMutationVariables = Exact<{
   customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface UpdateConnectionMutation { connection: DatabaseConnectionFragment }
+export interface UpdateConnectionMutation { connection: { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } }
 
 export type ExportDataFromContainerQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1548,12 +1528,7 @@ export type ExportDataFromContainerQueryVariables = Exact<{
   parameters: DataTransferParameters;
 }>;
 
-export interface ExportDataFromContainerQuery {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface ExportDataFromContainerQuery { taskInfo: { id: string; running: boolean; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type ExportDataFromResultsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1562,99 +1537,61 @@ export type ExportDataFromResultsQueryVariables = Exact<{
   parameters: DataTransferParameters;
 }>;
 
-export interface ExportDataFromResultsQuery {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface ExportDataFromResultsQuery { taskInfo: { id: string; running: boolean; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetDataTransferProcessorsQuery {
-  processors: Array<(
-    Pick<DataTransferProcessorInfo, 'id' | 'name' | 'description' | 'fileExtension' | 'appFileExtension' | 'appName' | 'order' | 'icon' | 'isBinary' | 'isHTML'>
-    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'length' | 'features' | 'order'>>>> }
-  )>;
-}
+export interface GetDataTransferProcessorsQuery { processors: Array<{ id: string; name?: Maybe<string>; description?: Maybe<string>; fileExtension?: Maybe<string>; appFileExtension?: Maybe<string>; appName?: Maybe<string>; order: number; icon?: Maybe<string>; isBinary?: Maybe<boolean>; isHTML?: Maybe<boolean>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; length: ObjectPropertyLength; features: string[]; order: number }>>> }> }
 
 export type RemoveDataTransferFileQueryVariables = Exact<{
   dataFileId: Scalars['String'];
 }>;
 
-export interface RemoveDataTransferFileQuery { result: Query['dataTransferRemoveDataFile'] }
+export interface RemoveDataTransferFileQuery { result?: Maybe<boolean> }
 
 export type NavGetStructContainersQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   catalogId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
+export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }>; schemaList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }> } }
 
-export type AdminRoleInfoFragment = Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>;
+export interface AdminRoleInfoFragment { roleId: string; roleName?: Maybe<string>; description?: Maybe<string> }
 
-export type AdminUserInfoFragment = (
-  Pick<AdminUserInfo, 'userId' | 'grantedRoles' | 'linkedAuthProviders'>
-  & { origins: ObjectOriginInfoFragment[] }
-);
+export interface AdminUserInfoFragment { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }
 
-export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
+export interface AllNavigatorSettingsFragment { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }
 
-export type AuthProviderConfigurationParametersFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>;
+export interface AuthProviderConfigurationParametersFragment { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }
 
-export type AuthTokenFragment = (
-  Pick<UserAuthToken, 'authProvider' | 'loginTime' | 'message'>
-  & { origin: ObjectOriginInfoFragment }
-);
+export interface AuthTokenFragment { authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }
 
-export type DatabaseConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'supportedDataFormats' | 'authNeeded' | 'authModel'>
-  & { origin?: Maybe<ObjectOriginInfoFragment>; authProperties?: Maybe<UserConnectionAuthPropertiesFragment[]>; networkHandlersConfig: Array<MakeOptional<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>, 'userName' | 'password' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
-);
+export interface DatabaseConnectionFragment { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } }
 
-export type DatabaseDriverFragment = (
-  MakeOptional<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers' | 'driverParameters'>, 'driverParameters'>
-  & { providerProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'length' | 'features' | 'order'>>>; driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
-);
+export interface DatabaseDriverFragment { id: string; name?: Maybe<string>; icon?: Maybe<string>; description?: Maybe<string>; defaultPort?: Maybe<string>; defaultDatabase?: Maybe<string>; defaultServer?: Maybe<string>; defaultUser?: Maybe<string>; sampleURL?: Maybe<string>; embedded?: Maybe<boolean>; anonymousAccess?: Maybe<boolean>; promotedScore?: Maybe<number>; defaultAuthModel: string; applicableNetworkHandlers: Array<Maybe<string>>; driverParameters?: Maybe<any>; providerProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; length: ObjectPropertyLength; features: string[]; order: number }>>; driverProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>> }>> }
 
-export type NavNodeInfoFragment = (
-  Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<NavNodePropertiesFragment[]> }
-);
+export interface NavNodeInfoFragment { id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> }
 
-export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'length' | 'features' | 'value' | 'order'>;
+export interface NavNodePropertiesFragment { id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }
 
-export type ObjectOriginInfoFragment = (
-  Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>
-  & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'length' | 'features' | 'order'>>> }
-);
+export interface ObjectOriginInfoFragment { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }
 
-export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
+export interface SessionStateFragment { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string }
 
-export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'length' | 'features' | 'order'>;
+export interface UserConnectionAuthPropertiesFragment { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }
 
-export type UserConnectionNetworkHandlerPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'order' | 'length' | 'features'>;
+export interface UserConnectionNetworkHandlerPropertiesFragment { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; order: number; length: ObjectPropertyLength; features: string[] }
 
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
   removeOnFinish: Scalars['Boolean'];
 }>;
 
-export interface GetAsyncTaskInfoMutation {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface GetAsyncTaskInfoMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetNetworkHandlersQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetNetworkHandlersQuery {
-  handlers: Array<(
-    Pick<NetworkHandlerDescriptor, 'id' | 'codeName' | 'label' | 'description' | 'secured' | 'type'>
-    & { properties: UserConnectionNetworkHandlerPropertiesFragment[] }
-  )>;
-}
+export interface GetNetworkHandlersQuery { handlers: Array<{ id: string; codeName: string; label: string; description?: Maybe<string>; secured: boolean; type?: Maybe<NetworkHandlerType>; properties: Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; order: number; length: ObjectPropertyLength; features: string[] }> }> }
 
 export type AsyncReadDataFromContainerMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1664,12 +1601,7 @@ export type AsyncReadDataFromContainerMutationVariables = Exact<{
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
-export interface AsyncReadDataFromContainerMutation {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface AsyncReadDataFromContainerMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1679,12 +1611,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
-export interface AsyncSqlExecuteQueryMutation {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface AsyncSqlExecuteQueryMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1693,46 +1620,19 @@ export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
   configuration: Scalars['Object'];
 }>;
 
-export interface AsyncSqlExplainExecutionPlanMutation {
-  taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  );
-}
+export interface AsyncSqlExplainExecutionPlanMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
 
-export interface GetSqlExecuteTaskResultsMutation {
-  result: (
-    Pick<SqlExecuteInfo, 'duration' | 'statusMessage' | 'filterText'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
-      & { resultSet?: Maybe<(
-        Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
-        & { columns?: Maybe<Array<Maybe<(
-          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'required' | 'readOnly' | 'readOnlyStatus' | 'scale' | 'typeName'>
-          & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
-        )>>>; }
-      )>; }
-    )>; }
-  );
-}
+export interface GetSqlExecuteTaskResultsMutation { result: { duration: number; statusMessage?: Maybe<string>; filterText?: Maybe<string>; results: Array<{ title?: Maybe<string>; updateRowCount?: Maybe<number>; sourceQuery?: Maybe<string>; dataFormat?: Maybe<ResultDataFormat>; resultSet?: Maybe<{ id: string; rows?: Maybe<Array<Maybe<Array<Maybe<any>>>>>; hasMoreData?: Maybe<boolean>; columns?: Maybe<Array<Maybe<{ dataKind?: Maybe<string>; entityName?: Maybe<string>; fullTypeName?: Maybe<string>; icon?: Maybe<string>; label?: Maybe<string>; maxLength?: Maybe<number>; name?: Maybe<string>; position: number; precision?: Maybe<number>; required: boolean; readOnly: boolean; readOnlyStatus?: Maybe<string>; scale?: Maybe<number>; typeName?: Maybe<string>; supportedOperations: Array<{ id: string; expression: string; argumentCount?: Maybe<number> }> }>>> }> }> } }
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
 
-export interface GetSqlExecutionPlanResultMutation {
-  result: (
-    Pick<SqlExecutionPlan, 'query'>
-    & { nodes: Array<(
-      Pick<SqlExecutionPlanNode, 'id' | 'parentId' | 'kind' | 'name' | 'type' | 'condition' | 'description'>
-      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'length' | 'features' | 'value' | 'order'>> }
-    )>; }
-  );
-}
+export interface GetSqlExecutionPlanResultMutation { result: { query: string; nodes: Array<{ id: string; parentId?: Maybe<string>; kind: string; name?: Maybe<string>; type: string; condition?: Maybe<string>; description?: Maybe<string>; properties: Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }> }> } }
 
 export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1743,15 +1643,7 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
   addedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
 }>;
 
-export interface UpdateResultsDataBatchMutation {
-  result: (
-    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount'>
-      & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )>; }
-  );
-}
+export interface UpdateResultsDataBatchMutation { result: { duration: number; filterText?: Maybe<string>; results: Array<{ updateRowCount?: Maybe<number>; resultSet?: Maybe<{ id: string; rows?: Maybe<Array<Maybe<Array<Maybe<any>>>>> }> }> } }
 
 export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1762,73 +1654,60 @@ export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
   addedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
 }>;
 
-export interface UpdateResultsDataBatchScriptMutation { result: Mutation['updateResultsDataBatchScript'] }
+export interface UpdateResultsDataBatchScriptMutation { result: string }
 
 export type MetadataGetNodeDdlQueryVariables = Exact<{
   nodeId: Scalars['ID'];
 }>;
 
-export type MetadataGetNodeDdlQuery = Pick<Query, 'metadataGetNodeDDL'>;
+export interface MetadataGetNodeDdlQuery { metadataGetNodeDDL?: Maybe<string> }
 
 export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
   filter?: Maybe<ObjectPropertyFilter>;
 }>;
 
-export interface GetChildrenDbObjectInfoQuery {
-  dbObjects: Array<(
-    Pick<NavigatorNodeInfo, 'id'>
-    & { object?: Maybe<(
-      Pick<DatabaseObjectInfo, 'features'>
-      & { properties?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
-    )>; }
-  )>;
-}
+export interface GetChildrenDbObjectInfoQuery { dbObjects: Array<{ id: string; object?: Maybe<{ features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> }> }
 
 export type GetDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
   filter?: Maybe<ObjectPropertyFilter>;
 }>;
 
-export interface GetDbObjectInfoQuery {
-  objectInfo: { object?: Maybe<(
-    Pick<DatabaseObjectInfo, 'features'>
-    & { properties?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
-  )>; };
-}
+export interface GetDbObjectInfoQuery { objectInfo: { object?: Maybe<{ features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> } }
 
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
-export type NavDeleteNodesMutation = Pick<Mutation, 'navDeleteNodes'>;
+export interface NavDeleteNodesMutation { navDeleteNodes?: Maybe<number> }
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
   withDetails: Scalars['Boolean'];
 }>;
 
-export interface NavNodeChildrenQuery { navNodeChildren: NavNodeInfoFragment[]; navNodeInfo: NavNodeInfoFragment }
+export interface NavNodeChildrenQuery { navNodeChildren: Array<{ id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> }>; navNodeInfo: { id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> } }
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
   withDetails: Scalars['Boolean'];
 }>;
 
-export interface NavNodeInfoQuery { navNodeInfo: NavNodeInfoFragment }
+export interface NavNodeInfoQuery { navNodeInfo: { id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> } }
 
 export type NavRefreshNodeQueryVariables = Exact<{
   nodePath: Scalars['ID'];
 }>;
 
-export type NavRefreshNodeQuery = Pick<Query, 'navRefreshNode'>;
+export interface NavRefreshNodeQuery { navRefreshNode?: Maybe<boolean> }
 
 export type NavRenameNodeMutationVariables = Exact<{
   nodePath: Scalars['ID'];
   newName: Scalars['String'];
 }>;
 
-export type NavRenameNodeMutation = Pick<Mutation, 'navRenameNode'>;
+export interface NavRenameNodeMutation { navRenameNode?: Maybe<string> }
 
 export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1839,65 +1718,60 @@ export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   maxResults?: Maybe<Scalars['Int']>;
 }>;
 
-export interface QuerySqlCompletionProposalsQuery { sqlCompletionProposals?: Maybe<Array<Maybe<Pick<SqlCompletionProposal, 'cursorPosition' | 'displayString' | 'icon' | 'nodePath' | 'replacementLength' | 'replacementOffset' | 'replacementString' | 'score' | 'type'>>>> }
+export interface QuerySqlCompletionProposalsQuery { sqlCompletionProposals?: Maybe<Array<Maybe<{ cursorPosition?: Maybe<number>; displayString: string; icon?: Maybe<string>; nodePath?: Maybe<string>; replacementLength: number; replacementOffset: number; replacementString: string; score?: Maybe<number>; type: string }>>> }
 
 export type QuerySqlDialectInfoQueryVariables = Exact<{
   connectionId: Scalars['ID'];
 }>;
 
-export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter' | 'supportsExplainExecutionPlan'>> }
+export interface QuerySqlDialectInfoQuery { dialect?: Maybe<{ name: string; dataTypes: Array<Maybe<string>>; functions: Array<Maybe<string>>; reservedWords: Array<Maybe<string>>; quoteStrings: Array<Maybe<Array<Maybe<string>>>>; singleLineComments: Array<Maybe<string>>; multiLineComments: Array<Maybe<Array<Maybe<string>>>>; catalogSeparator?: Maybe<string>; structSeparator?: Maybe<string>; scriptDelimiter?: Maybe<string>; supportsExplainExecutionPlan: boolean }> }
 
 export type ConfigureServerQueryVariables = Exact<{
   configuration: ServerConfigInput;
 }>;
 
-export type ConfigureServerQuery = Pick<Query, 'configureServer'>;
+export interface ConfigureServerQuery { configureServer: boolean }
 
 export type SetDefaultNavigatorSettingsQueryVariables = Exact<{
   settings: NavigatorSettingsInput;
 }>;
 
-export type SetDefaultNavigatorSettingsQuery = Pick<Query, 'setDefaultNavigatorSettings'>;
+export interface SetDefaultNavigatorSettingsQuery { setDefaultNavigatorSettings: boolean }
 
 export type ChangeSessionLanguageMutationVariables = Exact<{
   locale: Scalars['String'];
 }>;
 
-export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
+export interface ChangeSessionLanguageMutation { changeSessionLanguage?: Maybe<boolean> }
 
 export type OpenSessionMutationVariables = Exact<{
   defaultLocale?: Maybe<Scalars['String']>;
 }>;
 
-export interface OpenSessionMutation { session: SessionStateFragment }
+export interface OpenSessionMutation { session: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string } }
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
   clearEntries: Scalars['Boolean'];
 }>;
 
-export interface ReadSessionLogQuery { log: Array<Pick<LogEntry, 'time' | 'type' | 'message' | 'stackTrace'>> }
+export interface ReadSessionLogQuery { log: Array<{ time?: Maybe<any>; type: string; message?: Maybe<string>; stackTrace?: Maybe<string> }> }
 
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface ServerConfigQuery {
-  serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'rootURI' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
-    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
-  );
-}
+export interface ServerConfigQuery { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; productConfiguration: any; supportsCustomConnections?: Maybe<boolean>; supportsConnectionBrowser?: Maybe<boolean>; supportsWorkspaces?: Maybe<boolean>; sessionExpireTime?: Maybe<number>; anonymousAccessEnabled?: Maybe<boolean>; adminCredentialsSaveEnabled?: Maybe<boolean>; publicCredentialsSaveEnabled?: Maybe<boolean>; licenseRequired: boolean; licenseValid: boolean; configurationMode?: Maybe<boolean>; developmentMode?: Maybe<boolean>; enabledAuthProviders: string[]; supportedLanguages: Array<{ isoCode: string; displayName?: Maybe<string>; nativeName?: Maybe<string> }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; name: string; description?: Maybe<string>; buildTime: string; releaseTime: string; licenseInfo?: Maybe<string> } } }
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface SessionPermissionsQuery { permissions: Query['sessionPermissions'] }
+export interface SessionPermissionsQuery { permissions: Array<Maybe<string>> }
 
 export type SessionStateQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface SessionStateQuery { sessionState: SessionStateFragment }
+export interface SessionStateQuery { sessionState: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string } }
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
-export type TouchSessionMutation = Pick<Mutation, 'touchSession'>;
+export interface TouchSessionMutation { touchSession?: Maybe<boolean> }
 
 export type SqlResultCloseMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1905,7 +1779,7 @@ export type SqlResultCloseMutationVariables = Exact<{
   resultId: Scalars['ID'];
 }>;
 
-export interface SqlResultCloseMutation { result: Mutation['sqlResultClose'] }
+export interface SqlResultCloseMutation { result: boolean }
 
 export const AdminRoleInfoFragmentDoc = `
     fragment AdminRoleInfo on AdminRoleInfo {
@@ -3095,271 +2969,272 @@ export const SqlResultCloseDocument = `
 }
     `;
 
-export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
+export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
-const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
+const defaultWrapper: SdkFunctionWrapper = (action, _operationName) => action();
+
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    asyncTaskCancel(variables: AsyncTaskCancelMutationVariables): Promise<AsyncTaskCancelMutation> {
-      return withWrapper(() => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables));
+    asyncTaskCancel(variables: AsyncTaskCancelMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncTaskCancelMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncTaskCancel');
     },
-    createRole(variables: CreateRoleQueryVariables): Promise<CreateRoleQuery> {
-      return withWrapper(() => client.request<CreateRoleQuery>(CreateRoleDocument, variables));
+    createRole(variables: CreateRoleQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateRoleQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateRoleQuery>(CreateRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createRole');
     },
-    deleteRole(variables: DeleteRoleQueryVariables): Promise<DeleteRoleQuery> {
-      return withWrapper(() => client.request<DeleteRoleQuery>(DeleteRoleDocument, variables));
+    deleteRole(variables: DeleteRoleQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteRoleQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteRoleQuery>(DeleteRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteRole');
     },
-    getRoleGrantedUsers(variables: GetRoleGrantedUsersQueryVariables): Promise<GetRoleGrantedUsersQuery> {
-      return withWrapper(() => client.request<GetRoleGrantedUsersQuery>(GetRoleGrantedUsersDocument, variables));
+    getRoleGrantedUsers(variables: GetRoleGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetRoleGrantedUsersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetRoleGrantedUsersQuery>(GetRoleGrantedUsersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getRoleGrantedUsers');
     },
-    getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
-      return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
+    getRolesList(variables?: GetRolesListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetRolesListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetRolesListQuery>(GetRolesListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getRolesList');
     },
-    updateRole(variables: UpdateRoleQueryVariables): Promise<UpdateRoleQuery> {
-      return withWrapper(() => client.request<UpdateRoleQuery>(UpdateRoleDocument, variables));
+    updateRole(variables: UpdateRoleQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateRoleQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateRoleQuery>(UpdateRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateRole');
     },
-    authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables): Promise<AuthChangeLocalPasswordQuery> {
-      return withWrapper(() => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables));
+    authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AuthChangeLocalPasswordQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authChangeLocalPassword');
     },
-    authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
-      return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));
+    authLogin(variables: AuthLoginQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AuthLoginQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<AuthLoginQuery>(AuthLoginDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authLogin');
     },
-    authLogout(variables?: AuthLogoutQueryVariables): Promise<AuthLogoutQuery> {
-      return withWrapper(() => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables));
+    authLogout(variables?: AuthLogoutQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AuthLogoutQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authLogout');
     },
-    deleteAuthProviderConfiguration(variables: DeleteAuthProviderConfigurationQueryVariables): Promise<DeleteAuthProviderConfigurationQuery> {
-      return withWrapper(() => client.request<DeleteAuthProviderConfigurationQuery>(DeleteAuthProviderConfigurationDocument, variables));
+    deleteAuthProviderConfiguration(variables: DeleteAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteAuthProviderConfigurationQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteAuthProviderConfigurationQuery>(DeleteAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteAuthProviderConfiguration');
     },
-    getActiveUser(variables: GetActiveUserQueryVariables): Promise<GetActiveUserQuery> {
-      return withWrapper(() => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables));
+    getActiveUser(variables: GetActiveUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetActiveUserQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getActiveUser');
     },
-    getAuthProviderConfigurationParameters(variables: GetAuthProviderConfigurationParametersQueryVariables): Promise<GetAuthProviderConfigurationParametersQuery> {
-      return withWrapper(() => client.request<GetAuthProviderConfigurationParametersQuery>(GetAuthProviderConfigurationParametersDocument, variables));
+    getAuthProviderConfigurationParameters(variables: GetAuthProviderConfigurationParametersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthProviderConfigurationParametersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAuthProviderConfigurationParametersQuery>(GetAuthProviderConfigurationParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviderConfigurationParameters');
     },
-    getAuthProviderConfigurations(variables?: GetAuthProviderConfigurationsQueryVariables): Promise<GetAuthProviderConfigurationsQuery> {
-      return withWrapper(() => client.request<GetAuthProviderConfigurationsQuery>(GetAuthProviderConfigurationsDocument, variables));
+    getAuthProviderConfigurations(variables?: GetAuthProviderConfigurationsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthProviderConfigurationsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAuthProviderConfigurationsQuery>(GetAuthProviderConfigurationsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviderConfigurations');
     },
-    getAuthProviders(variables?: GetAuthProvidersQueryVariables): Promise<GetAuthProvidersQuery> {
-      return withWrapper(() => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables));
+    getAuthProviders(variables?: GetAuthProvidersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthProvidersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviders');
     },
-    saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables): Promise<SaveAuthProviderConfigurationQuery> {
-      return withWrapper(() => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables));
+    saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SaveAuthProviderConfigurationQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveAuthProviderConfiguration');
     },
-    createUser(variables: CreateUserQueryVariables): Promise<CreateUserQuery> {
-      return withWrapper(() => client.request<CreateUserQuery>(CreateUserDocument, variables));
+    createUser(variables: CreateUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateUserQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateUserQuery>(CreateUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createUser');
     },
-    deleteUser(variables: DeleteUserQueryVariables): Promise<DeleteUserQuery> {
-      return withWrapper(() => client.request<DeleteUserQuery>(DeleteUserDocument, variables));
+    deleteUser(variables: DeleteUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteUserQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteUserQuery>(DeleteUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUser');
     },
-    getPermissionsList(variables?: GetPermissionsListQueryVariables): Promise<GetPermissionsListQuery> {
-      return withWrapper(() => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables));
+    getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetPermissionsListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList');
     },
-    getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables): Promise<GetUserGrantedConnectionsQuery> {
-      return withWrapper(() => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables));
+    getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUserGrantedConnectionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserGrantedConnections');
     },
-    getUsersList(variables: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
-      return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
+    getUsersList(variables: GetUsersListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUsersListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetUsersListQuery>(GetUsersListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUsersList');
     },
-    grantUserRole(variables: GrantUserRoleQueryVariables): Promise<GrantUserRoleQuery> {
-      return withWrapper(() => client.request<GrantUserRoleQuery>(GrantUserRoleDocument, variables));
+    grantUserRole(variables: GrantUserRoleQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GrantUserRoleQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GrantUserRoleQuery>(GrantUserRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'grantUserRole');
     },
-    revokeUserRole(variables: RevokeUserRoleQueryVariables): Promise<RevokeUserRoleQuery> {
-      return withWrapper(() => client.request<RevokeUserRoleQuery>(RevokeUserRoleDocument, variables));
+    revokeUserRole(variables: RevokeUserRoleQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<RevokeUserRoleQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<RevokeUserRoleQuery>(RevokeUserRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'revokeUserRole');
     },
-    setConnections(variables: SetConnectionsQueryVariables): Promise<SetConnectionsQuery> {
-      return withWrapper(() => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables));
+    setConnections(variables: SetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetConnectionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnections');
     },
-    setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
-      return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));
+    setUserCredentials(variables: SetUserCredentialsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetUserCredentialsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserCredentials');
     },
-    createConnectionConfiguration(variables: CreateConnectionConfigurationQueryVariables): Promise<CreateConnectionConfigurationQuery> {
-      return withWrapper(() => client.request<CreateConnectionConfigurationQuery>(CreateConnectionConfigurationDocument, variables));
+    createConnectionConfiguration(variables: CreateConnectionConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionConfigurationQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionConfigurationQuery>(CreateConnectionConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionConfiguration');
     },
-    createConnectionConfigurationFromNode(variables: CreateConnectionConfigurationFromNodeQueryVariables): Promise<CreateConnectionConfigurationFromNodeQuery> {
-      return withWrapper(() => client.request<CreateConnectionConfigurationFromNodeQuery>(CreateConnectionConfigurationFromNodeDocument, variables));
+    createConnectionConfigurationFromNode(variables: CreateConnectionConfigurationFromNodeQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionConfigurationFromNodeQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionConfigurationFromNodeQuery>(CreateConnectionConfigurationFromNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionConfigurationFromNode');
     },
-    deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables): Promise<DeleteConnectionConfigurationQuery> {
-      return withWrapper(() => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables));
+    deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteConnectionConfigurationQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnectionConfiguration');
     },
-    getConnectionAccess(variables?: GetConnectionAccessQueryVariables): Promise<GetConnectionAccessQuery> {
-      return withWrapper(() => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables));
+    getConnectionAccess(variables?: GetConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetConnectionAccessQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getConnectionAccess');
     },
-    getConnections(variables: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
-      return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
+    getConnections(variables: GetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetConnectionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getConnections');
     },
-    getSubjectConnectionAccess(variables?: GetSubjectConnectionAccessQueryVariables): Promise<GetSubjectConnectionAccessQuery> {
-      return withWrapper(() => client.request<GetSubjectConnectionAccessQuery>(GetSubjectConnectionAccessDocument, variables));
+    getSubjectConnectionAccess(variables?: GetSubjectConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSubjectConnectionAccessQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetSubjectConnectionAccessQuery>(GetSubjectConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSubjectConnectionAccess');
     },
-    searchDatabases(variables: SearchDatabasesQueryVariables): Promise<SearchDatabasesQuery> {
-      return withWrapper(() => client.request<SearchDatabasesQuery>(SearchDatabasesDocument, variables));
+    searchDatabases(variables: SearchDatabasesQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SearchDatabasesQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SearchDatabasesQuery>(SearchDatabasesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'searchDatabases');
     },
-    setConnectionAccess(variables: SetConnectionAccessQueryVariables): Promise<SetConnectionAccessQuery> {
-      return withWrapper(() => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables));
+    setConnectionAccess(variables: SetConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetConnectionAccessQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnectionAccess');
     },
-    setSubjectConnectionAccess(variables: SetSubjectConnectionAccessQueryVariables): Promise<SetSubjectConnectionAccessQuery> {
-      return withWrapper(() => client.request<SetSubjectConnectionAccessQuery>(SetSubjectConnectionAccessDocument, variables));
+    setSubjectConnectionAccess(variables: SetSubjectConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetSubjectConnectionAccessQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetSubjectConnectionAccessQuery>(SetSubjectConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setSubjectConnectionAccess');
     },
-    updateConnectionConfiguration(variables: UpdateConnectionConfigurationQueryVariables): Promise<UpdateConnectionConfigurationQuery> {
-      return withWrapper(() => client.request<UpdateConnectionConfigurationQuery>(UpdateConnectionConfigurationDocument, variables));
+    updateConnectionConfiguration(variables: UpdateConnectionConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateConnectionConfigurationQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateConnectionConfigurationQuery>(UpdateConnectionConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateConnectionConfiguration');
     },
-    closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
-      return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));
+    closeConnection(variables: CloseConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CloseConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeConnection');
     },
-    createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
-      return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
+    createConnection(variables: CreateConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnection');
     },
-    createConnectionFromNode(variables: CreateConnectionFromNodeMutationVariables): Promise<CreateConnectionFromNodeMutation> {
-      return withWrapper(() => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables));
+    createConnectionFromNode(variables: CreateConnectionFromNodeMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionFromNodeMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFromNode');
     },
-    createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables): Promise<CreateConnectionFromTemplateMutation> {
-      return withWrapper(() => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables));
+    createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionFromTemplateMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFromTemplate');
     },
-    deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
-      return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));
+    deleteConnection(variables: DeleteConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnection');
     },
-    driverList(variables: DriverListQueryVariables): Promise<DriverListQuery> {
-      return withWrapper(() => client.request<DriverListQuery>(DriverListDocument, variables));
+    driverList(variables: DriverListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DriverListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DriverListQuery>(DriverListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'driverList');
     },
-    executionContextCreate(variables: ExecutionContextCreateMutationVariables): Promise<ExecutionContextCreateMutation> {
-      return withWrapper(() => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables));
+    executionContextCreate(variables: ExecutionContextCreateMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExecutionContextCreateMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextCreate');
     },
-    executionContextDestroy(variables: ExecutionContextDestroyMutationVariables): Promise<ExecutionContextDestroyMutation> {
-      return withWrapper(() => client.request<ExecutionContextDestroyMutation>(ExecutionContextDestroyDocument, variables));
+    executionContextDestroy(variables: ExecutionContextDestroyMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExecutionContextDestroyMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExecutionContextDestroyMutation>(ExecutionContextDestroyDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextDestroy');
     },
-    executionContextList(variables?: ExecutionContextListQueryVariables): Promise<ExecutionContextListQuery> {
-      return withWrapper(() => client.request<ExecutionContextListQuery>(ExecutionContextListDocument, variables));
+    executionContextList(variables?: ExecutionContextListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExecutionContextListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExecutionContextListQuery>(ExecutionContextListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextList');
     },
-    executionContextUpdate(variables: ExecutionContextUpdateMutationVariables): Promise<ExecutionContextUpdateMutation> {
-      return withWrapper(() => client.request<ExecutionContextUpdateMutation>(ExecutionContextUpdateDocument, variables));
+    executionContextUpdate(variables: ExecutionContextUpdateMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExecutionContextUpdateMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExecutionContextUpdateMutation>(ExecutionContextUpdateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextUpdate');
     },
-    getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
-      return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
+    getAuthModels(variables?: GetAuthModelsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthModelsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthModels');
     },
-    getTemplateConnections(variables: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
-      return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
+    getTemplateConnections(variables: GetTemplateConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetTemplateConnectionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTemplateConnections');
     },
-    getUserConnections(variables: GetUserConnectionsQueryVariables): Promise<GetUserConnectionsQuery> {
-      return withWrapper(() => client.request<GetUserConnectionsQuery>(GetUserConnectionsDocument, variables));
+    getUserConnections(variables: GetUserConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUserConnectionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetUserConnectionsQuery>(GetUserConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserConnections');
     },
-    initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
-      return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
+    initConnection(variables: InitConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<InitConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<InitConnectionMutation>(InitConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'initConnection');
     },
-    refreshSessionConnections(variables?: RefreshSessionConnectionsMutationVariables): Promise<RefreshSessionConnectionsMutation> {
-      return withWrapper(() => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables));
+    refreshSessionConnections(variables?: RefreshSessionConnectionsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<RefreshSessionConnectionsMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'refreshSessionConnections');
     },
-    setConnectionNavigatorSettings(variables: SetConnectionNavigatorSettingsMutationVariables): Promise<SetConnectionNavigatorSettingsMutation> {
-      return withWrapper(() => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables));
+    setConnectionNavigatorSettings(variables: SetConnectionNavigatorSettingsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetConnectionNavigatorSettingsMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnectionNavigatorSettings');
     },
-    testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
-      return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));
+    testConnection(variables: TestConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<TestConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<TestConnectionMutation>(TestConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'testConnection');
     },
-    testNetworkHandler(variables: TestNetworkHandlerMutationVariables): Promise<TestNetworkHandlerMutation> {
-      return withWrapper(() => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables));
+    testNetworkHandler(variables: TestNetworkHandlerMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<TestNetworkHandlerMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'testNetworkHandler');
     },
-    updateConnection(variables: UpdateConnectionMutationVariables): Promise<UpdateConnectionMutation> {
-      return withWrapper(() => client.request<UpdateConnectionMutation>(UpdateConnectionDocument, variables));
+    updateConnection(variables: UpdateConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateConnectionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateConnectionMutation>(UpdateConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateConnection');
     },
-    exportDataFromContainer(variables: ExportDataFromContainerQueryVariables): Promise<ExportDataFromContainerQuery> {
-      return withWrapper(() => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables));
+    exportDataFromContainer(variables: ExportDataFromContainerQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExportDataFromContainerQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'exportDataFromContainer');
     },
-    exportDataFromResults(variables: ExportDataFromResultsQueryVariables): Promise<ExportDataFromResultsQuery> {
-      return withWrapper(() => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables));
+    exportDataFromResults(variables: ExportDataFromResultsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ExportDataFromResultsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'exportDataFromResults');
     },
-    getDataTransferProcessors(variables?: GetDataTransferProcessorsQueryVariables): Promise<GetDataTransferProcessorsQuery> {
-      return withWrapper(() => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables));
+    getDataTransferProcessors(variables?: GetDataTransferProcessorsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetDataTransferProcessorsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDataTransferProcessors');
     },
-    removeDataTransferFile(variables: RemoveDataTransferFileQueryVariables): Promise<RemoveDataTransferFileQuery> {
-      return withWrapper(() => client.request<RemoveDataTransferFileQuery>(RemoveDataTransferFileDocument, variables));
+    removeDataTransferFile(variables: RemoveDataTransferFileQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<RemoveDataTransferFileQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<RemoveDataTransferFileQuery>(RemoveDataTransferFileDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'removeDataTransferFile');
     },
-    navGetStructContainers(variables: NavGetStructContainersQueryVariables): Promise<NavGetStructContainersQuery> {
-      return withWrapper(() => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables));
+    navGetStructContainers(variables: NavGetStructContainersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavGetStructContainersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navGetStructContainers');
     },
-    getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables): Promise<GetAsyncTaskInfoMutation> {
-      return withWrapper(() => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables));
+    getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAsyncTaskInfoMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAsyncTaskInfo');
     },
-    getNetworkHandlers(variables?: GetNetworkHandlersQueryVariables): Promise<GetNetworkHandlersQuery> {
-      return withWrapper(() => client.request<GetNetworkHandlersQuery>(GetNetworkHandlersDocument, variables));
+    getNetworkHandlers(variables?: GetNetworkHandlersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetNetworkHandlersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetNetworkHandlersQuery>(GetNetworkHandlersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getNetworkHandlers');
     },
-    asyncReadDataFromContainer(variables: AsyncReadDataFromContainerMutationVariables): Promise<AsyncReadDataFromContainerMutation> {
-      return withWrapper(() => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables));
+    asyncReadDataFromContainer(variables: AsyncReadDataFromContainerMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncReadDataFromContainerMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncReadDataFromContainer');
     },
-    asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
-      return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
+    asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncSqlExecuteQueryMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncSqlExecuteQuery');
     },
-    asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables): Promise<AsyncSqlExplainExecutionPlanMutation> {
-      return withWrapper(() => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables));
+    asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncSqlExplainExecutionPlanMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncSqlExplainExecutionPlan');
     },
-    getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
-      return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
+    getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecuteTaskResultsMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecuteTaskResults');
     },
-    getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables): Promise<GetSqlExecutionPlanResultMutation> {
-      return withWrapper(() => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables));
+    getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecutionPlanResultMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecutionPlanResult');
     },
-    updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables): Promise<UpdateResultsDataBatchMutation> {
-      return withWrapper(() => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables));
+    updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateResultsDataBatchMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatch');
     },
-    updateResultsDataBatchScript(variables: UpdateResultsDataBatchScriptMutationVariables): Promise<UpdateResultsDataBatchScriptMutation> {
-      return withWrapper(() => client.request<UpdateResultsDataBatchScriptMutation>(UpdateResultsDataBatchScriptDocument, variables));
+    updateResultsDataBatchScript(variables: UpdateResultsDataBatchScriptMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateResultsDataBatchScriptMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateResultsDataBatchScriptMutation>(UpdateResultsDataBatchScriptDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatchScript');
     },
-    metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables): Promise<MetadataGetNodeDdlQuery> {
-      return withWrapper(() => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables));
+    metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<MetadataGetNodeDdlQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'metadataGetNodeDDL');
     },
-    getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables): Promise<GetChildrenDbObjectInfoQuery> {
-      return withWrapper(() => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables));
+    getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetChildrenDbObjectInfoQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getChildrenDBObjectInfo');
     },
-    getDBObjectInfo(variables: GetDbObjectInfoQueryVariables): Promise<GetDbObjectInfoQuery> {
-      return withWrapper(() => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables));
+    getDBObjectInfo(variables: GetDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetDbObjectInfoQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDBObjectInfo');
     },
-    navDeleteNodes(variables: NavDeleteNodesMutationVariables): Promise<NavDeleteNodesMutation> {
-      return withWrapper(() => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables));
+    navDeleteNodes(variables: NavDeleteNodesMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavDeleteNodesMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navDeleteNodes');
     },
-    navNodeChildren(variables: NavNodeChildrenQueryVariables): Promise<NavNodeChildrenQuery> {
-      return withWrapper(() => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables));
+    navNodeChildren(variables: NavNodeChildrenQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavNodeChildrenQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navNodeChildren');
     },
-    navNodeInfo(variables: NavNodeInfoQueryVariables): Promise<NavNodeInfoQuery> {
-      return withWrapper(() => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables));
+    navNodeInfo(variables: NavNodeInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavNodeInfoQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navNodeInfo');
     },
-    navRefreshNode(variables: NavRefreshNodeQueryVariables): Promise<NavRefreshNodeQuery> {
-      return withWrapper(() => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables));
+    navRefreshNode(variables: NavRefreshNodeQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavRefreshNodeQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRefreshNode');
     },
-    navRenameNode(variables: NavRenameNodeMutationVariables): Promise<NavRenameNodeMutation> {
-      return withWrapper(() => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables));
+    navRenameNode(variables: NavRenameNodeMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavRenameNodeMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRenameNode');
     },
-    querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables): Promise<QuerySqlCompletionProposalsQuery> {
-      return withWrapper(() => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables));
+    querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlCompletionProposalsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlCompletionProposals');
     },
-    querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables): Promise<QuerySqlDialectInfoQuery> {
-      return withWrapper(() => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables));
+    querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlDialectInfoQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlDialectInfo');
     },
-    configureServer(variables: ConfigureServerQueryVariables): Promise<ConfigureServerQuery> {
-      return withWrapper(() => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables));
+    configureServer(variables: ConfigureServerQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ConfigureServerQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'configureServer');
     },
-    setDefaultNavigatorSettings(variables: SetDefaultNavigatorSettingsQueryVariables): Promise<SetDefaultNavigatorSettingsQuery> {
-      return withWrapper(() => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables));
+    setDefaultNavigatorSettings(variables: SetDefaultNavigatorSettingsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetDefaultNavigatorSettingsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setDefaultNavigatorSettings');
     },
-    changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
-      return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
+    changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ChangeSessionLanguageMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'changeSessionLanguage');
     },
-    openSession(variables?: OpenSessionMutationVariables): Promise<OpenSessionMutation> {
-      return withWrapper(() => client.request<OpenSessionMutation>(OpenSessionDocument, variables));
+    openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<OpenSessionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<OpenSessionMutation>(OpenSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'openSession');
     },
-    readSessionLog(variables: ReadSessionLogQueryVariables): Promise<ReadSessionLogQuery> {
-      return withWrapper(() => client.request<ReadSessionLogQuery>(ReadSessionLogDocument, variables));
+    readSessionLog(variables: ReadSessionLogQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ReadSessionLogQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ReadSessionLogQuery>(ReadSessionLogDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readSessionLog');
     },
-    serverConfig(variables?: ServerConfigQueryVariables): Promise<ServerConfigQuery> {
-      return withWrapper(() => client.request<ServerConfigQuery>(ServerConfigDocument, variables));
+    serverConfig(variables?: ServerConfigQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ServerConfigQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ServerConfigQuery>(ServerConfigDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'serverConfig');
     },
-    sessionPermissions(variables?: SessionPermissionsQueryVariables): Promise<SessionPermissionsQuery> {
-      return withWrapper(() => client.request<SessionPermissionsQuery>(SessionPermissionsDocument, variables));
+    sessionPermissions(variables?: SessionPermissionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SessionPermissionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SessionPermissionsQuery>(SessionPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sessionPermissions');
     },
-    sessionState(variables?: SessionStateQueryVariables): Promise<SessionStateQuery> {
-      return withWrapper(() => client.request<SessionStateQuery>(SessionStateDocument, variables));
+    sessionState(variables?: SessionStateQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SessionStateQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SessionStateQuery>(SessionStateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sessionState');
     },
-    touchSession(variables?: TouchSessionMutationVariables): Promise<TouchSessionMutation> {
-      return withWrapper(() => client.request<TouchSessionMutation>(TouchSessionDocument, variables));
+    touchSession(variables?: TouchSessionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<TouchSessionMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<TouchSessionMutation>(TouchSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'touchSession');
     },
-    sqlResultClose(variables: SqlResultCloseMutationVariables): Promise<SqlResultCloseMutation> {
-      return withWrapper(() => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables));
+    sqlResultClose(variables: SqlResultCloseMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlResultCloseMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlResultClose');
     },
   };
 }
