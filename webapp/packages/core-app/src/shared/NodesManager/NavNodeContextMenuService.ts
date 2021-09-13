@@ -226,7 +226,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             });
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-              if (name !== result) {
+              if (name !== result && result.trim().length) {
                 try {
                   await this.navTreeResource.changeName(node, result);
                 } catch (exception) {
