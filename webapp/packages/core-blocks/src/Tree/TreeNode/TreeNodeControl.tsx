@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { EventContext } from '@cloudbeaver/core-events';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
@@ -33,7 +33,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   const context = useContext(TreeNodeContext);
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
 
@@ -47,7 +47,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   };
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
 
@@ -57,7 +57,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   };
 
   const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag)) {
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
     context.open();

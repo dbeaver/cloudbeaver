@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 
 import { InlineEditor } from '../../../shared/InlineEditor/InlineEditor';
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
@@ -34,7 +34,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     }
 
     try {
-      if (node.name !== name) {
+      if (node.name !== name && name.trim().length) {
         setLoading(true);
         await navTreeResource.changeName(node, name);
       }
@@ -45,6 +45,10 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onClose();
     }
   }, [name, onClose, node, loading, navTreeResource, notificationService]);
+
+  const stopPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
+    EventContext.set(event, EventStopPropagationFlag);
+  };
 
   return (
     <InlineEditor
@@ -57,6 +61,8 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onSave={save}
       onReject={onClose}
       onBlur={onClose}
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
     />
   );
 });

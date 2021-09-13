@@ -37,6 +37,8 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   onSave: () => void;
   onReject?: () => void;
   onUndo?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onDoubleClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
 }
 
@@ -55,6 +57,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   onSave,
   onUndo,
   onReject,
+  onClick,
+  onDoubleClick,
   className,
   ...rest
 }, ref) {
@@ -103,7 +107,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   useImperativeHandle(ref, () => inputRef.current!);
 
   return styled(useStyles(InlineEditorStyles))(
-    <editor className={className} {...use({ active })}>
+    <editor as='div' className={className} {...use({ active })} onClick={onClick} onDoubleClick={onDoubleClick}>
       <editor-container>
         <input
           ref={inputRef}
