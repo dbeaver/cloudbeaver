@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { DBObject, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
@@ -38,12 +38,15 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 }) {
   const translate = useTranslate();
   const tree = useMapResource(NavTreeResource, objectId);
-  const key = resourceKeyList([objectId, ...tree.data || []]);
+  const key = resourceKeyList(tree.data || []);
   const dbObject = useMapResource(DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
       await resource.loadChildren(objectId, key);
+      return true;
     },
   });
+
+  const objects = dbObject.data as DBObject[];
 
   return styled(styles)(
     <Loader state={[tree, dbObject]} style={styles}>{() => styled(styles)(
@@ -52,7 +55,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <div>
-            <ObjectChildrenPropertyTable nodeIds={tree.data} />
+            <ObjectChildrenPropertyTable objects={objects} />
           </div>
         )}
       </>
@@ -60,7 +63,3 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
     </Loader>
   );
 });
-
-export const objectPropertyTablePanel = (parentId: string, objectId: string) => (
-  <ObjectPropertyTable parentId={parentId} objectId={objectId} />
-);

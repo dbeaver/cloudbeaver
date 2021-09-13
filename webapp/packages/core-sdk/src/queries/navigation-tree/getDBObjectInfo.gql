@@ -1,10 +1,5 @@
 query getDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
   objectInfo: navNodeInfo(nodePath: $navNodeId) {
-    object {
-      features
-      properties(filter: $filter) {
-        ...NavNodeProperties
-      }
-    }
+    ...NavNodeDBObjectInfo
   }
 }

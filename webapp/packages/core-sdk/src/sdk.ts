@@ -1570,6 +1570,8 @@ export interface DatabaseConnectionFragment { id: string; name: string; descript
 
 export interface DatabaseDriverFragment { id: string; name?: Maybe<string>; icon?: Maybe<string>; description?: Maybe<string>; defaultPort?: Maybe<string>; defaultDatabase?: Maybe<string>; defaultServer?: Maybe<string>; defaultUser?: Maybe<string>; sampleURL?: Maybe<string>; embedded?: Maybe<boolean>; anonymousAccess?: Maybe<boolean>; promotedScore?: Maybe<number>; defaultAuthModel: string; applicableNetworkHandlers: Array<Maybe<string>>; driverParameters?: Maybe<any>; providerProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; length: ObjectPropertyLength; features: string[]; order: number }>>; driverProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>> }>> }
 
+export interface NavNodeDbObjectInfoFragment { id: string; object?: Maybe<{ type?: Maybe<string>; features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> }
+
 export interface NavNodeInfoFragment { id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> }
 
 export interface NavNodePropertiesFragment { id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }
@@ -1667,14 +1669,14 @@ export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   filter?: Maybe<ObjectPropertyFilter>;
 }>;
 
-export interface GetChildrenDbObjectInfoQuery { dbObjects: Array<{ id: string; object?: Maybe<{ features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> }> }
+export interface GetChildrenDbObjectInfoQuery { dbObjects: Array<{ id: string; object?: Maybe<{ type?: Maybe<string>; features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> }> }
 
 export type GetDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
   filter?: Maybe<ObjectPropertyFilter>;
 }>;
 
-export interface GetDbObjectInfoQuery { objectInfo: { object?: Maybe<{ features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> } }
+export interface GetDbObjectInfoQuery { objectInfo: { id: string; object?: Maybe<{ type?: Maybe<string>; features?: Maybe<string[]>; properties?: Maybe<Array<Maybe<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>>> }> } }
 
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
@@ -1966,6 +1968,18 @@ export const NavNodePropertiesFragmentDoc = `
   order
 }
     `;
+export const NavNodeDbObjectInfoFragmentDoc = `
+    fragment NavNodeDBObjectInfo on NavigatorNodeInfo {
+  id
+  object {
+    type
+    features
+    properties(filter: $filter) {
+      ...NavNodeProperties
+    }
+  }
+}
+    ${NavNodePropertiesFragmentDoc}`;
 export const NavNodeInfoFragmentDoc = `
     fragment NavNodeInfo on NavigatorNodeInfo {
   id
@@ -2775,28 +2789,17 @@ export const MetadataGetNodeDdlDocument = `
 export const GetChildrenDbObjectInfoDocument = `
     query getChildrenDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
   dbObjects: navNodeChildren(parentPath: $navNodeId) {
-    id
-    object {
-      features
-      properties(filter: $filter) {
-        ...NavNodeProperties
-      }
-    }
+    ...NavNodeDBObjectInfo
   }
 }
-    ${NavNodePropertiesFragmentDoc}`;
+    ${NavNodeDbObjectInfoFragmentDoc}`;
 export const GetDbObjectInfoDocument = `
     query getDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
   objectInfo: navNodeInfo(nodePath: $navNodeId) {
-    object {
-      features
-      properties(filter: $filter) {
-        ...NavNodeProperties
-      }
-    }
+    ...NavNodeDBObjectInfo
   }
 }
-    ${NavNodePropertiesFragmentDoc}`;
+    ${NavNodeDbObjectInfoFragmentDoc}`;
 export const NavDeleteNodesDocument = `
     mutation navDeleteNodes($nodePaths: [ID!]!) {
   navDeleteNodes(nodePaths: $nodePaths)

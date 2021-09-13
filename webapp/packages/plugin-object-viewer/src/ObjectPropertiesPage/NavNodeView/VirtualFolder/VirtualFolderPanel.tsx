@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { DBObjectResource, NavNodeInfoResource, NavNodeTransformViewComponent, NavTreeResource } from '@cloudbeaver/core-app';
-import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
+import { DBObject, DBObjectResource, NavNodeInfoResource, NavNodeTransformViewComponent, NavTreeResource } from '@cloudbeaver/core-app';
+import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ObjectChildrenPropertyTable } from '../../ObjectPropertyTable/ObjectChildrenPropertyTable';
@@ -24,33 +26,37 @@ const style = css`
   }
 `;
 
-export const VirtualFolderPanel: NavNodeTransformViewComponent = function VirtualFolderPanel({
+export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({
   folderId,
   nodeId,
 }) {
+  const translate = useTranslate();
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const tree = useMapResource(NavTreeResource, nodeId);
-  const key = resourceKeyList([nodeId, ...tree.data || []]);
+  const key = resourceKeyList(tree.data || []);
   const dbObject = useMapResource(DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
       await resource.loadChildren(nodeId, key);
+      return true;
     },
   });
 
-  const nodeIds = navNodeInfoResource
-    .get(resourceKeyList(tree.data || []))
-    .filter(node => node?.nodeType === nodeType)
-    .map(node => node!.id);
+  const objects = dbObject.data
+    .filter(object => object && navNodeInfoResource.get(object.id)?.nodeType === nodeType) as DBObject[];
 
   return styled(style)(
     <Loader state={[tree, dbObject]}>{() => styled(style)(
       <>
-        <tab-wrapper>
-          <ObjectChildrenPropertyTable nodeIds={nodeIds} />
-        </tab-wrapper>
+        {objects.length === 0 ? (
+          <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+        ) : (
+          <tab-wrapper>
+            <ObjectChildrenPropertyTable objects={objects} />
+          </tab-wrapper>
+        )}
       </>
     )}
     </Loader>
   );
-};
+});

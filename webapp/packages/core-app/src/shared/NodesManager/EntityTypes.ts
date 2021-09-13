@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DatabaseObjectInfo, NavigatorNodeInfo } from '@cloudbeaver/core-sdk';
+import type { NavigatorNodeInfo, NavNodeDbObjectInfoFragment } from '@cloudbeaver/core-sdk';
 
 export type NavNodeInfo = NavigatorNodeInfo;
 
@@ -15,6 +15,4 @@ export type NavNode = Omit<NavNodeInfo, 'object'> & {
   objectFeatures: string[];
 };
 
-export type DBObject = DatabaseObjectInfo & {
-  navNodeId: string;
-};
+export type DBObject = NavNodeDbObjectInfoFragment;

@@ -1,0 +1,10 @@
+fragment NavNodeDBObjectInfo on NavigatorNodeInfo {
+  id
+  object {
+    type
+    features
+    properties(filter: $filter) {
+      ...NavNodeProperties
+    }
+  }
+}

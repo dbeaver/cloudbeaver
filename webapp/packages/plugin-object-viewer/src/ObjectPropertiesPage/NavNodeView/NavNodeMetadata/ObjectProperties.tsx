@@ -28,8 +28,10 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
   const translate = useTranslate();
   const dbObject = useMapResource(DBObjectResource, objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);
-  const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject.data?.properties ?? emptyArray);
-  const properties = dbObject.data?.properties;
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(
+    dbObject.data?.object?.properties ?? emptyArray
+  );
+  const properties = dbObject.data?.object?.properties;
 
   return styled(styles)(
     <Loader state={dbObject}>{() => styled(styles)(

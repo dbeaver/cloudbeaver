@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList
@@ -55,22 +57,18 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       navNodeId: parentId,
     });
 
-    for (const dbObject of dbObjects) {
-      this.set(
-        dbObject.id,
-        {
-          navNodeId: dbObject.id,
-          ...dbObject.object,
-        }
-      );
-    }
+    runInAction(() => {
+      for (const dbObject of dbObjects) {
+        this.set(dbObject.id, dbObject);
+      }
+    });
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {
-    const { objectInfo: { object } } = await this.graphQLService.sdk.getDBObjectInfo({
+    const { objectInfo } = await this.graphQLService.sdk.getDBObjectInfo({
       navNodeId,
     });
 
-    return { navNodeId, ...object };
+    return objectInfo;
   }
 }

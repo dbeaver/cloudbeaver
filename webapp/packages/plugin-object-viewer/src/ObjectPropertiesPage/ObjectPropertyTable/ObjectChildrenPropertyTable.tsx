@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { TableHeader, TableBody, Table, useTable } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-app';
+import { TableHeader, TableBody, Table, useTable, getComputed } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Header } from './Header';
@@ -50,31 +50,41 @@ const style = composes(
 );
 
 interface Props {
-  nodeIds: string[];
+  objects: DBObject[];
 }
 
 export const ObjectChildrenPropertyTable = observer<Props>(function ObjectPropertyTable({
-  nodeIds,
+  objects,
 }) {
-  const firstChild = nodeIds[0] || '';
-  const dbObject = useDatabaseObjectInfo(firstChild).dbObject;
-  const properties = dbObject?.properties;
-
+  const styles = useStyles(style);
   const table = useTable();
 
-  return styled(useStyles(style))(
+  if (objects.length === 0) {
+    return null;
+  }
+
+  const baseObject = getComputed(() => (
+    objects
+      .slice()
+      .sort((a, b) => (a.object?.properties?.length || 0) - (b.object?.properties?.length || 0))
+  ));
+
+  const nodeIds = getComputed(() => objects.map(object => object.id));
+  const properties = baseObject[0].object?.properties || [];
+
+  return styled(styles)(
     <wrapper>
       <table-container>
         <Table selectedItems={table.selected}>
           <TableHeader>
-            <Header properties={properties || []} />
+            <Header properties={properties} />
           </TableHeader>
           <TableBody>
-            {nodeIds.map(id => (
+            {objects.map(object => (
               <Item
-                key={id}
-                objectId={id}
-                columns={properties?.length || 0}
+                key={object.id}
+                dbObject={object}
+                columns={properties.length}
               />
             ))}
           </TableBody>

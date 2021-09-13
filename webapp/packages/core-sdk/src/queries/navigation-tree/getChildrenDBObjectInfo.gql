@@ -3,12 +3,6 @@ query getChildrenDBObjectInfo(
   $filter: ObjectPropertyFilter
 ) {
   dbObjects: navNodeChildren(parentPath: $navNodeId) {
-    id
-    object {
-      features
-      properties(filter: $filter) {
-        ...NavNodeProperties
-      }
-    }
+    ...NavNodeDBObjectInfo
   }
 }

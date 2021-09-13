@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { NavNode, NavNodeContextMenuService, NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@cloudbeaver/core-app';
+import { DBObject, NavNode, NavNodeContextMenuService, NavNodeManagerService, useNode } from '@cloudbeaver/core-app';
 import {
   StaticImage, TableItem, TableColumnValue, TableItemSelect, useMouse, getComputed, Icon, useStateDelay
 } from '@cloudbeaver/core-blocks';
@@ -69,17 +69,16 @@ const itemStyles = css`
   `;
 
 interface Props {
-  objectId: string;
+  dbObject: DBObject;
   columns: number;
 }
 
 export const Item = observer<Props>(function Item({
-  objectId, columns,
+  dbObject, columns,
 }) {
   const styles = useStyles(itemStyles);
-
+  const objectId = dbObject.id;
   const { node } = useNode(objectId);
-  const { dbObject } = useDatabaseObjectInfo(objectId);
 
   if (!node) {
     return styled(styles)(
@@ -97,7 +96,7 @@ export const Item = observer<Props>(function Item({
     );
   }
 
-  if (!dbObject?.properties || dbObject.properties.length === 0) {
+  if (!dbObject.object?.properties || dbObject.object.properties.length === 0) {
     return styled(styles)(
       <TableItem item={objectId}>
         <TableColumnValue centerContent>
@@ -123,7 +122,7 @@ export const Item = observer<Props>(function Item({
           <StaticImage icon={node.icon} />
         </icon>
       </TableColumnValue>
-      {dbObject.properties.map((property, index) => (
+      {dbObject.object.properties.map((property, index) => (
         <ItemName key={property.id} node={node} property={property} index={index} />
       ))}
     </TableItem>
