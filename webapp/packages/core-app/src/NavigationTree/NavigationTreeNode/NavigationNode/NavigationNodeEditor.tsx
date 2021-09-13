@@ -50,6 +50,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     <InlineEditor
       value={name}
       disabled={loading}
+      controlsPosition='inside'
       simple
       autofocus
       onChange={setName}
