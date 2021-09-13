@@ -46,11 +46,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     }
   }, [name, onClose, node, loading, navTreeResource, notificationService]);
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    EventContext.set(event, EventStopPropagationFlag);
-  };
-
-  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const stopPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
     EventContext.set(event, EventStopPropagationFlag);
   };
 
@@ -64,8 +60,8 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onSave={save}
       onReject={onClose}
       onBlur={onClose}
-      onClick={handleClick}
-      onDoubleClick={handleDbClick}
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
     />
   );
 });
