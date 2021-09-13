@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
@@ -111,13 +113,15 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
 
     const all = ResourceKeyUtils.hasMark(key, AuthProvidersResource.keyAll.mark);
 
-    if (all) {
-      this.data.clear();
-    }
+    runInAction(() => {
+      if (all) {
+        this.data.clear();
+      }
 
-    for (const provider of providers) {
-      this.data.set(provider.id, provider as AuthProvider);
-    }
+      for (const provider of providers) {
+        this.data.set(provider.id, provider as AuthProvider);
+      }
+    });
 
     if (all) {
       this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.list[0], true);
