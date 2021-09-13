@@ -228,6 +228,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
                 DBSObject object = ne.getKey().getObject();
                 DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
+                if (executionContext == null) {
+                    // It may happen in case of lazy context initialization
+                    executionContext = DBUtils.getDefaultContext(object.getDataSource(), true);
+                }
                 DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                 ne.getValue().deleteObject(commandContext, object, options);
                 commandContext.saveChanges(session.getProgressMonitor(), options);
