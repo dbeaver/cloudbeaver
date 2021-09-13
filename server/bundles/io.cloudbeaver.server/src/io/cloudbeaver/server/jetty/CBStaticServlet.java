@@ -6,13 +6,14 @@ import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.ResourceService;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.util.resource.Resource;
+import org.jkiss.utils.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
@@ -49,7 +50,11 @@ public class CBStaticServlet extends DefaultServlet {
 
         private boolean patchIndexHtml(HttpServletResponse response, HttpContent content) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            content.getResource().writeTo(baos, 0, content.getContentLengthValue());
+            Resource resource = content.getResource();
+            File file = resource.getFile();
+            try (InputStream fis = new FileInputStream(file)) {
+                IOUtils.copyStream(fis, baos);
+            }
             String indexContents = new String(baos.toByteArray(), StandardCharsets.UTF_8);
             indexContents = indexContents.replace("{ROOT_URI}", CBApplication.getInstance().getRootURI());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
