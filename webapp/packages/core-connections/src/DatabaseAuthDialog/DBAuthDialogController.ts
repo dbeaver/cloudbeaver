@@ -18,9 +18,12 @@ import type { IConnectionAuthenticationConfig } from '../ConnectionAuthenticatio
 import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
 
+const USER_NAME_PROPERTY_ID = 'userName';
+
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
+  configured = false;
   config: IConnectionAuthenticationConfig = {
     credentials: {},
     networkHandlersConfig: [],
@@ -31,6 +34,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private connectionId!: string;
   private isDistructed = false;
+  private networkHandlers!: string[];
   private close!: () => void;
 
   constructor(
@@ -40,16 +44,21 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     private dbDriverResource: DBDriverResource
   ) {
     makeObservable(this, {
-      isAuthenticating: observable,
+      isAuthenticating: observable.ref,
+      configured: observable.ref,
       config: observable,
     });
   }
 
-  init(connectionId: string, onClose: () => void): void {
+  async init(connectionId: string, networkHandlers: string[], onClose: () => void): Promise<void> {
     this.connectionId = connectionId;
+    this.networkHandlers = networkHandlers;
     this.close = onClose;
-    this.loadAuthModel();
+
+    await this.loadAuthModel();
     this.loadDrivers();
+
+    this.configured = true;
   }
 
   destruct(): void {
@@ -99,7 +108,28 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadAuthModel() {
     try {
-      await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties']);
+      const connection = await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
+
+      if (connection.authNeeded) {
+        const property = connection.authProperties?.find(property => property.id === USER_NAME_PROPERTY_ID);
+
+        if (property?.value) {
+          this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
+        }
+      }
+
+      for (const id of this.networkHandlers) {
+        const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
+
+        if (handler?.userName) {
+          this.config.networkHandlersConfig.push({
+            id: handler.id,
+            userName: handler.userName,
+            password: handler.password,
+            savePassword: handler.savePassword,
+          });
+        }
+      }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth model');
     }

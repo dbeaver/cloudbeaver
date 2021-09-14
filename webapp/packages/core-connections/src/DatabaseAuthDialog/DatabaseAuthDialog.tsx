@@ -59,7 +59,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   rejectDialog,
 }) {
   const connection = useConnectionInfo(payload.connectionId);
-  const controller = useController(DBAuthDialogController, payload.connectionId, rejectDialog);
+  const controller = useController(DBAuthDialogController, payload.connectionId, payload.networkHandlers, rejectDialog);
 
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -93,7 +93,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
       )}
       onReject={options?.persistent ? undefined : rejectDialog}
     >
-      {(!connection.isLoaded() || connection.isLoading())
+      {(!connection.isLoaded() || connection.isLoading() || !controller.configured)
         ? <Loader />
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
