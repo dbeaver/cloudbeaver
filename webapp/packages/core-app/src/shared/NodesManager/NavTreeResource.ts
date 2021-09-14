@@ -79,6 +79,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
+    this.onDataUpdate.addHandler(navNodeInfoResource.markUpdated.bind(navNodeInfoResource));
     this.sessionDataResource.onDataUpdate.addPostHandler(() => this.markOutdated());
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler);
@@ -106,7 +107,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       ResourceKeyUtils.forEach(children, key => {
         const metadata = this.metadata.get(key);
 
-        if (!metadata.withDetails) {
+        if (!metadata.withDetails && state) {
           metadata.outdated = true;
         }
         metadata.withDetails = state;
@@ -273,7 +274,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
-    const closedConnectionsTree: string[] = [];
+    const closedConnections: string[] = [];
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
@@ -282,15 +283,17 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         const connectionInfo = this.connectionInfo.get(key);
 
         if (!connectionInfo?.connected) {
-          closedConnectionsTree.push(...this.get(nodeId) || []);
+          closedConnections.push(nodeId);
         } else {
           await this.markOutdated(nodeId);
         }
       }
     });
 
-    if (closedConnectionsTree.length > 0) {
-      this.delete(resourceKeyList(closedConnectionsTree));
+    if (closedConnections.length > 0) {
+      const key = resourceKeyList(closedConnections);
+      this.set(key, closedConnections.map(() => []));
+      await this.markOutdated(ROOT_NODE_PATH);
     }
   }
 

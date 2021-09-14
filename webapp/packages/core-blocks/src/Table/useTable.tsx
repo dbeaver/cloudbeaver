@@ -36,7 +36,7 @@ export function useTable(): ITableState {
       return Array.from(this.selected.values()).some(v => v);
     },
     unselect(key?: string | string[]) {
-      if (!key) {
+      if (key === undefined) {
         this.selected.clear();
       } else {
         if (typeof key === 'string') {
@@ -51,7 +51,7 @@ export function useTable(): ITableState {
       return this.selected;
     },
     unexpand(key?: string | string[]) {
-      if (!key) {
+      if (key === undefined) {
         this.expanded.clear();
       } else {
         if (typeof key === 'string') {

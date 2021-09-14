@@ -89,6 +89,7 @@ export abstract class CachedMapResource<
     makeObservable(this, {
       set: action,
       delete: action,
+      clear: action,
       values: computed,
       keys: computed,
     });
@@ -159,7 +160,7 @@ export abstract class CachedMapResource<
   markOutdated(): Promise<void>
   markOutdated(key: ResourceKey<TKey>): Promise<void>
   async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
-    if (!key) {
+    if (key === undefined) {
       key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
@@ -176,7 +177,7 @@ export abstract class CachedMapResource<
   markUpdated(): void
   markUpdated(key: ResourceKey<TKey>): void
   markUpdated(key?: ResourceKey<TKey>): void {
-    if (!key) {
+    if (key === undefined) {
       key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
@@ -241,6 +242,11 @@ export abstract class CachedMapResource<
     this.onItemDelete.execute(key);
   }
 
+  clear(): void {
+    this.data.clear();
+    this.metadata.clear();
+  }
+
   async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: TKey,
     includes?: T
@@ -291,7 +297,7 @@ export abstract class CachedMapResource<
   }
 
   getIncludes(key?: ResourceKey<TKey>): string[] {
-    if (!key) {
+    if (key === undefined) {
       return this.defaultIncludes;
     }
     key = this.transformParam(key);
