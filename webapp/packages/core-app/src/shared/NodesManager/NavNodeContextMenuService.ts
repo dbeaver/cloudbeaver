@@ -195,7 +195,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         onClick: async context => {
           const node = context.data.node;
           try {
-            await this.navNodeManagerService.refreshTree(node.parentId);
+            await this.navNodeManagerService.refreshTree(node.id);
           } catch (exception) {
             this.notificationService.logException(exception, 'Failed to refresh node');
           }
