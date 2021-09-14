@@ -39,6 +39,10 @@ export const BASE_CONTAINERS_STYLES = composes(
         align-items: baseline;
       }
 
+      &[flexStart]{
+        align-items: flex-start;
+      }
+
       &[center] {
         align-items: center;
         justify-content: center;

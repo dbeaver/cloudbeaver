@@ -36,7 +36,6 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   const props = useObjectRef(() => ({
     handleSubmit(e: React.FormEvent<HTMLFormElement>) {
       e.preventDefault();
-      e.stopPropagation();
 
       setDisabled(true);
       const result = this.onSubmit?.(e);
@@ -61,7 +60,7 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   }), false, ['change']);
 
   return (
-    <form {...rest} ref={ref} onSubmit={props.handleSubmit}>
+    <form {...rest} ref={ref} onSubmit={e => props.handleSubmit(e)}>
       <fieldset disabled={disabled} className={rest.className}>
         <FormContext.Provider value={context}>
           {children}

@@ -9,6 +9,7 @@
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export interface IContainerProps extends ILayoutSizeProps {
+  flexStart?: boolean;
   baseline?: boolean;
   center?: boolean;
   vertical?: boolean;
