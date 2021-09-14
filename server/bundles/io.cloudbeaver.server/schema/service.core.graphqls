@@ -272,6 +272,9 @@ type ConnectionInfo {
     useUrl: Boolean!
     saveCredentials: Boolean!
 
+    folder: String
+    nodePath: String
+
     connectTime: String
     connectionError: ServerError
     serverVersion: String

@@ -22,11 +22,13 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -148,6 +150,21 @@ public class WebConnectionInfo {
     @Property
     public boolean isSaveCredentials() {
         return dataSourceContainer.isSavePassword();
+    }
+
+    @Property
+    public String getFolder() {
+        DBPDataSourceFolder folder = dataSourceContainer.getFolder();
+        return folder == null ? null : folder.getFolderPath();
+    }
+
+    @Property
+    public String getNodePath() {
+        DBNDatabaseNode dsNode = session.getNavigatorModel().getNodeByObject(
+            session.getProgressMonitor(),
+            dataSourceContainer,
+            true);
+        return dsNode == null ? null : dsNode.getNodeItemPath();
     }
 
     @Property
