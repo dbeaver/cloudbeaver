@@ -56,7 +56,6 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     this.close = onClose;
 
     await this.loadAuthModel();
-    this.fillCredentials();
     this.loadDrivers();
 
     this.configured = true;
@@ -90,35 +89,6 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     }
   };
 
-  private fillCredentials() {
-    const connection = this.connectionInfoResource.get(this.connectionId);
-
-    if (!connection) {
-      return;
-    }
-
-    if (connection.authNeeded) {
-      const property = connection.authProperties?.find(property => property.id === USER_NAME_PROPERTY_ID);
-
-      if (property?.value) {
-        this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
-      }
-    }
-
-    for (const id of this.networkHandlers) {
-      const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
-
-      if (handler?.userName) {
-        this.config.networkHandlersConfig.push({
-          id: handler.id,
-          userName: handler.userName,
-          password: handler.password,
-          savePassword: handler.savePassword,
-        });
-      }
-    }
-  }
-
   private getConfig() {
     const config: ConnectionInitConfig = {
       id: this.connectionId,
@@ -138,7 +108,28 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadAuthModel() {
     try {
-      await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
+      const connection = await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
+
+      if (connection.authNeeded) {
+        const property = connection.authProperties?.find(property => property.id === USER_NAME_PROPERTY_ID);
+
+        if (property?.value) {
+          this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
+        }
+      }
+
+      for (const id of this.networkHandlers) {
+        const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
+
+        if (handler?.userName) {
+          this.config.networkHandlersConfig.push({
+            id: handler.id,
+            userName: handler.userName,
+            password: handler.password,
+            savePassword: handler.savePassword,
+          });
+        }
+      }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth model');
     }
