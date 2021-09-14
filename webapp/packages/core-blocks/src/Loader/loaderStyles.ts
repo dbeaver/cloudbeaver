@@ -58,7 +58,7 @@ export const loaderStyles = css`
   }
 
   loader[|inline] {
-    height: 32px;
+    height: 38px;
     flex-direction: row;
     margin: 0;
     justify-content: left;

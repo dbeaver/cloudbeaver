@@ -53,10 +53,10 @@ const styles = css`
     gap: 16px;
   }
 
-  [|inline] {
-    &error {
-      align-items: center;
-    }
+  error[|inline] {
+    align-items: center;
+    height: 38px;
+
     & error-data {
       display: flex;
       align-items: center;

@@ -11,6 +11,9 @@ fragment DatabaseConnection on ConnectionInfo {
   readOnly
   saveCredentials
 
+  folder
+  nodePath
+
   host
   port
   databaseName
