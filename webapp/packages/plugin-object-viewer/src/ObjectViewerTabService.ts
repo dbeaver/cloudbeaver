@@ -64,7 +64,7 @@ export class ObjectViewerTabService {
     this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
-    this.navNodeManagerService.navNodeInfoResource.onItemDelete.addHandler(this.removeTabs.bind(this));
+    this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {

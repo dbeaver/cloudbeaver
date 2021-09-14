@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -237,9 +237,15 @@ export abstract class CachedMapResource<
   delete(key: ResourceKey<TKey>): void;
   delete(key: ResourceKey<TKey>): void {
     key = this.transformParam(key);
-    ResourceKeyUtils.forEach(key, key => this.data.delete(key));
-    this.markUpdated(key);
-    this.onItemDelete.execute(key);
+
+    this.onItemDelete
+      .execute(key)
+      .finally(() => {
+        runInAction(() => {
+          ResourceKeyUtils.forEach(key, key => this.data.delete(key));
+          this.markUpdated(key);
+        });
+      });
   }
 
   clear(): void {

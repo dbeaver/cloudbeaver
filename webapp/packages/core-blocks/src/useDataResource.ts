@@ -12,6 +12,7 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedDataResource, CachedResourceData, CachedResourceParam, isResourceKeyList, ResourceKey } from '@cloudbeaver/core-sdk';
 
+import { getComputed } from './getComputed';
 import type { ILoadableState } from './Loader/Loader';
 import { useObjectRef } from './useObjectRef';
 
@@ -47,7 +48,7 @@ export function useDataResource<
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
 
-  const outdated = resource.isOutdated(key);
+  const outdated = getComputed(() => resource.isOutdated(key) && !resource.isDataLoading(key));
 
   const refObj = useObjectRef(() => ({
     loading: false,

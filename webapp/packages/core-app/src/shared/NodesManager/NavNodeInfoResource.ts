@@ -16,7 +16,8 @@ import {
   isResourceKeyList,
   NavNodeInfoFragment,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata
+  ICachedMapResourceMetadata,
+  ResourceKeyList
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -57,6 +58,19 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
         metadata.outdated = true;
       }
       metadata.withDetails = state;
+    });
+  }
+
+  setParent(key: string, parentId: string): void;
+  setParent(key: ResourceKeyList<string>, parentId: string): void;
+  setParent(key: ResourceKey<string>, parentId: string): void;
+  setParent(key: ResourceKey<string>, parentId: string): void {
+    ResourceKeyUtils.forEach(key, key => {
+      const node = this.get(key);
+
+      if (node) {
+        node.parentId = parentId;
+      }
     });
   }
 

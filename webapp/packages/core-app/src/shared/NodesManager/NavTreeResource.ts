@@ -140,14 +140,19 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   async changeName(node: NavNode, name: string): Promise<void> {
-    await this.performUpdate(resourceKeyList([node.id, node.parentId]), [], async () => {
-      await this.graphQLService.sdk.navRenameNode({
-        nodePath: node.id,
-        newName: name,
-      });
+    await this.performUpdate(node.parentId, [], async () => {
+      this.markDataLoading(node.id);
+      try {
+        await this.graphQLService.sdk.navRenameNode({
+          nodePath: node.id,
+          newName: name,
+        });
+      } finally {
+        this.markDataLoaded(node.id);
+      }
     });
 
-    await this.refreshTree(node.parentId);
+    await this.markOutdated(node.parentId);
   }
 
   deleteInNode(key: string, value: string[]): void;
@@ -274,47 +279,88 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
+    const outdatedTrees: string[] = [];
+    const outdatedFolders: string[] = [];
     const closedConnections: string[] = [];
 
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+    ResourceKeyUtils.forEach(key, key => {
+      const connectionInfo = this.connectionInfo.get(key);
 
-      if (this.has(nodeId)) {
-        const connectionInfo = this.connectionInfo.get(key);
+      if (!connectionInfo?.nodePath) {
+        return;
+      }
 
-        if (!connectionInfo?.connected) {
-          closedConnections.push(nodeId);
-        } else {
-          await this.markOutdated(nodeId);
+      if (!this.has(connectionInfo.nodePath)) {
+        return;
+      }
+
+      if (!connectionInfo.connected) {
+        closedConnections.push(connectionInfo.nodePath);
+
+        const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
+
+        if (!outdatedFolders.includes(folder)) {
+          outdatedFolders.push(folder);
         }
+      } else {
+        outdatedTrees.push(connectionInfo.nodePath);
       }
     });
 
     if (closedConnections.length > 0) {
       const key = resourceKeyList(closedConnections);
       this.set(key, closedConnections.map(() => []));
-      await this.markOutdated(ROOT_NODE_PATH);
+    }
+
+    if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
+      const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
+      await this.markOutdated(key);
     }
   }
 
   private connectionRemoveHandler(key: ResourceKey<string>) {
-    runInAction(() => {
-      ResourceKeyUtils.forEach(key, key => {
-        const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+    ResourceKeyUtils.forEach(key, key => {
+      const connectionInfo = this.connectionInfo.get(key);
 
-        const node = this.navNodeInfoResource.get(nodeId);
+      if (!connectionInfo?.nodePath) {
+        return;
+      }
 
-        if (node) {
-          this.deleteInNode(node.parentId, [nodeId]);
-        }
-      });
+      const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
+
+      if (connectionInfo) {
+        this.deleteInNode(folder, [connectionInfo.nodePath]);
+      }
     });
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-    await this.markOutdated(ROOT_NODE_PATH);
-    await this.markTreeOutdated(nodeId);
+    if (!connection.nodePath) {
+      return;
+    }
+    const folder = /* connection.folder || */ ROOT_NODE_PATH;
+
+    const children = this.get(folder);
+
+    if (!children) {
+      return;
+    }
+
+    const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
+    this.navNodeInfoResource.setParent(connection.nodePath, folder);
+
+    let insertIndex = 0;
+
+    const nodes = this.navNodeInfoResource.get(resourceKeyList(children));
+
+    for (const node of nodes) {
+      if (!node?.folder && node?.name?.localeCompare(connectionNode.name!) === 1) {
+        break;
+      }
+      insertIndex++;
+    }
+
+    children.splice(insertIndex, 0, connection.nodePath);
   }
 
   private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
