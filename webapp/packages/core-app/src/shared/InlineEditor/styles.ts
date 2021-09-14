@@ -129,6 +129,10 @@ export const InlineEditorStyles = composes(
       width: 100%;
     }
 
+    & Icon {
+      width: 100%;
+    }
+
     &[disabled]::before {
       display: none;
     }
