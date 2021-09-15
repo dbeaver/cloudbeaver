@@ -31,7 +31,7 @@ $link: #219;
 $error: #f00;
 $delimiter: rgb(238, 204, 100);
 $cursor: #fff;
-$active-query: $mdc-theme-secondary;
+$active-query: $color-positive;
 
 :global .CodeMirror-hints {
   @include mdc-elevation(3);

@@ -87,10 +87,6 @@
       background: rgba(128, 203, 196, 0.2);
     }
 
-    &.custom-select .cm-s-material :global(div).CodeMirror-selected {
-      display: none;
-    }
-
     .CodeMirror :global(pre).CodeMirror-line,
     .CodeMirror :global(pre).CodeMirror-line-like {
       padding: 0 16px;
@@ -198,7 +194,7 @@
     }
 
     .cm-s-material .active-query {
-      background-color: $active-query;
+      border-bottom: solid 1px $active-query;
     }
 
     .cm-s-material .running-query:before {

@@ -63,7 +63,6 @@ const styles = composes(
     }
 
     SQLCodeEditorLoader {
-      composes: custom-select from global;
       flex: 1;
       overflow: auto;
     }
