@@ -227,11 +227,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             Map<String, Object> options = new LinkedHashMap<>();
             for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
                 DBSObject object = ne.getKey().getObject();
-                DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
-                if (executionContext == null) {
-                    // It may happen in case of lazy context initialization
-                    executionContext = DBUtils.getDefaultContext(object.getDataSource(), true);
-                }
+                DBCExecutionContext executionContext = getCommandExecutionContext(object);
                 DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                 ne.getValue().deleteObject(commandContext, object, options);
                 commandContext.saveChanges(session.getProgressMonitor(), options);
@@ -250,7 +246,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 DBEObjectRenamer objectRenamer = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                     object.getClass(), DBEObjectRenamer.class);
                 if (objectRenamer != null) {
-                    DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
+                    DBCExecutionContext executionContext = getCommandExecutionContext(object);
                     Map<String, Object> options = new LinkedHashMap<>();
                     DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                     objectRenamer.renameObject(commandContext, object, options, newName);
@@ -260,6 +256,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
         }
         throw new DBException("Node " + node.getNodeItemPath() + " rename is not supported");
+    }
+
+    public DBCExecutionContext getCommandExecutionContext(DBSObject object) {
+        DBCExecutionContext executionContext = DBUtils.getDefaultContext(object, true);
+        if (executionContext == null) {
+            // It may happen in case of lazy context initialization
+            executionContext = DBUtils.getDefaultContext(object.getDataSource(), true);
+        }
+        return executionContext;
     }
 
 }
