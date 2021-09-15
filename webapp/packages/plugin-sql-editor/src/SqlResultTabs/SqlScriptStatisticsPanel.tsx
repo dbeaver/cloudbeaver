@@ -62,7 +62,7 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
     : undefined;
 
   return styled(styles)(
-    <statistics as='div'>
+    <statistics>
       {translate('sql_editor_sql_execution_queries')} {statistics.executedQueries} / {statistics.queries}<br />
       {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms<br />
       {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}<br />
@@ -71,6 +71,7 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
           <Loader
             message='sql_editor_sql_execution_executing'
             cancelDisabled={!source.canCancel}
+            inline
             onCancel={() => source.cancel()}
           />
           <pre>{source.options?.query}</pre>

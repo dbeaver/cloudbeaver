@@ -68,8 +68,10 @@ export const loaderStyles = css`
       height: 24px;
     }
     & message {
+      padding: 0 16px;
+    }
+    & actions {
       padding: 0;
-      padding-left: 16px;
     }
   }
 
