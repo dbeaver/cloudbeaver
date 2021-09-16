@@ -147,8 +147,14 @@ export class ConnectionSelectorController {
   private getConnectionItems(): IMenuItem[] {
     return this.connectionInfo.values
       .slice()
-      .sort(compareConnectionsInfo)
-      .map(item => {
+      .sort((a, b) => {
+        if (a.connected === b.connected) {
+          return compareConnectionsInfo(a, b);
+        }
+
+        return Number(b.connected) - Number(a.connected);
+      })
+      .map((item, index, array) => {
         const icon = this.dbDriverResource.get(item.driverId)?.icon;
 
         const menuItem: IMenuItem = {
@@ -157,6 +163,12 @@ export class ConnectionSelectorController {
           icon,
           onClick: () => this.connectionSelectorService.selectConnection(item.id),
         };
+
+        const next = array[index + 1];
+        if (item.connected && next && !next.connected) {
+          menuItem.separator = true;
+        }
+
         return menuItem;
       });
   }
