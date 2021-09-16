@@ -282,6 +282,9 @@ public class GraphQLEndpoint extends HttpServlet {
         public WebExecutionStrategy() {
             super(handlerParameters -> {
                 Throwable exception = handlerParameters.getException();
+                if (exception instanceof GraphQLException && exception.getCause() != null) {
+                    exception = exception.getCause();
+                }
                 if (exception instanceof InvocationTargetException) {
                     exception = ((InvocationTargetException) exception).getTargetException();
                 }
