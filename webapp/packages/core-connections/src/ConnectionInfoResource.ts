@@ -97,13 +97,11 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           ...this.getIncludesMap(),
         });
 
-        runInAction(() => {
-          const unrestoredConnectionIdList = Array.from(this.data.values())
-            .map(connection => connection.id)
-            .filter(connectionId => !connections.some(connection => connection.id === connectionId));
+        const unrestoredConnectionIdList = Array.from(this.data.values())
+          .map(connection => connection.id)
+          .filter(connectionId => !connections.some(connection => connection.id === connectionId));
 
-          this.delete(resourceKeyList(unrestoredConnectionIdList));
-        });
+        this.delete(resourceKeyList(unrestoredConnectionIdList));
 
         await this.addList(connections);
       });
