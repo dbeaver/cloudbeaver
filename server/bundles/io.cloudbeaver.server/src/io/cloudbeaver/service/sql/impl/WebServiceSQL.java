@@ -44,6 +44,8 @@ import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
+import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
+import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.utils.CommonUtils;
 
@@ -154,6 +156,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
         DBDAttributeBinding attribute = results.getAttributes()[attributeIndex];
         return attribute.getValueHandler().getSupportedOperators(attribute);
+    }
+
+    @Override
+    public SQLGeneratorDescriptor[] getEntityQueryGenerators(@NotNull WebSession session) throws DBWebException {
+        return SQLGeneratorConfigurationRegistry.getInstance().getAllGenerators().toArray(new SQLGeneratorDescriptor[0]);
+    }
+
+    @Override
+    public String generateEntityQuery(@NotNull WebSession session, String generatorId, Map<String, Object> options) throws DBWebException {
+        throw new DBWebException("Not implemented yet");
     }
 
     @Override

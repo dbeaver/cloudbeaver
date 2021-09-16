@@ -72,6 +72,16 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("resultsId"),
                     env.getArgument("attributeIndex"))
             )
+            .dataFetcher("sqlEntityQueryGenerators", env ->
+                getService(env).getEntityQueryGenerators(
+                    getWebSession(env))
+            )
+            .dataFetcher("sqlGenerateEntityQuery", env ->
+                getService(env).generateEntityQuery(
+                    getWebSession(env),
+                    env.getArgument("generatorId"),
+                    env.getArgument("options"))
+            )
         ;
 
         model.getMutationType()

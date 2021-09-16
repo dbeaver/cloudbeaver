@@ -25,6 +25,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,16 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         int attributeIndex) throws DBWebException;
+
+    @WebAction
+    SQLGeneratorDescriptor[] getEntityQueryGenerators(
+        @NotNull WebSession session) throws DBWebException;
+
+    @WebAction
+    String generateEntityQuery(
+        @NotNull WebSession session,
+        String generatorId,
+        Map<String, Object> options) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;
