@@ -80,7 +80,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 getService(env).generateEntityQuery(
                     getWebSession(env),
                     env.getArgument("generatorId"),
-                    env.getArgument("options"))
+                    env.getArgument("options"),
+                    env.getArgument("entityNodeIds"))
             )
         ;
 

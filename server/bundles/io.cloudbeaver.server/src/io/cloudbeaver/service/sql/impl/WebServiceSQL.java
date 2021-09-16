@@ -164,7 +164,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public String generateEntityQuery(@NotNull WebSession session, String generatorId, Map<String, Object> options) throws DBWebException {
+    public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> entityNodeIds) throws DBWebException {
         throw new DBWebException("Not implemented yet");
     }
 

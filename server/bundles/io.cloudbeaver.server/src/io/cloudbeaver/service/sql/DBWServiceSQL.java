@@ -62,8 +62,9 @@ public interface DBWServiceSQL extends DBWService {
     @WebAction
     String generateEntityQuery(
         @NotNull WebSession session,
-        String generatorId,
-        Map<String, Object> options) throws DBWebException;
+        @NotNull String generatorId,
+        @NotNull Map<String, Object> options,
+        @NotNull List<String> entityNodeIds) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;
