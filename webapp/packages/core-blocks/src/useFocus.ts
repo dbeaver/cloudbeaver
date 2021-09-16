@@ -20,6 +20,7 @@ interface FocusOptions {
 
 interface IState {
   focus: boolean;
+  focusFirstChild: () => void;
 }
 
 export function useFocus<T extends HTMLElement>({
@@ -28,24 +29,45 @@ export function useFocus<T extends HTMLElement>({
   onBlur,
 }: FocusOptions): [React.RefObject<T>, IState] {
   const handlersRef = useObjectRef({ onFocus, onBlur });
+  const reference = useRef<T>(null);
   // TODO: seems can be inconsistent when element changes
   const state = useObservableRef<IState>(
-    () => ({ focus: false }),
+    () => ({
+      focus: false,
+      focusFirstChild() {
+        if (reference.current !== null && focusFirstChild) {
+          const firstFocusable = reference.current
+            .querySelectorAll<T>(`
+            button:not([disabled=disabled]), 
+            [href], 
+            input:not([disabled=disabled],[readonly=readonly]), 
+            select:not([disabled=disabled],[readonly=readonly]), 
+            textarea:not([disabled=disabled],[readonly=readonly]), 
+            [tabndex]:not([tabndex="-1"])`);
+
+          let tabIndex = -1;
+          let lastElement: T | undefined;
+
+          firstFocusable.forEach(element => {
+            if (element.tabIndex > tabIndex) {
+              lastElement = element;
+              tabIndex = element.tabIndex;
+            }
+          });
+
+          if (lastElement) {
+            lastElement.focus();
+          }
+        }
+      },
+    }),
     { focus: observable.ref },
     false,
     'useFocus'
   );
-  const reference = useRef<T>(null);
 
   useLayoutEffect(() => {
-    if (reference.current !== null && focusFirstChild) {
-      const firstFocusable = reference.current
-        .querySelector<T>('button, [href], input, select, textarea, [tabndex]:not([tabndex="-1"])');
-
-      if (firstFocusable) {
-        firstFocusable.focus();
-      }
-    }
+    state.focusFirstChild();
   }, [focusFirstChild]);
 
   useEffect(() => {
