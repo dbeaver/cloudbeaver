@@ -45,6 +45,11 @@ public class WebUserAuthToken {
     }
 
     @NotNull
+    public String getAuthConfiguration() {
+        return authInfo.getAuthConfiguration();
+    }
+
+    @NotNull
     public OffsetDateTime getLoginTime() {
         return authInfo.getLoginTime();
     }
