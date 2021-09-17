@@ -57,14 +57,15 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     SQLGeneratorDescriptor[] getEntityQueryGenerators(
-        @NotNull WebSession session) throws DBWebException;
+        @NotNull WebSession session,
+        @NotNull List<String> nodePathList) throws DBWebException;
 
     @WebAction
     String generateEntityQuery(
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull Map<String, Object> options,
-        @NotNull List<String> entityNodeIds) throws DBWebException;
+        @NotNull List<String> nodePathList) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;

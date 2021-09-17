@@ -74,14 +74,15 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             )
             .dataFetcher("sqlEntityQueryGenerators", env ->
                 getService(env).getEntityQueryGenerators(
-                    getWebSession(env))
+                    getWebSession(env),
+                    env.getArgument("nodePathList"))
             )
             .dataFetcher("sqlGenerateEntityQuery", env ->
                 getService(env).generateEntityQuery(
                     getWebSession(env),
                     env.getArgument("generatorId"),
                     env.getArgument("options"),
-                    env.getArgument("entityNodeIds"))
+                    env.getArgument("nodePathList"))
             )
         ;
 

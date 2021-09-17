@@ -202,7 +202,8 @@ extend type Query {
     ): [DataTypeLogicalOperation!]!
 
     # List of all available entity query generators
-    sqlEntityQueryGenerators: [SQLQueryGenerator!]!
+    sqlEntityQueryGenerators(nodePathList: [String!]!
+        ): [SQLQueryGenerator!]!
 
     # Options:
     # fullyQualifiedNames: Boolean
@@ -215,7 +216,7 @@ extend type Query {
     sqlGenerateEntityQuery(
         generatorId: String!,
         options: Object!,
-        entityNodeIds: [String!]!
+        nodePathList: [String!]!
         ): String!
 }
 

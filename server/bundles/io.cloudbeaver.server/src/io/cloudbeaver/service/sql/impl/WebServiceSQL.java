@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -42,11 +43,14 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.sql.generator.SQLGenerator;
 import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSWrapper;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -159,13 +163,55 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public SQLGeneratorDescriptor[] getEntityQueryGenerators(@NotNull WebSession session) throws DBWebException {
-        return SQLGeneratorConfigurationRegistry.getInstance().getAllGenerators().toArray(new SQLGeneratorDescriptor[0]);
+    public SQLGeneratorDescriptor[] getEntityQueryGenerators(
+        @NotNull WebSession session,
+        @NotNull List<String> nodePathList)
+        throws DBWebException
+    {
+        List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
+        return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
     @Override
-    public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> entityNodeIds) throws DBWebException {
-        throw new DBWebException("Not implemented yet");
+    public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> nodePathList) throws DBWebException {
+        List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
+        SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
+        if (generator == null) {
+            throw new DBWebException("Generator '" + generatorId + "' not found");
+        }
+        try {
+            SQLGenerator<DBSObject> generatorInstance = generator.createGenerator(objectList);
+            generatorInstance.run(session.getProgressMonitor());
+            return generatorInstance.getResult();
+        } catch (DBException e) {
+            throw new DBWebException("Error creating SQL generator", e);
+        } catch (InvocationTargetException e) {
+            throw new DBWebException("Error generating SQL", e.getTargetException());
+        } catch (InterruptedException e) {
+            return "-- Interrupted";
+        }
+    }
+
+    @NotNull
+    private List<DBSObject> getObjectListFromNodeIds(@NotNull WebSession session, @NotNull List<String> nodePathList) throws DBWebException {
+        try {
+            List<DBSObject> objectList = new ArrayList<>(nodePathList.size());
+            for (String nodePath : nodePathList) {
+                DBNNode node = session.getNavigatorModel().getNodeByPath(session.getProgressMonitor(), nodePath);
+                if (node == null) {
+                    throw new DBException("Node '" + nodePath + "' not found");
+                }
+                if (node instanceof DBSWrapper) {
+                    DBSObject object = ((DBSWrapper) node).getObject();
+                    if (object != null) {
+                        objectList.add(object);
+                    }
+                }
+            }
+            return objectList;
+        } catch (DBException e) {
+            throw new DBWebException("Error getting objects from node IDs", e);
+        }
     }
 
     @Override
