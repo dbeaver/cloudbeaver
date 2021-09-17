@@ -1,5 +1,6 @@
 fragment AuthToken on UserAuthToken {
   authProvider
+  authConfiguration
   loginTime
   message
   origin {

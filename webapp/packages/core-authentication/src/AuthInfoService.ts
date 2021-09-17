@@ -9,7 +9,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import type { AuthProviderConfiguration, UserInfo } from '@cloudbeaver/core-sdk';
+import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
+import { AuthProvidersResource } from './AuthProvidersResource';
 import { UserInfoResource } from './UserInfoResource';
 
 @injectable()
@@ -18,11 +20,41 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
+  get userAuthConfigurations(): AuthProviderConfiguration[] {
+    const tokens = this.userInfo?.authTokens;
+    const result: AuthProviderConfiguration[] = [];
+
+    if (!tokens) {
+      return result;
+    }
+
+    for (const token of tokens) {
+      if (token.authConfiguration) {
+        const provider = this.authProvidersResource.values.find(
+          provider => provider.id === token.authProvider
+        );
+
+        if (provider) {
+          const configuration = provider.configurations?.find(
+            configuration => configuration.id === token.authConfiguration
+          );
+
+          if (configuration) {
+            result.push(configuration);
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   private activeSSO: Promise<UserInfo | null> | null;
 
   constructor(
-    private userInfoResource: UserInfoResource,
-    private sessionDataResource: SessionDataResource
+    private readonly userInfoResource: UserInfoResource,
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly sessionDataResource: SessionDataResource
   ) {
     this.activeSSO = null;
   }
@@ -48,13 +80,7 @@ export class AuthInfoService {
   }
 
   private async ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    const w = 600;
-    const h = 700;
-    const systemZoom = window.top.outerWidth / window.screen.availWidth;
-    const top = (window.top.outerHeight - h) / 2 / systemZoom + window.top.screenY;
-    const left = (window.top.outerWidth - w) / 2 / systemZoom + window.top.screenX;
-    const strWindowFeatures = `toolbar=no, menubar=no, width=${w / systemZoom}, height=${h / systemZoom}, top=${top}, left=${left}`;
-    const popup = window.open(configuration.signInLink, configuration.displayName, strWindowFeatures);
+    const popup = openCenteredPopup(configuration.signInLink, configuration.displayName, 600, 700);
 
     if (popup) {
       popup.focus();
