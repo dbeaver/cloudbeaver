@@ -1176,7 +1176,7 @@ export type AuthLoginQueryVariables = Exact<{
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface AuthLoginQuery { authToken: { authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } } }
+export interface AuthLoginQuery { authToken: { authProvider: string; authConfiguration?: Maybe<string>; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } } }
 
 export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1192,7 +1192,7 @@ export type GetActiveUserQueryVariables = Exact<{
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface GetActiveUserQuery { user?: Maybe<{ userId: string; displayName?: Maybe<string>; linkedAuthProviders: string[]; authTokens: Array<{ authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }> }> }
+export interface GetActiveUserQuery { user?: Maybe<{ userId: string; displayName?: Maybe<string>; linkedAuthProviders: string[]; authTokens: Array<{ authProvider: string; authConfiguration?: Maybe<string>; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }> }> }
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -1566,7 +1566,7 @@ export interface AllNavigatorSettingsFragment { showSystemObjects: boolean; show
 
 export interface AuthProviderConfigurationParametersFragment { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }
 
-export interface AuthTokenFragment { authProvider: string; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }
+export interface AuthTokenFragment { authProvider: string; authConfiguration?: Maybe<string>; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }
 
 export interface DatabaseConnectionFragment { id: string; name: string; description?: Maybe<string>; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; folder?: Maybe<string>; nodePath?: Maybe<string>; host?: Maybe<string>; port?: Maybe<string>; databaseName?: Maybe<string>; url?: Maybe<string>; properties?: Maybe<any>; providerProperties: any; features: string[]; supportedDataFormats: ResultDataFormat[]; authNeeded: boolean; authModel?: Maybe<string>; origin?: Maybe<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }>; authProperties?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>>; networkHandlersConfig: Array<{ id: string; enabled: boolean; userName?: Maybe<string>; password?: Maybe<string>; savePassword: boolean; properties?: Maybe<any> }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } }
 
@@ -1841,6 +1841,7 @@ export const AuthProviderConfigurationParametersFragmentDoc = `
 export const AuthTokenFragmentDoc = `
     fragment AuthToken on UserAuthToken {
   authProvider
+  authConfiguration
   loginTime
   message
   origin {

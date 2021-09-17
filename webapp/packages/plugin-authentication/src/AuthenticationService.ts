@@ -7,13 +7,14 @@
  */
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
+import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
@@ -21,15 +22,16 @@ import { AuthDialogService } from './Dialog/AuthDialogService';
 export class AuthenticationService extends Bootstrap {
   private authPromise: Promise<void> | null;
   constructor(
-    private screenService: ScreenService,
-    private appAuthService: AppAuthService,
-    private authDialogService: AuthDialogService,
-    private userInfoResource: UserInfoResource,
-    private notificationService: NotificationService,
+    private readonly screenService: ScreenService,
+    private readonly appAuthService: AppAuthService,
+    private readonly authDialogService: AuthDialogService,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly notificationService: NotificationService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly authProviderService: AuthProviderService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly sessionDataResource: SessionDataResource,
+    private readonly authInfoService: AuthInfoService
   ) {
     super();
     this.authPromise = null;
@@ -40,6 +42,16 @@ export class AuthenticationService extends Bootstrap {
   }
 
   async logout(): Promise<void> {
+    const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
+
+    if (userAuthConfiguration?.signOutLink) {
+      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, userAuthConfiguration.displayName, 600, 700);
+      if (popup) {
+        popup.blur();
+        window.focus();
+      }
+    }
+
     try {
       await this.userInfoResource.logout();
 
