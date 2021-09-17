@@ -107,6 +107,7 @@ export * from './Containers/Container';
 export * from './Containers/Group';
 export * from './Containers/GroupClose';
 export * from './Containers/GroupItem';
+export * from './Containers/GroupSubTitle';
 export * from './Containers/GroupTitle';
 export * from './Containers/ColoredContainer';
 export * from './Containers/IContainerProps';

@@ -18,6 +18,9 @@ export const BASE_CONTAINERS_STYLES = composes(
     ColoredContainer {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
+    GroupSubTitle {
+      composes: theme-text-text-hint-on-light from global;
+    }
   `,
   css`
     Container, ColoredContainer, Group {
@@ -135,6 +138,12 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 0;
       text-transform: uppercase;
       opacity: 0.9;
+    }
+
+    GroupSubTitle {
+      composes: theme-typography--caption from global;
+      display: block;
+      text-transform: none;
     }
 
     GroupClose {
