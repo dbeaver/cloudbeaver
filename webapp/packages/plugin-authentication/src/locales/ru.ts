@@ -52,6 +52,7 @@ export default [
   ['administration_identity_providers_provider_configuration_icon_url', 'URL Иконки'],
   ['administration_identity_providers_provider_configuration_parameters', 'Параметры'],
   ['administration_identity_providers_provider_configuration_links', 'Ссылки'],
+  ['administration_identity_providers_provider_configuration_links_metadata', 'Скачать файл метаданных'],
   ['administration_identity_providers_wizard_description', 'Добавьте провайдеры идентификации'],
   ['administration_identity_providers_configuration_create', 'Создание конфигурации'],
   ['administration_identity_providers_choose_provider_placeholder', 'Выберите провайдер...'],
