@@ -101,7 +101,7 @@ public class WebAuthInfo {
 
     @Property
     public String getAuthConfiguration() {
-        return authProviderConfiguration.getId();
+        return authProviderConfiguration == null ? null : authProviderConfiguration.getId();
     }
 
     public WebUser getUser() {
