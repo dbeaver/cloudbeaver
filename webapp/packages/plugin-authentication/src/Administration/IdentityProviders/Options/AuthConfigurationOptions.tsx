@@ -131,13 +131,14 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             )}
             {categories.map(category => (
               <Group key={category} small gap vertical>
-                <GroupTitle>{category}</GroupTitle>
+                <GroupTitle keepSize>{category}</GroupTitle>
                 <ObjectPropertyInfoFormNew
                   state={state.config.parameters}
                   properties={parameters.data!}
                   category={category}
                   disabled={state.disabled}
                   readOnly={state.readonly}
+                  keepSize
                 />
               </Group>
             ))}
@@ -146,9 +147,37 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
         {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink) && (
           <Group small gap>
             <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
-            {state.config.signInLink && <Link href={state.config.signInLink}>Sign in</Link>}
-            {state.config.signOutLink && <Link href={state.config.signOutLink}>Sign out</Link>}
-            {state.config.metadataLink && <Link href={state.config.metadataLink} target='_blank' rel='noopener noreferrer'>Metadata</Link>}
+            <InputFieldNew
+              name='signInLink'
+              state={state.config}
+              title={state.config.signInLink}
+              disabled={state.disabled}
+              readOnly
+              tiny
+              fill
+            >
+              Sign in
+            </InputFieldNew>
+            <InputFieldNew
+              name='signOutLink'
+              state={state.config}
+              title={state.config.signOutLink}
+              disabled={state.disabled}
+              readOnly
+              tiny
+              fill
+            >
+              Sign out
+            </InputFieldNew>
+            {state.config.metadataLink && (
+              <Link
+                href={state.config.metadataLink}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                {translate('administration_identity_providers_provider_configuration_links_metadata')}
+              </Link>
+            )}
           </Group>
         )}
       </ColoredContainer>
