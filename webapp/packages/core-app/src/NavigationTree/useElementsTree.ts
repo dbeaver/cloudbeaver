@@ -85,6 +85,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       for (const child of children) {
         const nodeState = state.get(child);
         if (!nodeState.expanded && child !== options.root) {
+          if (navNodeInfoResource.isOutdated(child)) {
+            await navNodeInfoResource.load(child);
+          }
           continue;
         }
 

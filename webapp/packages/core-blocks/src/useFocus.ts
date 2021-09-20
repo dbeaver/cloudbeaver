@@ -40,9 +40,9 @@ export function useFocus<T extends HTMLElement>({
             .querySelectorAll<T>(`
             button:not([disabled=disabled]), 
             [href], 
-            input:not([disabled=disabled],[readonly=readonly]), 
-            select:not([disabled=disabled],[readonly=readonly]), 
-            textarea:not([disabled=disabled],[readonly=readonly]), 
+            input:not([disabled=disabled]):not([readonly=readonly]), 
+            select:not([disabled=disabled]):not([readonly=readonly]), 
+            textarea:not([disabled=disabled]):not([readonly=readonly]), 
             [tabndex]:not([tabndex="-1"])`);
 
           let tabIndex = -1;

@@ -12,6 +12,7 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 
+import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { NetworkHandlerResource } from '../../NetworkHandlerResource';
 import { DatabaseConnection, ConnectionsResource } from '../ConnectionsResource';
@@ -36,6 +37,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sessionDataResource: SessionDataResource,
     private readonly networkHandlerResource: NetworkHandlerResource
   ) {
@@ -73,6 +75,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   private async refreshUserConnections(configuration: boolean, outside: boolean): Promise<void> {
     if (outside) {
       this.connectionsResource.cleanNewFlags();
+      await this.connectionInfoResource.refreshUserConnections();
       await this.sessionDataResource.refresh();
     }
   }

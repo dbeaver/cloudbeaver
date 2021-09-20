@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, runInAction } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
@@ -78,13 +78,17 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     sessionDataResource.onDataUpdate.addHandler(() => this.refreshUserConnections(true));
   }
 
+  async updateSessionConnections(): Promise<boolean> {
+    return await this.connectionsResource.updateSessionConnections();
+  }
+
   async refreshUserConnections(sessionUpdate?: boolean): Promise<void> {
     this.sessionUpdate = sessionUpdate === true;
     try {
       const connectionsList = resourceKeyList(Array.from(this.data.keys()));
       await this.performUpdate(connectionsList, [], async () => {
         if (!sessionUpdate) {
-          const updated = await this.connectionsResource.updateSessionConnections();
+          const updated = await this.updateSessionConnections();
 
           if (!updated) {
             return;
