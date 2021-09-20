@@ -28,7 +28,6 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { CoreSettingsService } from '../../CoreSettingsService';
 import type { NavNode } from './EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
-import { NodeManagerUtils } from './NodeManagerUtils';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -290,7 +289,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         return;
       }
 
-      if (!this.has(connectionInfo.nodePath)) {
+      if (!this.navNodeInfoResource.has(connectionInfo.nodePath)) {
         return;
       }
 
