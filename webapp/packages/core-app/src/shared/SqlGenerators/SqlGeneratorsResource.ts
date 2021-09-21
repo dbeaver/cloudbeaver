@@ -18,7 +18,7 @@ import {
 
 import { NavNodeInfoResource } from '../NodesManager/NavNodeInfoResource';
 
-export const MAX_GENERATORS_LENGTH = 7;
+export const MAX_GENERATORS_LENGTH = 15;
 
 @injectable()
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {

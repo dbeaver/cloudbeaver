@@ -80,9 +80,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     loading: true,
     error: new GQLErrorCatcher(),
     get dialect(): SqlDialectInfo | undefined {
-      if (!this.connectionId) {
-        return undefined;
-      }
       return this.sqlDialectInfoService.getDialectInfo(this.connectionId);
     },
     async load() {
@@ -108,13 +105,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   useEffect(() => {
     state.load();
 
-    if (connectionId) {
-      sqlDialectInfoService.loadSqlDialectInfo(connectionId)
-        .catch(exception => {
-          console.error(exception);
-          console.warn(`Can't get dialect for connection: '${connectionId}'. Default dialect will be used`);
-        });
-    }
+    sqlDialectInfoService.loadSqlDialectInfo(connectionId)
+      .catch(exception => {
+        console.error(exception);
+        console.warn(`Can't get dialect for connection: '${connectionId}'. Default dialect will be used`);
+      });
   }, []);
 
   return styled(style)(
