@@ -666,6 +666,8 @@ export interface Query {
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
+  sqlEntityQueryGenerators: SqlQueryGenerator[];
+  sqlGenerateEntityQuery: Scalars['String'];
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
   sqlSupportedOperations: DataTypeLogicalOperation[];
   templateConnections: ConnectionInfo[];
@@ -880,6 +882,16 @@ export interface QuerySqlDialectInfoArgs {
   connectionId: Scalars['ID'];
 }
 
+export interface QuerySqlEntityQueryGeneratorsArgs {
+  nodePathList: Array<Scalars['String']>;
+}
+
+export interface QuerySqlGenerateEntityQueryArgs {
+  generatorId: Scalars['String'];
+  nodePathList: Array<Scalars['String']>;
+  options: Scalars['Object'];
+}
+
 export interface QuerySqlListContextsArgs {
   connectionId?: Maybe<Scalars['ID']>;
   contextId?: Maybe<Scalars['ID']>;
@@ -989,6 +1001,14 @@ export interface SqlExecutionPlanNode {
   parentId?: Maybe<Scalars['ID']>;
   properties: ObjectPropertyInfo[];
   type: Scalars['String'];
+}
+
+export interface SqlQueryGenerator {
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  label: Scalars['String'];
+  multiObject: Scalars['Boolean'];
+  order: Scalars['Int'];
 }
 
 export interface SqlQueryResults {
@@ -1776,6 +1796,20 @@ export interface SessionStateQuery { sessionState: { createTime: string; lastAcc
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
 export interface TouchSessionMutation { touchSession?: Maybe<boolean> }
+
+export type SqlEntityQueryGeneratorsQueryVariables = Exact<{
+  nodePathList: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+export interface SqlEntityQueryGeneratorsQuery { generators: Array<{ id: string; label: string; description?: Maybe<string>; order: number; multiObject: boolean }> }
+
+export type SqlGenerateEntityQueryQueryVariables = Exact<{
+  generatorId: Scalars['String'];
+  options: Scalars['Object'];
+  nodePathList: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+export interface SqlGenerateEntityQueryQuery { sqlGenerateEntityQuery: string }
 
 export type SqlResultCloseMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -2967,6 +3001,26 @@ export const TouchSessionDocument = `
   touchSession
 }
     `;
+export const SqlEntityQueryGeneratorsDocument = `
+    query sqlEntityQueryGenerators($nodePathList: [String!]!) {
+  generators: sqlEntityQueryGenerators(nodePathList: $nodePathList) {
+    id
+    label
+    description
+    order
+    multiObject
+  }
+}
+    `;
+export const SqlGenerateEntityQueryDocument = `
+    query sqlGenerateEntityQuery($generatorId: String!, $options: Object!, $nodePathList: [String!]!) {
+  sqlGenerateEntityQuery(
+    generatorId: $generatorId
+    options: $options
+    nodePathList: $nodePathList
+  )
+}
+    `;
 export const SqlResultCloseDocument = `
     mutation sqlResultClose($connectionId: ID!, $contextId: ID!, $resultId: ID!) {
   result: sqlResultClose(
@@ -3240,6 +3294,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     touchSession(variables?: TouchSessionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<TouchSessionMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<TouchSessionMutation>(TouchSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'touchSession');
+    },
+    sqlEntityQueryGenerators(variables: SqlEntityQueryGeneratorsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlEntityQueryGeneratorsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SqlEntityQueryGeneratorsQuery>(SqlEntityQueryGeneratorsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlEntityQueryGenerators');
+    },
+    sqlGenerateEntityQuery(variables: SqlGenerateEntityQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlGenerateEntityQueryQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SqlGenerateEntityQueryQuery>(SqlGenerateEntityQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlGenerateEntityQuery');
     },
     sqlResultClose(variables: SqlResultCloseMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlResultCloseMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlResultClose');

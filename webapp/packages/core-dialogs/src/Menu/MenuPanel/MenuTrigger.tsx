@@ -10,8 +10,8 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
 import {
-  MenuButton,
-  Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio, MenuInitialState
+  MenuButton, Menu, MenuItem, MenuStateReturn, useMenuState,
+  MenuItemCheckbox, MenuItemRadio, MenuInitialState
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
@@ -105,6 +105,7 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
 interface MenuPanelProps {
   panel: IMenuPanel;
   menu: MenuStateReturn; // from reakit useMenuState
+  panelAvailable?: boolean;
   onItemClose?: () => void;
   rtl?: boolean;
   style?: ComponentStyle;
@@ -113,6 +114,7 @@ interface MenuPanelProps {
 const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
   panel,
   menu,
+  panelAvailable,
   rtl,
   onItemClose,
   style,
@@ -124,7 +126,7 @@ const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
   }
 
   return styled(styles)(
-    <Menu {...menu} aria-label={panel.id}>
+    <Menu {...menu} aria-label={panel.id} visible={panelAvailable ?? menu.visible}>
       <menu-box dir={rtl ? 'rtl' : undefined}>
         {panel.menuItems.map(item => (
           <MenuPanelElement key={item.id} item={item} menu={menu} style={style} onItemClose={onItemClose} />
@@ -162,7 +164,7 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
     () => item.panel?.menuItems.every(item => item.isHidden)
   ), [item.panel]);
 
-  if (hidden.get()) {
+  if (hidden.get() && item.isPanelAvailable === undefined) {
     return null;
   }
 
@@ -212,7 +214,6 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         checked={item.isChecked}
         onClick={onClick}
       >
-
         <MenuPanelItem menuItem={item} style={style} />
       </MenuItemCheckbox>
     );
@@ -245,9 +246,7 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
   props,
   ref
 ) {
-  const {
-    menuItem, style, ...rest
-  } = props;
+  const { menuItem, style, ...rest } = props;
   const menu = useMenuState();
 
   const handleItemClose = useCallback(() => {
@@ -255,14 +254,24 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
     props.onItemClose?.();
   }, [menu.hide, props.onItemClose]);
 
+  const handleMouseEnter = useCallback(() => {
+    menuItem.onMouseEnter?.();
+  }, [menuItem.onMouseEnter]);
+
   return styled(useStyles(menuPanelStyles, style))(
     <>
-      <MenuButton ref={ref} {...menu} {...rest}>
+      <MenuButton ref={ref} {...menu} {...rest} onMouseEnter={handleMouseEnter}>
         <box>
           <MenuPanelItem menuItem={menuItem} style={style} />
         </box>
       </MenuButton>
-      <MenuPanel panel={menuItem.panel!} menu={menu} style={style} onItemClose={handleItemClose} />
+      <MenuPanel
+        panel={menuItem.panel!}
+        menu={menu}
+        style={style}
+        panelAvailable={menuItem.isPanelAvailable}
+        onItemClose={handleItemClose}
+      />
     </>
   );
 }, { forwardRef: true });

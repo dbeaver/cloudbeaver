@@ -22,8 +22,11 @@ export interface IMenuItem {
   id: string;
   title: TLocalizationToken;
   onClick?: () => void; // it is not mandatory if it is just opens submenu
+  onMouseEnter?: () => void;
   isDisabled?: boolean;
   isHidden?: boolean;
+  isProcessing?: boolean;
+  isPanelAvailable?: boolean;
   keepMenuOpen?: boolean;
   icon?: string; // path to icon or svg icon name
   tooltip?: string;

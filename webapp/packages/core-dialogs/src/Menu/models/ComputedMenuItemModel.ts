@@ -15,14 +15,18 @@ import type { IMenuItemOptions, MenuItemType } from './MenuOptionsStore';
 
 export interface IComputedMenuItemOptions extends IMenuItemOptions {
   onClick?: () => void;
+  onMouseEnter?: () => void;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
+  isProcessing?: () => boolean;
+  isPanelAvailable?: () => boolean;
   isChecked?: () => boolean;
 }
 
 export class ComputedMenuItemModel implements IMenuItem {
   id: string;
   onClick?: () => void;
+  onMouseEnter?: () => void;
   panel?: IMenuPanel;
   type?: MenuItemType;
   separator?: boolean;
@@ -58,7 +62,15 @@ export class ComputedMenuItemModel implements IMenuItem {
     return this.options.isHidden ? this.options.isHidden() : false;
   }
 
-  get isChecked() {
+  get isProcessing(): boolean {
+    return this.options.isProcessing ? this.options.isProcessing() : false;
+  }
+
+  get isPanelAvailable(): boolean | undefined {
+    return this.options.isPanelAvailable ? this.options.isPanelAvailable() : undefined;
+  }
+
+  get isChecked(): boolean {
     return this.options.isChecked ? this.options.isChecked() : false;
   }
 
@@ -69,6 +81,8 @@ export class ComputedMenuItemModel implements IMenuItem {
       isDisabled: computed,
       icon: computed,
       isHidden: computed,
+      isProcessing: computed,
+      isPanelAvailable: computed,
       isChecked: computed,
     });
 
@@ -79,5 +93,6 @@ export class ComputedMenuItemModel implements IMenuItem {
     this.rtl = options.rtl;
     this.panel = options.panel;
     this.onClick = this.options.onClick;
+    this.onMouseEnter = this.options.onMouseEnter;
   }
 }

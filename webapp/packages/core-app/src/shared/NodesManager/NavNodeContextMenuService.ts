@@ -6,13 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ComputedContextMenuModel, ConfirmationDialog, ContextMenuService, DialogueStateResult, IContextMenuItem, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNavigatorViewSettingsEqual, CONNECTION_NAVIGATOR_VIEW_SETTINGS, NavigatorViewSettings } from '@cloudbeaver/core-root';
+import type { SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
+import { GeneratedSqlDialog } from '../SqlGenerators/GeneratedSqlDialog';
+import { MAX_GENERATORS_LENGTH, SqlGeneratorsResource } from '../SqlGenerators/SqlGeneratorsResource';
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
@@ -31,6 +33,7 @@ export interface INodeMenuData {
 export class NavNodeContextMenuService extends Bootstrap {
   static nodeContextType = 'NodeWithParent';
   private static nodeViewMenuItemToken = 'nodeView';
+  private static sqlGeneratorsToken = 'sqlGenerators';
   private static menuToken = 'navTreeMenu';
 
   constructor(
@@ -40,6 +43,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navTreeResource: NavTreeResource,
+    private readonly sqlGeneratorsResource: SqlGeneratorsResource
   ) {
     super();
   }
@@ -50,6 +54,10 @@ export class NavNodeContextMenuService extends Bootstrap {
 
   getNodeViewMenuItemToken(): string {
     return NavNodeContextMenuService.nodeViewMenuItemToken;
+  }
+
+  getSqlGeneratorsToken(): string {
+    return NavNodeContextMenuService.sqlGeneratorsToken;
   }
 
   constructMenuWithContext(node: NavNode, actions?: INodeActions): IMenuPanel {
@@ -89,7 +97,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     }
   }
 
-  registerNodeViewMenuItem(): void {
+  private registerNodeViewMenuItem(): void {
     this.contextMenuService.addMenuItem<INodeMenuData>(
       this.contextMenuService.getRootMenuToken(),
       {
@@ -162,6 +170,70 @@ export class NavNodeContextMenuService extends Bootstrap {
             showSystemObjects: !currentSettings.showSystemObjects,
           });
         },
+      }
+    );
+  }
+
+  private getSqlGeneratorsItems(
+    generatorsGetter: () => SqlQueryGenerator[]
+  ): Array<IContextMenuItem<INodeMenuData>> {
+    return Array.from(Array(MAX_GENERATORS_LENGTH).keys()).map(index => {
+      const id = String(index) + 'Generator';
+      return {
+        id,
+        isPresent: () => true,
+        isHidden: () => {
+          const generators = generatorsGetter();
+          return index >= generators.length;
+        },
+        titleGetter: () => {
+          const generators = generatorsGetter();
+
+          if (index >= generators.length) {
+            return '';
+          }
+
+          return generators[index].label;
+        },
+        onClick: context => {
+          const generators = generatorsGetter();
+
+          if (index < generators.length) {
+            this.commonDialogService.open(GeneratedSqlDialog, {
+              generatorId: generators[index].id,
+              pathId: context.data.node.id,
+            });
+          }
+        },
+      };
+    });
+  }
+
+  private registerSqlGenerators() {
+    this.contextMenuService.addMenuItem<INodeMenuData>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: this.getSqlGeneratorsToken(),
+        order: 3,
+        title: 'app_shared_sql_generators_panel_title',
+        isPresent(context) {
+          return context.contextType === NavNodeContextMenuService.nodeContextType
+            && (
+              context.data.node.objectFeatures.includes(EObjectFeature.entity)
+              || context.data.node.objectFeatures.includes(EObjectFeature.entityContainer)
+            );
+        },
+        isProcessing: context => this.sqlGeneratorsResource.isDataLoading(context.data.node.id),
+        isPanelAvailable: context => this.sqlGeneratorsResource.isLoaded(context.data.node.id),
+        isDisabled: context => this.sqlGeneratorsResource.get(context.data.node.id)?.length === 0,
+        onClick: context => this.sqlGeneratorsResource.load(context.data.node.id),
+        onMouseEnter: context => this.sqlGeneratorsResource.load(context.data.node.id),
+        panel: new ComputedContextMenuModel<INodeMenuData>({
+          id: 'generatorsPanel',
+          menuItemsGetter: context => this.getSqlGeneratorsItems(
+            () => this.sqlGeneratorsResource.get(context.data.node.id) || []
+          ),
+        }),
       }
     );
   }
@@ -273,6 +345,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     );
 
     this.registerNodeViewMenuItem();
+    this.registerSqlGenerators();
   }
 
   load(): void { }
