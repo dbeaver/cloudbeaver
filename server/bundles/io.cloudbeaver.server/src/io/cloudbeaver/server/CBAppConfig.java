@@ -35,21 +35,57 @@ import java.util.Map;
 public class CBAppConfig {
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
-    private boolean anonymousAccessEnabled = true;
-    private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
-    private String defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
-    private boolean supportsCustomConnections = true;
-    private boolean supportsConnectionBrowser = false;
-    private boolean supportsUserWorkspaces = false;
-    private boolean publicCredentialsSaveEnabled = true;
-    private boolean adminCredentialsSaveEnabled = true;
-    private String[] enabledDrivers = new String[0];
-    private String[] disabledDrivers = new String[0];
-    private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
-    private String[] enabledAuthProviders = null;
-    private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
-    private Map<String, Object> plugins = new LinkedHashMap<>();
-    private final Map<String, AuthProviderConfig> authConfiguration = new LinkedHashMap<>();
+    private boolean anonymousAccessEnabled;
+    private String anonymousUserRole;
+    private String defaultUserRole;
+    private boolean supportsCustomConnections;
+    private boolean supportsConnectionBrowser;
+    private boolean supportsUserWorkspaces;
+    private boolean publicCredentialsSaveEnabled;
+    private boolean adminCredentialsSaveEnabled;
+    private String[] enabledDrivers;
+    private String[] disabledDrivers;
+    private String defaultAuthProvider;
+    private String[] enabledAuthProviders;
+    private DataSourceNavigatorSettings defaultNavigatorSettings;
+    private final Map<String, Object> plugins;
+    private final Map<String, AuthProviderConfig> authConfiguration;
+
+    public CBAppConfig() {
+        this.anonymousAccessEnabled = true;
+        this.anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
+        this.defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
+        this.supportsCustomConnections = true;
+        this.supportsConnectionBrowser = false;
+        this.supportsUserWorkspaces = false;
+        this.publicCredentialsSaveEnabled = true;
+        this.adminCredentialsSaveEnabled = true;
+        this.enabledDrivers = new String[0];
+        this.disabledDrivers = new String[0];
+        this.defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
+        this.enabledAuthProviders = null;
+        this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
+        this.plugins = new LinkedHashMap<>();
+        this.authConfiguration = new LinkedHashMap<>();
+    }
+
+    public CBAppConfig(CBAppConfig src) {
+        this.anonymousAccessEnabled = src.anonymousAccessEnabled;
+        this.anonymousUserRole = src.anonymousUserRole;
+        this.defaultUserRole = src.defaultUserRole;
+        this.supportsCustomConnections = src.supportsCustomConnections;
+        this.supportsConnectionBrowser = src.supportsConnectionBrowser;
+        this.supportsUserWorkspaces = src.supportsUserWorkspaces;
+        this.publicCredentialsSaveEnabled = src.publicCredentialsSaveEnabled;
+        this.adminCredentialsSaveEnabled = src.adminCredentialsSaveEnabled;
+        this.enabledDrivers = src.enabledDrivers;
+        this.disabledDrivers = src.disabledDrivers;
+        this.defaultAuthProvider = src.defaultAuthProvider;
+        this.enabledAuthProviders = src.enabledAuthProviders;
+        this.defaultNavigatorSettings = src.defaultNavigatorSettings;
+        this.plugins = new LinkedHashMap<>(src.plugins);
+        this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
+    }
 
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;

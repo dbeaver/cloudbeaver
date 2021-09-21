@@ -56,6 +56,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class controls all aspects of the application's execution
@@ -443,6 +445,8 @@ public class CBApplication extends BaseApplicationImpl {
         homeDirectory = new File(homeFolder);
         String productConfigPath = null;
 
+        CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
+
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<CBDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
@@ -494,6 +498,15 @@ public class CBApplication extends BaseApplicationImpl {
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
+        }
+
+        // Merge new config with old one
+        {
+            Map<String, Object> mergedPlugins = Stream.concat(prevConfig.getPlugins().entrySet().stream(),
+                appConfiguration.getPlugins().entrySet().stream()).collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            appConfiguration.getPlugins().clear();
+            appConfiguration.getPlugins().putAll(mergedPlugins);
         }
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
