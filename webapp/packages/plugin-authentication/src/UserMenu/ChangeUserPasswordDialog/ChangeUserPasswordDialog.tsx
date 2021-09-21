@@ -99,9 +99,9 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
             onCancel={rejectDialog}
             onChange={change}
           >
-            {(errorDetails?.message || state.customError) && (
+            {(state.error.responseMessage || state.customError) && (
               <ErrorMessage
-                text={errorDetails?.message || translate(state.customError)}
+                text={state.error.responseMessage || translate(state.customError)}
                 hasDetails={errorDetails?.hasDetails}
                 onShowDetails={openErrorDetails}
               />

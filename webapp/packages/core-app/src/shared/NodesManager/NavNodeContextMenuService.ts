@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
@@ -89,7 +88,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     }
   }
 
-  registerNodeViewMenuItem(): void {
+  private registerNodeViewMenuItem(): void {
     this.contextMenuService.addMenuItem<INodeMenuData>(
       this.contextMenuService.getRootMenuToken(),
       {

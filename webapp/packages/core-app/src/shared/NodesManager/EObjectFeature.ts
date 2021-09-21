@@ -18,4 +18,5 @@ export enum EObjectFeature {
   'dataSource' = 'dataSource', // connection
   'dataSourceTemporary' = 'dataSourceTemporary',
   'dataSourceConnected' = 'dataSourceConnected',
+  'entityContainer' = 'entityContainer',
 }

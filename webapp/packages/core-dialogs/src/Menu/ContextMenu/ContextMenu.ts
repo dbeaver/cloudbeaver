@@ -89,6 +89,7 @@ export class ContextMenu {
 class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions {
   id: string;
   onClick?: () => void;
+  onMouseEnter?: () => void;
   // set title or getter
   title?: TLocalizationToken;
   titleGetter?: () => TLocalizationToken | undefined;
@@ -96,6 +97,8 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   tooltipGetter?: () => TLocalizationToken | undefined;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
+  isProcessing?: () => boolean;
+  isPanelAvailable?: () => boolean;
   // set icon or getter
   icon?: string;
   isChecked?: () => boolean;
@@ -121,11 +124,20 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     if (options.onClick) {
       this.onClick = () => options.onClick!(this.context);
     }
+    if (options.onMouseEnter) {
+      this.onMouseEnter = () => options.onMouseEnter!(this.context);
+    }
     if (options.isDisabled) {
       this.isDisabled = () => options.isDisabled!(this.context);
     }
     if (options.isHidden) {
       this.isHidden = () => options.isHidden!(this.context);
+    }
+    if (options.isProcessing) {
+      this.isProcessing = () => options.isProcessing!(this.context);
+    }
+    if (options.isPanelAvailable) {
+      this.isPanelAvailable = () => options.isPanelAvailable!(this.context);
     }
     if (options.isChecked) {
       this.isChecked = () => options.isChecked!(this.context);

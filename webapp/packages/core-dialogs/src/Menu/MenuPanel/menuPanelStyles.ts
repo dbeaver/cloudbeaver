@@ -114,6 +114,9 @@ export const menuPanelStyles = composes(
         height: 16px;
         object-fit: contain;
       }
+      & Loader {
+        width: 16px;
+      }
     }
   `
 );

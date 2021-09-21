@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Checkbox, Icon, IconOrImage, Radio } from '@cloudbeaver/core-blocks';
+import { Checkbox, Icon, IconOrImage, Loader, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
@@ -45,7 +45,9 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
         <Translate token={menuItem.title} />
       </menu-item-text>
       <menu-item-content>
-        {menuItem.panel && <Icon name="arrow" viewBox="0 0 16 16" />}
+        {menuItem.panel && (
+          menuItem.isProcessing ? <Loader small fullSize /> : <Icon name="arrow" viewBox="0 0 16 16" />
+        )}
       </menu-item-content>
     </menu-panel-item>
 

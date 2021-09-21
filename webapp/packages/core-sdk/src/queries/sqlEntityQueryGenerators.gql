@@ -1,0 +1,9 @@
+query sqlEntityQueryGenerators($nodePathList: [String!]!) {
+  generators: sqlEntityQueryGenerators(nodePathList: $nodePathList) {
+    id
+    label
+    description
+    order
+    multiObject
+  }
+}

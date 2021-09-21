@@ -27,6 +27,8 @@ export default [
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],
   ['app_shared_inlineEditor_dialog_apply', 'Применить'],
   ['app_shared_inlineEditor_dialog_cancel', 'Отменить'],
+  ['app_shared_sql_generators_panel_title', 'Сгенерировать SQL'],
+  ['app_shared_sql_generators_dialog_title', 'Сгенерированный SQL'],
   ['app_log_view_clear_log', 'Очистить лог'],
   ['app_log_view_entry_type', 'Тип'],
   ['app_log_view_entry_timestamp', 'Время'],
