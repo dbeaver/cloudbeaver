@@ -77,7 +77,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
           return context.contextType === NavNodeContextMenuService.nodeContextType
             && (
               context.data.node.objectFeatures.includes(EObjectFeature.entity)
-              || context.data.node.objectFeatures.includes(EObjectFeature.entityContainer)
+              || context.data.node.objectFeatures.includes(EObjectFeature.script)
             );
         },
         isProcessing: context => this.sqlGeneratorsResource.isDataLoading(context.data.node.id),
