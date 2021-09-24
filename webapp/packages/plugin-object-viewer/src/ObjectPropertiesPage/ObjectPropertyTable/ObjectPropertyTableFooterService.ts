@@ -7,7 +7,7 @@
  */
 
 import { ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
-import type { ITableState } from '@cloudbeaver/core-blocks';
+import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem,
@@ -18,7 +18,7 @@ import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface IObjectPropertyTableFooterContext {
   nodeIds: string[];
-  tableState: ITableState;
+  tableState: TableState;
 }
 
 @injectable()
@@ -93,7 +93,7 @@ export class ObjectPropertyTableFooterService {
     );
   }
 
-  constructMenuWithContext(nodeIds: string[], tableState: ITableState): IMenuItem[] {
+  constructMenuWithContext(nodeIds: string[], tableState: TableState): IMenuItem[] {
     const context: IMenuContext<IObjectPropertyTableFooterContext> = {
       menuId: this.objectPropertyTableFooterToken,
       contextType: ObjectPropertyTableFooterService.objectPropertyContextType,

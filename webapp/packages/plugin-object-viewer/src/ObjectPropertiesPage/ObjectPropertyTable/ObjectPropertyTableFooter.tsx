@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ITableState, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { TableState, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ObjectPropertyTableFooterItem } from './ObjectPropertyTableFooterItem';
@@ -16,7 +16,7 @@ import { ObjectPropertyTableFooterService } from './ObjectPropertyTableFooterSer
 
 interface Props {
   nodeIds: string[];
-  tableState: ITableState;
+  tableState: TableState;
   className?: string;
 }
 

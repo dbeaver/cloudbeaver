@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel, useTable } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -51,8 +51,7 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const service = useService(CreateAuthConfigurationService);
 
-  const tableState = useTable();
-  const configurationsTableState = useConfigurationsTable(tableState);
+  const table = useConfigurationsTable();
 
   return styled(style)(
     <>
@@ -61,7 +60,7 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           title={translate('administration_identity_providers_add_tooltip')}
           icon="add"
           viewBox="0 0 24 24"
-          disabled={!!sub || configurationsTableState.processing}
+          disabled={!!sub || table.processing}
           onClick={service.create}
         >
           {translate('ui_add')}
@@ -70,8 +69,8 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           title={translate('administration_identity_providers_refresh_tooltip')}
           icon="refresh"
           viewBox="0 0 24 24"
-          disabled={configurationsTableState.processing}
-          onClick={configurationsTableState.update}
+          disabled={table.processing}
+          onClick={table.update}
         >
           {translate('ui_refresh')}
         </ToolsAction>
@@ -79,8 +78,8 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           title={translate('administration_identity_providers_delete_tooltip')}
           icon="trash"
           viewBox="0 0 24 24"
-          disabled={!tableState.itemsSelected || configurationsTableState.processing}
-          onClick={configurationsTableState.delete}
+          disabled={!table.tableState.itemsSelected || table.processing}
+          onClick={table.delete}
         >
           {translate('ui_delete')}
         </ToolsAction>
@@ -94,11 +93,11 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           )}
           <layout-grid-cell {...use({ span: 12 })}>
             <AuthConfigurationsTable
-              configurations={configurationsTableState.configurations}
-              selectedItems={tableState.selected}
-              expandedItems={tableState.expanded}
+              configurations={table.configurations}
+              selectedItems={table.tableState.selected}
+              expandedItems={table.tableState.expanded}
             />
-            <Loader loading={configurationsTableState.processing} overlay />
+            <Loader loading={table.processing} overlay />
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>

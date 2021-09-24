@@ -39,6 +39,9 @@ export const defaultRULocale = [
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
   ['ui_cant_delete_item', 'Этот элемент нельзя удалить'],
+  ['ui_no_items_placeholder', 'Вы еще ничего не добавили.'],
+  ['ui_search_no_result_placeholder', 'По вашему запросу ничего не найдено.'],
+  ['ui_save_reminder', 'У вас есть несохраненные изменения.'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['app_root_session_expire_warning_title', 'Ваша сессия скоро закончится'],

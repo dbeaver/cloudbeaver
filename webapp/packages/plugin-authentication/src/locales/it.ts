@@ -42,6 +42,9 @@ export default [
   ['authentication_user_password_change_menu_title', 'Modifica la password locale'],
   ['authentication_user_password_change_success', 'Password modificata con successo'],
   ['authentication_user_password_change_dialog_submit', 'Modifica'],
+  ['authentication_user_icon_tooltip', 'Utente'],
+  ['authentication_role_icon_tooltip', 'Ruolo'],
+
   ['administration_configuration_wizard_configuration_admin', 'Credenziali amministrative'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],
   ['administration_configuration_wizard_configuration_admin_password', 'Password'],

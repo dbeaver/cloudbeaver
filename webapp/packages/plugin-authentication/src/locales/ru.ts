@@ -42,6 +42,8 @@ export default [
   ['authentication_user_password_change_menu_title', 'Изменить локальный пароль'],
   ['authentication_user_password_change_success', 'Пароль успешно изменен'],
   ['authentication_user_password_change_dialog_submit', 'Изменить'],
+  ['authentication_user_icon_tooltip', 'Пользователь'],
+  ['authentication_role_icon_tooltip', 'Роль'],
 
   ['administration_identity_providers_tab_title', 'Провайдеры идентификации'],
   ['administration_identity_providers_provider', 'Провайдер'],

@@ -9,28 +9,28 @@
 import { computed, observable } from 'mobx';
 
 import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { ITableState, useObservableRef } from '@cloudbeaver/core-blocks';
+import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminAuthProviderConfiguration, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
+  tableState: TableState;
   processing: boolean;
-  tableState: ITableState;
   configurations: AdminAuthProviderConfiguration[];
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
 
-export function useConfigurationsTable(tableState: ITableState): State {
+export function useConfigurationsTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
   const resource = useService(AuthConfigurationsResource);
 
   return useObservableRef<State>(() => ({
+    tableState: new TableState(),
     processing: false,
-    tableState,
     get configurations() {
       return resource.values.slice().sort(compareAuthConfigurations);
     },
@@ -89,5 +89,5 @@ export function useConfigurationsTable(tableState: ITableState): State {
   }), {
     processing: observable.ref,
     configurations: computed,
-  }, { tableState }, ['update', 'delete']);
+  }, false, ['update', 'delete']);
 }

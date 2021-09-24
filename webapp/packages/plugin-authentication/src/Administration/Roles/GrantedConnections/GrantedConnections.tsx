@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  IconOrImage, Loader, TabContainerPanelComponent,
+  InfoItem, Loader, TabContainerPanelComponent,
   TextPlaceholder, useMapResource, useTab,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionsResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
@@ -36,25 +36,10 @@ const styles = css`
     position: relative;
     overflow: auto !important;
   }
-  info-item {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-  }
-  IconOrImage {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px;
-  }
   Loader {
     z-index: 2;
   }
 `;
-
-interface IInfoItem {
-  text: TLocalizationToken;
-  icon: string;
-}
 
 export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = observer(function GrantedConnections({
   tabId,
@@ -63,49 +48,40 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
 
-  const { state, edit, grant, load, revoke } = useGrantedConnections(formState.config, formState.mode);
-
+  const state = useGrantedConnections(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
   const dbDriverResource = useMapResource(DBDriverResource, selected ? 'all' : null);
   const connections = useMapResource(ConnectionsResource, selected ? ConnectionsResource.keyAll : null);
 
   const grantedConnections = useMemo(() => computed(() => connections.resource.values
-    .filter(connection => state.grantedSubjects.includes(connection.id))
-  ), [state.grantedSubjects, connections.resource]);
+    .filter(connection => state.state.grantedSubjects.includes(connection.id))
+  ), [state.state.grantedSubjects, connections.resource]);
 
   useEffect(() => {
-    if (selected && !state.loaded) {
-      load();
+    if (selected && !state.state.loaded) {
+      state.load();
     }
-  }, [selected, state.loaded, load]);
+  }, [selected, state.state.loaded]);
 
   if (!selected) {
     return null;
   }
 
-  let infoItem: IInfoItem | null = null;
+  let info: TLocalizationToken | null = null;
 
-  const unsaved = (formState.mode === 'edit' && (state.initialGrantedSubjects.length !== state.grantedSubjects.length
-    || state.initialGrantedSubjects.some(subject => !state.grantedSubjects.includes(subject))));
   const cloudExists = connections.resource.values.some(isCloudConnection);
 
   if (cloudExists) {
-    infoItem = {
-      text: 'connections_connection_access_cloud_placeholder',
-      icon: '/icons/info_icon.svg',
-    };
+    info = 'cloud_connections_access_placeholder';
   }
 
-  if (unsaved) {
-    infoItem = {
-      text: 'connections_connection_access_save_reminder',
-      icon: '/icons/info_icon.svg',
-    };
+  if (formState.mode === 'edit' && state.changed) {
+    info = 'ui_save_reminder';
   }
 
   return styled(style)(
-    <Loader state={[connections, dbDriverResource, state]}>
+    <Loader state={[connections, dbDriverResource, state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
           {!connections.resource.values.length ? (
@@ -114,25 +90,20 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
             </Group>
           ) : (
             <>
-              {infoItem && (
-                <info-item>
-                  <IconOrImage icon={infoItem.icon} />
-                  {translate(infoItem.text)}
-                </info-item>
-              )}
+              {info && <InfoItem info={info} />}
               <Container gap overflow>
                 <GrantedConnectionList
                   grantedConnections={grantedConnections.get()}
                   disabled={formState.disabled}
-                  onEdit={edit}
-                  onRevoke={revoke}
+                  onEdit={state.edit}
+                  onRevoke={state.revoke}
                 />
-                {state.editing && (
+                {state.state.editing && (
                   <ConnectionList
                     connectionList={connections.resource.values}
-                    grantedSubjects={state.grantedSubjects}
+                    grantedSubjects={state.state.grantedSubjects}
                     disabled={formState.disabled}
-                    onGrant={grant}
+                    onGrant={state.grant}
                   />
                 )}
               </Container>

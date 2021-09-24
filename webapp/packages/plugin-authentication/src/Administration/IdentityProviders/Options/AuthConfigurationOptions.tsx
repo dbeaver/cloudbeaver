@@ -153,8 +153,6 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               title={state.config.signInLink}
               disabled={state.disabled}
               readOnly
-              tiny
-              fill
             >
               Sign in
             </InputFieldNew>
@@ -164,8 +162,6 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               title={state.config.signOutLink}
               disabled={state.disabled}
               readOnly
-              tiny
-              fill
             >
               Sign out
             </InputFieldNew>
