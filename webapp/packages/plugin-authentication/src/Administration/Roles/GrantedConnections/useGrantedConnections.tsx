@@ -17,7 +17,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import type { RoleFormMode } from '../IRoleFormProps';
 import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
 
-interface IConnectionAccessState {
+interface State {
   state: IGrantedConnectionsTabState;
   changed: boolean;
   edit: () => void;
@@ -26,7 +26,7 @@ interface IConnectionAccessState {
   load: () => Promise<void>;
 }
 
-export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): Readonly<IConnectionAccessState> {
+export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): Readonly<State> {
   const resource = useService(RolesResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IGrantedConnectionsTabState>();

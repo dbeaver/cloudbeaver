@@ -17,7 +17,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
-interface IConnectionAccessState {
+interface State {
   state: IConnectionAccessTabState;
   changed: boolean;
   edit: () => void;
@@ -26,9 +26,7 @@ interface IConnectionAccessState {
   load: () => Promise<void>;
 }
 
-export function useConnectionAccessState(
-  connection: DatabaseConnectionFragment | undefined
-): Readonly<IConnectionAccessState> {
+export function useConnectionAccessState(connection: DatabaseConnectionFragment | undefined): Readonly<State> {
   const resource = useService(ConnectionsResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IConnectionAccessTabState>();
