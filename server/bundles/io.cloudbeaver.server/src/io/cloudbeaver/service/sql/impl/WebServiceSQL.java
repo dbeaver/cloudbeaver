@@ -26,6 +26,8 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.*;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -114,7 +116,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     completionContext.getSyntaxManager(),
                     completionContext.getRuleManager(),
                     document);
-                activeQuery = SQLScriptParser.extractActiveQuery(parserContext, position, 0);
+                activeQuery = SQLScriptParser.extractActiveQuery(parserContext, new IRegion[]{new Region(position, 0)});
             } else {
                 activeQuery = new SQLQuery(dataSource, query);
             }
