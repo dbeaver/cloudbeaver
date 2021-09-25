@@ -74,7 +74,6 @@ export const menuPanelStyles = composes(
       }
 
       &:hover, &:global([aria-expanded="true"]) {
-        font-weight: 600;
         & Icon {
           opacity: 1;
         }
