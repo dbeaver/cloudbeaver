@@ -14,6 +14,7 @@ import { AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } fr
 import { BASE_CONTAINERS_STYLES, Container, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
@@ -24,7 +25,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   configurationWizard,
 }) {
   const authProviderService = useService(AuthProviderService);
-  const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
+  const providers = useMapResource(AuthProvidersResource, CachedMapAllKey);
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const formContext = useContext(FormContext);

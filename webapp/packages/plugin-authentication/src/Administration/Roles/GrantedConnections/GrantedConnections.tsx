@@ -18,6 +18,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { ConnectionsResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
@@ -51,8 +52,8 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   const state = useGrantedConnections(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const dbDriverResource = useMapResource(DBDriverResource, selected ? 'all' : null);
-  const connections = useMapResource(ConnectionsResource, selected ? ConnectionsResource.keyAll : null);
+  const dbDriverResource = useMapResource(DBDriverResource, CachedMapAllKey, { isActive: () => selected });
+  const connections = useMapResource(ConnectionsResource, CachedMapAllKey, { isActive: () => selected });
 
   const grantedConnections = useMemo(() => computed(() => connections.resource.values
     .filter(connection => state.state.grantedSubjects.includes(connection.id))

@@ -74,7 +74,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
         this.data.authTokens.push(authToken as UserAuthToken);
       }
     });
-    await this.sessionDataResource.refresh();
+    await this.sessionDataResource.markOutdated();
 
     return this.data;
   }

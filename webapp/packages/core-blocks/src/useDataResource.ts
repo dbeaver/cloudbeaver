@@ -48,10 +48,14 @@ export function useDataResource<
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
 
-  const outdated = getComputed(() => resource.isOutdated(key) && !resource.isDataLoading(key));
+  const outdated = getComputed(() => (
+    (resource.isOutdated(key) || !resource.isLoaded(key, includes))
+    && !resource.isDataLoading(key)
+  ));
 
   const refObj = useObjectRef(() => ({
     loading: false,
+    firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     load: () => {},
   }), {
@@ -64,6 +68,7 @@ export function useDataResource<
   });
 
   refObj.load = async function load() {
+    this.firstRender = false;
     const { loading, resource, actions, prevData } = refObj;
 
     if (loading) {
@@ -140,10 +145,14 @@ export function useDataResource<
   }));
 
   useEffect(() => {
+    if (!outdated && !refObj.firstRender) {
+      return;
+    }
+
     if (result.exception === null) {
       refObj.load();
     }
-  }, [key, includes, outdated]);
+  });
 
   return result;
 }

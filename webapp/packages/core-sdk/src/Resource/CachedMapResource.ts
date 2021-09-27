@@ -50,6 +50,8 @@ export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
   includes: string[];
 }
 
+export const CachedMapAllKey = resourceKeyList<any>([Symbol('@cached-map-resource/all')], 'all');
+
 export abstract class CachedMapResource<
   TKey,
   TValue,
@@ -86,6 +88,13 @@ export abstract class CachedMapResource<
       includes: [...this.defaultIncludes],
     }));
 
+    this.addAlias(CachedMapAllKey, key => {
+      if (this.keys.length > 0) {
+        return resourceKeyList(this.keys, CachedMapAllKey.mark);
+      }
+      return resourceKeyList([]);
+    });
+
     makeObservable(this, {
       set: action,
       delete: action,
@@ -116,6 +125,10 @@ export abstract class CachedMapResource<
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      return true;
+    }
+
     key = this.transformParam(key);
     return ResourceKeyUtils.some(key, key => this.metadata.get(key).outdated);
   }
@@ -161,15 +174,24 @@ export abstract class CachedMapResource<
   markOutdated(key: ResourceKey<TKey>): Promise<void>
   async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
     if (key === undefined) {
-      key = resourceKeyList(this.keys);
+      key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
+      this.loadedKeys = [];
     } else {
+      if (this.isAlias(key)) {
+        const index = this.loadedKeys.findIndex(loadedKey => this.includes(key!, loadedKey));
+
+        if (index >= 0) {
+          this.loadedKeys.splice(index, 1);
+        }
+      }
+
       key = this.transformParam(key);
     }
 
-    ResourceKeyUtils.forEach(key, key => {
+    runInAction(() => ResourceKeyUtils.forEach(key!, key => {
       const metadata = this.metadata.get(key);
       metadata.outdated = true;
-    });
+    }));
 
     await this.onDataOutdated.execute(key);
   }
@@ -178,8 +200,12 @@ export abstract class CachedMapResource<
   markUpdated(key: ResourceKey<TKey>): void
   markUpdated(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
+      // TODO: maybe should add all aliases to loadedKeys
       key = resourceKeyList(this.keys);
     } else {
+      if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+        this.loadedKeys.push(key);
+      }
       key = this.transformParam(key);
     }
 
@@ -191,6 +217,10 @@ export abstract class CachedMapResource<
   }
 
   isLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      return false;
+    }
+
     key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
       if (!this.has(key)) {
@@ -294,6 +324,10 @@ export abstract class CachedMapResource<
   }
 
   has(key: TKey): boolean {
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      return false;
+    }
+
     key = this.transformParam(key) as TKey;
     return this.data.has(key);
   }

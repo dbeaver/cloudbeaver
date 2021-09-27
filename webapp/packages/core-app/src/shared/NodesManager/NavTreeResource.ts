@@ -10,8 +10,8 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { EPermission, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -28,6 +28,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { CoreSettingsService } from '../../CoreSettingsService';
 import type { NavNode } from './EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
+import { NodeManagerUtils } from './NodeManagerUtils';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -55,6 +56,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private coreSettingsService: CoreSettingsService,
     private sessionDataResource: SessionDataResource,
     private connectionInfo: ConnectionInfoResource,
+    permissionsResource: PermissionsResource,
   ) {
     super();
 
@@ -75,6 +77,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       exception: null,
       includes: [],
     }));
+
+    this.beforeLoad
+      .addHandler(() => permissionsResource.load())
+      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EPermission.public)));
 
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
@@ -321,13 +327,19 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfo.get(key);
 
-      if (!connectionInfo?.nodePath) {
+      if (!connectionInfo) {
         return;
+      }
+
+      let nodePath = connectionInfo.nodePath;
+
+      if (!nodePath) {
+        nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key);
       }
 
       const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
 
-      if (connectionInfo) {
+      if (connectionInfo.nodePath) {
         this.deleteInNode(folder, [connectionInfo.nodePath]);
       }
     });
