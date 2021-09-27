@@ -17,7 +17,7 @@ import {
   TextareaNew, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { AuthProviderConfigurationParametersFragment } from '@cloudbeaver/core-sdk';
+import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';
@@ -39,7 +39,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
-  const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
+  const providers = useMapResource(AuthProvidersResource, CachedMapAllKey);
   const parameters = useMapResource(AuthConfigurationParametersResource, state.config.providerId || null);
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);

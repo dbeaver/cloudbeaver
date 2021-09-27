@@ -64,6 +64,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     DBDriverResource,
     { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
     {
+      isActive: () => selected && !!formState.config.driverId,
       onData: driver => {
         for (const key of Object.keys(formState.config.properties)) {
           if (driver.driverProperties?.some(property => property.id === key)

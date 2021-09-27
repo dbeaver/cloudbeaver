@@ -6,11 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  splitStyles, Split, ResizerControls, Pane, ErrorBoundary
+  splitStyles, Split, ResizerControls, Pane, ErrorBoundary, Loader, useMapResource, useDataResource
 } from '@cloudbeaver/core-blocks';
+import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { PermissionsResource } from '@cloudbeaver/core-root';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { NavigationTree } from '../NavigationTree';
@@ -42,20 +46,32 @@ const mainStyles = composes(
   `
 );
 
-export const Main: React.FC = function Main() {
-  return styled(useStyles(mainStyles, splitStyles))(
-    <space as="main">
-      <Split sticky={30}>
-        <Pane main>
-          <ErrorBoundary remount>
-            <NavigationTree />
-          </ErrorBoundary>
-        </Pane>
-        <ResizerControls />
-        <Pane>
-          <RightArea />
-        </Pane>
-      </Split>
-    </space>
+export const Main = observer(function Main() {
+  const styles = useStyles(mainStyles, splitStyles);
+  const permissionsService = useDataResource(PermissionsResource, undefined);
+  const connectionExecutionContext = useMapResource(
+    ConnectionExecutionContextResource,
+    CachedMapAllKey
   );
-};
+  const connectionInfo = useMapResource(ConnectionInfoResource, CachedMapAllKey);
+
+  return styled(styles)(
+    <Loader state={[connectionExecutionContext, connectionInfo, permissionsService]}>
+      {() => styled(styles)(
+        <space as="main">
+          <Split sticky={30}>
+            <Pane main>
+              <ErrorBoundary remount>
+                <NavigationTree />
+              </ErrorBoundary>
+            </Pane>
+            <ResizerControls />
+            <Pane>
+              <RightArea />
+            </Pane>
+          </Split>
+        </space>
+      )}
+    </Loader>
+  );
+});

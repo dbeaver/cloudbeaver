@@ -72,11 +72,15 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  private async refreshUserConnections(configuration: boolean, outside: boolean): Promise<void> {
-    if (outside) {
+  private async refreshUserConnections(
+    configuration: boolean,
+    outside: boolean,
+    outsideAdminPage: boolean
+  ): Promise<void> {
+    if (outsideAdminPage) {
       this.connectionsResource.cleanNewFlags();
-      await this.connectionInfoResource.refreshUserConnections();
-      await this.sessionDataResource.refresh();
+      await this.connectionInfoResource.updateSessionConnections();
+      await this.sessionDataResource.markOutdated();
     }
   }
 

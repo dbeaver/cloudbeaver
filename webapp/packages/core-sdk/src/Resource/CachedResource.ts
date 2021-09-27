@@ -54,6 +54,7 @@ export abstract class CachedResource<
   readonly beforeLoad: IExecutor<TParam>;
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
+  protected loadedKeys: TParam[];
 
   protected get loading(): boolean {
     return this.scheduler.executing;
@@ -70,6 +71,7 @@ export abstract class CachedResource<
     this.loadingTask = this.loadingTask.bind(this);
 
     this.logActivity = false;
+    this.loadedKeys = [];
 
     this.paramAliases = [];
     this.metadata = new MetadataMap(() => ({ outdated: true, loading: false, exception: null }));
@@ -87,7 +89,8 @@ export abstract class CachedResource<
       this.spy(this.onDataError, 'onDataError');
     }
 
-    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader'>(this, {
+    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader' | 'loadedKeys'>(this, {
+      loadedKeys: observable,
       data: observable,
       loader: action,
       markDataLoading: action,
@@ -113,7 +116,7 @@ export abstract class CachedResource<
       resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate > ' + this.getName()));
     }
 
-    resource.onDataUpdate.addHandler(param => this.load(param, context));
+    // resource.onDataUpdate.addHandler(param => { this.load(param, context); });
 
     if (this.logActivity) {
       resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate < ' + this.getName()));
@@ -129,6 +132,10 @@ export abstract class CachedResource<
 
   abstract isLoaded(param: TParam, context: TContext): boolean;
 
+  isAlias(key: TParam): boolean {
+    return this.paramAliases.some(alias => this.includes(key, alias.param));
+  }
+
   waitLoad(): Promise<void> {
     return this.scheduler.wait();
   }
@@ -137,12 +144,20 @@ export abstract class CachedResource<
     return this.loading;
   }
 
+  isAliasLoaded(key: TParam): boolean {
+    return this.loadedKeys.some(loadedKey => this.includes(key, loadedKey));
+  }
+
   getException(param: TParam): Error | null {
     param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).exception;
   }
 
   isOutdated(param: TParam): boolean {
+    if (this.isAlias(param) && !this.isAliasLoaded(param)) {
+      return true;
+    }
+
     param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).outdated;
   }
@@ -172,6 +187,14 @@ export abstract class CachedResource<
   }
 
   async markOutdated(param: TParam): Promise<void> {
+    if (this.isAlias(param)) {
+      const index = this.loadedKeys.findIndex(key => this.includes(param, key));
+
+      if (index >= 0) {
+        this.loadedKeys.splice(index, 1);
+      }
+    }
+
     param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = true;
@@ -179,6 +202,10 @@ export abstract class CachedResource<
   }
 
   markUpdated(param: TParam): void {
+    if (this.isAlias(param) && !this.isAliasLoaded(param)) {
+      this.loadedKeys.push(param);
+    }
+
     param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = false;
@@ -210,13 +237,11 @@ export abstract class CachedResource<
   }
 
   async refresh(param: TParam, context: TContext): Promise<any> {
-    param = this.transformParam(param);
     await this.loadData(param, true, context);
     return this.data;
   }
 
   async load(param: TParam, context: TContext): Promise<any> {
-    param = this.transformParam(param);
     await this.loadData(param, false, context);
     return this.data;
   }
@@ -251,7 +276,6 @@ export abstract class CachedResource<
       return;
     }
 
-    param = this.transformParam(param);
     const contexts = await this.beforeLoad.execute(param);
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -277,7 +301,6 @@ export abstract class CachedResource<
   }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
-    param = this.transformParam(param);
     const contexts = await this.beforeLoad.execute(param);
 
     if (ExecutorInterrupter.isInterrupted(contexts) && !refresh) {

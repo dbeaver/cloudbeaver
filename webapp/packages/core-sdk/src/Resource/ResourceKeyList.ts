@@ -47,7 +47,7 @@ export interface ResourceKeyUtils {
   map: MapFnc;
   includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
   exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKey<TKey>;
-  join: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => ResourceKey<TKey>;
+  join: <TKey>(...keys: Array<ResourceKey<TKey>>) => ResourceKey<TKey>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -153,19 +153,15 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     return resourceKeyList(param.list.filter(param => param !== key), param.mark);
   },
 
-  join<TKey>(param: ResourceKey<TKey>, key: ResourceKey<TKey>): ResourceKey<TKey> {
+  join<TKey>(...keys: Array<ResourceKey<TKey>>): ResourceKey<TKey> {
     const list: TKey[] = [];
 
-    if (isResourceKeyList(param)) {
-      list.push(...param.list);
-    } else {
-      list.push(param);
-    }
-
-    if (isResourceKeyList(key)) {
-      list.push(...key.list);
-    } else {
-      list.push(key);
+    for (const param of keys) {
+      if (isResourceKeyList(param)) {
+        list.push(...param.list);
+      } else {
+        list.push(param);
+      }
     }
 
     return resourceKeyList(list);

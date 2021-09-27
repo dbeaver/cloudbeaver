@@ -133,6 +133,7 @@ export function useMapResource<
 
   const refObj = useObservableRef(() => ({
     loading: false,
+    firstRender: true,
     prevData: undefined as CachedMapResourceLoader<
     TKeyArg,
     CachedMapResourceKey<TResource>,
@@ -140,6 +141,7 @@ export function useMapResource<
     TIncludes
     > | undefined,
     async load() {
+      this.firstRender = false;
       const { resource, actions, prevData, key, includes } = this;
 
       const active = await actions?.isActive?.(resource);
@@ -193,7 +195,10 @@ export function useMapResource<
     actions,
   });
 
-  const outdated = getComputed(() => resource.isOutdated(key) && !resource.isDataLoading(key));
+  const outdated = getComputed(() => (
+    (resource.isOutdated(key) || !resource.isLoaded(key, includes as any))
+    && !resource.isDataLoading(key)
+  ));
 
   const [result] = useState<
   IMapResourceResult<TResource, TIncludes>
@@ -234,10 +239,14 @@ export function useMapResource<
   }));
 
   useEffect(() => {
+    if (!outdated && !refObj.firstRender) {
+      return;
+    }
+
     if (result.exception === null || (Array.isArray(result.exception) && !result.exception.some(Boolean))) {
       refObj.load();
     }
-  }, [key, includes, outdated]);
+  });
 
   return result;
 }

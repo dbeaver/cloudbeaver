@@ -82,7 +82,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     config.properties = { ...state.config.properties };
   }
 
-  private async formState(
+  private formState(
     data: IConnectionFormState,
     contexts: IExecutionContextProvider<IConnectionFormState>
   ) {
@@ -91,7 +91,11 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     }
 
     const config = contexts.getContext(connectionConfigContext);
-    const driver = await this.dbDriverResource.load(data.config.driverId, ['includeDriverProperties']);
+    const driver = this.dbDriverResource.get(data.config.driverId);
+
+    if (!driver?.driverProperties) {
+      return;
+    }
 
     if (!isObjectPropertyInfoStateEqual(driver.driverProperties, config.properties, data.info.properties)) {
       const stateContext = contexts.getContext(connectionFormStateContext);

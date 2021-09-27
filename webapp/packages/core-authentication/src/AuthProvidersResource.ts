@@ -18,8 +18,8 @@ import {
   resourceKeyList,
   ResourceKeyUtils,
   isResourceKeyList,
+  CachedMapAllKey,
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
@@ -28,9 +28,6 @@ export type AuthProvider = AuthProviderInfo;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider, void> {
-  static keyAll = resourceKeyList(['all'], 'all');
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
-
   constructor(
     private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
@@ -38,27 +35,12 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     private readonly authConfigurationsResource: AuthConfigurationsResource
   ) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
 
     this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.serverConfigResource.onDataUpdate.addHandler(async () => { await this.load(AuthProvidersResource.keyAll); });
-    this.addAlias(AuthProvidersResource.keyAll, key => {
-      if (this.keys.length > 0) {
-        return resourceKeyList(this.keys, AuthProvidersResource.keyAll.mark);
-      }
-      return AuthProvidersResource.keyAll;
-    });
+    this.serverConfigResource.onDataUpdate.addHandler(this.loadAll.bind(this));
 
     this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
     this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   getEnabledProviders(): AuthProvider[] {
@@ -91,27 +73,26 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
 
   async loadAll(): Promise<AuthProvider[]> {
     this.resetIncludes();
-    await this.load(AuthProvidersResource.keyAll);
+    await this.load(CachedMapAllKey);
 
     return this.values;
   }
 
   async refreshAll(): Promise<AuthProvider[]> {
     this.resetIncludes();
-    await this.refresh(AuthProvidersResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.values;
   }
 
   refreshAllLazy(): void {
     this.resetIncludes();
-    this.markOutdated(AuthProvidersResource.keyAll);
-    this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.list[0], false);
+    this.markOutdated(CachedMapAllKey);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
-    const { providers } = await this.graphQLService.sdk.getAuthProviders();
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
-    const all = ResourceKeyUtils.hasMark(key, AuthProvidersResource.keyAll.mark);
+    const { providers } = await this.graphQLService.sdk.getAuthProviders();
 
     runInAction(() => {
       if (all) {
@@ -122,16 +103,10 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
         this.data.set(provider.id, provider as AuthProvider);
       }
     });
-
-    if (all) {
-      this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.list[0], true);
-    }
     return this.data;
   }
 
   private updateConfigurations(key: ResourceKey<string>) {
-    this.loadedKeyMetadata.set(AuthProvidersResource.keyAll.mark, false);
-
     const configurations = isResourceKeyList(key)
       ? this.authConfigurationsResource.get(key) : [this.authConfigurationsResource.get(key)];
 
@@ -143,14 +118,16 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   private deleteConfigurations(key: ResourceKey<string>) {
-    this.values.forEach(provider => {
-      if (provider.configurable && provider.configurations?.length) {
-        ResourceKeyUtils.forEach(key, id => {
-          const index = provider.configurations!.findIndex(configuration => configuration.id === id);
-          if (index >= 0) {
-            provider.configurations!.splice(index, 1);
-          }
-        });
+    runInAction(() => {
+      for (const provider of this.values) {
+        if (provider.configurable && provider.configurations?.length) {
+          ResourceKeyUtils.forEach(key, id => {
+            const index = provider.configurations!.findIndex(configuration => configuration.id === id);
+            if (index >= 0) {
+              provider.configurations!.splice(index, 1);
+            }
+          });
+        }
       }
     });
   }

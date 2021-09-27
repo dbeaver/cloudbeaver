@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
@@ -23,13 +25,20 @@ export class AuthConfigurationParametersResource
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionDataResource: SessionDataResource,
+    permissionsResource: PermissionsResource,
   ) {
     super();
 
     this.sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
+
+    this.beforeLoad
+      .addHandler(() => permissionsResource.load())
+      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EAdminPermission.admin)));
   }
 
-  protected async loader(key: ResourceKey<string>) {
+  protected async loader(
+    key: ResourceKey<string>
+  ): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
     const values: AuthProviderConfigurationParametersFragment[][] = [];
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { parameters } = await this.graphQLService.sdk.getAuthProviderConfigurationParameters({ providerId: key });

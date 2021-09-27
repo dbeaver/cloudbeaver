@@ -7,7 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -16,48 +17,29 @@ import {
   ResourceKeyUtils,
   ResourceKeyList,
   SqlContextInfo,
+  CachedMapAllKey,
 } from '@cloudbeaver/core-sdk';
-import { flat, MetadataMap } from '@cloudbeaver/core-utils';
+import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
 import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
 
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
-  static keyAll = resourceKeyList(['all'], 'all');
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
-
   constructor(
     private graphQLService: GraphQLService,
     private connectionInfoResource: ConnectionInfoResource,
-    private permissionsResource: PermissionsResource,
-    sessionDataResource: SessionDataResource
+    permissionsResource: PermissionsResource
   ) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
 
-    sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
-    sessionDataResource.onDataUpdate.addHandler(async () => {
-      await this.load(ConnectionExecutionContextResource.keyAll);
-    });
-    this.permissionsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.beforeLoad
+      .addHandler(() => permissionsResource.load())
+      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EPermission.public)));
+
+    permissionsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     connectionInfoResource.onItemAdd.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
-
-    this.addAlias(ConnectionExecutionContextResource.keyAll, key => {
-      if (this.keys.length > 0) {
-        return resourceKeyList(this.keys, ConnectionExecutionContextResource.keyAll.mark);
-      }
-      return ConnectionExecutionContextResource.keyAll;
-    });
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   updateConnectionContexts(key: ResourceKey<string>): void {
@@ -150,33 +132,29 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
   async loadAll(): Promise<IConnectionExecutionContextInfo[]> {
     this.resetIncludes();
-    await this.load(ConnectionExecutionContextResource.keyAll);
+    await this.load(CachedMapAllKey);
 
     return this.values;
   }
 
   async refreshAll(): Promise<IConnectionExecutionContextInfo[]> {
     this.resetIncludes();
-    await this.refresh(ConnectionExecutionContextResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.values;
   }
 
   refreshAllLazy(): void {
     this.resetIncludes();
-    this.markOutdated(ConnectionExecutionContextResource.keyAll);
-    this.loadedKeyMetadata.set(ConnectionExecutionContextResource.keyAll.list[0], false);
+    this.markOutdated(CachedMapAllKey);
   }
 
   protected async loader(
     key: ResourceKey<string>
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
-    if (!this.permissionsResource.has(EPermission.public)) {
-      return this.data;
-    }
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    key = this.transformParam(key);
 
-    const all = ResourceKeyUtils.hasMark(key, ConnectionExecutionContextResource.keyAll.mark);
-
-    await ResourceKeyUtils.forEachAsync(all ? ConnectionExecutionContextResource.keyAll : key, async contextId => {
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async contextId => {
       const context = this.get(contextId);
       const { contexts } = await this.graphQLService.sdk.executionContextList({
         contextId: all ? undefined : (context?.id ?? contextId),
@@ -192,9 +170,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       }
     });
 
-    if (all) {
-      this.loadedKeyMetadata.set(ConnectionExecutionContextResource.keyAll.list[0], true);
-    }
     return this.data;
   }
 

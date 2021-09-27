@@ -13,33 +13,21 @@ import {
   ResourceKey,
   ResourceKeyUtils,
   DatabaseDriverFragment,
-  DriverListQueryVariables
+  DriverListQueryVariables,
+  CachedMapAllKey,
+  resourceKeyList
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
 
-const allKey = 'all';
-
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
-
   constructor(private graphQLService: GraphQLService) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   async loadAll(): Promise<Map<string, DBDriver>> {
-    await this.load(allKey);
+    await this.load(CachedMapAllKey);
     return this.data;
   }
 
@@ -52,36 +40,35 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   }
 
   protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DBDriver>> {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    key = this.transformParam(key);
+
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
+      const driverId = all ? undefined : key;
+
       const { drivers } = await this.graphQLService.sdk.driverList({
-        driverId: key === allKey ? undefined : key,
+        driverId,
         includeDriverParameters: false,
         includeDriverProperties: false,
         includeProviderProperties: false,
-        ...this.getIncludesMap(key === allKey ? undefined : key, includes),
+        ...this.getIncludesMap(driverId, includes),
       });
 
-      if (key === allKey) {
+      if (all) {
         this.resetIncludes();
         this.data.clear();
       }
 
-      for (const driver of drivers) {
-        this.updateDriver(driver);
-      }
-
-      if (key === allKey) {
-        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
-        //       here we should check is it's was a full update
-        this.loadedKeyMetadata.set(allKey, true);
-      }
+      this.updateDriver(...drivers);
     });
 
     return this.data;
   }
 
-  private updateDriver(driver: DBDriver) {
-    const oldDriver = this.get(driver.id) || {};
-    this.set(driver.id, { ...oldDriver, ...driver });
+  private updateDriver(...drivers: DBDriver[]) {
+    const keys = resourceKeyList(drivers.map(driver => driver.id));
+
+    const oldDriver = this.get(keys);
+    this.set(keys, oldDriver.map((oldDriver, i) => ({ ...oldDriver, ...drivers[i] })));
   }
 }

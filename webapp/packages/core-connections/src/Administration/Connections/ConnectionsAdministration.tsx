@@ -13,6 +13,7 @@ import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } fro
 import { Loader, useMapResource, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionsResource } from '../ConnectionsResource';
@@ -71,7 +72,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useMapResource(ConnectionsResource, ConnectionsResource.keyAll);
+  useMapResource(ConnectionsResource, CachedMapAllKey);
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>

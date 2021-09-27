@@ -12,6 +12,7 @@ import { Observable, Subject } from 'rxjs';
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -26,8 +27,8 @@ import {
   TestConnectionMutation,
   resourceKeyList,
   ResourceKeyList,
+  CachedMapAllKey,
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
@@ -36,11 +37,9 @@ export type NewConnection = DatabaseConnectionFragment & { [NEW_CONNECTION_SYMBO
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables> {
-  static keyAll = resourceKeyList(['all'], 'all');
   readonly onConnectionCreate: Observable<DatabaseConnection>;
 
   private changed: boolean;
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
   private connectionCreateSubject: Subject<DatabaseConnection>;
 
   constructor(
@@ -55,26 +54,13 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     });
 
     sessionDataResource.onDataUpdate.addHandler(() => this.markOutdated());
+    this.beforeLoad
+      .addHandler(() => this.permissionsResource.load())
+      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EAdminPermission.admin)));
 
     this.changed = false;
     this.connectionCreateSubject = new Subject<DatabaseConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
-
-    this.addAlias(ConnectionsResource.keyAll, key => {
-      if (this.keys.length > 0) {
-        return resourceKeyList(this.keys, ConnectionsResource.keyAll.mark);
-      }
-      return ConnectionsResource.keyAll;
-    });
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   getEmptyConfig(): ConnectionConfig {
@@ -86,13 +72,13 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   async refreshAll(): Promise<DatabaseConnection[]> {
     this.resetIncludes();
-    await this.refresh(ConnectionsResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.values;
   }
 
   async loadAll(): Promise<DatabaseConnection[]> {
     this.resetIncludes();
-    await this.load(ConnectionsResource.keyAll);
+    await this.load(CachedMapAllKey);
     return this.values;
   }
 
@@ -198,17 +184,16 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
   }
 
   protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DatabaseConnection>> {
-    if (!(await this.permissionsResource.hasAsync(EAdminPermission.admin))) {
-      return this.data;
-    }
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    key = this.transformParam(key);
 
-    const all = ResourceKeyUtils.hasMark(key, ConnectionsResource.keyAll.mark);
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
+      const id = all ? undefined : key;
 
-    await ResourceKeyUtils.forEachAsync(all ? ConnectionsResource.keyAll : key, async key => {
       const { connections } = await this.graphQLService.sdk.getConnections({
-        id: !all ? key : undefined,
+        id,
         ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(undefined, includes),
+        ...this.getIncludesMap(id, includes),
       });
 
       if (all) {
@@ -217,10 +202,6 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
       }
 
       this.updateConnection(...connections);
-
-      if (all) {
-        this.loadedKeyMetadata.set(ConnectionsResource.keyAll.list[0], true);
-      }
     });
 
     return this.data;
