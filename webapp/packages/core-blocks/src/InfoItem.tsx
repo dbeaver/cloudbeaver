@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
@@ -34,7 +35,7 @@ const styles = css`
   }
 `;
 
-export const InfoItem: React.FC<Props> = function InfoItem({ info, icon = '/icons/info_icon.svg', className }) {
+export const InfoItem = observer<Props>(function InfoItem({ info, icon = '/icons/info_icon.svg', className }) {
   const translate = useTranslate();
   return styled(styles)(
     <info-item className={className}>
@@ -42,4 +43,4 @@ export const InfoItem: React.FC<Props> = function InfoItem({ info, icon = '/icon
       {translate(info)}
     </info-item>
   );
-};
+});

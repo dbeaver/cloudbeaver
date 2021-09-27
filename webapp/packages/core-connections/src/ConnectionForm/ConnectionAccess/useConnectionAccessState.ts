@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -66,7 +66,7 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
       }
     },
   }),
-  { changed: computed, edit: action.bound, revoke: action.bound, grant: action.bound },
+  { state: observable.ref, changed: computed, edit: action.bound, revoke: action.bound, grant: action.bound },
   { state, connection, resource, notificationService },
   ['load']);
 }

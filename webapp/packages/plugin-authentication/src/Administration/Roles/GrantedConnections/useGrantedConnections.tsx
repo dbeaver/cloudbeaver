@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
 import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
@@ -66,7 +66,7 @@ export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): Reado
       }
     },
   }),
-  { changed: computed, grant: action.bound, revoke: action.bound, edit: action.bound },
+  { state: observable.ref, changed: computed, grant: action.bound, revoke: action.bound, edit: action.bound },
   { state, role, mode, resource, notificationService },
   ['load']);
 }
