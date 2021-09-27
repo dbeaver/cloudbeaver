@@ -34,16 +34,10 @@ export default [
   ['connections_connection_address', 'Indirizzo'],
   ['connections_connection_name', 'Nome della connessione'],
   ['connections_connection_access_user_or_role_name', 'Nome dell\'Utente o del ruolo'],
-  ['connections_connection_access_save_reminder', 'Ci sono modifiche non salvate. Cliccare Salva per salvare tutte le modifiche ai permessi.'],
-  ['connections_connection_access_user_tooltip', 'Utente'],
-  ['connections_connection_access_role_tooltip', 'Ruolo'],
   ['connections_connection_access_revoke', 'Revoca'],
   ['connections_connection_access_grant', 'Permetti'],
   ['connections_connection_access_edit', 'Modifica'],
-  ['connections_connection_access_cloud_placeholder', 'Connessioni Cloud sono visibili a tutti gli utenti. Il gestore degli accessi può essere configurato in "AWS Management Console".'],
-  ['connections_connection_access_empty_table_placeholder', 'Non ci sono ancora elementi. Premi il pulsante Modifica per gestire le impostazioni d\'accesso.'],
   ['connections_connection_access_filter_placeholder', 'Cerca per utente o ruolo'],
-  ['connections_connection_access_filter_no_result', 'Nessun risultato trovato.'],
   ['connections_connection_access_admin_info', 'Gli amministratori vedono tutte le connessioni.'],
   ['connections_connection_description', 'Descrizione'],
   ['connections_connection_driver', 'Driver'],
@@ -68,4 +62,6 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', 'Password'],
   ['connections_driver_search_placeholder', 'Digita il nome del driver...'],
   ['connections_not_found', 'Nessuna connessione al database trovata'],
+
+  ['cloud_connections_access_placeholder', 'Connessioni Cloud sono visibili a tutti gli utenti. Il gestore degli accessi può essere configurato in "AWS Management Console".'],
 ];

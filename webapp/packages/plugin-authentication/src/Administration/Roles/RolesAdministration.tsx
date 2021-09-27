@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel, useTable } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -50,8 +50,7 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const service = useService(CreateRoleService);
 
-  const tableState = useTable();
-  const rolesTableState = useRolesTable(tableState);
+  const table = useRolesTable();
 
   return styled(style)(
     <>
@@ -60,7 +59,7 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
           title={translate('administration_roles_add_tooltip')}
           icon="add"
           viewBox="0 0 24 24"
-          disabled={!!sub || rolesTableState.processing}
+          disabled={!!sub || table.processing}
           onClick={service.create}
         >
           {translate('ui_add')}
@@ -69,8 +68,8 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
           title={translate('administration_roles_refresh_tooltip')}
           icon="refresh"
           viewBox="0 0 24 24"
-          disabled={rolesTableState.processing}
-          onClick={rolesTableState.update}
+          disabled={table.processing}
+          onClick={table.update}
         >
           {translate('ui_refresh')}
         </ToolsAction>
@@ -78,8 +77,8 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
           title={translate('administration_roles_delete_tooltip')}
           icon="trash"
           viewBox="0 0 24 24"
-          disabled={!tableState.itemsSelected || rolesTableState.processing}
-          onClick={rolesTableState.delete}
+          disabled={!table.tableState.itemsSelected || table.processing}
+          onClick={table.delete}
         >
           {translate('ui_delete')}
         </ToolsAction>
@@ -93,11 +92,11 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
           )}
           <layout-grid-cell {...use({ span: 12 })}>
             <RolesTable
-              roles={rolesTableState.roles}
-              selectedItems={tableState.selected}
-              expandedItems={tableState.expanded}
+              roles={table.roles}
+              selectedItems={table.tableState.selected}
+              expandedItems={table.tableState.expanded}
             />
-            <Loader loading={false} overlay />
+            <Loader loading={table.processing} overlay />
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>

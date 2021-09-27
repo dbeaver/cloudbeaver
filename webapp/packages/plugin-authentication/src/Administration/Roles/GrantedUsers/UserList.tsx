@@ -63,15 +63,15 @@ const styles = composes(
 interface Props {
   userList: AdminUserInfoFragment[];
   grantedUsers: string[];
-  onGrant: (subjectIds: string[]) => void;
   disabled: boolean;
+  onGrant: (subjectIds: string[]) => void;
 }
 
 export const UserList = observer<Props>(function UserList({
   userList,
   grantedUsers,
-  onGrant,
   disabled,
+  onGrant,
 }) {
   const props = useObjectRef({ onGrant });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
@@ -105,7 +105,7 @@ export const UserList = observer<Props>(function UserList({
               {!users.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
-                    {translate('connections_connection_access_filter_no_result')}
+                    {translate('ui_search_no_result_placeholder')}
                   </TableColumnValue>
                 </TableItem>
               )}
@@ -115,7 +115,7 @@ export const UserList = observer<Props>(function UserList({
                   id={user.userId}
                   name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ' (you)' : ''}`}
                   icon='/icons/user.svg'
-                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  iconTooltip={translate('authentication_user_icon_tooltip')}
                   disabled={disabled || !!grantedUsers.includes(user.userId)}
                 />
               ))}

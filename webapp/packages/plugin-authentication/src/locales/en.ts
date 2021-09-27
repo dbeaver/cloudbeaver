@@ -44,6 +44,9 @@ export default [
   ['authentication_user_password_change_menu_title', 'Change local password'],
   ['authentication_user_password_change_success', 'Password was changed successfully'],
   ['authentication_user_password_change_dialog_submit', 'Change'],
+  ['authentication_user_icon_tooltip', 'User'],
+  ['authentication_role_icon_tooltip', 'Role'],
+
   ['administration_configuration_wizard_configuration_admin', 'Administrator Credentials'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],
   ['administration_configuration_wizard_configuration_admin_password', 'Password'],

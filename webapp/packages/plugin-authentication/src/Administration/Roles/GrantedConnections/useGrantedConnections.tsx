@@ -6,59 +6,67 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, computed, observable } from 'mobx';
+
 import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { useObjectRef, useTabState } from '@cloudbeaver/core-blocks';
+import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { RoleFormMode } from '../IRoleFormProps';
 import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
 
-interface IConnectionAccessState {
+interface State {
   state: IGrantedConnectionsTabState;
+  changed: boolean;
+  edit: () => void;
   revoke: (subjectIds: string[]) => void;
   grant: (subjectIds: string[]) => void;
-  edit: () => void;
   load: () => Promise<void>;
 }
 
-export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): IConnectionAccessState {
+export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): Readonly<State> {
   const resource = useService(RolesResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IGrantedConnectionsTabState>();
 
-  const edit = () => {
-    state.editing = !state.editing;
-  };
-
-  const revoke = (subjectIds: string[]): void => {
-    state.grantedSubjects = state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
-  };
-
-  const grant = (subjectIds: string[]): void => {
-    state.grantedSubjects.push(...subjectIds);
-  };
-
-  const load = async () => {
-    if (state.loaded || state.loading) {
-      return;
-    }
-
-    try {
-      state.loading = true;
-
-      if (mode === 'edit') {
-        const grantInfo = await resource.getSubjectConnectionAccess(role.roleId);
-        state.grantedSubjects = grantInfo.map(subject => subject.connectionId);
-        state.initialGrantedSubjects = state.grantedSubjects.slice();
+  return useObservableRef(() => ({
+    get changed() {
+      return !isArraysEqual(this.state.initialGrantedSubjects, this.state.grantedSubjects);
+    },
+    edit() {
+      this.state.editing = !this.state.editing;
+    },
+    grant(subjectIds: string[]) {
+      this.state.grantedSubjects.push(...subjectIds);
+    },
+    revoke(subjectIds: string[]) {
+      this.state.grantedSubjects = this.state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
+    },
+    async load() {
+      if (this.state.loaded || this.state.loading) {
+        return;
       }
 
-      state.loaded = true;
-    } catch (exception) {
-      notificationService.logException(exception, `Error getting granted connections for "${role.roleId}"`);
-    }
-    state.loading = false;
-  };
+      try {
+        this.state.loading = true;
 
-  return useObjectRef({ state, revoke, grant, edit, load });
+        if (this.mode === 'edit') {
+          const grantInfo = await this.resource.getSubjectConnectionAccess(this.role.roleId);
+          this.state.grantedSubjects = grantInfo.map(subject => subject.connectionId);
+          this.state.initialGrantedSubjects = this.state.grantedSubjects.slice();
+        }
+
+        this.state.loaded = true;
+      } catch (exception) {
+        this.notificationService.logException(exception, `Error getting granted connections for "${this.role.roleId}"`);
+      } finally {
+        this.state.loading = false;
+      }
+    },
+  }),
+  { state: observable.ref, changed: computed, grant: action.bound, revoke: action.bound, edit: action.bound },
+  { state, role, mode, resource, notificationService },
+  ['load']);
 }

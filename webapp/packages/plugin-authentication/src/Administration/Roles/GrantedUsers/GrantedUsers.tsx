@@ -14,10 +14,10 @@ import styled, { css } from 'reshadow';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  IconOrImage, Loader, TabContainerPanelComponent,
+  InfoItem, Loader, TabContainerPanelComponent,
   TextPlaceholder, useMapResource, useTab,
 } from '@cloudbeaver/core-blocks';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
@@ -36,25 +36,10 @@ const styles = css`
     position: relative;
     overflow: auto !important;
   }
-  info-item {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-  }
-  IconOrImage {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px;
-  }
   Loader {
     z-index: 2;
   }
 `;
-
-interface IInfoItem {
-  text: TLocalizationToken;
-  icon: string;
-}
 
 export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer(function GrantedUsers({
   tabId,
@@ -63,40 +48,27 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
 
-  const { state, edit, grant, load, revoke } = useGrantedUsers(formState.config, formState.mode);
-
+  const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
   const users = useMapResource(UsersResource, selected ? UsersResource.keyAll : null);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
-    .filter(user => state.grantedUsers.includes(user.userId))
-  ), [state.grantedUsers, users.resource]);
+    .filter(user => state.state.grantedUsers.includes(user.userId))
+  ), [state.state.grantedUsers, users.resource]);
 
   useEffect(() => {
-    if (selected && !state.loaded) {
-      load();
+    if (selected && !state.state.loaded) {
+      state.load();
     }
-  }, [selected, state.loaded, load]);
+  }, [selected, state.state.loaded]);
 
   if (!selected) {
     return null;
   }
 
-  let infoItem: IInfoItem | null = null;
-
-  const unsaved = (formState.mode === 'edit' && (state.initialGrantedUsers.length !== state.grantedUsers.length
-    || state.initialGrantedUsers.some(subject => !state.grantedUsers.includes(subject))));
-
-  if (unsaved) {
-    infoItem = {
-      text: 'connections_connection_access_save_reminder',
-      icon: '/icons/info_icon.svg',
-    };
-  }
-
   return styled(style)(
-    <Loader state={[users, state]}>
+    <Loader state={[users, state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
           {!users.resource.values.length ? (
@@ -105,25 +77,20 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
             </Group>
           ) : (
             <>
-              {infoItem && (
-                <info-item>
-                  <IconOrImage icon={infoItem.icon} />
-                  {translate(infoItem.text)}
-                </info-item>
-              )}
+              {formState.mode === 'edit' && state.changed && <InfoItem info='ui_save_reminder' />}
               <Container gap overflow>
                 <GrantedUserList
                   grantedUsers={grantedUsers.get()}
                   disabled={formState.disabled}
-                  onEdit={edit}
-                  onRevoke={revoke}
+                  onEdit={state.edit}
+                  onRevoke={state.revoke}
                 />
-                {state.editing && (
+                {state.state.editing && (
                   <UserList
                     userList={users.resource.values}
-                    grantedUsers={state.grantedUsers}
+                    grantedUsers={state.state.grantedUsers}
                     disabled={formState.disabled}
-                    onGrant={grant}
+                    onGrant={state.grant}
                   />
                 )}
               </Container>

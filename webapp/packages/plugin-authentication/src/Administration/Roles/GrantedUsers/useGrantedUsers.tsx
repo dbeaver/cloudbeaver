@@ -6,60 +6,67 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, computed, observable } from 'mobx';
+
 import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { useObjectRef, useTabState } from '@cloudbeaver/core-blocks';
+import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { RoleFormMode } from '../IRoleFormProps';
 import type { IGrantedUsersTabState } from './IGrantedUsersTabState';
 
-interface IConnectionAccessState {
+interface State {
   state: IGrantedUsersTabState;
+  changed: boolean;
+  edit: () => void;
   revoke: (subjectIds: string[]) => void;
   grant: (subjectIds: string[]) => void;
-  edit: () => void;
   load: () => Promise<void>;
 }
 
-export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): IConnectionAccessState {
+export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): Readonly<State> {
   const resource = useService(RolesResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IGrantedUsersTabState>();
 
-  const edit = () => {
-    state.editing = !state.editing;
-  };
-
-  const revoke = (subjectIds: string[]): void => {
-    state.grantedUsers = state.grantedUsers.filter(subject => !subjectIds.includes(subject));
-  };
-
-  const grant = (subjectIds: string[]): void => {
-    state.grantedUsers.push(...subjectIds);
-  };
-
-  const load = async () => {
-    if (state.loaded || state.loading) {
-      return;
-    }
-
-    try {
-      state.loading = true;
-
-      if (mode === 'edit') {
-        const grantedUsers = await resource.loadGrantedUsers(role.roleId);
-        state.grantedUsers = grantedUsers;
-
-        state.initialGrantedUsers = state.grantedUsers.slice();
+  return useObservableRef(() => ({
+    get changed() {
+      return !isArraysEqual(this.state.initialGrantedUsers, this.state.grantedUsers);
+    },
+    edit() {
+      this.state.editing = !this.state.editing;
+    },
+    revoke(subjectIds: string[]) {
+      this.state.grantedUsers = this.state.grantedUsers.filter(subject => !subjectIds.includes(subject));
+    },
+    grant(subjectIds: string[]) {
+      this.state.grantedUsers.push(...subjectIds);
+    },
+    async load() {
+      if (this.state.loaded || this.state.loading) {
+        return;
       }
 
-      state.loaded = true;
-    } catch (exception) {
-      notificationService.logException(exception, "Can't load users info");
-    }
-    state.loading = false;
-  };
+      try {
+        this.state.loading = true;
 
-  return useObjectRef({ state, revoke, grant, edit, load });
+        if (this.mode === 'edit') {
+          const grantedUsers = await this.resource.loadGrantedUsers(this.role.roleId);
+          this.state.grantedUsers = grantedUsers;
+          this.state.initialGrantedUsers = this.state.grantedUsers.slice();
+        }
+
+        this.state.loaded = true;
+      } catch (exception) {
+        this.notificationService.logException(exception, "Can't load users info");
+      } finally {
+        this.state.loading = false;
+      }
+    },
+  }),
+  { state: observable.ref, changed: computed, edit: action.bound, revoke: action.bound, grant: action.bound },
+  { state, role, mode, resource, notificationService },
+  ['load']);
 }

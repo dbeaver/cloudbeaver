@@ -34,7 +34,6 @@ const styles = composes(
     layout-grid {
       width: 100%;
       overflow: auto;
-      flex: 1;
     }
 
     layout-grid-inner {
@@ -96,12 +95,14 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       </ToolsPanel>
       <layout-grid>
         <layout-grid-inner>
-          <layout-grid-cell {...use({ span: 12 })}>
-            {controller.isProvidersLoading ? <Loader /> : (
-              <>
-                {sub && service.user && (
+          {controller.isProvidersLoading ? <Loader /> : (
+            <>
+              {sub && service.user && (
+                <layout-grid-cell {...use({ span: 12 })}>
                   <CreateUser user={service.user} onCancel={service.cancelCreate} />
-                )}
+                </layout-grid-cell>
+              )}
+              <layout-grid-cell {...use({ span: 12 })}>
                 <UsersTable
                   users={controller.users}
                   selectedItems={controller.selectedItems}
@@ -109,9 +110,9 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
                   selectable={controller.isLocalProviderAvailable}
                 />
                 <Loader loading={controller.isLoading} overlay />
-              </>
-            )}
-          </layout-grid-cell>
+              </layout-grid-cell>
+            </>
+          )}
         </layout-grid-inner>
       </layout-grid>
     </>

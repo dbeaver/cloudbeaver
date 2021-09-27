@@ -9,28 +9,28 @@
 import { computed, observable } from 'mobx';
 
 import { compareRoles, RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { ITableState, useObservableRef } from '@cloudbeaver/core-blocks';
+import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
+  tableState: TableState;
   processing: boolean;
-  tableState: ITableState;
   roles: RoleInfo[];
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
 
-export function useRolesTable(tableState: ITableState): State {
+export function useRolesTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
   const resource = useService(RolesResource);
 
   return useObservableRef<State>(() => ({
+    tableState: new TableState(),
     processing: false,
-    tableState,
     get roles() {
       return resource.values.slice().sort(compareRoles);
     },
@@ -85,5 +85,5 @@ export function useRolesTable(tableState: ITableState): State {
   }), {
     processing: observable.ref,
     roles: computed,
-  }, { tableState }, ['update', 'delete']);
+  }, false, ['update', 'delete']);
 }

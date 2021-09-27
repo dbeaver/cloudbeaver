@@ -96,7 +96,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
             {cloudExists && (
               <TableItem item='cloudInfo' selectDisabled>
                 <TableColumnValue colSpan={5}>
-                  {translate('connections_connection_access_cloud_placeholder')}
+                  {translate('cloud_connections_access_placeholder')}
                 </TableColumnValue>
               </TableItem>
             )}

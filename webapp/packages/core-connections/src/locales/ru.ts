@@ -31,13 +31,7 @@ export default [
   ['connections_connection_address', 'Адрес'],
   ['connections_connection_name', 'Название подключения'],
   ['connections_connection_access_user_or_role_name', 'Имя пользователя или роли'],
-  ['connections_connection_access_save_reminder', 'У вас есть несохраненные изменения. Нажмите кнопку Сохранить, чтобы применить изменения в настройках доступа.'],
-  ['connections_connection_access_user_tooltip', 'Пользователь'],
-  ['connections_connection_access_role_tooltip', 'Роль'],
-  ['connections_connection_access_cloud_placeholder', 'Облачные подключения видны всем пользователям. Вы можете настроить доступ в "Консоль Управления AWS".'],
-  ['connections_connection_access_empty_table_placeholder', 'Вы еще ничего не добавили. Нажмите кнопку Изменить, чтобы изменить настройки доступа.'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или роли'],
-  ['connections_connection_access_filter_no_result', 'По вашему запросу ничего не найдено.'],
   ['connections_connection_access_admin_info', 'Администраторы видят все подключения.'],
   ['connections_connection_description', 'Описание'],
   ['connections_connection_driver', 'Драйвер'],
@@ -62,4 +56,6 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', 'Пароль'],
   ['connections_driver_search_placeholder', 'Введите название драйвера...'],
   ['connections_not_found', 'Подключения к базам данных не найдены'],
+
+  ['cloud_connections_access_placeholder', 'Облачные подключения видны всем пользователям. Вы можете настроить доступ в "Консоль Управления AWS".'],
 ];

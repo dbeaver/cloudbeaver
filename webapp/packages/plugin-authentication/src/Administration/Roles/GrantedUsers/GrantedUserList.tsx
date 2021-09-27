@@ -95,9 +95,9 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
   let tableInfoText: TLocalizationToken | null = null;
   if (!users.length) {
     if (filterState.filterValue) {
-      tableInfoText = 'connections_connection_access_filter_no_result';
+      tableInfoText = 'ui_search_no_result_placeholder';
     } else {
-      tableInfoText = 'connections_connection_access_empty_table_placeholder';
+      tableInfoText = 'ui_no_items_placeholder';
     }
   }
 
@@ -125,7 +125,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
                   id={user.userId}
                   name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ' (you)' : ''}`}
                   icon='/icons/user.svg'
-                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  iconTooltip={translate('authentication_user_icon_tooltip')}
                   disabled={disabled}
                 />
               ))}

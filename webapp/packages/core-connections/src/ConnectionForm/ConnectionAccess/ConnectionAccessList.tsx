@@ -108,7 +108,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
               {!roles.get().length && !users.get().length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
-                    {translate('connections_connection_access_filter_no_result')}
+                    {translate('ui_search_no_result_placeholder')}
                   </TableColumnValue>
                 </TableItem>
               )}
@@ -119,7 +119,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
                   name={role.roleName || ''}
                   description={role.description}
                   icon='/icons/role.svg'
-                  iconTooltip='connections_connection_access_role_tooltip'
+                  iconTooltip='authentication_role_icon_tooltip'
                   disabled={disabled || grantedSubjects.includes(role.roleId)}
                 />
               ))}
@@ -129,7 +129,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
                   id={user.userId}
                   name={user.userId}
                   icon='/icons/user.svg'
-                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  iconTooltip={translate('authentication_user_icon_tooltip')}
                   disabled={disabled || grantedSubjects.includes(user.userId)}
                 />
               ))}

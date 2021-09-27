@@ -98,9 +98,9 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
   let tableInfoText: TLocalizationToken = 'connections_connection_access_admin_info';
   if (!roles.get().length && !users.get().length) {
     if (filterState.filterValue) {
-      tableInfoText = 'connections_connection_access_filter_no_result';
+      tableInfoText = 'ui_search_no_result_placeholder';
     } else {
-      tableInfoText = 'connections_connection_access_empty_table_placeholder';
+      tableInfoText = 'ui_no_items_placeholder';
     }
   }
 
@@ -127,7 +127,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
                   name={role.roleName || ''}
                   description={role.description}
                   icon='/icons/role.svg'
-                  iconTooltip={translate('connections_connection_access_role_tooltip')}
+                  iconTooltip={translate('authentication_role_icon_tooltip')}
                   disabled={disabled}
                 />
               ))}
@@ -137,7 +137,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
                   id={user.userId}
                   name={user.userId}
                   icon='/icons/user.svg'
-                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  iconTooltip={translate('authentication_user_icon_tooltip')}
                   disabled={disabled}
                 />
               ))}

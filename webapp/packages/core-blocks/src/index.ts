@@ -52,6 +52,7 @@ export * from './Table/TableItemExpand';
 export * from './Table/TableItemSelect';
 export * from './Table/TableItemSeparator';
 export * from './Table/useTable';
+export * from './Table/TableState';
 
 export * from './Tabs/ITab';
 export * from './Tabs/TabContext';
@@ -139,6 +140,7 @@ export * from './IconButton';
 export * from './IconOrImage';
 export * from './StaticImage';
 export * from './TextPlaceholder';
+export * from './InfoItem';
 export * from './useClickEvents';
 export * from './useClipboard';
 export * from './useDataResource';

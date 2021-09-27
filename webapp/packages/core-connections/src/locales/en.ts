@@ -34,14 +34,8 @@ export default [
   ['connections_connection_address', 'Address'],
   ['connections_connection_name', 'Connection name'],
   ['connections_connection_access_user_or_role_name', 'User or Role name'],
-  ['connections_connection_access_save_reminder', 'You have unsaved changes. Click Save to save all permission changes.'],
-  ['connections_connection_access_user_tooltip', 'User'],
-  ['connections_connection_access_role_tooltip', 'Role'],
-  ['connections_connection_access_cloud_placeholder', 'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".'],
-  ['connections_connection_access_empty_table_placeholder', 'There are no items yet. Press Edit button to manage access settings.'],
   ['connections_connection_access_filter_placeholder', 'Search for user or role name'],
-  ['connections_connection_access_filter_no_result', 'No results have been found.'],
-  ['connections_connection_access_admin_info', 'Administators see all connections.'],
+  ['connections_connection_access_admin_info', 'Administrators see all connections.'],
   ['connections_connection_description', 'Description'],
   ['connections_connection_driver', 'Driver'],
   ['connections_connection_host', 'Host'],
@@ -65,4 +59,6 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', 'Password'],
   ['connections_driver_search_placeholder', 'Type driver name...'],
   ['connections_not_found', 'No database connections were found'],
+
+  ['cloud_connections_access_placeholder', 'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".'],
 ];

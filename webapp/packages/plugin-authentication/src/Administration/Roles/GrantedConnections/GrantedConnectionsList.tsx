@@ -95,9 +95,9 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   let tableInfoText: TLocalizationToken | null = null;
   if (!connections.length) {
     if (filterState.filterValue) {
-      tableInfoText = 'connections_connection_access_filter_no_result';
+      tableInfoText = 'ui_search_no_result_placeholder';
     } else {
-      tableInfoText = 'connections_connection_access_empty_table_placeholder';
+      tableInfoText = 'ui_no_items_placeholder';
     }
   }
 

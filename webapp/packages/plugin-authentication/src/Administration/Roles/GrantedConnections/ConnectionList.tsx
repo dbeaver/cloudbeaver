@@ -63,15 +63,15 @@ const styles = composes(
 interface Props {
   connectionList: DatabaseConnectionFragment[];
   grantedSubjects: string[];
-  onGrant: (subjectIds: string[]) => void;
   disabled: boolean;
+  onGrant: (subjectIds: string[]) => void;
 }
 
 export const ConnectionList = observer<Props>(function ConnectionList({
   connectionList,
   grantedSubjects,
-  onGrant,
   disabled,
+  onGrant,
 }) {
   const props = useObjectRef({ onGrant });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
@@ -105,7 +105,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({
               {!connections.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
-                    {translate('connections_connection_access_filter_no_result')}
+                    {translate('ui_search_no_result_placeholder')}
                   </TableColumnValue>
                 </TableItem>
               )}
