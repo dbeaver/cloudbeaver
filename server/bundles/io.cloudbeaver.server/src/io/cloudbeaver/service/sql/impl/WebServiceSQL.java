@@ -18,7 +18,6 @@ package io.cloudbeaver.service.sql.impl;
 
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
@@ -237,17 +236,6 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
     }
 
-    @WebAction
-    @NotNull
-    public WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
-        return sqlContext.getProcessor().processQuery(
-            sqlContext.getProcessor().getWebSession().getProgressMonitor(),
-            sqlContext,
-            sql,
-            filter,
-            dataFormat);
-    }
-
     @Override
     public Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException {
         if (!sqlContext.closeResult(resultId)) {
@@ -298,14 +286,21 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) {
+    public WebAsyncTaskInfo asyncExecuteQuery(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @Nullable String resultId,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat)
+    {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                 try {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
-                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter, dataFormat);
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
+                        monitor, contextInfo, sql, resultId, filter, dataFormat);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
@@ -319,7 +314,12 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebAsyncTaskInfo asyncReadDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
+    public WebAsyncTaskInfo asyncReadDataFromContainer(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String nodePath,
+        @Nullable String resultId,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBWebException {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -327,12 +327,14 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor.beginTask("Read data", 1);
                     monitor.subTask("Extra data from " + nodePath);
 
-                    DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(monitor, nodePath, DBSDataContainer.class);
+                    DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
+                        monitor, nodePath, DBSDataContainer.class);
 
                     WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
                         contextInfo,
                         monitor,
                         dataContainer,
+                        resultId,
                         filter != null ? filter : new WebSQLDataFilter(),
                         dataFormat);
                     this.result = executeResults.getStatusMessage();

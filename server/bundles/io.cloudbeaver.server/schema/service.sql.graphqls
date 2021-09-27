@@ -232,6 +232,7 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         sql: String!,
+        resultId: ID,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat    # requested data format. May be ignored by server
     ): AsyncTaskInfo!
@@ -241,6 +242,7 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         containerNodePath: ID!,
+        resultId: ID,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!

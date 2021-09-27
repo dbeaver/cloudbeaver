@@ -144,6 +144,7 @@ public class WebSQLProcessor {
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
+        @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException {
         if (filter == null) {
@@ -158,18 +159,19 @@ public class WebSQLProcessor {
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
         try {
-            {
-                DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
-                if (dataFilter.hasFilters()) {
-                    sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
-                        monitor,
-                        context.getDataSource(),
-                        sql,
-                        dataFilter);
-                }
+            final DBDDataFilter dataFilter = filter.makeDataFilter(
+                monitor,
+                (resultId == null ? null : contextInfo.getResults(resultId)),
+                dataContainer);
+            if (dataFilter.hasFilters()) {
+                sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
+                    monitor,
+                    context.getDataSource(),
+                    sql,
+                    dataFilter);
             }
 
-            final WebSQLDataFilter dataFilter = filter;
+            final WebSQLDataFilter webDataFilter = filter;
             final String sqlQueryText = sql;
             SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
 
@@ -185,11 +187,11 @@ public class WebSQLProcessor {
                         session,
                         DBCStatementType.SCRIPT,
                         sqlQuery,
-                        dataFilter.getOffset(),
-                        dataFilter.getLimit()))
+                        webDataFilter.getOffset(),
+                        webDataFilter.getLimit()))
                     {
                         boolean hasResultSet = dbStat.executeStatement();
-                        fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, dataFilter, dataFormat);
+                        fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {
                         throw new InvocationTargetException(e);
                     }
@@ -213,13 +215,17 @@ public class WebSQLProcessor {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBSDataContainer dataContainer,
+        @Nullable String resultId,
         @NotNull WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
-        DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
+        DBDDataFilter dataFilter = filter.makeDataFilter(
+            monitor,
+            (resultId == null ? null : contextInfo.getResults(resultId)),
+            dataContainer);
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
@@ -238,7 +244,7 @@ public class WebSQLProcessor {
                     WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
                     results.setResultSet(resultSet);
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
-                    setResultFilterText(dataContainer, session.getDataSource(), executeInfo, filter);
+                    setResultFilterText(dataContainer, session.getDataSource(), executeInfo, dataFilter);
 
                     if (resultSet != null && resultSet.getRows() != null) {
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
@@ -622,7 +628,8 @@ public class WebSQLProcessor {
         @NotNull DBCStatement dbStat,
         boolean hasResultSet,
         @NotNull WebSQLExecuteInfo executeInfo,
-        @NotNull WebSQLDataFilter filter,
+        @NotNull WebSQLDataFilter webDataFilter,
+        @NotNull DBDDataFilter dataFilter,
         @Nullable WebDataFormat dataFormat) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
@@ -634,7 +641,7 @@ public class WebSQLProcessor {
                     break;
                 }
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
-                    readResultSet(dbStat.getSession(), resultSet, filter, dataReceiver);
+                    readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                     results.setResultSet(dataReceiver.getResultSet());
                 }
             } else {
@@ -651,14 +658,14 @@ public class WebSQLProcessor {
 
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
-        setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, filter);
+        setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, dataFilter);
     }
 
-    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull WebSQLDataFilter filter) throws DBException {
+    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull DBDDataFilter filter) throws DBException {
         if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
             SQLUtils.appendConditionString(
-                filter.makeDataFilter(webSession.getProgressMonitor(), dataContainer),
+                filter,
                 dataSource,
                 null,
                 where,

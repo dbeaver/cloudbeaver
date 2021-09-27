@@ -126,13 +126,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 getService(env).asyncExecuteQuery(
                     getSQLContext(env),
                     env.getArgument("sql"),
+                    env.getArgument("resultId"),
                     getDataFilter(env),
-                    getDataFormat(env)
-                ))
+                    getDataFormat(env)))
             .dataFetcher("asyncReadDataFromContainer", env ->
                 getService(env).asyncReadDataFromContainer(
                     getSQLContext(env),
                     env.getArgument("containerNodePath"),
+                    env.getArgument("resultId"),
                     getDataFilter(env),
                     getDataFormat(env)
                 ))

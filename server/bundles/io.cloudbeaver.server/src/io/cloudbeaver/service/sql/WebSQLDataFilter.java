@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
@@ -94,7 +96,11 @@ public class WebSQLDataFilter {
         return where;
     }
 
-    public DBDDataFilter makeDataFilter(DBRProgressMonitor monitor, DBSDataContainer dataContainer) throws DBException {
+    public DBDDataFilter makeDataFilter(
+        @NotNull DBRProgressMonitor monitor,
+        @Nullable WebSQLResultsInfo resultInfo,
+        @NotNull DBSDataContainer dataContainer) throws DBException
+    {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         if (!CommonUtils.isEmpty(constraints)) {

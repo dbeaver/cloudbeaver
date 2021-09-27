@@ -80,18 +80,20 @@ public interface DBWServiceSQL extends DBWService {
     WebAsyncTaskInfo asyncExecuteQuery(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
+        @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBException;
-
-    @WebAction
-    Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String nodePath,
+        @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException;
+
+    @WebAction
+    Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
     WebSQLExecuteInfo updateResultsDataBatch(
