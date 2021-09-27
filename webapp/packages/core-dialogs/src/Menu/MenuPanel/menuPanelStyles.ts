@@ -29,6 +29,9 @@ export const menuPanelStyles = composes(
     }
   `,
   css`
+    button-wrapper MenuButton {
+      width: 100%;
+    }
     MenuButton {
       background: none;
       border: none;
