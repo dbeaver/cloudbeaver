@@ -260,13 +260,13 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
 
   return styled(useStyles(menuPanelStyles, style))(
     <>
-      <button-wrapper onMouseEnter={handleMouseEnter}>
+      <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
         <MenuButton ref={ref} {...menu} {...rest}>
           <box>
             <MenuPanelItem menuItem={menuItem} style={style} />
           </box>
         </MenuButton>
-      </button-wrapper>
+      </menu-panel-button-wrapper>
       <MenuPanel
         panel={menuItem.panel!}
         menu={menu}
