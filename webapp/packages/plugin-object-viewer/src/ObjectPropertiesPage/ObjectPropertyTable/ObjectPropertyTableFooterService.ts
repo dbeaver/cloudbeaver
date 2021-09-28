@@ -60,7 +60,6 @@ export class ObjectPropertyTableFooterService {
         const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message: `You're going to delete following items: "${nodeNames.join(', ')}". Are you sure?`,
-          icon: '/icons/error_icon.svg',
           confirmActionText: 'ui_delete',
         });
 
