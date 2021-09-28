@@ -31,6 +31,10 @@ const styles = composes(
     }
 `,
   css`
+    CommonDialogWrapper {
+      min-height: 490px !important;
+      max-height: max(100vh - 48px, 490px) !important;
+    }
     SubmittingForm {
       overflow: auto;
       &[|form] {

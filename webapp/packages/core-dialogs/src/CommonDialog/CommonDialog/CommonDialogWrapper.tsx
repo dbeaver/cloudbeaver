@@ -81,7 +81,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
               </reject>
             )}
           </header-title>
-          <sub-title>{subTitle && translate(subTitle)}</sub-title>
+          {subTitle && <sub-title>{translate(subTitle)}</sub-title>}
         </header>
         <dialog-body {...use({ 'no-padding': noBodyPadding, 'no-overflow': noOverflow })}>
           <dialog-body-overflow-box>

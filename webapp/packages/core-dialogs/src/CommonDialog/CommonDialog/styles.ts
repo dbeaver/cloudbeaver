@@ -76,12 +76,12 @@ export const commonDialogBaseStyle = composes(
       }
       &[|size=large] {
         min-width: 720px;
-        min-height: 490px;
-        max-height: max(100vh - 48px, 490px);
+        min-height: 468px;
+        max-height: max(100vh - 48px, 468px);
 
         &[|fixedSize] {
           width: 720px;
-          height: 490px;
+          height: 468px;
         }
         &[|fixedWidth] {
           width: 720px;
@@ -90,16 +90,11 @@ export const commonDialogBaseStyle = composes(
     }
     header, dialog-body, footer {
       flex-shrink: 0;
-
+      padding: 24px;
+      
       &[|no-padding] {
         padding: 0px;
       }
-    }
-    dialog-body, footer {
-      padding: 24px;
-    }
-    header {
-      padding: 24px 24px 0;
     }
     dialog-body {
       padding-top: 0px;
@@ -183,10 +178,6 @@ export const commonDialogBaseStyle = composes(
     sub-title {
       composes: theme-typography--caption from global;
       grid-column: 2;
-      min-height: 24px;
-      &:not(:empty) {
-        padding-bottom: 20px;
-      }
     }
     reject {
       cursor: pointer;

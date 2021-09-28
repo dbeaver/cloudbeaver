@@ -28,13 +28,10 @@ import type { IUserFormProps } from './UserFormService';
 const styles = composes(
   css`
     Table {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+      composes: theme-background-surface theme-text-on-surface from global;
     }
   `,
   css`
-    Table {
-      border: 1px solid;
-    }
     StaticImage {
       display: flex;
       width: 24px;
