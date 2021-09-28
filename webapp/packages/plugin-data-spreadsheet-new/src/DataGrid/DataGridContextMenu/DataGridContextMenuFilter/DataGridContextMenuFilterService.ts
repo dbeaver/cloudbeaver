@@ -272,12 +272,8 @@ export class DataGridContextMenuFilterService {
             const format = model.source.getAction(resultIndex, ResultSetFormatAction);
             const data = model.source.getAction(resultIndex, ResultSetDataAction);
             const supportedOperations = data.getColumnOperations(key.column);
-            const cellValue = data.getCellValue(key);
+            const cellValue = data.getCellValue(key) ?? '';
             const columnLabel = data.getColumn(key.column)?.label || '';
-
-            if (!cellValue) {
-              return [];
-            }
 
             return supportedOperations
               .filter(operation => !nullOperationsFilter(operation))
@@ -286,21 +282,18 @@ export class DataGridContextMenuFilterService {
 
                 return {
                   id: operation.id,
-                  isPresent(context) {
-                    return context.contextType === DataGridContextMenuService.cellContext;
-                  },
+                  isPresent: () => true,
                   isDisabled(context) {
                     return context.data.model.isLoading();
                   },
                   title: title + ' ..',
                   icon: 'filter-custom',
                   onClick: async () => {
-                    const isNull = format.isNull(cellValue);
                     const stringifyCellValue = format.toDisplayString(cellValue);
                     const customValue = await this.commonDialogService.open(
                       FilterCustomValueDialog,
                       {
-                        defaultValue: isNull ? '' : stringifyCellValue,
+                        defaultValue: stringifyCellValue,
                         inputTitle: title + ':',
                       }
                     );
