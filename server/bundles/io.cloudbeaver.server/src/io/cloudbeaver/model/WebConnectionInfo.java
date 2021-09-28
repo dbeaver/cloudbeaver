@@ -165,7 +165,8 @@ public class WebConnectionInfo {
 
     @Property
     public String getConnectTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
+        return dataSourceContainer.getConnectTime() == null ? null :
+            CBConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
     }
 
     @Property
