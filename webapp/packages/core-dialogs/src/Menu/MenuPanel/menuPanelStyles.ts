@@ -48,14 +48,16 @@ export const menuPanelStyles = composes(
     }
     menu-box {
       composes: theme-typography--body2 theme-elevation-z5 from global;
-      display: flex;
       min-width: 140px;
-      flex-direction: column;
       padding: 12px 0;
 
       & menu-box {
         margin-top: -12px;
       }
+    }
+    menu-box, menu-panel-button-wrapper {
+      display: flex;
+      flex-direction: column;
     }
     MenuItem, MenuItemCheckbox, MenuItemRadio {
       display: flex;
