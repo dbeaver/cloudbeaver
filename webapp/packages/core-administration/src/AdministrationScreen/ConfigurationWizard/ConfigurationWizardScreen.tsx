@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
+import { useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { usePermission } from '@cloudbeaver/core-root';
+import { PermissionsResource, usePermission } from '@cloudbeaver/core-root';
 
 import { Administration } from '../../Administration/Administration';
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
@@ -21,6 +22,7 @@ import { WizardStepper } from './WizardStepper';
 import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
+  useDataResource(PermissionsResource, undefined);
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
 
@@ -31,6 +33,7 @@ export const ConfigurationWizardScreen = observer(function ConfigurationWizardSc
     },
     [administrationItemService, administrationScreenService]
   );
+
   if (!usePermission(EAdminPermission.admin)) {
     return <Translate token='root_permission_denied' />;
   }

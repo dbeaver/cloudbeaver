@@ -267,6 +267,7 @@ export class AdministrationScreenService {
 
   private async isAccessProvided(state: RouterState): Promise<boolean> {
     await this.serverConfigResource.load();
+    await this.permissionsResource.load();
 
     if (this.isConfigurationMode) {
       return true;
