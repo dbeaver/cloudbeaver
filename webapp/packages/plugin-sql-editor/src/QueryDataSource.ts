@@ -8,6 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
@@ -136,6 +137,12 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
     const queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
 
+    let firstResultId: string | undefined;
+
+    if (prevResults.length === 1) {
+      firstResultId = prevResults[0].id;
+    }
+
     this.currentTask = executionContext.run(async () => {
       await queryExecutionProcess.start(
         options.query,
@@ -146,7 +153,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
           constraints: options.constraints,
           where: options.whereFilter || undefined,
         },
-        this.dataFormat
+        this.dataFormat,
+        firstResultId
       );
 
       return await queryExecutionProcess.promise;
@@ -162,10 +170,26 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
         return prevResults;
       }
 
+      this.closeResults(executionContextInfo, prevResults);
+
       return results;
     } catch (exception) {
       this.error = exception;
       throw exception;
+    }
+  }
+
+  private async closeResults(context: IConnectionExecutionContextInfo, results: IDatabaseResultSet[]) {
+    for (const result of results) {
+      try {
+        await this.graphQLService.sdk.closeResult({
+          connectionId: context.connectionId,
+          contextId: context.id,
+          resultId: result.id,
+        });
+      } catch (exception) {
+        console.log(`Error closing result (${result.id}):`, exception);
+      }
     }
   }
 
@@ -182,6 +206,9 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   async dispose(): Promise<void> {
+    if (this.executionContext?.context) {
+      await this.closeResults(this.executionContext.context, this.results);
+    }
     await this.cancel();
   }
 }

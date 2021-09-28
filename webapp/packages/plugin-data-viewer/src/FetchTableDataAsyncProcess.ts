@@ -38,10 +38,11 @@ export class FetchTableDataAsyncProcess extends Deferred<SqlExecuteInfo> {
     tableDataParams: ITableDataParams,
     filter: SqlDataFilter,
     dataFormat?: ResultDataFormat,
+    resultId?: string,
   ): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(tableDataParams, filter, dataFormat);
+      const taskInfo = await this.executeQueryAsync(tableDataParams, filter, dataFormat, resultId);
       await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -113,12 +114,14 @@ export class FetchTableDataAsyncProcess extends Deferred<SqlExecuteInfo> {
   private async executeQueryAsync(
     tableDataParams: ITableDataParams,
     filter: SqlDataFilter,
-    dataFormat?: ResultDataFormat
+    dataFormat?: ResultDataFormat,
+    resultId?: string,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
       connectionId: tableDataParams.connectionId,
       contextId: tableDataParams.contextId,
       containerNodePath: tableDataParams.containerNodePath,
+      resultId,
       filter,
       dataFormat,
     });

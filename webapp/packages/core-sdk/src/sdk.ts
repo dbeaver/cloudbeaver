@@ -327,6 +327,7 @@ export interface MutationAsyncReadDataFromContainerArgs {
   contextId: Scalars['ID'];
   dataFormat?: Maybe<ResultDataFormat>;
   filter?: Maybe<SqlDataFilter>;
+  resultId?: Maybe<Scalars['ID']>;
 }
 
 export interface MutationAsyncSqlExecuteQueryArgs {
@@ -334,6 +335,7 @@ export interface MutationAsyncSqlExecuteQueryArgs {
   contextId: Scalars['ID'];
   dataFormat?: Maybe<ResultDataFormat>;
   filter?: Maybe<SqlDataFilter>;
+  resultId?: Maybe<Scalars['ID']>;
   sql: Scalars['String'];
 }
 
@@ -1621,6 +1623,7 @@ export type AsyncReadDataFromContainerMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
+  resultId?: Maybe<Scalars['ID']>;
   filter?: Maybe<SqlDataFilter>;
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
@@ -1631,6 +1634,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   query: Scalars['String'];
+  resultId?: Maybe<Scalars['ID']>;
   filter?: Maybe<SqlDataFilter>;
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
@@ -1645,6 +1649,14 @@ export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
 }>;
 
 export interface AsyncSqlExplainExecutionPlanMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+
+export type CloseResultMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultId: Scalars['ID'];
+}>;
+
+export interface CloseResultMutation { result: boolean }
 
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -1810,14 +1822,6 @@ export type SqlGenerateEntityQueryQueryVariables = Exact<{
 }>;
 
 export interface SqlGenerateEntityQueryQuery { sqlGenerateEntityQuery: string }
-
-export type SqlResultCloseMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultId: Scalars['ID'];
-}>;
-
-export interface SqlResultCloseMutation { result: boolean }
 
 export const AdminRoleInfoFragmentDoc = `
     fragment AdminRoleInfo on AdminRoleInfo {
@@ -2654,11 +2658,12 @@ export const GetNetworkHandlersDocument = `
 }
     ${UserConnectionNetworkHandlerPropertiesFragmentDoc}`;
 export const AsyncReadDataFromContainerDocument = `
-    mutation asyncReadDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+    mutation asyncReadDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $resultId: ID, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
   taskInfo: asyncReadDataFromContainer(
     connectionId: $connectionId
     contextId: $contextId
     containerNodePath: $containerNodePath
+    resultId: $resultId
     filter: $filter
     dataFormat: $dataFormat
   ) {
@@ -2676,11 +2681,12 @@ export const AsyncReadDataFromContainerDocument = `
 }
     `;
 export const AsyncSqlExecuteQueryDocument = `
-    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $resultId: ID, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
   taskInfo: asyncSqlExecuteQuery(
     connectionId: $connectionId
     contextId: $contextId
     sql: $query
+    resultId: $resultId
     filter: $filter
     dataFormat: $dataFormat
   ) {
@@ -2716,6 +2722,15 @@ export const AsyncSqlExplainExecutionPlanDocument = `
     }
     taskResult
   }
+}
+    `;
+export const CloseResultDocument = `
+    mutation closeResult($connectionId: ID!, $contextId: ID!, $resultId: ID!) {
+  result: sqlResultClose(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultId: $resultId
+  )
 }
     `;
 export const GetSqlExecuteTaskResultsDocument = `
@@ -3021,15 +3036,6 @@ export const SqlGenerateEntityQueryDocument = `
   )
 }
     `;
-export const SqlResultCloseDocument = `
-    mutation sqlResultClose($connectionId: ID!, $contextId: ID!, $resultId: ID!) {
-  result: sqlResultClose(
-    connectionId: $connectionId
-    contextId: $contextId
-    resultId: $resultId
-  )
-}
-    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -3226,6 +3232,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncSqlExplainExecutionPlanMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncSqlExplainExecutionPlan');
     },
+    closeResult(variables: CloseResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CloseResultMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CloseResultMutation>(CloseResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeResult');
+    },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecuteTaskResults');
     },
@@ -3300,9 +3309,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     sqlGenerateEntityQuery(variables: SqlGenerateEntityQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlGenerateEntityQueryQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SqlGenerateEntityQueryQuery>(SqlGenerateEntityQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlGenerateEntityQuery');
-    },
-    sqlResultClose(variables: SqlResultCloseMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlResultCloseMutation> {
-      return withWrapper(wrappedRequestHeaders => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlResultClose');
     },
   };
 }

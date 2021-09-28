@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ConnectionExecutionContextService, IConnectionExecutionContext } from '@cloudbeaver/core-connections';
+import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
@@ -65,6 +65,12 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
 
+    let firstResultId: string | undefined;
+
+    if (prevResults.length === 1) {
+      firstResultId = prevResults[0].id;
+    }
+
     this.currentTask = executionContext.run(async () => {
       await fetchTableProcess.start(
         {
@@ -79,6 +85,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           where: options.whereFilter || undefined,
         },
         this.dataFormat,
+        firstResultId
       );
 
       return fetchTableProcess.promise;
@@ -99,6 +106,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       if (!response?.results) {
         return prevResults;
       }
+
+      await this.closeResults(executionContext.context!, prevResults);
 
       return this.transformResults(response.results, limit);
     } catch (exception) {
@@ -157,7 +166,25 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   async dispose(): Promise<void> {
+    if (this.executionContext?.context) {
+      await this.closeResults(this.executionContext.context, this.results);
+    }
+
     await this.executionContext?.destroy();
+  }
+
+  private async closeResults(context: IConnectionExecutionContextInfo, results: IDatabaseResultSet[]) {
+    for (const result of results) {
+      try {
+        await this.graphQLService.sdk.closeResult({
+          connectionId: context.connectionId,
+          contextId: context.id,
+          resultId: result.id,
+        });
+      } catch (exception) {
+        console.log(`Error closing result (${result.id}):`, exception);
+      }
+    }
   }
 
   private transformResults(results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {

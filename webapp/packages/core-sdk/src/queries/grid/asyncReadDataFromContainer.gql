@@ -3,6 +3,7 @@ mutation asyncReadDataFromContainer(
     $connectionId: ID!
     $contextId: ID!
     $containerNodePath: ID!
+    $resultId: ID
     $filter: SQLDataFilter
     $dataFormat: ResultDataFormat
 ) {
@@ -10,6 +11,7 @@ mutation asyncReadDataFromContainer(
         connectionId: $connectionId
         contextId: $contextId
         containerNodePath: $containerNodePath
+        resultId: $resultId
         filter: $filter
         dataFormat: $dataFormat
     ) {

@@ -1,0 +1,11 @@
+mutation closeResult(
+    $connectionId: ID!
+    $contextId: ID!
+    $resultId: ID!
+) {
+    result: sqlResultClose(
+        connectionId: $connectionId
+        contextId: $contextId
+        resultId: $resultId
+    )
+}
