@@ -8,7 +8,7 @@
 
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, ContextMenuService, DialogueStateResult, IMenuPanel, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNavigatorViewSettingsEqual, CONNECTION_NAVIGATOR_VIEW_SETTINGS, NavigatorViewSettings } from '@cloudbeaver/core-root';
 
@@ -206,7 +206,6 @@ export class NavNodeContextMenuService extends Bootstrap {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'rename',
-        icon: 'edit',
         title: 'ui_rename',
         isPresent: context => context.contextType === NavNodeContextMenuService.nodeContextType,
         isHidden: context => !context.data.node.features?.includes(ENodeFeature.canRename),
@@ -250,12 +249,10 @@ export class NavNodeContextMenuService extends Bootstrap {
           const node = context.data.node;
           const nodeName = getNodeName(node);
 
-          const result = await this.commonDialogService.open(ConfirmationDialog, {
+          const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
             title: 'ui_data_delete_confirmation',
-            subTitle: node.name,
             message: `You're going to delete "${nodeName}". Are you sure?`,
             confirmActionText: 'ui_delete',
-            icon: node.icon,
           });
 
           if (result === DialogueStateResult.Rejected) {

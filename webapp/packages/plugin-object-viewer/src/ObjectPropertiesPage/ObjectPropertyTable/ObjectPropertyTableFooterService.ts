@@ -11,7 +11,7 @@ import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem,
-  CommonDialogService, ConfirmationDialog, DialogueStateResult
+  CommonDialogService, DialogueStateResult, ConfirmationDialogDelete
 } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
@@ -57,11 +57,9 @@ export class ObjectPropertyTableFooterService {
           .filter(node => node.features?.includes(ENodeFeature.canDelete));
         const nodeNames = nodes.map(getNodeName);
 
-        const result = await this.commonDialogService.open(ConfirmationDialog, {
+        const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message: `You're going to delete following items: "${nodeNames.join(', ')}". Are you sure?`,
-          icon: '/icons/error_icon.svg',
-          bigIcon: true,
           confirmActionText: 'ui_delete',
         });
 

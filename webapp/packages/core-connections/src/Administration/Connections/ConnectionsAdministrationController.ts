@@ -9,7 +9,7 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -73,7 +73,7 @@ export class ConnectionsAdministrationController {
       .map(id => this.connectionsResource.get(id)?.name)
       .filter(Boolean);
 
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
       message: `You're going to delete these connections: ${connectionNames.map(name => `"${name}"`).join(', ')}. Are you sure?`,
       confirmActionText: 'ui_delete',
