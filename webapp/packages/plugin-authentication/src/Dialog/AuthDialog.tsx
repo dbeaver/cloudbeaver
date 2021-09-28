@@ -93,7 +93,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   const configurable = !!controller.provider?.configurable;
 
   const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
-  let subTitle: string | undefined;
+  let subTitle = controller.provider?.description;
 
   if (configurable) {
     subTitle = 'authentication_identity_provider_dialog_subtitle';

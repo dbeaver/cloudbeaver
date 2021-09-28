@@ -1,6 +1,7 @@
 export * from './CommonDialog/CommonDialog/CommonDialogWrapper';
 export * from './CommonDialog/CommonDialogService';
 export * from './CommonDialog/ConfirmationDialog';
+export * from './CommonDialog/ConfirmationDialogDelete';
 export * from './CommonDialog/RenameDialog';
 export * from './CommonDialog/DialogsPortal';
 

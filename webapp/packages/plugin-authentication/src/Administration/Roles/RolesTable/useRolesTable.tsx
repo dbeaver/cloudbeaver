@@ -11,7 +11,7 @@ import { computed, observable } from 'mobx';
 import { compareRoles, RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
 import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -60,7 +60,7 @@ export function useRolesTable(): Readonly<State> {
         return;
       }
 
-      const result = await dialogService.open(ConfirmationDialog, {
+      const result = await dialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message: `You're going to delete these roles: ${deletionList.map(name => `"${name}"`).join(', ')}. Are you sure?`,
         confirmActionText: 'ui_delete',

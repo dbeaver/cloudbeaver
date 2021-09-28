@@ -24,6 +24,9 @@ export const topMenuStyles = composes(
     menu-box {
       background-color: #338ecc!important;
     }
+    menu-box menu-panel-item {
+      border-color: #ffffff !important;
+    }
     MenuTrigger {
       height: 100%;
       padding: 0 16px !important;

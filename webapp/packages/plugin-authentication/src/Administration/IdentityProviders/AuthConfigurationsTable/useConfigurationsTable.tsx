@@ -11,7 +11,7 @@ import { computed, observable } from 'mobx';
 import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
 import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminAuthProviderConfiguration, resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -64,7 +64,7 @@ export function useConfigurationsTable(): Readonly<State> {
         .map(id => resource.get(id)?.displayName)
         .filter(Boolean);
 
-      const result = await dialogService.open(ConfirmationDialog, {
+      const result = await dialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message: `You're going to delete these configurations: ${configurationsNames.map(name => `"${name}"`).join(', ')}. Are you sure?`,
         confirmActionText: 'ui_delete',

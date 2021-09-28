@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 
@@ -70,7 +70,7 @@ export class ConnectionsManagerService {
       return;
     }
 
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
       message: `You're going to delete "${connection.name}" connection. Are you sure?`,
       confirmActionText: 'ui_delete',
