@@ -12,7 +12,7 @@ import { CachedResource } from './CachedResource';
 
 export abstract class CachedDataResource<
   TData,
-  TParam,
+  TParam = void,
   TKey = TParam,
   TContext = void,
 > extends CachedResource<TData, TParam, TKey, TContext> {

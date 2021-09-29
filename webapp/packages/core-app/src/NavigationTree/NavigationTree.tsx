@@ -84,8 +84,8 @@ export const NavigationTree = observer(function NavigationTree() {
         filters={[connectionGroupFilter]}
         renderers={[navigationTreeConnectionGroupRenderer]}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
-          <center as="div">
-            <message as="div">
+          <center>
+            <message>
               No connections.<br />
               Use the top menu to setup connection to your database.
             </message>
