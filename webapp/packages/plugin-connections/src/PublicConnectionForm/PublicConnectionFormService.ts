@@ -12,6 +12,7 @@ import { ConnectionFormService, ConnectionInfoResource, IConnectionFormState } f
 import { ConnectionFormState } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
@@ -27,6 +28,7 @@ export class PublicConnectionFormService {
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
+    private readonly notificationService: NotificationService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -84,6 +86,16 @@ export class PublicConnectionFormService {
     }
   }
 
+  save(): void {
+    const connection = this.formState?.info;
+
+    this.close(true);
+
+    if (connection?.id && connection.connected) {
+      this.tryReconnect(connection.id);
+    }
+  }
+
   private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
     if (!this.formState || !this.formState.config.connectionId) {
       return;
@@ -122,6 +134,25 @@ export class PublicConnectionFormService {
       ExecutorInterrupter.interrupt(contexts);
     }
   };
+
+  private async tryReconnect(id: string) {
+    const result = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'connections_public_connection_edit_reconnect_title',
+      message: 'connections_public_connection_edit_reconnect_message',
+      confirmActionText: 'ui_yes',
+    });
+
+    if (result === DialogueStateResult.Rejected) {
+      return;
+    }
+
+    try {
+      await this.connectionInfoResource.close(id);
+      await this.connectionInfoResource.init({ id });
+    } catch (exception) {
+      this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
+    }
+  }
 
   private clearFormState() {
     this.formState?.dispose();
