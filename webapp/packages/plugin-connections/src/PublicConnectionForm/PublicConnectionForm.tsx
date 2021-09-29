@@ -8,8 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
 import { ConnectionForm } from '@cloudbeaver/core-connections';
