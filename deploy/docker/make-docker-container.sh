@@ -1,3 +1,3 @@
 cd ..
-docker build -t dbeaver/cloudbeaver:dev . --file ./docker/Dockerfile
+docker build -t fivetran/cloudbeaver:dev . --file ./docker/Dockerfile
 
