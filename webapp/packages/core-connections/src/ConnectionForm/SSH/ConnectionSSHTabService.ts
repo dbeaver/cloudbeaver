@@ -191,15 +191,17 @@ export class ConnectionSSHTabService extends Bootstrap {
     const port = Number(initialConfig?.properties?.port);
     const formPort = Number(handler.properties?.port);
 
+    const passwordChanged = (
+      (((initialConfig?.password === null && handler.password !== null) || initialConfig?.password === '') && handler.password !== '')
+      || !!handler.password?.length
+    );
+
     if (handler.enabled !== initialConfig?.enabled
-        || handler.savePassword !== initialConfig?.savePassword
-        || handler.userName !== initialConfig?.userName
-        || (
-          ((initialConfig?.password === null || initialConfig?.password === '') && handler.password !== '')
-            || (handler.password?.length || 0) > 0
-        )
-        || handler.properties?.host !== initialConfig?.properties?.host
-        || port !== formPort) {
+      || handler.savePassword !== initialConfig?.savePassword
+      || handler.userName !== initialConfig?.userName
+      || passwordChanged
+      || handler.properties?.host !== initialConfig?.properties?.host
+      || port !== formPort) {
       return true;
     }
 
