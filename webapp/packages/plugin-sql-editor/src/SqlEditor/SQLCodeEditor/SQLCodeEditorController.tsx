@@ -83,7 +83,7 @@ export class SQLCodeEditorController {
         builtin = [
           ...(this.dialect.functions || []),
           ...(this.dialect.reservedWords || []),
-        ].map(v => v.toLowerCase());
+        ].map(v => v.toUpperCase());
       }
 
       if (this.bindings.options) {
