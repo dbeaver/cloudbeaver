@@ -133,15 +133,15 @@ export class ConnectionFormService {
     const config = contexts.getContext(connectionConfigContext);
 
     if (credentialsState.authModelId) {
-      if (config.credentials === undefined) {
-        config.credentials = {};
+      if (!config.credentials) {
+        config.credentials = { ...data.state.config.credentials };
       }
 
       config.credentials = observable(config.credentials);
     }
 
     if (credentialsState.networkHandlers.length > 0) {
-      if (config.networkHandlersConfig === undefined) {
+      if (!config.networkHandlersConfig) {
         config.networkHandlersConfig = [];
       }
 

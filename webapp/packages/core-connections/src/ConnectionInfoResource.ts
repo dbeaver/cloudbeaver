@@ -156,7 +156,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       const { connection } = await this.graphQLService.sdk.initConnection({
         ...config,
         ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(),
+        ...this.getIncludesMap(config.id),
       });
       this.updateConnection(connection);
     });
