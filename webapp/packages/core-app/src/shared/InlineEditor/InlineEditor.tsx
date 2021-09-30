@@ -29,6 +29,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   simple?: boolean;
   hideSave?: boolean;
   hideCancel?: boolean;
+  disableSave?: boolean;
   edited?: boolean;
   autofocus?: boolean;
   active?: boolean;
@@ -48,6 +49,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   simple,
   hideSave,
   hideCancel,
+  disableSave,
   edited = false,
   autofocus,
   active,
@@ -88,13 +90,13 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case 'Enter':
-        props.onSave();
+        !disableSave && props.onSave();
         break;
       case 'Escape':
         props.onReject?.();
         break;
     }
-  }, []);
+  }, [disableSave]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -124,7 +126,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
         {!hideSave && (
           <editor-action
             as="button"
-            disabled={disabled}
+            disabled={disabled || disableSave}
             onClick={onSave}
           >
             {loading ? <Loader small fullSize /> : <Icon name="apply" viewBox="0 0 12 10" />}
