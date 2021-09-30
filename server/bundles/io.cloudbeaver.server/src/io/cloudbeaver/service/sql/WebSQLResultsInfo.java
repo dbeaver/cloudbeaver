@@ -18,9 +18,14 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
+import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+
+import java.util.List;
 
 /**
  * Web query results info.
@@ -67,4 +72,24 @@ public class WebSQLResultsInfo {
         return null;
     }
 
+    public DBSAttributeBase getAttribute(String attributeName) {
+        DBPDataSource dataSource = dataContainer.getDataSource();
+
+        DBDAttributeBinding[] attrList = attributes;
+        DBDAttributeBinding binding = null;
+        for (String san : attributeName.split("\\.")) {
+            if (dataSource != null) {
+                san = DBUtils.getUnQuotedIdentifier(dataSource, san);
+            }
+            binding = DBUtils.findObject(attrList, san);
+            if (binding == null) {
+                return null;
+            }
+            List<DBDAttributeBinding> nestedBindings = binding.getNestedBindings();
+            if (nestedBindings != null && !nestedBindings.isEmpty()) {
+                attrList = nestedBindings.toArray(new DBDAttributeBinding[0]);
+            }
+        }
+        return binding == null ? null : binding.getAttribute();
+    }
 }

@@ -23,9 +23,9 @@ import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
-import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -108,7 +108,10 @@ public class WebSQLDataFilter {
             for (WebSQLDataFilterConstraint webConstr : constraints) {
                 DBDAttributeConstraint dbConstraint;
                 if (dataContainer instanceof DBSEntity) {
-                    DBSEntityAttribute attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
+                    DBSAttributeBase attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
+                    if (attribute == null && resultInfo != null) {
+                        attribute = resultInfo.getAttribute(webConstr.getAttribute());
+                    }
                     if (attribute == null) {
                         dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
                     } else {
