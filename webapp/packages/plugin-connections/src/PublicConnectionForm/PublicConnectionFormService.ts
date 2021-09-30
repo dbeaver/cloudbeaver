@@ -8,7 +8,7 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { ConnectionFormService, ConnectionInfoResource, IConnectionFormState } from '@cloudbeaver/core-connections';
+import { ConnectionAuthService, ConnectionFormService, ConnectionInfoResource, IConnectionFormState } from '@cloudbeaver/core-connections';
 import { ConnectionFormState } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -32,6 +32,7 @@ export class PublicConnectionFormService {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionAuthService: ConnectionAuthService,
     private readonly sessionDataResource: SessionDataResource
   ) {
     makeObservable(this, {
@@ -148,7 +149,7 @@ export class PublicConnectionFormService {
 
     try {
       await this.connectionInfoResource.close(id);
-      await this.connectionInfoResource.init({ id });
+      await this.connectionAuthService.auth(id);
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
     }
