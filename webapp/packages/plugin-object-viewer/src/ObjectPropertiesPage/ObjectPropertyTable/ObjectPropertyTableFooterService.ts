@@ -50,7 +50,8 @@ export class ObjectPropertyTableFooterService {
         }
 
         const selectedNodes = this.getSelectedNodes(context.data.tableState.selectedList);
-        return !selectedNodes.some(node => node.features?.includes(ENodeFeature.canDelete));
+        return !selectedNodes.some(node => node.features?.includes(ENodeFeature.canDelete))
+          || this.navTreeResource.isLoading();
       },
       onClick: async context => {
         const nodes = this.getSelectedNodes(context.data.tableState.selectedList)
