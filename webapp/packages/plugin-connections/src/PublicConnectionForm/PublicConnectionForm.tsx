@@ -26,7 +26,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   const service = useService(PublicConnectionFormService);
 
   const close = useCallback(() => service.close(true), []);
-  const save = useCallback(() => service.close(true), []);
+  const save = useCallback(() => service.save(), []);
 
   return styled(styles)(
     <Loader loading={service.formState === null}>
