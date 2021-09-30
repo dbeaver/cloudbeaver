@@ -107,19 +107,19 @@ public class WebSQLDataFilter {
             List<DBDAttributeConstraint> dbdConstraints = new ArrayList<>();
             for (WebSQLDataFilterConstraint webConstr : constraints) {
                 DBDAttributeConstraint dbConstraint;
+                DBSAttributeBase attribute = null;
                 if (dataContainer instanceof DBSEntity) {
-                    DBSAttributeBase attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
-                    if (attribute == null && resultInfo != null) {
-                        attribute = resultInfo.getAttribute(webConstr.getAttribute());
-                    }
-                    if (attribute == null) {
-                        dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
-                    } else {
-                        dbConstraint = new DBDAttributeConstraint(attribute, -1);
-                    }
-                } else {
-                    dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
+                    attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
                 }
+                if (attribute == null && resultInfo != null) {
+                    attribute = resultInfo.getAttribute(webConstr.getAttribute());
+                }
+                if (attribute == null) {
+                    dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
+                } else {
+                    dbConstraint = new DBDAttributeConstraint(attribute, -1);
+                }
+
                 dbConstraint.setPlainNameReference(true);
 
                 if (webConstr.getOrderPosition() != null) {
