@@ -31,7 +31,7 @@ import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 
-const closeCharacters = /[\s()[\]{};:>,=]/;
+const closeCharacters = /[\s()[\]{};:>,=\\*]/;
 
 @injectable()
 export class SqlEditorController implements IInitializableController, IDestructibleController {
@@ -370,7 +370,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     // TODO: probably should be moved to SQLCodeEditorController
     editor.on('changes', (cm, changes) => {
       this.resetLineStateHighlight();
-      if (!this.activeSuggest || editor.state.completionActive) {
+      if (!this.activeSuggest) {
         return;
       }
 
@@ -378,13 +378,21 @@ export class SqlEditorController implements IInitializableController, IDestructi
       const origin = lastChange?.origin || '';
       const change = lastChange?.text[0] || '';
 
+      const nextCursor = editor.getCursor('from');
+
+      if (nextCursor.line !== lastChange.from.line) {
+        editor.closeHint();
+        return;
+      }
+
       if (
-        ignoredChanges.includes(origin)
+        editor.state.completionActive
+        || ignoredChanges.includes(origin)
         || closeCharacters.test(change)) {
         return;
       }
 
-      cursor = editor.getCursor('from');
+      cursor = nextCursor;
       this.showHint(true);
     });
 
@@ -395,8 +403,17 @@ export class SqlEditorController implements IInitializableController, IDestructi
 
       if (editor.state.completionActive) {
         if (newCursor.ch !== cursor?.ch || newCursor.line !== cursor.line) {
+          const ch = newCursor.ch > cursor.ch
+            ? editor.getRange(cursor, newCursor)
+            : editor.getRange(newCursor, cursor);
+
           cursor = newCursor;
-          editor.state.completionActive.update();
+
+          if (closeCharacters.test(ch) || newCursor.line !== cursor.line) {
+            editor.closeHint();
+          } else {
+            editor.state.completionActive.update();
+          }
         }
       }
       this.highlightActiveQuery();
