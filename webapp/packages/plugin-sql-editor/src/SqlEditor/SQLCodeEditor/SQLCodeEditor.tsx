@@ -16,7 +16,7 @@ import type { ISQLCodeEditorProps } from './ISQLCodeEditorProps';
 import { SQLCodeEditorController } from './SQLCodeEditorController';
 
 export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorController>(function SQLCodeEditor(props, ref) {
-  const controller = useController(SQLCodeEditorController, props.bindings);
+  const controller = useController(SQLCodeEditorController);
   controller.setDialect(props.dialect);
 
   useMemo(() => {
@@ -28,6 +28,10 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
   return (
     <CodeEditorLoader
       {...controller.bindings}
+      options={{
+        ...controller.bindings.options,
+        mode: controller.mode,
+      }}
       className={props.className}
       readonly={props.readonly}
       value={props.value || ''}

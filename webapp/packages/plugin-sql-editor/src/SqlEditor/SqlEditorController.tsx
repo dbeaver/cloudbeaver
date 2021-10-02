@@ -15,12 +15,12 @@ import type {
   ShowHintOptions,
   HintFunction,
 } from 'codemirror';
-import { observable, computed, makeObservable, autorun } from 'mobx';
+import { observable, computed, makeObservable, autorun, IReactionDisposer } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import type { ITab } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
-import { IInitializableController, injectable } from '@cloudbeaver/core-di';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
@@ -34,7 +34,7 @@ import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 const closeCharacters = /[\s()[\]{};:>,=]/;
 
 @injectable()
-export class SqlEditorController implements IInitializableController {
+export class SqlEditorController implements IInitializableController, IDestructibleController {
   get dialect(): SqlDialectInfo | undefined {
     if (!this.tab.handlerState.executionContext) {
       return undefined;
@@ -109,6 +109,7 @@ export class SqlEditorController implements IInitializableController {
   private cursor: Position | null;
   private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
+  private reactionDisposer: IReactionDisposer | null;
 
   constructor(
     private connectionExecutionContextService: ConnectionExecutionContextService,
@@ -122,6 +123,7 @@ export class SqlEditorController implements IInitializableController {
     this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
     this.cursor = null;
     this.executingScript = false;
+    this.reactionDisposer = null;
 
     this.parser.setCustomDelimiters(['\n\n']);
 
@@ -140,7 +142,7 @@ export class SqlEditorController implements IInitializableController {
     this.tab = tab;
     this.parser.setScript(this.value);
 
-    autorun(() => {
+    this.reactionDisposer = autorun(() => {
       if (this.tab.handlerState.executionContext) {
         this.sqlDialectInfoService
           .loadSqlDialectInfo(this.tab.handlerState.executionContext.connectionId)
@@ -149,6 +151,10 @@ export class SqlEditorController implements IInitializableController {
           });
       }
     });
+  }
+
+  destruct(): void {
+    this.reactionDisposer?.();
   }
 
   executeQuery = async (): Promise<void> => {

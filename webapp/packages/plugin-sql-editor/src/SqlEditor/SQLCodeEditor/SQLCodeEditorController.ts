@@ -8,11 +8,11 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
+import { Editor, EditorConfiguration, findModeByName, ModeSpec, ModeSpecOptions } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, computed } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -32,6 +32,38 @@ export class SQLCodeEditorController {
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 
+  get mode(): string | ModeSpec<ModeSpecOptions> | undefined {
+    const name = (
+      this.dialect?.name
+      && this.editor
+      && findModeByName(this.dialect.name)?.mime
+    ) || COMMON_EDITOR_CONFIGURATION.mode as string;
+
+    if (!this.dialect) {
+      return name;
+    }
+
+    let keywords: string[] | undefined;
+    let builtin: string[] | undefined;
+
+    if (this.dialect?.dataTypes) {
+      keywords = this.dialect.dataTypes.map(v => v.toLowerCase());
+    }
+
+    if (this.dialect?.functions || this.dialect?.reservedWords) {
+      builtin = [
+        ...(this.dialect.functions || []),
+        ...(this.dialect.reservedWords || []),
+      ].map(v => v.toUpperCase());
+    }
+
+    return {
+      name,
+      extra_keywords: keywords,
+      extra_builtins: builtin,
+    };
+  }
+
   bindings: Omit<IControlledCodeMirror, 'value'> = {
     options: { ...COMMON_EDITOR_CONFIGURATION },
     editorDidMount: this.handleConfigure.bind(this),
@@ -39,13 +71,12 @@ export class SQLCodeEditorController {
   };
 
   constructor() {
-    makeObservable(this, {
+    makeObservable<this, 'dialect' | 'editor'>(this, {
+      dialect: observable.ref,
+      editor: observable.ref,
       bindings: observable,
+      mode: computed,
     });
-  }
-
-  init(bindings?: Partial<IControlledCodeMirror>): void {
-    this.setBindings(bindings);
   }
 
   setBindings(bindings?: Partial<IControlledCodeMirror>): void {
@@ -70,36 +101,6 @@ export class SQLCodeEditorController {
     }
 
     this.dialect = dialect;
-
-    if (this.editor) {
-      let keywords: string[] | undefined;
-      let builtin: string[] | undefined;
-
-      if (this.dialect?.dataTypes) {
-        keywords = this.dialect.dataTypes.map(v => v.toLowerCase());
-      }
-
-      if (this.dialect?.functions || this.dialect?.reservedWords) {
-        builtin = [
-          ...(this.dialect.functions || []),
-          ...(this.dialect.reservedWords || []),
-        ].map(v => v.toUpperCase());
-      }
-
-      if (this.bindings.options) {
-        const name = this.dialect?.name && findModeByName(this.dialect.name)?.mime;
-
-        if (this.dialect) {
-          this.bindings.options.mode = {
-            name: name || COMMON_EDITOR_CONFIGURATION.mode as string,
-            extra_keywords: keywords,
-            extra_builtins: builtin,
-          };
-        } else {
-          this.bindings.options.mode = name || COMMON_EDITOR_CONFIGURATION.mode;
-        }
-      }
-    }
   }
 
   focus(): void {
