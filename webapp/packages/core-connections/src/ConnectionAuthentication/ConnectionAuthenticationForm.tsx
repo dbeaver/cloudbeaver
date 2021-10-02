@@ -33,7 +33,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
   config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
 }) {
   const translate = useTranslate();
-  const authModel = useMapResource(DatabaseAuthModelsResource, authModelId);
+  const authModel = useMapResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
 
   let properties = authModel.data?.properties;
 

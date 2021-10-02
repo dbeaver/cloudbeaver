@@ -8,3 +8,5 @@ export * from './IExecutionContext';
 export * from './IExecutor';
 export * from './IExecutorHandler';
 export * from './IExecutorHandlersCollection';
+export * from './ISyncExecutor';
+export * from './SyncExecutor';

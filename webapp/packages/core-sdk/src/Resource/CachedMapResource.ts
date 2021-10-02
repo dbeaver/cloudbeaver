@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResource, ICachedResourceMetadata } from './CachedResource';
@@ -62,8 +62,8 @@ export abstract class CachedMapResource<
   TKey,
   string[] | undefined
   > {
-  readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
-  readonly onItemDelete: IExecutor<ResourceKey<TKey>>;
+  readonly onItemAdd: ISyncExecutor<ResourceKey<TKey>>;
+  readonly onItemDelete: ISyncExecutor<ResourceKey<TKey>>;
   protected metadata: MetadataMap<TKey, ICachedMapResourceMetadata>;
   protected defaultIncludes: string[];
 
@@ -77,16 +77,16 @@ export abstract class CachedMapResource<
 
   constructor(defaultIncludes?: CachedResourceIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
-    this.onItemAdd = new Executor(null, this.includes);
-    this.onItemDelete = new Executor(null, this.includes);
+    this.onItemAdd = new SyncExecutor<ResourceKey<TKey>>(null);
+    this.onItemDelete = new SyncExecutor<ResourceKey<TKey>>(null);
     this.defaultIncludes = defaultIncludes || [];
 
-    this.metadata = new MetadataMap(() => ({
+    this.metadata = new MetadataMap(() => observable({
       outdated: true,
       loading: false,
       exception: null,
-      includes: [...this.defaultIncludes],
-    }));
+      includes: observable([...this.defaultIncludes]),
+    }, undefined, { deep: false }));
 
     this.addAlias(CachedMapAllKey, key => {
       if (this.keys.length > 0) {
@@ -104,6 +104,81 @@ export abstract class CachedMapResource<
     });
   }
 
+  // outdateResource<T = TKey>(
+  //   resource: CachedMapResource<T, any, any>,
+  //   map?: (param: ResourceKey<TKey>) => ResourceKey<T>
+  // ): this {
+  //   this.onDataOutdated.addHandler(param => {
+  //     try {
+  //       if (this.logActivity) {
+  //         console.group(this.getActionPrefixedName(' outdate - ' + resource.getName()));
+  //       }
+
+  //       if (map) {
+  //         param = map(param) as any as TKey;
+  //       }
+
+  //       resource.markOutdated(param as any as T);
+  //     } finally {
+  //       if (this.logActivity) {
+  //         console.groupEnd();
+  //       }
+  //     }
+  //   });
+
+  //   return this;
+  // }
+
+  // updateResource<T = TKey>(
+  //   resource: CachedMapResource<T, any, any>,
+  //   map?: (param: ResourceKey<TKey>) => ResourceKey<T>
+  // ): this {
+  //   this.onDataOutdated.addHandler(param => {
+  //     try {
+  //       if (this.logActivity) {
+  //         console.group(this.getActionPrefixedName(' update - ' + resource.getName()));
+  //       }
+
+  //       if (map) {
+  //         param = map(param) as any as TKey;
+  //       }
+
+  //       resource.markUpdated(param as any as T);
+  //     } finally {
+  //       if (this.logActivity) {
+  //         console.groupEnd();
+  //       }
+  //     }
+  //   });
+
+  //   return this;
+  // }
+
+  deleteInResource<T = TKey>(
+    resource: CachedMapResource<T, any, any>,
+    map?: (key: ResourceKey<TKey>) => ResourceKey<T>
+  ): this {
+    this.onItemDelete.addHandler(param => {
+      try {
+        if (this.logActivity) {
+          console.group(this.getActionPrefixedName(' outdate - ' + resource.getName()));
+        }
+
+        if (map) {
+          param = map(param) as any as TKey;
+        }
+
+        resource.delete(param as any as T);
+      } finally {
+        if (this.logActivity) {
+          console.groupEnd();
+        }
+      }
+    });
+
+    return this;
+  }
+
   isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
@@ -117,9 +192,6 @@ export abstract class CachedMapResource<
   getException(key: ResourceKeyList<TKey>): Array<Error | null>;
   getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null;
   getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null {
-    if (ResourceKeyUtils.some(key, key => !this.has(key))) { // TODO: metadata isn't properly cleared while rename with opened in Metadata Editor node
-      return null;
-    }
     key = this.transformParam(key);
     return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
   }
@@ -159,20 +231,24 @@ export abstract class CachedMapResource<
     });
   }
 
-  async markDataError(exception: Error, key: ResourceKey<TKey>): Promise<void> {
+  markDataError(exception: Error, key: ResourceKey<TKey>): void {
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      this.loadedKeys.push(key);
+    }
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.exception = exception;
+      metadata.outdated = false;
     });
 
-    await this.onDataError.execute({ param: key, exception });
+    this.onDataError.execute({ param: key, exception });
   }
 
-  markOutdated(): Promise<void>
-  markOutdated(key: ResourceKey<TKey>): Promise<void>
-  async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
+  markOutdated(): void
+  markOutdated(key: ResourceKey<TKey>): void
+  markOutdated(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
       key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
       this.loadedKeys = [];
@@ -193,7 +269,7 @@ export abstract class CachedMapResource<
       metadata.outdated = true;
     }));
 
-    await this.onDataOutdated.execute(key);
+    this.onDataOutdated.execute(key);
   }
 
   markUpdated(): void
@@ -268,14 +344,9 @@ export abstract class CachedMapResource<
   delete(key: ResourceKey<TKey>): void {
     key = this.transformParam(key);
 
-    this.onItemDelete
-      .execute(key)
-      .finally(() => {
-        runInAction(() => {
-          ResourceKeyUtils.forEach(key, key => this.data.delete(key));
-          this.markUpdated(key);
-        });
-      });
+    this.onItemDelete.execute(key);
+    ResourceKeyUtils.forEach(key, key => this.data.delete(key));
+    this.markUpdated(key);
   }
 
   clear(): void {
@@ -330,6 +401,14 @@ export abstract class CachedMapResource<
 
     key = this.transformParam(key) as TKey;
     return this.data.has(key);
+  }
+
+  protected lock(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
+    if (this.isAlias(param) || this.isAlias(second)) {
+      return true;
+    }
+
+    return this.includes(param, second);
   }
 
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {

@@ -12,26 +12,28 @@ import type { IExecutorHandler } from './IExecutorHandler';
 export type ExecutorDataMap<T, TNext> = (data: T, contexts: IExecutionContextProvider<T>) => TNext;
 export type ChainLinkType = 'next' | 'before';
 
-export interface IChainLink<T> {
-  executor: IExecutorHandlersCollection<any>;
+export interface IChainLink<T, TResult> {
+  executor: IExecutorHandlersCollection<any, TResult>;
   map?: ExecutorDataMap<T, any>;
   type: ChainLinkType;
 }
 
-export interface IExecutorHandlersCollection<T = unknown> {
-  readonly handlers: Array<IExecutorHandler<T>>;
-  readonly postHandlers: Array<IExecutorHandler<T>>;
-  readonly chain: Array<IChainLink<T>>;
-  readonly collections: Array<IExecutorHandlersCollection<T>>;
+export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> {
+  readonly handlers: Array<IExecutorHandler<T, TResult>>;
+  readonly postHandlers: Array<IExecutorHandler<T, TResult>>;
+  readonly chain: Array<IChainLink<T, TResult>>;
+  readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
 
-  before: <TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>) => this;
-  next: <TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>) => this;
-  addCollection: (collection: IExecutorHandlersCollection<T>) => this;
-  addHandler: (handler: IExecutorHandler<T>) => this;
-  removeHandler: (handler: IExecutorHandler<T>) => void;
-  addPostHandler: (handler: IExecutorHandler<T>) => this;
-  removePostHandler: (handler: IExecutorHandler<T>) => void;
+  before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  addCollection: (collection: IExecutorHandlersCollection<T, TResult>) => this;
+  addHandler: (handler: IExecutorHandler<T, TResult>) => this;
+  removeHandler: (handler: IExecutorHandler<T, TResult>) => void;
+  addPostHandler: (handler: IExecutorHandler<T, TResult>) => this;
+  removePostHandler: (handler: IExecutorHandler<T, TResult>) => void;
 
-  for: (link: IExecutorHandlersCollection<any>) => IExecutorHandlersCollection<T>;
-  getLinkHandlers: (link: IExecutorHandlersCollection<any>) => IExecutorHandlersCollection<T> | undefined;
+  for: (link: IExecutorHandlersCollection<any, TResult>) => IExecutorHandlersCollection<T, TResult>;
+  getLinkHandlers: (
+    link: IExecutorHandlersCollection<any, TResult>
+  ) => IExecutorHandlersCollection<T, TResult> | undefined;
 }

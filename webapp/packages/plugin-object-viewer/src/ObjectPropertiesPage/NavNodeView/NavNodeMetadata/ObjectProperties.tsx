@@ -9,24 +9,33 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { DBObjectResource } from '@cloudbeaver/core-app';
+import { DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group, useMapResource } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { preloadNodeParents } from '../../../preloadNodeParents';
+
 interface Props {
   objectId: string;
+  parents: string[];
 }
 
 const emptyArray: ObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer<Props>(function ObjectProperties({
   objectId,
+  parents,
 }) {
   const translate = useTranslate();
-  const dbObject = useMapResource(DBObjectResource, objectId);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
+  const dbObject = useMapResource(ObjectProperties, DBObjectResource, objectId, {
+    onLoad: async () => !(await preloadNodeParents(navTreeResource, navNodeInfoResource, parents, objectId)),
+  });
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(
     dbObject.data?.object?.properties ?? emptyArray

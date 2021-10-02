@@ -119,6 +119,8 @@ export class NavigationTabsService {
         return map;
       }
     );
+
+    this.userInfoResource.onDataUpdate.addHandler(this.unloadTabs.bind(this));
   }
 
   openTab(tab: ITab, isSelected?: boolean): void {
@@ -246,9 +248,9 @@ export class NavigationTabsService {
   }
 
   async unloadTabs(): Promise<void> {
-    if (this.administrationScreenService.publicDisabled) {
-      return;
-    }
+    // if (this.administrationScreenService.publicDisabled) {
+    //   return;
+    // }
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
         if (tab.restored) {

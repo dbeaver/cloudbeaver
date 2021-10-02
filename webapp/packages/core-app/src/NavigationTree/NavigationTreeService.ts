@@ -79,6 +79,11 @@ export class NavigationTreeService {
           return false;
         }
       }
+
+      if (tryConnect && this.navTreeResource.getException(id)) {
+        this.navTreeResource.markOutdated(id);
+      }
+
       await this.navTreeResource.load(id);
       return true;
     } catch (exception) {

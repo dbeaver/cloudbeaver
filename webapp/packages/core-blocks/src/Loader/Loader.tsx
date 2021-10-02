@@ -89,18 +89,18 @@ export const Loader = observer<Props>(function Loader({
         loading = element.loading;
         loaded = !loading;
       } else {
-        if ('isLoaded' in element) {
-          loaded = element.isLoaded();
-        }
-        if ('isLoading' in element) {
-          loading = element.isLoading();
-        }
+        loaded = element.isLoaded();
+        loading = element.isLoading();
+
         if ('exception' in element && element.exception) {
           if (Array.isArray(element.exception)) {
-            if (element.exception.length === 0) {
+            const error = element.exception.find(Boolean);
+
+            if (!error) {
               continue;
             }
-            exception = element.exception[0];
+
+            exception = error;
           } else {
             exception = element.exception;
           }

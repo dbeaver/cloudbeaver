@@ -79,8 +79,11 @@ export class ConnectionsAdministrationService extends Bootstrap {
   ): Promise<void> {
     if (outsideAdminPage) {
       this.connectionsResource.cleanNewFlags();
-      await this.connectionInfoResource.updateSessionConnections();
-      await this.sessionDataResource.markOutdated();
+      const updated = await this.connectionsResource.updateSessionConnections();
+
+      if (updated) {
+        this.sessionDataResource.markOutdated();
+      }
     }
   }
 

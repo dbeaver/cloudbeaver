@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import {
@@ -15,7 +15,6 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { use } from '@reshadow/react';
 
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';

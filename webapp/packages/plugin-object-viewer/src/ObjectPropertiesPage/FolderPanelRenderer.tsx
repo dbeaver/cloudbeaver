@@ -17,38 +17,41 @@ import { ObjectPropertyTable } from './ObjectPropertyTable/ObjectPropertyTable';
 interface IFolderPanelRendererProps {
   nodeId: string;
   folderId: string;
+  parents: string[];
   style?: ComponentStyle;
 }
 
 export const FolderPanelRenderer = observer<IFolderPanelRendererProps>(function FolderPanelRenderer({
   nodeId,
   folderId,
+  parents,
   style,
 }) {
   const navNodeViewService = useService(NavNodeViewService);
 
   for (const panel of navNodeViewService.panels) {
-    const Panel = panel(nodeId, folderId);
+    const Panel = panel(nodeId, folderId, parents);
 
     if (Panel) {
-      return <Panel nodeId={nodeId} folderId={folderId} style={style} />;
+      return <Panel nodeId={nodeId} folderId={folderId} parents={parents} style={style} />;
     }
   }
 
-  return <NavNodePanel nodeId={folderId} style={style} />;
+  return <NavNodePanel nodeId={folderId} style={style} parents={parents} />;
 });
 
 interface INavNodePanelProps {
   nodeId: string;
+  parents: string[];
   style?: ComponentStyle;
 }
 
-const NavNodePanel = observer<INavNodePanelProps>(function NavNodeTab({ nodeId }) {
+const NavNodePanel = observer<INavNodePanelProps>(function NavNodeTab({ nodeId, parents }) {
   const nodeInfo = useNode(nodeId);
 
   if (!nodeInfo.node) {
     return null;
   }
 
-  return <ObjectPropertyTable objectId={nodeId} parentId={nodeInfo.node.parentId} />;
+  return <ObjectPropertyTable objectId={nodeId} parents={parents} parentId={nodeInfo.node.parentId} />;
 });

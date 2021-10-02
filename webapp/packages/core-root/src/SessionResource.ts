@@ -22,11 +22,11 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
   private defaultLocale: string | undefined;
   constructor(
     private graphQLService: GraphQLService,
-    serverConfiguration: ServerConfigResource
+    serverConfigResource: ServerConfigResource
   ) {
     super(null);
 
-    this.sync(serverConfiguration);
+    this.sync(serverConfigResource);
   }
 
   setDefaultLocale(defaultLocale?: string): void {

@@ -10,13 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
+import { ITab, NavNodeInfoResource, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
 import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
+import { preloadNodeParents } from '../preloadNodeParents';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
 
@@ -72,13 +73,17 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
   const style = useStyles(verticalTabStyles, styles);
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
+  const parents = tab.handlerState.parents;
   let folderId = tab.handlerState.folderId;
 
-  const children = useMapResource(NavTreeResource, nodeId);
+  const children = useMapResource(ObjectFolders, NavTreeResource, nodeId, {
+    onLoad: async resource => !(await preloadNodeParents(resource, navNodeInfoResource, parents, nodeId)),
+  });
 
   const folders = navNodeViewService.getFolders(nodeId) || [];
 
@@ -86,15 +91,23 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
     navNodeManagerService.navToNode(nodeId, parentId, tabData.tabId);
   }
 
-  useEffect(() => {
-    if (!folders.includes(folderId) && folders.length > 0) {
-      navNodeManagerService.navToNode(nodeId, parentId, folders[0]);
-    }
-  });
+  const wrongFolder = (
+    !folders.includes(folderId)
+    && folders.length > 0
+    && children.isLoaded()
+    && !children.isLoading()
+    && !children.isOutdated()
+  );
 
-  if (!folders.includes(folderId) && folders.length > 0) {
+  if (wrongFolder) {
     folderId = folders[0];
   }
+
+  useEffect(() => {
+    if (wrongFolder) {
+      navNodeManagerService.navToNode(nodeId, parentId, folderId);
+    }
+  });
 
   return styled(style)(
     <Loader state={children} style={style}>{() => styled(style)(
@@ -104,12 +117,24 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
             <vertical-tabs>
               <TabList aria-label="Object folders">
                 {folders.map(folderId => (
-                  <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
+                  <FolderTabRenderer
+                    key={folderId}
+                    nodeId={nodeId}
+                    folderId={folderId}
+                    parents={parents}
+                    style={tabStyles}
+                  />
                 ))}
               </TabList>
               {folders.map(folderId => (
                 <TabPanel key={folderId} tabId={folderId}>
-                  <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} style={tabStyles} />
+                  <FolderPanelRenderer
+                    key={folderId}
+                    nodeId={nodeId}
+                    folderId={folderId}
+                    parents={parents}
+                    style={tabStyles}
+                  />
                 </TabPanel>
               ))}
             </vertical-tabs>

@@ -7,7 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { GraphQLService, CachedDataResource, CachedResource } from '@cloudbeaver/core-sdk';
 
 import { SessionDataResource } from './SessionDataResource';
 
@@ -22,8 +23,16 @@ export class PermissionsResource extends CachedDataResource<Set<string>> {
     this.sync(sessionDataResource);
   }
 
-  has(id: string): boolean {
-    return this.data.has(id);
+  require(resource: CachedResource<any, any, any, any>, ...permissions: string[]): this {
+    resource
+      .preloadResource(this, () => undefined)
+      .before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));
+
+    return this;
+  }
+
+  has(...permissions: string[]): boolean {
+    return !permissions.some(permission => !this.data.has(permission));
   }
 
   async hasAsync(id: string): Promise<boolean> {

@@ -44,7 +44,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   constructor(
     private graphQLService: GraphQLService,
-    private permissionsResource: PermissionsResource,
+    permissionsResource: PermissionsResource,
     sessionDataResource: SessionDataResource
   ) {
     super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
@@ -54,9 +54,8 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     });
 
     sessionDataResource.onDataUpdate.addHandler(() => this.markOutdated());
-    this.beforeLoad
-      .addHandler(() => this.permissionsResource.load())
-      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EAdminPermission.admin)));
+
+    permissionsResource.require(this, EAdminPermission.admin);
 
     this.changed = false;
     this.connectionCreateSubject = new Subject<DatabaseConnection>();

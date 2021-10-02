@@ -19,12 +19,14 @@ import {
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
+  ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
   IConnectionExecutionContextInfo,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -42,8 +44,9 @@ export class SqlEditorTabService extends Bootstrap {
     private notificationService: NotificationService,
     private sqlEditorService: SqlEditorService,
     private readonly sqlResultTabsService: SqlResultTabsService,
-    private connectionExecutionContextService: ConnectionExecutionContextService,
-    private connectionExecutionContextResource: ConnectionExecutionContextResource
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly connectionInfo: ConnectionInfoResource,
   ) {
     super();
 
@@ -147,6 +150,8 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     if (tab.handlerState.executionContext) {
+      await this.connectionInfo.load(CachedMapAllKey);
+      await this.connectionExecutionContextResource.loadAll();
       const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.baseId);
 
       if (!executionContext) {

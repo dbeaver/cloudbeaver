@@ -75,6 +75,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const driver = useMapResource(
+    Options,
     DBDriverResource,
     { key: config.driverId || null, includes: ['includeProviderProperties'] },
     {
@@ -89,6 +90,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }, []);
 
   const { data: authModel } = useMapResource(
+    Options,
     DatabaseAuthModelsResource,
     info?.authModel || driver.data?.defaultAuthModel || null,
     {

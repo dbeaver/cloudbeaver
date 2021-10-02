@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedDataResource,
-  DatabaseObjectInfo, ICachedResourceMetadata, ResourceKeyUtils
+  DatabaseObjectInfo, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -44,6 +44,7 @@ string
     private connectionInfoResource: ConnectionInfoResource
   ) {
     super(new MetadataMap(() => ({ })));
+
     this.metadata = new MetadataMap(() => ({
       outdated: true,
       loading: false,
@@ -51,6 +52,9 @@ string
       outdatedData: [],
       loadingData: [],
     }));
+
+    this.preloadResource(connectionInfoResource, () => CachedMapAllKey);
+
     this.connectionInfoResource.onItemDelete.addHandler(
       key => ResourceKeyUtils.forEach(key, key => this.data.delete(key))
     );
@@ -98,14 +102,14 @@ string
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
 
-  async markOutdated(param: ObjectContainerParams): Promise<void> {
+  markOutdated(param: ObjectContainerParams): void {
     const catalogId = param.catalogId ?? defaultCatalog;
 
     const metadata = this.metadata.get(param.connectionId);
     if (!metadata.outdatedData.includes(catalogId)) {
       metadata.outdatedData.push(catalogId);
     }
-    await this.onDataOutdated.execute(param);
+    this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: ObjectContainerParams): void {

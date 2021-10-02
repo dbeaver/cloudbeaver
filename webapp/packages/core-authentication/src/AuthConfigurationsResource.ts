@@ -11,10 +11,10 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import {
   AdminAuthProviderConfiguration, AuthProviderConfiguration,
+  CachedMapAllKey,
   CachedMapResource, GetAuthProviderConfigurationsQueryVariables,
   GraphQLService, ResourceKey, ResourceKeyList, resourceKeyList, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
@@ -23,38 +23,26 @@ type NewConfiguration = AdminAuthProviderConfiguration & { [NEW_CONFIGURATION_SY
 @injectable()
 export class AuthConfigurationsResource
   extends CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables> {
-  static keyAll = resourceKeyList(['all'], 'all');
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
-
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly permissionsResource: PermissionsResource,
+    permissionsResource: PermissionsResource,
   ) {
     super([]);
 
-    this.loadedKeyMetadata = new MetadataMap(() => false);
-
-    this.permissionsResource.onDataOutdated.addHandler(this.markAllOutdated.bind(this));
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
+    permissionsResource
+      .require(this, EAdminPermission.admin)
+      .outdateResource(this);
   }
 
   async loader(key: ResourceKey<string>): Promise<Map<string, AdminAuthProviderConfiguration>> {
-    if (!(await this.permissionsResource.hasAsync(EAdminPermission.admin))) {
-      return this.data;
-    }
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    key = this.transformParam(key);
 
-    const all = ResourceKeyUtils.hasMark(key, AuthConfigurationsResource.keyAll.mark);
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
+      const providerId = all ? undefined : key;
 
-    await ResourceKeyUtils.forEachAsync(all ? AuthConfigurationsResource.keyAll : key, async key => {
       const { configurations } = await this.graphQLService.sdk.getAuthProviderConfigurations({
-        providerId: !all ? key : undefined,
+        providerId,
       });
 
       if (all) {
@@ -62,17 +50,13 @@ export class AuthConfigurationsResource
       }
 
       this.updateConfiguration(...configurations);
-
-      if (all) {
-        this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.list[0], true);
-      }
     });
 
     return this.data;
   }
 
   async refreshAll(): Promise<AdminAuthProviderConfiguration[]> {
-    await this.refresh(AuthConfigurationsResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.values;
   }
 
@@ -118,11 +102,6 @@ export class AuthConfigurationsResource
     this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
 
     return key;
-  }
-
-  private markAllOutdated() {
-    this.markOutdated();
-    this.loadedKeyMetadata.set(AuthConfigurationsResource.keyAll.mark, false);
   }
 }
 

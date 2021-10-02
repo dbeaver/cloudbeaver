@@ -21,7 +21,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   ...rest
 }) {
   const styles = useStyles(style);
-  const handler = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID);
+  const handler = useMapResource(SSHTab, NetworkHandlerResource, SSH_TUNNEL_ID);
 
   return styled(styles)(
     <Tab {...rest} title={handler.data?.description} style={style}>

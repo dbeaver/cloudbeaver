@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
@@ -16,9 +18,10 @@ import {
   AdminUserInfoFragment,
   AdminUserInfo,
   ResourceKeyUtils,
-  GetUsersListQueryVariables
+  GetUsersListQueryVariables,
+  CachedMapAllKey,
+  resourceKeyList
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
@@ -40,8 +43,6 @@ interface UserCreateOptions {
 
 @injectable()
 export class UsersResource extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
-  static keyAll = 'all';
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
     private serverConfigResource: ServerConfigResource,
@@ -49,7 +50,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private authInfoService: AuthInfoService
   ) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
     this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
   }
 
@@ -58,14 +58,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       return true;
     }
     return NEW_USER_SYMBOL in this.get(id)!;
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   getEmptyUser(): AdminUserInfo {
@@ -158,28 +150,30 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         throw new Error('You can\'t delete current logged user');
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
-      this.data.delete(key);
+
+      runInAction(() => {
+        this.data.delete(key);
+        this.markUpdated(key);
+        this.onItemDelete.execute(key);
+      });
     });
-    this.markUpdated(key);
-    await this.onItemDelete.execute(key);
   }
 
   async loadAll(): Promise<Map<string, AdminUser>> {
     this.resetIncludes();
-    await this.load(UsersResource.keyAll);
+    await this.load(CachedMapAllKey);
     return this.data;
   }
 
   async refreshAll(): Promise<Map<string, AdminUser>> {
     this.resetIncludes();
-    await this.refresh(UsersResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.data;
   }
 
   refreshAllLazy(): void {
     this.resetIncludes();
-    this.markOutdated(UsersResource.keyAll);
-    this.loadedKeyMetadata.set(UsersResource.keyAll, false);
+    this.markOutdated(CachedMapAllKey);
   }
 
   isActiveUser(userId: string): boolean {
@@ -187,24 +181,28 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, AdminUser>> {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    key = this.transformParam(key);
+    const usersList: AdminUser[] = [];
+
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
+      const userId = all ? undefined : key;
+
       const { users } = await this.graphQLService.sdk.getUsersList({
-        userId: key === UsersResource.keyAll ? undefined : key,
+        userId,
         ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key === UsersResource.keyAll ? undefined : key, includes),
+        ...this.getIncludesMap(userId, includes),
       });
 
-      if (key === UsersResource.keyAll) {
+      usersList.push(...users);
+    });
+
+    runInAction(() => {
+      if (all) {
         this.data.clear();
       }
 
-      for (const user of users) {
-        this.set(user.userId, user);
-      }
-
-      if (key === UsersResource.keyAll) {
-        this.loadedKeyMetadata.set(UsersResource.keyAll, true);
-      }
+      this.set(resourceKeyList(usersList.map(user => user.userId)), usersList);
     });
 
     return this.data;

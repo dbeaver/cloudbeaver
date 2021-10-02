@@ -11,12 +11,20 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 export type NavNodeTransformViewComponent = React.FC<{
   nodeId: string;
   folderId: string;
+  parents: string[];
   style?: ComponentStyle;
 }>;
 
-export type NavNodeTransformView = (nodeId: string, folderId: string) => NavNodeTransformViewComponent | undefined;
+export type NavNodeTransformView = (
+  nodeId: string,
+  folderId: string,
+  parents: string[]
+) => NavNodeTransformViewComponent | undefined;
 
-export type NavNodeFolderTransformFn = (nodeId: string, children: string[] | undefined) => string[] | undefined;
+export type NavNodeFolderTransformFn = (
+  nodeId: string,
+  children: string[] | undefined
+) => string[] | undefined;
 
 export interface INavNodeFolderTransform {
   order?: number;

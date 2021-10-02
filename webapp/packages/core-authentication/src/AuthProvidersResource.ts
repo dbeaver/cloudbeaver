@@ -36,8 +36,8 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   ) {
     super();
 
-    this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.serverConfigResource.onDataUpdate.addHandler(this.loadAll.bind(this));
+    this.preloadResource(serverConfigResource, () => undefined);
+    this.serverConfigResource.outdateResource(this);
 
     this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
     this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
@@ -72,7 +72,6 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   async loadAll(): Promise<AuthProvider[]> {
-    this.resetIncludes();
     await this.load(CachedMapAllKey);
 
     return this.values;

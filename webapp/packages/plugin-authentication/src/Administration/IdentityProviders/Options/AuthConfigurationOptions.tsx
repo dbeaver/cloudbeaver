@@ -39,8 +39,12 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
-  const providers = useMapResource(AuthProvidersResource, CachedMapAllKey);
-  const parameters = useMapResource(AuthConfigurationParametersResource, state.config.providerId || null);
+  const providers = useMapResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
+  const parameters = useMapResource(
+    AuthConfigurationOptions,
+    AuthConfigurationParametersResource,
+    state.config.providerId || null
+  );
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);
 

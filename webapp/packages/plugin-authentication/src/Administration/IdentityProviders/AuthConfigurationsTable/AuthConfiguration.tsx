@@ -44,7 +44,7 @@ interface Props {
 
 export const AuthConfiguration = observer<Props>(function AuthConfiguration({ configuration }) {
   const service = useService(AuthConfigurationsAdministrationService);
-  const resource = useMapResource(AuthProvidersResource, configuration.providerId);
+  const resource = useMapResource(AuthConfiguration, AuthProvidersResource, configuration.providerId);
 
   const icon = configuration.iconURL || resource.data?.icon;
 

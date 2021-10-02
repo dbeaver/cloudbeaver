@@ -45,7 +45,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const initialConfig = info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
   const state = config.networkHandlersConfig!.find(state => state.id === SSH_TUNNEL_ID)!;
 
-  const resource = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID, {
+  const resource = useMapResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
       if (Object.keys(state).length === 0) {
         for (const property of handler.properties) {

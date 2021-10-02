@@ -7,11 +7,10 @@
  */
 
 import { useCallback } from 'react';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { Link } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { css } from '@reshadow/react';
 
 import { NavigationTreeService } from '../../NavigationTree/NavigationTreeService';
 import { parseNodeParentId } from './NavNodeManagerService';

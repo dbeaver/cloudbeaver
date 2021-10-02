@@ -25,7 +25,7 @@ interface Props {
 
 export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const translate = useTranslate();
-  const handler = useMapResource(NetworkHandlerResource, id);
+  const handler = useMapResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
 
   if (!networkHandlersConfig.some(state => state.id === id)) {
     networkHandlersConfig.push({

@@ -11,7 +11,7 @@ import { AuthConfigurationsResource, AuthProviderService, AuthProvidersResource 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
+import { AdminAuthProviderConfiguration, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsAdministration } from './AuthConfigurationsAdministration';
 import { AuthConfigurationsDrawerItem } from './AuthConfigurationsDrawerItem';
@@ -71,7 +71,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
 
   private async loadConfigurations() {
     try {
-      await this.authConfigurationsResource.load(AuthConfigurationsResource.keyAll);
+      await this.authConfigurationsResource.load(CachedMapAllKey);
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading configurations');
     }

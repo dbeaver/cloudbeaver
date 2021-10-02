@@ -8,20 +8,23 @@
 
 import { Connection, ConnectionsResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsService, SessionDataResource } from '@cloudbeaver/core-root';
+import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class TemplateConnectionsResource extends CachedDataResource<Connection[], void> {
   constructor(
     private graphQLService: GraphQLService,
-    private permissionsService: PermissionsService,
+    permissionsResource: PermissionsResource,
     connectionsResource: ConnectionsResource,
-    sessionDataResource: SessionDataResource,
   ) {
     super([]);
-    connectionsResource.onDataUpdate.addHandler(() => this.markOutdated());
-    sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
+
+    connectionsResource.outdateResource(this, () => undefined);
+
+    permissionsResource
+      .require(this, EPermission.public)
+      .outdateResource(this);
   }
 
   isLoaded(): boolean {
@@ -29,9 +32,6 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   }
 
   protected async loader(): Promise<Connection[]> {
-    if (!(await this.permissionsService.hasAsync(EPermission.public))) {
-      return [];
-    }
     const { connections } = await this.graphQLService.sdk.getTemplateConnections({
       customIncludeNetworkHandlerCredentials: false,
       customIncludeOriginDetails: false,

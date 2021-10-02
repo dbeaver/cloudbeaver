@@ -57,7 +57,52 @@ export function useDataResource<
     loading: false,
     firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
-    load: () => {},
+    async load(refresh?: boolean) {
+      this.firstRender = false;
+      const { loading, resource, actions, prevData } = refObj;
+
+      if (loading) {
+        return;
+      }
+
+      this.loading = true;
+
+      try {
+        await actions?.onLoad?.(resource);
+
+        if (key === null) {
+          return;
+        }
+
+        if (refresh) {
+          resource.markOutdated(key);
+        }
+
+        const newData = await resource.load(key, includes);
+        setException(null);
+
+        try {
+          await actions?.onData?.(
+            newData,
+            resource,
+            prevData
+          );
+        } finally {
+          this.prevData = newData;
+        }
+      } catch (exception) {
+        if (resource.getException(key) === null) {
+          setException(exception);
+        }
+        actions?.onError?.(exception);
+
+        if (!this.exceptionObserved) {
+          notifications.logException(exception, 'Can\'t load data');
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
   }), {
     exceptionObserved: false,
     resource,
@@ -66,49 +111,6 @@ export function useDataResource<
     includes,
     actions,
   });
-
-  refObj.load = async function load() {
-    this.firstRender = false;
-    const { loading, resource, actions, prevData } = refObj;
-
-    if (loading) {
-      return;
-    }
-
-    this.loading = true;
-
-    try {
-      await actions?.onLoad?.(resource);
-
-      if (key === null) {
-        return;
-      }
-
-      const newData = await resource.load(key, includes);
-      setException(null);
-
-      try {
-        await actions?.onData?.(
-          newData,
-          resource,
-          prevData
-        );
-      } finally {
-        refObj.prevData = newData;
-      }
-    } catch (exception) {
-      if (resource.getException(key) === null) {
-        setException(exception);
-      }
-      actions?.onError?.(exception);
-
-      if (!refObj.exceptionObserved) {
-        notifications.logException(exception, 'Can\'t load data');
-      }
-    } finally {
-      this.loading = false;
-    }
-  };
 
   const [result] = useState<IMapResourceResult<TResource>>(() => ({
     get resource() {
@@ -129,7 +131,8 @@ export function useDataResource<
       return refObj.resource.isLoaded(refObj.key, refObj.includes);
     },
     reload: () => {
-      refObj.load();
+      setException(null);
+      refObj.load(true);
     },
     isLoading: () => {
       if (refObj.key === null) {

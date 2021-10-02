@@ -10,7 +10,7 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -21,7 +21,8 @@ import {
   resourceKeyList,
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata
+  ICachedMapResourceMetadata,
+  CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -78,14 +79,15 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       includes: [],
     }));
 
-    this.beforeLoad
-      .addHandler(() => permissionsResource.load())
-      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EPermission.public)));
+    permissionsResource.require(this, EPermission.public);
+    this.preloadResource(connectionInfo, () => CachedMapAllKey);
 
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
-    this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
-    this.onDataUpdate.addHandler(navNodeInfoResource.markUpdated.bind(navNodeInfoResource));
-    this.sessionDataResource.onDataUpdate.addPostHandler(() => this.markOutdated());
+
+    navNodeInfoResource.preloadResource(this);
+    this.outdateResource(navNodeInfoResource);
+    this.updateResource(navNodeInfoResource);
+    this.sessionDataResource.outdateResource(this);
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
@@ -95,13 +97,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     await this.graphQLService.sdk.navRefreshNode({
       nodePath: navNodeId,
     });
-    await this.markTreeOutdated(navNodeId);
-    await this.refresh(navNodeId);
+    this.markTreeOutdated(navNodeId);
     await this.onNodeRefresh.execute(navNodeId);
   }
 
-  async markTreeOutdated(navNodeId: ResourceKey<string>): Promise<void> {
-    await this.markOutdated(resourceKeyList(this.getNestedChildren(navNodeId)));
+  markTreeOutdated(navNodeId: ResourceKey<string>): void {
+    this.markOutdated(resourceKeyList(this.getNestedChildren(navNodeId)));
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {
@@ -157,7 +158,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       }
     });
 
-    await this.markOutdated(node.parentId);
+    this.markOutdated(node.parentId);
   }
 
   deleteInNode(key: string, value: string[]): void;
@@ -283,7 +284,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return nestedChildren;
   }
 
-  private async connectionUpdateHandler(key: ResourceKey<string>) {
+  private connectionUpdateHandler(key: ResourceKey<string>) {
     const outdatedTrees: string[] = [];
     const outdatedFolders: string[] = [];
     const closedConnections: string[] = [];
@@ -319,7 +320,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
       const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
-      await this.markOutdated(key);
+      this.markOutdated(key);
     }
   }
 

@@ -135,7 +135,11 @@ export const CreateConnection = observer<Props>(function CreateConnection({
   const style = useStyles(componentStyle);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
-  const driver = useMapResource(DBDriverResource, createConnectionService.data?.config.driverId || null);
+  const driver = useMapResource(
+    CreateConnection,
+    DBDriverResource,
+    createConnectionService.data?.config.driverId || null
+  );
 
   if (createConnectionService.data) {
     return styled(style)(

@@ -18,6 +18,7 @@ import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
+import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
@@ -80,6 +81,7 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
 }) {
   const context = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !context.loading);
 
   const [editing, setEditing] = useState(false);
@@ -90,6 +92,12 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
     },
   });
 
+  let icon = node.icon;
+
+  if (navNodeInfoResource.getException(node.id) || navTreeResource.getException(node.id)) {
+    icon = '/icons/error_icon_sm.svg';
+  }
+
   const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -99,7 +107,7 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
   return styled(useStyles(TREE_NODE_STYLES, styles))(
     <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
       <TreeNodeExpand />
-      <TreeNodeIcon icon={node.icon}>
+      <TreeNodeIcon icon={icon}>
         <status {...use({ connected })} />
       </TreeNodeIcon>
       <TreeNodeName>

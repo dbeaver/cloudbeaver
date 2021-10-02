@@ -52,8 +52,18 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   const state = useGrantedConnections(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const dbDriverResource = useMapResource(DBDriverResource, CachedMapAllKey, { isActive: () => selected });
-  const connections = useMapResource(ConnectionsResource, CachedMapAllKey, { isActive: () => selected });
+  const dbDriverResource = useMapResource(
+    GrantedConnections,
+    DBDriverResource,
+    CachedMapAllKey,
+    { isActive: () => selected }
+  );
+  const connections = useMapResource(
+    GrantedConnections,
+    ConnectionsResource,
+    CachedMapAllKey,
+    { isActive: () => selected }
+  );
 
   const grantedConnections = useMemo(() => computed(() => connections.resource.values
     .filter(connection => state.state.grantedSubjects.includes(connection.id))

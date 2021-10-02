@@ -50,10 +50,11 @@ export const Main = observer(function Main() {
   const styles = useStyles(mainStyles, splitStyles);
   const permissionsService = useDataResource(PermissionsResource, undefined);
   const connectionExecutionContext = useMapResource(
+    Main,
     ConnectionExecutionContextResource,
     CachedMapAllKey
   );
-  const connectionInfo = useMapResource(ConnectionInfoResource, CachedMapAllKey);
+  const connectionInfo = useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
 
   return styled(styles)(
     <Loader state={[connectionExecutionContext, connectionInfo, permissionsService]}>

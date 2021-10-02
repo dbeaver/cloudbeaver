@@ -40,6 +40,7 @@ interface IActions<
     > | undefined,
   ) => Promise<any> | any;
   onError?: (exception: Error) => void;
+  preload?: Array<IMapResourceState<any>>;
 }
 
 interface KeyWithIncludes<TKey, TIncludes> {
@@ -47,30 +48,31 @@ interface KeyWithIncludes<TKey, TIncludes> {
   includes: TIncludes;
 }
 
+interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> extends ILoadableState {
+  resource: TResource;
+  isOutdated: () => boolean;
+}
+
 interface IMapResourceListResult<
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
-> extends ILoadableState {
+> extends IMapResourceState<TResource> {
   data: CachedMapResourceListGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
-  resource: TResource;
   exception: Error[] | null;
-  reload: () => void;
 }
 
 interface IMapResourceResult<
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
-> extends ILoadableState {
+> extends IMapResourceState<TResource> {
   data: CachedMapResourceGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
-  resource: TResource;
   exception: Error | null;
-  reload: () => void;
 }
 
 export function useMapResource<
@@ -80,6 +82,7 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
+  component: React.FC<any>,
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any
     ? CachedMapResourceKey<TResource> | null | KeyWithIncludes<CachedMapResourceKey<TResource>, TIncludes>
@@ -94,6 +97,7 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
+  component: React.FC<any>,
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any
     ? (
@@ -115,6 +119,7 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
+  component: React.FC<any>,
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: TResource extends any ? IActions<TKeyArg, TResource, TIncludes> : never
@@ -125,6 +130,7 @@ export function useMapResource<
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as TIncludes;
+  const [loadFunctionName] = useState(component.name);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
     key = keyObj.key;
@@ -140,7 +146,25 @@ export function useMapResource<
     CachedMapResourceValue<TResource>,
     TIncludes
     > | undefined,
-    async load() {
+    get preloaded(): boolean {
+      if (this.actions?.preload) {
+        for (const preload of this.actions.preload) {
+          if (
+            !preload.isLoaded()
+            || preload.isOutdated()
+            || (
+              Array.isArray(preload.exception)
+                ? preload.exception.some(Boolean)
+                : !!preload.exception
+            )
+          ) {
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+    async [loadFunctionName](refresh?: boolean) {
       this.firstRender = false;
       const { resource, actions, prevData, key, includes } = this;
 
@@ -160,23 +184,33 @@ export function useMapResource<
           return;
         }
 
-        const newData = await resource.load(key, includes as any);
-        setException(null);
-
-        try {
-          await actions?.onData?.(
-            newData,
-            resource,
-            prevData
-          );
-        } finally {
-          this.prevData = newData;
+        if (refresh) {
+          resource.markOutdated(key);
         }
+
+        const newData = await resource.load(key, includes as any);
+        this.prevData = newData;
+
+        await actions?.onData?.(
+          newData,
+          resource,
+          prevData
+        );
+        setException(null);
       } catch (exception) {
-        if (resource.getException(key) === null) {
+        const resourceException = resource.getException(key);
+
+        if (
+          !resourceException
+          || (
+            Array.isArray(resourceException) && !resourceException.some(Boolean)
+          )
+        ) {
           setException(exception);
         }
+
         actions?.onError?.(exception);
+
         if (!this.exceptionObserved) {
           notifications.logException(exception, 'Can\'t load data');
         }
@@ -218,16 +252,30 @@ export function useMapResource<
 
       return resource.get(refObj.key);
     },
-    isLoaded: () => {
+    isOutdated: () => {
+      if (refObj.key === null || !refObj.preloaded) {
+        return true;
+      }
+
+      return resource.isOutdated(key);
+    },
+    isLoaded() {
       if (refObj.key === null) {
         return true;
+      }
+
+      if (
+        Array.isArray(this.exception)
+          ? this.exception.some(Boolean)
+          : !!this.exception
+      ) {
+        return false;
       }
 
       return resource.isLoaded(refObj.key, refObj.includes as any);
     },
     reload: () => {
-      setException(null);
-      refObj.load();
+      (refObj as any)[loadFunctionName](true);
     },
     isLoading: () => {
       if (refObj.key === null) {
@@ -238,13 +286,15 @@ export function useMapResource<
     },
   }));
 
+  const preloaded = refObj.preloaded; // make mobx subscription
+
   useEffect(() => {
-    if (!outdated && !refObj.firstRender) {
+    if (!preloaded || (!outdated && !refObj.firstRender)) {
       return;
     }
 
     if (result.exception === null || (Array.isArray(result.exception) && !result.exception.some(Boolean))) {
-      refObj.load();
+      (refObj as any)[loadFunctionName]();
     }
   });
 

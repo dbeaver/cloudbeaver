@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList
+  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList
 } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
@@ -23,8 +21,10 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super();
-    this.navNodeInfoResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.navNodeInfoResource.onItemDelete.addHandler(this.delete.bind(this));
+
+    // this.preloadResource(this.navNodeInfoResource);
+    this.navNodeInfoResource.outdateResource(this);
+    this.navNodeInfoResource.deleteInResource(this);
   }
 
   async loadChildren(parentId: string, key: ResourceKey<string>): Promise<Map<string, DBObject>> {
@@ -57,11 +57,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       navNodeId: parentId,
     });
 
-    runInAction(() => {
-      for (const dbObject of dbObjects) {
-        this.set(dbObject.id, dbObject);
-      }
-    });
+    this.set(resourceKeyList(dbObjects.map(dbObject => dbObject.id)), dbObjects);
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {

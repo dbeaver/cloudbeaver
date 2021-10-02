@@ -12,6 +12,7 @@ import { ObjectProperties } from './ObjectProperties';
 
 export const NavNodeMetadataPanel: NavNodeTransformViewComponent = function NavNodeMetadataPanel({
   nodeId,
+  parents,
 }) {
-  return <ObjectProperties objectId={nodeId} />;
+  return <ObjectProperties objectId={nodeId} parents={parents} />;
 };

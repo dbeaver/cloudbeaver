@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { preloadNodeParents } from '../../../preloadNodeParents';
 import { ObjectChildrenPropertyTable } from '../../ObjectPropertyTable/ObjectChildrenPropertyTable';
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
@@ -29,17 +30,21 @@ const style = css`
 export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({
   folderId,
   nodeId,
+  parents,
 }) {
   const translate = useTranslate();
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const tree = useMapResource(NavTreeResource, nodeId);
+  const tree = useMapResource(VirtualFolderPanel, NavTreeResource, nodeId, {
+    onLoad: async resource => !(await preloadNodeParents(resource, navNodeInfoResource, parents, nodeId)),
+  });
   const key = resourceKeyList(tree.data || []);
-  const dbObject = useMapResource(DBObjectResource, key, {
+  const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
       await resource.loadChildren(nodeId, key);
       return true;
     },
+    preload: [tree],
   });
 
   const objects = dbObject.data

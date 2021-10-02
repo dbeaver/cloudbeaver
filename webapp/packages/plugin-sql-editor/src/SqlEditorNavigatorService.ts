@@ -7,10 +7,11 @@
  */
 
 import { NavigationTabsService } from '@cloudbeaver/core-app';
-import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
@@ -48,9 +49,9 @@ export class SqlEditorNavigatorService {
 
   constructor(
     private navigationTabsService: NavigationTabsService,
-    private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
     private sqlEditorTabService: SqlEditorTabService,
+    private connectionInfoResource: ConnectionInfoResource,
     private readonly sqlResultTabsService: SqlResultTabsService,
     navigationService: NavigationService
   ) {
@@ -60,7 +61,9 @@ export class SqlEditorNavigatorService {
     )
       .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
-    this.connectionsManagerService.onCloseConnection.subscribe(this.handleConnectionClose.bind(this));
+
+    this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionClose.bind(this));
+    this.connectionInfoResource.onConnectionClose.addHandler(connection => this.handleConnectionClose(connection.id));
   }
 
   openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
@@ -88,10 +91,10 @@ export class SqlEditorNavigatorService {
     });
   }
 
-  private async handleConnectionClose(connectionId: string) {
+  private async handleConnectionClose(key: ResourceKey<string>) {
     try {
       for (const tab of this.navigationTabsService.findTabs<ISqlEditorTabState>(
-        isSQLEditorTab(tab => !!tab.handlerState.executionContext?.connectionId.includes(connectionId))
+        isSQLEditorTab(tab => ResourceKeyUtils.includes(key, tab.handlerState.executionContext?.connectionId))
       )) {
         this.sqlEditorTabService.resetConnectionInfo(tab.handlerState);
       }

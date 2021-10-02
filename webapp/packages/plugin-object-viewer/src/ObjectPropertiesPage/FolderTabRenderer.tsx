@@ -18,21 +18,23 @@ import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 interface IFolderTabRendererProps {
   nodeId: string;
   folderId: string;
+  parents: string[];
   style?: ComponentStyle;
 }
 
 export const FolderTabRenderer = observer<IFolderTabRendererProps>(function FolderTabRenderer({
   nodeId,
   folderId,
+  parents,
   style,
 }) {
   const navNodeViewService = useService(NavNodeViewService);
 
   for (const tab of navNodeViewService.tabs) {
-    const Tab = tab(nodeId, folderId);
+    const Tab = tab(nodeId, folderId, parents);
 
     if (Tab) {
-      return <Tab nodeId={nodeId} folderId={folderId} style={style} />;
+      return <Tab nodeId={nodeId} folderId={folderId} style={style} parents={parents} />;
     }
   }
 

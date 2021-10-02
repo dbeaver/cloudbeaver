@@ -72,7 +72,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useMapResource(ConnectionsResource, CachedMapAllKey);
+  useMapResource(ConnectionsAdministration, ConnectionsResource, CachedMapAllKey);
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>

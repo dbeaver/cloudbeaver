@@ -8,7 +8,6 @@
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
@@ -29,11 +28,8 @@ export class AuthConfigurationParametersResource
   ) {
     super();
 
-    this.sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
-
-    this.beforeLoad
-      .addHandler(() => permissionsResource.load())
-      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EAdminPermission.admin)));
+    this.sessionDataResource.outdateResource(this);
+    permissionsResource.require(this, EAdminPermission.admin);
   }
 
   protected async loader(

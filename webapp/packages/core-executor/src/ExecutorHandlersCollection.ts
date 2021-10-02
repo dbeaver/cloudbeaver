@@ -9,24 +9,25 @@
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandlersCollection<T> {
-  handlers: Array<IExecutorHandler<T>> = [];
-  postHandlers: Array<IExecutorHandler<T>> = [];
-  chain: Array<IChainLink<T>> = [];
-  readonly collections: Array<IExecutorHandlersCollection<T>>;
-  private links: Map<IExecutorHandlersCollection<any>, IExecutorHandlersCollection<T>>;
+export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>>
+implements IExecutorHandlersCollection<T, TResult> {
+  handlers: Array<IExecutorHandler<T, TResult>> = [];
+  postHandlers: Array<IExecutorHandler<T, TResult>> = [];
+  chain: Array<IChainLink<T, TResult>> = [];
+  readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
+  private links: Map<IExecutorHandlersCollection<any, TResult>, IExecutorHandlersCollection<T, TResult>>;
 
   constructor() {
     this.links = new Map();
     this.collections = [];
   }
 
-  addCollection(collection: IExecutorHandlersCollection<T>): this {
+  addCollection(collection: IExecutorHandlersCollection<T, TResult>): this {
     this.collections.push(collection);
     return this;
   }
 
-  for(link: IExecutorHandlersCollection<any>): IExecutorHandlersCollection<T> {
+  for(link: IExecutorHandlersCollection<any, TResult>): IExecutorHandlersCollection<T, TResult> {
     if (!this.links.has(link)) {
       this.links.set(link, new ExecutorHandlersCollection());
     }
@@ -34,11 +35,13 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this.links.get(link)!;
   }
 
-  getLinkHandlers(link: IExecutorHandlersCollection<any>): IExecutorHandlersCollection<T> | undefined {
+  getLinkHandlers(
+    link: IExecutorHandlersCollection<any, TResult>
+  ): IExecutorHandlersCollection<T, TResult> | undefined {
     return this.links.get(link);
   }
 
-  before<TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>): this {
+  before<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>): this {
     this.chain.push({
       executor,
       map,
@@ -47,7 +50,7 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this;
   }
 
-  next<TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>): this {
+  next<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>): this {
     this.chain.push({
       executor,
       map,
@@ -56,21 +59,21 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this;
   }
 
-  addHandler(handler: IExecutorHandler<T>): this {
+  addHandler(handler: IExecutorHandler<T, TResult>): this {
     this.handlers.push(handler);
     return this;
   }
 
-  removeHandler(handler: IExecutorHandler<T>): void {
+  removeHandler(handler: IExecutorHandler<T, TResult>): void {
     this.handlers = this.handlers.filter(h => h !== handler);
   }
 
-  addPostHandler(handler: IExecutorHandler<T>): this {
+  addPostHandler(handler: IExecutorHandler<T, TResult>): this {
     this.postHandlers.push(handler);
     return this;
   }
 
-  removePostHandler(handler: IExecutorHandler<T>): void {
+  removePostHandler(handler: IExecutorHandler<T, TResult>): void {
     this.postHandlers = this.postHandlers.filter(h => h !== handler);
   }
 }

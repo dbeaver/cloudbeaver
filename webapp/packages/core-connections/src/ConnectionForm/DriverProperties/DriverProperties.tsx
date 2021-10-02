@@ -61,6 +61,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   });
 
   const driver = useMapResource(
+    DriverProperties,
     DBDriverResource,
     { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
     {

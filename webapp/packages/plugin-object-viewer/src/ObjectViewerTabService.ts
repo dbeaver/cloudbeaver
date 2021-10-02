@@ -19,7 +19,7 @@ import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbe
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -318,6 +318,7 @@ export class ObjectViewerTabService {
     ) {
       // tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
       if (tab.handlerState.connectionId) {
+        await this.connectionInfo.load(CachedMapAllKey);
         if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
           return false;
         }

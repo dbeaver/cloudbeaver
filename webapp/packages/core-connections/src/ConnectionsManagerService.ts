@@ -22,7 +22,6 @@ import { EConnectionFeature } from './EConnectionFeature';
 @injectable()
 export class ConnectionsManagerService {
   onOpenConnection = new Subject<Connection>();
-  onCloseConnection = new Subject<string>();
   private disconnecting: boolean;
   private connectionExecutor: IExecutor<string | null>;
 
@@ -80,7 +79,6 @@ export class ConnectionsManagerService {
     }
 
     await this.connectionInfo.deleteConnection(id);
-    await this.afterConnectionClose(id);
   }
 
   hasAnyConnection(connected?: boolean): boolean {
@@ -124,7 +122,6 @@ export class ConnectionsManagerService {
       return;
     }
     await this.connectionInfo.close(connection.id);
-    await this.afterConnectionClose(connection.id);
   }
 
   async closeAllConnections(): Promise<void> {
@@ -164,10 +161,6 @@ export class ConnectionsManagerService {
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
     await this.connectionObjectContainers.load({ connectionId, catalogId });
     return this.connectionObjectContainers.get({ connectionId, catalogId })!;
-  }
-
-  private async afterConnectionClose(id: string) {
-    this.onCloseConnection.next(id);
   }
 
   private addConnection(connection: Connection) {

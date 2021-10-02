@@ -27,7 +27,7 @@ import {
   CachedMapAllKey,
 } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
+import type { DatabaseConnection } from './Administration/ConnectionsResource';
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
@@ -51,7 +51,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
-    private connectionsResource: ConnectionsResource,
     sessionDataResource: SessionDataResource,
     permissionsResource: PermissionsResource
   ) {
@@ -68,13 +67,11 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
-    this.beforeLoad
-      .addHandler(() => permissionsResource.load())
-      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EPermission.public)));
+    permissionsResource.require(this, EPermission.public);
 
-    sessionDataResource.onDataOutdated.addHandler(async () => {
+    sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
-      await this.markOutdated();
+      this.markOutdated();
     });
 
     makeObservable(this, {
@@ -83,10 +80,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       createFromNode: action,
       add: action,
     });
-  }
-
-  async updateSessionConnections(): Promise<boolean> {
-    return await this.connectionsResource.updateSessionConnections();
   }
 
   async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {

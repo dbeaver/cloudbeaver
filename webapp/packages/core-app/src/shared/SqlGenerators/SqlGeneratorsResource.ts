@@ -28,8 +28,8 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
   ) {
     super();
 
-    this.navNodeInfoResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.navNodeInfoResource.onItemDelete.addHandler(this.delete.bind(this));
+    this.navNodeInfoResource.outdateResource(this);
+    this.navNodeInfoResource.deleteInResource(this);
   }
 
   async generateEntityQuery(

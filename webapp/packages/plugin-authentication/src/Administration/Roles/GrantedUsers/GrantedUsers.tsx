@@ -18,6 +18,7 @@ import {
   TextPlaceholder, useMapResource, useTab,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
@@ -51,7 +52,7 @@ export const GrantedUsers: TabContainerPanelComponent<IRoleFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useMapResource(UsersResource, selected ? UsersResource.keyAll : null);
+  const users = useMapResource(GrantedUsers, UsersResource, selected ? CachedMapAllKey : null);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedUsers.includes(user.userId))

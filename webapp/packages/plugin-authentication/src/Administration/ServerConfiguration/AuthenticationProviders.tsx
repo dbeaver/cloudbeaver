@@ -25,7 +25,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   configurationWizard,
 }) {
   const authProviderService = useService(AuthProviderService);
-  const providers = useMapResource(AuthProvidersResource, CachedMapAllKey);
+  const providers = useMapResource(AuthenticationProviders, AuthProvidersResource, CachedMapAllKey);
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const formContext = useContext(FormContext);

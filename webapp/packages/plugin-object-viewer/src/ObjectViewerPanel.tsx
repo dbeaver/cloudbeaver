@@ -22,6 +22,7 @@ import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
+import { preloadNodeParents } from './preloadNodeParents';
 
 const styles = composes(
   css`
@@ -51,6 +52,11 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
 
+  const objectId = tab.handlerState.objectId;
+  const connectionId = tab.handlerState.connectionId || null;
+  const parentId = tab.handlerState.parentId;
+  const parents = tab.handlerState.parents;
+
   const state = useObservableRef(() => ({
     connecting: false,
     notFound: false,
@@ -59,39 +65,31 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     notFound: observable.ref,
   }, false);
 
-  const connection = useMapResource(ConnectionInfoResource, tab.handlerState.connectionId || null, {
-    isActive: resource => !tab.handlerState.connectionId || !resource.has(tab.handlerState.connectionId),
+  const connection = useMapResource(ObjectViewerPanel, ConnectionInfoResource, connectionId, {
+    isActive: resource => !connectionId || !resource.has(connectionId),
   });
 
-  const children = useMapResource(NavTreeResource, tab.handlerState.parentId, {
+  const children = useMapResource(ObjectViewerPanel, NavTreeResource, parentId, {
     onLoad: async resource => {
-      if (tab.handlerState.parents.length === 0) {
-        return true;
-      }
-
-      const first = tab.handlerState.parents[0];
-      await resource.load(first);
-
-      for (const nodeId of tab.handlerState.parents) {
-        if (!navNodeInfoResource.has(nodeId)) {
-          state.notFound = true;
-          return true;
-        }
-        await resource.load(nodeId);
-      }
-      state.notFound = false;
-      return false;
+      const preload = await preloadNodeParents(resource, navNodeInfoResource, parents);
+      state.notFound = !preload;
+      return state.notFound;
     },
     isActive: () => connection.data?.connected || false,
+    onData: data => {
+      state.notFound = !data.includes(objectId);
+    },
+    preload: [connection],
   });
 
-  const dataPreloaded = children.isLoaded() && !!children.data?.includes(tab.handlerState.objectId) && !state.notFound;
-
-  const node = useMapResource(navNodeInfoResource, dataPreloaded ? tab.handlerState.objectId : null, {
+  const node = useMapResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
+    onLoad: async resource => !(await preloadNodeParents(children.resource, resource, parents, objectId)),
     onData(data) {
       tab.handlerState.tabIcon = data.icon;
       tab.handlerState.tabTitle = data.name;
     },
+    isActive: () => !state.notFound,
+    preload: [children],
   });
 
   const pages = dbObjectPagesService.orderedPages;

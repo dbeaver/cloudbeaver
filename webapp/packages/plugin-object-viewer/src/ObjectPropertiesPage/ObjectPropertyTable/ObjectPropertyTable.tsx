@@ -7,14 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { DBObject, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { DBObject, DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { css } from '@reshadow/react';
 
+import { preloadNodeParents } from '../../preloadNodeParents';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
 
 const styles = css`
@@ -30,20 +31,33 @@ const styles = css`
 interface ObjectPropertyTableProps {
   objectId: string;
   parentId: string;
+  parents: string[];
 }
 
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({
   objectId,
   parentId,
+  parents,
 }) {
   const translate = useTranslate();
-  const tree = useMapResource(NavTreeResource, objectId);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
+  const tree = useMapResource(ObjectPropertyTable, NavTreeResource, objectId, {
+    onLoad: async () => !(await preloadNodeParents(navTreeResource, navNodeInfoResource, parents, objectId)),
+  });
   const key = resourceKeyList(tree.data || []);
-  const dbObject = useMapResource(DBObjectResource, key, {
+  const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
+      const preloaded = await preloadNodeParents(navTreeResource, navNodeInfoResource, parents);
+
+      if (!preloaded) {
+        return true;
+      }
+
       await resource.loadChildren(objectId, key);
       return true;
     },
+    preload: [tree],
   });
 
   const objects = dbObject.data as DBObject[];

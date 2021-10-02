@@ -7,7 +7,6 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -33,11 +32,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   ) {
     super();
 
-    this.beforeLoad
-      .addHandler(() => permissionsResource.load())
-      .addHandler(ExecutorInterrupter.interrupter(() => !permissionsResource.has(EPermission.public)));
+    permissionsResource
+      .require(this, EPermission.public)
+      .outdateResource(this);
 
-    permissionsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     connectionInfoResource.onItemAdd.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
   }

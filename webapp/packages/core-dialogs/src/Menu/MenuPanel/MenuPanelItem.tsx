@@ -7,13 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import { Checkbox, Icon, IconOrImage, Loader, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
-import { use } from '@reshadow/react';
 
 import { menuPanelStyles } from './menuPanelStyles';
 

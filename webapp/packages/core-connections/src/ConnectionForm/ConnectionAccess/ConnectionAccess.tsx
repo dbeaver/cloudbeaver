@@ -59,11 +59,11 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   const { selected } = useTab(tabId, state.load);
 
-  const users = useMapResource(UsersResource, null, {
+  const users = useMapResource(ConnectionAccess, UsersResource, null, {
     onLoad: resource => { resource.loadAll(); },
   });
 
-  const roles = useMapResource(RolesResource, null, {
+  const roles = useMapResource(ConnectionAccess, RolesResource, null, {
     onLoad: resource => { resource.loadAll(); },
   });
 

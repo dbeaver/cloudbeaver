@@ -59,7 +59,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const style = useStyles(styles);
   const controller = useController(ConnectionSelectorController);
   const isEnabled = usePermission(EPermission.public);
-  const driver = useMapResource(DBDriverResource, CachedMapAllKey, {
+  const driver = useMapResource(ConnectionSelector, DBDriverResource, CachedMapAllKey, {
     isActive: () => isEnabled,
   });
   const ConnectionMenu = TopMenuItem;

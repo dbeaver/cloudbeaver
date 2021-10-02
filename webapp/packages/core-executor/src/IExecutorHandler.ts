@@ -8,7 +8,7 @@
 
 import type { IExecutionContextProvider } from './IExecutionContext';
 
-export type IExecutorHandler<T> = (
+export type IExecutorHandler<T, TResult = any | Promise<any>> = (
   data: T,
   contexts: IExecutionContextProvider<T>
-) => any | Promise<any>;
+) => TResult;

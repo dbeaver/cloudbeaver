@@ -14,18 +14,16 @@ import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
-export class UserInfoResource extends CachedDataResource<UserInfo | null, void> {
+export class UserInfoResource extends CachedDataResource<UserInfo | null> {
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
-    private sessionResource: SessionResource,
+    sessionResource: SessionResource,
     private sessionDataResource: SessionDataResource
   ) {
     super(null);
 
-    this.sync(this.sessionResource);
-    this.sessionDataResource.beforeLoad.addHandler(() => this.load());
-    this.onDataOutdated.addHandler(() => this.sessionDataResource.markOutdated());
+    this.sync(sessionResource);
   }
 
   isLinked(provideId: string): boolean {
@@ -74,7 +72,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
         this.data.authTokens.push(authToken as UserAuthToken);
       }
     });
-    await this.sessionDataResource.markOutdated();
+    this.sessionDataResource.markOutdated();
 
     return this.data;
   }
@@ -86,7 +84,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
         this.data = null;
       }
     });
-    await this.sessionDataResource.refresh();
+    this.sessionDataResource.markOutdated();
   }
 
   protected async loader(): Promise<UserInfo | null> {

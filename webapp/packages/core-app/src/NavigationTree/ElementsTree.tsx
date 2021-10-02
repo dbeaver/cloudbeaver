@@ -77,7 +77,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const Placeholder = emptyPlaceholder;
   const navNodeInfoResource = useService(NavNodeInfoResource);
 
-  useMapResource(NavTreeResource, root);
+  useMapResource(ElementsTree, NavTreeResource, root);
 
   const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
 
