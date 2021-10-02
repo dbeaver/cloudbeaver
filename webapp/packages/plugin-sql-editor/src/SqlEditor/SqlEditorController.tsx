@@ -416,6 +416,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   }
 
   private beforeExecute(): void {
+    this.editor?.closeHint();
     this.resetLineStateHighlight();
   }
 
