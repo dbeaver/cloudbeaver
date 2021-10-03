@@ -165,7 +165,6 @@ export function useMapResource<
       return true;
     },
     async [loadFunctionName](refresh?: boolean) {
-      this.firstRender = false;
       const { resource, actions, prevData, key, includes } = this;
 
       const active = await actions?.isActive?.(resource);
@@ -174,6 +173,7 @@ export function useMapResource<
         return;
       }
 
+      this.firstRender = false;
       this.loading = true;
 
       try {
@@ -289,7 +289,7 @@ export function useMapResource<
   const preloaded = refObj.preloaded; // make mobx subscription
 
   useEffect(() => {
-    if (!preloaded || (!outdated && !refObj.firstRender)) {
+    if ((!preloaded || !outdated) && !refObj.firstRender) {
       return;
     }
 

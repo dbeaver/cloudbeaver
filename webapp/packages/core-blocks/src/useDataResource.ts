@@ -58,13 +58,13 @@ export function useDataResource<
     firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     async load(refresh?: boolean) {
-      this.firstRender = false;
       const { loading, resource, actions, prevData } = refObj;
 
       if (loading) {
         return;
       }
 
+      this.firstRender = false;
       this.loading = true;
 
       try {
