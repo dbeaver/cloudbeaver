@@ -320,7 +320,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
       const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
-      this.markOutdated(key);
+      // this.markOutdated(key);
+      this.refresh(key); // TODO: better to use markOutdated, but currently leads for missing update if connection was initiated not from nav-tree
     }
   }
 
