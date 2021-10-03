@@ -62,6 +62,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
     try {
       for (const result of prevResults) {
+        if (result.id === null) {
+          continue;
+        }
+
         const executionContextInfo = this.executionContext.context;
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
           connectionId: this.options.connectionId,
@@ -148,6 +152,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       prevResults.length === 1
       && prevResults[0].contextId === executionContext.context!.id
       && prevResults[0].connectionId === executionContext.context?.connectionId
+      && prevResults[0].id !== null
     ) {
       firstResultId = prevResults[0].id;
     }
@@ -190,6 +195,9 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
   private async closeResults(results: IDatabaseResultSet[]) {
     for (const result of results) {
+      if (result.id === null) {
+        continue;
+      }
       try {
         await this.graphQLService.sdk.closeResult({
           connectionId: result.connectionId,
@@ -208,7 +216,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     limit: number
   ): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>(result => ({
-      id: result.resultSet?.id || '0',
+      id: result.resultSet?.id || null,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,

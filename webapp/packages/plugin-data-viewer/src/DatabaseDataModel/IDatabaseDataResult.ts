@@ -9,7 +9,7 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 export interface IDatabaseDataResult {
-  id: string;
+  id: string | null;
   uniqueResultId: string;
   connectionId: string;
   contextId: string;

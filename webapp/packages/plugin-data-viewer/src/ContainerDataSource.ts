@@ -71,6 +71,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       prevResults.length === 1
       && prevResults[0].contextId === executionContext.context!.id
       && prevResults[0].connectionId === executionContext.context?.connectionId
+      && prevResults[0].id !== null
     ) {
       firstResultId = prevResults[0].id;
     }
@@ -127,6 +128,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     try {
       for (const result of prevResults) {
+        if (result.id === null) {
+          continue;
+        }
         const executionContextInfo = executionContext.context!;
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
           connectionId: executionContextInfo.connectionId,
@@ -177,6 +181,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
   private async closeResults(results: IDatabaseResultSet[]) {
     for (const result of results) {
+      if (result.id === null) {
+        continue;
+      }
       try {
         await this.graphQLService.sdk.closeResult({
           connectionId: result.connectionId,

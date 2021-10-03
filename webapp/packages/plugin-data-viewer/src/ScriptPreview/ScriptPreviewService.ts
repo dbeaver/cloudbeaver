@@ -50,7 +50,7 @@ export class ScriptPreviewService {
 
     const result = model.source.getResult(resultIndex);
 
-    if (!result) {
+    if (!result || !result.id) {
       throw new Error(`There is no result for provided result index: '${resultIndex}'`);
     }
 

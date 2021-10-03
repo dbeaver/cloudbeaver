@@ -13,16 +13,16 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
 export type DatabaseDataSelectActionsData<TKey> = {
   type: 'select';
-  resultId: string;
+  resultId: string | null;
   key: TKey;
   selected: boolean;
 } | {
   type: 'focus';
-  resultId: string;
+  resultId: string | null;
   key: TKey | null;
 } | {
   type: 'clear';
-  resultId: string;
+  resultId: string | null;
 };
 
 export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataResult>

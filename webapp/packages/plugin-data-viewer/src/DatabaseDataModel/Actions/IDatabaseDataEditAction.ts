@@ -28,7 +28,7 @@ export interface IDatabaseDataEditActionValue<TKey, TValue> {
 export interface IDatabaseDataEditActionData<TKey, TValue> {
   revert: boolean;
   type?: DatabaseEditChangeType;
-  resultId: string;
+  resultId: string | null;
   value?: Array<IDatabaseDataEditActionValue<TKey, TValue>>;
 }
 
