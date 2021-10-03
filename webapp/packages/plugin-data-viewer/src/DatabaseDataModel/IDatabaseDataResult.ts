@@ -10,6 +10,9 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 export interface IDatabaseDataResult {
   id: string;
+  uniqueResultId: string;
+  connectionId: string;
+  contextId: string;
   dataFormat: ResultDataFormat;
   loadedFully: boolean;
   updateRowCount: number;

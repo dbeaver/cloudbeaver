@@ -52,7 +52,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
       throw new Error('DataFormat unsupported');
     }
 
-    const actions = this.getOrCreateActionsList(result.id);
+    const actions = this.getOrCreateActionsList(result.uniqueResultId);
 
     return runInAction(() => {
       let action = actions.find(action => action instanceof Action);
@@ -70,7 +70,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
         }
 
         action = new Action(this.source, result, ...depends);
-        this.addActionToList(result.id, actions, action);
+        this.addActionToList(result.uniqueResultId, actions, action);
       }
       return action as T;
     });
@@ -80,7 +80,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     result: TResult,
     Action: IDatabaseDataActionInterface<TOptions, TResult, T>
   ): T | undefined {
-    const actions = this.getActionsList(result.id);
+    const actions = this.getActionsList(result.uniqueResultId);
     const action = actions?.find(action => action instanceof Action);
 
     return action as T | undefined;
@@ -90,7 +90,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     const actionsMap = Array.from(this.actions.entries());
 
     for (const [key, actions] of actionsMap) {
-      const result = results.find(result => result.id === key);
+      const result = results.find(result => result.uniqueResultId === key);
 
       if (!result) {
         for (const action of actions) {

@@ -76,6 +76,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       activeRequest: observable.ref,
       activeSave: observable.ref,
       activeTask: observable.ref,
+      setResults: action,
       setSupportedDataFormats: action,
     });
   }

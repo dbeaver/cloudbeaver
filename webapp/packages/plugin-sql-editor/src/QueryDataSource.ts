@@ -62,9 +62,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
     try {
       for (const result of prevResults) {
+        const executionContextInfo = this.executionContext.context;
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
           connectionId: this.options.connectionId,
-          contextId: this.executionContext.context.id,
+          contextId: executionContextInfo.id,
           resultsId: result.id,
         };
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
@@ -80,7 +81,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
 
         if (editor) {
-          const responseResult = this.transformResults(response.result.results, 0)
+          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
             .find(newResult => newResult.id === result.id);
 
           if (responseResult) {
@@ -108,7 +109,11 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     return this;
   }
 
-  getResults(response: SqlExecuteInfo, limit: number): IDatabaseResultSet[] | null {
+  getResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    response: SqlExecuteInfo,
+    limit: number
+  ): IDatabaseResultSet[] | null {
     this.requestInfo = {
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
@@ -120,7 +125,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       return null;
     }
 
-    return this.transformResults(response.results, limit);
+    return this.transformResults(executionContextInfo, response.results, limit);
   }
 
   async request(
@@ -139,7 +144,11 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
     let firstResultId: string | undefined;
 
-    if (prevResults.length === 1) {
+    if (
+      prevResults.length === 1
+      && prevResults[0].contextId === executionContext.context!.id
+      && prevResults[0].connectionId === executionContext.context?.connectionId
+    ) {
       firstResultId = prevResults[0].id;
     }
 
@@ -163,14 +172,14 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     try {
       const response = await this.currentTask;
 
-      const results = this.getResults(response, limit);
+      const results = this.getResults(executionContextInfo, response, limit);
       this.clearError();
 
       if (!results) {
         return prevResults;
       }
 
-      this.closeResults(executionContextInfo, prevResults);
+      this.closeResults(prevResults);
 
       return results;
     } catch (exception) {
@@ -179,12 +188,12 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     }
   }
 
-  private async closeResults(context: IConnectionExecutionContextInfo, results: IDatabaseResultSet[]) {
+  private async closeResults(results: IDatabaseResultSet[]) {
     for (const result of results) {
       try {
         await this.graphQLService.sdk.closeResult({
-          connectionId: context.connectionId,
-          contextId: context.id,
+          connectionId: result.connectionId,
+          contextId: result.contextId,
           resultId: result.id,
         });
       } catch (exception) {
@@ -193,9 +202,16 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     }
   }
 
-  private transformResults(results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+  private transformResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    results: SqlQueryResults[],
+    limit: number
+  ): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || '0',
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,
+      connectionId: executionContextInfo.connectionId,
+      contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
@@ -206,9 +222,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   async dispose(): Promise<void> {
-    if (this.executionContext?.context) {
-      await this.closeResults(this.executionContext.context, this.results);
-    }
+    await this.closeResults(this.results);
     await this.cancel();
   }
 }

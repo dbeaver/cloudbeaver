@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
@@ -23,6 +25,10 @@ implements IDatabaseDataAction<TOptions, TResult> {
   constructor(source: IDatabaseDataSource<TOptions, TResult>, result: TResult) {
     this.result = result;
     this.source = source;
+
+    makeObservable(this, {
+      result: observable.ref,
+    });
   }
 
   updateResult(result: TResult): void {
