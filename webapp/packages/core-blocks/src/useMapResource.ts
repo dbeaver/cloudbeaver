@@ -289,7 +289,7 @@ export function useMapResource<
   const preloaded = refObj.preloaded; // make mobx subscription
 
   useEffect(() => {
-    if ((!preloaded || !outdated) && !refObj.firstRender) {
+    if (!preloaded || (!outdated && !refObj.firstRender)) {
       return;
     }
 
