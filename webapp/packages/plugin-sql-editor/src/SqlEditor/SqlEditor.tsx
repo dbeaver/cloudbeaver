@@ -42,6 +42,7 @@ const styles = composes(
       display: flex;
       flex-direction: column;
       align-items: center;
+      user-select: none;
     }
   
     button {
@@ -94,11 +95,10 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
 
   return styled(style)(
     <sql-editor className={className}>
-      <actions>
+      <actions onMouseDown={preventFocus}>
         <button
           disabled={controller.isLineScriptEmpty || controller.isDisabled}
           title={translate('sql_editor_sql_execution_button_tooltip')}
-          onMouseDown={preventFocus}
           onClick={controller.executeQuery}
         >
           <StaticImage icon="/icons/sql_exec.svg" />
@@ -106,7 +106,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
         <button
           disabled={controller.isLineScriptEmpty || controller.isDisabled}
           title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-          onMouseDown={preventFocus}
           onClick={controller.executeQueryNewTab}
         >
           <StaticImage icon="/icons/sql_exec_new.svg" />
@@ -114,7 +113,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
         <button
           disabled={controller.isDisabled || controller.isScriptEmpty}
           title={translate('sql_editor_sql_execution_script_button_tooltip')}
-          onMouseDown={preventFocus}
           onClick={controller.executeScript}
         >
           <StaticImage icon="/icons/sql_script_exec.svg" />
@@ -123,7 +121,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
           <button
             disabled={controller.isLineScriptEmpty || controller.isDisabled}
             title={translate('sql_editor_execution_plan_button_tooltip')}
-            onMouseDown={preventFocus}
             onClick={controller.showExecutionPlan}
           >
             <StaticImage icon="/icons/sql_execution_plan.svg" />
