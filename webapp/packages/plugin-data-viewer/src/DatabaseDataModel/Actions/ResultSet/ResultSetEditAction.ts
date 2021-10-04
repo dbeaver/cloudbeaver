@@ -332,8 +332,9 @@ export class ResultSetEditAction
   }
 
   revert(...keys: IResultSetElementKey[]): void {
-    const reverted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
-    const deleted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+    const revertedUpdates: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+    const revertedDeletions: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+    const revertedAdditions: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
 
     for (const key of keys) {
       const row = ResultSetDataKeysUtils.serialize(key.row);
@@ -347,33 +348,47 @@ export class ResultSetEditAction
       let value: IResultSetValue | undefined;
 
       if (update.type === DatabaseEditChangeType.delete) {
-        deleted.push({ key });
+        revertedDeletions.push({ key });
         this.editorData.delete(row);
       } else {
         prevValue = update.update[key.column.index];
         value = update.source?.[key.column.index] ?? null;
         update.update[key.column.index] = value;
-        reverted.push({ key, prevValue, value });
+
+        if (update.type === DatabaseEditChangeType.add) {
+          revertedAdditions.push({ key, prevValue, value });
+        } else {
+          revertedUpdates.push({ key, prevValue, value });
+        }
       }
 
       this.removeEmptyUpdate(update);
     }
 
-    if (reverted.length > 0) {
+    if (revertedUpdates.length > 0) {
       this.action.execute({
         resultId: this.result.id,
         type: DatabaseEditChangeType.update,
         revert: true,
-        value: reverted,
+        value: revertedUpdates,
       });
     }
 
-    if (deleted.length > 0) {
+    if (revertedDeletions.length > 0) {
       this.action.execute({
         resultId: this.result.id,
         type: DatabaseEditChangeType.delete,
         revert: true,
-        value: deleted,
+        value: revertedDeletions,
+      });
+    }
+
+    if (revertedAdditions.length > 0) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: DatabaseEditChangeType.add,
+        revert: true,
+        value: revertedAdditions,
       });
     }
   }
