@@ -88,6 +88,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
+      disableSave={model.source.options?.whereFilter === model.source.requestInfo.requestFilter}
       disabled={!supported || model.isLoading() || model.isDisabled(resultIndex)}
       simple
       onSave={handleApply}
