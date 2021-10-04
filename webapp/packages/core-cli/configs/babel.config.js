@@ -15,15 +15,11 @@ console.warn = (...args) => {
 
 module.exports = {
   compact: !devMode,
+  assumptions: {
+    setPublicClassFields: true, // defines properties in extending classes via Object.defineProperty
+    setSpreadProperties: true
+  },
   presets: [
-    [
-      "@babel/preset-react",
-      {
-        "runtime": "automatic",
-        // "importSource": "preact-jsx-runtime"
-      }
-    ],
-    ['@babel/preset-typescript', { isTSX: true, allExtensions:true }],
     [
       "@babel/preset-env",
       {
@@ -41,15 +37,23 @@ module.exports = {
         exclude: ["transform-async-to-generator", "transform-regenerator"],
       }
     ],
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic",
+        // "importSource": "preact-jsx-runtime"
+      }
+    ],
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
   ],
   plugins: [
-    '@babel/plugin-syntax-dynamic-import',
     'babel-plugin-transform-typescript-metadata',
+    '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining',
     ['@babel/plugin-proposal-decorators', { legacy: true }],
-    ['@babel/plugin-proposal-class-properties', { loose: false }],
-    ["@babel/plugin-proposal-object-rest-spread", { loose: true, useBuiltIns: true }],
+    ['@babel/plugin-proposal-class-properties'],
+    ["@babel/plugin-proposal-object-rest-spread", { useBuiltIns: true }],
     'reshadow/babel',
     /*devMode &&*/[
       "babel-plugin-module-resolver",
@@ -59,5 +63,5 @@ module.exports = {
         },
       },
     ],
-  ].filter(Boolean),
+  ].filter(Boolean)
 }

@@ -12,7 +12,7 @@ import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connecti
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
-import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
@@ -20,8 +20,13 @@ export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
 }
 
+export interface IQueryRequestInfo extends IRequestInfo {
+  query: string;
+}
+
 export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IDatabaseResultSet> {
   currentTask: ITask<SqlExecuteInfo> | null;
+  requestInfo: IQueryRequestInfo;
 
   get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
@@ -33,11 +38,18 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   ) {
     super();
 
+    this.currentTask = null;
+    this.requestInfo = {
+      requestDuration: 0,
+      requestMessage: '',
+      requestFilter: '',
+      source: null,
+      query: '',
+    };
+
     makeObservable(this, {
       currentTask: observable.ref,
     });
-
-    this.currentTask = null;
   }
 
   isDisabled(resultIndex: number): boolean {
@@ -123,6 +135,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       requestMessage: response.statusMessage || '',
       requestFilter: response.filterText || '',
       source: this.options?.query || null,
+      query: this.options?.query || '',
     };
 
     if (!response.results) {
@@ -153,6 +166,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       && prevResults[0].contextId === executionContext.context!.id
       && prevResults[0].connectionId === executionContext.context?.connectionId
       && prevResults[0].id !== null
+      && this.requestInfo.query === this.options?.query
     ) {
       firstResultId = prevResults[0].id;
     }
