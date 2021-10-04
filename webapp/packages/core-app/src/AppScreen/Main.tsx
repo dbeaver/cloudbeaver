@@ -49,15 +49,15 @@ const mainStyles = composes(
 export const Main = observer(function Main() {
   const styles = useStyles(mainStyles, splitStyles);
   const permissionsService = useDataResource(PermissionsResource, undefined);
-  const connectionExecutionContext = useMapResource(
+  useMapResource(
     Main,
     ConnectionExecutionContextResource,
     CachedMapAllKey
   );
-  const connectionInfo = useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
+  useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
 
   return styled(styles)(
-    <Loader state={[connectionExecutionContext, connectionInfo, permissionsService]}>
+    <Loader state={[permissionsService]}>
       {() => styled(styles)(
         <space as="main">
           <Split sticky={30}>
