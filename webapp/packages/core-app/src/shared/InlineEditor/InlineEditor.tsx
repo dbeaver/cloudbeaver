@@ -91,7 +91,9 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case 'Enter':
-        !props.disableSave && props.onSave();
+        if (!props.disableSave) {
+          props.onSave();
+        }
         break;
       case 'Escape':
         props.onReject?.();
