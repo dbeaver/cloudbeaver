@@ -244,11 +244,6 @@ export class ConnectionFormState implements IConnectionFormState {
     }
 
     const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    if (!this.resource.has(data.config.connectionId)) {
-      return;
-    }
-
     await this.resource.load(data.config.connectionId, configuration.connectionIncludes);
   }
 }

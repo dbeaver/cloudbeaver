@@ -223,6 +223,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       });
 
       if (all) {
+        this.resetIncludes();
         const unrestoredConnectionIdList = Array.from(this.data.values())
           .map(connection => connection.id)
           .filter(connectionId => !connections.some(connection => connection.id === connectionId));
