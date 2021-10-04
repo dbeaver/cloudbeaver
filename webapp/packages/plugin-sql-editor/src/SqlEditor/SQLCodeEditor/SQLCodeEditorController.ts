@@ -8,7 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Editor, EditorConfiguration, findModeByName, ModeSpec, ModeSpecOptions } from 'codemirror';
+import { Editor, EditorConfiguration, findModeByName, ModeSpec } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
@@ -17,6 +17,11 @@ import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { injectable } from '@cloudbeaver/core-di';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+
+interface ISqlModeOptions {
+  keywords: Record<string, boolean>;
+  builtin: Record<string, boolean>;
+}
 
 const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
   theme: 'material',
@@ -32,7 +37,7 @@ export class SQLCodeEditorController {
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 
-  get mode(): string | ModeSpec<ModeSpecOptions> | undefined {
+  get mode(): string | ModeSpec<ISqlModeOptions> | undefined {
     const name = (
       this.dialect?.name
       && this.editor
@@ -43,24 +48,31 @@ export class SQLCodeEditorController {
       return name;
     }
 
-    let keywords: string[] | undefined;
-    let builtin: string[] | undefined;
+    const keywords: Record<string, boolean> = {};
+    const builtin: Record<string, boolean> = {};
 
     if (this.dialect?.dataTypes) {
-      keywords = this.dialect.dataTypes.map(v => v.toLowerCase());
+      for (const key of this.dialect.dataTypes) {
+        keywords[key.toLowerCase()] = true;
+      }
     }
 
-    if (this.dialect?.functions || this.dialect?.reservedWords) {
-      builtin = [
-        ...(this.dialect.functions || []),
-        ...(this.dialect.reservedWords || []),
-      ].map(v => v.toUpperCase());
+    if (this.dialect?.reservedWords) {
+      for (const key of this.dialect.reservedWords) {
+        keywords[key.toLowerCase()] = true;
+      }
+    }
+
+    if (this.dialect?.functions) {
+      for (const key of this.dialect.functions) {
+        builtin[key.toLowerCase()] = true;
+      }
     }
 
     return {
       name,
-      extra_keywords: keywords,
-      extra_builtins: builtin,
+      keywords,
+      builtin,
     };
   }
 
