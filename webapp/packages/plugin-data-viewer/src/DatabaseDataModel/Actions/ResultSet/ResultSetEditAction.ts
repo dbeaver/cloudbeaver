@@ -331,37 +331,51 @@ export class ResultSetEditAction
     this.clear();
   }
 
-  revert(key: IResultSetElementKey): void {
-    const row = ResultSetDataKeysUtils.serialize(key.row);
-    const update = this.editorData.get(row);
+  revert(...keys: IResultSetElementKey[]): void {
+    const reverted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
+    const deleted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
 
-    if (!update) {
-      return;
+    for (const key of keys) {
+      const row = ResultSetDataKeysUtils.serialize(key.row);
+      const update = this.editorData.get(row);
+
+      if (!update) {
+        continue;
+      }
+
+      let prevValue: IResultSetValue | undefined;
+      let value: IResultSetValue | undefined;
+
+      if (update.type === DatabaseEditChangeType.delete) {
+        deleted.push({ key });
+        this.editorData.delete(row);
+      } else {
+        prevValue = update.update[key.column.index];
+        value = update.source?.[key.column.index] ?? null;
+        update.update[key.column.index] = value;
+        reverted.push({ key, prevValue, value });
+      }
+
+      this.removeEmptyUpdate(update);
     }
 
-    let prevValue: IResultSetValue | undefined;
-    let value: IResultSetValue | undefined;
-
-    if (update.type === DatabaseEditChangeType.delete) {
-      this.editorData.delete(row);
-    } else {
-      prevValue = update.update[key.column.index];
-      value = update.source?.[key.column.index] ?? null;
-      update.update[key.column.index] = value;
+    if (reverted.length > 0) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: DatabaseEditChangeType.update,
+        revert: true,
+        value: reverted,
+      });
     }
 
-    this.action.execute({
-      resultId: this.result.id,
-      type: update.type,
-      revert: true,
-      value: [{
-        key,
-        prevValue,
-        value,
-      }],
-    });
-
-    this.removeEmptyUpdate(update);
+    if (deleted.length > 0) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: DatabaseEditChangeType.delete,
+        revert: true,
+        value: deleted,
+      });
+    }
   }
 
   clear(): void {
