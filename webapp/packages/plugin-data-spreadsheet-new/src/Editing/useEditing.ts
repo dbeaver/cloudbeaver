@@ -33,10 +33,13 @@ export function useEditing(options: IEditingOptions): IEditingContext {
     editorOpened: false,
   }), {
     editorOpened: observable.ref,
-  }, { options });
+    readonly: observable.ref,
+  }, { options, readonly: !!options.readonly });
 
   const [context] = useState<IEditingContext>({
-    readonly: !!state.options.readonly,
+    get readonly() {
+      return state.readonly;
+    },
     edit(position: CellPosition, key?: string) {
       if (state.options.readonly) {
         return;
