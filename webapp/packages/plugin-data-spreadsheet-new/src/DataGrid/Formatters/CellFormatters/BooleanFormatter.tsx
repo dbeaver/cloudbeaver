@@ -54,7 +54,7 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
   const disabled = (
     !column.editable
-    || !!editingContext.readonly
+    || editingContext.readonly
     || formatter.isReadOnly(cellContext.cell)
   );
 

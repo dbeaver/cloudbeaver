@@ -18,7 +18,7 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataSource<TOptions, TResult> {
+  implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -168,7 +168,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
   }
 
   isReadonly(): boolean {
-    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
+    return this.access === DatabaseDataAccessMode.Readonly
+      || this.results.length > 1
+      || !this.executionContext?.context
+      || this.disabled;
   }
 
   isLoading(): boolean {
@@ -222,7 +225,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeTask) {
       try {
         await this.activeTask;
-      } catch {}
+      } catch { }
     }
 
     if (this.activeSave) {

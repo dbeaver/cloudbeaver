@@ -6,13 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
+import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
 
@@ -31,19 +33,24 @@ const styles = css`
   }
 `;
 
-export const TableIndexColumnHeader: React.FC<HeaderRendererProps<any>> = function TableIndexColumnHeader(props) {
+export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(function TableIndexColumnHeader(props) {
+  const dataGridContext = useContext(DataGridContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const tableDataContext = useContext(TableDataContext);
   const translate = useTranslate();
 
-  if (!tableDataContext || !selectionContext) {
-    throw new Error('One of the following contexts are missed(table data context, grid selection context)');
+  if (!tableDataContext || !selectionContext || !dataGridContext) {
+    throw new Error('Contexts required');
   }
 
+  const readonly = getComputed(
+    () => tableDataContext.isReadOnly() || dataGridContext.model.isReadonly()
+  );
+
   return styled(styles)(
-    <container as='div' title={translate('data_grid_table_index_column_tooltip')} onClick={() => selectionContext.selectTable()}>
-      {tableDataContext.isReadOnly() && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
+    <container title={translate('data_grid_table_index_column_tooltip')} onClick={() => selectionContext.selectTable()}>
+      {readonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
       {props.column.name}
     </container>
   );
-};
+});
