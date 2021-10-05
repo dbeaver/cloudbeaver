@@ -53,19 +53,19 @@ export class SQLCodeEditorController {
 
     if (this.dialect?.dataTypes) {
       for (const key of this.dialect.dataTypes) {
-        keywords[key.toLowerCase()] = true;
-      }
-    }
-
-    if (this.dialect?.reservedWords) {
-      for (const key of this.dialect.reservedWords) {
-        keywords[key.toLowerCase()] = true;
+        builtin[key.toLowerCase()] = true;
       }
     }
 
     if (this.dialect?.functions) {
       for (const key of this.dialect.functions) {
         builtin[key.toLowerCase()] = true;
+      }
+    }
+
+    if (this.dialect?.reservedWords) {
+      for (const key of this.dialect.reservedWords) {
+        keywords[key.toLowerCase()] = true;
       }
     }
 

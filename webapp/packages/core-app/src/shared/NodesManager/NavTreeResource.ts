@@ -80,7 +80,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }));
 
     permissionsResource.require(this, EPermission.public);
-    this.preloadResource(connectionInfo, () => CachedMapAllKey);
+    // this.preloadResource(connectionInfo, () => CachedMapAllKey);
 
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
 
