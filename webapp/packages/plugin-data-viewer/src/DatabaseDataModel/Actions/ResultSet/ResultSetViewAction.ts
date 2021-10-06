@@ -30,8 +30,8 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
 
   get rowKeys(): IResultSetRowKey[] {
     return [
-      ...this.data.rows.map((c, index) => ({ index })),
       ...this.editor.addRows,
+      ...this.data.rows.map((c, index) => ({ index })),
     ].sort((a, b) => a.index - b.index);
   }
 

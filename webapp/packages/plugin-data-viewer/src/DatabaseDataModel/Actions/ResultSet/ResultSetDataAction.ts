@@ -54,7 +54,7 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
 
   insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
     if (this.result.data?.rows) {
-      this.result.data.rows.splice(row.index + shift + 1, 0, value);
+      this.result.data.rows.splice(row.index + shift, 0, value);
     }
   }
 

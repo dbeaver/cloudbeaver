@@ -176,6 +176,8 @@ export class ResultSetEditAction
 
     if (!row) {
       row = this.data.getDefaultKey().row;
+    } else if (!('key' in row)) {
+      row = { ...row, index: row.index + 1 };
     }
 
     if (!column) {
