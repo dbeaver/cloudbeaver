@@ -96,6 +96,13 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
 
+        this.requestInfo = {
+          ...this.requestInfo,
+          requestDuration: response.result.duration,
+          requestMessage: 'Saved successfully',
+          source: this.options.query,
+        };
+
         if (editor) {
           const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
             .find(newResult => newResult.id === result.id);
@@ -103,13 +110,6 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
           if (responseResult) {
             editor.applyUpdate(responseResult);
           }
-
-          this.requestInfo = {
-            ...this.requestInfo,
-            requestDuration: response.result.duration,
-            requestMessage: 'Saved successfully',
-            source: this.options.query,
-          };
         }
       }
       this.clearError();

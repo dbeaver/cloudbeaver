@@ -149,6 +149,13 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
 
+        this.requestInfo = {
+          ...this.requestInfo,
+          requestDuration: response.result.duration,
+          requestMessage: 'Saved successfully',
+          source: null,
+        };
+
         if (editor) {
           const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
             .find(newResult => newResult.id === result.id);
@@ -156,13 +163,6 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           if (responseResult) {
             editor.applyUpdate(responseResult);
           }
-
-          this.requestInfo = {
-            ...this.requestInfo,
-            requestDuration: response.result.duration,
-            requestMessage: 'Saved successfully',
-            source: null,
-          };
         }
       }
       this.clearError();

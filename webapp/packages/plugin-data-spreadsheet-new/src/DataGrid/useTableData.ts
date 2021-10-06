@@ -40,9 +40,9 @@ export function useTableData(
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  return useObservableRef<ITableData>(() => ({
+  return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(() => ({
     get gridDiv(): HTMLDivElement | null {
-      return gridDIVElement.current;
+      return this.gridDIVElement.current;
     },
     get columnKeys(): IResultSetColumnKey[] {
       return this.view.columnKeys;
@@ -160,10 +160,12 @@ export function useTableData(
     data: observable.ref,
     editor: observable.ref,
     view: observable.ref,
+    gridDIVElement: observable.ref,
   }, {
     format,
     data,
     editor,
     view,
+    gridDIVElement,
   });
 }

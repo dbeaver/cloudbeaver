@@ -73,7 +73,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       return false;
     }
 
-    return !this.hasRow(cell.row);
+    return this.hasRow(cell.row);
   }
 
   hasRow(key: IResultSetRowKey): boolean {

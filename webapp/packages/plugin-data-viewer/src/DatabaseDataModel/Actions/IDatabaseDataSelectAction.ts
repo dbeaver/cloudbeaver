@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
@@ -27,7 +27,7 @@ export type DatabaseDataSelectActionsData<TKey> = {
 
 export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  readonly actions: IExecutor<DatabaseDataSelectActionsData<TKey>>;
+  readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<TKey>>;
   isSelected: () => boolean;
   isElementSelected: (key: TKey) => boolean;
   getFocusedElement: () => TKey | null;

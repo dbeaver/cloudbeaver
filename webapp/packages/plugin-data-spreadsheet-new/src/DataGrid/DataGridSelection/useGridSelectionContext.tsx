@@ -196,6 +196,7 @@ export function useGridSelectionContext(
 
     if (!multiple) {
       selectionAction.clear();
+      return;
     }
 
     if (temporary) {
@@ -229,14 +230,14 @@ export function useGridSelectionContext(
       return;
     }
 
-    const column = props.tableData.getColumn(cell.colIdx);
-
     if (state.range) {
       return;
     }
-    const isIndexColumn = props.tableData.isIndexColumn(column.key);
 
+    const column = props.tableData.getColumn(cell.colIdx);
+    const isIndexColumn = props.tableData.isIndexColumn(column.key);
     const row = props.tableData.getRow(cell.rowIdx);
+
     if (isIndexColumn) {
       selectRows(row, row, undefined, multiple, temporary);
       return;

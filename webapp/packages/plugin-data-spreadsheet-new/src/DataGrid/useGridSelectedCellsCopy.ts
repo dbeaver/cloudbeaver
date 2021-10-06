@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import type { ITableData } from './TableDataContext';
@@ -19,7 +19,13 @@ const EVENT_KEY_CODE = {
   C: 'KeyC',
 };
 
-function copyGridSelectedDataToClipboard(
+function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): string {
+  const cell = tableData.getCellValue(key);
+  const cellValue = cell !== undefined ? tableData.format.getText(cell) : undefined;
+  return cellValue ?? '';
+}
+
+function getSelectedCellsValue(
   tableData: ITableData,
   selectedCells: Map<string, IResultSetElementKey[]>
 ) {
@@ -48,9 +54,7 @@ function copyGridSelectedDataToClipboard(
       const cellKey = rowSelection.find(key => ResultSetDataKeysUtils.isEqual(key.column, column));
 
       if (cellKey) {
-        const cell = tableData.getCellValue(cellKey);
-        const cellValue = cell !== undefined ? tableData.format.getText(cell) : undefined;
-        rowCellsValues.push(cellValue ?? '');
+        rowCellsValues.push(getCellCopyValue(tableData, cellKey));
       } else {
         rowCellsValues.push('');
       }
@@ -58,7 +62,7 @@ function copyGridSelectedDataToClipboard(
     rowsValues.push(rowCellsValues.join('\t'));
   }
 
-  copyToClipboard(rowsValues.join('\r\n'));
+  return rowsValues.join('\r\n');
 }
 
 // needed for event.code
@@ -66,16 +70,28 @@ type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
+  resultSetSelectAction: ResultSetSelectAction,
   selectionContext: IDataGridSelectionContext
 ) {
-  const props = useObjectRef({ tableData, selectionContext });
+  const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
-      copyGridSelectedDataToClipboard(
-        props.tableData,
-        props.selectionContext.selectedCells
-      );
+      const focusedElement = props.resultSetSelectAction.getFocusedElement();
+      let value: string | null = null;
+
+      if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
+        value = getSelectedCellsValue(
+          props.tableData,
+          props.selectionContext.selectedCells
+        );
+      } else if (focusedElement) {
+        value = getCellCopyValue(tableData, focusedElement);
+      }
+
+      if (value !== null) {
+        copyToClipboard(value);
+      }
     }
   }, []);
 

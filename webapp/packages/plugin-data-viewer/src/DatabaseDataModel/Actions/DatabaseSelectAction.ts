@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction';
@@ -20,11 +20,11 @@ export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataRe
   extends DatabaseDataAction<any, TResult>
   implements IDatabaseDataSelectAction<TKey, TResult> {
   static dataFormat: ResultDataFormat | null = null;
-  readonly actions: IExecutor<DatabaseDataSelectActionsData<TKey>>;
+  readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<TKey>>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
     super(source, result);
-    this.actions = new Executor();
+    this.actions = new SyncExecutor();
   }
 
   abstract isSelected(): boolean;

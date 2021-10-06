@@ -87,7 +87,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
   }
 
   updateResults(results: TResult[]): void {
-    const actionsMap = Array.from(this.actions.entries());
+    let actionsMap = Array.from(this.actions.entries());
 
     for (const [key, actions] of actionsMap) {
       const result = results.find(result => result.uniqueResultId === key);
@@ -101,6 +101,14 @@ implements IDatabaseDataActions<TOptions, TResult> {
         for (const action of actions) {
           action.updateResult(result);
         }
+      }
+    }
+
+    actionsMap = Array.from(this.actions.entries());
+
+    for (const [, actions] of actionsMap) {
+      for (const action of actions) {
+        action.afterResultUpdate();
       }
     }
   }

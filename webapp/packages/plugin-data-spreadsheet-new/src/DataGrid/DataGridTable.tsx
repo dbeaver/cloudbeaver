@@ -81,6 +81,19 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   });
 
+  function isGridInFocus(): boolean {
+    const gridDiv = gridContainerRef.current;
+    const focusSink = gridDiv?.querySelector('.rdg-focus-sink');
+
+    if (!gridDiv || !focusSink) {
+      return false;
+    }
+
+    const active = document.activeElement;
+
+    return gridDiv === active || focusSink === active;
+  }
+
   function setContainersRef(element: HTMLDivElement) {
     gridContainerRef.current = element;
 
@@ -93,7 +106,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }
   }
 
-  const { onKeydownHandler } = useGridSelectedCellsCopy(tableData, gridSelectionContext);
+  const { onKeydownHandler } = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
@@ -154,17 +167,19 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     tableData.editor.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
-      if (data.type === 'focus') {
-        if (!data.key?.column || !data.key.row) {
-          return;
+      setTimeout(() => { // TODO: update focus after render rows update
+        if (data.type === 'focus') {
+          if (!data.key?.column || !data.key.row) {
+            return;
+          }
+
+          const idx = tableData.getColumnIndexFromColumnKey(data.key.column);
+          const rowIdx = tableData.getRowIndexFromKey(data.key.row);
+
+          focusSyncRef.current = { idx, rowIdx };
+          dataGridRef.current?.selectCell({ idx, rowIdx });
         }
-
-        const idx = tableData.getColumnIndexFromColumnKey(data.key.column);
-        const rowIdx = tableData.getRowIndexFromKey(data.key.row);
-
-        focusSyncRef.current = { idx, rowIdx };
-        dataGridRef.current?.selectCell({ idx, rowIdx });
-      }
+      }, 1);
     }
 
     selectionAction.actions.addHandler(syncFocus);
@@ -229,10 +244,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     actions,
     columnResize,
     resultIndex,
-    isGridInFocus: () => gridContainerRef.current === document.activeElement,
+    isGridInFocus,
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
-  }), [model, actions, resultIndex, editorRef, dataGridRef]);
+  }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef]);
 
   return styled(styles)(
     <DataGridContext.Provider value={gridContext}>

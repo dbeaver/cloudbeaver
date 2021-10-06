@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 import type { IDatabaseDataSource } from '../IDatabaseDataSource';
 import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { DatabaseEditChangeType, IDatabaseDataEditAction, IDatabaseDataEditActionData } from './IDatabaseDataEditAction';
+import type { DatabaseEditChangeType, IDatabaseDataEditAction, IDatabaseDataEditActionData, IDatabaseDataEditApplyActionData } from './IDatabaseDataEditAction';
 
 @databaseDataAction()
 export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabaseDataResult>
@@ -21,12 +21,14 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   implements IDatabaseDataEditAction<TKey, TValue, TResult> {
   static dataFormat: ResultDataFormat | null = null;
 
-  readonly action: IExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
+  readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
+  readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<any>>;
   protected features: Array<keyof this>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
     super(source, result);
-    this.action = new Executor();
+    this.action = new SyncExecutor();
+    this.applyAction = new SyncExecutor();
     this.features = [];
   }
 

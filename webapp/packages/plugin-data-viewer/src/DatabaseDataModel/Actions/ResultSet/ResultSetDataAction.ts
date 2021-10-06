@@ -52,16 +52,25 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     };
   }
 
-  insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
+  insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): IResultSetRowKey | undefined {
     if (this.result.data?.rows) {
-      this.result.data.rows.splice(row.index + shift, 0, value);
+      const index = row.index + shift;
+      this.result.data.rows.splice(index, 0, value);
+
+      return { index };
     }
+
+    return undefined;
   }
 
-  removeRow(row: IResultSetRowKey, shift = 0): void {
+  removeRow(row: IResultSetRowKey, shift = 0): IResultSetRowKey | undefined {
     if (this.result.data?.rows) {
-      this.result.data.rows.splice(row.index + shift, 1);
+      const index = row.index + shift;
+      this.result.data.rows.splice(index, 1);
+
+      return { index: index - 1 };
     }
+    return undefined;
   }
 
   setRowValue(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {

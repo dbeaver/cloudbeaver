@@ -8,16 +8,17 @@
 
 import { action, computed, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseSelectAction } from '../DatabaseSelectAction';
-import { DatabaseEditChangeType, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
+import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditApplyActionData } from '../IDatabaseDataEditAction';
 import type { DatabaseDataSelectActionsData } from '../IDatabaseDataSelectAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey';
+import { ResultSetDataAction } from './ResultSetDataAction';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
@@ -31,24 +32,27 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     return Array.from(this.selectedElements.values()).flat();
   }
 
-  readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
+  readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
   private view: ResultSetViewAction;
   private edit: ResultSetEditAction;
+  private data: ResultSetDataAction;
   private validationDisposer: IReactionDisposer;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
     result: IDatabaseResultSet,
     view: ResultSetViewAction,
-    edit: ResultSetEditAction
+    edit: ResultSetEditAction,
+    data: ResultSetDataAction
   ) {
     super(source, result);
     this.view = view;
     this.edit = edit;
-    this.actions = new Executor();
+    this.data = data;
+    this.actions = new SyncExecutor();
     this.selectedElements = new Map();
     this.focusedElement = null;
 
@@ -64,7 +68,13 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     this.validationDisposer = reaction(() => this.view.rowKeys, (current, previous) => {
       if (this.focusedElement) {
         const focus = this.focusedElement;
+        const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+
         const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+
+        if (currentIndex >= 0 && focusIndex === -1) {
+          return;
+        }
 
         if (focusIndex === -1 || current.length === 0) {
           this.focus(null);
@@ -97,6 +107,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     });
 
     this.edit.action.addHandler(this.syncFocus.bind(this));
+    this.edit.applyAction.addHandler(this.syncFocusOnUpdate.bind(this));
   }
 
   isSelected(): boolean {
@@ -238,7 +249,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     });
   }
 
-  updateResult(): void {
+  afterResultUpdate(): void {
     this.validateSelection();
   }
 
@@ -268,6 +279,32 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     for (const key of removeKeys) {
       this.selectedElements.delete(key);
     }
+  }
+
+  private syncFocusOnUpdate(data: IDatabaseDataEditApplyActionData<IResultSetRowKey>) {
+    let nextFocus = {
+      ...this.data.getDefaultKey(),
+      ...this.focusedElement,
+    };
+
+    for (const update of data.updates) {
+      switch (update.type) {
+        case DatabaseEditChangeType.add:
+          if (nextFocus === null || ResultSetDataKeysUtils.isEqual(update.row, nextFocus.row)) {
+            nextFocus = { ...nextFocus, row: update.newRow };
+          }
+          break;
+
+        case DatabaseEditChangeType.delete:
+          if (nextFocus === null || ResultSetDataKeysUtils.isEqual(update.row, nextFocus.row)) {
+            nextFocus = { ...nextFocus, row: update.newRow };
+          }
+          this.set({ row: update.row }, false, true);
+          break;
+      }
+    }
+
+    this.focus(nextFocus);
   }
 
   private syncFocus(data: IDatabaseDataEditActionData<IResultSetElementKey, IResultSetValue>) {

@@ -8,6 +8,7 @@
 
 import { action, computed, makeObservable, observable } from 'mobx';
 
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -15,7 +16,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
-import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditActionValue } from '../IDatabaseDataEditAction';
+import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditActionValue, IDatabaseDataEditApplyActionData, IDatabaseDataEditApplyActionUpdate } from '../IDatabaseDataEditAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -36,6 +37,7 @@ export class ResultSetEditAction
   extends DatabaseEditAction<IResultSetElementKey, IResultSetValue, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
+  readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
   private editorData: Map<string, IResultSetUpdate>;
   private data: ResultSetDataAction;
 
@@ -45,6 +47,7 @@ export class ResultSetEditAction
     data: ResultSetDataAction
   ) {
     super(source, result);
+    this.applyAction = new SyncExecutor();
     this.editorData = new Map();
     this.data = data;
     this.features = ['add', 'delete'];
@@ -286,6 +289,7 @@ export class ResultSetEditAction
   }
 
   applyUpdate(result: IDatabaseResultSet): void {
+    const applyUpdate: Array<IDatabaseDataEditApplyActionUpdate<IResultSetRowKey>> = [];
     let rowIndex = 0;
     let addShift = 0;
     let deleteShift = 0;
@@ -303,6 +307,11 @@ export class ResultSetEditAction
 
           if (value !== undefined) {
             this.data.setRowValue(update.row, value);
+            applyUpdate.push({
+              type: DatabaseEditChangeType.update,
+              row: update.row,
+              newRow: update.row,
+            });
           }
 
           rowIndex++;
@@ -313,7 +322,15 @@ export class ResultSetEditAction
           const value = result.data?.rows?.[rowIndex];
 
           if (value !== undefined) {
-            this.data.insertRow(update.row, value, addShift);
+            const newRow = this.data.insertRow(update.row, value, addShift);
+
+            if (newRow) {
+              applyUpdate.push({
+                type: DatabaseEditChangeType.add,
+                row: update.row,
+                newRow,
+              });
+            }
           }
 
           insertedRows.push(update.row);
@@ -324,12 +341,29 @@ export class ResultSetEditAction
 
         case DatabaseEditChangeType.delete: {
           const insertShift = insertedRows.filter(row => row.index < update.row.index).length;
-          this.data.removeRow(update.row, deleteShift + insertShift);
+          const newRow = this.data.removeRow(update.row, deleteShift + insertShift);
+
+          if (newRow) {
+            applyUpdate.push({
+              type: DatabaseEditChangeType.delete,
+              row: update.row,
+              newRow,
+            });
+          }
+
           deleteShift--;
           break;
         }
       }
     }
+
+    if (applyUpdate.length > 0) {
+      this.applyAction.execute({
+        resultId: result.id,
+        updates: applyUpdate,
+      });
+    }
+
     this.clear();
   }
 

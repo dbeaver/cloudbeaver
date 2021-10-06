@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
@@ -25,6 +25,17 @@ export interface IDatabaseDataEditActionValue<TKey, TValue> {
   prevValue?: TValue;
 }
 
+export interface IDatabaseDataEditApplyActionUpdate<TKey> {
+  type?: DatabaseEditChangeType;
+  row: TKey;
+  newRow: TKey;
+}
+
+export interface IDatabaseDataEditApplyActionData<TKey> {
+  resultId: string | null;
+  updates: Array<IDatabaseDataEditApplyActionUpdate<TKey>>;
+}
+
 export interface IDatabaseDataEditActionData<TKey, TValue> {
   revert: boolean;
   type?: DatabaseEditChangeType;
@@ -34,7 +45,8 @@ export interface IDatabaseDataEditActionData<TKey, TValue> {
 
 export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  readonly action: IExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
+  readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
+  readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<any>>;
   isEdited: () => boolean;
   isElementEdited: (key: TKey) => boolean;
   hasFeature: (feature: keyof this) => boolean;
