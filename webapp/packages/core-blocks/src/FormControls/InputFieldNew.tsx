@@ -65,6 +65,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
   mod?: 'surface';
   ref?: React.Ref<HTMLInputElement>;
   style?: ComponentStyle;
+  onCustomCopy?: () => void;
 };
 
 type ControlledProps = BaseProps & {
@@ -112,6 +113,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   tiny,
   autoHide,
   onChange,
+  onCustomCopy,
   ...rest
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
   const [passwordRevealed, setPasswordRevealed] = useState(false);
@@ -181,6 +183,11 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
               name={passwordRevealed ? 'password-hide' : 'password-show'}
               viewBox='0 0 16 16'
             />
+          </icon-container>
+        )}
+        {onCustomCopy && (
+          <icon-container title={translate('ui_copy_to_clipboard')} onClick={onCustomCopy}>
+            <Icon name="copy" viewBox='0 0 32 32' />
           </icon-container>
         )}
       </input-container>
