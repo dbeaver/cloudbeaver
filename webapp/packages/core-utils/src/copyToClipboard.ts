@@ -23,6 +23,6 @@ export function copyToClipboard(data: string): void {
   document.body.removeChild(shadowElement);
 
   if (activeElement instanceof HTMLElement) {
-    activeElement.focus();
+    activeElement.focus({ preventScroll: true });
   }
 }
