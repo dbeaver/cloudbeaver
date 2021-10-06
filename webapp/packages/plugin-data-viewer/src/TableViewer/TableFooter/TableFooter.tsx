@@ -81,7 +81,7 @@ export const TableFooter = observer<Props>(function TableFooter({
   const [limit, setLimit] = useState(model.countGain + '');
 
   const handleChange = useCallback(
-    () => {
+    async () => {
       if (!ref.current) {
         return;
       }
@@ -90,7 +90,9 @@ export const TableFooter = observer<Props>(function TableFooter({
 
       setLimit(value + '');
       if (model.countGain !== value) {
-        model.setCountGain(value).reload();
+        await model
+          .setCountGain(value)
+          .reload();
       }
     },
     [model]

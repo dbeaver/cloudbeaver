@@ -42,6 +42,8 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
 
       if (result instanceof Promise) {
         result.finally(() => { setDisabled(false); });
+      } else {
+        setDisabled(false);
       }
     },
   }), {
