@@ -14,7 +14,7 @@ import { AuthConfigurationParametersResource, AuthProvidersResource } from '@clo
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, FieldCheckboxNew, Group, GroupTitle,
   InputFieldNew, Link, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent,
-  TextareaNew, useMapResource, useObjectPropertyCategories
+  TextareaNew, useClipboard, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -37,6 +37,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const formRef = useRef<HTMLFormElement>(null);
 
   const translate = useTranslate();
+  const copy = useClipboard();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
   const providers = useMapResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
@@ -156,7 +157,9 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               state={state.config}
               title={state.config.signInLink}
               disabled={state.disabled}
+              autoHide
               readOnly
+              onCustomCopy={() => copy(state.config.signInLink!, true)}
             >
               Sign in
             </InputFieldNew>
@@ -165,7 +168,9 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               state={state.config}
               title={state.config.signOutLink}
               disabled={state.disabled}
+              autoHide
               readOnly
+              onCustomCopy={() => copy(state.config.signOutLink!, true)}
             >
               Sign out
             </InputFieldNew>
