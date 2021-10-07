@@ -33,7 +33,7 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
   const focusedCell = selection.getFocusedElement();
-  const selectedCells = selection.elements;
+  const selectedCells = selection.elements.slice();
 
   if (selectedCells.length === 0 && focusedCell) {
     selectedCells.push(focusedCell);
