@@ -174,23 +174,16 @@ export class ResultSetEditAction
   }
 
   add(key?: IResultSetElementKey): void {
-    let row = key?.row;
-    let column = key?.column;
+    this.addRow(key?.row, undefined, key?.column);
+  }
 
+  addRow(row?: IResultSetRowKey, value?: IResultSetValue[], column?: IResultSetColumnKey): void {
     if (!row) {
       row = this.data.getDefaultKey().row;
     } else if (!('key' in row)) {
       row = { ...row, index: row.index + 1 };
     }
 
-    if (!column) {
-      column = this.data.getDefaultKey().column;
-    }
-
-    this.addRow(row, undefined, column);
-  }
-
-  addRow(row: IResultSetRowKey, value?: IResultSetValue[], column?: IResultSetColumnKey): void {
     if (value === undefined) {
       value = this.data.columns.map(() => null);
     }
@@ -340,7 +333,7 @@ export class ResultSetEditAction
         }
 
         case DatabaseEditChangeType.delete: {
-          const insertShift = insertedRows.filter(row => row.index < update.row.index).length;
+          const insertShift = insertedRows.filter(row => row.index <= update.row.index).length;
           const newRow = this.data.removeRow(update.row, deleteShift + insertShift);
 
           if (newRow) {
