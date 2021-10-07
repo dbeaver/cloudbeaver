@@ -419,7 +419,8 @@ public class WebSQLProcessor {
                     }
                     for (int i = 0; i < keyAttributes.length; i++) {
                         DBDAttributeBinding keyAttribute = keyAttributes[i];
-                        if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
+                        boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+                        if (isDocumentValue) {
                             rowValues[updateAttributes.length + i] =
                                 makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
                         } else {
@@ -433,7 +434,7 @@ public class WebSQLProcessor {
                         }
                         if (ArrayUtils.contains(updateAttributes, keyAttribute)) {
                             // Key attribute is already updated
-                        } else {
+                        } else if (!isDocumentValue) {
                             finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
                         }
                     }
