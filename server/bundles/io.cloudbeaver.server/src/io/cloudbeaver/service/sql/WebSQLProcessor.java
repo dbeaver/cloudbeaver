@@ -431,7 +431,11 @@ public class WebSQLProcessor {
                                 false,
                                 true);
                         }
-                        finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
+                        if (ArrayUtils.contains(updateAttributes, keyAttribute)) {
+                            // Key attribute is already updated
+                        } else {
+                            finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
+                        }
                     }
 
                     DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(
