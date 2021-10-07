@@ -108,6 +108,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             String userId;
             DBASession authSession;
             if (configMode) {
+                if (webSession.getUser() != null) {
+                    // Already logged in - remove auth token
+                    webSession.removeAuthInfo(providerId);
+                }
                 if (authProviderExternal != null) {
                     userId = authProviderExternal.validateLocalAuth(
                         webSession.getProgressMonitor(),
