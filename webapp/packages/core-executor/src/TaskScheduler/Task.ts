@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask } from './ITask';
 
@@ -15,7 +15,11 @@ export class Task<TValue> implements ITask<TValue> {
   executing: boolean;
 
   get cancellable(): boolean {
-    return !this.cancelled && (!this.executing || !!this.externalCancel);
+    if (this.cancelled) {
+      return false;
+    }
+
+    return !this.executing || this.externalCancel !== undefined;
   }
 
   private resolve!: (value: TValue) => void;
@@ -38,6 +42,7 @@ export class Task<TValue> implements ITask<TValue> {
     this.executing = false;
 
     makeObservable(this, {
+      cancellable: computed,
       cancelled: observable,
       executing: observable,
     });
@@ -107,6 +112,10 @@ export class Task<TValue> implements ITask<TValue> {
   }
 
   cancel(): Promise<void> | void {
+    if (this.cancelled) {
+      return;
+    }
+
     this.cancelled = true;
 
     if (!this.executing) {
