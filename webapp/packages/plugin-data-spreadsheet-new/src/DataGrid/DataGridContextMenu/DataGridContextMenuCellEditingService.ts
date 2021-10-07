@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction, DatabaseSelectAction, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -123,6 +123,10 @@ export class DataGridContextMenuCellEditingService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
+          if (context.data.model.isReadonly()) {
+            return true;
+          }
+
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
           return (
@@ -133,6 +137,44 @@ export class DataGridContextMenuCellEditingService {
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           editor.deleteRow(context.data.key.row);
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
+        id: 'row_delete_selected',
+        order: 6.1,
+        icon: '/icons/data_delete_sm.svg',
+        title: 'data_viewer_action_edit_delete',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          if (context.data.model.isReadonly()) {
+            return true;
+          }
+
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const select = context.data.model.source.getActionImplementation(
+            context.data.resultIndex,
+            ResultSetSelectAction
+          );
+
+          const selectedElements = select?.getSelectedElements() || [];
+
+          return !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
+        },
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const select = context.data.model.source.getActionImplementation(
+            context.data.resultIndex,
+            ResultSetSelectAction
+          );
+
+          const selectedElements = select?.getSelectedElements() || [];
+
+          editor?.delete(...selectedElements);
         },
       }
     );
@@ -153,6 +195,38 @@ export class DataGridContextMenuCellEditingService {
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           editor.revert(context.data.key);
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
+        id: 'row_revert_selected',
+        order: 7.1,
+        icon: '/icons/data_revert_sm.svg',
+        title: 'data_viewer_action_edit_revert',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const select = context.data.model.source.getActionImplementation(
+            context.data.resultIndex,
+            ResultSetSelectAction
+          );
+
+          const selectedElements = select?.getSelectedElements() || [];
+          return !selectedElements.some(key => editor.getElementState(key) !== null);
+        },
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const select = context.data.model.source.getActionImplementation(
+            context.data.resultIndex,
+            ResultSetSelectAction
+          );
+
+          const selectedElements = select?.getSelectedElements() || [];
+          editor.revert(...selectedElements);
         },
       }
     );

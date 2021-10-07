@@ -17,6 +17,9 @@ export const cellMenuStyles = composes(
     }
 `,
   css`
+    :global(.rdg-cell):not(:global(.rdg-cell-selected)):not(:hover) cell-menu {
+      display: none;
+    }
     cell-menu {
       flex: 0 0 auto;
       padding-left: 8px;
