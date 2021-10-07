@@ -36,6 +36,9 @@ const styles = composes(
       align-items: center;
       transform: rotate(90deg);
     }
+    Icon {
+      width: 100%;
+    }
   `
 );
 
@@ -45,7 +48,7 @@ export const SlideOverlay: React.FC<Props> = function SlideOverlay({
 }) {
   return styled(useStyles(styles))(
     <div className={className} onClick={onClick}>
-      <icon-btn as='div'>
+      <icon-btn>
         <Icon name="angle" viewBox="0 0 15 8" />
       </icon-btn>
     </div>
