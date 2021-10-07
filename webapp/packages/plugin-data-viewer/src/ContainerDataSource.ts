@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable, observable } from 'mobx';
+
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
@@ -38,6 +40,11 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     this.currentTask = null;
     this.executionContext = null;
+
+    makeObservable(this, {
+      currentTask: observable.ref,
+      canCancel: computed,
+    });
   }
 
   isDisabled(resultIndex: number): boolean {

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
 
@@ -37,6 +37,9 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     this.currentTask = null;
     makeObservable<this, 'currentTask'>(this, {
       currentTask: observable.ref,
+      context: computed,
+      executing: computed,
+      cancellable: computed,
     });
   }
 
