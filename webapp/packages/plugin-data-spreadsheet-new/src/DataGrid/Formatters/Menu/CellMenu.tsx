@@ -12,6 +12,7 @@ import styled from 'reshadow';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
@@ -57,10 +58,15 @@ export const CellMenu = observer<Props>(function CellMenu({
     event.stopPropagation();
   }
 
+  function markStopPropagation(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    EventContext.set(event, EventStopPropagationFlag);
+  }
+
   return styled(style)(
     <cell-menu
       as='div'
-      onClick={stopPropagation}
+      onMouseDown={markStopPropagation}
+      onMouseUp={markStopPropagation}
       onDoubleClick={stopPropagation}
     >
       <MenuTrigger
