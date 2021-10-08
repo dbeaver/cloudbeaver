@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { RolesResource } from '@cloudbeaver/core-authentication';
+import { TableContext } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -43,6 +44,11 @@ export const RoleEdit = observer<Props>(function RoleEdit({
 }) {
   const resource = useService(RolesResource);
   const boxRef = useRef<HTMLDivElement>(null);
+  const tableContext = useContext(TableContext);
+
+  const collapse = useCallback(() => {
+    tableContext?.setItemExpand(item, false);
+  }, [tableContext, item]);
 
   useEffect(() => {
     boxRef.current?.scrollIntoView({
@@ -62,6 +68,7 @@ export const RoleEdit = observer<Props>(function RoleEdit({
     <box ref={boxRef} as='div'>
       <RoleForm
         state={data}
+        onCancel={collapse}
       />
     </box>
   );
