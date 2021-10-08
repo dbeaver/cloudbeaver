@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
+import { TableContext } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -43,6 +44,11 @@ export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationE
 }) {
   const resource = useService(AuthConfigurationsResource);
   const boxRef = useRef<HTMLDivElement>(null);
+  const tableContext = useContext(TableContext);
+
+  const collapse = useCallback(() => {
+    tableContext?.setItemExpand(item, false);
+  }, [tableContext, item]);
 
   useEffect(() => {
     boxRef.current?.scrollIntoView({
@@ -62,6 +68,7 @@ export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationE
     <box ref={boxRef} as='div'>
       <AuthConfigurationForm
         state={data}
+        onCancel={collapse}
       />
     </box>
   );
