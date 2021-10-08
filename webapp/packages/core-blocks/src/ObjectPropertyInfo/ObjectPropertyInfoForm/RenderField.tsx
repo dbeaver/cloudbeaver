@@ -150,6 +150,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           defaultValue={defaultValue}
           title={property.description}
           disabled={disabled}
+          readOnly={readOnly}
           className={className}
         >
           {property.displayName ?? ''}
@@ -166,6 +167,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         defaultValue={defaultValue}
         title={property.description}
         disabled={disabled}
+        readOnly={readOnly}
         className={className}
       >
         {property.displayName ?? ''}
