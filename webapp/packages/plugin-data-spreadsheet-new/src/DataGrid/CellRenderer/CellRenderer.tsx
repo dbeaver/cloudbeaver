@@ -91,27 +91,6 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
   }), []).get();
 
   const state = useObjectRef(() => ({
-    mouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-      if (EventContext.has(event, EventStopPropagationFlag)) {
-        return;
-      }
-
-      const dataGridApi = this.dataGridContext?.getDataGridApi();
-
-      if (dataGridApi && !this.isCellSelected) {
-        dataGridApi.selectCell(cellContext.position);
-      }
-
-      this.selectionContext?.select(
-        {
-          colIdx: this.column.idx,
-          rowIdx: this.rowIdx,
-        },
-        event.ctrlKey || event.metaKey,
-        event.shiftKey,
-        true
-      );
-    },
     mouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       if (
         !this.selectionContext
@@ -168,7 +147,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     dataGridContext,
     editingContext,
     tableDataContext,
-  }, ['doubleClick', 'mouseUp', 'mouseDown']);
+  }, ['doubleClick', 'mouseUp']);
 
   useEffect(() => () => editingContext?.closeEditor(cellContext.position), []);
 
@@ -179,7 +158,6 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
         className={classes}
         data-row-index={rowIdx}
         data-column-index={column.idx}
-        onMouseDown={state.mouseDown}
         onMouseUp={state.mouseUp}
         onDoubleClick={state.doubleClick}
         {...props}

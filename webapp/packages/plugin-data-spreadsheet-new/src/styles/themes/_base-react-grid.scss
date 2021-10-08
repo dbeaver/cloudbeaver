@@ -63,7 +63,7 @@ $deleted-color: rgba(255,51,0,0.3);
         @include mdc-theme-prop(border-color, background, false);
       }
 
-      .rdg-row:hover,
+      .rdg-row:hover .rdg-cell,
       .rdg-row:hover .rdg-cell-frozen {
         @include stripes-background($mdc-theme-secondary);
         border-bottom: 1px solid;

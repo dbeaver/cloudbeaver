@@ -65,7 +65,6 @@ export const CellMenu = observer<Props>(function CellMenu({
   return styled(style)(
     <cell-menu
       as='div'
-      onMouseDown={markStopPropagation}
       onMouseUp={markStopPropagation}
       onDoubleClick={stopPropagation}
     >

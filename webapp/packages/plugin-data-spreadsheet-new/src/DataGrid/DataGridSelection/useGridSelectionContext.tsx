@@ -186,12 +186,11 @@ export function useGridSelectionContext(
     return props.selectionAction.isElementSelected({ row, column });
   }
 
-  function selectCell(key: IResultSetElementKey, multiple: boolean, temporary: boolean) {
+  function selectCell(key: IResultSetElementKey, multiple: boolean) {
     const { temporarySelection } = state;
     const { selectionAction } = props;
     temporarySelection.clear();
 
-    const selectedColumns = selectionAction.getRowSelection(key.row);
     const selected = selectionAction.isElementSelected(key);
 
     if (!multiple) {
@@ -199,23 +198,13 @@ export function useGridSelectionContext(
       return;
     }
 
-    if (temporary) {
-      temporarySelection.set(
-        ResultSetDataKeysUtils.serialize(key.row),
-        [...selectedColumns, key]
-          .filter(column => {
-            if (!multiple) {
-              return ResultSetDataKeysUtils.isEqual(column.column, key.column);
-            }
-            if (selected) {
-              return !ResultSetDataKeysUtils.isEqual(column.column, key.column);
-            }
-            return true;
-          })
-      );
-    } else {
-      selectionAction.set(key, !selected);
+    const focusedElement = selectionAction.getFocusedElement();
+
+    if (selectionAction.elements.length === 0 && focusedElement) {
+      selectionAction.set(focusedElement, true);
     }
+
+    selectionAction.set(key, !selected);
   }
 
   function select(cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) {
@@ -244,7 +233,7 @@ export function useGridSelectionContext(
     }
 
     if (column.columnDataIndex !== null) {
-      selectCell({ row, column: column.columnDataIndex }, multiple, temporary);
+      selectCell({ row, column: column.columnDataIndex }, multiple);
     }
   }
 
