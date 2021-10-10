@@ -161,41 +161,43 @@ export class SQLParser {
         if (currentSegment.endsWith(releaseChar)) {
           ignore = false;
         }
-        continue;
+
+        if (position < script.length) {
+          continue;
+        }
       }
 
-      for (const scriptDelimiter of this.scriptDelimiters) {
-        if (currentSegment.endsWith(scriptDelimiter) || position === script.length) {
-          let query = currentSegment;
+      const scriptDelimiter = this.scriptDelimiters.find(scriptDelimiter => currentSegment.endsWith(scriptDelimiter));
 
-          if (position !== script.length) {
-            query = query.substr(0, query.length - scriptDelimiter.length);
-          }
+      if (scriptDelimiter || position === script.length) {
+        let query = currentSegment;
 
-          query = query.trim();
-
-          if (query) {
-            const begin = script.indexOf(query, position - currentSegment.length);
-            const end = begin + query.length;
-            const from = this.getScriptLineAtPos(begin);
-            const to = this.getScriptLineAtPos(end);
-
-            if (from && to) {
-              this._scripts.push({
-                query,
-                begin,
-                end,
-                from: from.index,
-                to: to.index,
-                fromPosition: begin - from.begin,
-                toPosition: end - to.begin,
-              });
-            }
-          }
-
-          currentSegment = '';
-          break;
+        if (scriptDelimiter) {
+          query = query.substr(0, query.length - scriptDelimiter.length);
         }
+
+        query = query.trim();
+
+        if (query) {
+          const begin = script.indexOf(query, position - currentSegment.length);
+          const end = begin + query.length;
+          const from = this.getScriptLineAtPos(begin);
+          const to = this.getScriptLineAtPos(end);
+
+          if (from && to) {
+            this._scripts.push({
+              query,
+              begin,
+              end,
+              from: from.index,
+              to: to.index,
+              fromPosition: begin - from.begin,
+              toPosition: end - to.begin,
+            });
+          }
+        }
+
+        currentSegment = '';
       }
 
       for (const singleLineComment of this.singleLineComments) {
