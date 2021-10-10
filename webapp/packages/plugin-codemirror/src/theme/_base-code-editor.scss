@@ -194,7 +194,7 @@
     }
 
     .cm-s-material .active-query {
-      border-bottom: solid 1px $active-query;
+      @include mdc-theme-prop(background, secondary, false);
     }
 
     .cm-s-material .running-query:before {

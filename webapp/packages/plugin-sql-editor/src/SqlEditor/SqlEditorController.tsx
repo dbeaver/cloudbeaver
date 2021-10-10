@@ -425,6 +425,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
   private highlightActiveQuery() {
     this.highlightSegment(true);
 
+    if (this.editor?.somethingSelected()) {
+      return;
+    }
+
     const query = this.getSubQuery();
 
     if (query) {
