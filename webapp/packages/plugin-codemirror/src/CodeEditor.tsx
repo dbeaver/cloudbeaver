@@ -17,6 +17,7 @@ import 'codemirror/mode/htmlembedded/htmlembedded';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/meta';
 import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/hint/show-hint.css';
 
@@ -57,7 +58,11 @@ export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) 
 
   return styled(useStyles(SqlEditorStyles))(
     <code-editor ref={wrapperRef} {...use({ readonly })} className={className}>
-      <CodeMirror {...props} editorDidMount={handleMount} />
+      <CodeMirror
+        {...props}
+        editorDidMount={handleMount}
+        options={{ styleSelectedText: true, ...props.options }}
+      />
     </code-editor>
   );
 });

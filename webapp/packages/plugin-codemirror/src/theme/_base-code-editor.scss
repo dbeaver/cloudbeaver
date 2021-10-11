@@ -80,11 +80,11 @@
     }
 
     .cm-s-material :global(div).CodeMirror-selected {
-      background: rgba(128, 203, 196, 0.2);
+      @include mdc-theme-prop(background, primary, false);
     }
 
     .cm-s-material.CodeMirror-focused :global(div).CodeMirror-selected {
-      background: rgba(128, 203, 196, 0.2);
+      @include mdc-theme-prop(background, primary, false);
     }
 
     .CodeMirror :global(pre).CodeMirror-line,
@@ -95,13 +95,13 @@
     .cm-s-material .CodeMirror-line::selection,
     .cm-s-material .CodeMirror-line > :global(span)::selection,
     .cm-s-material .CodeMirror-line > :global(span) > :global(span)::selection {
-      background: rgba(128, 203, 196, 0.2);
+      @include mdc-theme-prop(background, primary, false);
     }
 
     .cm-s-material .CodeMirror-line::-moz-selection,
     .cm-s-material .CodeMirror-line > :global(span)::-moz-selection,
     .cm-s-material .CodeMirror-line > :global(span) > :global(span)::-moz-selection {
-      background: rgba(128, 203, 196, 0.2);
+      @include mdc-theme-prop(background, primary, false);
     }
 
     .cm-s-material .CodeMirror-activeline-background {
@@ -195,6 +195,10 @@
 
     .cm-s-material .active-query {
       @include mdc-theme-prop(background, secondary, false);
+    }
+
+    .cm-s-material .CodeMirror-selectedtext {
+      color: white;
     }
 
     .cm-s-material .running-query:before {
