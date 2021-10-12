@@ -39,7 +39,6 @@ export class LocalizationService extends Bootstrap {
   constructor(
     private notificationService: NotificationService,
     private sessionResource: SessionResource,
-    sessionDataResource: SessionDataResource,
     private serverService: ServerService,
     private settingsService: SettingsService
   ) {
@@ -51,7 +50,7 @@ export class LocalizationService extends Bootstrap {
       setCurrentLocale: action,
     });
 
-    sessionDataResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
+    sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
   }
 
   addProvider(provider: ILocaleProvider): void {
@@ -104,7 +103,6 @@ export class LocalizationService extends Bootstrap {
       return;
     }
     await this.sessionResource.changeLanguage(key);
-    // window.location.reload();
   }
 
   private async syncLanguage() {
