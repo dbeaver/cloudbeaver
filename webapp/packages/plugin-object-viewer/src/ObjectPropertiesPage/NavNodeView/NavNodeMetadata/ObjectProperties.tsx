@@ -12,6 +12,7 @@ import styled from 'reshadow';
 import { DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group, useMapResource } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -33,8 +34,15 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
   const translate = useTranslate();
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const dbObject = useMapResource(ObjectProperties, DBObjectResource, objectId, {
-    onLoad: async () => !(await preloadNodeParents(navTreeResource, navNodeInfoResource, parents, objectId)),
+    onLoad: async () => !(await preloadNodeParents(
+      connectionInfoResource,
+      navTreeResource,
+      navNodeInfoResource,
+      parents,
+      objectId
+    )),
   });
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(

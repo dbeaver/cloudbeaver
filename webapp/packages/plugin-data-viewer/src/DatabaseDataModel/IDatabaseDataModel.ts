@@ -38,5 +38,6 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   requestDataPortion: (offset: number, count: number) => Promise<void>;
   requestData: () => Promise<void>;
   cancel: () => Promise<void> | void;
+  resetData: () => void;
   dispose: () => Promise<void>;
 }

@@ -95,10 +95,12 @@ export abstract class CachedMapResource<
       return resourceKeyList([]);
     });
 
-    makeObservable(this, {
+    makeObservable<this, 'dataSet' | 'dataDelete'>(this, {
       set: action,
       delete: action,
       clear: action,
+      dataSet: action,
+      dataDelete: action,
       values: computed,
       keys: computed,
     });
@@ -203,27 +205,30 @@ export abstract class CachedMapResource<
   markOutdated(): void
   markOutdated(key: ResourceKey<TKey>): void
   markOutdated(key?: ResourceKey<TKey>): void {
+    if (
+      (
+        (key === undefined ? this.scheduler.executing : this.scheduler.isExecuting(key))
+      ) && !this.outdateWaitList.some(param => this.includes(key!, param))) {
+      this.outdateWaitList.push(key as ResourceKey<TKey>);
+      return;
+    }
+
+    this.markOutdatedSync(key as ResourceKey<TKey>);
+  }
+
+  cleanError(): void
+  cleanError(key: ResourceKey<TKey>): void
+  cleanError(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
-      key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
-      this.loadedKeys = [];
+      key = resourceKeyList(this.keys);
     } else {
-      if (this.isAlias(key)) {
-        const index = this.loadedKeys.findIndex(loadedKey => this.includes(key!, loadedKey));
-
-        if (index >= 0) {
-          this.loadedKeys.splice(index, 1);
-        }
-      }
-
       key = this.transformParam(key);
     }
 
-    runInAction(() => ResourceKeyUtils.forEach(key!, key => {
+    ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
-      metadata.outdated = true;
-    }));
-
-    this.onDataOutdated.execute(key);
+      metadata.exception = null;
+    });
   }
 
   markUpdated(): void
@@ -243,7 +248,6 @@ export abstract class CachedMapResource<
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.outdated = false;
-      metadata.exception = null;
     });
   }
 
@@ -284,9 +288,9 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, (key, i) => {
       if (i === -1) {
-        this.data.set(key, value as TValue);
+        this.dataSet(key, value as TValue);
       } else {
-        this.data.set(key, (value as TValue[])[i]);
+        this.dataSet(key, (value as TValue[])[i]);
       }
     });
     this.markUpdated(key);
@@ -300,7 +304,7 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     this.onItemDelete.execute(key);
-    ResourceKeyUtils.forEach(key, key => this.data.delete(key));
+    ResourceKeyUtils.forEach(key, key => this.dataDelete(key));
     this.markUpdated(key);
   }
 
@@ -358,14 +362,6 @@ export abstract class CachedMapResource<
     return this.data.has(key);
   }
 
-  protected lock(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
-    if (this.isAlias(param) || this.isAlias(second)) {
-      return true;
-    }
-
-    return this.includes(param, second);
-  }
-
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
     if (param === key) {
       return true;
@@ -394,6 +390,22 @@ export abstract class CachedMapResource<
     }, {});
   }
 
+  protected dataSet(key: TKey, value: TValue): void {
+    this.data.set(key, value);
+  }
+
+  protected dataDelete(key: TKey): void {
+    this.data.delete(key);
+  }
+
+  protected lock(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
+    if (this.isAlias(param) || this.isAlias(second)) {
+      return true;
+    }
+
+    return this.includes(param, second);
+  }
+
   protected resetIncludes(): void {
     const keys = resourceKeyList(this.keys);
     ResourceKeyUtils.forEach(keys, key => {
@@ -414,5 +426,31 @@ export abstract class CachedMapResource<
         }
       }
     });
+  }
+
+  protected markOutdatedSync(): void
+  protected markOutdatedSync(key: ResourceKey<TKey>): void
+  protected markOutdatedSync(key?: ResourceKey<TKey>): void {
+    if (key === undefined) {
+      key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
+      this.loadedKeys = [];
+    } else {
+      if (this.isAlias(key)) {
+        const index = this.loadedKeys.findIndex(loadedKey => this.includes(key!, loadedKey));
+
+        if (index >= 0) {
+          this.loadedKeys.splice(index, 1);
+        }
+      }
+
+      key = this.transformParam(key);
+    }
+
+    runInAction(() => ResourceKeyUtils.forEach(key!, key => {
+      const metadata = this.metadata.get(key);
+      metadata.outdated = true;
+    }));
+
+    this.onDataOutdated.execute(key);
   }
 }

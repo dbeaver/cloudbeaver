@@ -322,8 +322,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
       const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
-      // this.markOutdated(key);
-      this.refresh(key); // TODO: better to use markOutdated, but currently leads for missing update if connection was initiated not from nav-tree
+      this.markOutdated(key);
     }
   }
 
@@ -428,7 +427,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
   }
 
-  private async loadNodeChildren(parentPath: string) {
+  private async loadNodeChildren(parentPath: string): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,

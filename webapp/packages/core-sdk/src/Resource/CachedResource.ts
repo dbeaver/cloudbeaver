@@ -63,6 +63,7 @@ export abstract class CachedResource<
   protected scheduler: TaskScheduler<TParam>;
   protected paramAliases: Array<IParamAlias<TParam>>;
   protected logActivity: boolean;
+  protected outdateWaitList: TParam[];
 
   constructor(defaultValue: TData) {
     super();
@@ -75,6 +76,7 @@ export abstract class CachedResource<
     this.loadedKeys = [];
 
     this.paramAliases = [];
+    this.outdateWaitList = [];
     this.metadata = new MetadataMap(() => (observable({
       outdated: true,
       loading: false,
@@ -271,19 +273,19 @@ export abstract class CachedResource<
     this.onDataError.execute({ param, exception });
   }
 
-  markOutdated(param: TParam): void {
-    if (this.isAlias(param)) {
-      const index = this.loadedKeys.findIndex(key => this.includes(param, key));
-
-      if (index >= 0) {
-        this.loadedKeys.splice(index, 1);
-      }
-    }
-
+  cleanError(param: TParam): void {
     param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
-    metadata.outdated = true;
-    this.onDataOutdated.execute(param);
+    metadata.exception = null;
+  }
+
+  markOutdated(param: TParam): void {
+    if (this.scheduler.isExecuting(param) && !this.outdateWaitList.some(key => this.includes(param, key))) {
+      this.outdateWaitList.push(param);
+      return;
+    }
+
+    this.markOutdatedSync(param);
   }
 
   markUpdated(param: TParam): void {
@@ -294,7 +296,6 @@ export abstract class CachedResource<
     param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = false;
-    metadata.exception = null;
   }
 
   addAlias(param: TParam, getAlias: (param: TParam) => TParam): void {
@@ -335,6 +336,21 @@ export abstract class CachedResource<
     this.data = data;
   }
 
+  protected markOutdatedSync(param: TParam): void {
+    if (this.isAlias(param)) {
+      const index = this.loadedKeys.findIndex(key => this.includes(param, key));
+
+      if (index >= 0) {
+        this.loadedKeys.splice(index, 1);
+      }
+    }
+
+    param = this.transformParam(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
+    metadata.outdated = true;
+    this.onDataOutdated.execute(param);
+  }
+
   protected lock(param: TParam, second: TParam): boolean {
     if (this.isAlias(param) || this.isAlias(second)) {
       return true;
@@ -373,17 +389,18 @@ export abstract class CachedResource<
     update: (param: TParam, context: TContext) => Promise<T>,
     exitCheck?: () => boolean
   ): Promise<T | undefined> {
-    if (exitCheck?.()) {
-      return;
-    }
-
     const contexts = await this.beforeLoad.execute(param);
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
-    this.markDataLoading(param, context);
+    await this.scheduler.waitRelease(param);
+
+    if (exitCheck?.()) {
+      return;
+    }
+
     let loaded = false;
     return this.scheduler.schedule(
       param,
@@ -393,14 +410,22 @@ export abstract class CachedResource<
           return;
         }
 
-        const result = await this.taskWrapper(param, context, update);
-        loaded = true;
-        return result;
+        this.markDataLoading(param, context);
+        try {
+          const result = await this.taskWrapper(param, context, update);
+          loaded = true;
+          return result;
+        } finally {
+          this.markDataLoaded(param, context);
+        }
       },
       {
-        after: () => this.markDataLoaded(param, context),
+        before: () => {
+          this.markOutdatedSync(param);
+        },
         success: () => {
           if (loaded) {
+            this.cleanError(param);
             this.onDataUpdate.execute(param);
           }
         },
@@ -415,28 +440,41 @@ export abstract class CachedResource<
       return;
     }
 
-    if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
-      return;
+    if (!refresh) {
+      await this.scheduler.waitRelease(param);
+
+      if (this.isLoaded(param, context) && !this.isOutdated(param)) {
+        return;
+      }
     }
 
-    this.markDataLoading(param, context);
     let loaded = false;
     await this.scheduler.schedule(
       param,
       async () => {
         // repeated because previous task maybe has been load requested data
-        if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
+        if (this.isLoaded(param, context) && !this.isOutdated(param)) {
           return;
         }
 
-        const result = await this.taskWrapper(param, context, this.loadingTask);
-        loaded = true;
-        return result;
+        this.markDataLoading(param, context);
+        try {
+          const result = await this.taskWrapper(param, context, this.loadingTask);
+          loaded = true;
+          return result;
+        } finally {
+          this.markDataLoaded(param, context);
+        }
       },
       {
-        after: () => this.markDataLoaded(param, context),
+        before: () => {
+          if (refresh) {
+            this.markOutdatedSync(param);
+          }
+        },
         success: async () => {
           if (loaded) {
+            this.cleanError(param);
             this.onDataUpdate.execute(param);
           }
         },
@@ -456,9 +494,18 @@ export abstract class CachedResource<
     if (this.logActivity) {
       console.log(this.getActionPrefixedName('loading'));
     }
-    this.markOutdated(param);
+
     const value = await promise(param, context);
     this.markUpdated(param);
+
+    for (let i = 0; i < this.outdateWaitList.length; i++) {
+      const key = this.outdateWaitList[i];
+      if (this.includes(param, key)) {
+        this.markOutdatedSync(param);
+        this.outdateWaitList.splice(i, 1);
+        break;
+      }
+    }
     return value;
   }
 

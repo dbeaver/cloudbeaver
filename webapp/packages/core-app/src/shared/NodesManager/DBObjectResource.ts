@@ -8,23 +8,26 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList
+  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
+import { NavTreeResource } from './NavTreeResource';
 
 @injectable()
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
     private graphQLService: GraphQLService,
-    private navNodeInfoResource: NavNodeInfoResource
+    private navNodeInfoResource: NavNodeInfoResource,
+    private navTreeResource: NavTreeResource
   ) {
     super();
 
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
+    this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
   }
 
   async loadChildren(parentId: string, key: ResourceKey<string>): Promise<Map<string, DBObject>> {
@@ -66,5 +69,19 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     });
 
     return objectInfo;
+  }
+
+  private outdateChildren(key: ResourceKey<string>): void {
+    const childrenToOutdate: string[] = [];
+
+    ResourceKeyUtils.forEach(key, key => {
+      childrenToOutdate.push(...this.navTreeResource.get(key) || []);
+    });
+
+    const outdateKey = resourceKeyList(childrenToOutdate);
+
+    // if (!this.isOutdated(outdateKey)) {
+    this.markOutdated(outdateKey);
+    // }
   }
 }

@@ -7,8 +7,10 @@
  */
 
 import type { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import type { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 
 export async function preloadNodeParents(
+  connectionInfoResource: ConnectionInfoResource,
   navTreeResource: NavTreeResource,
   navNodeInfoResource: NavNodeInfoResource,
   parents: string[],
@@ -19,12 +21,20 @@ export async function preloadNodeParents(
   }
 
   const first = parents[0];
+  await connectionInfoResource.waitLoad();
   await navTreeResource.load(first);
 
   for (const nodeId of parents) {
     if (!navNodeInfoResource.has(nodeId)) {
       return false;
     }
+
+    const connection = connectionInfoResource.getConnectionForNode(nodeId);
+
+    if (connection && !connection.connected) {
+      return false;
+    }
+
     await navTreeResource.load(nodeId);
   }
 

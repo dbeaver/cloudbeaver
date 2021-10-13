@@ -124,6 +124,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.cancel();
   }
 
+  resetData(): void {
+    this.source.resetData();
+  }
+
   async dispose(): Promise<void> {
     await this.source.dispose();
   }

@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { DBObject, DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
@@ -39,16 +40,29 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   parentId,
   parents,
 }) {
+  parents = [...parents, parentId];
   const translate = useTranslate();
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const navTreeResource = useService(NavTreeResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const tree = useMapResource(ObjectPropertyTable, NavTreeResource, objectId, {
-    onLoad: async () => !(await preloadNodeParents(navTreeResource, navNodeInfoResource, parents, objectId)),
+    onLoad: async resource => !(await preloadNodeParents(
+      connectionInfoResource,
+      resource,
+      navNodeInfoResource,
+      parents,
+      objectId
+    )),
   });
   const key = resourceKeyList(tree.data || []);
   const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
-      const preloaded = await preloadNodeParents(navTreeResource, navNodeInfoResource, parents);
+      const preloaded = await preloadNodeParents(
+        connectionInfoResource,
+        tree.resource,
+        navNodeInfoResource,
+        parents,
+        objectId
+      );
 
       if (!preloaded) {
         return true;

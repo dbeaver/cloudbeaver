@@ -71,7 +71,12 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   const children = useMapResource(ObjectViewerPanel, NavTreeResource, parentId, {
     onLoad: async resource => {
-      const preload = await preloadNodeParents(resource, navNodeInfoResource, parents);
+      const preload = await preloadNodeParents(
+        connection.resource,
+        resource,
+        navNodeInfoResource,
+        parents
+      );
       state.notFound = !preload;
       return state.notFound;
     },
@@ -83,7 +88,13 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   });
 
   const node = useMapResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
-    onLoad: async resource => !(await preloadNodeParents(children.resource, resource, parents, objectId)),
+    onLoad: async resource => !(await preloadNodeParents(
+      connection.resource,
+      children.resource,
+      resource,
+      parents,
+      objectId
+    )),
     onData(data) {
       tab.handlerState.tabIcon = data.icon;
       tab.handlerState.tabTitle = data.name;

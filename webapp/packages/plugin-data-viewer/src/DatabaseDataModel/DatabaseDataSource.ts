@@ -303,6 +303,13 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.error = null;
   }
 
+  resetData(): void {
+    if (this.activeSave || this.activeRequest) {
+      return;
+    }
+    this.setResults([]);
+  }
+
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 

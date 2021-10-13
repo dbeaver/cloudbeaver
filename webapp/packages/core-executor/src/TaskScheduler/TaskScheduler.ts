@@ -19,6 +19,7 @@ interface ITaskContainer<T, TValue> {
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
 export interface IScheduleOptions {
   cancel?: () => Promise<any> | any;
+  before?: () => any;
   after?: () => Promise<any> | any;
   success?: () => Promise<any> | any;
   error?: (exception: Error) => Promise<any> | any;
@@ -56,6 +57,19 @@ export class TaskScheduler<TIdentifier> {
     return this.queue.some(active => this.isBlocked!(active.id, id));
   }
 
+  async waitRelease(id: TIdentifier): Promise<void> {
+    const promise = this.queue
+      .slice()
+      .reverse()
+      .find(active => this.isBlocked!(active.id, id));
+
+    if (promise) {
+      try {
+        await promise.task;
+      } catch {}
+    }
+  }
+
   schedule<T>(
     id: TIdentifier,
     promise: () => Promise<T>,
@@ -68,6 +82,7 @@ export class TaskScheduler<TIdentifier> {
     const task = new Task<T>(promise, options?.cancel);
     const container: ITaskContainer<TIdentifier, T> = { id, task };
     this.queue.push(container);
+    options?.before?.();
 
     this.execute(container);
 

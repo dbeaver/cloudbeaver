@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
@@ -49,6 +49,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   readonly onConnectionClose: IExecutor<Connection>;
 
   private sessionUpdate: boolean;
+  private nodeIdMap: Map<string, string>;
   constructor(
     private graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource,
@@ -59,6 +60,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.onConnectionCreate = new Executor();
     this.onConnectionClose = new Executor();
     this.sessionUpdate = false;
+    this.nodeIdMap = new Map();
 
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
@@ -74,12 +76,26 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       this.markOutdated();
     });
 
-    makeObservable(this, {
+    makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
+      nodeIdMap: observable,
+      updateConnection: action,
       createFromTemplate: action,
       createConnection: action,
       createFromNode: action,
       add: action,
     });
+  }
+
+  getConnectionForNode(nodeId: string): Connection | undefined {
+    const connectionPart = nodeId.slice(0, 53);
+
+    const connectionId = this.nodeIdMap.get(connectionPart);
+
+    if (connectionId) {
+      return this.get(connectionId);
+    }
+
+    return undefined;
   }
 
   async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {
@@ -236,6 +252,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.sessionUpdate = false;
 
     return this.data;
+  }
+
+  protected dataSet(key: string, value: Connection): void {
+    this.data.set(key, value);
+
+    if (value.nodePath) {
+      this.nodeIdMap.set(value.nodePath, key);
+    }
+  }
+
+  protected dataDelete(key: string): void {
+    this.data.delete(key);
+    this.nodeIdMap.delete(key);
   }
 
   private updateConnection(...connections: Connection[]): ResourceKeyList<string> {

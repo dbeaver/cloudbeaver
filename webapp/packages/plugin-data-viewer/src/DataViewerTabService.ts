@@ -7,6 +7,7 @@
  */
 
 import { NavNodeManagerService, INodeNavigationData, ITab } from '@cloudbeaver/core-app';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -29,6 +30,7 @@ export class DataViewerTabService {
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService,
     private dataPresentationService: DataPresentationService,
+    private connectionInfoResource: ConnectionInfoResource,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -88,14 +90,23 @@ export class DataViewerTabService {
 
     let model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
 
-    if (tab.handlerState.tableId && model && !model.source.executionContext?.context) {
-      await this.dataViewerTableService.removeTableModel(tab.handlerState.tableId);
-      model = undefined;
+    if (
+      model
+      && !model.source.executionContext?.context
+      && model.source.results.length > 0
+    ) {
+      model.resetData();
     }
 
     if (!model) {
-      model = await this.dataViewerTableService.create(
-        tab.handlerState.connectionId,
+      const connectionInfo = this.connectionInfoResource.get(tab.handlerState.connectionId);
+
+      if (!connectionInfo) {
+        throw new Error('Connection doesn\'t exists');
+      }
+
+      model = this.dataViewerTableService.create(
+        connectionInfo,
         tab.handlerState.objectId
       );
       tab.handlerState.tableId = model.id;
