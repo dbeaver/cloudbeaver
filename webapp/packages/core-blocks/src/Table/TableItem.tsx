@@ -7,14 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import {
-  useContext, useCallback, useMemo, Children
-} from 'react';
+import { useContext, useCallback, useMemo, Children } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { getComputed } from '../getComputed';
 import { useObjectRef } from '../useObjectRef';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
@@ -55,12 +54,16 @@ export const TableItem = observer<Props>(function TableItem({
     throw new Error('TableContext must be provided');
   }
 
+  const selectable = getComputed(() => selectDisabled || (!!context.state.isItemSelectable && ((
+    context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)
+  ) || !context.state.isItemSelectable(item))));
+
   const itemContext = useMemo<ITableItemContext>(() => ({
     item,
-    selectDisabled,
+    selectDisabled: selectable,
     isSelected: () => !!context.selectedItems.get(item),
     isExpanded: () => !!context.expandedItems.get(item),
-  }), [item, selectDisabled]);
+  }), [item, selectable]);
 
   const isSelected = itemContext.isSelected();
   const isExpanded = itemContext.isExpanded();

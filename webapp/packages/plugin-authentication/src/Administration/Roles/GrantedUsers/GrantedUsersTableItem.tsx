@@ -7,10 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, TableColumnValue, TableContext, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
+import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
 
 interface Props {
   id: any;
@@ -30,16 +29,8 @@ const style = css`
 `;
 
 export const GrantedUsersTableItem = observer<Props>(function GrantedUsersTableItem({
-  id, name, icon, iconTooltip, tooltip, disabled: tableDisabled, className,
+  id, name, icon, iconTooltip, tooltip, disabled, className,
 }) {
-  const tableContext = useContext(TableContext);
-
-  if (!tableContext) {
-    throw new Error('Context must be provided');
-  }
-
-  const disabled = tableDisabled || tableContext.state.isItemSelectable?.(id) === false;
-
   return styled(style)(
     <TableItem
       item={id}
