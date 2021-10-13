@@ -50,20 +50,21 @@ export const TableItem = observer<Props>(function TableItem({
   const styles = useStyles();
   const context = useContext(TableContext);
   const props = useObjectRef({ selectOnItem });
+
   if (!context) {
     throw new Error('TableContext must be provided');
   }
 
-  const selectable = getComputed(() => selectDisabled || (!!context.state.isItemSelectable && ((
+  const selectionDisabled = getComputed(() => selectDisabled || (!!context.state.isItemSelectable && ((
     context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)
   ) || !context.state.isItemSelectable(item))));
 
   const itemContext = useMemo<ITableItemContext>(() => ({
     item,
-    selectDisabled: selectable,
+    selectDisabled: selectionDisabled,
     isSelected: () => !!context.selectedItems.get(item),
     isExpanded: () => !!context.expandedItems.get(item),
-  }), [item, selectable]);
+  }), [item, selectionDisabled]);
 
   const isSelected = itemContext.isSelected();
   const isExpanded = itemContext.isExpanded();

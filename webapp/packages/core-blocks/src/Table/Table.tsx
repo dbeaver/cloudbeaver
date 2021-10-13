@@ -81,7 +81,6 @@ export const Table = observer<Props>(function Table({
     state,
     selectedItems: selected,
     expandedItems: expanded,
-    isItemSelectable,
     setItemExpand,
     setItemSelect,
     clearSelection,
