@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useAppLoadingScreen } from '@cloudbeaver/core-blocks';
+import { Loader, useAppLoadingScreen, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
+import { PermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -31,7 +32,9 @@ const bodyStyles = css`
 
 export const Body = observer(function Body() {
   useAppLoadingScreen();
+  const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
+  const permissionsService = useDataResource(PermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
@@ -44,9 +47,14 @@ export const Body = observer(function Body() {
     document.documentElement.dataset.backendVersion = backendVersion;
   });
 
-  return styled(useStyles(bodyStyles))(
+  return styled(style)(
     <theme ref={ref}>
-      {Screen && <Screen />}
+      <Loader state={permissionsService}>{() => styled(style)(
+        <>
+          {Screen && <Screen />}
+        </>
+      )}
+      </Loader>
       <DialogsPortal />
       <Notifications />
     </theme>

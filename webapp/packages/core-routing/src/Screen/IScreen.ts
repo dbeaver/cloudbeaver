@@ -17,6 +17,7 @@ export interface IScreen {
   root?: boolean;
   onActivate?: (state: RouterState, prevState?: RouterState) => void | Promise<void>;
   onDeactivate?: (state: RouterState, nextState: RouterState) => void | Promise<void>;
+  canDeActivate?: (state: RouterState, nextState: RouterState) => boolean | Promise<boolean>;
 }
 
 export type ScreenComponent = React.FunctionComponent;

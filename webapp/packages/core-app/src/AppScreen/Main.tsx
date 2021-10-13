@@ -48,7 +48,6 @@ const mainStyles = composes(
 
 export const Main = observer(function Main() {
   const styles = useStyles(mainStyles, splitStyles);
-  const permissionsService = useDataResource(PermissionsResource, undefined);
   useMapResource(
     Main,
     ConnectionExecutionContextResource,
@@ -57,22 +56,18 @@ export const Main = observer(function Main() {
   useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
 
   return styled(styles)(
-    <Loader state={[permissionsService]}>
-      {() => styled(styles)(
-        <space as="main">
-          <Split sticky={30}>
-            <Pane main>
-              <ErrorBoundary remount>
-                <NavigationTree />
-              </ErrorBoundary>
-            </Pane>
-            <ResizerControls />
-            <Pane>
-              <RightArea />
-            </Pane>
-          </Split>
-        </space>
-      )}
-    </Loader>
+    <space as="main">
+      <Split sticky={30}>
+        <Pane main>
+          <ErrorBoundary remount>
+            <NavigationTree />
+          </ErrorBoundary>
+        </Pane>
+        <ResizerControls />
+        <Pane>
+          <RightArea />
+        </Pane>
+      </Split>
+    </space>
   );
 });

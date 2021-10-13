@@ -25,33 +25,37 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   register(): void {
+    const canActivate
+      = () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService);
+
     this.screenService.create({
       name: AdministrationScreenService.screenName,
       routes: [
         {
           name: AdministrationScreenService.screenName,
           path: '/admin',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.itemRouteName,
           path: '/:item',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.itemSubRouteName,
           path: '/:sub',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.itemSubParamRouteName,
           path: '/:param',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
       ],
       component: AdministrationScreen,
       onActivate: this.administrationScreenService.handleActivate.bind(this.administrationScreenService),
       onDeactivate: this.administrationScreenService.handleDeactivate.bind(this.administrationScreenService),
+      canDeActivate: this.administrationScreenService.handleCanDeActivate.bind(this.administrationScreenService),
     });
 
     this.screenService.create({
@@ -60,27 +64,28 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
         {
           name: AdministrationScreenService.setupName,
           path: '/setup',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.setupItemRouteName,
           path: '/:item',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.setupItemSubRouteName,
           path: '/:sub',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
         {
           name: AdministrationScreenService.setupItemSubParamRouteName,
           path: '/:param',
-          canActivate: () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService),
+          canActivate,
         },
       ],
       component: ConfigurationWizardScreen,
       onActivate: this.administrationScreenService.handleActivate.bind(this.administrationScreenService),
       onDeactivate: this.administrationScreenService.handleDeactivate.bind(this.administrationScreenService),
+      canDeActivate: this.administrationScreenService.handleCanDeActivate.bind(this.administrationScreenService),
     });
   }
 

@@ -177,6 +177,30 @@ export class AdministrationItemService {
     await this.deActivationTask.execute({ screen, configurationWizard, outside, outsideAdminPage });
   }
 
+  async canDeActivate(
+    screen: IAdministrationItemRoute,
+    configurationWizard: boolean,
+    outside: boolean
+  ): Promise<boolean> {
+    const item = this.getItem(screen.item, configurationWizard);
+    if (!item) {
+      return false;
+    }
+
+    if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside))) {
+      return false;
+    }
+
+    if (screen.sub) {
+      const sub = this.getItemSub(item, screen.sub);
+      if (sub?.canDeActivate && !(await sub.canDeActivate(screen.param, configurationWizard))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async canActivate(
     screen: IAdministrationItemRoute,
     configurationWizard: boolean,

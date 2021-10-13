@@ -316,7 +316,6 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
-      // tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
       if (tab.handlerState.connectionId) {
         await this.connectionInfo.load(CachedMapAllKey);
         if (!this.connectionInfo.has(tab.handlerState.connectionId)) {

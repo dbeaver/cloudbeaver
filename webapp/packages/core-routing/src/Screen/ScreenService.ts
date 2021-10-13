@@ -10,9 +10,9 @@ import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 
-import { RouterService } from '../RouterService';
+import { RouterService, RouterTransitionData } from '../RouterService';
 import type { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
@@ -31,6 +31,7 @@ export class ScreenService {
   ) {
     this.routeChange = new Executor();
     this.routerService.subscribe(this.onRouteChange.bind(this));
+    this.routerService.transitionTask.addHandler(this.routeTransition.bind(this));
 
     makeObservable(this, {
       screen: computed,
@@ -88,6 +89,25 @@ export class ScreenService {
     }
 
     return this.screens.get(screen);
+  }
+
+  private async routeTransition(
+    data: RouterTransitionData,
+    contexts: IExecutionContextProvider<RouterTransitionData>
+  ): Promise<void> {
+    if (!data.fromState) {
+      return;
+    }
+
+    const screen = this.getScreenByRoute(data.fromState.name);
+
+    if (screen?.canDeActivate) {
+      const canDeactivate = await screen.canDeActivate(data.fromState, data.toState);
+
+      if (!canDeactivate) {
+        ExecutorInterrupter.interrupt(contexts);
+      }
+    }
   }
 
   private async onRouteChange(state: SubscribeState) {

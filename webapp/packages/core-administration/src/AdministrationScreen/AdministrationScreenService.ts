@@ -201,12 +201,31 @@ export class AdministrationScreenService {
     }
   }
 
-  async handleCanActivate(toState: RouterState): Promise<boolean> {
+  async handleCanDeActivate(fromState: RouterState, toState: RouterState): Promise<boolean> {
+    if (!fromState.params?.item) {
+      return true;
+    }
+
+    const fromScreen = this.getScreen(toState);
+    const screen = this.getScreen(fromState);
+
+    if (!screen) {
+      return true;
+    }
+
+    return this.administrationItemService.canDeActivate(
+      screen,
+      this.isConfigurationMode,
+      screen.item !== fromScreen?.item
+    );
+  }
+
+  async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
     if (!toState.params?.item) {
       return false;
     }
 
-    const fromScreen = this.getScreen(this.screenService.routerService.state);
+    const fromScreen = this.getScreen(fromState);
     const screen = this.getScreen(toState);
     if (!screen) {
       return false;

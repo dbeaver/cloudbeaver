@@ -21,7 +21,7 @@ export type RouterState = State;
 
 export interface RouterTransitionData {
   toState: RouterState;
-  fromState: RouterState;
+  fromState: RouterState | null;
   done: DoneFn;
 }
 
@@ -87,7 +87,7 @@ export class RouterService extends Bootstrap {
       toState,
       done
     ) => {
-      const contexts = await this.transitionTask.execute({ fromState, toState, done });
+      const contexts = await this.transitionTask.execute({ fromState: toState, toState: fromState, done });
 
       if (ExecutorInterrupter.isInterrupted(contexts)) {
         // eslint-disable-next-line prefer-promise-reject-errors

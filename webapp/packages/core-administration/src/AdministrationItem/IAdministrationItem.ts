@@ -69,6 +69,7 @@ export interface IAdministrationItemSubItem {
   onActivate?: AdministrationItemSubEvent;
   onDeActivate?: AdministrationItemSubEvent;
   canActivate?: AdministrationItemSubCanActivateEvent;
+  canDeActivate?: AdministrationItemSubCanActivateEvent;
 }
 
 export interface IConfigurationWizardItemOptions {
@@ -99,6 +100,7 @@ export interface IAdministrationItemOptions {
   onActivate?: AdministrationItemEvent;
   onDeActivate?: AdministrationItemEvent;
   canActivate?: AdministrationItemCanActivateEvent;
+  canDeActivate?: AdministrationItemCanActivateEvent;
 }
 
 export interface IAdministrationItem extends IAdministrationItemOptions {
