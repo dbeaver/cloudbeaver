@@ -39,13 +39,13 @@ export class CreateConnectionService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionsResource: ConnectionsResource
   ) {
+    this.data = null;
+    this.tabsContainer = new TabsContainer();
+
     makeObservable(this, {
       data: observable,
       disabled: observable,
     });
-
-    this.data = null;
-    this.tabsContainer = new TabsContainer();
 
     this.setConnectionTemplate = this.setConnectionTemplate.bind(this);
     this.clearConnectionTemplate = this.clearConnectionTemplate.bind(this);

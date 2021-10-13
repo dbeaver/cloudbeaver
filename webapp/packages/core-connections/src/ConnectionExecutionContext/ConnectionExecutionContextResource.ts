@@ -40,31 +40,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
   }
 
-  updateConnectionContexts(key: ResourceKey<string>): void {
-    this.delete(
-      resourceKeyList(
-        flat(ResourceKeyUtils.map(
-          key,
-          connectionId => this.values.filter(context => {
-            const connection = this.connectionInfoResource.get(connectionId);
-            return context.connectionId === connectionId && !connection?.connected;
-          })
-        )).map(context => context.baseId)
-      )
-    );
-  }
-
-  deleteConnectionContexts(key: ResourceKey<string>): void {
-    this.delete(
-      resourceKeyList(
-        flat(ResourceKeyUtils.map(
-          key,
-          connectionId => this.values.filter(context => context.connectionId === connectionId)
-        )).map(context => context.baseId)
-      )
-    );
-  }
-
   async create(
     connectionId: string,
     defaultCatalog?: string,
@@ -129,7 +104,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async loadAll(): Promise<IConnectionExecutionContextInfo[]> {
-    this.resetIncludes();
     await this.load(CachedMapAllKey);
 
     return this.values;
@@ -161,14 +135,41 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
       const key = this.updateContexts(...contexts.map(getBaseContext));
 
-      for (const contextId of this.keys) {
-        if (!ResourceKeyUtils.includes(key, contextId)) {
-          this.delete(contextId);
+      if (all) {
+        for (const contextId of this.keys) {
+          if (!ResourceKeyUtils.includes(key, contextId)) {
+            this.delete(contextId);
+          }
         }
       }
     });
 
     return this.data;
+  }
+
+  private updateConnectionContexts(key: ResourceKey<string>): void {
+    this.delete(
+      resourceKeyList(
+        flat(ResourceKeyUtils.map(
+          key,
+          connectionId => this.values.filter(context => {
+            const connection = this.connectionInfoResource.get(connectionId);
+            return context.connectionId === connectionId && !connection?.connected;
+          })
+        )).map(context => context.baseId)
+      )
+    );
+  }
+
+  private deleteConnectionContexts(key: ResourceKey<string>): void {
+    this.delete(
+      resourceKeyList(
+        flat(ResourceKeyUtils.map(
+          key,
+          connectionId => this.values.filter(context => context.connectionId === connectionId)
+        )).map(context => context.baseId)
+      )
+    );
   }
 
   private updateContexts(...contexts: IConnectionExecutionContextInfo[]): ResourceKeyList<string> {

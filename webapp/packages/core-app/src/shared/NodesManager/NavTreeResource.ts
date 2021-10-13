@@ -8,6 +8,7 @@
 
 import { action, computed, makeObservable, runInAction } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -21,8 +22,7 @@ import {
   resourceKeyList,
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata,
-  CachedMapAllKey
+  ICachedMapResourceMetadata
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -57,6 +57,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private coreSettingsService: CoreSettingsService,
     private sessionDataResource: SessionDataResource,
     private connectionInfo: ConnectionInfoResource,
+    private userInfoResource: UserInfoResource,
     permissionsResource: PermissionsResource,
   ) {
     super();
@@ -91,6 +92,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
+    this.userInfoResource.userChange.addHandler(() => this.clear());
   }
 
   async refreshTree(navNodeId: string): Promise<void> {

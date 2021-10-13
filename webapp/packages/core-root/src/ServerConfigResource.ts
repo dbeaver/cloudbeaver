@@ -142,7 +142,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         if (this.data) {
           this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
         } else {
-          this.data = await this.loader();
+          this.setData(await this.loader());
         }
       }
 
@@ -150,7 +150,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         await this.graphQLService.sdk.configureServer({
           configuration: this.update,
         });
-        this.data = await this.loader();
+        this.setData(await this.loader());
       }
     }, () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate));
   }
@@ -161,7 +161,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         configuration: !this.isChanged() && onlyRestart ? {} : this.update,
       });
 
-      this.data = await this.loader();
+      this.setData(await this.loader());
     }, () => !this.isChanged() && !onlyRestart);
   }
 

@@ -104,56 +104,6 @@ export abstract class CachedMapResource<
     });
   }
 
-  // outdateResource<T = TKey>(
-  //   resource: CachedMapResource<T, any, any>,
-  //   map?: (param: ResourceKey<TKey>) => ResourceKey<T>
-  // ): this {
-  //   this.onDataOutdated.addHandler(param => {
-  //     try {
-  //       if (this.logActivity) {
-  //         console.group(this.getActionPrefixedName(' outdate - ' + resource.getName()));
-  //       }
-
-  //       if (map) {
-  //         param = map(param) as any as TKey;
-  //       }
-
-  //       resource.markOutdated(param as any as T);
-  //     } finally {
-  //       if (this.logActivity) {
-  //         console.groupEnd();
-  //       }
-  //     }
-  //   });
-
-  //   return this;
-  // }
-
-  // updateResource<T = TKey>(
-  //   resource: CachedMapResource<T, any, any>,
-  //   map?: (param: ResourceKey<TKey>) => ResourceKey<T>
-  // ): this {
-  //   this.onDataOutdated.addHandler(param => {
-  //     try {
-  //       if (this.logActivity) {
-  //         console.group(this.getActionPrefixedName(' update - ' + resource.getName()));
-  //       }
-
-  //       if (map) {
-  //         param = map(param) as any as TKey;
-  //       }
-
-  //       resource.markUpdated(param as any as T);
-  //     } finally {
-  //       if (this.logActivity) {
-  //         console.groupEnd();
-  //       }
-  //     }
-  //   });
-
-  //   return this;
-  // }
-
   deleteInResource<T = TKey>(
     resource: CachedMapResource<T, any, any>,
     map?: (key: ResourceKey<TKey>) => ResourceKey<T>
@@ -202,7 +152,11 @@ export abstract class CachedMapResource<
     }
 
     key = this.transformParam(key);
-    return ResourceKeyUtils.some(key, key => this.metadata.get(key).outdated);
+    return ResourceKeyUtils.some(key, key => {
+      const metadata = this.metadata.get(key);
+
+      return metadata.outdated;
+    });
   }
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
@@ -282,6 +236,7 @@ export abstract class CachedMapResource<
       if (this.isAlias(key) && !this.isAliasLoaded(key)) {
         this.loadedKeys.push(key);
       }
+
       key = this.transformParam(key);
     }
 
@@ -412,6 +367,10 @@ export abstract class CachedMapResource<
   }
 
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
+    if (param === key) {
+      return true;
+    }
+
     return ResourceKeyUtils.includes(param, key);
   }
 

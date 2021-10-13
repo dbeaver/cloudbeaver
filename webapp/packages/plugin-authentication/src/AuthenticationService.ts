@@ -10,7 +10,7 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
@@ -85,9 +85,9 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionDataResource.beforeLoad.addHandler(
-      ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
-    );
+    // this.sessionDataResource.beforeLoad.addHandler(
+    //   ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
+    // );
     this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 

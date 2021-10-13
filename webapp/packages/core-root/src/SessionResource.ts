@@ -36,7 +36,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
   async refreshSilent(): Promise<void> {
     const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
 
-    this.data = session;
+    this.setData(session);
   }
 
   async changeLanguage(locale: string): Promise<void> {

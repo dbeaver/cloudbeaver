@@ -280,7 +280,7 @@ export class NavNodeManagerService extends Bootstrap {
         return NodeManagerUtils.parentsFromPath(nodeId);
       }
 
-      while (parent && parent.parentId !== ROOT_NODE_PATH && parent.id !== parent.parentId) {
+      while (parent && parent.id !== parent.parentId) {
         parents.unshift(parent.parentId);
         parent = this.getNode(parent.parentId);
       }

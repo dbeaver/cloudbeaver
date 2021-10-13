@@ -26,15 +26,15 @@ export class CreateRoleService {
     private readonly roleFormService: RoleFormService,
     private readonly rolesResource: RolesResource
   ) {
-    makeObservable(this, {
-      data: observable,
-      disabled: observable,
-    });
-
     this.data = null;
 
     this.cancelCreate = this.cancelCreate.bind(this);
     this.create = this.create.bind(this);
+
+    makeObservable(this, {
+      data: observable,
+      disabled: observable,
+    });
   }
 
   cancelCreate(): void {

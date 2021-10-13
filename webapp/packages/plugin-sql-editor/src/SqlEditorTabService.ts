@@ -26,7 +26,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -70,7 +70,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   register(): void {
     this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
-    this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextUpdate.bind(this));
+    this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
 
   load(): void {}
@@ -111,14 +111,27 @@ export class SqlEditorTabService extends Bootstrap {
     state.executionContext = undefined;
   }
 
-  private async handleExecutionContextUpdate() {
+  private async handleExecutionContextUpdate(key: ResourceKey<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => !!tab.handlerState.executionContext)
     );
 
     for (const tab of tabs) {
       const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.baseId);
+
       if (!executionContext) {
+        this.resetConnectionInfo(tab.handlerState);
+      }
+    }
+  }
+
+  private async handleExecutionContextDelete(key: ResourceKey<string>) {
+    const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
+      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+    );
+
+    for (const tab of tabs) {
+      if (ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.baseId)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }

@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
@@ -15,6 +16,8 @@ import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserInfo | null> {
+  readonly userChange: ISyncExecutor<string>;
+
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
@@ -22,6 +25,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
     private sessionDataResource: SessionDataResource
   ) {
     super(null);
+
+    this.userChange = new SyncExecutor();
 
     this.sync(sessionResource);
   }
@@ -66,8 +71,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
         linkUser: link,
         customIncludeOriginDetails: true,
       });
+
       if (this.data === null || link) {
-        this.data = await this.loader();
+        this.setData(await this.loader());
       } else {
         this.data.authTokens.push(authToken as UserAuthToken);
       }
@@ -81,7 +87,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
     await this.performUpdate(undefined, undefined, async () => {
       if (this.data) {
         await this.graphQLService.sdk.authLogout();
-        this.data = null;
+        this.setData(null);
       }
     });
     this.sessionDataResource.markOutdated();
@@ -93,5 +99,15 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
     });
 
     return (user as UserInfo | null) ?? null;
+  }
+
+  protected setData(data: UserInfo|null): void {
+    const prevUserId = this.getId();
+    this.data = data;
+    const currentUserId = this.getId();
+
+    if (prevUserId !== currentUserId) {
+      this.userChange.execute(currentUserId);
+    }
   }
 }

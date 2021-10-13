@@ -10,7 +10,7 @@ import { action, observable, makeObservable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ServerService, SessionResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { ServerService, SessionResource } from '@cloudbeaver/core-root';
 import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 

@@ -21,22 +21,17 @@ export abstract class CachedDataResource<
   constructor(defaultValue: TData) {
     super(defaultValue);
 
+    this.loaded = false;
+
     makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loaded'>(this, {
       loaded: observable,
     });
 
-    this.loaded = false;
+    this.onDataUpdate.addHandler(() => { this.loaded = true; });
   }
 
   isLoaded(param: TParam, context: TContext): boolean {
     return this.loaded;
-  }
-
-  markUpdated(param: TParam): void {
-    const metadata = this.metadata.get(param as unknown as TKey);
-    metadata.outdated = false;
-    metadata.exception = null;
-    this.loaded = true;
   }
 
   async refresh(param: TParam, context: TContext): Promise<TData> {

@@ -26,15 +26,15 @@ export class CreateAuthConfigurationService {
     private readonly authConfigurationFormService: AuthConfigurationFormService,
     private readonly authConfigurationsResource: AuthConfigurationsResource
   ) {
-    makeObservable(this, {
-      data: observable,
-      disabled: observable,
-    });
-
     this.data = null;
 
     this.cancelCreate = this.cancelCreate.bind(this);
     this.create = this.create.bind(this);
+
+    makeObservable(this, {
+      data: observable,
+      disabled: observable,
+    });
   }
 
   cancelCreate(): void {

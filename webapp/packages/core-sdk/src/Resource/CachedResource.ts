@@ -126,7 +126,7 @@ export abstract class CachedResource<
   }
 
   updateResource<T = TParam>(resource: CachedResource<any, T, any, any>, map?: (param: TParam) => T): this {
-    this.onDataOutdated.addHandler(param => {
+    this.onDataUpdate.addHandler(param => {
       try {
         if (this.logActivity) {
           console.group(this.getActionPrefixedName(' update - ' + resource.getName()));
@@ -238,7 +238,8 @@ export abstract class CachedResource<
     }
 
     param = this.transformParam(param);
-    return this.metadata.get(param as unknown as TKey).outdated;
+    const metadata = this.metadata.get(param as unknown as TKey);
+    return metadata.outdated;
   }
 
   isDataLoading(param: TParam): boolean {
@@ -330,6 +331,10 @@ export abstract class CachedResource<
     return this.data;
   }
 
+  protected setData(data: TData): void {
+    this.data = data;
+  }
+
   protected lock(param: TParam, second: TParam): boolean {
     if (this.isAlias(param) || this.isAlias(second)) {
       return true;
@@ -339,6 +344,10 @@ export abstract class CachedResource<
   }
 
   protected includes(param: TParam, second: TParam): boolean {
+    if (param === second) {
+      return true;
+    }
+
     param = this.transformParam(param);
     second = this.transformParam(second);
     return param === second;
@@ -436,7 +445,7 @@ export abstract class CachedResource<
   }
 
   private async loadingTask(param: TParam, context: TContext) {
-    this.data = await this.loader(param, context);
+    this.setData(await this.loader(param, context));
   }
 
   private async taskWrapper<T>(

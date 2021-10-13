@@ -7,14 +7,11 @@
  */
 
 import { NavigationTabsService } from '@cloudbeaver/core-app';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
@@ -51,7 +48,6 @@ export class SqlEditorNavigatorService {
     private navigationTabsService: NavigationTabsService,
     private notificationService: NotificationService,
     private sqlEditorTabService: SqlEditorTabService,
-    private connectionInfoResource: ConnectionInfoResource,
     private readonly sqlResultTabsService: SqlResultTabsService,
     navigationService: NavigationService
   ) {
@@ -61,13 +57,10 @@ export class SqlEditorNavigatorService {
     )
       .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
-
-    this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionClose.bind(this));
-    this.connectionInfoResource.onConnectionClose.addHandler(connection => this.handleConnectionClose(connection.id));
   }
 
-  openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
-    this.navigator.execute({
+  async openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string): Promise<void> {
+    await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       connectionId,
       catalogId,
@@ -75,33 +68,20 @@ export class SqlEditorNavigatorService {
     });
   }
 
-  openEditorResult(editorId: string, resultId: string) {
-    this.navigator.execute({
+  async openEditorResult(editorId: string, resultId: string): Promise<void> {
+    await this.navigator.execute({
       type: SQLEditorNavigationAction.select,
       editorId,
       resultId,
     });
   }
 
-  closeEditorResult(editorId: string, resultId: string) {
-    this.navigator.execute({
+  async closeEditorResult(editorId: string, resultId: string): Promise<void> {
+    await this.navigator.execute({
       type: SQLEditorNavigationAction.close,
       editorId,
       resultId,
     });
-  }
-
-  private async handleConnectionClose(key: ResourceKey<string>) {
-    try {
-      for (const tab of this.navigationTabsService.findTabs<ISqlEditorTabState>(
-        isSQLEditorTab(tab => ResourceKeyUtils.includes(key, tab.handlerState.executionContext?.connectionId))
-      )) {
-        this.sqlEditorTabService.resetConnectionInfo(tab.handlerState);
-      }
-      return;
-    } catch (exception) {
-      this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing connection close');
-    }
   }
 
   private async navigateHandler(

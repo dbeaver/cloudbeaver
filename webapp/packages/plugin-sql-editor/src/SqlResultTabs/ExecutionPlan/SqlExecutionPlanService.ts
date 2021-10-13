@@ -31,10 +31,11 @@ export class SqlExecutionPlanService {
     private notificationService: NotificationService,
     private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
+    this.data = new Map();
+
     makeObservable(this, {
       data: observable,
     });
-    this.data = new Map();
   }
 
   async executeExecutionPlan(

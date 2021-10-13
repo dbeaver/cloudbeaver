@@ -28,19 +28,19 @@ export abstract class LocalResource<
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
-    makeObservable<LocalResource<TData, TParam>, 'outdated' | 'dataLoading' | 'loading'>(this, {
-      data: observable,
-      outdated: observable,
-      dataLoading: observable,
-      loading: observable,
-    });
-
     this.includes = this.includes.bind(this);
     this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
     this.onDataOutdated = new Executor(null, this.includes);
     this.onDataUpdate = new Executor();
     this.loadingTask = this.loadingTask.bind(this);
+
+    makeObservable<LocalResource<TData, TParam>, 'outdated' | 'dataLoading' | 'loading'>(this, {
+      data: observable,
+      outdated: observable,
+      dataLoading: observable,
+      loading: observable,
+    });
   }
 
   abstract isLoaded(param: TParam): boolean;
