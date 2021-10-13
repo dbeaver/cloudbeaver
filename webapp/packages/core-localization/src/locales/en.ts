@@ -47,6 +47,7 @@ export const defaultENLocale = [
   ['ui_yes', 'Yes'],
 
   ['root_permission_denied', 'You have no permissions'],
+  ['root_permission_no_permission', 'You have no permission for this action'],
   ['app_root_session_expire_warning_title', 'Session is about to expire'],
   ['app_root_session_expire_warning_message', 'Your session will expire in less than 5 minutes. To keep working, close this popup.'],
   ['app_root_session_expire_warning_button', 'I am here'],

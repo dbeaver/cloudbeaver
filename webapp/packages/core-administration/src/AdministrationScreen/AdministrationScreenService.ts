@@ -9,6 +9,7 @@
 import { computed, observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
@@ -66,7 +67,8 @@ export class AdministrationScreenService {
     private screenService: ScreenService,
     private administrationItemService: AdministrationItemService,
     private autoSaveService: LocalStorageSaveService,
-    private serverConfigResource: ServerConfigResource
+    private serverConfigResource: ServerConfigResource,
+    private notificationService: NotificationService
   ) {
     this.info = {
       workspaceId: '',
@@ -282,6 +284,7 @@ export class AdministrationScreenService {
     const administrator = await this.permissionsService.hasAsync(EAdminPermission.admin);
 
     if (!administrator) {
+      this.notificationService.logInfo({ title: 'root_permission_no_permission' });
       return false;
     }
 

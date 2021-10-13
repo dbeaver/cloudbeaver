@@ -45,6 +45,7 @@ export const defaultRULocale = [
   ['ui_yes', 'Да'],
 
   ['root_permission_denied', 'Отказано в доступе'],
+  ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
   ['app_root_session_expire_warning_title', 'Ваша сессия скоро закончится'],
   ['app_root_session_expire_warning_message', 'Ваша сессия закончится меньше чем через 5 минут. Чтобы продолжить работать, закройте этот диалог.'],
   ['app_root_session_expire_warning_button', 'Я тут'],
