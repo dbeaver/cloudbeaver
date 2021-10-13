@@ -45,6 +45,8 @@ export const defaultENLocale = [
   ['ui_search_no_result_placeholder', 'No results have been found.'],
   ['ui_save_reminder', 'You have unsaved changes.'],
   ['ui_yes', 'Yes'],
+  ['ui_select_all', 'Select all'],
+  ['ui_reconnect', 'Reconnect'],
 
   ['root_permission_denied', 'You have no permissions'],
   ['root_permission_no_permission', 'You have no permission for this action'],

@@ -19,7 +19,8 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   Button,
-  useObjectRef
+  useObjectRef,
+  getSelectedItems
 } from '@cloudbeaver/core-blocks';
 import { getComputed } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
@@ -82,15 +83,15 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
+  const connections = getFilteredConnections(grantedConnections, filterState.filterValue);
+  const keys = connections.map(connection => connection.id);
+
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const revoke = useCallback(() => {
-    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
-    props.onRevoke(selectedList);
+    props.onRevoke(getSelectedItems(selectedSubjects));
     selectedSubjects.clear();
   }, []);
-
-  const connections = getFilteredConnections(grantedConnections, filterState.filterValue);
 
   let tableInfoText: TLocalizationToken | null = null;
   if (!connections.length) {
@@ -109,8 +110,8 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table selectedItems={selectedSubjects}>
-            <GrantedConnectionsTableInnerHeader />
+          <Table keys={keys} selectedItems={selectedSubjects}>
+            <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               <TableItem item='tableInfo' selectDisabled>
                 {tableInfoText && (
@@ -126,6 +127,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
                     key={connection.id}
                     id={connection.id}
                     name={connection.name}
+                    tooltip={connection.name}
                     host={`${connection.host || ''}${connection.port ? ':' + connection.port : ''}`}
                     icon={driver?.icon}
                     disabled={disabled}

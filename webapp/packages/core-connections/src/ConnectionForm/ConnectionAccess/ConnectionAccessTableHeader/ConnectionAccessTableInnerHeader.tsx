@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TableColumnHeader, TableHeader } from '@cloudbeaver/core-blocks';
+import { TableColumnHeader, TableHeader, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
+  disabled?: boolean;
   className?: string;
 }
 
@@ -32,11 +33,13 @@ const styles = composes(
   `
 );
 
-export const ConnectionAccessTableInnerHeader = observer<Props>(function ConnectionAccessTableInnerHeader({ className }) {
+export const ConnectionAccessTableInnerHeader = observer<Props>(function ConnectionAccessTableInnerHeader({ disabled, className }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <TableHeader className={className}>
-      <TableColumnHeader min />
+      <TableColumnHeader min>
+        <TableSelect id='selectUsersAndRoles' disabled={disabled} />
+      </TableColumnHeader>
       <TableColumnHeader min />
       <TableColumnHeader>{translate('connections_connection_access_user_or_role_name')}</TableColumnHeader>
       <TableColumnHeader>{translate('connections_connection_description')}</TableColumnHeader>

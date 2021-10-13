@@ -21,7 +21,8 @@ import {
   Group,
   Button,
   useObjectRef,
-  getComputed
+  getComputed,
+  getSelectedItems
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
@@ -68,10 +69,7 @@ interface Props {
 }
 
 export const GrantedUserList = observer<Props>(function GrantedUserList({
-  grantedUsers,
-  disabled,
-  onRevoke,
-  onEdit,
+  grantedUsers, disabled, onRevoke, onEdit,
 }) {
   const props = useObjectRef({ onRevoke, onEdit });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
@@ -84,13 +82,13 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
+  const users = getFilteredUsers(grantedUsers, filterState.filterValue);
+  const keys = users.map(user => user.userId);
+
   const revoke = useCallback(() => {
-    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
-    props.onRevoke(selectedList);
+    props.onRevoke(getSelectedItems(selectedSubjects));
     selectedSubjects.clear();
   }, []);
-
-  const users = getFilteredUsers(grantedUsers, filterState.filterValue);
 
   let tableInfoText: TLocalizationToken | null = null;
   if (!users.length) {
@@ -109,8 +107,12 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
-          <Table selectedItems={selectedSubjects}>
-            <GrantedUsersTableInnerHeader />
+          <Table
+            keys={keys}
+            selectedItems={selectedSubjects}
+            isItemSelectable={item => !usersResource.isActiveUser(item)}
+          >
+            <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               <TableItem item='tableInfo' selectDisabled>
                 {tableInfoText && (
@@ -119,16 +121,20 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
                   </TableColumnValue>
                 )}
               </TableItem>
-              {users.map(user => (
-                <GrantedUsersTableItem
-                  key={user.userId}
-                  id={user.userId}
-                  name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ' (you)' : ''}`}
-                  icon='/icons/user.svg'
-                  iconTooltip={translate('authentication_user_icon_tooltip')}
-                  disabled={disabled}
-                />
-              ))}
+              {users.map(user => {
+                const activeUser = usersResource.isActiveUser(user.userId);
+                return (
+                  <GrantedUsersTableItem
+                    key={user.userId}
+                    id={user.userId}
+                    name={`${user.userId}${activeUser ? ' (you)' : ''}`}
+                    tooltip={activeUser ? translate('administration_roles_role_granted_users_permission_denied') : user.userId}
+                    icon='/icons/user.svg'
+                    iconTooltip={translate('authentication_user_icon_tooltip')}
+                    disabled={disabled}
+                  />
+                );
+              })}
             </TableBody>
           </Table>
         </table-container>

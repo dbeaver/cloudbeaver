@@ -7,14 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import {
-  useContext, useCallback, useMemo, Children
-} from 'react';
+import { useContext, useCallback, useMemo, Children } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { getComputed } from '../getComputed';
 import { useObjectRef } from '../useObjectRef';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
@@ -30,6 +29,7 @@ interface Props {
   selectOnItem?: boolean;
   selectDisabled?: boolean;
   disabled?: boolean;
+  title?: string;
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -42,6 +42,7 @@ export const TableItem = observer<Props>(function TableItem({
   selectDisabled = false,
   disabled,
   children,
+  title,
   className,
   onClick,
   onDoubleClick,
@@ -49,16 +50,21 @@ export const TableItem = observer<Props>(function TableItem({
   const styles = useStyles();
   const context = useContext(TableContext);
   const props = useObjectRef({ selectOnItem });
+
   if (!context) {
     throw new Error('TableContext must be provided');
   }
 
+  const selectionDisabled = getComputed(() => selectDisabled || (!!context.state.isItemSelectable && ((
+    context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)
+  ) || !context.state.isItemSelectable(item))));
+
   const itemContext = useMemo<ITableItemContext>(() => ({
     item,
-    selectDisabled,
+    selectDisabled: selectionDisabled,
     isSelected: () => !!context.selectedItems.get(item),
     isExpanded: () => !!context.expandedItems.get(item),
-  }), [item, selectDisabled]);
+  }), [item, selectionDisabled]);
 
   const isSelected = itemContext.isSelected();
   const isExpanded = itemContext.isExpanded();
@@ -91,6 +97,7 @@ export const TableItem = observer<Props>(function TableItem({
   return styled(styles)(
     <TableItemContext.Provider value={itemContext}>
       <tr
+        title={title}
         className={className}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}

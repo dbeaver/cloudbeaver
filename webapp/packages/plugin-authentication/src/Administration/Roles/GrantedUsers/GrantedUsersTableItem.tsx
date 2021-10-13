@@ -10,14 +10,14 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 
 interface Props {
   id: any;
   name: string;
   icon: string;
   disabled: boolean;
-  iconTooltip?: TLocalizationToken;
+  iconTooltip?: string;
+  tooltip?: string;
   className?: string;
 }
 
@@ -29,12 +29,12 @@ const style = css`
 `;
 
 export const GrantedUsersTableItem = observer<Props>(function GrantedUsersTableItem({
-  id, name, icon, iconTooltip, disabled, className,
+  id, name, icon, iconTooltip, tooltip, disabled, className,
 }) {
-  const translate = useTranslate();
   return styled(style)(
     <TableItem
       item={id}
+      title={tooltip}
       disabled={disabled}
       selectDisabled={disabled}
       className={className}
@@ -42,7 +42,7 @@ export const GrantedUsersTableItem = observer<Props>(function GrantedUsersTableI
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue><StaticImage icon={icon} title={translate(iconTooltip)} /></TableColumnValue>
+      <TableColumnValue><StaticImage icon={icon} title={iconTooltip} /></TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
     </TableItem>
   );

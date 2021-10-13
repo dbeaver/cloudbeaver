@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { RoleInfo } from '@cloudbeaver/core-authentication';
@@ -21,6 +21,8 @@ import {
   Group,
   Button,
   useObjectRef,
+  getComputed,
+  getSelectedItems,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
@@ -78,59 +80,60 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
   const translate = useTranslate();
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const selectedList = useMemo(() => computed(
-    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
-  ), [selectedSubjects]);
+
+  const roles = getFilteredRoles(roleList, filterState.filterValue);
+  const users = getFilteredUsers(userList, filterState.filterValue);
+  const keys = roles.map(role => role.roleId).concat(users.map(user => user.userId));
+
+  const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const grant = useCallback(() => {
-    props.onGrant(selectedList.get());
+    props.onGrant(getSelectedItems(selectedSubjects));
     selectedSubjects.clear();
   }, []);
-
-  const roles = useMemo(() => computed(() => getFilteredRoles(
-    roleList, filterState.filterValue
-  )), [filterState, roleList]);
-
-  const users = useMemo(() => computed(() => getFilteredUsers(
-    userList, filterState.filterValue
-  )), [filterState, userList]);
 
   return styled(style)(
     <Group box medium overflow>
       <container>
         <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </ConnectionAccessTableHeader>
         <table-container>
-          <Table selectedItems={selectedSubjects}>
-            <ConnectionAccessTableInnerHeader />
+          <Table
+            keys={keys}
+            selectedItems={selectedSubjects}
+            isItemSelectable={item => !grantedSubjects.includes(item)}
+          >
+            <ConnectionAccessTableInnerHeader disabled={disabled} />
             <TableBody>
-              {!roles.get().length && !users.get().length && filterState.filterValue && (
+              {!keys.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate('ui_search_no_result_placeholder')}
                   </TableColumnValue>
                 </TableItem>
               )}
-              {roles.get().map(role => (
+              {roles.map(role => (
                 <ConnectionAccessTableItem
                   key={role.roleId}
                   id={role.roleId}
                   name={role.roleName || ''}
+                  tooltip={role.roleName}
                   description={role.description}
                   icon='/icons/role.svg'
-                  iconTooltip='authentication_role_icon_tooltip'
-                  disabled={disabled || grantedSubjects.includes(role.roleId)}
+                  iconTooltip={translate('authentication_role_icon_tooltip')}
+                  disabled={disabled}
                 />
               ))}
-              {users.get().map(user => (
+              {users.map(user => (
                 <ConnectionAccessTableItem
                   key={user.userId}
                   id={user.userId}
                   name={user.userId}
+                  tooltip={user.userId}
                   icon='/icons/user.svg'
                   iconTooltip={translate('authentication_user_icon_tooltip')}
-                  disabled={disabled || grantedSubjects.includes(user.userId)}
+                  disabled={disabled}
                 />
               ))}
             </TableBody>

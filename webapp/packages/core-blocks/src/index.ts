@@ -53,6 +53,8 @@ export * from './Table/TableItemSelect';
 export * from './Table/TableItemSeparator';
 export * from './Table/useTable';
 export * from './Table/TableState';
+export * from './Table/TableSelect';
+export * from './Table/getSelectedItems';
 
 export * from './Tabs/ITab';
 export * from './Tabs/TabContext';

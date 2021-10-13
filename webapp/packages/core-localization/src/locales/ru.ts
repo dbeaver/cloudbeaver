@@ -43,6 +43,8 @@ export const defaultRULocale = [
   ['ui_search_no_result_placeholder', 'По вашему запросу ничего не найдено.'],
   ['ui_save_reminder', 'У вас есть несохраненные изменения.'],
   ['ui_yes', 'Да'],
+  ['ui_select_all', 'Выбрать все'],
+  ['ui_reconnect', 'Переподключиться'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
