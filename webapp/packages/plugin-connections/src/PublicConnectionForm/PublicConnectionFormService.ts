@@ -140,7 +140,7 @@ export class PublicConnectionFormService {
     const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'connections_public_connection_edit_reconnect_title',
       message: 'connections_public_connection_edit_reconnect_message',
-      confirmActionText: 'ui_yes',
+      confirmActionText: 'ui_reconnect',
     });
 
     if (result === DialogueStateResult.Rejected) {

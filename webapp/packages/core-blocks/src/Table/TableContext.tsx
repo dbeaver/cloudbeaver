@@ -8,7 +8,16 @@
 
 import { createContext } from 'react';
 
+export interface ITableState {
+  keys?: any[];
+  readonly selectableItems: any[];
+  readonly tableSelected: boolean;
+  selectTable: () => void;
+  isItemSelectable?: (item: any) => boolean;
+}
+
 export interface ITableContext {
+  state: ITableState;
   selectedItems: Map<any, boolean>;
   expandedItems: Map<any, boolean>;
   setItemSelect: (item: any, state: boolean) => void;

@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { StaticImage, TableColumnValue, TableContext, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
 
 interface Props {
   id: any;
@@ -18,7 +18,8 @@ interface Props {
   disabled: boolean;
   host?: string;
   icon?: string;
-  iconTooltip?: TLocalizationToken;
+  iconTooltip?: string;
+  tooltip?: string;
   className?: string;
 }
 
@@ -30,13 +31,20 @@ const style = css`
 `;
 
 export const GrantedConnectionsTableItem = observer<Props>(function GrantedConnectionsTableItem({
-  id, name, host, icon, iconTooltip, disabled, className,
+  id, name, host, icon, iconTooltip, tooltip, disabled: tableDisabled, className,
 }) {
-  const translate = useTranslate();
+  const tableContext = useContext(TableContext);
+
+  if (!tableContext) {
+    throw new Error('Context must be provided');
+  }
+
+  const disabled = tableDisabled || tableContext.state.isItemSelectable?.(id) === false;
 
   return styled(style)(
     <TableItem
       item={id}
+      title={tooltip}
       disabled={disabled}
       selectDisabled={disabled}
       className={className}
@@ -44,7 +52,7 @@ export const GrantedConnectionsTableItem = observer<Props>(function GrantedConne
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue>{icon && <StaticImage icon={icon} title={translate(iconTooltip)} />}</TableColumnValue>
+      <TableColumnValue>{icon && <StaticImage icon={icon} title={iconTooltip} />}</TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue>{host && host}</TableColumnValue>
     </TableItem>

@@ -22,6 +22,7 @@ import {
   Button,
   useObjectRef,
   getComputed,
+  getSelectedItems,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -84,13 +85,13 @@ export const UserList = observer<Props>(function UserList({
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
+  const users = getFilteredUsers(userList, filterState.filterValue);
+  const keys = users.map(user => user.userId);
+
   const grant = useCallback(() => {
-    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
-    props.onGrant(selectedList);
+    props.onGrant(getSelectedItems(selectedSubjects));
     selectedSubjects.clear();
   }, []);
-
-  const users = getFilteredUsers(userList, filterState.filterValue);
 
   return styled(style)(
     <Group box medium overflow>
@@ -99,8 +100,8 @@ export const UserList = observer<Props>(function UserList({
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
-          <Table selectedItems={selectedSubjects}>
-            <GrantedUsersTableInnerHeader />
+          <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedUsers.includes(item)}>
+            <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               {!users.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
@@ -109,16 +110,20 @@ export const UserList = observer<Props>(function UserList({
                   </TableColumnValue>
                 </TableItem>
               )}
-              {users.map(user => (
-                <GrantedUsersTableItem
-                  key={user.userId}
-                  id={user.userId}
-                  name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ' (you)' : ''}`}
-                  icon='/icons/user.svg'
-                  iconTooltip={translate('authentication_user_icon_tooltip')}
-                  disabled={disabled || !!grantedUsers.includes(user.userId)}
-                />
-              ))}
+              {users.map(user => {
+                const activeUser = usersResource.isActiveUser(user.userId);
+                return (
+                  <GrantedUsersTableItem
+                    key={user.userId}
+                    id={user.userId}
+                    name={`${user.userId}${activeUser ? ' (you)' : ''}`}
+                    tooltip={activeUser ? translate('administration_roles_role_granted_users_permission_denied') : user.userId}
+                    icon='/icons/user.svg'
+                    iconTooltip={translate('authentication_user_icon_tooltip')}
+                    disabled={disabled}
+                  />
+                );
+              })}
             </TableBody>
           </Table>
         </table-container>

@@ -30,6 +30,7 @@ interface Props {
   selectOnItem?: boolean;
   selectDisabled?: boolean;
   disabled?: boolean;
+  title?: string;
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -42,6 +43,7 @@ export const TableItem = observer<Props>(function TableItem({
   selectDisabled = false,
   disabled,
   children,
+  title,
   className,
   onClick,
   onDoubleClick,
@@ -91,6 +93,7 @@ export const TableItem = observer<Props>(function TableItem({
   return styled(styles)(
     <TableItemContext.Provider value={itemContext}>
       <tr
+        title={title}
         className={className}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}

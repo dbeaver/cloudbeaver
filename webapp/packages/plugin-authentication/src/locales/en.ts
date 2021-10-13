@@ -98,6 +98,7 @@ export default [
   ['administration_roles_role_granted_users_user_id', 'User ID'],
   ['administration_roles_role_granted_users_user_name', 'User name'],
   ['administration_roles_role_granted_users_empty', 'No available users'],
+  ['administration_roles_role_granted_users_permission_denied', "You can't edit your own permissions"],
 
   ['administration_roles_role_granted_connections_tab_title', 'Connections'],
   ['administration_roles_role_granted_connections_search_placeholder', 'Search for connection name...'],

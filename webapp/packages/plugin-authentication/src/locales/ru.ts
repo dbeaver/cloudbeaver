@@ -86,6 +86,7 @@ export default [
   ['administration_roles_role_granted_users_user_id', 'ID пользователя'],
   ['administration_roles_role_granted_users_user_name', 'Имя пользователя'],
   ['administration_roles_role_granted_users_empty', 'Нет доступных пользователей'],
+  ['administration_roles_role_granted_users_permission_denied', 'Вы не можете редактировать свои настройки доступа'],
 
   ['administration_roles_role_granted_connections_tab_title', 'Подключения'],
   ['administration_roles_role_granted_connections_search_placeholder', 'Поиск по названию подключения...'],

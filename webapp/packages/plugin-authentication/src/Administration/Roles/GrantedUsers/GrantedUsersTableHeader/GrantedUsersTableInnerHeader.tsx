@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TableColumnHeader, TableHeader } from '@cloudbeaver/core-blocks';
+import { TableColumnHeader, TableHeader, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
+  disabled?: boolean;
   className?: string;
 }
 
@@ -32,11 +33,14 @@ const styles = composes(
   `
 );
 
-export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUsersTableInnerHeader({ className }) {
+export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUsersTableInnerHeader({ disabled, className }) {
   const translate = useTranslate();
+
   return styled(useStyles(styles))(
     <TableHeader className={className}>
-      <TableColumnHeader min />
+      <TableColumnHeader min>
+        <TableSelect id='selectUsers' disabled={disabled} />
+      </TableColumnHeader>
       <TableColumnHeader min />
       <TableColumnHeader>{translate('administration_roles_role_granted_users_user_id')}</TableColumnHeader>
     </TableHeader>

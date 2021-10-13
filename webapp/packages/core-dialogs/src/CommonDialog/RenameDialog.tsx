@@ -75,7 +75,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
             mod={['unelevated']}
             onClick={() => resolveDialog(name)}
           >
-            <Translate token={confirmActionText || 'ui_processing_ok'} />
+            <Translate token={confirmActionText || 'ui_rename'} />
           </Button>
         </>
       )}

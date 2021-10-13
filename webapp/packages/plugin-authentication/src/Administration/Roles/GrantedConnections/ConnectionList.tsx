@@ -21,6 +21,7 @@ import {
   Button,
   useObjectRef,
   getComputed,
+  getSelectedItems,
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -85,12 +86,12 @@ export const ConnectionList = observer<Props>(function ConnectionList({
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const grant = useCallback(() => {
-    const selectedList = Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key);
-    props.onGrant(selectedList);
+    props.onGrant(getSelectedItems(selectedSubjects));
     selectedSubjects.clear();
   }, []);
 
   const connections = getFilteredConnections(connectionList, filterState.filterValue);
+  const keys = connections.map(connection => connection.id);
 
   return styled(style)(
     <Group box medium overflow>
@@ -99,8 +100,12 @@ export const ConnectionList = observer<Props>(function ConnectionList({
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table selectedItems={selectedSubjects}>
-            <GrantedConnectionsTableInnerHeader />
+          <Table
+            keys={keys}
+            selectedItems={selectedSubjects}
+            isItemSelectable={item => !grantedSubjects.includes(item)}
+          >
+            <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               {!connections.length && filterState.filterValue && (
                 <TableItem item='tableInfo' selectDisabled>
@@ -116,9 +121,10 @@ export const ConnectionList = observer<Props>(function ConnectionList({
                     key={connection.id}
                     id={connection.id}
                     name={connection.name}
+                    tooltip={connection.name}
                     host={`${connection.host || ''}${connection.host && connection.port ? ':' + connection.port : ''}`}
                     icon={driver?.icon}
-                    disabled={disabled || grantedSubjects.includes(connection.id)}
+                    disabled={disabled}
                   />
                 );
               })}
