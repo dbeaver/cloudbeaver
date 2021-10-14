@@ -18,66 +18,29 @@ export const baseFormControlStyles = composes(
   `,
   css`
     field {
-      display: flex;
-      flex-wrap: wrap;
-      flex: auto;
       box-sizing: border-box;
-      align-items: center;
-      padding: 12px;
-      min-height: 54px;
-
-      & input, 
-      & textarea {
-        flex: 1;
-        min-height: 26px;
+      max-width: 100%;
+      &[|small] {
+        max-width: 250px;
+      }
+      &[|medium] {
+        max-width: 450px;
+      }
+      &[|large] {
+        max-width: 650px;
       }
     }
 
     field-label {
-      composes: theme-typography--body1 from global;
       box-sizing: border-box;
-      width: 180px;
-      text-align: right;
-      padding: 0 16px;
-      line-height: 16px;
-      font-weight: 500;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     field-description {
       composes: theme-typography--caption from global;
-      flex-basis: 100%;
-      padding-top: 8px;
-      padding-bottom: 8px;
-      padding-left: 180px;
-    }
-  
-    field[|raw] {
-      & field-description {
-        padding: 0;
-      }
-    }
-  
-    field[|long] {
-      & field-label {
-        width: 200px;
-      }
-      & field-description {
-        padding-left: 200px;
-      }
-    }
-
-    field[|short] {
-      & field-label {
-        width: auto;
-      }
-      & field-description {
-        padding-left: auto;
-      }
-    }
-  
-    field-label + field-description {
-      padding-left: 0!important;
-      flex-basis: auto;
+      padding-top: 4px;
     }
   `
 );

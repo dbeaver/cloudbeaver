@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import type { AuthProvider } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Group, InputFieldNew, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
@@ -33,7 +33,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group ref={elementRef} gap small center>
       {provider.credentialParameters.map(parameter => parameter.user && (
-        <InputFieldNew
+        <InputField
           key={parameter.id}
           title={parameter.description}
           type={parameter.encryption === 'none' ? 'text' : 'password'}
@@ -45,7 +45,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
           onChange={value => handleChange(parameter.id, value)}
         >
           {parameter.displayName}
-        </InputFieldNew>
+        </InputField>
       ))}
     </Group>
   );

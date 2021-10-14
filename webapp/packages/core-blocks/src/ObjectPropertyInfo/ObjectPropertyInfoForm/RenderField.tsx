@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import { FieldCheckboxNew } from '../../FormControls/Checkboxes/FieldCheckboxNew';
-import { ComboboxNew } from '../../FormControls/ComboboxNew';
-import { FormFieldDescriptionNew } from '../../FormControls/FormFieldDescriptionNew';
-import { InputFieldNew } from '../../FormControls/InputFieldNew';
+import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
+import { Combobox } from '../../FormControls/Combobox';
+import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
+import { InputField } from '../../FormControls/InputField';
 import { isControlPresented } from '../../FormControls/isControlPresented';
-import { TextareaNew } from '../../FormControls/TextareaNew';
+import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
@@ -86,9 +86,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   if (controltype === 'link') {
     return (
-      <FormFieldDescriptionNew label={property.displayName} className={className}>
+      <FormFieldDescription label={property.displayName} className={className}>
         <Link href={state?.[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
-      </FormFieldDescriptionNew>
+      </FormFieldDescription>
     );
   }
 
@@ -97,9 +97,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       return null;
     }
     return (
-      <FormFieldDescriptionNew title={property.description} label={property.displayName} className={className}>
+      <FormFieldDescription title={property.description} label={property.displayName} className={className}>
         {state?.[property.id!]}
-      </FormFieldDescriptionNew>
+      </FormFieldDescription>
     );
   }
 
@@ -110,7 +110,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controltype === 'checkbox') {
     if (state !== undefined) {
       return (
-        <FieldCheckboxNew
+        <FieldCheckbox
           id={property.id}
           name={property.id!}
           state={state}
@@ -120,11 +120,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           className={className}
         >
           {property.displayName ?? ''}
-        </FieldCheckboxNew>
+        </FieldCheckbox>
       );
     }
     return (
-      <FieldCheckboxNew
+      <FieldCheckbox
         id={property.id}
         name={property.id!}
         checked={value}
@@ -134,14 +134,14 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         className={className}
       >
         {property.displayName ?? ''}
-      </FieldCheckboxNew>
+      </FieldCheckbox>
     );
   }
 
   if (controltype === 'combobox') {
     if (state !== undefined) {
       return (
-        <ComboboxNew
+        <Combobox
           name={property.id!}
           state={state}
           items={property.validValues!}
@@ -154,12 +154,12 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           className={className}
         >
           {property.displayName ?? ''}
-        </ComboboxNew>
+        </Combobox>
       );
     }
 
     return (
-      <ComboboxNew
+      <Combobox
         name={property.id!}
         items={property.validValues!}
         keySelector={value => value}
@@ -171,14 +171,14 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         className={className}
       >
         {property.displayName ?? ''}
-      </ComboboxNew>
+      </Combobox>
     );
   }
 
   if (controltype === 'textarea') {
     if (state !== undefined) {
       return (
-        <TextareaNew
+        <Textarea
           title={property.description}
           name={property.id!}
           state={state}
@@ -188,12 +188,12 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           className={className}
         >
           {property.displayName ?? ''}
-        </TextareaNew>
+        </Textarea>
       );
     }
 
     return (
-      <TextareaNew
+      <Textarea
         title={property.description}
         name={property.id!}
         value={value}
@@ -203,13 +203,13 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         className={className}
       >
         {property.displayName ?? ''}
-      </TextareaNew>
+      </Textarea>
     );
   }
 
   if (state !== undefined) {
     return (
-      <InputFieldNew
+      <InputField
         type={password ? 'password' : 'text'}
         title={property.description}
         name={property.id!}
@@ -225,11 +225,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         onFocus={onFocus}
       >
         {property.displayName}
-      </InputFieldNew>
+      </InputField>
     );
   }
   return (
-    <InputFieldNew
+    <InputField
       type={password ? 'password' : 'text'}
       title={property.description}
       name={property.id!}
@@ -244,6 +244,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       onFocus={onFocus}
     >
       {property.displayName}
-    </InputFieldNew>
+    </InputField>
   );
 });

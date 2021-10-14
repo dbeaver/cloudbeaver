@@ -12,9 +12,9 @@ import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, ComboboxNew, FieldCheckboxNew, Group, GroupTitle,
-  InputFieldNew, Link, ObjectPropertyInfoFormNew, SubmittingForm, TabContainerPanelComponent,
-  TextareaNew, useClipboard, useMapResource, useObjectPropertyCategories
+  BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
+  InputField, Link, ObjectPropertyInfoForm, SubmittingForm, TabContainerPanelComponent,
+  Textarea, useClipboard, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -56,7 +56,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
     <SubmittingForm ref={formRef} onSubmit={state.save}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
-          <ComboboxNew
+          <Combobox
             name='providerId'
             state={state.config}
             items={identityProviders}
@@ -70,8 +70,8 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             fill
           >
             {translate('administration_identity_providers_provider')}
-          </ComboboxNew>
-          <InputFieldNew
+          </Combobox>
+          <InputField
             name='id'
             state={state.config}
             readOnly={state.readonly || edit}
@@ -81,8 +81,8 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             fill
           >
             {translate('administration_identity_providers_provider_id')}
-          </InputFieldNew>
-          <InputFieldNew
+          </InputField>
+          <InputField
             name='displayName'
             state={state.config}
             minLength={1}
@@ -93,24 +93,24 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             fill
           >
             {translate('administration_identity_providers_provider_configuration_name')}
-          </InputFieldNew>
-          <TextareaNew
+          </InputField>
+          <Textarea
             name='description'
             state={state.config}
             disabled={state.disabled}
             readOnly={state.readonly}
           >
             {translate('administration_identity_providers_provider_configuration_description')}
-          </TextareaNew>
-          <InputFieldNew
+          </Textarea>
+          <InputField
             name='iconURL'
             state={state.config}
             disabled={state.disabled}
             readOnly={state.readonly}
           >
             {translate('administration_identity_providers_provider_configuration_icon_url')}
-          </InputFieldNew>
-          <FieldCheckboxNew
+          </InputField>
+          <FieldCheckbox
             id={edit ? state.config.id : 'AuthConfigurationDisabled'}
             name='disabled'
             state={state.config}
@@ -118,14 +118,14 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             readOnly={state.readonly}
           >
             {translate('administration_identity_providers_provider_configuration_disabled')}
-          </FieldCheckboxNew>
+          </FieldCheckbox>
         </Group>
         {parameters.isLoaded() && parameters.data && (
           <>
             {isUncategorizedExists && (
               <Group small gap vertical>
                 <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
-                <ObjectPropertyInfoFormNew
+                <ObjectPropertyInfoForm
                   state={state.config.parameters}
                   properties={parameters.data}
                   category={null}
@@ -137,7 +137,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             {categories.map(category => (
               <Group key={category} small gap vertical>
                 <GroupTitle keepSize>{category}</GroupTitle>
-                <ObjectPropertyInfoFormNew
+                <ObjectPropertyInfoForm
                   state={state.config.parameters}
                   properties={parameters.data!}
                   category={category}
@@ -152,7 +152,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
         {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink) && (
           <Group small gap>
             <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
-            <InputFieldNew
+            <InputField
               name='signInLink'
               state={state.config}
               title={state.config.signInLink}
@@ -162,8 +162,8 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               onCustomCopy={() => copy(state.config.signInLink!, true)}
             >
               Sign in
-            </InputFieldNew>
-            <InputFieldNew
+            </InputField>
+            <InputField
               name='signOutLink'
               state={state.config}
               title={state.config.signOutLink}
@@ -173,7 +173,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               onCustomCopy={() => copy(state.config.signOutLink!, true)}
             >
               Sign out
-            </InputFieldNew>
+            </InputField>
             {state.config.metadataLink && (
               <Link
                 href={state.config.metadataLink}

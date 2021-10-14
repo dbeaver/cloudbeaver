@@ -10,7 +10,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, SwitchNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Switch } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -25,7 +25,7 @@ export const ServerConfigurationConfigurationForm = observer<Props>(function Ser
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <SwitchNew
+      <Switch
         name="customConnectionsEnabled"
         state={serverConfig}
         description={translate('administration_configuration_wizard_configuration_custom_connections_description')}
@@ -34,7 +34,7 @@ export const ServerConfigurationConfigurationForm = observer<Props>(function Ser
         autoHide
       >
         {translate('administration_configuration_wizard_configuration_custom_connections')}
-      </SwitchNew>
+      </Switch>
     </>
   );
 });

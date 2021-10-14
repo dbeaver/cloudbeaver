@@ -14,7 +14,7 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
 import { useFocus } from '../useFocus';
-import { InputFieldNew } from './InputFieldNew';
+import { InputField } from './InputField';
 
 const styles = css`
   filter-container {
@@ -22,7 +22,7 @@ const styles = css`
     min-width: 24px;
     min-height: 24px;
   }
-  InputFieldNew {
+  InputField {
     display: none;
     width: 300px;
     &[|max] {
@@ -148,7 +148,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
 
   return styled(useStyles(styles, toggleMode && toggleModeButtonStyle))(
     <filter-container className={className}>
-      <InputFieldNew
+      <InputField
         ref={inputRef}
         style={innerInputStyle}
         placeholder={placeholder}

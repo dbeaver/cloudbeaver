@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputFieldNew, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -84,12 +84,12 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
     >
       <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(name)}>
         <Container center>
-          <InputFieldNew
+          <InputField
             value={name}
             onChange={value => setName(String(value))}
           >
             {translate('ui_name') + ':'}
-          </InputFieldNew>
+          </InputField>
         </Container>
       </SubmittingForm>
     </CommonDialogWrapper>

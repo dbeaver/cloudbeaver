@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import {
-  useLayoutEffect, useCallback, useState, useRef, useContext
+  useLayoutEffect, useCallback, useState, useRef, useContext, useEffect
 } from 'react';
 import {
   useMenuState,
@@ -20,6 +20,8 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
 import { baseFormControlStyles } from './baseFormControlStyles';
@@ -30,7 +32,7 @@ const styles = composes(
     Menu {
       composes: theme-text-on-surface theme-background-surface from global;
     }
-    MenuItem, MenuButton {
+    MenuItem {
       composes: theme-ripple from global;
     }
   `,
@@ -38,11 +40,25 @@ const styles = composes(
     field  input {
       margin: 0;
     }
+    field-label {
+      display: block;
+      padding-bottom: 10px;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
+    }
+    input {
+      padding-right: 12px !important;
+    }
     MenuButton {
+      position: absolute;
+      right: 0;
       background: transparent;
       outline: none;
       padding: 4px;
       cursor: pointer;
+      &:hover {
+        opacity: 0.7;
+      }
     }
 
     Menu {
@@ -59,7 +75,7 @@ const styles = composes(
       & MenuItem {
         background: transparent;
         display: block;
-        padding: 4px 36px;
+        padding: 4px 12px;
         text-align: left;
         outline: none;
         color: inherit;
@@ -82,12 +98,11 @@ const styles = composes(
   `
 );
 
-type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value'> & {
+type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
   propertyName?: string;
   items: TValue[];
-  mod?: 'surface';
-  long?: boolean;
   searchable?: boolean;
+  defaultValue?: string;
   keySelector: (item: TValue) => TKey;
   valueSelector: (item: TValue) => string;
   onSwitch?: (state: boolean) => void;
@@ -98,7 +113,6 @@ type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
   value?: string;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
   onChange?: (value: string, name: string | undefined) => any;
-
   state?: never;
 };
 
@@ -107,7 +121,6 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = BaseProps<TState[T
   state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
   onChange?: (value: string, name: TKey | undefined) => any;
-
   value?: never;
 };
 
@@ -118,6 +131,7 @@ interface ComboboxType {
 
 export const Combobox: ComboboxType = observer(function Combobox({
   value: controlledValue,
+  defaultValue,
   name,
   state,
   propertyName,
@@ -125,10 +139,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
   children,
   title,
   className,
-  mod,
-  long,
   searchable,
   readOnly,
+  disabled,
   keySelector = v => v,
   valueSelector = v => v,
   onChange = () => {},
@@ -136,6 +149,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   onSwitch,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
+  rest = filterLayoutFakeProps(rest);
   const context = useContext(FormContext);
   const ref = useRef<HTMLInputElement>(null);
   const menu = useMenuState({
@@ -143,15 +157,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
     currentId: null,
     gutter: 4,
   });
-  const [searchValue, setSearchValue] = useState('');
-  let value: string | number | readonly string[] | undefined = controlledValue;
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
-  if (state) {
-    if (name in state) {
-      value = state[name];
-    } else if (rest.defaultValue !== undefined) {
-      value = rest.defaultValue;
-    }
+  if (state && name !== undefined && name in state) {
+    value = state[name];
+  }
+
+  const selectedItem = items.find(item => keySelector(item) === value);
+
+  let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
+
+  if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
+    inputValue = searchValue;
   }
 
   const handleChange = useCallback(
@@ -175,7 +193,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       if (context) {
         context.change(null, name);
       }
-      setSearchValue('');
+      setSearchValue(null);
     },
     [value, state, name, menu, context, onSelect]
   );
@@ -193,55 +211,55 @@ export const Combobox: ComboboxType = observer(function Combobox({
       if (context) {
         context.change(id, name);
       }
+      setSearchValue(null);
     },
     [value, state, name, menu, context, onSelect]
   );
 
+  useEffect(() => {
+    if (ref.current === document.activeElement && inputValue === searchValue) {
+      menu.show();
+    }
+  });
+
   useLayoutEffect(() => onSwitch?.(menu.visible), [onSwitch, menu.visible]);
 
-  const selectedItem = items.find(item => keySelector(item) === value);
   const filteredItems = items.filter(
-    item => selectedItem || !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
+    item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
   );
 
-  if (ref.current === document.activeElement && !selectedItem && searchValue) {
-    menu.show();
-  }
-
   return styled(useStyles(baseFormControlStyles, styles))(
-    <field as="div" className={className} {...use({ long })}>
-      <field-label title={title} as='label'>{children}</field-label>
-      <input-box as="div">
+    <field className={className}>
+      <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>
+      <input-box>
         <input
           ref={ref}
+          role='new'
+          autoComplete="off"
           name={name}
           title={title}
-          value={selectedItem ? valueSelector(selectedItem) : searchValue}
-          readOnly={!!selectedItem || readOnly}
+          value={inputValue}
+          disabled={disabled}
+          readOnly={readOnly}
           onChange={handleChange}
-          {...use({ mod })}
           {...rest}
         />
         {(selectedItem && !readOnly && searchable) && (
           <IconButton type="button" name="reject" viewBox="0 0 11 11" onClick={handleRemove} />
         )}
-        {!readOnly && (
-          <>
-            <MenuButton {...menu}><Icon name="arrow" viewBox="0 0 16 16" {...use({ focus: menu.visible })} /></MenuButton>
-            <Menu
-              {...menu}
-              aria-label={propertyName}
-              unstable_initialFocusRef={ref}
-              unstable_finalFocusRef={ref}
-            >
-              {filteredItems.map(item => (
-                <MenuItem key={keySelector(item)} id={keySelector(item)} type='button' {...menu} onClick={handleMenuSelect}>
-                  {valueSelector(item)}
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
-        )}
+        <MenuButton {...menu} disabled={readOnly || disabled}><Icon name="arrow" viewBox="0 0 16 16" {...use({ focus: menu.visible })} /></MenuButton>
+        <Menu
+          {...menu}
+          aria-label={propertyName}
+          unstable_initialFocusRef={ref}
+          unstable_finalFocusRef={ref}
+        >
+          {filteredItems.map(item => (
+            <MenuItem key={keySelector(item)} id={keySelector(item)} type='button' {...menu} onClick={handleMenuSelect}>
+              {valueSelector(item)}
+            </MenuItem>
+          ))}
+        </Menu>
       </input-box>
     </field>
   );

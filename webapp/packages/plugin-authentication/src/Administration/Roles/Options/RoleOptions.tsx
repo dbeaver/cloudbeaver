@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Group,
-  InputFieldNew, SubmittingForm, TabContainerPanelComponent, TextareaNew,
+  InputField, SubmittingForm, TabContainerPanelComponent, Textarea,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -39,7 +39,7 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
     <SubmittingForm ref={formRef} onSubmit={state.save}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
-          <InputFieldNew
+          <InputField
             name='roleId'
             state={state.config}
             readOnly={state.readonly || edit}
@@ -49,8 +49,8 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
             fill
           >
             {translate('administration_roles_role_id')}
-          </InputFieldNew>
-          <InputFieldNew
+          </InputField>
+          <InputField
             name='roleName'
             state={state.config}
             readOnly={state.readonly}
@@ -59,8 +59,8 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
             fill
           >
             {translate('administration_roles_role_name')}
-          </InputFieldNew>
-          <TextareaNew
+          </InputField>
+          <Textarea
             name='description'
             state={state.config}
             readOnly={state.readonly}
@@ -69,7 +69,7 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
             fill
           >
             {translate('administration_roles_role_description')}
-          </TextareaNew>
+          </Textarea>
         </Group>
       </ColoredContainer>
     </SubmittingForm>

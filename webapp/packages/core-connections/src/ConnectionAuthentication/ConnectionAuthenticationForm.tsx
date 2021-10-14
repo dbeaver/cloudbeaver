@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, FieldCheckboxNew, Group, GroupTitle, ObjectPropertyInfoFormNew, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -48,14 +48,14 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
           {properties ? (
             <>
               {!!networkHandlers?.length && <GroupTitle>{translate('connections_database_authentication')}</GroupTitle>}
-              <ObjectPropertyInfoFormNew
+              <ObjectPropertyInfoForm
                 autofillToken={`section-${formId || ''} section-auth`}
                 properties={properties}
                 state={config.credentials}
                 disabled={disabled}
               />
               {allowSaveCredentials && (
-                <FieldCheckboxNew
+                <FieldCheckbox
                   id={formId || 'DBAuthSaveCredentials'}
                   name="saveCredentials"
                   label={translate('connections_connection_edit_save_credentials')}

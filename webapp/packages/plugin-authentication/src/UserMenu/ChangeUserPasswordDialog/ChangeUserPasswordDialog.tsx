@@ -12,7 +12,7 @@ import { useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, ErrorMessage, Group, InputFieldNew, SubmittingForm, useErrorDetails, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, ErrorMessage, Group, InputField, SubmittingForm, useErrorDetails, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -113,7 +113,7 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
         <SubmittingForm onSubmit={change}>
           <Container>
             <Group small gap center>
-              <InputFieldNew
+              <InputField
                 ref={focusedRef}
                 type='password'
                 name='oldPassword'
@@ -124,8 +124,8 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
                 required
               >
                 {translate('authentication_user_current_password')}
-              </InputFieldNew>
-              <InputFieldNew
+              </InputField>
+              <InputField
                 type='password'
                 name='newPassword'
                 autoComplete='new-password'
@@ -136,8 +136,8 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
                 required
               >
                 {translate('authentication_user_new_password')}
-              </InputFieldNew>
-              <InputFieldNew
+              </InputField>
+              <InputField
                 type='password'
                 name='repeatedPassword'
                 state={state}
@@ -147,7 +147,7 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
                 required
               >
                 {translate('authentication_user_password_repeat')}
-              </InputFieldNew>
+              </InputField>
             </Group>
           </Container>
         </SubmittingForm>

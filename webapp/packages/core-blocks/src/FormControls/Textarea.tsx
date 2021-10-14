@@ -10,8 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
@@ -19,18 +20,39 @@ const styles = css`
   textarea {
     line-height: 19px;
   }
+  field[|embedded] {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    & textarea {
+      border-radius: 0 !important;
+      height: 100%;
+      resize: none !important;
+    }
+  }
+  field-label {
+    display: block;
+    padding-bottom: 10px;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
+
+    &:empty {
+      display: none;
+    }
+  }
 `;
 
-type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & {
+type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> & ILayoutSizeProps & {
   mod?: 'surface';
-  long?: boolean;
+  style?: ComponentStyle;
+  embedded?: boolean;
 };
 
 type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   onChange?: (value: string, name?: string) => any;
-
   state?: never;
 };
 
@@ -38,7 +60,6 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: string, name: TKey) => any;
-
   value?: never;
 };
 
@@ -49,12 +70,18 @@ interface TextareaType {
 
 export const Textarea: TextareaType = observer(function Textarea({
   name,
+  style,
   value: controlledValue,
   state,
   children,
   className,
+  fill,
+  tiny,
+  small,
+  medium,
+  large,
   mod,
-  long,
+  embedded,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -74,13 +101,15 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStyles, styles))(
-    <field as="div" className={className} {...use({ long })}>
-      <field-label as='label'>{children}</field-label>
+  return styled(useStyles(baseFormControlStyles, styles, style))(
+    <field className={className} {...use({ tiny, small, medium, large, embedded })}>
+      <field-label as='label' title={rest.title}>{children}</field-label>
       <textarea
         {...rest}
+        role='new'
         value={value ?? ''}
         name={name}
+        data-embedded={embedded}
         onChange={handleChange}
         {...use({ mod })}
       />

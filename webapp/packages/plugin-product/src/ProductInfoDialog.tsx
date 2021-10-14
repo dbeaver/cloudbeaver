@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { useAppVersion } from '@cloudbeaver/core-app';
-import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescriptionNew, Group, IconOrImage, Link, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -29,7 +29,7 @@ const productInfoDialogStyles = css`
       display: flex;
       white-space: pre-wrap;
     }
-    FormFieldDescriptionNew {
+    FormFieldDescription {
       white-space: pre-wrap;
     }
     IconOrImage {
@@ -72,33 +72,33 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(
             ) : (
               <>
                 <IconOrImage icon={logoIcon} />
-                <FormFieldDescriptionNew label={translate('app_product_info_name')}>
+                <FormFieldDescription label={translate('app_product_info_name')}>
                   {productInfo.name}
-                </FormFieldDescriptionNew>
-                <FormFieldDescriptionNew label={translate('app_product_info_description')}>
+                </FormFieldDescription>
+                <FormFieldDescription label={translate('app_product_info_description')}>
                   {productInfo.description}
-                </FormFieldDescriptionNew>
+                </FormFieldDescription>
                 {productInfo.licenseInfo && (
-                  <FormFieldDescriptionNew label={translate('app_product_info_license_info')}>
+                  <FormFieldDescription label={translate('app_product_info_license_info')}>
                     {productInfo.licenseInfo}
-                  </FormFieldDescriptionNew>
+                  </FormFieldDescription>
                 )}
-                <FormFieldDescriptionNew label={translate('app_product_info_build_time')}>
+                <FormFieldDescription label={translate('app_product_info_build_time')}>
                   {productInfo.buildTime}
-                </FormFieldDescriptionNew>
-                <FormFieldDescriptionNew label="Backend version">
+                </FormFieldDescription>
+                <FormFieldDescription label="Backend version">
                   {productInfo.version}
-                </FormFieldDescriptionNew>
-                <FormFieldDescriptionNew label="Frontend version">
+                </FormFieldDescription>
+                <FormFieldDescription label="Frontend version">
                   {version.frontendVersion}
-                </FormFieldDescriptionNew>
-                <FormFieldDescriptionNew label={translate('app_product_info_contacts')}>
-                  <contacts-info as='div'>You can contact us via our
+                </FormFieldDescription>
+                <FormFieldDescription label={translate('app_product_info_contacts')}>
+                  <contacts-info>You can contact us via our
                     <Link href="https://cloudbeaver.io/contact/" target='_blank' rel='noopener noreferrer'> Site </Link>
                     or
                     <Link href="https://github.com/dbeaver/cloudbeaver" target='_blank' rel='noopener noreferrer'> Github</Link>
                   </contacts-info>
-                </FormFieldDescriptionNew>
+                </FormFieldDescription>
               </>
             )}
           </Group>

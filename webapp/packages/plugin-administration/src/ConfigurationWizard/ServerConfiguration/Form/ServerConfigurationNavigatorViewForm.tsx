@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, SwitchNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Switch } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -38,7 +38,7 @@ export const ServerConfigurationNavigatorViewForm = observer<Props>(function Ser
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <SwitchNew
+      <Switch
         name="simpleNavigatorViewEnabled"
         description={translate('administration_configuration_wizard_configuration_navigation_tree_view_description')}
         mod={['primary']}
@@ -47,7 +47,7 @@ export const ServerConfigurationNavigatorViewForm = observer<Props>(function Ser
         onChange={onNavigatorViewChangeHandler}
       >
         {translate('administration_configuration_wizard_configuration_navigation_tree_view')}
-      </SwitchNew>
+      </Switch>
     </>
   );
 });

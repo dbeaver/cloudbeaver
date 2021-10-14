@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -58,7 +58,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         <>
           <Group key='authentication' form gap medium>
             <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
-            <SwitchNew
+            <Switch
               name="anonymousAccessEnabled"
               state={serverConfig}
               description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
@@ -68,10 +68,10 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
               autoHide
             >
               {translate('administration_configuration_wizard_configuration_anonymous_access')}
-            </SwitchNew>
+            </Switch>
             <Loader state={providers} inline>
               {() => localProvider && styled(styles)(
-                <SwitchNew
+                <Switch
                   key={localProvider.id}
                   value={localProvider.id}
                   name="enabledAuthProviders"
@@ -82,7 +82,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                   autoHide
                 >
                   {localProvider.label}
-                </SwitchNew>
+                </Switch>
               )}
             </Loader>
           </Group>
@@ -101,7 +101,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                   const links = authProviderService.getServiceDescriptionLinks(provider);
 
                   return (
-                    <SwitchNew
+                    <Switch
                       key={provider.id}
                       value={provider.id}
                       name="enabledAuthProviders"
@@ -121,7 +121,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                       autoHide
                     >
                       {provider.label}
-                    </SwitchNew>
+                    </Switch>
                   );
                 })}
               </>

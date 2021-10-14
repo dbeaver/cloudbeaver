@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, SwitchNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -25,7 +25,7 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group form gap medium>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_security')}</GroupTitle>
-      <SwitchNew
+      <Switch
         name="adminCredentialsSaveEnabled"
         state={serverConfig}
         description={translate('administration_configuration_wizard_configuration_security_admin_credentials_description')}
@@ -34,8 +34,8 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
         autoHide
       >
         {translate('administration_configuration_wizard_configuration_security_admin_credentials')}
-      </SwitchNew>
-      <SwitchNew
+      </Switch>
+      <Switch
         name="publicCredentialsSaveEnabled"
         state={serverConfig}
         description={translate('administration_configuration_wizard_configuration_security_public_credentials_description')}
@@ -45,7 +45,7 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
         autoHide
       >
         {translate('administration_configuration_wizard_configuration_security_public_credentials')}
-      </SwitchNew>
+      </Switch>
     </Group>
   );
 });

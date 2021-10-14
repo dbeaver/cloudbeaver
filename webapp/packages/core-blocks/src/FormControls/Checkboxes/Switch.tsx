@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
 import { baseFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
@@ -18,34 +19,39 @@ import { useCheckboxState } from './useCheckboxState';
 
 const switchStyles = composes(
   css`
-  switch-control {
-    composes: theme-switch from global;
-  }
-  switch-control-track {
-    composes: theme-switch__track from global;
-  }
-  switch-input {
-    composes: theme-switch_native-control from global;
-  }
-  switch-control-underlay {
-    composes: theme-switch__thumb-underlay from global;
-  }
-  switch-control-thumb {
-    composes: theme-switch__thumb from global;
-  }
-  radio-ripple {
-    composes: theme-radio_ripple from global;
-  }
+    switch-control {
+      composes: theme-switch from global;
+    }
+    switch-control-track {
+      composes: theme-switch__track from global;
+    }
+    switch-input {
+      composes: theme-switch_native-control from global;
+    }
+    switch-control-underlay {
+      composes: theme-switch__thumb-underlay from global;
+    }
+    switch-control-thumb {
+      composes: theme-switch__thumb from global;
+    }
+    radio-ripple {
+      composes: theme-radio_ripple from global;
+    }
   `,
   css`
-    field {
-      max-width: 450px;
+    switch-body {
+      display: flex;
+      align-items: center;
     }
-    field label {
-      width: auto;
-    }
-    switch-control {
-      margin-left: 2px;
+    field-label {
+      composes: theme-typography--body1 from global;
+      cursor: pointer;
+      user-select: none;
+      display: block;
+      padding-left: 18px;
+      min-width: 50px;
+      white-space: pre-wrap;
+      font-weight: 500;
     }
   `
 );
@@ -79,7 +85,7 @@ const switchState = {
 
 interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
-  description?: string;
+  description?: React.ReactNode;
 }
 
 interface SwitchType {
@@ -91,7 +97,6 @@ export const Switch: SwitchType = observer(function Switch({
   name,
   value,
   defaultValue,
-  label,
   description,
   state,
   checked,
@@ -113,6 +118,7 @@ export const Switch: SwitchType = observer(function Switch({
     name,
     onChange,
   });
+  rest = filterLayoutFakeProps(rest);
   const styles = useStyles(
     baseFormControlStyles,
     switchStyles,
@@ -126,27 +132,28 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return styled(styles)(
-    <field as="div" className={className}>
-      <field-label as="div">{children}</field-label>
-      <switch-control as='div'>
-        <switch-control-track as='div' />
-        <switch-control-underlay as='div'>
-          <switch-control-thumb as='div' />
-          <switch-input
-            as='input'
-            {...rest}
-            type="checkbox"
-            id={value || name}
-            role="switch"
-            aria-checked={checkboxState.checked}
-            checked={checkboxState.checked}
-            disabled={disabled}
-            onChange={checkboxState.change}
-          />
-        </switch-control-underlay>
-      </switch-control>
-      <label htmlFor={value || name}>{label}</label>
-      <field-description as='div'>{description}</field-description>
+    <field className={className}>
+      <switch-body>
+        <switch-control>
+          <switch-control-track />
+          <switch-control-underlay>
+            <switch-control-thumb />
+            <switch-input
+              as='input'
+              {...rest}
+              type="checkbox"
+              id={value || name}
+              role="switch"
+              aria-checked={checkboxState.checked}
+              checked={checkboxState.checked}
+              disabled={disabled}
+              onChange={checkboxState.change}
+            />
+          </switch-control-underlay>
+        </switch-control>
+        <field-label as="label" htmlFor={value || name}>{children}</field-label>
+      </switch-body>
+      <field-description>{description}</field-description>
     </field>
   );
 });
