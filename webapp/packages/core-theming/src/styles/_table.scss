@@ -77,6 +77,15 @@
       width: 28px;
     }
 
+    &[use|centerContent] > th-flex {
+      align-items: center;
+      justify-content: center;
+    }
+
+    > th-flex {
+      display: flex;
+    }
+
     &:last-child {
       border-right: none;
     }
