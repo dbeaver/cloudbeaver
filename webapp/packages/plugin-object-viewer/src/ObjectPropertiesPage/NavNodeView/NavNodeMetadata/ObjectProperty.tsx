@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { FieldCheckboxNew, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, InputField } from '@cloudbeaver/core-blocks';
 
 import type { ObjectPropertyProps } from '../../formControls';
 import { additionalProps, filterProperty, getValue, matchType } from '../../helpers';
@@ -25,7 +25,7 @@ export const ObjectProperty = observer<ObjectPropertyProps>(function ObjectPrope
     <>
       {matchType(objectProperty.dataType) === 'checkbox'
         ? (
-          <FieldCheckboxNew
+          <FieldCheckbox
             className={className}
             title={objectProperty.description}
             name={objectProperty.id}
@@ -34,10 +34,10 @@ export const ObjectProperty = observer<ObjectPropertyProps>(function ObjectPrope
             {...additionalProps(objectProperty)}
           >
             {objectProperty.displayName}
-          </FieldCheckboxNew>
+          </FieldCheckbox>
         )
         : (
-          <InputFieldNew
+          <InputField
             className={className}
             title={objectProperty.description}
             name={objectProperty.id}
@@ -45,7 +45,7 @@ export const ObjectProperty = observer<ObjectPropertyProps>(function ObjectPrope
             readOnly
             {...additionalProps(objectProperty)}
           >{objectProperty.displayName}
-          </InputFieldNew>
+          </InputField>
         )}
     </>
   );

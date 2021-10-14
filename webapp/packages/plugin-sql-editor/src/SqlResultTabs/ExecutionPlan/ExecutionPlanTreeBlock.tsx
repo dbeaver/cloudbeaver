@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import {
   Split, Pane, ResizerControls, splitStyles, TextPlaceholder,
-  Table, TableHeader, TableColumnHeader, TableBody, TextareaNew
+  Table, TableHeader, TableColumnHeader, TableBody, Textarea
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
@@ -46,7 +46,7 @@ const styles = composes(
     Pane:last-child {
       flex: 0 0 150px;
     }
-    TextareaNew > :global(textarea) {
+    Textarea > :global(textarea) {
       border: none !important;
     }
   `
@@ -97,7 +97,7 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
       </Pane>
       <ResizerControls />
       <Pane main>
-        <TextareaNew
+        <Textarea
           className={className}
           name='value'
           rows={3}

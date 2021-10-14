@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TabList, TabsState, TextareaNew, UNDERLINE_TAB_STYLES, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TabList, TabsState, Textarea, UNDERLINE_TAB_STYLES, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
@@ -48,7 +48,7 @@ const styles = composes(
       padding: 0 8px;
       padding-bottom: 16px;
     }
-    TextareaNew {
+    Textarea {
       flex: 1;
     }
     CodeEditorLoader {
@@ -170,7 +170,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           onBeforeChange={(editor, data, value) => handleChange(value)}
         />
       ) : (
-        <TextareaNew
+        <Textarea
           name="value"
           rows={3}
           value={stringValue}

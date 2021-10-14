@@ -10,7 +10,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -28,7 +28,7 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
   return styled(style)(
     <Group form gap medium>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_admin')}</GroupTitle>
-      <InputFieldNew
+      <InputField
         type="text"
         name="adminName"
         state={serverConfig}
@@ -38,8 +38,8 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
         tiny
       >
         {translate('administration_configuration_wizard_configuration_admin_name')}
-      </InputFieldNew>
-      <InputFieldNew
+      </InputField>
+      <InputField
         type="password"
         name="adminPassword"
         state={serverConfig}
@@ -49,7 +49,7 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
         tiny
       >
         {translate('administration_configuration_wizard_configuration_admin_password')}
-      </InputFieldNew>
+      </InputField>
     </Group>
   );
 });

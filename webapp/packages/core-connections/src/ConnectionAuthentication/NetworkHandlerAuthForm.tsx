@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckboxNew, GroupTitle, InputFieldNew, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -41,7 +41,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
       <GroupTitle>{handler.data?.label || translate(`connections_network_handler_${id}_title`, 'connections_network_handler_default_title')}</GroupTitle>
-      <InputFieldNew
+      <InputField
         type="text"
         name="userName"
         state={state}
@@ -49,8 +49,8 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
         mod='surface'
       >
         {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
-      </InputFieldNew>
-      <InputFieldNew
+      </InputField>
+      <InputField
         type="password"
         name="password"
         state={state}
@@ -58,9 +58,9 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
         mod='surface'
       >
         {translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password')}
-      </InputFieldNew>
+      </InputField>
       {allowSaveCredentials && (
-        <FieldCheckboxNew
+        <FieldCheckbox
           id={id + ' savePassword'}
           name="savePassword"
           state={state}

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
-import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group, useMapResource } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useMapResource } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -51,7 +51,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
           <ColoredContainer overflow parent gap>
             {isUncategorizedExists && (
               <Group gap large>
-                <ObjectPropertyInfoFormNew
+                <ObjectPropertyInfoForm
                   properties={properties}
                   category={null}
                   small
@@ -62,7 +62,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
             {categories.map(category => (
               <Group key={category} gap large>
                 <GroupTitle>{category}</GroupTitle>
-                <ObjectPropertyInfoFormNew
+                <ObjectPropertyInfoForm
                   properties={properties}
                   category={category}
                   small

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckboxNew, Group, GroupTitle, InputFieldNew, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -38,7 +38,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
     <ColoredContainer parent gap overflow>
       <Group small gap vertical overflow>
         <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
-        <InputFieldNew
+        <InputField
           type='text'
           name='login'
           state={controller.credentials}
@@ -50,10 +50,10 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           required
         >
           {translate('authentication_user_name')}
-        </InputFieldNew>
+        </InputField>
         {controller.local && (
           <>
-            <InputFieldNew
+            <InputField
               type='password'
               name='password'
               state={controller.credentials}
@@ -66,8 +66,8 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               required
             >
               {translate('authentication_user_password')}
-            </InputFieldNew>
-            <InputFieldNew
+            </InputField>
+            <InputField
               type='password'
               name='passwordRepeat'
               state={controller.credentials}
@@ -79,7 +79,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               required
             >
               {translate('authentication_user_password_repeat')}
-            </InputFieldNew>
+            </InputField>
           </>
         )}
       </Group>
@@ -89,7 +89,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           const label = `${role.roleId}${role.roleName && role.roleName !== role.roleId ? ' (' + role.roleName + ')' : ''}`;
           const tooltip = `${label}${role.description ? '\n' + role.description : ''}`;
           return (
-            <FieldCheckboxNew
+            <FieldCheckbox
               key={role.roleId}
               id={uuid()}
               title={tooltip}
@@ -99,7 +99,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               onChange={checked => handleRoleChange(role.roleId, checked)}
             >
               {label}
-            </FieldCheckboxNew>
+            </FieldCheckbox>
           );
         })}
       </Group>

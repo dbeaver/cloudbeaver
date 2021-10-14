@@ -121,17 +121,17 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       style
     )
   )(
-    <checkbox-container className={className} title={title} as='div'>
-      <checkbox as='div'>
+    <checkbox-container className={className} title={title}>
+      <checkbox>
         <checkbox-input as='input' type='checkbox' {...rest} id={id || rest.name} />
-        <checkbox-background as='div'>
+        <checkbox-background>
           <checkbox-checkmark as='svg' viewBox='0 0 24 24'>
             <checkbox-checkmark-path as='path' fill='none' d='M1.73,12.91 8.1,19.28 22.79,4.59' />
           </checkbox-checkmark>
-          <checkbox-mixedmark as='div' />
+          <checkbox-mixedmark />
         </checkbox-background>
         {ripple && (
-          <checkbox-ripple as='div' />
+          <checkbox-ripple />
         )}
       </checkbox>
       {label && (id || rest.name) && <checkbox-label as='label' htmlFor={id || rest.name}>{label}</checkbox-label>}

@@ -24,8 +24,6 @@ const excludedFromVendor = [
   'backbone',
   'lodash',
   'canvg',
-  'sanitize-html',
-  'react-sanitized-html',
   'dagre',
   'svg-pathdata',
   '@emotion',

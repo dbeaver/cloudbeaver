@@ -15,9 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "go-split": "^2.x.x",
-    "sanitize-html": "^1.x.x",
-    "react-sanitized-html": "^2.x.x"
+    "go-split": "^2.x.x"
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",

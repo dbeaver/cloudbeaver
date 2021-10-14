@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
-  InputFieldNew,
+  InputField,
   SubmittingForm,
   TabContainerPanelComponent,
   useMapResource,
@@ -21,10 +21,10 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   GroupTitle,
-  FieldCheckboxNew,
-  ObjectPropertyInfoFormNew,
-  TextareaNew,
-  ComboboxNew,
+  FieldCheckbox,
+  ObjectPropertyInfoForm,
+  Textarea,
+  Combobox,
   Container,
   useFormValidator,
 } from '@cloudbeaver/core-blocks';
@@ -39,7 +39,7 @@ import { DBDriverResource } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { ParametersFormNew } from './ParametersFormNew';
+import { ParametersForm } from './ParametersForm';
 import { useOptions } from './useOptions';
 
 const styles = css`
@@ -120,7 +120,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         <Container medium gap>
           <Group form gap>
             <Container wrap gap>
-              <ComboboxNew
+              <Combobox
                 name='driverId'
                 state={config}
                 items={drivers}
@@ -132,8 +132,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 fill
               >
                 {translate('connections_connection_driver')}
-              </ComboboxNew>
-              <InputFieldNew
+              </Combobox>
+              <InputField
                 type="text"
                 name="name"
                 minLength={1}
@@ -146,10 +146,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 fill
               >
                 {translate('connections_connection_name')}
-              </InputFieldNew>
+              </InputField>
             </Container>
             {JDBC ? (
-              <InputFieldNew
+              <InputField
                 type="text"
                 name="url"
                 state={config}
@@ -159,9 +159,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 mod='surface'
               >
                 {translate('customConnection_url_JDBC')}
-              </InputFieldNew>
+              </InputField>
             ) : (
-              <ParametersFormNew
+              <ParametersForm
                 config={config}
                 embedded={driver.data?.embedded}
                 disabled={disabled}
@@ -170,7 +170,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               />
             )}
             {admin && originLocal && (
-              <FieldCheckboxNew
+              <FieldCheckbox
                 id={config.connectionId}
                 name="template"
                 state={config}
@@ -179,9 +179,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 // autoHide={} // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
-              </FieldCheckboxNew>
+              </FieldCheckbox>
             )}
-            <TextareaNew
+            <Textarea
               name="description"
               rows={3}
               state={config}
@@ -189,7 +189,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               readOnly={readonly}
             >
               {translate('connections_connection_description')}
-            </TextareaNew>
+            </Textarea>
           </Group>
         </Container>
         <Container medium gap>
@@ -197,7 +197,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <Container wrap gap>
-                <ObjectPropertyInfoFormNew
+                <ObjectPropertyInfoForm
                   autofillToken='new-password'
                   properties={properties}
                   state={config.credentials}
@@ -208,13 +208,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 />
               </Container>
               {credentialsSavingEnabled && (
-                <FieldCheckboxNew
+                <FieldCheckbox
                   id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
                   state={config}
                   disabled={disabled || readonly}
                 >{translate('connections_connection_edit_save_credentials')}
-                </FieldCheckboxNew>
+                </FieldCheckbox>
               )}
             </Group>
           )}
@@ -223,7 +223,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
               {booleanProviderProperties && booleanProviderProperties.length > 0 && (
                 <Container gap wrap>
-                  <ObjectPropertyInfoFormNew
+                  <ObjectPropertyInfoForm
                     properties={booleanProviderProperties}
                     state={config.providerProperties}
                     disabled={disabled}
@@ -234,7 +234,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
               {providerPropertiesWithoutBoolean && (
                 <Container wrap gap>
-                  <ObjectPropertyInfoFormNew
+                  <ObjectPropertyInfoForm
                     properties={providerPropertiesWithoutBoolean}
                     state={config.providerProperties}
                     disabled={disabled}

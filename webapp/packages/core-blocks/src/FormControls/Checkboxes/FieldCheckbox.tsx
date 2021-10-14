@@ -14,9 +14,24 @@ import { baseFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 
-const fieldCheckboxStyles = css`
+const style = css`
   Checkbox {
     margin: -10px;
+  }
+  field {
+    display: flex;
+    align-items: flex-end;
+    white-space: pre-wrap;
+  }
+  field-label {
+    composes: theme-typography--body2 from global;
+    cursor: pointer;
+    user-select: none;
+    padding-left: 10px;
+    line-height: 16px;
+  }
+  Checkbox[disabled] + field-label {
+    cursor: auto;
   }
 `;
 
@@ -25,16 +40,22 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   className,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const styles = useStyles(baseFormControlStyles, fieldCheckboxStyles);
+  const styles = useStyles(baseFormControlStyles, style);
 
   if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;
   }
 
   return styled(styles)(
-    <field className={className} as="div">
-      <field-label as="div">{children}</field-label>
+    <field className={className}>
       <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
+      <field-label
+        htmlFor={rest.id || rest.name}
+        title={rest.title}
+        as="label"
+      >
+        {children}
+      </field-label>
     </field>
   );
 };

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
-import { useClipboard, Button, SanitizedHTML } from '@cloudbeaver/core-blocks';
+import { useClipboard, Button, Iframe } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -66,7 +66,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       onReject={props.rejectDialog}
     >
       {error.reason && <property>{error.reason}</property>}
-      {error.htmlBody && (<SanitizedHTML html={error.htmlBody} />)}
+      {error.htmlBody && <Iframe srcDoc={error.htmlBody} />}
       {error.errors.map(
         (error, id) => (
           <>

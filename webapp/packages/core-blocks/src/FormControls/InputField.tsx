@@ -7,26 +7,73 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
-import styled, { use } from 'reshadow';
+import { useCallback, useContext, useState } from 'react';
+import styled, { use, css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useTranslate } from '@cloudbeaver/core-localization';
+import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { Icon } from '../Icon';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
+const INPUT_FIELD_STYLES = composes(
+  css`
+    Icon {
+      composes: theme-text-on-secondary from global;
+    }
+`,
+  css`
+    field-label {
+      display: block;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
+    }
+    field-label:not(:empty) {
+      padding-bottom: 10px;
+    }
+    input-container {
+      position: relative;
+    }
+    icon-container {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      & Icon {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    input[disabled] + icon-container {
+      cursor: auto;
+      opacity: 0.8;
+    }
+    input:not(:only-child) {
+      padding-right: 32px !important;
+    }
+`);
+
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
   mod?: 'surface';
-  long?: boolean;
-  short?: boolean;
+  ref?: React.Ref<HTMLInputElement>;
+  style?: ComponentStyle;
+  onCustomCopy?: () => void;
 };
 
 type ControlledProps = BaseProps & {
   name?: string;
-  value?: string;
-  onChange?: (value: string, name?: string) => any;
+  value?: string | number;
+  mapState?: (value: string | number) => string | number;
+  mapValue?: (value: string | number) => string | number;
+  onChange?: (value: string | number, name?: string) => any;
   state?: never;
   autoHide?: never;
 };
@@ -34,7 +81,9 @@ type ControlledProps = BaseProps & {
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?: (value: string, name: TKey) => any;
+  mapState?: (value: TState[TKey]) => TState[TKey] | string | number;
+  mapValue?: (value: TState[TKey]) => TState[TKey];
+  onChange?: (value: TState[TKey], name: TKey) => any;
   autoHide?: boolean;
   value?: never;
 };
@@ -46,34 +95,57 @@ interface InputFieldType {
 
 export const InputField: InputFieldType = observer(function InputField({
   name,
+  style,
   value: valueControlled,
   defaultValue,
   required,
   state,
+  mapState,
+  mapValue,
   children,
   className,
   description,
   mod,
-  long,
-  short,
+  fill,
+  small,
+  medium,
+  large,
+  tiny,
   autoHide,
   onChange,
+  onCustomCopy,
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
-  const styles = useStyles(baseFormControlStyles);
+}: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
+  const [passwordRevealed, setPasswordRevealed] = useState(false);
+  const translate = useTranslate();
+  const styles = useStyles(baseFormControlStyles, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
 
+  const revealPassword = useCallback(() => {
+    if (rest.disabled) {
+      return;
+    }
+
+    setPasswordRevealed(prev => !prev);
+  }, [rest.disabled]);
+
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = mapValue?.(event.target.value) ?? event.target.value;
+
     if (state) {
-      state[name] = event.target.value;
+      state[name] = value;
     }
     if (onChange) {
-      onChange(event.target.value, name);
+      onChange(value, name);
     }
     if (context) {
-      context.change(event.target.value, name);
+      context.change(value, name);
     }
   }, [state, name, context, onChange]);
+
+  if (autoHide && !isControlPresented(name, state, defaultValue)) {
+    return null;
+  }
 
   let value: any = valueControlled ?? defaultValue ?? undefined;
 
@@ -81,26 +153,49 @@ export const InputField: InputFieldType = observer(function InputField({
     value = state[name];
   }
 
-  if (autoHide && !isControlPresented(name, state, defaultValue)) {
-    return null;
+  if (mapState) {
+    value = mapState(value);
   }
 
+  const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
+
   return styled(styles)(
-    <field as="div" className={className} {...use({ long, short })}>
-      <field-label as='label' title={rest.title}>{children} {required && '*'}</field-label>
-      <input
-        {...rest}
-        name={name}
-        value={value ?? ''}
-        onChange={handleChange}
-        {...use({ mod })}
-        required={required}
-      />
+    <field className={className} {...use({ small, medium, large, tiny })}>
+      <field-label title={rest.title}>{children}{required && ' *'}</field-label>
+      <input-container>
+        <input
+          ref={ref}
+          role='new'
+          {...rest}
+          type={passwordRevealed ? 'text' : rest.type}
+          name={name}
+          value={value ?? ''}
+          onChange={handleChange}
+          {...use({ mod })}
+          required={required}
+        />
+        {showRevealPasswordButton && (
+          <icon-container
+            title={translate('ui_reveal_password')}
+            onClick={revealPassword}
+          >
+            <Icon
+              name={passwordRevealed ? 'password-hide' : 'password-show'}
+              viewBox='0 0 16 16'
+            />
+          </icon-container>
+        )}
+        {onCustomCopy && (
+          <icon-container title={translate('ui_copy_to_clipboard')} onClick={onCustomCopy}>
+            <Icon name="copy" viewBox='0 0 32 32' />
+          </icon-container>
+        )}
+      </input-container>
       {description && (
-        <field-description as='div'>
+        <field-description>
           {description}
         </field-description>
       )}
     </field>
   );
-});
+}, { forwardRef: true });

@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, GroupItem, Container } from '@cloudbeaver/core-blocks';
+import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField, FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -78,16 +78,16 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
     <SubmittingForm onSubmit={save}>
       <ColoredContainer parent>
         <Group form gap keepSize large>
-          <SwitchNew
+          <Switch
             name="enabled"
             state={state}
             mod={['primary']}
             disabled={disabled || readonly}
           >
             {translate('connections_network_handler_ssh_tunnel_enable')}
-          </SwitchNew>
+          </Switch>
           <Container wrap gap>
-            <InputFieldNew
+            <InputField
               type="text"
               name="host"
               state={state.properties}
@@ -97,8 +97,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               small
             >
               {translate('connections_network_handler_ssh_tunnel_host')}
-            </InputFieldNew>
-            <InputFieldNew
+            </InputField>
+            <InputField
               type="number"
               name="port"
               state={state.properties}
@@ -108,10 +108,10 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_port')}
-            </InputFieldNew>
+            </InputField>
           </Container>
           <Container wrap gap>
-            <InputFieldNew
+            <InputField
               type="text"
               name="userName"
               state={state}
@@ -121,8 +121,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
-            </InputFieldNew>
-            <InputFieldNew
+            </InputField>
+            <InputField
               type="password"
               name="password"
               placeholder={passwordHint}
@@ -134,16 +134,16 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_password')}
-            </InputFieldNew>
+            </InputField>
           </Container>
           {credentialsSavingEnabled && (
-            <FieldCheckboxNew
+            <FieldCheckbox
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
               state={state}
               disabled={disabled || !enabled || readonly}
             >{translate('connections_connection_edit_save_credentials')}
-            </FieldCheckboxNew>
+            </FieldCheckbox>
           )}
           <GroupItem>
             <Button

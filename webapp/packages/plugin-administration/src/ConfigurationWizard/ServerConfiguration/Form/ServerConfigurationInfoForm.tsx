@@ -10,7 +10,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -27,7 +27,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group form gap medium>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
-      <InputFieldNew
+      <InputField
         type="text"
         name="serverName"
         state={state.serverConfig}
@@ -36,8 +36,8 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         medium
       >
         {translate('administration_configuration_wizard_configuration_server_name')}
-      </InputFieldNew>
-      <InputFieldNew
+      </InputField>
+      <InputField
         title={translate('administration_configuration_wizard_configuration_server_url_description')}
         type="url"
         name="serverURL"
@@ -47,8 +47,8 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         medium
       >
         {translate('administration_configuration_wizard_configuration_server_url')}
-      </InputFieldNew>
-      <InputFieldNew
+      </InputField>
+      <InputField
         title={translate('administration_configuration_wizard_configuration_server_session_lifetime_description')}
         type="number"
         name="sessionExpireTime"
@@ -61,7 +61,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         tiny
       >
         {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
-      </InputFieldNew>
+      </InputField>
     </Group>
   );
 });

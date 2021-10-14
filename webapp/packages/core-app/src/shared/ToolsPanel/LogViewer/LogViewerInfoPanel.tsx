@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, TextareaNew, useClipboard } from '@cloudbeaver/core-blocks';
+import { Button, Textarea, useClipboard } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import type { ILogEntry } from './ILogEntry';
@@ -53,7 +53,7 @@ const styles = css`
   type, message {
     margin-bottom: 12px;
   }
-  TextareaNew {
+  Textarea {
     flex: 1;
   } 
 `;
@@ -91,7 +91,7 @@ export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({
       <content-wrapper>
         <type as='h2'>{typeInfo}</type>
         <message title={selectedItem.message}>{selectedItem.message}</message>
-        <TextareaNew
+        <Textarea
           name="value"
           rows={3}
           value={selectedItem.stackTrace}

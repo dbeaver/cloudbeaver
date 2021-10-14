@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -132,7 +132,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   return styled(style)(
     <ColoredContainer parent>
       <Group gap large>
-        <ObjectPropertyInfoFormNew
+        <ObjectPropertyInfoForm
           properties={state.properties}
           state={state.state}
           readOnly

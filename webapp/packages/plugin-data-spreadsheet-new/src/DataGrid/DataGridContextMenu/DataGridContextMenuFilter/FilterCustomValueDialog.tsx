@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { css } from 'reshadow';
 
-import { Button, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { Button, InputField } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -79,14 +79,14 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
         noOverflow
         onReject={rejectDialog}
       >
-        <InputFieldNew
+        <InputField
           ref={inputRef}
           name='customValue'
           value={value}
           onChange={setValue}
         >
           {payload.inputTitle}
-        </InputFieldNew>
+        </InputField>
       </CommonDialogWrapper>
     );
   }
