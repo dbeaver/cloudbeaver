@@ -47,6 +47,8 @@ export const defaultENLocale = [
   ['ui_yes', 'Yes'],
   ['ui_select_all', 'Select all'],
   ['ui_reconnect', 'Reconnect'],
+  ['ui_forget', 'Forget'],
+  ['ui_set', 'Set'],
 
   ['root_permission_denied', 'You have no permissions'],
   ['root_permission_no_permission', 'You have no permission for this action'],
