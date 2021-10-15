@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import type { RoleInfo } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -30,10 +30,14 @@ interface Props {
 
 export const RolesTable = observer<Props>(function RolesTable({ roles, selectedItems, expandedItems }) {
   const translate = useTranslate();
+  const keys = roles.map(role => role.roleId);
+
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min />
+        <TableColumnHeader min flex centerContent>
+          <TableSelect />
+        </TableColumnHeader>
         <TableColumnHeader min />
         <TableColumnHeader>{translate('administration_roles_role_id')}</TableColumnHeader>
         <TableColumnHeader>{translate('administration_roles_role_name')}</TableColumnHeader>

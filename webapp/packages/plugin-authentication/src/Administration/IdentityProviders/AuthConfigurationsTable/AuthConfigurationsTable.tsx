@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { Table, TableHeader, TableColumnHeader, TableBody } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -30,10 +30,14 @@ interface Props {
 
 export const AuthConfigurationsTable = observer<Props>(function AuthConfigurationsTable({ configurations, selectedItems, expandedItems }) {
   const translate = useTranslate();
+  const keys = configurations.map(configuration => configuration.id);
+
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min />
+        <TableColumnHeader min flex centerContent>
+          <TableSelect />
+        </TableColumnHeader>
         <TableColumnHeader min />
         <TableColumnHeader min />
         <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>

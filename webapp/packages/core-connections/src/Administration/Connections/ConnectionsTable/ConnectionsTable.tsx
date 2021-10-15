@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -46,11 +46,14 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   expandedItems,
 }) {
   const translate = useTranslate();
+  const keys = connections.map(connection => connection.id);
 
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min />
+        <TableColumnHeader min flex centerContent>
+          <TableSelect />
+        </TableColumnHeader>
         <TableColumnHeader min />
         <TableColumnHeader min />
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>

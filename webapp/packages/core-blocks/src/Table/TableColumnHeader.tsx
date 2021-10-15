@@ -13,15 +13,21 @@ import { useStyles } from '@cloudbeaver/core-theming';
 interface Props {
   title?: string;
   min?: boolean;
+  flex?: boolean;
+  centerContent?: boolean;
   className?: string;
 }
 
 export const TableColumnHeader: React.FC<Props> = function TableColumnHeader({
-  title, children, min, className,
+  title, min, flex, centerContent, className, children,
 }) {
   return styled(useStyles())(
-    <th title={title} className={className} {...use({ min })}>
-      {children}
+    <th
+      title={title}
+      className={className}
+      {...use({ min, centerContent })}
+    >
+      {flex ? <th-flex className={className}>{children}</th-flex> : children}
     </th>
   );
 };

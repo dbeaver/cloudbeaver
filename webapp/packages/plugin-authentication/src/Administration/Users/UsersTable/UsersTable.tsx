@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import {
-  Table, TableHeader, TableColumnHeader, TableBody
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -33,10 +33,16 @@ interface Props {
 
 export const UsersTable = observer<Props>(function UsersTable({ users, selectedItems, expandedItems, selectable }) {
   const translate = useTranslate();
+  const keys = users.map(user => user.userId);
+
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        {selectable && <TableColumnHeader min />}
+        {selectable && (
+          <TableColumnHeader min flex centerContent>
+            <TableSelect />
+          </TableColumnHeader>
+        )}
         <TableColumnHeader min />
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>

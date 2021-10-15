@@ -8,6 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
+import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
 
@@ -15,11 +16,18 @@ import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
 import { TableContext } from './TableContext';
 
 interface Props {
-  id: string;
+  id?: string;
   disabled?: boolean;
   tooltip?: string;
   className?: string;
 }
+
+const styles = css`
+  Checkbox {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+`;
 
 export const TableSelect = observer<Props>(function TableSelect({ id, disabled, tooltip, className }) {
   const tableContext = useContext(TableContext);
@@ -29,7 +37,7 @@ export const TableSelect = observer<Props>(function TableSelect({ id, disabled, 
     throw new Error('Context must be provided');
   }
 
-  return (
+  return styled(styles)(
     <Checkbox
       id={id}
       className={className}
