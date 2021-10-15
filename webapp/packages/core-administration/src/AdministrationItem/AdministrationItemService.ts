@@ -183,8 +183,9 @@ export class AdministrationItemService {
     outside: boolean
   ): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
+
     if (!item) {
-      return false;
+      return true;
     }
 
     if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside))) {
