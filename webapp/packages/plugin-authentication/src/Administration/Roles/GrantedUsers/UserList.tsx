@@ -100,7 +100,11 @@ export const UserList = observer<Props>(function UserList({
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
         </GrantedUsersTableHeader>
         <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedUsers.includes(item)}>
+          <Table
+            keys={keys}
+            selectedItems={selectedSubjects}
+            isItemSelectable={item => !(usersResource.isActiveUser(item) || grantedUsers.includes(item))}
+          >
             <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               {!users.length && filterState.filterValue && (
