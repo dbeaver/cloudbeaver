@@ -45,6 +45,8 @@ export const defaultENLocale = [
   ['ui_search_no_result_placeholder', 'No results have been found.'],
   ['ui_save_reminder', 'You have unsaved changes.'],
   ['ui_yes', 'Yes'],
+  ['ui_forget', 'Forget'],
+  ['ui_set', 'Set'],
 
   ['root_permission_denied', 'You have no permissions'],
   ['app_root_session_expire_warning_title', 'Session is about to expire'],
