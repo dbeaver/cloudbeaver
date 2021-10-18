@@ -39,6 +39,7 @@ public class AdminServerConfig {
     private final boolean customConnectionsEnabled;
     private final boolean publicCredentialsSaveEnabled;
     private final boolean adminCredentialsSaveEnabled;
+    private final List<String> enabledFeatures;
     private final List<String> enabledAuthProviders;
 
     private long sessionExpireTime;
@@ -54,6 +55,13 @@ public class AdminServerConfig {
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
         this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
         this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+
+        if (params.containsKey("enabledFeatures")) {
+            this.enabledFeatures = JSONUtils.getStringList(params, "enabledFeatures");
+        } else {
+            this.enabledFeatures = Arrays.asList(appConfig.getEnabledFeatures());
+        }
+
         if (params.containsKey("enabledAuthProviders")) {
             this.enabledAuthProviders = JSONUtils.getStringList(params, "enabledAuthProviders");
         } else {
@@ -117,6 +125,10 @@ public class AdminServerConfig {
 
     public void setSessionExpireTime(long sessionExpireTime) {
         this.sessionExpireTime = sessionExpireTime;
+    }
+
+    public List<String> getEnabledFeatures() {
+        return enabledFeatures;
     }
 
     public List<String> getEnabledAuthProviders() {

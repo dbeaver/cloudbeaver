@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWConnectionGrant;
+import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
@@ -29,10 +30,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebPermissionDescriptor;
-import io.cloudbeaver.registry.WebServiceDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.*;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
@@ -379,6 +377,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     ////////////////////////////////////////////////////////////////////
+    // Features
+
+    @Override
+    public List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException {
+        return WebFeatureRegistry.getInstance().getWebFeatures();
+    }
+
+    ////////////////////////////////////////////////////////////////////
     // Auth providers
 
     @Override
@@ -453,6 +459,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
             appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
+            appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
+
             if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
                 // All of them
                 appConfig.setEnabledAuthProviders(new String[0]);

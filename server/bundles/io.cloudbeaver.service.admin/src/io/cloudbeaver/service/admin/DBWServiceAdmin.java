@@ -94,6 +94,12 @@ public interface DBWServiceAdmin extends DBWService {
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
+    // Features
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException;
+
+    ////////////////////////////////////////////////////////////////////
     // Auth providers
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)

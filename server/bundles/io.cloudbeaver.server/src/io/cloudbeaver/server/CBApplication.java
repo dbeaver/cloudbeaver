@@ -718,6 +718,9 @@ public class CBApplication extends BaseApplicationImpl {
 
                         json.endObject();
                     }
+                    if (appConfig.getEnabledFeatures() != null) {
+                        JSONUtils.serializeStringList(json, "enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()), true);
+                    }
                     if (appConfig.getEnabledAuthProviders() != null) {
                         JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
                     }

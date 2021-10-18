@@ -67,6 +67,15 @@ type AdminAuthProviderConfiguration {
     metadataLink: String
 }
 
+type WebFeatureSet {
+    id: String!
+    label: String!
+    description: String
+    icon: String
+
+    enabled: Boolean!
+}
+
 input ServerConfigInput {
     serverName: String
     serverURL: String
@@ -80,6 +89,7 @@ input ServerConfigInput {
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
 
+    enabledFeatures: [ID!]
     enabledAuthProviders: [ID!]
 
     sessionExpireTime: Int
@@ -126,6 +136,10 @@ extend type Query {
 
     getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
+
+    #### Feature sets
+
+    listFeatureSets: [WebFeatureSet!]!
 
     #### Auth providers and configurations
 

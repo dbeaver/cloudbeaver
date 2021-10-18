@@ -24,6 +24,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.utils.ArrayUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -46,6 +47,7 @@ public class CBAppConfig {
     private String[] enabledDrivers;
     private String[] disabledDrivers;
     private String defaultAuthProvider;
+    private String[] enabledFeatures;
     private String[] enabledAuthProviders;
     private DataSourceNavigatorSettings defaultNavigatorSettings;
     private final Map<String, Object> plugins;
@@ -63,6 +65,7 @@ public class CBAppConfig {
         this.enabledDrivers = new String[0];
         this.disabledDrivers = new String[0];
         this.defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
+        this.enabledFeatures = null;
         this.enabledAuthProviders = null;
         this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
         this.plugins = new LinkedHashMap<>();
@@ -81,6 +84,7 @@ public class CBAppConfig {
         this.enabledDrivers = src.enabledDrivers;
         this.disabledDrivers = src.disabledDrivers;
         this.defaultAuthProvider = src.defaultAuthProvider;
+        this.enabledFeatures = src.enabledFeatures;
         this.enabledAuthProviders = src.enabledAuthProviders;
         this.defaultNavigatorSettings = src.defaultNavigatorSettings;
         this.plugins = new LinkedHashMap<>(src.plugins);
@@ -141,6 +145,18 @@ public class CBAppConfig {
 
     public String[] getDisabledDrivers() {
         return disabledDrivers;
+    }
+
+    public boolean isFeatureEnabled(String id) {
+        return ArrayUtils.contains(enabledFeatures, id);
+    }
+
+    public String[] getEnabledFeatures() {
+        return enabledAuthProviders;
+    }
+
+    public void setEnabledFeatures(String[] enabledFeatures) {
+        this.enabledFeatures = enabledFeatures;
     }
 
     public String getDefaultAuthProvider() {

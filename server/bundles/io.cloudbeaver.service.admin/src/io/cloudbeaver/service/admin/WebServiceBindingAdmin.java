@@ -99,6 +99,9 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setSubjectConnectionAccess",
             env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")))
 
+        .dataFetcher("listFeatureSets",
+            env -> getService(env).listFeatureSets(getWebSession(env)))
+
         .dataFetcher("listAuthProviderConfigurationParameters",
             env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
         .dataFetcher("listAuthProviderConfigurations",
