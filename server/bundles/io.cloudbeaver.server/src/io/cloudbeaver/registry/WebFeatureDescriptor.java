@@ -20,6 +20,7 @@ package io.cloudbeaver.registry;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.server.CBApplication;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.impl.AbstractContextDescriptor;
 
@@ -44,10 +45,12 @@ public class WebFeatureDescriptor extends AbstractContextDescriptor implements D
         this.icon = iconToImage(config.getAttribute("icon"));
     }
 
+    @NotNull
     public String getId() {
         return id;
     }
 
+    @NotNull
     public String getLabel() {
         return label;
     }

@@ -2,10 +2,10 @@
 <schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.service" name="Web services"/>
+         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.feature" name="Web features"/>
       </appInfo>
       <documentation>
-         Web service
+         Web feature
       </documentation>
    </annotation>
 
@@ -17,12 +17,12 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="service"/>
+            <element ref="feature"/>
          </sequence>
       </complexType>
    </element>
 
-   <element name="service">
+   <element name="feature">
       <annotation>
          <documentation>
             Web service description

@@ -16,9 +16,11 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -148,11 +150,16 @@ public class CBAppConfig {
     }
 
     public boolean isFeatureEnabled(String id) {
-        return ArrayUtils.contains(enabledFeatures, id);
+        return ArrayUtils.contains(getEnabledFeatures(), id);
     }
 
     public String[] getEnabledFeatures() {
-        return enabledAuthProviders;
+        if (enabledFeatures == null) {
+            // No config - enable all features (+backward compatibility)
+            return WebFeatureRegistry.getInstance().getWebFeatures()
+                .stream().map(DBWFeatureSet::getId).toArray(String[]::new);
+        }
+        return enabledFeatures;
     }
 
     public void setEnabledFeatures(String[] enabledFeatures) {

@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -138,13 +139,28 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             try {
-                WebAction webAction = method.getAnnotation(WebAction.class);
-                if (webAction != null) {
-                    checkPermissions(method, webAction);
+                try {
+                    WebAction webAction = method.getAnnotation(WebAction.class);
+                    if (webAction != null) {
+                        checkPermissions(method, webAction);
+                    }
+                    beforeWebActionCall(webAction, method);
+                    try {
+                        return method.invoke(impl, args);
+                    } finally {
+                        afterWebActionCall(webAction, method);
+                    }
+                } catch (InvocationTargetException e) {
+                    throw e.getTargetException();
                 }
-                return method.invoke(impl, args);
-            } catch (InvocationTargetException e) {
-                throw e.getTargetException();
+            } catch (Throwable ex) {
+                for (Class<?> exType : method.getExceptionTypes()) {
+                    if (exType.isInstance(ex)) {
+                        throw ex;
+                    }
+                }
+                // Undeclared exception - wrap
+                throw new InvocationTargetException(ex);
             }
         }
 
@@ -183,4 +199,14 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
 
     }
+
+    protected void beforeWebActionCall(WebAction webAction, Method method) throws DBException {
+
+    }
+
+    protected void afterWebActionCall(WebAction webAction, Method method) throws DBException {
+
+    }
+
+
 }
