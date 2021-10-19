@@ -166,6 +166,10 @@ public class CBAppConfig {
         this.enabledFeatures = enabledFeatures;
     }
 
+    public boolean isAuthProviderEnabled(String id) {
+        return ArrayUtils.contains(getEnabledAuthProviders(), id);
+    }
+
     public String getDefaultAuthProvider() {
         return defaultAuthProvider;
     }
