@@ -140,9 +140,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             try {
                 try {
+                    WebActionSet actionSet = method.getDeclaringClass().getAnnotation(WebActionSet.class);
+                    if (actionSet != null) {
+                        checkServicePermissions(method, actionSet);
+                    }
                     WebAction webAction = method.getAnnotation(WebAction.class);
                     if (webAction != null) {
-                        checkPermissions(method, webAction);
+                        checkActionPermissions(method, webAction);
                     }
                     beforeWebActionCall(webAction, method);
                     try {
@@ -164,7 +168,19 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
         }
 
-        private void checkPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
+        private void checkServicePermissions(Method method, WebActionSet actionSet) throws DBWebException {
+            String[] features = actionSet.requireFeatures();
+            if (features.length > 0) {
+                for (String feature : features) {
+                    if (!CBApplication.getInstance().isConfigurationMode() &&
+                        !CBApplication.getInstance().getAppConfiguration().isFeatureEnabled(feature)) {
+                        throw new DBWebException("Feature " + feature + " is disabled");
+                    }
+                }
+            }
+        }
+
+        private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
             String[] reqPermissions = webAction.requirePermissions();
             if (reqPermissions.length == 0) {
                 return;
@@ -200,6 +216,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
     }
 
+    // Perform any checks before action call
     protected void beforeWebActionCall(WebAction webAction, Method method) throws DBException {
 
     }
