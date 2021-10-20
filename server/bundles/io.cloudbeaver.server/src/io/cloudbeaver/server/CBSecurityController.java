@@ -517,6 +517,19 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteRole(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT COUNT(*) FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
+                dbStat.setString(1, roleId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        int userCount = dbResult.getInt(1);
+                        if (userCount > 0) {
+                            throw new DBCException("Role can't be deleted. There are " + userCount + " user(s) who have this role. Un-assign role first.");
+                        }
+                    }
+                }
+            }
+
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, roleId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
