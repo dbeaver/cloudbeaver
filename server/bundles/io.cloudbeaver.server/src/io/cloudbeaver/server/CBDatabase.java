@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
 public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
+    public static final String SCHEMA_CREATE_SQL_PATH = "db/cb_schema_create.sql";
     private static final String CURRENT_SCHEMA_VERSION = "1.0";
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
