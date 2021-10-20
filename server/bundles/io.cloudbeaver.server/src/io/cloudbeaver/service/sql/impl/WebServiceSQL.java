@@ -115,7 +115,7 @@ public class WebServiceSQL implements DBWServiceSQL {
 
             if (position != null) {
                 SQLParserContext parserContext = new SQLParserContext(
-                    () -> sqlContext.getProcessor().getExecutionContext(),
+                    sqlContext.getProcessor().getConnection().getDataSource(),
                     completionContext.getSyntaxManager(),
                     completionContext.getRuleManager(),
                     document);

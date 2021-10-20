@@ -71,7 +71,7 @@ public class WebSQLProcessor {
         this.connection = connection;
 
         syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(connection.getDataSource());
+        syntaxManager.init(connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
 
         ruleManager = new SQLRuleManager(syntaxManager);
         ruleManager.loadRules(connection.getDataSource(), false);
