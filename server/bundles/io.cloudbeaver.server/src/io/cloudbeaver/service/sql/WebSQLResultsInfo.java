@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 
 import java.util.List;
 
@@ -92,4 +93,14 @@ public class WebSQLResultsInfo {
         }
         return binding == null ? null : binding.getAttribute();
     }
+
+    public DBSTypedObject getAttributeByPosition(int pos) {
+        for (DBDAttributeBinding attr : attributes) {
+            if (attr.getOrdinalPosition() == pos) {
+                return attr;
+            }
+        }
+        return null;
+    }
+
 }

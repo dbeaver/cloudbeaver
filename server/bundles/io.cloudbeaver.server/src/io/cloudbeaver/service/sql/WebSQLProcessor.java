@@ -273,6 +273,8 @@ public class WebSQLProcessor {
         DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
             monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, keyReceiver);
 
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+
         long totalUpdateCount = 0;
 
         WebSQLExecuteInfo result = new WebSQLExecuteInfo();
@@ -296,7 +298,7 @@ public class WebSQLProcessor {
 
                     // Patch result rows (adapt to web format)
                     for (int i = 0; i < rowValues.length; i++) {
-                        rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, null, rowValues[i], dataFormat);
+                        rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, resultsInfo.getAttributeByPosition(i), rowValues[i], dataFormat);
                     }
 
                     totalUpdateCount += statistics.getRowsUpdated();
@@ -319,7 +321,6 @@ public class WebSQLProcessor {
         }
 
         WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
         updatedResultSet.setResultsInfo(resultsInfo);
         updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -370,7 +371,8 @@ public class WebSQLProcessor {
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat,
-        @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches, DBDDataReceiver keyReceiver)
+        @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches,
+        @Nullable DBDDataReceiver keyReceiver)
         throws DBException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
