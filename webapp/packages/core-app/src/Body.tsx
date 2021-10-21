@@ -34,7 +34,7 @@ export const Body = observer(function Body() {
   useAppLoadingScreen();
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
-  const permissionsService = useDataResource(PermissionsResource, undefined);
+  const permissionsService = useDataResource(Body, PermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();

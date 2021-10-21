@@ -37,6 +37,7 @@ export function useDataResource<
   TResource extends CachedDataResource<any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceParam<TResource>>
 >(
+  component: React.FC<any>,
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null : never,
   actions?: IActions<TResource>
@@ -47,6 +48,7 @@ export function useDataResource<
   const [exception, setException] = useState<Error | null>(null);
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
+  const [loadFunctionName] = useState(component.name);
 
   const outdated = getComputed(() => (
     (resource.isOutdated(key) || !resource.isLoaded(key, includes))
@@ -57,7 +59,7 @@ export function useDataResource<
     loading: false,
     firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
-    async load(refresh?: boolean) {
+    async [loadFunctionName](refresh?: boolean) {
       const { loading, resource, actions, prevData } = refObj;
 
       if (loading) {
@@ -132,7 +134,7 @@ export function useDataResource<
     },
     reload: () => {
       setException(null);
-      refObj.load(true);
+      (refObj as any)[loadFunctionName](true);
     },
     isLoading: () => {
       if (refObj.key === null) {
@@ -153,7 +155,7 @@ export function useDataResource<
     }
 
     if (result.exception === null) {
-      refObj.load();
+      (refObj as any)[loadFunctionName]();
     }
   });
 

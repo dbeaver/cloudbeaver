@@ -22,7 +22,7 @@ import { WizardStepper } from './WizardStepper';
 import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
-  useDataResource(PermissionsResource, undefined);
+  useDataResource(ConfigurationWizardScreen, PermissionsResource, undefined);
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
 
