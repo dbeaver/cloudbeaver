@@ -136,6 +136,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public String[] getEnabledFeatures() {
+        return application.getAppConfiguration().getEnabledFeatures();
+    }
+
+    @Property
     public String[] getEnabledAuthProviders() {
         return application.getAppConfiguration().getEnabledAuthProviders();
     }
