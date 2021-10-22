@@ -95,6 +95,7 @@ interface SwitchType {
 
 export const Switch: SwitchType = observer(function Switch({
   name,
+  id,
   value,
   defaultValue,
   description,
@@ -142,7 +143,7 @@ export const Switch: SwitchType = observer(function Switch({
               as='input'
               {...rest}
               type="checkbox"
-              id={value || name}
+              id={id || value || name}
               role="switch"
               aria-checked={checkboxState.checked}
               checked={checkboxState.checked}
@@ -151,7 +152,7 @@ export const Switch: SwitchType = observer(function Switch({
             />
           </switch-control-underlay>
         </switch-control>
-        <field-label as="label" htmlFor={value || name}>{children}</field-label>
+        <field-label as="label" htmlFor={id || value || name}>{children}</field-label>
       </switch-body>
       <field-description>{description}</field-description>
     </field>

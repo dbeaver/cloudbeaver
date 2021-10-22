@@ -9,6 +9,7 @@ export * from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardSer
 export * from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService';
 export * from './AdministrationToolsPanelStyles';
 export * from './AdministrationLocaleService';
+export * from './AdministrationSettingsService';
 export * from './EAdminPermission';
 
 export * from './useAdministrationSettings';

@@ -12,6 +12,12 @@ export function parseJSONFlat(
   scope?: string
 ) {
   if (typeof object === 'object') {
+    if (Array.isArray(object)) {
+      if (scope) {
+        setValue(scope, object);
+      }
+      return;
+    }
     for (const [key, value] of Object.entries<any>(object)) {
       parseJSONFlat(value, setValue, `${scope ? `${scope}.` : ''}${key}`);
     }

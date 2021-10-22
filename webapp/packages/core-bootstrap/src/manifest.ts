@@ -8,6 +8,7 @@
 
 import {
   AdministrationLocaleService,
+  AdministrationSettingsService,
   AdministrationTopAppBarService,
   AdministrationScreenService,
   AdministrationItemService,
@@ -117,6 +118,7 @@ export const coreManifest: PluginManifest = {
     RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
     NetworkStateService,
     AdministrationLocaleService,
+    AdministrationSettingsService,
     AdministrationTopAppBarService,
     AdministrationScreenService,
     AdministrationScreenServiceBootstrap,

@@ -56,12 +56,18 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   get publicDisabled(): boolean {
-    if (this.data?.configurationMode
-    || (this.data?.licenseRequired && !this.data?.licenseValid)) {
+    if (
+      this.data?.configurationMode
+      || (this.data?.licenseRequired && !this.data?.licenseValid)
+    ) {
       return true;
     }
 
     return false;
+  }
+
+  get enabledFeatures(): string[] {
+    return this.update.enabledFeatures || this.data?.enabledFeatures || [];
   }
 
   get enabledAuthProviders(): string[] {
@@ -74,6 +80,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
   get userCredentialsSaveEnabled(): boolean {
     return this.update.publicCredentialsSaveEnabled ?? this.data?.publicCredentialsSaveEnabled ?? false;
+  }
+
+  isFeatureEnabled(feature: string): boolean {
+    return this.enabledFeatures.includes(feature);
   }
 
   isChanged(): boolean {
@@ -97,6 +107,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
       || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
       || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
+      || !isArraysEqual(this.update.enabledFeatures || [], this.data.enabledFeatures)
     );
   }
 
@@ -194,5 +205,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     this.update.customConnectionsEnabled = serverConfig.supportsCustomConnections;
     this.update.enabledAuthProviders = [...serverConfig.enabledAuthProviders];
+    this.update.enabledFeatures = [...serverConfig.enabledFeatures];
   }
 }
