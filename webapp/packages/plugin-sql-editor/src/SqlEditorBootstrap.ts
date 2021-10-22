@@ -18,7 +18,7 @@ import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
-import { ActiveViewService } from '@cloudbeaver/core-view';
+import { ViewService } from '@cloudbeaver/core-view';
 
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
@@ -29,7 +29,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     private contextMenuService: ContextMenuService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
-    private activeViewService: ActiveViewService
+    private viewService: ViewService
   ) {
     super();
   }
@@ -63,7 +63,7 @@ export class SqlEditorBootstrap extends Bootstrap {
   load(): void { }
 
   private isSQLEntryDisabled() {
-    const activeView = this.activeViewService.view;
+    const activeView = this.viewService.activeView;
     if (activeView) {
       return !ExtensionUtils
         .from(activeView.extensions)
@@ -77,7 +77,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     let catalogId: string | undefined;
     let schemaId: string | undefined;
 
-    const activeView = this.activeViewService.view;
+    const activeView = this.viewService.activeView;
 
     if (activeView) {
       ExtensionUtils.from(activeView.extensions)

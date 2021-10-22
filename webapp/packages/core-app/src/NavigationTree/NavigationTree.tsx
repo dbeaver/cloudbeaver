@@ -10,11 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useFocus } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
-import { useActiveView } from '@cloudbeaver/core-view';
+import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { ElementsTree } from './ElementsTree';
@@ -24,11 +23,7 @@ import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
-  inside-box {
-    flex: 1;
-    position: relative;
-    min-width: 100%;
-    overflow: auto;
+  CaptureView {
     outline: none;
   }
 
@@ -62,8 +57,6 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
 
-  const [onFocus, onBlur] = useActiveView(navTreeService.getView);
-  const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
   const { handleOpen, handleSelect } = useNavigationTree();
 
@@ -77,7 +70,7 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   return styled(navigationTreeStyles)(
-    <inside-box ref={ref} as='div' tabIndex={0}>
+    <CaptureView view={navTreeService}>
       <ElementsTree
         root={ROOT_NODE_PATH}
         localState={navTreeService.treeState}
@@ -94,6 +87,6 @@ export const NavigationTree = observer(function NavigationTree() {
         customSelect={handleSelect}
         onOpen={handleOpen}
       />
-    </inside-box>
+    </CaptureView>
   );
 });

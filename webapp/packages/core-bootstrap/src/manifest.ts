@@ -106,7 +106,7 @@ import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { NavigationService, OptionsPanelService, ClipboardBootstrap, ClipboardService } from '@cloudbeaver/core-ui';
-import { ActiveViewService } from '@cloudbeaver/core-view';
+import { ViewService } from '@cloudbeaver/core-view';
 
 export const coreManifest: PluginManifest = {
   info: {
@@ -126,7 +126,7 @@ export const coreManifest: PluginManifest = {
     AdministrationTopAppBarBootstrapService,
     ConfigurationWizardService,
     WizardTopAppBarService,
-    ActiveViewService,
+    ViewService,
     ProductSettingsService,
     ProductManagerService,
     PluginManagerService,

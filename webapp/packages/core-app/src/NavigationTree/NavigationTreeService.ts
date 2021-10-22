@@ -14,6 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IActiveView } from '@cloudbeaver/core-view';
+import type { IView } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
@@ -29,7 +30,7 @@ export interface INavigationNodeSelectionData {
 }
 
 @injectable()
-export class NavigationTreeService {
+export class NavigationTreeService implements IView<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
   readonly nodeSelectionTask: IExecutor<INavigationNodeSelectionData>;
 

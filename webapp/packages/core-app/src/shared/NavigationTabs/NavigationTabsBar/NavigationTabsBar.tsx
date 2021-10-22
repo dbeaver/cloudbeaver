@@ -11,13 +11,13 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TextPlaceholder, TabsBox, TabPanel, useFocus, useExecutor
+  TextPlaceholder, TabsBox, TabPanel, useExecutor
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { useActiveView } from '@cloudbeaver/core-view';
+import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
@@ -36,6 +36,11 @@ const styles = composes(
     TabsBox {
       outline: none;
     }
+    CaptureView {
+      flex: 1;
+      display: flex;
+      overflow: auto;
+    }
   `
 );
 
@@ -46,9 +51,6 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   //       it's related to hooks order and state restoration
   const style = useStyles(styles);
   const translate = useTranslate();
-
-  const [onFocus, onBlur] = useActiveView(navigation.getView);
-  const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
@@ -70,20 +72,21 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   }
 
   return styled(style)(
-    <TabsBox
-      ref={ref}
-      currentTabId={navigation.currentTabId}
-      tabs={navigation.tabIdList.map(tabId => (
-        <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
-      ))}
-      style={styles}
-      tabIndex={0}
-    >
-      {navigation.tabIdList.map(tabId => (
-        <TabPanel key={tabId} tabId={tabId} lazy>
-          <TabHandlerPanel tabId={tabId} />
-        </TabPanel>
-      ))}
-    </TabsBox>
+    <CaptureView view={navigation}>
+      <TabsBox
+        currentTabId={navigation.currentTabId}
+        tabs={navigation.tabIdList.map(tabId => (
+          <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
+        ))}
+        style={styles}
+        tabIndex={0}
+      >
+        {navigation.tabIdList.map(tabId => (
+          <TabPanel key={tabId} tabId={tabId} lazy>
+            <TabHandlerPanel tabId={tabId} />
+          </TabPanel>
+        ))}
+      </TabsBox>
+    </CaptureView>
   );
 });

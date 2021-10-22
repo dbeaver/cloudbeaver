@@ -14,7 +14,7 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import type { IActiveView } from '@cloudbeaver/core-view';
+import type { IActiveView, IView } from '@cloudbeaver/core-view';
 
 import type { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
@@ -29,7 +29,7 @@ interface TabsState {
 const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
 @injectable()
-export class NavigationTabsService {
+export class NavigationTabsService implements IView<ITab<any>> {
   handlers = new Map<string, TabHandler>();
   tabsMap = new Map<string, ITab>();
   state = new Map<string, TabsState>();
