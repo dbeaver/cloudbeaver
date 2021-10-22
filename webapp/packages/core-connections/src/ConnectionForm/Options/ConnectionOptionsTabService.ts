@@ -201,7 +201,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
-    const driver = await this.dbDriverResource.load(state.config.driverId!, ['includeProviderProperties']);
+    if (!state.config.driverId) {
+      return;
+    }
+
+    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
 
     if (state.mode === 'edit') {
       config.connectionId = state.config.connectionId;

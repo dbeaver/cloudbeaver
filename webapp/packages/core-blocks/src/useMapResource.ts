@@ -229,10 +229,11 @@ export function useMapResource<
     actions,
   });
 
-  const outdated = getComputed(() => (
+  // TODO: getComputed skips update somehow ...
+  const outdated = (
     (resource.isOutdated(key) || !resource.isLoaded(key, includes as any))
     && !resource.isDataLoading(key)
-  ));
+  );
 
   const [result] = useState<
   IMapResourceResult<TResource, TIncludes>

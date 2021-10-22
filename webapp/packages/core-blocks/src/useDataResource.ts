@@ -50,10 +50,11 @@ export function useDataResource<
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
   const [loadFunctionName] = useState(component.name);
 
-  const outdated = getComputed(() => (
+  // TODO: getComputed skips update somehow ...
+  const outdated = (
     (resource.isOutdated(key) || !resource.isLoaded(key, includes))
     && !resource.isDataLoading(key)
-  ));
+  );
 
   const refObj = useObjectRef(() => ({
     loading: false,

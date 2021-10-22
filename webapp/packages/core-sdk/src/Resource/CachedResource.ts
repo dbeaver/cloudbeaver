@@ -500,12 +500,13 @@ export abstract class CachedResource<
 
     for (let i = 0; i < this.outdateWaitList.length; i++) {
       const key = this.outdateWaitList[i];
-      if (this.includes(param, key)) {
-        this.markOutdatedSync(param);
-        this.outdateWaitList.splice(i, 1);
-        break;
-      }
+      // if (this.includes(param, key)) {
+      this.markOutdatedSync(key);
+      // this.outdateWaitList.splice(i, 1);
+      // break;
+      // }
     }
+    this.outdateWaitList = [];
     return value;
   }
 

@@ -247,10 +247,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       loadTree(options.root);
     }],
   });
-  useExecutor({
-    executor: navTreeResource.onNodeRefresh,
-    postHandlers: [loadTree],
-  });
+  // useExecutor({
+  //   executor: navTreeResource.onNodeRefresh,
+  //   postHandlers: [loadTree],
+  // });
 
   useExecutor({
     executor: navNodeInfoResource.onItemDelete,

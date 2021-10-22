@@ -9,7 +9,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, NavigatorViewSettings, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -45,8 +45,8 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
-  readonly onConnectionCreate: IExecutor<Connection>;
-  readonly onConnectionClose: IExecutor<Connection>;
+  readonly onConnectionCreate: ISyncExecutor<Connection>;
+  readonly onConnectionClose: ISyncExecutor<Connection>;
 
   private sessionUpdate: boolean;
   private nodeIdMap: Map<string, string>;
@@ -57,8 +57,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   ) {
     super();
 
-    this.onConnectionCreate = new Executor();
-    this.onConnectionClose = new Executor();
+    this.onConnectionCreate = new SyncExecutor();
+    this.onConnectionClose = new SyncExecutor();
     this.sessionUpdate = false;
     this.nodeIdMap = new Map();
 
@@ -136,25 +136,25 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  async addList(connections: Connection[]): Promise<Connection[]> {
+  addList(connections: Connection[]): Connection[] {
     const newConnections = connections.filter(connection => !this.data.has(connection.id));
     const key = this.updateConnection(...connections);
 
     for (const connection of newConnections) {
-      await this.onConnectionCreate.execute(this.get(connection.id)!);
+      this.onConnectionCreate.execute(this.get(connection.id)!);
     }
 
     return this.get(key) as Connection[];
   }
 
-  async add(connection: Connection): Promise<Connection> {
+  add(connection: Connection): Connection {
     const exists = this.data.has(connection.id);
     this.updateConnection(connection);
 
     const observedConnection = this.get(connection.id)!;
 
     if (!exists) {
-      await this.onConnectionCreate.execute(observedConnection);
+      this.onConnectionCreate.execute(observedConnection);
     }
 
     return observedConnection;
@@ -214,7 +214,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     });
 
     const connection = this.get(id)!;
-    await this.onConnectionClose.execute(connection);
+    this.onConnectionClose.execute(connection);
     return connection;
   }
 
