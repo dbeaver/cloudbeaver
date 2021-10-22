@@ -18,6 +18,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
+import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
@@ -123,6 +124,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                 <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
                 <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
                 <ServerConfigurationNavigatorViewForm configs={service.state} />
+                <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
                 <Placeholder container={service.pluginsContainer} />
               </Group>
               <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />

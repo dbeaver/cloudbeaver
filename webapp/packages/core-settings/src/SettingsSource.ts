@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import type { ISettingsSource } from './ISettingsSource';
 
 export class SettingsSource implements ISettingsSource {
   protected store = new Map<string, any>();
 
-  constructor(protected fallback?: ISettingsSource) {}
+  constructor(protected fallback?: ISettingsSource) {
+    makeObservable<this, 'store'>(this, {
+      store: observable,
+    });
+  }
 
   has(key: string): boolean {
     return this.store.has(key) || !!this.fallback?.has(key);

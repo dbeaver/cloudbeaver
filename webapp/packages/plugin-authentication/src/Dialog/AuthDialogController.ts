@@ -92,11 +92,13 @@ export class AuthDialogController implements IInitializableController, IDestruct
     this.loadProviders();
   }
 
-  setAdminMode(mode: boolean): void {
+  setAdminMode(mode: boolean, providerId: string | null): void {
     if (this.admin !== mode) {
       this.admin = mode;
 
-      this.selectFirstAvailable();
+      if (!providerId) {
+        this.selectFirstAvailable();
+      }
     }
   }
 

@@ -85,8 +85,8 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   const controller = useController(AuthDialogController, link, providerId, rejectDialog);
   const translate = useTranslate();
 
-  if (!providerId) {
-    controller.setAdminMode(administrationScreenService.activeScreen !== null);
+  if (administrationScreenService.activeScreen !== null) {
+    controller.setAdminMode(administrationScreenService.activeScreen !== null, providerId);
   }
 
   const additional = userInfo.data !== null

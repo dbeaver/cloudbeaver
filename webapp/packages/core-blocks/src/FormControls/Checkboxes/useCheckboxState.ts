@@ -87,5 +87,5 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
 
       refresh(count + 1);
     },
-  }), { checked });
+  }), { checked }, ['change']);
 }
