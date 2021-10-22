@@ -44,6 +44,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
     private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
     private final boolean configurable;
+    private final String[] requiredFeatures;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -71,6 +72,13 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
                     credentialParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
                 }
             }
+        }
+
+        String rfList = cfg.getAttribute("requiredFeatures");
+        if (!CommonUtils.isEmpty(rfList)) {
+            requiredFeatures = rfList.split(",");
+        } else {
+            requiredFeatures = null;
         }
     }
 
@@ -122,5 +130,9 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     @Override
     public String toString() {
         return getId();
+    }
+
+    public String[] getRequiredFeatures() {
+        return requiredFeatures;
     }
 }

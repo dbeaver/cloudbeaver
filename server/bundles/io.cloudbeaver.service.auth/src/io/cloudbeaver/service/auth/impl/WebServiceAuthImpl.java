@@ -29,6 +29,7 @@ import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
@@ -64,13 +65,28 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        if (authProvider == null) {
+            throw new DBWebException("Invalid auth provider '" + providerId + "'");
+        }
+
         boolean configMode = CBApplication.getInstance().isConfigurationMode();
 
         // Check enabled auth providers
         boolean providerEnabled = true;
-        String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
+        CBAppConfig appConfiguration = CBApplication.getInstance().getAppConfiguration();
+        String[] enabledAuthProviders = appConfiguration.getEnabledAuthProviders();
         if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
             providerEnabled = false;
+        } else {
+            if (!ArrayUtils.isEmpty(authProvider.getRequiredFeatures())) {
+                for (String rf : authProvider.getRequiredFeatures()) {
+                    if (!appConfiguration.isFeatureEnabled(rf)) {
+                        providerEnabled = false;
+                        break;
+                    }
+                }
+            }
         }
         if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
             // 1. Admin can authorize in any providers
@@ -85,10 +101,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
             }
-        }
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
-        if (authProvider == null) {
-            throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
