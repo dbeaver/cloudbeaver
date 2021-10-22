@@ -1,0 +1,10 @@
+query listFeatureSets {
+  features: listFeatureSets {
+    id
+    label
+    description
+    icon
+
+    enabled
+  }
+}

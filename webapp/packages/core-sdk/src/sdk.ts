@@ -645,6 +645,7 @@ export interface Query {
   grantUserRole?: Maybe<Scalars['Boolean']>;
   listAuthProviderConfigurationParameters: ObjectPropertyInfo[];
   listAuthProviderConfigurations: AdminAuthProviderConfiguration[];
+  listFeatureSets: WebFeatureSet[];
   listPermissions: Array<Maybe<AdminPermissionInfo>>;
   listRoles: Array<Maybe<AdminRoleInfo>>;
   listUsers: Array<Maybe<AdminUserInfo>>;
@@ -1060,6 +1061,7 @@ export interface ServerConfig {
   defaultNavigatorSettings: NavigatorSettings;
   developmentMode?: Maybe<Scalars['Boolean']>;
   enabledAuthProviders: Array<Scalars['ID']>;
+  enabledFeatures: Array<Scalars['ID']>;
   licenseRequired: Scalars['Boolean'];
   licenseValid: Scalars['Boolean'];
   localHostAddress?: Maybe<Scalars['String']>;
@@ -1087,6 +1089,7 @@ export interface ServerConfigInput {
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
   enabledAuthProviders?: Maybe<Array<Scalars['ID']>>;
+  enabledFeatures?: Maybe<Array<Scalars['ID']>>;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   serverName?: Maybe<Scalars['String']>;
   serverURL?: Maybe<Scalars['String']>;
@@ -1135,6 +1138,14 @@ export interface UserInfo {
   displayName?: Maybe<Scalars['String']>;
   linkedAuthProviders: Array<Scalars['String']>;
   userId: Scalars['ID'];
+}
+
+export interface WebFeatureSet {
+  description?: Maybe<Scalars['String']>;
+  enabled: Scalars['Boolean'];
+  icon?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  label: Scalars['String'];
 }
 
 export interface WebServiceConfig {
@@ -1768,6 +1779,10 @@ export type ConfigureServerQueryVariables = Exact<{
 
 export interface ConfigureServerQuery { configureServer: boolean }
 
+export type ListFeatureSetsQueryVariables = Exact<{ [key: string]: never }>;
+
+export interface ListFeatureSetsQuery { features: Array<{ id: string; label: string; description?: Maybe<string>; icon?: Maybe<string>; enabled: boolean }> }
+
 export type SetDefaultNavigatorSettingsQueryVariables = Exact<{
   settings: NavigatorSettingsInput;
 }>;
@@ -1795,7 +1810,7 @@ export interface ReadSessionLogQuery { log: Array<{ time?: Maybe<any>; type: str
 
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface ServerConfigQuery { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; productConfiguration: any; supportsCustomConnections?: Maybe<boolean>; supportsConnectionBrowser?: Maybe<boolean>; supportsWorkspaces?: Maybe<boolean>; sessionExpireTime?: Maybe<number>; anonymousAccessEnabled?: Maybe<boolean>; adminCredentialsSaveEnabled?: Maybe<boolean>; publicCredentialsSaveEnabled?: Maybe<boolean>; licenseRequired: boolean; licenseValid: boolean; configurationMode?: Maybe<boolean>; developmentMode?: Maybe<boolean>; enabledAuthProviders: string[]; supportedLanguages: Array<{ isoCode: string; displayName?: Maybe<string>; nativeName?: Maybe<string> }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; name: string; description?: Maybe<string>; buildTime: string; releaseTime: string; licenseInfo?: Maybe<string> } } }
+export interface ServerConfigQuery { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; productConfiguration: any; supportsCustomConnections?: Maybe<boolean>; supportsConnectionBrowser?: Maybe<boolean>; supportsWorkspaces?: Maybe<boolean>; sessionExpireTime?: Maybe<number>; anonymousAccessEnabled?: Maybe<boolean>; adminCredentialsSaveEnabled?: Maybe<boolean>; publicCredentialsSaveEnabled?: Maybe<boolean>; licenseRequired: boolean; licenseValid: boolean; configurationMode?: Maybe<boolean>; developmentMode?: Maybe<boolean>; enabledFeatures: string[]; enabledAuthProviders: string[]; supportedLanguages: Array<{ isoCode: string; displayName?: Maybe<string>; nativeName?: Maybe<string> }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; name: string; description?: Maybe<string>; buildTime: string; releaseTime: string; licenseInfo?: Maybe<string> } } }
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2930,6 +2945,17 @@ export const ConfigureServerDocument = `
   configureServer(configuration: $configuration)
 }
     `;
+export const ListFeatureSetsDocument = `
+    query listFeatureSets {
+  features: listFeatureSets {
+    id
+    label
+    description
+    icon
+    enabled
+  }
+}
+    `;
 export const SetDefaultNavigatorSettingsDocument = `
     query setDefaultNavigatorSettings($settings: NavigatorSettingsInput!) {
   setDefaultNavigatorSettings(settings: $settings)
@@ -2977,6 +3003,7 @@ export const ServerConfigDocument = `
     licenseValid
     configurationMode
     developmentMode
+    enabledFeatures
     enabledAuthProviders
     supportedLanguages {
       isoCode
@@ -3279,6 +3306,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     configureServer(variables: ConfigureServerQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ConfigureServerQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'configureServer');
+    },
+    listFeatureSets(variables?: ListFeatureSetsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ListFeatureSetsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ListFeatureSetsQuery>(ListFeatureSetsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'listFeatureSets');
     },
     setDefaultNavigatorSettings(variables: SetDefaultNavigatorSettingsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetDefaultNavigatorSettingsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setDefaultNavigatorSettings');

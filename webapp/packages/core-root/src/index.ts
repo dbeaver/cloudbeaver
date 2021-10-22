@@ -1,5 +1,5 @@
 export * from './ConnectionNavigatorViewSettings';
-export * from './FeatureResource';
+export * from './FeaturesResource';
 export * from './NetworkError';
 export * from './NetworkStateService';
 export * from './PermissionsResource';
