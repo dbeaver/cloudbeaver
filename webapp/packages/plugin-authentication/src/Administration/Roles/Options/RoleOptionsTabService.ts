@@ -28,7 +28,7 @@ export class RoleOptionsTabService extends Bootstrap {
   register(): void {
     this.roleFormService.tabsContainer.add({
       key: 'options',
-      name: 'Options',
+      name: 'ui_options',
       order: 1,
       panel: () => RoleOptions,
     });

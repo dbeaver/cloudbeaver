@@ -13,6 +13,7 @@ import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
@@ -27,6 +28,8 @@ export function useRolesTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
   const resource = useService(RolesResource);
+
+  const translate = useTranslate();
 
   return useObservableRef<State>(() => ({
     tableState: new TableState(),
@@ -60,9 +63,11 @@ export function useRolesTable(): Readonly<State> {
         return;
       }
 
+      const roleNames = deletionList.map(name => `"${name}"`).join(', ');
+      const message = `${translate('administration_roles_delete_confirmation')}${roleNames}. ${translate('ui_are_you_sure')}`;
       const result = await dialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
-        message: `You're going to delete these roles: ${deletionList.map(name => `"${name}"`).join(', ')}. Are you sure?`,
+        message,
         confirmActionText: 'ui_delete',
       });
 

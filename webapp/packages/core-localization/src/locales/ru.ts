@@ -47,6 +47,8 @@ export const defaultRULocale = [
   ['ui_reconnect', 'Переподключиться'],
   ['ui_forget', 'Забыть'],
   ['ui_set', 'Установить'],
+  ['ui_are_you_sure', 'Вы уверены?'],
+  ['ui_options', 'Параметры'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

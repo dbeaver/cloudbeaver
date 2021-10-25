@@ -51,7 +51,6 @@ export default [
   ['administration_configuration_wizard_configuration_anonymous_access', 'Permetti l\'accesso anonimo'],
   ['administration_configuration_wizard_configuration_anonymous_access_description', 'Permetti di lavorare con CloudBeaver senza autenticazione'],
   ['administration_configuration_wizard_configuration_authentication_group', 'Impostazioni di autenticazione'],
-  ['administration_configuration_wizard_configuration_features_group', 'Функции'],
   ['administration_configuration_wizard_configuration_services', 'Servizi'],
   ['administration_configuration_wizard_configuration_authentication', 'Abilita l\'autenticazione utente'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Permetti agli utenti di autenticarsi. In alternativa solo l\'accesso anonimo sarà attivo'],
