@@ -88,32 +88,30 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 }
             }
         }
-        if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            // 1. Admin can authorize in any providers
-            // 2. When it authorizes in non-local provider for the first time we force linkUser flag
-            if (!providerEnabled && webSession.getUser() != null) {
-                linkWithActiveUser = true;
-            }
-        } else {
-            if (!providerEnabled) {
-                // Admin can use local provider anytime
-                if (!isAdminAuthTry(providerId, authParameters)) {
-                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
-                }
-            }
-        }
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
-
             DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
             DBWAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBWAuthProviderExternal<?> ?
                 (DBWAuthProviderExternal<?>) authProviderInstance : null;
             Map<String, Object> userCredentials;
+
             if (authProviderExternal != null) {
                 userCredentials = authProviderExternal.authExternalUser(webSession.getProgressMonitor(), providerConfig, authParameters);
             } else {
                 // User credentials are the same as auth parameters
                 userCredentials = authParameters;
+            }
+
+            if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+                // 1. Admin can authorize in any providers
+                // 2. When it authorizes in non-local provider for the first time we force linkUser flag
+                if (!providerEnabled && webSession.getUser() != null) {
+                    linkWithActiveUser = true;
+                }
+            } else if (!providerEnabled) {
+                if (!isAdminAuthTry(authProvider, userCredentials)) {
+                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+                }
             }
 
             WebUser user = null;
@@ -229,20 +227,22 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
     }
 
-    private boolean isAdminAuthTry(@NotNull String providerId, @NotNull Map<String, Object> authParameters) {
+    private boolean isAdminAuthTry(@NotNull WebAuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
+        DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
         boolean isAdmin = false;
-        if (LocalAuthProvider.PROVIDER_ID.equals(providerId)) {
-            Object userId = authParameters.get(LocalAuthProvider.CRED_USER);
+
+        try {
+            Object userId = securityController.getUserByCredentials(authProvider, userCredentials);
+
             if (userId != null) {
-                try {
-                    isAdmin = CBPlatform.getInstance().getApplication().getSecurityController()
+                    isAdmin = securityController
                         .getUserPermissions(CommonUtils.toString(userId))
                             .contains(DBWConstants.PERMISSION_ADMIN);
-                } catch (DBCException e) {
-                    log.error(e);
-                }
             }
+        } catch (DBCException e) {
+            log.error(e);
         }
+
         return isAdmin;
     }
 
