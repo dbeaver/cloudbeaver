@@ -13,6 +13,7 @@ import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminAuthProviderConfiguration, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
@@ -27,6 +28,8 @@ export function useConfigurationsTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
   const resource = useService(AuthConfigurationsResource);
+
+  const translate = useTranslate();
 
   return useObservableRef<State>(() => ({
     tableState: new TableState(),
@@ -60,13 +63,13 @@ export function useConfigurationsTable(): Readonly<State> {
         return;
       }
 
-      const configurationsNames = deletionList
-        .map(id => resource.get(id)?.displayName)
-        .filter(Boolean);
+      const configurationNames = deletionList.map(id => resource.get(id)?.displayName).filter(Boolean);
+      const nameList = configurationNames.map(name => `"${name}"`).join(', ');
+      const message = `${translate('administration_identity_providers_delete_confirmation')}${nameList}. ${translate('ui_are_you_sure')}`;
 
       const result = await dialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
-        message: `You're going to delete these configurations: ${configurationsNames.map(name => `"${name}"`).join(', ')}. Are you sure?`,
+        message,
         confirmActionText: 'ui_delete',
       });
 

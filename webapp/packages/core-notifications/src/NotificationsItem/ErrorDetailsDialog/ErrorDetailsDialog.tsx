@@ -12,6 +12,7 @@ import styled from 'reshadow';
 
 import { useClipboard, Button, Iframe } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ErrorModel, IErrorInfo } from './ErrorModel';
@@ -35,6 +36,8 @@ function DisplayErrorInfo({ error }: {error: IErrorInfo}) {
 }
 
 export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observer(function ErrorDetailsDialog(props) {
+  const translate = useTranslate();
+
   const error = useMemo(
     () => (props.payload instanceof Error
       ? new ErrorModel({ error: props.payload })
@@ -56,9 +59,9 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       footer={(
         <>
           {error.textToCopy && (
-            <Button type="button" mod={['outlined']} onClick={copyHandler}>Copy</Button>
+            <Button type="button" mod={['outlined']} onClick={copyHandler}>{translate('ui_copy_to_clipboard')}</Button>
           )}
-          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
+          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>{translate('ui_close')}</Button>
         </>
       )}
       style={dialogStyle}

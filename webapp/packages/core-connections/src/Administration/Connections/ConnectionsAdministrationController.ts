@@ -11,6 +11,7 @@ import { observable, computed, makeObservable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { DatabaseConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';
@@ -31,7 +32,8 @@ export class ConnectionsAdministrationController {
   constructor(
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private commonDialogService: CommonDialogService
+    private commonDialogService: CommonDialogService,
+    private localizationService: LocalizationService,
   ) {
     makeObservable(this, {
       isProcessing: observable,
@@ -69,13 +71,13 @@ export class ConnectionsAdministrationController {
       return;
     }
 
-    const connectionNames = deletionList
-      .map(id => this.connectionsResource.get(id)?.name)
-      .filter(Boolean);
+    const connectionNames = deletionList.map(id => this.connectionsResource.get(id)?.name).filter(Boolean);
+    const nameList = connectionNames.map(name => `"${name}"`).join(', ');
+    const message = `${this.localizationService.translate('connections_administration_delete_confirmation')}${nameList}. ${this.localizationService.translate('ui_are_you_sure')}`;
 
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
-      message: `You're going to delete these connections: ${connectionNames.map(name => `"${name}"`).join(', ')}. Are you sure?`,
+      message,
       confirmActionText: 'ui_delete',
     });
 

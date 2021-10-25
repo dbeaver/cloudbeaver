@@ -28,7 +28,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   register(): void {
     this.authConfigurationFormService.tabsContainer.add({
       key: 'options',
-      name: 'Options',
+      name: 'ui_options',
       order: 1,
       panel: () => AuthConfigurationOptions,
     });

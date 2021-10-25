@@ -12,6 +12,7 @@ import { AdminUser, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UsersResource
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -56,6 +57,7 @@ export class UsersAdministrationController implements IInitializableController {
     private authProvidersResource: AuthProvidersResource,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
+    private localizationService: LocalizationService
   ) {
     makeObservable(this, {
       isDeleting: observable,
@@ -92,9 +94,12 @@ export class UsersAdministrationController implements IInitializableController {
       return;
     }
 
+    const userNames = deletionList.map(name => `"${name}"`).join(', ');
+    const message = `${this.localizationService.translate('authentication_administration_users_delete_confirmation')}${userNames}. ${this.localizationService.translate('ui_are_you_sure')}`;
+
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
-      message: `You're going to delete these users: ${deletionList.map(name => `"${name}"`).join(', ')}. Are you sure?`,
+      message,
       confirmActionText: 'ui_delete',
     });
 

@@ -27,6 +27,8 @@ export default [
   ['authentication_administration_user_updated', 'User updated'],
   ['authentication_administration_user_created', 'User was created successfully'],
   ['authentication_administration_user_create_failed', 'Error creating new user'],
+  ['authentication_administration_users_delete_confirmation', "You're going to delete these users: "],
+
   ['authentication_user_name', 'User name'],
   ['authentication_user_credentials', 'Credentials'],
   ['authentication_user_current_password', 'Current password'],
@@ -53,7 +55,7 @@ export default [
   ['administration_configuration_wizard_configuration_anonymous_access', 'Allow anonymous access'],
   ['administration_configuration_wizard_configuration_anonymous_access_description', 'Allows to work with CloudBeaver without user authentication'],
   ['administration_configuration_wizard_configuration_authentication_group', 'Authentication settings'],
-  ['administration_configuration_wizard_configuration_features_group', 'Features'],
+  ['administration_configuration_wizard_configuration_services_group', 'Services'],
   ['administration_configuration_wizard_configuration_services', 'Services'],
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
@@ -74,6 +76,7 @@ export default [
   ['administration_identity_providers_add_tooltip', 'Add new configuration'],
   ['administration_identity_providers_refresh_tooltip', 'Refresh configuration list'],
   ['administration_identity_providers_delete_tooltip', 'Delete selected configurations'],
+  ['administration_identity_providers_delete_confirmation', "You're going to delete these configurations: "],
   ['administration_identity_providers_provider_save_error', 'Save configuration error'],
   ['administration_identity_providers_provider_create_error', 'Create configuration error'],
   ['administration_identity_providers_configuration_list_update_success', 'Configuration list was refreshed'],
@@ -93,6 +96,7 @@ export default [
   ['administration_roles_add_tooltip', 'Add new role'],
   ['administration_roles_refresh_tooltip', 'Refresh role list'],
   ['administration_roles_delete_tooltip', 'Delete selected roles'],
+  ['administration_roles_delete_confirmation', "You're going to delete these roles: "],
 
   ['administration_roles_role_granted_users_tab_title', 'Users'],
   ['administration_roles_role_granted_users_search_placeholder', 'Search for user ID...'],

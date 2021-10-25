@@ -6,6 +6,7 @@ export default [
 
   ['administration_configuration_wizard_configuration_server_info', 'Информация о сервере'],
   ['administration_configuration_wizard_configuration_server_name', 'Название сервера'],
+  ['administration_configuration_wizard_configuration_server_url', 'URL Сервера'],
   ['administration_configuration_wizard_configuration_server_info_unsaved', 'Есть несохранённые изменения'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Время сессии'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'В случае бездействия пользователя на протяжении указанного количества минут, его сессия будет закрыта.'],

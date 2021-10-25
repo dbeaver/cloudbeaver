@@ -10,6 +10,7 @@ export default [
   ['connections_administration_configuration_wizard_step_description', 'Подключения к базам'],
   ['connections_administration_configuration_wizard_message', 'Here you can create database connections manually or using a database server search.\nYou can skip this step and configure the connections later.'],
   ['connections_administration_connection_no_information', 'Нет доступной информации'],
+  ['connections_administration_delete_confirmation', 'Вы собираетесь удалить следующие подключения: '],
   ['connections_administration_tools_add_tooltip', 'Добавить новое подключение'],
   ['connections_administration_tools_refresh_tooltip', 'Обновить список подключений'],
   ['connections_administration_tools_delete_tooltip', 'Удалить выбранные подключения'],

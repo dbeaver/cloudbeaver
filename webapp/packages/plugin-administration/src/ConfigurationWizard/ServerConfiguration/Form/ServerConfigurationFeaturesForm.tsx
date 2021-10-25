@@ -39,7 +39,7 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
 
   return styled(styles)(
     <>
-      <GroupTitle>{translate('administration_configuration_wizard_configuration_features_group')}</GroupTitle>
+      <GroupTitle>{translate('administration_configuration_wizard_configuration_services_group')}</GroupTitle>
       <Loader state={features} inline>
         {() => styled(styles)(
           <>
