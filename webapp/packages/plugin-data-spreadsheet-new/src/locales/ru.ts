@@ -1,4 +1,5 @@
 export default [
+  ['data_grid_table_empty_placeholder', 'Таблица не содержит колонок'],
   ['data_grid_table_editing', 'Редактировать'],
   ['data_grid_table_editing_set_to_null', 'Установить в NULL'],
   ['data_grid_table_editing_open_inline_editor', 'Открыть встроенный редактор'],
