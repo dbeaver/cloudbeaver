@@ -48,6 +48,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
       }
     }
 
+    if (this.defaultProviderId !== null && !this.authProvidersResource.isAuthEnabled(this.defaultProviderId)) {
+      const primary = this.authProvidersResource.get(this.defaultProviderId);
+
+      if (primary) {
+        providers.push(primary);
+      }
+    }
+
     return providers
       .filter(provider => (
         provider && (

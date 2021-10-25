@@ -41,7 +41,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
-      if (serverConfig.enabledAuthProviders?.length === 0) {
+      if (serverConfig.enabledAuthProviders?.length === 0 && localProvider) {
         serverConfig.anonymousAccessEnabled = true;
       }
     }],
@@ -92,7 +92,6 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                         })}
                       </>
                     )}
-                    disabled={providers.resource.isBase(provider.id)}
                     mod={['primary']}
                     small
                     autoHide
@@ -108,6 +107,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       {configurationWizard && localProvider ? (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
       ) : <Container medium />}
+      <Container medium />
     </Container>
   );
 });

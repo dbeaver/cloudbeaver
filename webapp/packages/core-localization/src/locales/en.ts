@@ -13,6 +13,7 @@ export const defaultENLocale = [
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Create'],
   ['ui_processing_save', 'Save'],
+  ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
   ['ui_error_message', 'Error:'],
   ['ui_error_close', 'Close'],

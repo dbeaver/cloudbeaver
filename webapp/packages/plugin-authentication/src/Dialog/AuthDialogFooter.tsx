@@ -29,11 +29,13 @@ const styles = css`
 `;
 
 export interface Props {
+  authAvailable: boolean;
   isAuthenticating: boolean;
   onLogin: () => void;
 }
 
 export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({
+  authAvailable,
   isAuthenticating,
   onLogin,
   children,
@@ -47,6 +49,7 @@ export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({
         type="button"
         mod={['unelevated']}
         loading={isAuthenticating}
+        hidden={!authAvailable}
         onClick={onLogin}
       >
         {translate('authentication_login')}

@@ -10,14 +10,15 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
 import { AuthDialogController } from './AuthDialogController';
 import { AuthDialogFooter } from './AuthDialogFooter';
@@ -80,13 +81,16 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   options,
   rejectDialog,
 }) {
+  const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
+  const authProvidersResource = useService(AuthProvidersResource);
   const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
   const controller = useController(AuthDialogController, link, providerId, rejectDialog);
   const translate = useTranslate();
+  const isAdminPage = administrationScreenService.activeScreen !== null;
 
-  if (administrationScreenService.activeScreen !== null) {
-    controller.setAdminMode(administrationScreenService.activeScreen !== null, providerId);
+  if (isAdminPage) {
+    controller.setAdminMode(isAdminPage, providerId);
   }
 
   const additional = userInfo.data !== null
@@ -95,6 +99,14 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 
   const showTabs = controller.providers.length > 1;
   const configurable = !!controller.provider?.configurable;
+  let providerEnabled = false;
+
+  if (controller.provider && (
+    (isAdminPage && authProvidersResource.isPrimary(controller.provider.id))
+    || authProvidersResource.isAuthEnabled(controller.provider.id)
+  )) {
+    providerEnabled = true;
+  }
 
   const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
   let subTitle = controller.provider?.description;
@@ -107,6 +119,25 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     subTitle = 'authentication_request_token';
   }
 
+  function navToSettings() {
+    rejectDialog();
+    authConfigurationsAdministrationNavService.navToSettings();
+  }
+
+  function renderForm(provider: AuthProvider) {
+    if (configurable) {
+      return <ConfigurationsList provider={provider} onClose={rejectDialog} />;
+    }
+
+    return (
+      <AuthProviderForm
+        provider={provider}
+        credentials={controller.credentials}
+        authenticate={controller.isAuthenticating}
+      />
+    );
+  }
+
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
     <TabsState currentTabId={controller.provider?.id} onChange={tabData => controller.selectProvider(tabData.tabId)}>
       <CommonDialogWrapper
@@ -116,6 +147,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
         subTitle={subTitle}
         footer={!configurable && (
           <AuthDialogFooter
+            authAvailable={providerEnabled}
             isAuthenticating={controller.isAuthenticating}
             onLogin={controller.login}
           >
@@ -147,18 +179,34 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
         )}
         <SubmittingForm {...use({ form: !configurable })} onSubmit={controller.login}>
           {controller.provider && (
-            configurable ? (
-              <ConfigurationsList provider={controller.provider} onClose={rejectDialog} />
-            ) : (
-              <AuthProviderForm
-                provider={controller.provider}
-                credentials={controller.credentials}
-                authenticate={controller.isAuthenticating}
-              />
-            )
+            <>
+              {providerEnabled ? (
+                renderForm(controller.provider)
+              ) : (
+                <TextPlaceholder>
+                  {translate('authentication_provider_disabled')}
+                  <Link onClick={() => navToSettings()}>
+                    <Translate token="ui_configure" />
+                  </Link>
+                </TextPlaceholder>
+              )}
+            </>
           )}
           {controller.isLoading && <Loader />}
-          {!controller.isLoading && !controller.provider && <>Select available provider</>}
+          {!controller.isLoading && !controller.provider && (
+            <TextPlaceholder>
+              {controller.providers.length > 0 ? (
+                <>{translate('authentication_select_provider')}</>
+              ) : (
+                <>
+                  {translate('authentication_configure')}
+                  <Link onClick={() => navToSettings()}>
+                    <Translate token="ui_configure" />
+                  </Link>
+                </>
+              )}
+            </TextPlaceholder>
+          )}
         </SubmittingForm>
       </CommonDialogWrapper>
     </TabsState>

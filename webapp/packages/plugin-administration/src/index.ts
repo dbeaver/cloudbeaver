@@ -8,3 +8,4 @@ export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfiguratio
 export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfigurationSecurityForm';
 export * from './ConfigurationWizard/ServerConfiguration/IServerConfigurationPageState';
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService';
+export * from './ConfigurationWizard/ServerConfigurationAdministrationNavService';

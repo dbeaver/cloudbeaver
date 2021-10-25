@@ -16,6 +16,7 @@ import { ENotificationType, INotification, NotificationService } from '@cloudbea
 import { IExecutor, Executor, IExecutorHandler, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 
+import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
 import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
 export interface IConfigurationPlaceholderProps {
@@ -39,7 +40,6 @@ export class ServerConfigurationService {
   state: IServerConfigurationPageState;
   loading: boolean;
 
-  readonly routeName: string;
   readonly loadConfigTask: IExecutor<ILoadConfigData>;
   readonly prepareConfigTask: IExecutor<IServerConfigSaveData>;
   readonly saveTask: IExecutor<IServerConfigSaveData>;
@@ -67,7 +67,6 @@ export class ServerConfigurationService {
       done: observable,
     });
 
-    this.routeName = 'configuration';
     this.stateLinked = false;
     this.unSaveNotification = null;
     this.loadConfigTask = new Executor();
@@ -257,7 +256,7 @@ export class ServerConfigurationService {
 
     this.unSaveNotification = this.notificationService.customNotification(() => ActionSnackbar, {
       actionText: 'administration_configuration_wizard_configuration_server_info_unsaved_navigate',
-      onAction: () => this.administrationScreenService.navigateToItem(this.routeName),
+      onAction: () => this.administrationScreenService.navigateToItem(ADMINISTRATION_SERVER_CONFIGURATION_ITEM),
     }, {
       title: 'administration_configuration_wizard_configuration_server_info_unsaved_title',
       message: 'administration_configuration_wizard_configuration_server_info_unsaved_message',
