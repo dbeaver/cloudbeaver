@@ -6,14 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IActiveView } from './IActiveView';
-import { View } from './View';
+import type { IMenuItem } from './IMenuItem';
 
-export class AppView extends View<null> {
-  getView(): IActiveView<null> {
-    return {
-      context: null,
-      extensions: [],
-    };
-  }
+export interface IMenuLazyItem extends IMenuItem {
+  task: Promise<IMenuItem> | null;
+  load: () => Promise<IMenuItem>;
 }

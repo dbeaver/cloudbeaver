@@ -11,12 +11,13 @@ import { configure } from 'mobx';
 import { App, PluginManifest } from '@cloudbeaver/core-di';
 
 import { showErrorPage } from './ErrorPage';
+import { coreManifests } from './manifest';
 import { renderLayout } from './renderLayout';
 
 export async function bootstrap(plugins: PluginManifest[]): Promise<void> {
   configure({ enforceActions: 'never' });
 
-  const app = new App(plugins);
+  const app = new App([...coreManifests, ...plugins]);
   app.registerServices();
 
   try {

@@ -6,14 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IActiveView } from './IActiveView';
-import { View } from './View';
+import type { IMenu } from './IMenu';
 
-export class AppView extends View<null> {
-  getView(): IActiveView<null> {
-    return {
-      context: null,
-      extensions: [],
-    };
-  }
+export function createMenu(id: string, label: string): IMenu {
+  return {
+    id: `@menu/${id}`,
+    label,
+  };
 }

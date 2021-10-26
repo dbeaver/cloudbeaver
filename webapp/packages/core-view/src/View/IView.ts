@@ -6,8 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IAction } from '../Action/IAction';
 import type { IActiveView } from './IActiveView';
 
 export interface IView<T> {
+  actions: IAction[];
   getView: () => IActiveView<T> | null;
+  registerAction: (action: IAction) => void;
 }

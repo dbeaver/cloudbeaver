@@ -8,13 +8,18 @@
 
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
+import { HotKeys } from 'react-hotkeys';
 import styled, { css } from 'reshadow';
 
-import { useFocus } from '@cloudbeaver/core-blocks';
+import { getComputed, useFocus } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
+import { ActionService } from '../Action/ActionService';
+import type { IActionItem } from '../Action/IActionItem';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { useActiveView } from './useActiveView';
+import { useViewContext } from './useViewContext';
 
 const styles = css`
   div {
@@ -32,18 +37,43 @@ export const CaptureView = observer<Props>(function CaptureView({
   children,
   className,
 }) {
+  const [viewContext] = useViewContext(view);
+  const actionService = useService(ActionService);
   const [onFocus, onBlur] = useActiveView(view);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
 
   const context = useMemo(() => ({
-    view,
-  }), [view]);
+    viewContext,
+  }), [viewContext]);
+
+  const actionItems = getComputed(() => (
+    view.actions
+      .map(action => actionService.getAction(viewContext, action))
+      .filter(Boolean) as IActionItem[]
+  ));
+
+  const keyMap = actionItems.reduce((map, item) => ({
+    ...map,
+    [item.binding!.id]: item.binding?.binding.keys,
+  }), {});
+
+  const handlers = actionItems.reduce((map, item) => ({
+    ...map,
+    [item.binding!.id]: item.activate.bind(item.handler, true),
+  }), {});
 
   return styled(styles)(
     <CaptureViewContext.Provider value={context}>
-      <div ref={ref} className={className} tabIndex={0}>
+      <HotKeys
+        keyMap={keyMap}
+        handlers={handlers}
+        innerRef={ref}
+        className={className}
+        tabIndex={0}
+        allowChanges
+      >
         {children}
-      </div>
+      </HotKeys>
     </CaptureViewContext.Provider>
   );
 });

@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IActiveView } from './IActiveView';
-import { View } from './View';
+import { uuid } from '@cloudbeaver/core-utils';
 
-export class AppView extends View<null> {
-  getView(): IActiveView<null> {
-    return {
-      context: null,
-      extensions: [],
-    };
+import type { IMenuItem } from './IMenuItem';
+
+export class MenuItem implements IMenuItem {
+  readonly id: string;
+
+  constructor(id?: string) {
+    this.id = id ?? uuid();
   }
 }

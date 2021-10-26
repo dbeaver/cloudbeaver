@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
-import core, { bootstrap } from '@cloudbeaver/core-bootstrap';
+import { bootstrap } from '@cloudbeaver/core-bootstrap';
+import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
@@ -17,8 +18,7 @@ import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 
 import { defaultProductManifest } from './manifest';
 
-const PLUGINS = [
-  core,
+const PLUGINS: PluginManifest[] = [
   administration,
   spreadsheetNew,
   authentication,

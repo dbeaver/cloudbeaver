@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext } from 'react';
+import type { IContextProvider } from '../Context/IContextProvider';
+import type { IViewContext } from '../View/IViewContext';
+import type { IMenu } from './IMenu';
 
-import type { IViewContext } from './IViewContext';
-
-interface ICaptureViewContext {
+export interface IMenuContext {
+  menu: IMenu;
+  menuContext: IContextProvider;
   viewContext: IViewContext | null;
 }
-
-export const CaptureViewContext = createContext<ICaptureViewContext>({ viewContext: null });

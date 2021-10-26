@@ -6,14 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IActiveView } from './IActiveView';
-import { View } from './View';
+import type { IContextProvider } from '../Context/IContextProvider';
+import type { IView } from './IView';
 
-export class AppView extends View<null> {
-  getView(): IActiveView<null> {
-    return {
-      context: null,
-      extensions: [],
-    };
-  }
+export interface IViewContext {
+  view: IView<any>;
+  context: IContextProvider;
 }

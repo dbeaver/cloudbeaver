@@ -1,6 +1,6 @@
 // reexports
-import { coreManifest } from './manifest';
+import { coreManifests } from './manifest';
 
 export * from './bootstrap';
 
-export default coreManifest;
+export default coreManifests;

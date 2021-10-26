@@ -6,14 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IActiveView } from './IActiveView';
-import { View } from './View';
+import type { IActionInfo } from './IActionInfo';
 
-export class AppView extends View<null> {
-  getView(): IActiveView<null> {
-    return {
-      context: null,
-      extensions: [],
-    };
-  }
+export interface IAction {
+  id: string;
+  info: IActionInfo;
 }
