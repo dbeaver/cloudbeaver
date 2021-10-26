@@ -105,7 +105,7 @@ import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
-import { NavigationService, OptionsPanelService, ClipboardBootstrap, ClipboardService } from '@cloudbeaver/core-ui';
+import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 
 export const coreManifests: PluginManifest[] = [
@@ -151,8 +151,6 @@ export const coreManifests: PluginManifest[] = [
       PermissionsService,
       CoreSettingsService,
       CommonDialogService,
-      ClipboardService,
-      ClipboardBootstrap,
       SessionExpireService,
       SessionExpireWarningDialogService,
       SessionExpiredDialogService,
@@ -180,8 +178,6 @@ export const coreManifests: PluginManifest[] = [
       EnvironmentService,
       ExceptionsCatcherService,
       EventsSettingsService,
-      NavigationService,
-      OptionsPanelService,
       GraphQLService,
       LocalStorageSaveService,
       LocalizationService,
@@ -217,5 +213,6 @@ export const coreManifests: PluginManifest[] = [
       ServerService,
     ],
   },
+  coreUIManifest,
   coreViewManifest,
 ];

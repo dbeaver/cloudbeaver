@@ -4,3 +4,4 @@ export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
 export * from './Clipboard/ClipboardBootstrap';
 export * from './Clipboard/ClipboardService';
+export { manifest as coreUIManifest } from './manifest';
