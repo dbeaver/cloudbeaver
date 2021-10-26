@@ -1,4 +1,5 @@
 export default [
+  ['data_grid_table_empty_placeholder', 'The table does not contain any columns'],
   ['data_grid_table_editing', 'Edit'],
   ['data_grid_table_editing_set_to_null', 'Set to NULL'],
   ['data_grid_table_editing_open_inline_editor', 'Open inline editor'],

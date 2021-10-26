@@ -12,7 +12,9 @@ import DataGrid from 'react-data-grid';
 import type { DataGridHandle } from 'react-data-grid';
 import styled from 'reshadow';
 
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { Executor } from '@cloudbeaver/core-executor';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps, IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
@@ -39,6 +41,8 @@ const rowHeight = 25;
 const headerHeight = 28;
 
 export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, className }) {
+  const translate = useTranslate();
+
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
@@ -248,6 +252,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
   }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef]);
+
+  if (!tableData.columns.length) {
+    return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
+  }
 
   return styled(styles)(
     <DataGridContext.Provider value={gridContext}>
