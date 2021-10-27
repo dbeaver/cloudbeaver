@@ -11,7 +11,7 @@ import { Connection, ConnectionInfoResource, ConnectionsManagerService, EConnect
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT';
@@ -72,6 +72,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         ...items,
         ACTION_CONNECTION_VIEW_SIMPLE,
         ACTION_CONNECTION_VIEW_ADVANCED,
+        new MenuSeparatorItem(),
         ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS,
       ],
     });

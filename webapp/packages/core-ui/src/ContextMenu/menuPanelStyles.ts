@@ -27,6 +27,9 @@ export const menuPanelStyles = composes(
     menu-panel-item {
       composes: theme-border-color-background from global;
     }
+    MenuSeparator {
+      composes: theme-border-color-background from global;
+    }
   `,
   css`
     MenuButton {
@@ -82,6 +85,15 @@ export const menuPanelStyles = composes(
       }
     }
 
+    MenuSeparator {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      margin: 8px 0;
+      border: none;
+      border-bottom: 1px solid;
+    }
+
     menu-panel-item {
       flex: 1;
       display: flex;
@@ -89,9 +101,6 @@ export const menuPanelStyles = composes(
       align-items: center;
       height: 30px;
       padding: 0 4px;
-      &[|separator] {
-        border-bottom: 1px solid;
-      }
       & menu-item-text  {
         display: block;
         padding: 0 4px;
