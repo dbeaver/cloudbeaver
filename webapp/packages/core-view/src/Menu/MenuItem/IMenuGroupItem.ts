@@ -10,6 +10,7 @@ import type { IMenuItem } from './IMenuItem';
 
 export interface IMenuGroupItem extends IMenuItem {
   items: IMenuItem[];
+  disabled: boolean;
   add: (...items: IMenuItem[]) => void;
   addAfter: (index: number, ...items: IMenuItem[]) => void;
 }

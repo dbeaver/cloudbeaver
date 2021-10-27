@@ -6,12 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IContextProvider } from '../Context/IContextProvider';
-import type { IViewContext } from '../View/IViewContext';
+import { createDataContext } from '../DataContext/createDataContext';
 import type { IMenu } from './IMenu';
 
-export interface IMenuContext {
-  menu: IMenu;
-  menuContext: IContextProvider;
-  viewContext: IViewContext | null;
-}
+export const DATA_CONTEXT_MENU = createDataContext<IMenu>('menu');

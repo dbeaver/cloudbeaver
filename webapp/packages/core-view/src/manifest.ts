@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ActionService } from './Action/ActionService';
 import { KeyBindingService } from './Action/KeyBinding/KeyBindingService';
+import { MenuService } from './Menu/MenuService';
 import { ViewService } from './View/ViewService';
 
 export const manifest: PluginManifest = {
@@ -20,6 +21,7 @@ export const manifest: PluginManifest = {
   providers: [
     ActionService,
     KeyBindingService,
+    MenuService,
     ViewService,
   ],
 };

@@ -6,23 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useMemo, useState } from 'react';
+import { useContext } from 'react';
 
-import { Context } from '../Context/Context';
-import type { IContext } from '../Context/IContext';
+import type { IDataContext } from '../DataContext/IDataContext';
+import { useDataContext } from '../DataContext/useDataContext';
 import { CaptureViewContext } from '../View/CaptureViewContext';
+import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU';
 import type { IMenu } from './IMenu';
-import type { IMenuContext } from './IMenuContext';
 
-export function useMenuContext(menu: IMenu): [IMenuContext, IContext] {
+export function useMenuContext(menu: IMenu, _menuContext?: IDataContext): IDataContext {
   const viewContext = useContext(CaptureViewContext);
-  const [menuContext] = useState<IContext>(() => new Context());
+  const context = useDataContext(_menuContext || viewContext);
 
-  const context = useMemo<IMenuContext>(() => ({
-    menu,
-    menuContext,
-    viewContext: viewContext.viewContext,
-  }), [viewContext, menu]);
+  context.set(DATA_CONTEXT_MENU, menu);
 
-  return [context, menuContext];
+  return context;
 }

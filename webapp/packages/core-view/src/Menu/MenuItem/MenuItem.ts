@@ -8,12 +8,14 @@
 
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IMenuItem } from './IMenuItem';
+import type { IMenuItem, IMenuItemEvents } from './IMenuItem';
 
-export class MenuItem implements IMenuItem {
+export abstract class MenuItem implements IMenuItem {
   readonly id: string;
+  readonly events?: IMenuItemEvents;
 
-  constructor(id?: string) {
+  constructor(id?: string, events?: IMenuItemEvents) {
     this.id = id ?? uuid();
+    this.events = events;
   }
 }

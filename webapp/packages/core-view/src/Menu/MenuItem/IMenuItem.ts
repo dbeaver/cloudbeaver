@@ -6,6 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+export interface IMenuItemEvents {
+  onSelect?: () => void;
+}
+
 export interface IMenuItem {
-  id: string;
+  readonly id: string;
+  readonly events?: IMenuItemEvents;
+
+  hidden?: boolean;
 }

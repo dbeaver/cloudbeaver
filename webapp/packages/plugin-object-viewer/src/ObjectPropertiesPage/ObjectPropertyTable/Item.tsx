@@ -10,14 +10,17 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { DBObject, NavNode, NavNodeContextMenuService, NavNodeManagerService, useNode } from '@cloudbeaver/core-app';
+import { DBObject, NavNode, NavNodeManagerService, DATA_CONTEXT_NAV_NODE, MENU_NAV_TREE, useNode } from '@cloudbeaver/core-app';
 import {
   StaticImage, TableItem, TableColumnValue, TableItemSelect, useMouse, getComputed, Icon, useStateDelay
 } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { ContextMenu } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
 import { getValue } from '../helpers';
 
@@ -140,15 +143,19 @@ const ItemName = observer<IItemNameProps>(function ItemName({
   node,
   property,
 }) {
-  const navNodeContextMenuService = useService(NavNodeContextMenuService);
+  const connectionsInfoResource = useService(ConnectionInfoResource);
+  const menu = useMenu(MENU_NAV_TREE);
+  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
+
+  const connection = connectionsInfoResource.getConnectionForNode(node.id);
+
+  if (connection) {
+    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
+  }
   const navNodeManagerService = useService(NavNodeManagerService);
   const styles = useStyles(itemStyles);
   const [menuOpened, switchState] = useState(false);
   const mouse = useMouse<HTMLTableDataCellElement>();
-
-  function getPanel() {
-    return navNodeContextMenuService.constructMenuWithContext(node);
-  }
 
   function openNode() {
     navNodeManagerService.navToNode(node.id, node.parentId);
@@ -163,9 +170,7 @@ const ItemName = observer<IItemNameProps>(function ItemName({
       return true;
     }
 
-    const panel = getPanel();
-
-    return !panel.menuItems.length || panel.menuItems.every(item => item.isHidden);
+    return !menu.isAvailable();
   });
 
   return styled(styles)(
@@ -176,9 +181,9 @@ const ItemName = observer<IItemNameProps>(function ItemName({
     >
       <menu-box>
         {!isMenuEmpty && menuAvailable && (
-          <MenuTrigger getPanel={getPanel} modal disclosure onVisibleSwitch={switchState}>
+          <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
             <menu-icon><Icon name="snack" viewBox="0 0 16 10" /></menu-icon>
-          </MenuTrigger>
+          </ContextMenu>
         )}
         <menu-name>{name}</menu-name>
       </menu-box>

@@ -10,5 +10,6 @@ import type { IActionItem } from '../../Action/IActionItem';
 import type { IMenuItem } from './IMenuItem';
 
 export interface IMenuActionItem extends IMenuItem {
-  action: IActionItem | null;
+  action: IActionItem;
+  disabled: boolean;
 }

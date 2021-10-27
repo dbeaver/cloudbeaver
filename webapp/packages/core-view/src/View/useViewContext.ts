@@ -6,16 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useMemo, useState } from 'react';
+import { useContext } from 'react';
 
-import { Context } from '../Context/Context';
-import type { IContext } from '../Context/IContext';
+import type { IDataContext } from '../DataContext/IDataContext';
+import { useDataContext } from '../DataContext/useDataContext';
+import { CaptureViewContext } from './CaptureViewContext';
+import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW';
 import type { IView } from './IView';
-import type { IViewContext } from './IViewContext';
 
-export function useViewContext(view: IView<any>): [IViewContext, IContext] {
-  const [context] = useState<IContext>(() => new Context());
-  const viewContext = useMemo(() => ({ view, context }), [view]);
+export function useViewContext(view: IView<any>): IDataContext {
+  const context = useContext(CaptureViewContext);
+  const viewContext = useDataContext(context);
 
-  return [viewContext, context];
+  viewContext.set(DATA_CONTEXT_VIEW, view);
+
+  return viewContext;
 }

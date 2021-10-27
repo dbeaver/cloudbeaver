@@ -7,8 +7,13 @@
  */
 
 import type { IMenu } from '../IMenu';
-import type { IMenuItem } from './IMenuItem';
+import type { IMenuItem, IMenuItemEvents } from './IMenuItem';
+
+export interface IMenuSubMenuEvents extends IMenuItemEvents {
+  onOpen?: () => void;
+}
 
 export interface IMenuSubMenuItem extends IMenuItem {
   menu: IMenu;
+  events?: IMenuSubMenuEvents;
 }

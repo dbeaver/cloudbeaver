@@ -7,92 +7,84 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ComputedContextMenuModel, ContextMenuService, IContextMenuItem } from '@cloudbeaver/core-dialogs';
-import type { SqlQueryGenerator } from '@cloudbeaver/core-sdk';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { INodeMenuData, NavNodeContextMenuService } from '../../shared/NodesManager/NavNodeContextMenuService';
+import { DATA_CONTEXT_NAV_NODE } from '../NodesManager/DATA_CONTEXT_NAV_NODE';
 import { GeneratedSqlDialog } from './GeneratedSqlDialog';
-import { MAX_GENERATORS_LENGTH, SqlGeneratorsResource } from './SqlGeneratorsResource';
+import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS';
+import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 @injectable()
 export class SqlGeneratorsBootstrap extends Bootstrap {
-  private static readonly sqlGeneratorsToken = 'sqlGenerators';
-
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
-    private readonly contextMenuService: ContextMenuService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly menuService: MenuService,
   ) {
     super();
   }
 
-  private getSqlGeneratorsToken() {
-    return SqlGeneratorsBootstrap.sqlGeneratorsToken;
-  }
-
-  private getSqlGeneratorsItems(
-    generatorsGetter: () => SqlQueryGenerator[]
-  ): Array<IContextMenuItem<INodeMenuData>> {
-    return Array.from(Array(MAX_GENERATORS_LENGTH).keys()).map(index => {
-      const id = String(index) + 'Generator';
-      return {
-        id,
-        isPresent: () => true,
-        isHidden: () => {
-          const generators = generatorsGetter();
-          return index >= generators.length;
-        },
-        titleGetter: () => {
-          const generators = generatorsGetter();
-
-          if (index >= generators.length) {
-            return '';
-          }
-
-          return generators[index].label;
-        },
-        onClick: context => {
-          const generators = generatorsGetter();
-
-          if (index < generators.length) {
-            this.commonDialogService.open(GeneratedSqlDialog, {
-              generatorId: generators[index].id,
-              pathId: context.data.node.id,
-            });
-          }
-        },
-      };
-    });
-  }
-
   register(): void {
-    this.contextMenuService.addMenuItem<INodeMenuData>(
-      this.contextMenuService.getRootMenuToken(),
-      {
-        id: this.getSqlGeneratorsToken(),
-        order: 3,
-        title: 'app_shared_sql_generators_panel_title',
-        isPresent(context) {
-          return context.contextType === NavNodeContextMenuService.nodeContextType
-            && (
-              context.data.node.objectFeatures.includes(EObjectFeature.entity)
-              || context.data.node.objectFeatures.includes(EObjectFeature.script)
-            );
-        },
-        isProcessing: context => this.sqlGeneratorsResource.isDataLoading(context.data.node.id),
-        isPanelAvailable: context => this.sqlGeneratorsResource.isLoaded(context.data.node.id),
-        isDisabled: context => this.sqlGeneratorsResource.get(context.data.node.id)?.length === 0,
-        onClick: context => this.sqlGeneratorsResource.load(context.data.node.id),
-        onMouseEnter: context => this.sqlGeneratorsResource.load(context.data.node.id),
-        panel: new ComputedContextMenuModel<INodeMenuData>({
-          id: 'generatorsPanel',
-          menuItemsGetter: context => this.getSqlGeneratorsItems(
-            () => this.sqlGeneratorsResource.get(context.data.node.id) || []
-          ),
-        }),
-      }
-    );
+    this.menuService.setHandler({
+      id: 'node-sql-generators',
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_SQL_GENERATORS,
+      isLoading: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+
+        return this.sqlGeneratorsResource.isDataLoading(node.id);
+      },
+      isDisabled: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+
+        return this.sqlGeneratorsResource.get(node.id)?.length === 0;
+      },
+      handler: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        this.sqlGeneratorsResource.load(node.id);
+      },
+    });
+    this.menuService.addCreator({
+      isApplicable: context => {
+        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+
+        if (
+          !node
+          || !node.objectFeatures.includes(EObjectFeature.entity)
+          || !node.objectFeatures.includes(EObjectFeature.script)
+        ) {
+          return false;
+        }
+
+        return !context.find(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS);
+      },
+      getItems: (context, items) => [
+        ...items,
+        MENU_SQL_GENERATORS,
+      ],
+    });
+
+    this.menuService.addCreator({
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_SQL_GENERATORS,
+      getItems: (context, items) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+
+        const actions = this.sqlGeneratorsResource.get(node.id) || [];
+
+        return [
+          ...items,
+          ...actions.map(action => new MenuBaseItem(action.id, action.label, action.description, {
+            onSelect: () => {
+              this.commonDialogService.open(GeneratedSqlDialog, {
+                generatorId: action.id,
+                pathId: node.id,
+              });
+            },
+          })),
+        ];
+      },
+    });
   }
 
   load(): void | Promise<void> { }

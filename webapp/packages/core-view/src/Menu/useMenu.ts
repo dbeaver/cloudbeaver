@@ -9,22 +9,32 @@
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { IContext } from '../Context/IContext';
+import type { IDataContext } from '../DataContext/IDataContext';
 import type { IMenu } from './IMenu';
+import type { IMenuItem } from './MenuItem/IMenuItem';
 import { MenuService } from './MenuService';
 import { useMenuContext } from './useMenuContext';
 
-interface IMenuHook {
-  context: IContext;
+export interface IMenuData {
+  menu: IMenu;
+  context: IDataContext;
+  isAvailable: () => boolean;
+  getItems: () => IMenuItem[];
 }
 
-export function useMenu(menu: IMenu): IMenuHook {
+export function useMenu(menu: IMenu, menuContext?: IDataContext): IMenuData {
   const menuService = useService(MenuService);
-  const [menuContext, context] = useMenuContext(menu);
+  const context = useMenuContext(menu, menuContext);
 
   return useObjectRef(() => ({
+    isAvailable() {
+      return menuService.isMenuAvailable(this.context);
+    },
+    getItems() {
+      return menuService.getMenu(this.context);
+    },
+  }), {
+    menu,
     context,
-    isAvailable: () => menuService.isMenuAvailable(menuContext),
-    getItems: () => menuService.getMenu(menuContext),
-  }), false);
+  }, ['isAvailable', 'getItems']);
 }

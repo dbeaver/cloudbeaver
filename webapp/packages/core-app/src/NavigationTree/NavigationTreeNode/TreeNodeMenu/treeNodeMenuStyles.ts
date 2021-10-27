@@ -9,7 +9,7 @@
 import { css } from 'reshadow';
 
 export const treeNodeMenuStyles = css`
-  MenuTrigger {
+  ContextMenu {
     margin-left: 16px;
     padding: 0;
     height: 16px;

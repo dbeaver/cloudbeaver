@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type ContextGetter<T> = () => T;
+export type DataContextGetter<T> = () => T;

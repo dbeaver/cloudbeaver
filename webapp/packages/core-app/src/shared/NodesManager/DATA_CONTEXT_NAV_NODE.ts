@@ -6,12 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ContextGetter } from './ContextGetter';
+import { createDataContext } from '@cloudbeaver/core-view';
 
-export function createContext<T>(name: string): ContextGetter<T> {
-  function fn(): T {
-    return null as any as T;
-  }
-  fn.name = `@context/${name}`;
-  return fn;
-}
+import type { NavNode } from './EntityTypes';
+
+export const DATA_CONTEXT_NAV_NODE = createDataContext<NavNode>('nav-node');

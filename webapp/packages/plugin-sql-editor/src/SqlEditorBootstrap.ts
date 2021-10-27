@@ -8,28 +8,28 @@
 
 import {
   MainMenuService,
-  NavNodeContextMenuService,
   EObjectFeature,
-  NodeManagerUtils,
   ConnectionSchemaManagerService,
-  isObjectCatalogProvider, isObjectSchemaProvider, INodeMenuData
+  isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE
 } from '@cloudbeaver/core-app';
 import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
-import { ViewService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU_NESTED, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
+import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
 @injectable()
 export class SqlEditorBootstrap extends Bootstrap {
   constructor(
     private mainMenuService: MainMenuService,
-    private contextMenuService: ContextMenuService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
-    private viewService: ViewService
+    private viewService: ViewService,
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
   ) {
     super();
   }
@@ -44,18 +44,36 @@ export class SqlEditorBootstrap extends Bootstrap {
         isDisabled: () => this.isSQLEntryDisabled(),
       }
     );
-    this.contextMenuService.addMenuItem<INodeMenuData>(this.contextMenuService.getRootMenuToken(), {
-      id: 'open-sql-editor',
-      title: 'SQL',
-      order: 2,
-      isPresent(context) {
-        return context.contextType === NavNodeContextMenuService.nodeContextType
-          && context.data.node.objectFeatures.includes(EObjectFeature.dataSource);
+
+    this.menuService.addCreator({
+      isApplicable: context => {
+        const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+
+        if (!connection) {
+          return false;
+        }
+
+        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+
+        if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
+          return false;
+        }
+
+        return !context.has(DATA_CONTEXT_MENU_NESTED);
       },
-      onClick: context => {
-        const node = context.data.node;
-        const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-        this.sqlEditorNavigatorService.openNewEditor(connectionId);
+      getItems: (context, items) => [
+        ...items,
+        ACTION_SQL_EDITOR_OPEN,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'sql-editor',
+      isActionApplicable: (context, action) => action === ACTION_SQL_EDITOR_OPEN,
+      handler: async (context, action) => {
+        const connection = context.get(DATA_CONTEXT_CONNECTION);
+
+        this.sqlEditorNavigatorService.openNewEditor(connection.id);
       },
     });
   }

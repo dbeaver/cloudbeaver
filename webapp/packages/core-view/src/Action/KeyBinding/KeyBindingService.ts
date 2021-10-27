@@ -9,7 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 
 import type { IAction } from '../../Action/IAction';
-import type { IViewContext } from '../../View/IViewContext';
+import type { IDataContextProvider } from '../../DataContext/IDataContextProvider';
 import type { IKeyBindingHandler } from './IKeyBindingHandler';
 
 @injectable()
@@ -20,7 +20,7 @@ export class KeyBindingService {
     this.handlers = new Map();
   }
 
-  getKeyBindingHandler(context: IViewContext, action: IAction): IKeyBindingHandler | null {
+  getKeyBindingHandler(context: IDataContextProvider, action: IAction): IKeyBindingHandler | null {
     for (const handler of this.handlers.values()) {
       if (handler.isBindingApplicable(context, action)) {
         return handler;
