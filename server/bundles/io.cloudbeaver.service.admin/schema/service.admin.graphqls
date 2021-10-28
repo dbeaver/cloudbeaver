@@ -156,6 +156,14 @@ extend type Query {
         parameters: Object): AdminAuthProviderConfiguration!
     deleteAuthProviderConfiguration(id: ID!): Boolean!
 
+    #### User profile
+
+    saveUserMetaParameter(id: ID!, displayName: String!, description: String, required: Boolean!): Boolean!
+
+    deleteUserMetaParameter(id: ID!): Boolean!
+
+    setUserMetaParameterValues(userId: ID!, parameters: Object!): Boolean!
+
     #### Global configuration
 
     configureServer(configuration: ServerConfigInput!): Boolean!
