@@ -8,8 +8,8 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap';
 import { LocaleService } from './LocaleService';
-import { PublicConnectionFormBootstrap } from './PublicConnectionForm/PublicConnectionFormBootstrap';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
 
 export const connectionPlugin: PluginManifest = {
@@ -18,7 +18,7 @@ export const connectionPlugin: PluginManifest = {
   },
 
   providers: [
-    PublicConnectionFormBootstrap,
+    ConnectionMenuBootstrap,
     PublicConnectionFormService,
     LocaleService,
   ],

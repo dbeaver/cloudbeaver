@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +73,11 @@ public class WebUserInfo {
             }
         }
         return Arrays.asList(linkedProviders);
+    }
+
+    @Property
+    public Map<String, String> getMetaParameters() {
+        return user.getMetaParameters();
     }
 
 }

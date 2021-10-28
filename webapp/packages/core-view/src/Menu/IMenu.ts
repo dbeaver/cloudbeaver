@@ -9,4 +9,6 @@
 export interface IMenu {
   id: string;
   label: string;
+  icon?: string;
+  tooltip?: string;
 }

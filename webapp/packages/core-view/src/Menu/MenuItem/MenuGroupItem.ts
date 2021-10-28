@@ -12,10 +12,16 @@ import { MenuItem } from './MenuItem';
 
 export class MenuGroupItem extends MenuItem implements IMenuGroupItem {
   items: IMenuItem[];
+  readonly disabled: boolean;
+
+  get hidden(): boolean {
+    return this.items.length === 0;
+  }
 
   constructor(items: IMenuItem[] = []) {
     super();
     this.items = items;
+    this.disabled = false;
   }
 
   add(...items: IMenuItem[]): void {

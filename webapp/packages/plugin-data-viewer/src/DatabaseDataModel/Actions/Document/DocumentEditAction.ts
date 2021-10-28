@@ -22,7 +22,7 @@ import type { IDocumentElementKey } from './IDocumentElementKey';
 @databaseDataAction()
 export class DocumentEditAction
   extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Document;
+  static dataFormat = [ResultDataFormat.Document];
 
   readonly editedElements: Map<number, IDatabaseDataDocument>;
   private data: DocumentDataAction;

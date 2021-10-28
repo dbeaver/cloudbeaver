@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IContextProvider } from '../Context/IContextProvider';
-import type { IView } from './IView';
+import { createMenu } from '@cloudbeaver/core-view';
 
-export interface IViewContext {
-  view: IView<any>;
-  context: IContextProvider;
-}
+export const MENU_NAV_TREE = createMenu('nav-tree', 'Menu');

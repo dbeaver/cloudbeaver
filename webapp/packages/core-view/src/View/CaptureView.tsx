@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 import { HotKeys } from 'react-hotkeys';
 import styled, { css } from 'reshadow';
 
@@ -37,14 +36,10 @@ export const CaptureView = observer<Props>(function CaptureView({
   children,
   className,
 }) {
-  const [viewContext] = useViewContext(view);
+  const viewContext = useViewContext(view);
   const actionService = useService(ActionService);
   const [onFocus, onBlur] = useActiveView(view);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
-
-  const context = useMemo(() => ({
-    viewContext,
-  }), [viewContext]);
 
   const actionItems = getComputed(() => (
     view.actions
@@ -63,7 +58,7 @@ export const CaptureView = observer<Props>(function CaptureView({
   }), {});
 
   return styled(styles)(
-    <CaptureViewContext.Provider value={context}>
+    <CaptureViewContext.Provider value={viewContext}>
       <HotKeys
         keyMap={keyMap}
         handlers={handlers}

@@ -19,7 +19,7 @@ import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '.
 export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataResult>
   extends DatabaseDataAction<any, TResult>
   implements IDatabaseDataSelectAction<TKey, TResult> {
-  static dataFormat: ResultDataFormat | null = null;
+  static dataFormat: ResultDataFormat[] | null = null;
   readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<TKey>>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {

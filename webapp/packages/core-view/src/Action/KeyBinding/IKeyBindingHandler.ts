@@ -7,13 +7,13 @@
  */
 
 import type { IAction } from '../../Action/IAction';
-import type { IViewContext } from '../../View/IViewContext';
+import type { IDataContextProvider } from '../../DataContext/IDataContextProvider';
 import type { IKeyBinding } from './IKeyBinding';
 
 export interface IKeyBindingHandler {
   id: string;
   binding: IKeyBinding;
 
-  isBindingApplicable: (context: IViewContext, action: IAction) => boolean;
-  handler: (context: IViewContext, action: IAction) => void;
+  isBindingApplicable: (context: IDataContextProvider, action: IAction) => boolean;
+  handler: (context: IDataContextProvider, action: IAction) => void;
 }

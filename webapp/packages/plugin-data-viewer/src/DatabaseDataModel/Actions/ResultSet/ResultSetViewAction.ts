@@ -26,7 +26,7 @@ import type { IResultSetValue } from './ResultSetFormatAction';
 @databaseDataAction()
 export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataResultAction<IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   get rowKeys(): IResultSetRowKey[] {
     return [

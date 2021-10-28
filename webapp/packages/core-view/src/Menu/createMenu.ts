@@ -8,9 +8,30 @@
 
 import type { IMenu } from './IMenu';
 
-export function createMenu(id: string, label: string): IMenu {
-  return {
+const menuSymbol = Symbol('@menu');
+
+export function createMenu(
+  id: string,
+  label: string,
+  icon?: string,
+  tooltip?: string
+): IMenu {
+  const menu = {
     id: `@menu/${id}`,
     label,
+    icon,
+    tooltip,
   };
+
+  (menu as any)[menuSymbol] = true;
+
+  return menu;
+}
+
+export function isMenu(obj: any): obj is IMenu {
+  return (
+    obj
+    && typeof obj === 'object'
+    && menuSymbol in obj
+  );
 }

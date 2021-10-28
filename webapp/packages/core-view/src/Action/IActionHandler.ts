@@ -6,16 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IMenuContext } from '../Menu/IMenuContext';
-import type { IViewContext } from '../View/IViewContext';
+import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import type { IAction } from './IAction';
 import type { IActionInfo } from './IActionInfo';
 
 export interface IActionHandler {
   id: string;
 
-  getActionInfo?: (context: IMenuContext, action: IAction) => IActionInfo;
+  getActionInfo?: (context: IDataContextProvider, action: IAction) => IActionInfo;
 
-  isActionApplicable: (context: IViewContext, action: IAction) => boolean;
-  handler: (context: IViewContext, action: IAction) => void;
+  isChecked?: (context: IDataContextProvider, action: IAction) => boolean;
+  isLoading?: (context: IDataContextProvider, action: IAction) => boolean;
+  isDisabled?: (context: IDataContextProvider, action: IAction) => boolean;
+  isHidden?: (context: IDataContextProvider, action: IAction) => boolean;
+
+  isActionApplicable: (context: IDataContextProvider, action: IAction) => boolean;
+  handler: (context: IDataContextProvider, action: IAction) => void;
 }

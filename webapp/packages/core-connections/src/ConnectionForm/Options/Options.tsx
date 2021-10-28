@@ -61,7 +61,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     config,
     availableDrivers,
     submittingTask: submittingHandlers,
-    save,
     readonly,
     disabled,
   } = state;

@@ -11,7 +11,15 @@ import type { IMenuActionItem } from './IMenuActionItem';
 import { MenuItem } from './MenuItem';
 
 export class MenuActionItem extends MenuItem implements IMenuActionItem {
-  readonly action: IActionItem | null;
+  readonly action: IActionItem;
+
+  get hidden(): boolean {
+    return this.action.isHidden();
+  }
+
+  get disabled(): boolean {
+    return this.action.isDisabled();
+  }
 
   constructor(action: IActionItem) {
     super(action.action.id);

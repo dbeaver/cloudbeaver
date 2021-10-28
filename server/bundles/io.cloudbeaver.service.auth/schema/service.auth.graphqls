@@ -86,6 +86,9 @@ type UserInfo {
     authTokens: [UserAuthToken!]!
 
     linkedAuthProviders: [String!]!
+
+    # User profile properties map
+    metaParameters: Object!
 }
 
 extend type Query {
@@ -105,5 +108,7 @@ extend type Query {
     authProviders: [AuthProviderInfo!]!
 
     authChangeLocalPassword(oldPassword: String!, newPassword: String!): Boolean!
+
+    listUserProfileProperties: [ObjectPropertyInfo!]!
 
 }

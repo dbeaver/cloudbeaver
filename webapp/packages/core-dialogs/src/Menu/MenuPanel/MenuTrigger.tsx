@@ -246,13 +246,13 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
   props,
   ref
 ) {
-  const { menuItem, style, ...rest } = props;
+  const { menuItem, style, onItemClose, ...rest } = props;
   const menu = useMenuState();
 
   const handleItemClose = useCallback(() => {
     menu.hide();
-    props.onItemClose?.();
-  }, [menu.hide, props.onItemClose]);
+    onItemClose?.();
+  }, [menu.hide, onItemClose]);
 
   const handleMouseEnter = useCallback(() => {
     menuItem.onMouseEnter?.();

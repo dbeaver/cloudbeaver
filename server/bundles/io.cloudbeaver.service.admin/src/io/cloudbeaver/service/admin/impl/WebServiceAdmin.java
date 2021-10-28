@@ -594,4 +594,19 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return true;
     }
 
+    @Override
+    public boolean saveUserMetaParameter(WebSession webSession, String id, String displayName, String description, Boolean required) throws DBWebException {
+        throw new DBWebException("Not implemented");
+    }
+
+    @Override
+    public Object deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException {
+        throw new DBWebException("Not implemented");
+    }
+
+    @Override
+    public Object setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
+        throw new DBWebException("Not implemented");
+    }
+
 }

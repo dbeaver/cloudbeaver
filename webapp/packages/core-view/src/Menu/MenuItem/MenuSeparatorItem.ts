@@ -10,5 +10,10 @@ import type { IMenuSeparatorItem } from './IMenuSeparatorItem';
 import { MenuItem } from './MenuItem';
 
 export class MenuSeparatorItem extends MenuItem implements IMenuSeparatorItem {
+  readonly hidden: boolean;
 
+  constructor() {
+    super();
+    this.hidden = false;
+  }
 }

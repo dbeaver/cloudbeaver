@@ -8,10 +8,6 @@
 
 import { createContext } from 'react';
 
-import type { IViewContext } from './IViewContext';
+import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 
-interface ICaptureViewContext {
-  viewContext: IViewContext | null;
-}
-
-export const CaptureViewContext = createContext<ICaptureViewContext>({ viewContext: null });
+export const CaptureViewContext = createContext<IDataContextProvider | undefined>(undefined);

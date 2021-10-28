@@ -10,4 +10,5 @@ export interface IActionInfo {
   label: string;
   icon?: string;
   tooltip?: string;
+  type?: 'checkbox' | 'select';
 }

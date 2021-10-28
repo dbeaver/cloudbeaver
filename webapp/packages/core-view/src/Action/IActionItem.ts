@@ -8,12 +8,19 @@
 
 import type { IAction } from './IAction';
 import type { IActionHandler } from './IActionHandler';
+import type { IActionInfo } from './IActionInfo';
 import type { IKeyBindingHandler } from './KeyBinding/IKeyBindingHandler';
 
 export interface IActionItem {
   action: IAction;
+  actionInfo: IActionInfo;
   handler: IActionHandler;
   binding: IKeyBindingHandler | null;
+
+  isHidden: () => boolean;
+  isDisabled: () => boolean;
+  isChecked: () => boolean;
+  isLoading: () => boolean;
 
   activate: (binding?: boolean) => void;
 }

@@ -35,7 +35,6 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const {
     info,
     config,
-    save,
     readonly,
     disabled: formDisabled,
   } = formState;
@@ -75,7 +74,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   }
 
   return styled(styles)(
-    <SubmittingForm onSubmit={save}>
+    <SubmittingForm>
       <ColoredContainer parent>
         <Group form gap keepSize large>
           <Switch

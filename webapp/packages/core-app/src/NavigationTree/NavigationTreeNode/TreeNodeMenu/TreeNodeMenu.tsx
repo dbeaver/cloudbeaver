@@ -6,18 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { MenuTrigger } from '@cloudbeaver/core-dialogs';
+import { ContextMenu } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
+import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
-import { NavNodeContextMenuService } from '../../../shared/NodesManager/NavNodeContextMenuService';
+import { MENU_NAV_TREE } from '../../MENU_NAV_TREE';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
 interface Props {
@@ -31,25 +34,20 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   actions,
   selected,
 }) {
-  const navNodeContextMenuService = useService(NavNodeContextMenuService);
+  const connectionsInfoResource = useService(ConnectionInfoResource);
+  const menu = useMenu(MENU_NAV_TREE);
+  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
+  menu.context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions);
 
-  const menuPanel = useMemo(
-    () => navNodeContextMenuService.constructMenuWithContext(node, actions),
-    [node]
-  );
-  const isHidden = useMemo(
-    () => computed(() => !menuPanel.menuItems.length
-      || menuPanel.menuItems.every(item => item.isHidden)),
-    [menuPanel]
-  );
+  const connection = connectionsInfoResource.getConnectionForNode(node.id);
 
-  if (isHidden.get()) {
-    return null;
+  if (connection) {
+    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
   }
 
   return styled(treeNodeMenuStyles)(
-    <MenuTrigger panel={menuPanel} {...use({ selected })} modal>
+    <ContextMenu menu={menu} {...use({ selected })} modal>
       <Icon name="snack" viewBox="0 0 16 10" />
-    </MenuTrigger>
+    </ContextMenu>
   );
 });

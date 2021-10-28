@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IViewContext } from '../View/IViewContext';
+import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { ActionItem } from './ActionItem';
 import type { IAction } from './IAction';
 import type { IActionHandler } from './IActionHandler';
@@ -25,7 +25,14 @@ export class ActionService {
     this.handlers = new Map();
   }
 
-  getHandler(context: IViewContext, action: IAction): IActionHandler | null {
+  addHandler(handler: IActionHandler): void {
+    if (this.handlers.has(handler.id)) {
+      throw new Error(`Action handler with same id (${handler.id}) already exists`);
+    }
+    this.handlers.set(handler.id, handler);
+  }
+
+  getHandler(context: IDataContextProvider, action: IAction): IActionHandler | null {
     for (const handler of this.handlers.values()) {
       if (handler.isActionApplicable(context, action)) {
         return handler;
@@ -35,7 +42,7 @@ export class ActionService {
     return null;
   }
 
-  getAction(context: IViewContext, action: IAction): IActionItem | null {
+  getAction(context: IDataContextProvider, action: IAction): IActionItem | null {
     const handler = this.getHandler(context, action);
 
     if (handler) {

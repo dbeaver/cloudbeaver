@@ -9,9 +9,23 @@
 import type { IAction } from './IAction';
 import type { IActionInfo } from './IActionInfo';
 
+const actionSymbol = Symbol('@action');
+
 export function createAction(id: string, info: IActionInfo): IAction {
-  return {
+  const action: IAction = {
     id: `@action/${id}`,
     info,
   };
+
+  (action as any)[actionSymbol] = true;
+
+  return action;
+}
+
+export function isAction(obj: any): obj is IAction {
+  return (
+    obj
+    && typeof obj === 'object'
+    && actionSymbol in obj
+  );
 }

@@ -6,9 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ContextGetter } from './ContextGetter';
-import type { IContextProvider } from './IContextProvider';
+import type { IMenuItem } from './IMenuItem';
 
-export interface IContext extends IContextProvider {
-  set: <T>(context: ContextGetter<T>, value: T) => this;
+export interface IMenuBaseItem extends IMenuItem {
+  label: string;
+  icon?: string;
+  tooltip?: string;
+  hidden?: boolean;
+  disabled?: boolean;
 }
