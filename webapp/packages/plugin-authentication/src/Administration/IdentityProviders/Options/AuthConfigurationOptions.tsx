@@ -53,7 +53,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const edit = state.mode === 'edit';
 
   return styled(style)(
-    <SubmittingForm ref={formRef} onSubmit={state.save}>
+    <SubmittingForm ref={formRef}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
           <Combobox

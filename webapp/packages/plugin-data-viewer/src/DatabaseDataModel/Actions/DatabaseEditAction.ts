@@ -19,7 +19,7 @@ import type { DatabaseEditChangeType, IDatabaseDataEditAction, IDatabaseDataEdit
 export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabaseDataResult>
   extends DatabaseDataAction<any, TResult>
   implements IDatabaseDataEditAction<TKey, TValue, TResult> {
-  static dataFormat: ResultDataFormat | null = null;
+  static dataFormat: ResultDataFormat[] | null = null;
 
   readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<any>>;

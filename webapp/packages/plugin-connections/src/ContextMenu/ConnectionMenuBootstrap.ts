@@ -53,7 +53,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         return (
           context.has(DATA_CONTEXT_CONNECTION)
-         && !context.find(DATA_CONTEXT_MENU, MENU_CONNECTION_VIEW)
+          && !context.has(DATA_CONTEXT_MENU_NESTED)
         );
       },
       getItems: (context, items) => [
@@ -79,19 +79,11 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-view',
-      isActionApplicable: (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION);
-
-        if (!connection.connected) {
-          return false;
-        }
-
-        return [
-          ACTION_CONNECTION_VIEW_SIMPLE,
-          ACTION_CONNECTION_VIEW_ADVANCED,
-          ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS,
-        ].includes(action);
-      },
+      isActionApplicable: (context, action) => [
+        ACTION_CONNECTION_VIEW_SIMPLE,
+        ACTION_CONNECTION_VIEW_ADVANCED,
+        ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS,
+      ].includes(action),
       isChecked: (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
@@ -191,6 +183,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           }
           case ACTION_CONNECTION_EDIT: {
             this.publicConnectionFormService.open({ connectionId: connection.id });
+            break;
           }
         }
       },

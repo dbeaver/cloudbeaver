@@ -20,7 +20,7 @@ import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 @databaseDataAction()
 export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataResultAction<IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Document;
+  static dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {
     return this.result.data?.rows?.map(row => row[0]) || [];

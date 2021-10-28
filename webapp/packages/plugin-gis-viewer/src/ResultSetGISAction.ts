@@ -23,7 +23,7 @@ export class ResultSetGISAction extends DatabaseDataAction<any, IDatabaseResultS
   implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet> {
   private readonly GISValueType = 'geometry';
 
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   private view: ResultSetViewAction;
 

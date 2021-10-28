@@ -37,7 +37,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     result: TResult,
     Action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T | undefined {
-    if (Action.dataFormat !== result.dataFormat) {
+    if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
       return undefined;
     }
 
@@ -48,7 +48,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     result: TResult,
     Action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
-    if (Action.dataFormat !== result.dataFormat) {
+    if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
       throw new Error('DataFormat unsupported');
     }
 

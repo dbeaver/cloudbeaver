@@ -82,7 +82,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return styled(style)(
-    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={save} onChange={handleChange}>
+    <SubmittingForm ref={focusedRef} name='server_config' onChange={handleChange}>
       {!configurationWizard && (
         <ToolsPanel>
           <ToolsAction

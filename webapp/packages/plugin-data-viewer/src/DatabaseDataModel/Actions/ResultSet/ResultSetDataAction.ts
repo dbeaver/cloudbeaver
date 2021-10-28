@@ -23,7 +23,7 @@ import type { IResultSetValue } from './ResultSetFormatAction';
 @databaseDataAction()
 export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataResultAction<IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   get rows(): IResultSetValue[][] {
     return this.result.data?.rows || [];
