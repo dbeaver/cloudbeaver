@@ -24,7 +24,7 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 @databaseDataAction()
 export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
     return this.source.results.length < 2;

@@ -26,7 +26,7 @@ import { ResultSetViewAction } from './ResultSetViewAction';
 
 @databaseDataAction()
 export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   get elements(): IResultSetElementKey[] {
     return Array.from(this.selectedElements.values()).flat();

@@ -36,7 +36,7 @@ export type IDatabaseDataActionInterface<
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>
 > = AbstractConstructorFunction<TOptions, TResult, TAction> & {
-  dataFormat: ResultDataFormat | null;
+  dataFormat: ResultDataFormat[] | null;
   prototype: TAction;
 };
 
@@ -45,7 +45,7 @@ export type IDatabaseDataActionClass<
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>
 > = ConstructorFunction<TOptions, TResult, TAction> & {
-  dataFormat: ResultDataFormat | null;
+  dataFormat: ResultDataFormat[] | null;
   prototype: TAction;
 };
 

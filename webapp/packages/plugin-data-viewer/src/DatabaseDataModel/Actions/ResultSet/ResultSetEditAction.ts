@@ -35,7 +35,7 @@ export type IResultSetEditActionData = IDatabaseDataEditActionData<IResultSetEle
 @databaseDataAction()
 export class ResultSetEditAction
   extends DatabaseEditAction<IResultSetElementKey, IResultSetValue, IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
   private editorData: Map<string, IResultSetUpdate>;

@@ -25,7 +25,7 @@ export type IResultSetValue =
 @databaseDataAction()
 export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
-  static dataFormat = ResultDataFormat.Resultset;
+  static dataFormat = [ResultDataFormat.Resultset];
 
   private view: ResultSetViewAction;
   private edit: ResultSetEditAction;
