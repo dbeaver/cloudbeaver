@@ -15,6 +15,7 @@ import { FormContext, IChangeData, IFormContext } from './FormContext';
 
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange' | 'onSubmit'> & {
   disabled?: boolean;
+  disableEnterSubmit?: boolean;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => Promise<void> | void;
   onChange?: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
 };
@@ -22,6 +23,7 @@ type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<H
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
   {
     disabled: disabledProp,
+    disableEnterSubmit,
     children,
     onSubmit,
     onChange = () => {},
@@ -68,7 +70,7 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
           {children}
         </FormContext.Provider>
       </fieldset>
-      <button type="submit" hidden />
+      <button type="submit" disabled={disableEnterSubmit} aria-hidden={disableEnterSubmit} hidden />
     </form>
   );
 });

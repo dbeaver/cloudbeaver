@@ -36,7 +36,7 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
   const edit = state.mode === 'edit';
 
   return styled(style)(
-    <SubmittingForm ref={formRef} onSubmit={state.save}>
+    <SubmittingForm ref={formRef}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
           <InputField
