@@ -68,7 +68,11 @@ export class DataExportMenuService {
 
     this.actionService.addHandler({
       id: 'data-export',
-      isActionApplicable: (context, action) => action === ACTION_EXPORT,
+      isActionApplicable: (context, action) => (
+        action === ACTION_EXPORT
+        && context.has(DATA_CONTEXT_CONNECTION)
+        && context.has(DATA_CONTEXT_NAV_NODE)
+      ),
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);

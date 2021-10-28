@@ -42,10 +42,6 @@ export class NavNodeContextMenuService extends Bootstrap {
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
       isActionApplicable(context, action) {
-        if (context.has(DATA_CONTEXT_MENU_NESTED)) {
-          return false;
-        }
-
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
         if (!node) {
@@ -57,11 +53,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          return (
-            node.features?.includes(ENodeFeature.canDelete)
-            // || node.objectFeatures.includes(EObjectFeature.dataSource)
-            || false
-          );
+          return node.features?.includes(ENodeFeature.canDelete) || false;
         }
 
         return [
@@ -136,7 +128,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE),
+      isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => [
         ...items,
         ACTION_OPEN,

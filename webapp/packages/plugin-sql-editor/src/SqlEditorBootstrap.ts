@@ -71,9 +71,9 @@ export class SqlEditorBootstrap extends Bootstrap {
       id: 'sql-editor',
       isActionApplicable: (context, action) => action === ACTION_SQL_EDITOR_OPEN,
       handler: async (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION);
+        const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
 
-        this.sqlEditorNavigatorService.openNewEditor(connection.id);
+        this.sqlEditorNavigatorService.openNewEditor(connection?.id);
       },
     });
   }
