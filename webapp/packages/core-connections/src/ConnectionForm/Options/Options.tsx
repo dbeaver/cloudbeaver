@@ -115,7 +115,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const booleanProviderProperties = driver.data?.providerProperties?.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
-    <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={save}>
+    <SubmittingForm ref={formRef} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
