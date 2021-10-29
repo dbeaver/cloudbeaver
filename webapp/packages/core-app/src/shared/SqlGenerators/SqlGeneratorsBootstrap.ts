@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService, DATA_CONTEXT_MENU_NESTED } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { DATA_CONTEXT_NAV_NODE } from '../NodesManager/DATA_CONTEXT_NAV_NODE';
@@ -51,13 +51,15 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
 
         if (
           !node
-          || !node.objectFeatures.includes(EObjectFeature.entity)
-          || !node.objectFeatures.includes(EObjectFeature.script)
+          || !(
+            node.objectFeatures.includes(EObjectFeature.entity)
+            || node.objectFeatures.includes(EObjectFeature.script)
+          )
         ) {
           return false;
         }
 
-        return !context.find(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS);
+        return !context.find(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS) && !context.has(DATA_CONTEXT_MENU_NESTED);
       },
       getItems: (context, items) => [
         ...items,

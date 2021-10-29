@@ -18,6 +18,7 @@ import { menuPanelStyles } from './menuPanelStyles';
 interface MenuPanelItemProps {
   label: string;
   tooltip?: string;
+  binding?: string;
   icon?: string | React.ReactNode;
   menu?: boolean;
   loading?: boolean;
@@ -27,6 +28,7 @@ interface MenuPanelItemProps {
 export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({
   label,
   tooltip,
+  binding,
   icon,
   menu,
   loading = false,
@@ -41,6 +43,9 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
       <menu-item-text>
         <Translate token={label} />
       </menu-item-text>
+      <menu-item-binding>
+        {binding}
+      </menu-item-binding>
       <menu-item-content>
         {loading && <Loader small fullSize />}
         {menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}

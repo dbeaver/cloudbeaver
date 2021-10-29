@@ -14,7 +14,7 @@ import type { IAction } from '../Action/IAction';
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { isMenu } from './createMenu';
 import type { IMenuHandler } from './IMenuHandler';
-import type { IMenuItemsCreator } from './IMenuItemsCreator';
+import type { IMenuItemsCreator, MenuCreatorItem } from './IMenuItemsCreator';
 import type { IMenuActionItem } from './MenuItem/IMenuActionItem';
 import type { IMenuItem } from './MenuItem/IMenuItem';
 import { MenuActionItem } from './MenuItem/MenuActionItem';
@@ -69,9 +69,26 @@ export class MenuService {
   }
 
   getMenu(context: IDataContextProvider): IMenuItem[] {
-    return this.creators
-      .filter(filterApplicable(context))
-      .reduce<IMenuItem[]>((items, creator) => creator.getItems(context, items), [])
+    const applicableCreators = this.creators.filter(filterApplicable(context));
+
+    return applicableCreators
+      .reduce<MenuCreatorItem[]>(
+      (items, creator) => {
+        if (creator.orderItems) {
+          return creator.orderItems(context, items);
+        }
+        return items;
+      },
+      applicableCreators
+        .reduce<MenuCreatorItem[]>((items, creator) => creator.getItems(context, items), [])
+        .filter(item => {
+          if (isAction(item)) {
+            return this.actionService.getHandler(context, item) !== null;
+          }
+
+          return true;
+        })
+    )
       .map(item => {
         if (isAction(item)) {
           return this.createActionItem(context, item) as IMenuItem;

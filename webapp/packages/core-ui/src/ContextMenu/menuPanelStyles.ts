@@ -18,16 +18,11 @@ export const menuPanelStyles = composes(
     MenuItem,
     MenuItemCheckbox,
     MenuItemRadio,
-    MenuButton {
-      composes: theme-ripple from global;
-    }
+    MenuButton,
     MenuItemElement {
       composes: theme-ripple from global;
     }
-    menu-panel-item {
-      composes: theme-border-color-background from global;
-    }
-    MenuSeparator {
+    menu-panel-item, MenuSeparator {
       composes: theme-border-color-background from global;
     }
   `,
@@ -89,9 +84,13 @@ export const menuPanelStyles = composes(
       flex: 1;
       width: 100%;
       display: flex;
-      margin: 8px 0;
+      margin: 4px 0;
       border: none;
       border-bottom: 1px solid;
+    }
+
+    menu-item-binding {
+      composes: theme-typography--caption from global;
     }
 
     menu-panel-item {
@@ -101,10 +100,14 @@ export const menuPanelStyles = composes(
       align-items: center;
       height: 30px;
       padding: 0 4px;
-      & menu-item-text  {
+      & menu-item-text, & menu-item-binding  {
         display: block;
         padding: 0 4px;
         flex: 1;
+      }
+      & menu-item-binding {
+        text-align: right;
+        padding-left: 32px;
       }
       & menu-item-content {
         width: 24px;

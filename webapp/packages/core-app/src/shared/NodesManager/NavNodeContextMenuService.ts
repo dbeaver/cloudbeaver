@@ -9,7 +9,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
@@ -132,10 +132,50 @@ export class NavNodeContextMenuService extends Bootstrap {
       getItems: (context, items) => [
         ...items,
         ACTION_OPEN,
+        ACTION_DELETE,
         ACTION_RENAME,
         ACTION_REFRESH,
-        ACTION_DELETE,
       ],
+
+      orderItems: (context, items) => {
+        const refreshIndex = items.indexOf(ACTION_REFRESH);
+        if (refreshIndex > -1) {
+          items.splice(refreshIndex, 1);
+        }
+
+        const renameIndex = items.indexOf(ACTION_RENAME);
+        if (renameIndex > -1) {
+          items.splice(renameIndex, 1);
+        }
+
+        const deleteIndex = items.indexOf(ACTION_DELETE);
+        if (deleteIndex > -1) {
+          items.splice(deleteIndex, 1);
+        }
+
+        if (deleteIndex > -1) {
+          // if (items.length > 0) {
+          //   items.push(new MenuSeparatorItem());
+          // }
+          items.push(ACTION_DELETE);
+        }
+
+        if (renameIndex > -1) {
+          // if (items.length > 0 && deleteIndex === -1) {
+          //   items.push(new MenuSeparatorItem());
+          // }
+          items.push(ACTION_RENAME);
+        }
+
+        if (refreshIndex > -1) {
+          if (items.length > 0) {
+            items.push(new MenuSeparatorItem());
+          }
+          items.push(ACTION_REFRESH);
+        }
+
+        return items;
+      },
     });
   }
 

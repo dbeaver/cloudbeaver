@@ -11,6 +11,6 @@ import { createAction } from '@cloudbeaver/core-view';
 export const ACTION_SQL_EDITOR_OPEN = createAction(
   'sql-editor-open',
   {
-    label: 'SQL',
+    label: 'sql_editor_menu',
   }
 );

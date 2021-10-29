@@ -11,14 +11,16 @@ import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import type { IMenu } from './IMenu';
 import type { IMenuItem } from './MenuItem/IMenuItem';
 
+export type MenuCreatorItem = IMenuItem | IAction | IMenu;
+
 export interface IMenuItemsCreator {
   isApplicable?: (context: IDataContextProvider) => boolean;
   getItems: (
     context: IDataContextProvider,
-    items: Array<IMenuItem | IAction | IMenu>
-  ) => Array<IMenuItem | IAction | IMenu>;
+    items: MenuCreatorItem[]
+  ) => MenuCreatorItem[];
   orderItems?: (
     context: IDataContextProvider,
-    items: Array<IMenuItem | IAction | IMenu>
-  ) => Array<IMenuItem | IAction | IMenu>;
+    items: MenuCreatorItem[]
+  ) => MenuCreatorItem[];
 }
