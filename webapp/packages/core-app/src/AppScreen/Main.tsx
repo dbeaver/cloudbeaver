@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  splitStyles, Split, ResizerControls, Pane, ErrorBoundary, Loader, useMapResource, useDataResource
+  splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { PermissionsResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 

@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   TextPlaceholder, TabsBox, TabPanel, useExecutor
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -45,7 +45,7 @@ const styles = composes(
 );
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
-  const sessionDataResource = useService(SessionDataResource);
+  const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
@@ -61,7 +61,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   }
 
   useExecutor({
-    executor: sessionDataResource.onDataUpdate,
+    executor: userInfoResource.onDataUpdate,
     postHandlers: [restoreTabs],
   });
 
