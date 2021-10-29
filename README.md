@@ -21,6 +21,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### CloudBeaver 21.2.1 - 2021-10-29
+- Deleting of roles with assigned users has been prohibited.
+- “Select all” checkboxes have been added to simplify access management.
+- The SQL Editor highlighting has been improved.
+- Different bugs have been fixed.
+
 ### CloudBeaver 21.2.0 - 2021-10-14
 
 Changes since 21.1.0
