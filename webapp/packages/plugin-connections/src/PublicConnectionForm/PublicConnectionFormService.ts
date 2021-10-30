@@ -45,9 +45,9 @@ export class PublicConnectionFormService {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
-    // this.sessionDataResource.onDataOutdated.addHandler(() => {
-    //   this.close(true);
-    // });
+    this.sessionDataResource.onDataOutdated.addHandler(() => {
+      this.close(true);
+    });
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {
