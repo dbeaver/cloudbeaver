@@ -13,6 +13,7 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 interface Props {
   description?: string;
   before?: JSX.Element;
+  after?: React.ReactElement;
   className?: string;
 }
 
@@ -24,6 +25,7 @@ const styles = composes(
 `,
   css`
     main {
+      position: relative;
       display: flex;
       align-items: center;
       padding: 8px;
@@ -34,8 +36,13 @@ const styles = composes(
       height: 24px;
       flex-shrink: 0;
     }
+    after {
+      margin-left: 16px;
+      flex-shrink: 0;
+    }
     info {
       composes: theme-typography--body2 from global;
+      flex: 1;
       line-height: 1.4;
       display: flex;
       flex-direction: column;
@@ -47,15 +54,16 @@ const styles = composes(
     }
 `);
 
-export const Cell: React.FC<Props> = function Cell({ before, description, className, children }) {
+export const Cell: React.FC<Props> = function Cell({ before, after, description, className, children }) {
   return styled(useStyles(styles))(
     <cell className={className}>
       <main>
-        <before>{before && before}</before>
+        <before>{before}</before>
         <info>
           {children}
           {description && <description>{description}</description>}
         </info>
+        <after>{after}</after>
       </main>
     </cell>
   );

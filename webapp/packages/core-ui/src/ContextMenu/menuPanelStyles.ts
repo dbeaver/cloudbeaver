@@ -103,9 +103,9 @@ export const menuPanelStyles = composes(
       & menu-item-text, & menu-item-binding  {
         display: block;
         padding: 0 4px;
-        flex: 1;
       }
       & menu-item-binding {
+        flex: 1;
         text-align: right;
         padding-left: 32px;
       }

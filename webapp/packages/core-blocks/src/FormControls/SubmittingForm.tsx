@@ -13,6 +13,13 @@ import { Executor } from '@cloudbeaver/core-executor';
 import { useObjectRef } from '../useObjectRef';
 import { FormContext, IChangeData, IFormContext } from './FormContext';
 
+export interface IFormStateInfo {
+  edited: boolean;
+  disabled: boolean;
+  readonly: boolean;
+  statusMessage: string | null;
+}
+
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange' | 'onSubmit'> & {
   disabled?: boolean;
   disableEnterSubmit?: boolean;

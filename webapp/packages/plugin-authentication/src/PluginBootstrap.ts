@@ -11,13 +11,16 @@ import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
+import { CommonDialogService } from '../../core-dialogs/src';
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
-import { UserMenuService } from './UserMenu/UserMenuService';
+import { ChangeUserPasswordDialog } from './UserMenu/ChangeUserPasswordDialog/ChangeUserPasswordDialog';
+import { MENU_USER_PROFILE } from './UserMenu/MENU_USER_PROFILE';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -29,13 +32,25 @@ export class PluginBootstrap extends Bootstrap {
     private settingsMenuService: SettingsMenuService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService,
-    private userMenuService: UserMenuService,
-    private readonly serverConfigurationService: ServerConfigurationService
+    private menuService: MenuService,
+    private readonly serverConfigurationService: ServerConfigurationService,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
   }
 
   register(): void {
+    this.menuService.addCreator({
+      isApplicable:
+        context => context.get(DATA_CONTEXT_MENU) === MENU_USER_PROFILE
+        && !context.get(DATA_CONTEXT_MENU_NESTED),
+      getItems: (context, items) => [
+        ...items,
+        new MenuBaseItem('change-password', 'authentication_user_password_change_menu_title', undefined, {
+          onSelect: () => this.commonDialogService.open(ChangeUserPasswordDialog, null),
+        }),
+      ],
+    });
     this.settingsMenuService.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {
@@ -57,7 +72,6 @@ export class PluginBootstrap extends Bootstrap {
         onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
     );
-    this.userMenuService.register();
     this.topNavService.placeholder.add(UserInfo, 4);
     this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);

@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthInfoService, AuthProvider, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
@@ -57,12 +56,12 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
   const translate = useTranslate();
 
   const [search, setSearch] = useState('');
-  const configurations = useMemo(() => getComputed(() =>
+  const configurations = getComputed(() =>
     (provider.configurations || [])
       .filter(configuration => configuration.signInLink)
-  ), [provider.configurations]);
+  );
 
-  const filteredConfigurations = useMemo(() => computed(() => {
+  const filteredConfigurations = getComputed(() => {
     const sortedConfigurations = configurations.slice().sort(comparePublicAuthConfigurations) || [];
 
     if (!search) {
@@ -73,7 +72,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
       const target = `${configuration.displayName}${configuration.description || ''}`;
       return target.toUpperCase().includes(search.toUpperCase());
     });
-  }), [search, configurations]);
+  });
 
   async function auth(configuration: AuthProviderConfiguration) {
     const user = await authInfoService.sso(provider.id, configuration);
@@ -94,7 +93,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
         />
       )}
       <list>
-        {filteredConfigurations.get().map(configuration => {
+        {filteredConfigurations.map(configuration => {
           const icon = configuration.iconURL || provider.icon;
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (

@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
-import type { IConnectionFormStateInfo } from './Contexts/connectionFormStateContext';
 
 export type ConnectionFormMode = 'edit' | 'create';
 export type ConnectionFormType = 'admin' | 'public';
@@ -47,7 +47,7 @@ export interface IConnectionFormState {
   readonly setAvailableDrivers: (drivers: string[]) => this;
   readonly save: () => Promise<void>;
   readonly test: () => Promise<void>;
-  readonly checkFormState: () => Promise<IConnectionFormStateInfo | null>;
+  readonly checkFormState: () => Promise<IFormStateInfo | null>;
   readonly dispose: () => void;
 }
 

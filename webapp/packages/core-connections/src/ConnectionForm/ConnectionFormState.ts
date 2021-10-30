@@ -8,6 +8,7 @@
 
 import { computed, makeObservable, observable } from 'mobx';
 
+import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -16,7 +17,7 @@ import type { DatabaseConnection } from '../Administration/ConnectionsResource';
 import { EConnectionFeature } from '../EConnectionFeature';
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
 import type { ConnectionFormService } from './ConnectionFormService';
-import { connectionFormStateContext, IConnectionFormStateInfo } from './Contexts/connectionFormStateContext';
+import { connectionFormStateContext } from './Contexts/connectionFormStateContext';
 import type { IConnectionFormState, ConnectionFormMode, ConnectionFormType, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export class ConnectionFormState implements IConnectionFormState {
@@ -74,7 +75,7 @@ export class ConnectionFormState implements IConnectionFormState {
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
 
-  private stateInfo: IConnectionFormStateInfo | null;
+  private stateInfo: IFormStateInfo | null;
   private loadConnectionTask: IExecutor<IConnectionFormState>;
   private formStateTask: IExecutor<IConnectionFormState>;
   private _availableDrivers: string[];
@@ -201,7 +202,7 @@ export class ConnectionFormState implements IConnectionFormState {
     );
   }
 
-  async checkFormState(): Promise<IConnectionFormStateInfo | null> {
+  async checkFormState(): Promise<IFormStateInfo | null> {
     await this.loadConnectionInfo();
     return this.stateInfo;
   }

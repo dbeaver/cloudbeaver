@@ -6,14 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IConnectionFormStateInfo {
-  edited: boolean;
-  disabled: boolean;
-  readonly: boolean;
-  statusMessage: string | null;
-}
+import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 
-export interface IConnectionFormStateContext extends IConnectionFormStateInfo {
+export interface IConnectionFormStateContext extends IFormStateInfo {
   markEdited: () => void;
   setStatusMessage: (message: string | null) => void;
 }
