@@ -42,19 +42,7 @@ import {
   SessionExpiredDialogService,
   SessionExpireWarningDialogService
 } from '@cloudbeaver/core-app';
-import {
-  AppAuthService,
-  AuthInfoService,
-  AuthProviderService,
-  AuthProvidersResource,
-  AuthSettingsService,
-  AuthConfigurationsResource,
-  AuthConfigurationParametersResource,
-  RolesManagerService,
-  RolesResource,
-  UserInfoResource,
-  UsersResource
-} from '@cloudbeaver/core-authentication';
+import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
@@ -130,17 +118,6 @@ export const coreManifests: PluginManifest[] = [
       ProductSettingsService,
       ProductManagerService,
       PluginManagerService,
-      AppAuthService,
-      AuthInfoService,
-      AuthProviderService,
-      AuthSettingsService,
-      AuthProvidersResource,
-      AuthConfigurationsResource,
-      AuthConfigurationParametersResource,
-      RolesManagerService,
-      RolesResource,
-      UserInfoResource,
-      UsersResource,
       ServerSettingsService,
       ServerConfigResource,
       FeaturesResource,
@@ -213,6 +190,7 @@ export const coreManifests: PluginManifest[] = [
       ServerService,
     ],
   },
+  coreAuthenticationManifest,
   coreUIManifest,
   coreViewManifest,
 ];

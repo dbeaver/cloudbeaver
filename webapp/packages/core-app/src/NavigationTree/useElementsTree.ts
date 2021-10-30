@@ -9,9 +9,10 @@
 import { observable } from 'mobx';
 import { useState } from 'react';
 
-import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
@@ -42,6 +43,7 @@ export interface ITreeNodeState {
 
 interface IOptions {
   root: string;
+  keepData?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
@@ -54,6 +56,7 @@ interface IOptions {
 
 export interface IElementsTree {
   root: string;
+  loading: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
@@ -67,16 +70,35 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeService = useService(NavigationTreeService);
   const navTreeResource = useService(NavTreeResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
 
   const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({
     filter: '',
     selected: false,
     expanded: false,
   })));
-
   const state = options.localState || localTreeNodesState;
 
+  useUserData<Array<[string, ITreeNodeState]>>(
+    `elements-tree-${options.root}`,
+    () => observable([] as any),
+    async data => {
+      if (options.keepData) {
+        state.sync(data);
+
+        elementsTree.loading = true;
+        try {
+          await loadTree(options.root);
+        } finally {
+          elementsTree.loading = false;
+        }
+      }
+    }
+  );
+
   async function loadTree(nodeId: string) {
+    await connectionInfoResource.load(CachedMapAllKey);
+
     let children = [nodeId];
 
     while (children.length > 0) {
@@ -193,6 +215,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     root: options.root,
     renderers: options.renderers || [],
     state,
+    loading: options.keepData,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
     },
@@ -239,7 +262,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       await setSelection(node.id, !treeNodeState.selected);
     },
-  }), { root: observable.ref, renderers: observable.ref }, false);
+  }), { root: observable.ref, loading: observable.ref, renderers: observable.ref }, false);
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,

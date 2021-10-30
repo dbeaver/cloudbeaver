@@ -40,6 +40,7 @@ const styles = css`
 
 interface Props {
   root?: string;
+  keepData?: boolean;
   selectionTree?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   control?: React.FC<{
@@ -60,6 +61,7 @@ interface Props {
 export const ElementsTree = observer<Props>(function ElementsTree({
   root = ROOT_NODE_PATH,
   control,
+  keepData,
   localState,
   selectionTree = false,
   emptyPlaceholder,
@@ -83,6 +85,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   const tree = useElementsTree({
     root,
+    keepData,
     localState,
     filters: [nameFilter, ...(filters || [])],
     renderers,
@@ -103,8 +106,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     [control, selectionTree, onOpen]
   );
 
-  if (!nodeChildren.children || nodeChildren.children.length === 0) {
-    if (nodeChildren.isLoading()) {
+  if (!nodeChildren.children || nodeChildren.children.length === 0 || tree.loading) {
+    if (nodeChildren.isLoading() || tree.loading) {
       return styled(styles)(
         <center>
           <Loader />

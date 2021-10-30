@@ -18,6 +18,7 @@
     "go-split": "^2.x.x"
   },
   "peerDependencies": {
+    "@cloudbeaver/core-authentication": "^0.1.0",
     "@cloudbeaver/core-di": "^0.1.0",
     "@cloudbeaver/core-localization": "^0.1.0",
     "@cloudbeaver/core-product": "^0.1.0",

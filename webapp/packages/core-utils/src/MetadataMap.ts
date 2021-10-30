@@ -15,28 +15,36 @@ export class MetadataMap<TKey, TValue> {
   private data: Map<TKey, TValue>;
   private length: number;
 
+  private syncData: Array<[TKey, TValue]> | null;
+
   constructor(private defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
     this.data = observable(new Map());
     this.length = 0;
+    this.syncData = null;
   }
 
   [Symbol.iterator]() {
     return this.data[Symbol.iterator]();
   }
 
-  entries() {
+  sync(entities: Array<[TKey, TValue]>): void {
+    this.data = observable(new Map(entities));
+    this.syncData = entities;
+  }
+
+  entries(): IterableIterator<[TKey, TValue]> {
     return this.data.entries();
   }
 
-  keys() {
+  keys(): IterableIterator<TKey> {
     return this.data.keys();
   }
 
-  values() {
+  values(): IterableIterator<TValue> {
     return this.data.values();
   }
 
-  count() {
+  count(): number {
     return this.length;
   }
 
@@ -46,6 +54,7 @@ export class MetadataMap<TKey, TValue> {
 
   set(key: TKey, value: TValue): void {
     this.data.set(key, value);
+    this.syncData?.push([key, value]);
   }
 
   get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
@@ -61,7 +70,7 @@ export class MetadataMap<TKey, TValue> {
 
     const value = provider(key, this);
     untracked(() => {
-      this.data.set(key, value);
+      this.set(key, value);
       this.length++;
     });
     return this.data.get(key)!;
@@ -70,6 +79,11 @@ export class MetadataMap<TKey, TValue> {
   delete(key: TKey): void {
     if (this.data.has(key)) {
       this.data.delete(key);
+
+      const removeIndex = this.syncData?.findIndex(([k]) => k === key) || -1;
+      if (removeIndex > -1) {
+        this.syncData?.splice(removeIndex, 1);
+      }
       this.length--;
     }
   }
@@ -77,5 +91,6 @@ export class MetadataMap<TKey, TValue> {
   clear(): void {
     this.data.clear();
     this.length = 0;
+    this.syncData?.splice(0, this.syncData.length);
   }
 }

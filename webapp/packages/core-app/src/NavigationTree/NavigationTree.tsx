@@ -85,6 +85,7 @@ export const NavigationTree = observer(function NavigationTree() {
           </center>
         )}
         customSelect={handleSelect}
+        keepData
         onOpen={handleOpen}
       />
     </CaptureView>
