@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.auth" id="io.cloudbeaver.userProfile" name="User profile properties"/>
+      </appInfo>
+      <documentation>
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="propertyGroup"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="driver">
+      <annotation>
+         <documentation>
+            Web service description
+         </documentation>
+      </annotation>
+   </element>
+
+
+</schema>

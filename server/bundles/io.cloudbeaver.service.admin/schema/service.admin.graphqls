@@ -158,7 +158,7 @@ extend type Query {
 
     #### User profile
 
-    saveUserMetaParameter(id: ID!, displayName: String!, description: String, required: Boolean!): Boolean!
+    saveUserMetaParameter(id: ID!, displayName: String!, description: String, required: Boolean!): ObjectPropertyInfo!
 
     deleteUserMetaParameter(id: ID!): Boolean!
 

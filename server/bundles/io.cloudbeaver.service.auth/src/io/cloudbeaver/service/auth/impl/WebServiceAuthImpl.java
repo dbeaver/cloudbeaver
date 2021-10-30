@@ -23,12 +23,14 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.auth.DBWAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.WebUserProfileRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
@@ -296,6 +298,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (DBException e) {
             throw new DBWebException("Error changing user password", e);
         }
+    }
+
+    @Override
+    public WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession) {
+        return WebUserProfileRegistry.getInstance().getProperties().stream()
+            .map(p -> new WebPropertyInfo(webSession, p, null))
+            .toArray(WebPropertyInfo[]::new);
     }
 
 }

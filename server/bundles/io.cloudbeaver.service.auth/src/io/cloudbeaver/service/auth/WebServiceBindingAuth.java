@@ -56,6 +56,8 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env.getArgument("oldPassword"),
                 env.getArgument("newPassword")
             ))
+            .dataFetcher("listUserProfileProperties",
+                env -> getService(env).listUserProfileProperties(getWebSession(env)))
         ;
 
     }
