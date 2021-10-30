@@ -15,7 +15,7 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { PublicConnectionForm } from './PublicConnectionForm';
@@ -43,7 +43,8 @@ export class PublicConnectionFormService {
     });
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
-    this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeDeleted);
+    this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
+    this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
     // this.sessionDataResource.onDataOutdated.addHandler(() => {
     //   this.close(true);
     // });
@@ -97,12 +98,22 @@ export class PublicConnectionFormService {
     }
   }
 
-  private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+  private closeRemoved: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
     if (!this.formState || !this.formState.config.connectionId) {
       return;
     }
 
     if (!this.connectionInfoResource.has(this.formState.config.connectionId)) {
+      this.close(true);
+    }
+  };
+
+  private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+    if (!this.formState || !this.formState.config.connectionId) {
+      return;
+    }
+
+    if (ResourceKeyUtils.includes(data, this.formState.config.connectionId)) {
       this.close(true);
     }
   };
