@@ -48,7 +48,7 @@ public class WebSQLDialectInfo {
     }
 
     public String[] getFunctions() {
-        return dialect.getFunctions(dataSource).toArray(new String[0]);
+        return dialect.getFunctions().toArray(new String[0]);
     }
 
     public String[] getReservedWords() {
