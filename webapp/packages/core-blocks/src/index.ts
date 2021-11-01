@@ -125,6 +125,7 @@ export * from './FormControls/SubmittingForm';
 export * from './FormControls/Textarea';
 export * from './Link';
 export * from './Cell';
+export * from './UploadButton';
 export * from './ErrorMessage';
 export * from './StatusMessage';
 export * from './ExceptionMessage';

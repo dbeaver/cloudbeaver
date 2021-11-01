@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>export</title>
+    <g id="export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Page-1" transform="translate(3.000000, 2.000000)" fill="#338ECC">
+            <polygon id="Fill-1" points="12.7422 -0.0003 5.4502 7.2927 9.6172 7.2927 9.6172 20.4797 15.8672 20.4797 15.8672 7.2927 20.0342 7.2927"></polygon>
+            <polygon id="Fill-2" points="3.641 28.6602 21.844 28.6602 21.844 25.0192 3.641 25.0192"></polygon>
+            <polygon id="Fill-3" points="0 25.0192 3.641 25.0192 3.641 18.7792 0 18.7792"></polygon>
+            <polygon id="Fill-4" points="0 28.6602 3.641 28.6602 3.641 25.0192 0 25.0192"></polygon>
+            <polygon id="Fill-5" points="21.844 25.0192 25.485 25.0192 25.485 18.7792 21.844 18.7792"></polygon>
+            <polygon id="Fill-6" points="21.844 28.6602 25.485 28.6602 25.485 25.0192 21.844 25.0192"></polygon>
+        </g>
+    </g>
+</svg>

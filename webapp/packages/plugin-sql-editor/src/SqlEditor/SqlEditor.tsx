@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
+import { StaticImage, UploadButton, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -19,10 +19,11 @@ import type { ISqlEditorProps } from './ISqlEditorProps';
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
 import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlEditorController } from './SqlEditorController';
+import { useTools } from './useTools';
 
 const styles = composes(
   css`
-    button {
+    button, upload {
       composes: theme-ripple from global;
     }
   `,
@@ -35,6 +36,12 @@ const styles = composes(
       display: flex;
       overflow: auto;
     }
+
+    container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   
     actions {
       width: 32px;
@@ -44,8 +51,15 @@ const styles = composes(
       align-items: center;
       user-select: none;
     }
+
+    tools {
+      width: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   
-    button {
+    button, upload {
       background: none;
       padding: 0;
       margin: 0;
@@ -76,6 +90,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
   const editor = useRef<SQLCodeEditorController>(null);
   const baseTab = useBaseTab(tab.id);
   const controller = useController(SqlEditorController, tab);
+  const tools = useTools(controller, tab);
 
   useEffect(() => {
     if (!baseTab.selected) {
@@ -95,38 +110,58 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
 
   return styled(style)(
     <sql-editor className={className}>
-      <actions onMouseDown={preventFocus}>
-        <button
-          disabled={controller.isLineScriptEmpty || controller.isDisabled}
-          title={translate('sql_editor_sql_execution_button_tooltip')}
-          onClick={controller.executeQuery}
-        >
-          <StaticImage icon="/icons/sql_exec.svg" />
-        </button>
-        <button
-          disabled={controller.isLineScriptEmpty || controller.isDisabled}
-          title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-          onClick={controller.executeQueryNewTab}
-        >
-          <StaticImage icon="/icons/sql_exec_new.svg" />
-        </button>
-        <button
-          disabled={controller.isDisabled || controller.isScriptEmpty}
-          title={translate('sql_editor_sql_execution_script_button_tooltip')}
-          onClick={controller.executeScript}
-        >
-          <StaticImage icon="/icons/sql_script_exec.svg" />
-        </button>
-        {controller.dialect?.supportsExplainExecutionPlan && (
+      <container>
+        <actions onMouseDown={preventFocus}>
           <button
             disabled={controller.isLineScriptEmpty || controller.isDisabled}
-            title={translate('sql_editor_execution_plan_button_tooltip')}
-            onClick={controller.showExecutionPlan}
+            title={translate('sql_editor_sql_execution_button_tooltip')}
+            onClick={controller.executeQuery}
           >
-            <StaticImage icon="/icons/sql_execution_plan.svg" />
+            <StaticImage icon="/icons/sql_exec.svg" />
           </button>
-        )}
-      </actions>
+          <button
+            disabled={controller.isLineScriptEmpty || controller.isDisabled}
+            title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
+            onClick={controller.executeQueryNewTab}
+          >
+            <StaticImage icon="/icons/sql_exec_new.svg" />
+          </button>
+          <button
+            disabled={controller.isDisabled || controller.isScriptEmpty}
+            title={translate('sql_editor_sql_execution_script_button_tooltip')}
+            onClick={controller.executeScript}
+          >
+            <StaticImage icon="/icons/sql_script_exec.svg" />
+          </button>
+          {controller.dialect?.supportsExplainExecutionPlan && (
+            <button
+              disabled={controller.isLineScriptEmpty || controller.isDisabled}
+              title={translate('sql_editor_execution_plan_button_tooltip')}
+              onClick={controller.showExecutionPlan}
+            >
+              <StaticImage icon="/icons/sql_execution_plan.svg" />
+            </button>
+          )}
+        </actions>
+        <tools onMouseDown={preventFocus}>
+          <button
+            disabled={controller.isLineScriptEmpty}
+            title={translate('sql_editor_download_script_tooltip')}
+            onClick={tools.downloadScript}
+          >
+            <StaticImage icon='/icons/export.svg' />
+          </button>
+          <UploadButton
+            accept='.sql'
+            title={translate('sql_editor_upload_script_tooltip')}
+            onChange={event => tools.uploadScript(event.target.files)}
+          >
+            <upload>
+              <StaticImage icon='/icons/import.svg' />
+            </upload>
+          </UploadButton>
+        </tools>
+      </container>
       <SQLCodeEditorLoader
         ref={editor}
         readonly={controller.readonly}

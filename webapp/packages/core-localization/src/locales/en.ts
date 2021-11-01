@@ -52,6 +52,7 @@ export const defaultENLocale = [
   ['ui_set', 'Set'],
   ['ui_are_you_sure', 'Are you sure?'],
   ['ui_options', 'Options'],
+  ['ui_changes_might_be_lost', 'Your changes might be lost'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

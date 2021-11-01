@@ -14,4 +14,8 @@ export default [
   ['sql_execution_plan_properties_panel_value', 'Значение'],
   ['sql_execution_plan_properties_panel_general', 'Общие'],
   ['sql_execution_plan_properties_panel_details', 'Дополнительные'],
+  ['sql_editor_upload_script_tooltip', 'Загрузить sql скрипт'],
+  ['sql_editor_download_script_tooltip', 'Скачать sql скрипт'],
+  ['sql_editor_upload_script_unsaved_changes_dialog_message', 'Текущий скрипт будет перезаписан загруженным. Сохранить текущий?'],
+  ['sql_editor_upload_script_max_size_title', 'Размер файла превышает максимально допустимый'],
 ];
