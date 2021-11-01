@@ -12,10 +12,10 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { CreateUserService } from './CreateUserService';
 import { UsersAdministration } from './UsersAdministration';
-import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
+import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
+import { CreateUserService } from './UsersTable/CreateUserService';
 import { Origin } from './UsersTable/UserDetailsInfo/Origin';
 
 export interface IUserDetailsInfoProps {
@@ -41,7 +41,10 @@ export class UsersAdministrationService extends Bootstrap {
       order: 3,
       sub: [
         {
-          name: UsersAdministrationNavigationService.CreateItemName,
+          name: EUsersAdministrationSub.MetaProperties,
+        },
+        {
+          name: EUsersAdministrationSub.Users,
           onDeActivate: this.cancelCreate.bind(this),
         },
       ],
@@ -54,8 +57,10 @@ export class UsersAdministrationService extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  private async cancelCreate() {
-    this.createUserService.close();
+  private async cancelCreate(param: string | null) {
+    if (param === 'create') {
+      this.createUserService.close();
+    }
   }
 
   private async loadUsers() {

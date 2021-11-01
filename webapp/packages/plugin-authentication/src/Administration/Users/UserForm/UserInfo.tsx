@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, TabContainerPanelComponent, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -27,14 +28,16 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
   controller,
   editing,
 }) {
+  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
+  const userMetaParameters = useDataResource(UserInfo, UserMetaParametersResource, undefined);
 
   const handleRoleChange = useCallback(
     (roleId: string, value: boolean) => { controller.credentials.roles.set(roleId, value); },
     []
   );
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES, styles))(
+  return styled(style)(
     <ColoredContainer parent gap overflow>
       <Group small gap vertical overflow>
         <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
@@ -103,6 +106,22 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           );
         })}
       </Group>
+      <Loader state={userMetaParameters} inline>
+        {() => userMetaParameters.data.length > 0 && styled(style)(
+          <Group small gap vertical overflow>
+            <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
+
+            <Container wrap gap>
+              <ObjectPropertyInfoForm
+                state={controller.credentials.metaParameters}
+                properties={userMetaParameters.data}
+                category={null}
+                disabled={controller.isSaving}
+              />
+            </Container>
+          </Group>
+        )}
+      </Loader>
     </ColoredContainer>
   );
 });

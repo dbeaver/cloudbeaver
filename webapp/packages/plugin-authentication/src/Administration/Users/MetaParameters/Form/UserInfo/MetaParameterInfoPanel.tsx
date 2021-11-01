@@ -23,12 +23,12 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const UserInfoPanel = observer<Props>(function UserInfoPanel({
+export const MetaParameterInfoPanel = observer<Props>(function MetaParameterInfoPanel({
   user,
   className,
   style,
 }) {
-  const userMetaParameters = useDataResource(UserInfoPanel, UserMetaParametersResource, undefined);
+  const userMetaParameters = useDataResource(MetaParameterInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 

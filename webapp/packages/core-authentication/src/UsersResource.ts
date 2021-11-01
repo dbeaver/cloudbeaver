@@ -38,6 +38,7 @@ interface UserCreateOptions {
   userId: string;
   roles: string[];
   credentials: Record<string, any>;
+  metaParameters: Record<string, any>;
   grantedConnections: string[];
 }
 
@@ -85,8 +86,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.graphQLService.sdk.setConnections({ userId, connections });
   }
 
+  async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
+    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
+  }
+
   async create({
-    userId, roles, credentials, grantedConnections,
+    userId, roles, credentials, metaParameters, grantedConnections,
   }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
@@ -101,6 +106,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       }
 
       await this.setConnections(userId, grantedConnections);
+      await this.setMetaParameters(userId, metaParameters);
       const user = await this.refresh(userId) as AdminUserNew;
       user[NEW_USER_SYMBOL] = true;
     } catch (exception) {
@@ -211,6 +217,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   private getDefaultIncludes(): UserResourceIncludes {
     return {
       customIncludeOriginDetails: false,
+      includeMetaParameters: false,
     };
   }
 }

@@ -12,7 +12,7 @@ import { Translate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { UserForm } from './UserForm/UserForm';
+import { UserForm } from '../UserForm/UserForm';
 
 const styles = composes(
   css`
@@ -57,7 +57,7 @@ interface Props {
   onCancel: () => void;
 }
 
-export const CreateUser: React.FC<Props> = function CreateUser({
+export const CreateMetaParameter: React.FC<Props> = function CreateMetaParameter({
   user,
   onCancel,
 }) {

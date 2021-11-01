@@ -1281,12 +1281,20 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
 
 export interface SaveAuthProviderConfigurationQuery { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: Maybe<string>; description?: Maybe<string>; parameters: any; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> } }
 
+export type SaveUserMetaParametersQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  parameters: Scalars['Object'];
+}>;
+
+export interface SaveUserMetaParametersQuery { setUserMetaParameterValues: boolean }
+
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
+  includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface CreateUserQuery { user: { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> } }
+export interface CreateUserQuery { user: { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; metaParameters?: Maybe<any>; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> } }
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1314,10 +1322,11 @@ export interface GetUserGrantedConnectionsQuery { grantedConnections: Array<{ co
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
+  includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface GetUsersListQuery { users: Array<Maybe<{ userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }>> }
+export interface GetUsersListQuery { users: Array<Maybe<{ userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; metaParameters?: Maybe<any>; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }>> }
 
 export type GrantUserRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1641,7 +1650,7 @@ export interface NavGetStructContainersQuery { navGetStructContainers: { catalog
 
 export interface AdminRoleInfoFragment { roleId: string; roleName?: Maybe<string>; description?: Maybe<string> }
 
-export interface AdminUserInfoFragment { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }
+export interface AdminUserInfoFragment { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; metaParameters?: Maybe<any>; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }
 
 export interface AllNavigatorSettingsFragment { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }
 
@@ -1919,6 +1928,7 @@ export const AdminUserInfoFragmentDoc = `
   userId
   grantedRoles
   linkedAuthProviders
+  metaParameters @include(if: $includeMetaParameters)
   origins {
     ...ObjectOriginInfo
   }
@@ -2298,8 +2308,13 @@ export const SaveAuthProviderConfigurationDocument = `
   }
 }
     `;
+export const SaveUserMetaParametersDocument = `
+    query saveUserMetaParameters($userId: ID!, $parameters: Object!) {
+  setUserMetaParameterValues(userId: $userId, parameters: $parameters)
+}
+    `;
 export const CreateUserDocument = `
-    query createUser($userId: ID!, $customIncludeOriginDetails: Boolean!) {
+    query createUser($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   user: createUser(userId: $userId) {
     ...AdminUserInfo
   }
@@ -2336,7 +2351,7 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($userId: ID, $customIncludeOriginDetails: Boolean!) {
+    query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   users: listUsers(userId: $userId) {
     ...AdminUserInfo
   }
@@ -3195,6 +3210,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SaveAuthProviderConfigurationQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveAuthProviderConfiguration');
+    },
+    saveUserMetaParameters(variables: SaveUserMetaParametersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SaveUserMetaParametersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SaveUserMetaParametersQuery>(SaveUserMetaParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveUserMetaParameters');
     },
     createUser(variables: CreateUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateUserQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<CreateUserQuery>(CreateUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createUser');

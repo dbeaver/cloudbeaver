@@ -9,21 +9,19 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
+import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
+import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { filterUndefined } from '@cloudbeaver/core-utils';
 
-import { CreateUser } from './CreateUser';
-import { CreateUserService } from './CreateUserService';
-import { User } from './User';
-import { UsersTableController } from './UsersTableController';
+import { CreateMetaParameter } from './CreateMetaParameter';
+import { CreateMetaParameterService } from './CreateMetaParameterService';
+import { MetadataParam } from './MetadataParam';
+import { MetaParametersController } from './MetaParametersController';
 
 const layoutStyles = composes(
   css`
@@ -56,10 +54,6 @@ const styles = css`
   Table {
     width: 100%;
   }
-
-  Loader {
-    height: 100%;
-  }
 `;
 
 interface Props {
@@ -67,28 +61,15 @@ interface Props {
   param?: string | null;
 }
 
-export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
+export const MetaParameters = observer<Props>(function MetaParameters({ sub, param }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, layoutStyles);
-  const createUserService = useService(CreateUserService);
-  const controller = useController(UsersTableController);
-  const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
+  const controller = useController(MetaParametersController);
+  const createMetaParameterService = useService(CreateMetaParameterService);
+  const userMetaParametersResource = useDataResource(MetaParameters, UserMetaParametersResource, undefined);
+  const keys = userMetaParametersResource.data.map(metadata => metadata.id);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
-  const users = getComputed(() => usersResource.data
-    .filter<AdminUser>(filterUndefined)
-    .sort((a, b) => {
-      if (usersResource.resource.isNew(a.userId) === usersResource.resource.isNew(b.userId)) {
-        return a.userId.localeCompare(b.userId);
-      }
-      if (usersResource.resource.isNew(a.userId)) {
-        return -1;
-      }
-      return 1;
-    }));
 
-  const keys = users.map(user => user.userId);
-
-  return styled(style)(
+  return styled(useStyles(styles, layoutStyles))(
     <layout-grid>
       <layout-grid-inner>
         <layout-grid-cell {...use({ span: 12 })}>
@@ -98,8 +79,8 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 title={translate('authentication_administration_tools_add_tooltip')}
                 icon="add"
                 viewBox="0 0 24 24"
-                disabled={sub && !!createUserService.user}
-                onClick={createUserService.create}
+                disabled={sub && !!createMetaParameterService.user}
+                onClick={createMetaParameterService.create}
               >
                 {translate('ui_add')}
               </ToolsAction>
@@ -126,9 +107,12 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
           </ToolsPanel>
         </layout-grid-cell>
 
-        {param === 'create' && createUserService.user && (
+        {param === 'create' && createMetaParameterService.user && (
           <layout-grid-cell {...use({ span: 12 })}>
-            <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
+            <CreateMetaParameter
+              user={createMetaParameterService.user}
+              onCancel={createMetaParameterService.cancelCreate}
+            />
           </layout-grid-cell>
         )}
         <layout-grid-cell {...use({ span: 12 })}>
@@ -150,7 +134,13 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
               <TableColumnHeader />
             </TableHeader>
             <TableBody>
-              {users.map(user => <User key={user.userId} user={user} selectable={isLocalProviderAvailable} />)}
+              {userMetaParametersResource.data.map(param => (
+                <MetadataParam
+                  key={param.id}
+                  param={param}
+                  selectable={isLocalProviderAvailable}
+                />
+              ))}
             </TableBody>
           </Table>
         </layout-grid-cell>

@@ -17,7 +17,7 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class UsersAdministrationController implements IInitializableController {
+export class UsersTableController implements IInitializableController {
   isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());

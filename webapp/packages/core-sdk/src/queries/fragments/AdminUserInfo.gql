@@ -2,6 +2,7 @@ fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
   linkedAuthProviders
+  metaParameters @include(if: $includeMetaParameters)
   
   origins {
     ...ObjectOriginInfo

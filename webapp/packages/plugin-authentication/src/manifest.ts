@@ -21,11 +21,12 @@ import { RoleFormService } from './Administration/Roles/RoleFormService';
 import { RolesAdministrationNavService } from './Administration/Roles/RolesAdministrationNavService';
 import { RolesAdministrationService } from './Administration/Roles/RolesAdministrationService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
-import { CreateUserService } from './Administration/Users/CreateUserService';
+import { CreateMetaParameterService } from './Administration/Users/MetaParameters/CreateMetaParameterService';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
 import { UserFormService } from './Administration/Users/UserForm/UserFormService';
 import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
+import { CreateUserService } from './Administration/Users/UsersTable/CreateUserService';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
@@ -46,6 +47,7 @@ export const manifest: PluginManifest = {
     UsersAdministrationNavigationService,
     ServerConfigurationAuthenticationBootstrap,
     UserFormService,
+    CreateMetaParameterService,
     UserFormBaseBootstrap,
     AuthConfigurationsAdministrationService,
     CreateAuthConfigurationService,

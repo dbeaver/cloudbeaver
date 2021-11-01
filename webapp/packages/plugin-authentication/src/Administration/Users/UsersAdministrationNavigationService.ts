@@ -9,23 +9,32 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
+export enum EUsersAdministrationSub {
+  Users = 'users',
+  MetaProperties = 'metaProperties'
+}
+
 @injectable()
 export class UsersAdministrationNavigationService {
   static ItemName = 'users';
-  static CreateItemName = 'create';
 
   constructor(
     private administrationScreenService: AdministrationScreenService
   ) {}
 
-  navToRoot() {
+  navToRoot(): void {
     this.administrationScreenService.navigateToItem(UsersAdministrationNavigationService.ItemName);
   }
 
-  navToCreate() {
+  navToCreate(): void {
+    this.navToSub(EUsersAdministrationSub.Users, 'create');
+  }
+
+  navToSub(sub: EUsersAdministrationSub, param?: string | null): void {
     this.administrationScreenService.navigateToItemSub(
       UsersAdministrationNavigationService.ItemName,
-      UsersAdministrationNavigationService.CreateItemName
+      sub,
+      param
     );
   }
 }

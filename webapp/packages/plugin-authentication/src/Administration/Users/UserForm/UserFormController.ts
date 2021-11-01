@@ -26,6 +26,7 @@ interface IUserCredentials {
   login: string;
   password: string;
   passwordRepeat: string;
+  metaParameters: Record<string, any>;
   roles: Map<string, boolean>;
 }
 
@@ -88,6 +89,7 @@ export class UserFormController implements IInitializableController, IDestructib
       login: '',
       password: '',
       passwordRepeat: '',
+      metaParameters: {},
       roles: new Map(),
     };
     this.error = new GQLErrorCatcher();
@@ -128,6 +130,7 @@ export class UserFormController implements IInitializableController, IDestructib
           userId: this.credentials.login,
           credentials: { password: this.credentials.password },
           roles: this.getGrantedRoles(),
+          metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
         });
         this.collapse();
@@ -138,6 +141,7 @@ export class UserFormController implements IInitializableController, IDestructib
         }
         await this.updateRoles();
         await this.saveConnectionPermissions();
+        await this.saveMetaParameters();
         await this.usersResource.refresh(this.user.userId);
         this.notificationService.logSuccess({ title: 'authentication_administration_user_updated' });
       }
@@ -263,6 +267,10 @@ export class UserFormController implements IInitializableController, IDestructib
         return this.selectedConnections.get(connectionId)
           && connectionPermission?.subjectType !== AdminSubjectType.Role;
       });
+  }
+
+  private async saveMetaParameters() {
+    await this.usersResource.setMetaParameters(this.user.userId, this.credentials.metaParameters);
   }
 
   private async saveConnectionPermissions() {

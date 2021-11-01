@@ -22,6 +22,7 @@ export default [
   ['authentication_administration_user_origin_empty', 'No available details'],
   ['authentication_administration_user_info', 'Info'],
   ['authentication_administration_item', 'Users'],
+  ['authentication_administration_item_metaParameters', 'Meta Parameters'],
   ['authentication_administration_tools_add_tooltip', 'Add new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Refresh user list'],
   ['authentication_administration_tools_delete_tooltip', 'Delete selected users'],

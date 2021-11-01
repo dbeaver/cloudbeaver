@@ -125,7 +125,7 @@ export class AdministrationScreenService {
     }
   }
 
-  navigateToItemSub(item: string, sub: string, param?: string): void {
+  navigateToItemSub(item: string, sub: string, param?: string | null): void {
     if (!param) {
       if (this.isConfigurationMode) {
         this.screenService.navigate(AdministrationScreenService.setupItemSubRouteName, item, sub);

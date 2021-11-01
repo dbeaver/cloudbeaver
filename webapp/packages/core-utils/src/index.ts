@@ -6,6 +6,7 @@ export * from './Promises/PromiseExecutor';
 
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
+export * from './filterUndefined';
 export * from './flat';
 export * from './generateFileName';
 export * from './getMIME';

@@ -12,7 +12,7 @@ import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 
-import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
+import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
 
 @injectable()
 export class CreateUserService {
