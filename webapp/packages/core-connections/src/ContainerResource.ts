@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -51,6 +53,7 @@ string
       exception: null,
       outdatedData: [],
       loadingData: [],
+      includes: observable([]),
     }));
 
     this.preloadResource(connectionInfoResource, () => CachedMapAllKey);

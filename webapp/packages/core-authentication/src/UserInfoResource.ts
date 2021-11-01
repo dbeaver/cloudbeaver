@@ -9,13 +9,20 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
 
+export type UserInfoIncludes = GetActiveUserQueryVariables;
+
 @injectable()
-export class UserInfoResource extends CachedDataResource<UserInfo | null> {
+export class UserInfoResource extends CachedDataResource<
+UserInfo | null,
+void,
+void,
+UserInfoIncludes
+> {
   readonly userChange: ISyncExecutor<string>;
 
   constructor(
@@ -62,7 +69,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
   }
 
   async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
-    await this.performUpdate(undefined, undefined, async () => {
+    await this.performUpdate(undefined, [], async () => {
       const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
       const { authToken } = await this.graphQLService.sdk.authLogin({
@@ -84,7 +91,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
   }
 
   async logout(): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
+    await this.performUpdate(undefined, [], async () => {
       if (this.data) {
         await this.graphQLService.sdk.authLogout();
         this.setData(null);
@@ -93,9 +100,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
     this.sessionDataResource.markOutdated();
   }
 
-  protected async loader(): Promise<UserInfo | null> {
+  protected async loader(key: void, includes?: string[]): Promise<UserInfo | null> {
     const { user } = await this.graphQLService.sdk.getActiveUser({
-      customIncludeOriginDetails: true,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(key, includes),
     });
 
     return (user as UserInfo | null) ?? null;
@@ -109,5 +117,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null> {
     if (prevUserId !== currentUserId) {
       this.userChange.execute(currentUserId);
     }
+  }
+
+  private getDefaultIncludes(): UserInfoIncludes {
+    return {
+      customIncludeOriginDetails: true,
+      includeMetaParameters: false,
+    };
   }
 }

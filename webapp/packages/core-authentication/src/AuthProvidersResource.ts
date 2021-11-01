@@ -27,7 +27,7 @@ import { AuthSettingsService } from './AuthSettingsService';
 export type AuthProvider = AuthProviderInfo;
 
 @injectable()
-export class AuthProvidersResource extends CachedMapResource<string, AuthProvider, void> {
+export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {
   constructor(
     private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,

@@ -1,8 +1,9 @@
-query getActiveUser($customIncludeOriginDetails: Boolean!) {
+query getActiveUser($includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   user: activeUser {
     userId
     displayName
     linkedAuthProviders
+    metaParameters @include(if: $includeMetaParameters)
     authTokens {
       ...AuthToken
     }

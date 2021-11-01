@@ -639,6 +639,7 @@ export interface Query {
   deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
   deleteRole?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
+  deleteUserMetaParameter: Scalars['Boolean'];
   driverList: DriverInfo[];
   getConnectionSubjectAccess: AdminConnectionGrantInfo[];
   getSubjectConnectionAccess: AdminConnectionGrantInfo[];
@@ -648,6 +649,7 @@ export interface Query {
   listFeatureSets: WebFeatureSet[];
   listPermissions: Array<Maybe<AdminPermissionInfo>>;
   listRoles: Array<Maybe<AdminRoleInfo>>;
+  listUserProfileProperties: ObjectPropertyInfo[];
   listUsers: Array<Maybe<AdminUserInfo>>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
@@ -658,6 +660,7 @@ export interface Query {
   readSessionLog: LogEntry[];
   revokeUserRole?: Maybe<Scalars['Boolean']>;
   saveAuthProviderConfiguration: AdminAuthProviderConfiguration;
+  saveUserMetaParameter: ObjectPropertyInfo;
   searchConnections: AdminConnectionSearchInfo[];
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
@@ -667,6 +670,7 @@ export interface Query {
   setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
   setSubjectPermissions?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
+  setUserMetaParameterValues: Scalars['Boolean'];
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlEntityQueryGenerators: SqlQueryGenerator[];
@@ -765,6 +769,10 @@ export interface QueryDeleteUserArgs {
   userId: Scalars['ID'];
 }
 
+export interface QueryDeleteUserMetaParameterArgs {
+  id: Scalars['ID'];
+}
+
 export interface QueryDriverListArgs {
   id?: Maybe<Scalars['ID']>;
 }
@@ -843,6 +851,13 @@ export interface QuerySaveAuthProviderConfigurationArgs {
   providerId: Scalars['ID'];
 }
 
+export interface QuerySaveUserMetaParameterArgs {
+  description?: Maybe<Scalars['String']>;
+  displayName: Scalars['String'];
+  id: Scalars['ID'];
+  required: Scalars['Boolean'];
+}
+
 export interface QuerySearchConnectionsArgs {
   hostNames: Array<Scalars['String']>;
 }
@@ -869,6 +884,11 @@ export interface QuerySetSubjectPermissionsArgs {
 export interface QuerySetUserCredentialsArgs {
   credentials: Scalars['Object'];
   providerId: Scalars['ID'];
+  userId: Scalars['ID'];
+}
+
+export interface QuerySetUserMetaParameterValuesArgs {
+  parameters: Scalars['Object'];
   userId: Scalars['ID'];
 }
 
@@ -1137,6 +1157,7 @@ export interface UserInfo {
   authTokens: UserAuthToken[];
   displayName?: Maybe<Scalars['String']>;
   linkedAuthProviders: Array<Scalars['String']>;
+  metaParameters: Scalars['Object'];
   userId: Scalars['ID'];
 }
 
@@ -1222,10 +1243,11 @@ export type DeleteAuthProviderConfigurationQueryVariables = Exact<{
 export interface DeleteAuthProviderConfigurationQuery { deleteAuthProviderConfiguration: boolean }
 
 export type GetActiveUserQueryVariables = Exact<{
+  includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface GetActiveUserQuery { user?: Maybe<{ userId: string; displayName?: Maybe<string>; linkedAuthProviders: string[]; authTokens: Array<{ authProvider: string; authConfiguration?: Maybe<string>; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }> }> }
+export interface GetActiveUserQuery { user?: Maybe<{ userId: string; displayName?: Maybe<string>; linkedAuthProviders: string[]; metaParameters?: Maybe<any>; authTokens: Array<{ authProvider: string; authConfiguration?: Maybe<string>; loginTime: any; message?: Maybe<string>; origin: { type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> } }> }> }
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -1242,6 +1264,10 @@ export interface GetAuthProviderConfigurationsQuery { configurations: Array<{ pr
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetAuthProvidersQuery { providers: Array<{ id: string; label: string; icon?: Maybe<string>; description?: Maybe<string>; defaultProvider: boolean; configurable: boolean; configurations?: Maybe<Array<{ id: string; displayName: string; iconURL?: Maybe<string>; description?: Maybe<string>; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> }>>; credentialParameters: Array<{ id: string; displayName: string; description?: Maybe<string>; admin: boolean; user: boolean; identifying: boolean; possibleValues?: Maybe<Array<Maybe<string>>>; encryption?: Maybe<AuthCredentialEncryption> }> }> }
+
+export type GetUserProfilePropertiesQueryVariables = Exact<{ [key: string]: never }>;
+
+export interface GetUserProfilePropertiesQuery { properties: Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }> }
 
 export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -1267,6 +1293,12 @@ export type DeleteUserQueryVariables = Exact<{
 }>;
 
 export interface DeleteUserQuery { deleteUser?: Maybe<boolean> }
+
+export type DeleteUserMetaParameterQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export interface DeleteUserMetaParameterQuery { state: boolean }
 
 export type GetPermissionsListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
@@ -1315,6 +1347,22 @@ export type SetUserCredentialsQueryVariables = Exact<{
 }>;
 
 export interface SetUserCredentialsQuery { setUserCredentials?: Maybe<boolean> }
+
+export type SetUserMetaParameterQueryVariables = Exact<{
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  required: Scalars['Boolean'];
+}>;
+
+export interface SetUserMetaParameterQuery { parameter: { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number } }
+
+export type UpdateUserProfilePropertiesQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  parameters: Scalars['Object'];
+}>;
+
+export interface UpdateUserProfilePropertiesQuery { state: boolean }
 
 export type CreateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
@@ -2153,11 +2201,12 @@ export const DeleteAuthProviderConfigurationDocument = `
 }
     `;
 export const GetActiveUserDocument = `
-    query getActiveUser($customIncludeOriginDetails: Boolean!) {
+    query getActiveUser($includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   user: activeUser {
     userId
     displayName
     linkedAuthProviders
+    metaParameters @include(if: $includeMetaParameters)
     authTokens {
       ...AuthToken
     }
@@ -2218,6 +2267,13 @@ export const GetAuthProvidersDocument = `
   }
 }
     `;
+export const GetUserProfilePropertiesDocument = `
+    query getUserProfileProperties {
+  properties: listUserProfileProperties {
+    ...UserConnectionAuthProperties
+  }
+}
+    ${UserConnectionAuthPropertiesFragmentDoc}`;
 export const SaveAuthProviderConfigurationDocument = `
     query saveAuthProviderConfiguration($providerId: ID!, $id: ID!, $displayName: String, $disabled: Boolean, $iconURL: String, $description: String, $parameters: Object) {
   configuration: saveAuthProviderConfiguration(
@@ -2252,6 +2308,11 @@ export const CreateUserDocument = `
 export const DeleteUserDocument = `
     query deleteUser($userId: ID!) {
   deleteUser(userId: $userId)
+}
+    `;
+export const DeleteUserMetaParameterDocument = `
+    query deleteUserMetaParameter($id: ID!) {
+  state: deleteUserMetaParameter(id: $id)
 }
     `;
 export const GetPermissionsListDocument = `
@@ -2306,6 +2367,23 @@ export const SetUserCredentialsDocument = `
     providerId: $providerId
     credentials: $credentials
   )
+}
+    `;
+export const SetUserMetaParameterDocument = `
+    query setUserMetaParameter($id: ID!, $displayName: String!, $description: String, $required: Boolean!) {
+  parameter: saveUserMetaParameter(
+    id: $id
+    displayName: $displayName
+    description: $description
+    required: $required
+  ) {
+    ...UserConnectionAuthProperties
+  }
+}
+    ${UserConnectionAuthPropertiesFragmentDoc}`;
+export const UpdateUserProfilePropertiesDocument = `
+    query updateUserProfileProperties($userId: ID!, $parameters: Object!) {
+  state: setUserMetaParameterValues(userId: $userId, parameters: $parameters)
 }
     `;
 export const CreateConnectionConfigurationDocument = `
@@ -3112,6 +3190,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthProviders(variables?: GetAuthProvidersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthProvidersQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviders');
     },
+    getUserProfileProperties(variables?: GetUserProfilePropertiesQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUserProfilePropertiesQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetUserProfilePropertiesQuery>(GetUserProfilePropertiesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserProfileProperties');
+    },
     saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SaveAuthProviderConfigurationQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveAuthProviderConfiguration');
     },
@@ -3120,6 +3201,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteUser(variables: DeleteUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteUserQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<DeleteUserQuery>(DeleteUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUser');
+    },
+    deleteUserMetaParameter(variables: DeleteUserMetaParameterQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteUserMetaParameterQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteUserMetaParameterQuery>(DeleteUserMetaParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUserMetaParameter');
     },
     getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetPermissionsListQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList');
@@ -3141,6 +3225,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetUserCredentialsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserCredentials');
+    },
+    setUserMetaParameter(variables: SetUserMetaParameterQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetUserMetaParameterQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetUserMetaParameterQuery>(SetUserMetaParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserMetaParameter');
+    },
+    updateUserProfileProperties(variables: UpdateUserProfilePropertiesQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateUserProfilePropertiesQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<UpdateUserProfilePropertiesQuery>(UpdateUserProfilePropertiesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateUserProfileProperties');
     },
     createConnectionConfiguration(variables: CreateConnectionConfigurationQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionConfigurationQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionConfigurationQuery>(CreateConnectionConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionConfiguration');

@@ -17,7 +17,10 @@ import { UserForm } from './UserForm';
 
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
-  const userInfo = useDataResource(UserProfileForm, UserInfoResource, undefined);
+  const userInfo = useDataResource(UserProfileForm, UserInfoResource, {
+    key: undefined as any,
+    includes: ['includeMetaParameters'],
+  });
 
   if (!userProfileService.formState) {
     return null;

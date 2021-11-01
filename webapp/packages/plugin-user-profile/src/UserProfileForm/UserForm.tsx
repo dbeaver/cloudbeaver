@@ -141,7 +141,7 @@ export const UserForm = observer<Props>(function UserForm({
             </status-message>
             <TabList style={style} disabled={state.info.disabled}>
               <UserInfoTab style={style} />
-              <UserAuthProvidersTab style={style} />
+              {/* <UserAuthProvidersTab style={style} /> */}
             </TabList>
           </top-bar-tabs>
           <top-bar-actions>
@@ -150,7 +150,7 @@ export const UserForm = observer<Props>(function UserForm({
         </top-bar>
         <content-box>
           <UserInfoPanel user={user} style={style} />
-          <UserAuthProviderPanel user={user} style={style} />
+          {/* <UserAuthProviderPanel user={user} style={style} /> */}
         </content-box>
       </TabsState>
     </flex-box>

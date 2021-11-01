@@ -19,6 +19,7 @@ import { RolesManagerService } from './RolesManagerService';
 import { RolesResource } from './RolesResource';
 import { UserDataService } from './UserDataService';
 import { UserInfoResource } from './UserInfoResource';
+import { UserMetaParametersResource } from './UserMetaParametersResource';
 import { UsersResource } from './UsersResource';
 
 export const manifest: PluginManifest = {
@@ -39,5 +40,6 @@ export const manifest: PluginManifest = {
     UserDataService,
     UserInfoResource,
     UsersResource,
+    UserMetaParametersResource,
   ],
 };

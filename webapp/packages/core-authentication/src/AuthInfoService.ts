@@ -85,7 +85,7 @@ export class AuthInfoService {
     if (popup) {
       popup.focus();
       await this.waitWindowsClose(popup);
-      const user = await this.userInfoResource.refresh();
+      const user = await this.userInfoResource.refresh(undefined, []);
       await this.sessionDataResource.refresh();
       return user;
     }

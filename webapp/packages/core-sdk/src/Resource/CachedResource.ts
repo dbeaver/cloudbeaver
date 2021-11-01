@@ -15,6 +15,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 export interface ICachedResourceMetadata {
   outdated: boolean;
   loading: boolean;
+  includes: string[];
   exception: Error | null;
 }
 
@@ -28,23 +29,16 @@ export interface IParamAlias<TParam> {
   getAlias: (param: TParam) => TParam;
 }
 
-export type CachedResourceData<
-  TResource extends CachedResource<any, any, any, any>
-> = TResource extends CachedResource<infer T, any, any> ? T : never;
-
-export type CachedResourceParam<
-  TResource extends CachedResource<any, any, any, any>
-> = TResource extends CachedResource<any, infer T, any> ? T : never;
-
-export type CachedResourceKey<
-  TResource extends CachedResource<any, any, any, any>
-> = TResource extends CachedResource<any, any, infer T> ? T : never;
+export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any> ? T : never;
+export type CachedResourceParam<TResource> = TResource extends CachedResource<any, infer T, any, any> ? T : never;
+export type CachedResourceKey<TResource> = TResource extends CachedResource<any, any, infer T, any> ? T : never;
+export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, infer T> ? T : void;
 
 export abstract class CachedResource<
   TData,
   TParam,
   TKey = TParam,
-  TContext = void
+  TContext extends string[] | void = void
 > extends Dependency {
   data: TData;
 
@@ -55,6 +49,7 @@ export abstract class CachedResource<
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
   protected loadedKeys: TParam[];
+  protected defaultIncludes: string[];
 
   protected get loading(): boolean {
     return this.scheduler.executing;
@@ -65,7 +60,7 @@ export abstract class CachedResource<
   protected logActivity: boolean;
   protected outdateWaitList: TParam[];
 
-  constructor(defaultValue: TData) {
+  constructor(defaultValue: TData, defaultIncludes: string[] = []) {
     super();
 
     this.lock = this.lock.bind(this);
@@ -75,12 +70,14 @@ export abstract class CachedResource<
     this.logActivity = false;
     this.loadedKeys = [];
 
+    this.defaultIncludes = defaultIncludes || [];
     this.paramAliases = [];
     this.outdateWaitList = [];
     this.metadata = new MetadataMap(() => (observable({
       outdated: true,
       loading: false,
       exception: null,
+      includes: observable([...this.defaultIncludes]),
     }, undefined, { deep: false })));
     this.scheduler = new TaskScheduler(this.lock);
     this.data = defaultValue;
@@ -109,8 +106,7 @@ export abstract class CachedResource<
   }
 
   sync(
-    resource: CachedResource<any, TParam, TParam, void>,
-    context: TContext
+    resource: CachedResource<any, TParam, any, any>
   ): void {
     resource.outdateResource(this);
 
@@ -229,6 +225,16 @@ export abstract class CachedResource<
     return this.loadedKeys.some(loadedKey => this.includes(key, loadedKey));
   }
 
+  isIncludes(key: TParam, includes: TContext): boolean {
+    key = this.transformParam(key);
+    const metadata = this.metadata.get(key as any as TKey);
+
+    if (includes) {
+      return includes.every(include => metadata.includes.includes(include));
+    }
+    return true;
+  }
+
   getException(param: TParam): Error | null {
     param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).exception;
@@ -255,8 +261,13 @@ export abstract class CachedResource<
     metadata.loading = true;
   }
 
-  markDataLoaded(param: TParam, context: TContext): void {
+  markDataLoaded(param: TParam, includes: TContext): void {
     param = this.transformParam(param);
+
+    if (includes) {
+      this.commitIncludes(param, includes);
+    }
+
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = false;
   }
@@ -330,6 +341,43 @@ export abstract class CachedResource<
   async load(param: TParam, context: TContext): Promise<any> {
     await this.loadData(param, false, context);
     return this.data;
+  }
+
+  getIncludes(key?: TParam): string[] {
+    if (key === undefined) {
+      return this.defaultIncludes;
+    }
+    key = this.transformParam(key);
+
+    const metadata = this.metadata.get(key as any as TKey);
+
+    return metadata.includes;
+  }
+
+  getIncludesMap(key?: TParam, includes: string[] = this.defaultIncludes): Record<string, any> {
+    const keyIncludes = this.getIncludes(key);
+    return ['customIncludeBase', ...includes, ...keyIncludes].reduce<any>((map, key) => {
+      map[key] = true;
+
+      return map;
+    }, {});
+  }
+
+  protected resetIncludes(): void {
+    for (const metadata of this.metadata.values()) {
+      metadata.includes = [...this.defaultIncludes];
+    }
+  }
+
+  protected commitIncludes(key: TParam, includes: string[]): void {
+    key = this.transformParam(key);
+    const metadata = this.metadata.get(key as any as TKey);
+
+    for (const include of includes) {
+      if (!metadata.includes.includes(include)) {
+        metadata.includes.push(include);
+      }
+    }
   }
 
   protected setData(data: TData): void {

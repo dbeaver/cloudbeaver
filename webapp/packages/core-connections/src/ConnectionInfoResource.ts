@@ -25,6 +25,7 @@ import {
   NavigatorSettingsInput,
   ResourceKeyList,
   CachedMapAllKey,
+  CachedResourceIncludeArgs,
 } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseConnection } from './Administration/ConnectionsResource';
@@ -225,7 +226,10 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.delete(id);
   }
 
-  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, Connection>> {
+  protected async loader(
+    key: ResourceKey<string>,
+    includes: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes>
+  ): Promise<Map<string, Connection>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
     key = this.transformParam(key);
 

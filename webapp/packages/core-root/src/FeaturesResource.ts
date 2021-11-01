@@ -18,7 +18,7 @@ import { ServerConfigResource } from './ServerConfigResource';
 export type ApplicationFeature = WebFeatureSet;
 
 @injectable()
-export class FeaturesResource extends CachedDataResource<ApplicationFeature[], void> {
+export class FeaturesResource extends CachedDataResource<ApplicationFeature[], void | any> {
   constructor(
     private graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource

@@ -14,7 +14,11 @@ export type CachedResourceIncludeFlags<TValue, TArgs> = {
 
 export type CachedResourceIncludeList<TValue> = Array<CachedResourceIncludeTemplate<TValue>>;
 export type CachedResourceIncludeToKey<TKey> = TKey extends Array<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
-export type CachedResourceIncludeArgs<TValue, TArguments> = Array<keyof CachedResourceIncludeFlags<TValue, TArguments>>;
+export type CachedResourceIncludeArgs<TValue, TArguments> = Array<
+keyof CachedResourceIncludeFlags<
+Exclude<TValue, undefined | null>,
+TArguments>
+>;
 
 export type ApplyIncludes<TValue, TKeys> = TValue
 & ({
@@ -26,7 +30,9 @@ export type ApplyIncludes<TValue, TKeys> = TValue
 export type CachedResourceValueIncludes<TValue, TKeys> = TValue extends any
   ? (
     TValue extends Array<infer TElement>
-      ? Array<ApplyIncludes<TElement, TKeys>>
+      ? TElement extends Record<any, any>
+        ? Array<ApplyIncludes<TElement, TKeys>>
+        : ApplyIncludes<TValue, TKeys>
       : ApplyIncludes<TValue, TKeys>
   )
   : undefined;

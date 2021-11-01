@@ -9,10 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, TabPanel } from '@cloudbeaver/core-blocks';
+import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group, GroupTitle, InputField, IProperty, Loader, ObjectPropertyInfoForm, PropertiesTable, TabPanel, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import { AuthProvidersList } from '../AuthProviders/ConfigurationsList';
 
 interface Props {
   user: UserInfo;
@@ -25,8 +28,20 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
   className,
   style,
 }) {
+  const userMetaParameters = useDataResource(UserInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
+
+  // const properties = getComputed<IProperty[]>(() => userMetaParameters.data.map(property => ({
+  //   id: property.id!,
+  //   key: property.id!,
+  //   keyPlaceholder: property.id,
+  //   displayName: property.displayName,
+  //   valuePlaceholder: property.defaultValue,
+  //   defaultValue: property.defaultValue,
+  //   description: property.description,
+  //   validValues: property.validValues,
+  // })));
 
   return styled(styles)(
     <TabPanel tabId='info' className={className}>
@@ -63,8 +78,55 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 {translate('plugin_user_profile_info_displayName')}
               </InputField>
             </Container>
+
+            {userMetaParameters.data.length > 0 && (
+              <>
+                <Container wrap gap>
+                  <Loader state={userMetaParameters}>
+                    {() => (
+                      <ObjectPropertyInfoForm
+                        state={user.metaParameters}
+                        properties={userMetaParameters.data}
+                        category={null}
+                        disabled
+                        readOnly
+                      />
+                      // <PropertiesTable
+                      //   properties={properties}
+                      //   propertiesState={user.metaParameters}
+                      //   readOnly
+                      // />
+                    )}
+                  </Loader>
+                </Container>
+              </>
+            )}
+          </Group>
+          {/* <Group box keepSize large>
+            <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
+
+            <Loader state={userMetaParameters}>
+              {() => (
+                <ObjectPropertyInfoForm
+                  state={user.metaParameters}
+                  properties={userMetaParameters.data}
+                  category={null}
+                  disabled
+                  readOnly
+                />
+                // <PropertiesTable
+                //   properties={properties}
+                //   propertiesState={user.metaParameters}
+                //   readOnly
+                // />
+              )}
+            </Loader>
+          </Group> */}
+          <Group box medium overflow>
+            <AuthProvidersList user={user} providers={user.linkedAuthProviders} />
           </Group>
         </Container>
+
       </ColoredContainer>
     </TabPanel>
   );

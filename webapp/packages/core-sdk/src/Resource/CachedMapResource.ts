@@ -11,26 +11,20 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { CachedResource, ICachedResourceMetadata } from './CachedResource';
+import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
 import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
-export type CachedMapResourceKey<
-  TResource extends CachedMapResource<any, any, any>
-> = TResource extends CachedResource<Map<infer T, any>, any, any, any> ? T : never;
-
+export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
 export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any>
   ? T
   : never;
-
-export type CachedMapResourceArguments<
-  TResource extends CachedMapResource<any, any, any>
-> = TResource extends CachedMapResource<any, any, infer T> ? T : never;
+export type CachedMapResourceArguments<TResource> = TResource extends CachedMapResource<any, any, infer T> ? T : never;
 
 export type CachedMapResourceListGetter<
   TValue,
   TIncludes
-> = Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>;
+> = Array<CachedMapResourceGetter<TValue, TIncludes>>;
 
 export type CachedMapResourceGetter<
   TValue,
@@ -65,7 +59,6 @@ export abstract class CachedMapResource<
   readonly onItemAdd: ISyncExecutor<ResourceKey<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKey<TKey>>;
   protected metadata: MetadataMap<TKey, ICachedMapResourceMetadata>;
-  protected defaultIncludes: string[];
 
   get values(): TValue[] {
     return Array.from(this.data.values());
@@ -76,10 +69,9 @@ export abstract class CachedMapResource<
   }
 
   constructor(defaultIncludes?: CachedResourceIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
-    super(defaultValue || new Map());
+    super(defaultValue || new Map(), defaultIncludes);
     this.onItemAdd = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKey<TKey>>(null);
-    this.defaultIncludes = defaultIncludes || [];
 
     this.metadata = new MetadataMap(() => observable({
       outdated: true,
@@ -404,15 +396,6 @@ export abstract class CachedMapResource<
     }
 
     return this.includes(param, second);
-  }
-
-  protected resetIncludes(): void {
-    const keys = resourceKeyList(this.keys);
-    ResourceKeyUtils.forEach(keys, key => {
-      const metadata = this.metadata.get(key);
-
-      metadata.includes = [...this.defaultIncludes];
-    });
   }
 
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {

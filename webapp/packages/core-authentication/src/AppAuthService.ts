@@ -40,7 +40,7 @@ export class AppAuthService extends Bootstrap {
       throw new Error('Can\'t configure Authentication');
     }
 
-    const user = await this.userInfoResource.load();
+    const user = await this.userInfoResource.load(undefined, []);
 
     return !this.serverService.config.configurationMode
       && !config.anonymousAccessEnabled
@@ -48,7 +48,7 @@ export class AppAuthService extends Bootstrap {
   }
 
   async authUser(): Promise<boolean> {
-    const userInfo = await this.userInfoResource.load();
+    const userInfo = await this.userInfoResource.load(undefined, []);
 
     const state = userInfo !== null;
     await this.auth.execute(state);

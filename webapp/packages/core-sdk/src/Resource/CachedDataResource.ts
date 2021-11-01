@@ -9,13 +9,39 @@
 import { makeObservable, observable } from 'mobx';
 
 import { CachedResource } from './CachedResource';
+import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
+
+export type CachedDataResourceData<TResource> = TResource extends CachedDataResource<infer T, any, any, any>
+  ? T
+  : never;
+export type CachedDataResourceParam<TResource> = TResource extends CachedDataResource<any, infer T, any, any>
+  ? T
+  : never;
+export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, any, infer T, any>
+  ? T
+  : never;
+export type CachedDataResourceContext<TResource> = TResource extends CachedDataResource<any, any, any, infer T>
+  ? T
+  : never;
+
+export type CachedDataResourceGetter<
+  TValue,
+  TIncludes
+> = CachedResourceValueIncludes<TValue, TIncludes>;
+
+type ContextArg<TData, TContext> = TContext extends void ? void : CachedResourceIncludeArgs<TData, TContext>;
 
 export abstract class CachedDataResource<
   TData,
   TParam = void,
   TKey = TParam,
-  TContext = void,
-> extends CachedResource<TData, TParam, TKey, TContext> {
+  TContext extends Record<string, any> | void = void,
+> extends CachedResource<
+  TData,
+  TParam,
+  TKey,
+  ContextArg<TData, TContext>
+  > {
   protected loaded: boolean;
 
   constructor(defaultValue: TData) {
@@ -23,23 +49,36 @@ export abstract class CachedDataResource<
 
     this.loaded = false;
 
-    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loaded'>(this, {
+    makeObservable<this, 'loaded'>(this, {
       loaded: observable,
     });
 
     this.onDataUpdate.addHandler(() => { this.loaded = true; });
   }
 
-  isLoaded(param: TParam, context: TContext): boolean {
-    return this.loaded;
+  isLoaded(param: TParam, includes: ContextArg<TData, TContext>): boolean {
+    if (!this.loaded) {
+      return false;
+    }
+
+    param = this.transformParam(param);
+
+    if (includes) {
+      const metadata = this.metadata.get(param as any as TKey);
+
+      if (includes.some(include => !metadata.includes.includes(include))) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  async refresh(param: TParam, context: TContext): Promise<TData> {
+  async refresh(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
     await this.loadData(param, true, context);
     return this.data;
   }
 
-  async load(param: TParam, context: TContext): Promise<TData> {
+  async load(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
     await this.loadData(param, false, context);
     return this.data;
   }
