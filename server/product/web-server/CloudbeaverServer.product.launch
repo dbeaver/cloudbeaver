@@ -42,9 +42,10 @@
         <setEntry value="com.google.gson@default:default"/>
         <setEntry value="com.ibm.icu.base@default:default"/>
         <setEntry value="com.jcraft.jsch@default:default"/>
-        <setEntry value="com.sun.jna.platform@default:default"/>
-        <setEntry value="com.sun.jna@default:default"/>
-        <setEntry value="javax.servlet@default:default"/>
+        <setEntry value="com.sun.jna*4.5.1.v20190425-1842@default:default"/>
+        <setEntry value="com.sun.jna*5.8.0.v20210503-0343@default:default"/>
+        <setEntry value="com.sun.jna.platform*4.5.1.v20190425-1842@default:default"/>
+        <setEntry value="com.sun.jna.platform*5.8.0.v20210406-1004@default:default"/>
         <setEntry value="org.apache.commons.jexl@default:default"/>
         <setEntry value="org.apache.commons.logging@default:default"/>
         <setEntry value="org.apache.felix.scr@1:true"/>
@@ -88,7 +89,6 @@
         <setEntry value="org.jkiss.bundle.apache.dbcp@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.kerby@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.poi@default:default"/>
-        <setEntry value="org.jkiss.bundle.bouncycastle@default:default"/>
         <setEntry value="org.jkiss.bundle.cassandra@default:default"/>
         <setEntry value="org.jkiss.bundle.couchbase@default:default"/>
         <setEntry value="org.jkiss.bundle.gis@default:default"/>
@@ -98,9 +98,7 @@
         <setEntry value="org.jkiss.bundle.jaxb@default:default"/>
         <setEntry value="org.jkiss.bundle.jedis@default:default"/>
         <setEntry value="org.jkiss.bundle.lightcouch@default:default"/>
-        <setEntry value="org.jkiss.bundle.liquibase@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
-        <setEntry value="org.objectweb.asm*9.0.0.v20201001-1419@default:default"/>
         <setEntry value="org.slf4j.api@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
