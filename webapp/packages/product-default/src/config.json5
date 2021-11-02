@@ -18,7 +18,7 @@
             },
             sqlEditor: {
                 // max size of the file that can be uploaded to the editor (in kilobytes)
-                maxFileSize: 100,
+                maxFileSize: 100
             }
         }
     },
