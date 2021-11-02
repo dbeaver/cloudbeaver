@@ -14,13 +14,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { UserAuthProviderPanel } from './AuthProviders/UserAuthProvidersPanel';
-import { UserAuthProvidersTab } from './AuthProviders/UserAuthProvidersTab';
 import type { IUserProfileFormState } from './IUserProfileFormState';
 import { MetaParameterInfoPanel } from './UserInfo/MetaParameterInfoPanel';
 import { MetaParameterInfoTab } from './UserInfo/MetaParameterInfoTab';
-import { UserInfoPanel } from './UserInfo/UserInfoPanel';
-import { UserInfoTab } from './UserInfo/UserInfoTab';
 
 const tabsStyles = css`
   TabList {

@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -79,7 +79,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
                 title={translate('authentication_administration_tools_add_tooltip')}
                 icon="add"
                 viewBox="0 0 24 24"
-                disabled={sub && !!createMetaParameterService.user}
+                disabled={(sub && !!createMetaParameterService.user) || true}
                 onClick={createMetaParameterService.create}
               >
                 {translate('ui_add')}
@@ -89,7 +89,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
               title={translate('authentication_administration_tools_refresh_tooltip')}
               icon="refresh"
               viewBox="0 0 24 24"
-              onClick={controller.update}
+              onClick={userMetaParametersResource.reload}
             >
               {translate('ui_refresh')}
             </ToolsAction>
@@ -98,7 +98,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
                 title={translate('authentication_administration_tools_delete_tooltip')}
                 icon="trash"
                 viewBox="0 0 24 24"
-                disabled={!controller.itemsSelected}
+                disabled={!controller.itemsSelected || true}
                 onClick={controller.delete}
               >
                 {translate('ui_delete')}
@@ -143,6 +143,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
               ))}
             </TableBody>
           </Table>
+          <Loader state={userMetaParametersResource} overlay />
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>
