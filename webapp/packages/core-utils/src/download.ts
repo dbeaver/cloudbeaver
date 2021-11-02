@@ -9,6 +9,7 @@
 export function download(blob: Blob, fileName: string): void {
   const saveLink = document.createElement('a');
 
+  saveLink.tabIndex = -1;
   saveLink.download = fileName;
   saveLink.style.display = 'none';
   document.body.appendChild(saveLink);
