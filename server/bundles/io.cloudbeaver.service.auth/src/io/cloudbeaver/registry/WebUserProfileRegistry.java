@@ -54,8 +54,8 @@ public class WebUserProfileRegistry {
     private void loadExtensions(IExtensionRegistry registry) {
         IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(EXTENSION_ID);
         for (IConfigurationElement ext : extConfigs) {
-            for (IConfigurationElement cfgElement : ext.getChildren("userProfileProperties")) {
-                for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
+            if (ext.getName().equals("userProfileProperties")) {
+                for (IConfigurationElement propGroup : ArrayUtils.safeArray(ext.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
                     properties.addAll(PropertyDescriptor.extractProperties(propGroup));
                 }
             }
