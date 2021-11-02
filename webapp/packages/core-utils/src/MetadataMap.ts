@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, untracked } from 'mobx';
+import { makeObservable, observable, untracked } from 'mobx';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
 export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, TValue>) => TValue;
@@ -21,6 +21,10 @@ export class MetadataMap<TKey, TValue> {
     this.data = observable(new Map());
     this.length = 0;
     this.syncData = null;
+
+    makeObservable<this, 'data'>(this, {
+      data: observable.ref,
+    });
   }
 
   [Symbol.iterator]() {
@@ -54,7 +58,7 @@ export class MetadataMap<TKey, TValue> {
 
   set(key: TKey, value: TValue): void {
     this.data.set(key, value);
-    this.syncData?.push([key, value]);
+    this.syncData?.push([key, this.data.get(key)!]);
   }
 
   get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
