@@ -50,6 +50,7 @@ export const defaultRULocale = [
   ['ui_set', 'Установить'],
   ['ui_are_you_sure', 'Вы уверены?'],
   ['ui_options', 'Параметры'],
+  ['ui_changes_might_be_lost', 'Ваши изменения могут быть потеряны'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

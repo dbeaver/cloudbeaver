@@ -13,6 +13,7 @@ import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorService } from './SqlEditorService';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
@@ -35,5 +36,6 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlEditorService,
     SqlEditorNavigatorService,
     LocaleService,
+    SqlEditorSettingsService,
   ],
 };

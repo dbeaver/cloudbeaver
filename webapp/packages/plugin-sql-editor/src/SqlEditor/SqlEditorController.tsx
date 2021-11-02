@@ -234,6 +234,11 @@ export class SqlEditorController implements IInitializableController, IDestructi
     }
   };
 
+  setQuery(query: string): void {
+    this.tab.handlerState.query = query;
+    this.parser.setScript(query);
+  }
+
   private async executeQueryAction(
     query: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<void>
@@ -515,8 +520,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
       (data as any).cancel(); // seems it doesn't works, after disabling read-only mode, typings appears
       return;
     }
-    this.tab.handlerState.query = query;
-    this.parser.setScript(query);
+
+    this.setQuery(query);
   }
 }
 
