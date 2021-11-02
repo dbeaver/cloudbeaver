@@ -110,16 +110,13 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         {() => userMetaParameters.data.length > 0 && styled(style)(
           <Group small gap vertical overflow>
             <GroupTitle keepSize>{translate('authentication_user_meta_parameters')}</GroupTitle>
-
-            <Container wrap gap>
-              <ObjectPropertyInfoForm
-                state={controller.credentials.metaParameters}
-                properties={userMetaParameters.data}
-                disabled={controller.isSaving}
-                keepSize
-                tiny
-              />
-            </Container>
+            <ObjectPropertyInfoForm
+              state={controller.credentials.metaParameters}
+              properties={userMetaParameters.data}
+              disabled={controller.isSaving}
+              keepSize
+              tiny
+            />
           </Group>
         )}
       </Loader>

@@ -76,7 +76,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                     properties={userMetaParameters.data}
                     disabled
                     readOnly
-                    keepSize
                     tiny
                     fill
                   />
