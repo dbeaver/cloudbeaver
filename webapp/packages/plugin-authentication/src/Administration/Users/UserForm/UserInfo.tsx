@@ -115,8 +115,9 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               <ObjectPropertyInfoForm
                 state={controller.credentials.metaParameters}
                 properties={userMetaParameters.data}
-                category={null}
                 disabled={controller.isSaving}
+                keepSize
+                tiny
               />
             </Container>
           </Group>

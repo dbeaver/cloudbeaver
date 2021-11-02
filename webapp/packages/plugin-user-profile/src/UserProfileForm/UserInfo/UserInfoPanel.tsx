@@ -74,9 +74,11 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                   <ObjectPropertyInfoForm
                     state={user.metaParameters}
                     properties={userMetaParameters.data}
-                    category={null}
                     disabled
                     readOnly
+                    keepSize
+                    tiny
+                    fill
                   />
                 </Container>
               )}
