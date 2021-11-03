@@ -9,7 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
+import { TLocalizationToken, Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
@@ -31,8 +31,9 @@ export interface ConfirmationDialogPayload {
   subTitle?: string;
   bigIcon?: boolean;
   viewBox?: string;
-  message: string;
-  confirmActionText?: string;
+  message: TLocalizationToken;
+  confirmActionText?: TLocalizationToken;
+  cancelActionText?: TLocalizationToken;
 }
 
 export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = function ConfirmationDialog({
@@ -41,7 +42,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
   rejectDialog,
   className,
 }) {
-  const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText } = payload;
+  const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return styled(useStyles(style))(
     <CommonDialogWrapper
@@ -60,7 +61,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
             mod={['outlined']}
             onClick={rejectDialog}
           >
-            <Translate token='ui_processing_cancel' />
+            <Translate token={cancelActionText || 'ui_processing_cancel'} />
           </Button>
           <fill />
           <Button
