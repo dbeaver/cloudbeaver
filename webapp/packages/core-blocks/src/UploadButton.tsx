@@ -25,21 +25,20 @@ const styles = css`
 export const UploadButton: React.FC<Props> = function UploadButton({ id, reset, className, children, ...rest }) {
   const _id = id ?? uuid();
 
-  const clickHandler = (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
-    const target = event.target as HTMLInputElement;
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (rest.onChange) {
+      await (rest.onChange(event) as void | Promise<void>);
 
-    if (reset) {
-      target.value = '';
-    }
-
-    if (rest.onClick) {
-      rest.onClick(event);
+      if (reset) {
+        const target = event.target as HTMLInputElement;
+        target.value = '';
+      }
     }
   };
 
   return styled(styles)(
     <>
-      <input {...rest} type='file' id={_id} hidden onClick={clickHandler} />
+      <input {...rest} type='file' id={_id} hidden onChange={handleChange} />
       <label htmlFor={_id} className={className} title={rest.title}>
         {children}
       </label>

@@ -155,7 +155,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
             accept='.sql'
             title={translate('sql_editor_upload_script_tooltip')}
             reset
-            onChange={event => tools.uploadScript(event.target.files)}
+            onChange={async event => await tools.uploadScript(event.target.files)}
           >
             <upload>
               <StaticImage icon='/icons/load.svg' />
