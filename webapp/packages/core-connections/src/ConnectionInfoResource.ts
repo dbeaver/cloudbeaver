@@ -88,7 +88,11 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   getConnectionForNode(nodeId: string): Connection | undefined {
-    const connectionPart = nodeId.slice(0, nodeId.indexOf('/', 11));
+    const indexOfConnectionPart = nodeId.indexOf('/', 11);
+    const connectionPart = nodeId.slice(
+      0,
+      indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length
+    );
 
     const connectionId = this.nodeIdMap.get(connectionPart);
 
