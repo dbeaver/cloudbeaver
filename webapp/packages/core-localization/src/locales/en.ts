@@ -46,6 +46,7 @@ export const defaultENLocale = [
   ['ui_search_no_result_placeholder', 'No results have been found.'],
   ['ui_save_reminder', 'You have unsaved changes.'],
   ['ui_yes', 'Yes'],
+  ['ui_no', 'No'],
   ['ui_select_all', 'Select all'],
   ['ui_reconnect', 'Reconnect'],
   ['ui_forget', 'Forget'],

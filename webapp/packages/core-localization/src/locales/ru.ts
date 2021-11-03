@@ -44,6 +44,7 @@ export const defaultRULocale = [
   ['ui_search_no_result_placeholder', 'По вашему запросу ничего не найдено.'],
   ['ui_save_reminder', 'У вас есть несохраненные изменения.'],
   ['ui_yes', 'Да'],
+  ['ui_no', 'Нет'],
   ['ui_select_all', 'Выбрать все'],
   ['ui_reconnect', 'Переподключиться'],
   ['ui_forget', 'Забыть'],

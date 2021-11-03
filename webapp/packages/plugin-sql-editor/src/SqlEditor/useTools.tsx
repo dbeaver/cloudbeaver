@@ -45,7 +45,8 @@ export function useTools(controller: SqlEditorController, tab: ITab<ISqlEditorTa
         const state = await this.commonDialogService.open(ConfirmationDialog, {
           title: 'ui_changes_might_be_lost',
           message: 'sql_editor_upload_script_unsaved_changes_dialog_message',
-          confirmActionText: 'ui_processing_save',
+          confirmActionText: 'ui_yes',
+          cancelActionText: 'ui_no',
         });
 
         if (state !== DialogueStateResult.Rejected) {
