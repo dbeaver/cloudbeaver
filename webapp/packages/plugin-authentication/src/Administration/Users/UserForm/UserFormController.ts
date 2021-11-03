@@ -296,6 +296,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadUser() {
     try {
+      this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
     } catch (exception) {

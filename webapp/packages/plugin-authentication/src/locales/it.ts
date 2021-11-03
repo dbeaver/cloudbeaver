@@ -27,6 +27,7 @@ export default [
   ['authentication_administration_user_create_failed', 'Errore di creazione nuovo utente'],
   ['authentication_user_name', 'Nome utente'],
   ['authentication_user_credentials', 'Credenziali'],
+  ['authentication_user_meta_parameters', 'Parameters'],
   ['authentication_user_current_password', 'Password corrente'],
   ['authentication_user_new_password', 'Nuova password'],
   ['authentication_user_password', 'Password utente'],

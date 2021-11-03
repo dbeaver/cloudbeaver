@@ -35,6 +35,7 @@ export default [
 
   ['authentication_user_name', 'User name'],
   ['authentication_user_credentials', 'Credentials'],
+  ['authentication_user_meta_parameters', 'Parameters'],
   ['authentication_user_current_password', 'Current password'],
   ['authentication_user_new_password', 'New password'],
   ['authentication_user_password', 'User password'],
