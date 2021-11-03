@@ -600,15 +600,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Object deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException {
+    public Boolean deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException {
         throw new DBWebException("Not implemented");
     }
 
     @Override
-    public Object setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
+    public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
         try {
             CBApplication.getInstance().getSecurityController().setUserMeta(userId, parameters);
-            return parameters;
+            return true;
         } catch (DBCException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);
         }
