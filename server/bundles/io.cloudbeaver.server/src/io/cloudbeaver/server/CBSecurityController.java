@@ -252,8 +252,8 @@ class CBSecurityController implements DBWSecurityController {
                     try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
                         dbStat.setString(1, userId);
                         for (Map.Entry<String, Object> mpe : metaParameters.entrySet()) {
-                            dbStat.setString(1, mpe.getKey());
-                            dbStat.setString(2, CommonUtils.toString(mpe.getValue()));
+                            dbStat.setString(2, mpe.getKey());
+                            dbStat.setString(3, CommonUtils.toString(mpe.getValue()));
                             dbStat.execute();
                         }
                     }
