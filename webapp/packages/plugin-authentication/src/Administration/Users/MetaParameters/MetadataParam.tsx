@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand
 } from '@cloudbeaver/core-blocks';
-import type { ObjectPropertyInfo } from '@cloudBeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
