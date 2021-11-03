@@ -20,6 +20,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
 
@@ -44,6 +45,11 @@ public class LocalAuthSession implements DBASession {
     @Override
     public DBAAuthSpace getSessionSpace() {
         return webSession.getSingletonProject();
+    }
+
+    @Override
+    public DBASessionPrincipal getSessionPrincipal() {
+        return webSession.getSessionPrincipal();
     }
 
     @NotNull

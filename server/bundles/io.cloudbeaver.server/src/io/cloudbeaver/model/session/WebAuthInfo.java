@@ -25,6 +25,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.time.OffsetDateTime;
@@ -33,7 +34,7 @@ import java.util.Map;
 /**
  * WebAuthInfo
  */
-public class WebAuthInfo {
+public class WebAuthInfo implements DBASessionPrincipal {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);
 
@@ -148,5 +149,18 @@ public class WebAuthInfo {
 
     public void setUserCredentials(Map<String, Object> userCredentials) {
         this.userCredentials = userCredentials;
+    }
+
+    //////////////////////////////////////
+    // Principal
+
+    @Override
+    public String getUserDomain() {
+        return authProvider.getId();
+    }
+
+    @Override
+    public String getUserName() {
+        return user.getUserId();
     }
 }

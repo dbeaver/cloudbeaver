@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProvider;
@@ -133,6 +134,16 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     @Override
     public DBAAuthSpace getSessionSpace() {
         return sessionProject;
+    }
+
+    @Override
+    public DBASessionPrincipal getSessionPrincipal() {
+        synchronized (authTokens) {
+            if (authTokens.isEmpty()) {
+                return null;
+            }
+            return authTokens.get(0);
+        }
     }
 
     @NotNull

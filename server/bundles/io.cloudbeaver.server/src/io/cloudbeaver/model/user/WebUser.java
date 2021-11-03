@@ -32,13 +32,13 @@ public class WebUser implements WebAuthSubject {
     private final String userId;
     private String displayName;
 
-    private Map<String, String> metaParameters = new LinkedHashMap<>();
-    private Map<String, Object> configurationParameters = new LinkedHashMap<>();
+    private final Map<String, String> metaParameters = new LinkedHashMap<>();
+    private final Map<String, Object> configurationParameters = new LinkedHashMap<>();
 
     private WebRole[] roles = null;
 
     private String activeAuthModel;
-    private Map<String, Map<String, Object>> authCredentials = new HashMap<>();
+    private final Map<String, Map<String, Object>> authCredentials = new HashMap<>();
 
     public WebUser(@NotNull String userId) {
         this.userId = userId;
