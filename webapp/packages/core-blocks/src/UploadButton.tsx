@@ -12,6 +12,8 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 interface Props extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   className?: string;
+  /** Reset prev file path. This ensures that the onChange event will be triggered for the same file as well */
+  reset?: boolean;
 }
 
 const styles = css`
@@ -20,12 +22,17 @@ const styles = css`
   }
 `;
 
-export const UploadButton: React.FC<Props> = function UploadButton({ id, className, children, ...rest }) {
+export const UploadButton: React.FC<Props> = function UploadButton({ id, reset, className, children, ...rest }) {
   const _id = id ?? uuid();
+
+  const handleReset = (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+    const target = event.target as HTMLInputElement;
+    target.value = '';
+  };
 
   return styled(styles)(
     <>
-      <input {...rest} type='file' id={_id} hidden />
+      <input {...rest} type='file' id={_id} hidden onClick={reset ? handleReset : undefined} />
       <label htmlFor={_id} className={className} title={rest.title}>
         {children}
       </label>
