@@ -12,12 +12,13 @@ import type { ITab } from '@cloudbeaver/core-app';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, generateFileName, uploadTextFiles } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
+import { ScriptImportDialog } from './ScriptImportDialog';
 import type { SqlEditorController } from './SqlEditorController';
 
 interface State {
@@ -42,14 +43,13 @@ export function useTools(controller: SqlEditorController, tab: ITab<ISqlEditorTa
       }
 
       if (this.controller.value.trim()) {
-        const state = await this.commonDialogService.open(ConfirmationDialog, {
-          title: 'ui_changes_might_be_lost',
-          message: 'sql_editor_upload_script_unsaved_changes_dialog_message',
-          confirmActionText: 'ui_yes',
-          cancelActionText: 'ui_no',
-        });
+        const result = await this.commonDialogService.open(ScriptImportDialog, null);
 
-        if (state !== DialogueStateResult.Rejected) {
+        if (result === DialogueStateResult.Rejected) {
+          return;
+        }
+
+        if (result !== DialogueStateResult.Resolved && result) {
           this.downloadScript();
         }
       }
