@@ -606,7 +606,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public Object setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
-        throw new DBWebException("Not implemented");
+        try {
+            CBApplication.getInstance().getSecurityController().setUserMeta(userId, parameters);
+            return parameters;
+        } catch (DBCException e) {
+            throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);
+        }
     }
 
 }

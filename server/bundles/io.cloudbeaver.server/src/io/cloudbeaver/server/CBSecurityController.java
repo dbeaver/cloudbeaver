@@ -238,6 +238,33 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public void setUserMeta(String userId, Map<String, Object> metaParameters) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                // Delete old metas
+                try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_USER_META WHERE USER_ID=?")) {
+                    dbStat.setString(1, userId);
+                    dbStat.execute();
+                }
+                if (!metaParameters.isEmpty()) {
+                    // Insert new metas
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
+                        dbStat.setString(1, userId);
+                        for (Map.Entry<String, Object> mpe : metaParameters.entrySet()) {
+                            dbStat.setString(1, mpe.getKey());
+                            dbStat.setString(2, CommonUtils.toString(mpe.getValue()));
+                            dbStat.execute();
+                        }
+                    }
+                }
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while loading users", e);
+        }
+    }
+
     ///////////////////////////////////////////
     // Credentials
 

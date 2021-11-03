@@ -50,6 +50,8 @@ public interface DBWSecurityController {
     @NotNull
     WebUser[] findUsers(String userNameMask) throws DBCException;
 
+    void setUserMeta(String userId, Map<String, Object> metaParameters) throws DBCException;
+
     ///////////////////////////////////////////
     // Credentials
 
