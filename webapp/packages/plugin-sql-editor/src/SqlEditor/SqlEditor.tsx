@@ -145,7 +145,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
         </actions>
         <tools onMouseDown={preventFocus}>
           <button
-            disabled={controller.isLineScriptEmpty}
+            disabled={!controller.value.trim()}
             title={translate('sql_editor_download_script_tooltip')}
             onClick={tools.downloadScript}
           >
