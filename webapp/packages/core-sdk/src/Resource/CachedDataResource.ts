@@ -45,7 +45,7 @@ export abstract class CachedDataResource<
   protected loaded: boolean;
 
   constructor(defaultValue: TData) {
-    super(defaultValue);
+    super(defaultValue, []);
 
     this.loaded = false;
 
@@ -64,7 +64,7 @@ export abstract class CachedDataResource<
     param = this.transformParam(param);
 
     if (includes) {
-      const metadata = this.metadata.get(param as any as TKey);
+      const metadata = this.getMetadata(param);
 
       if (includes.some(include => !metadata.includes.includes(include))) {
         return false;

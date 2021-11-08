@@ -34,7 +34,6 @@ UserInfoIncludes
     super(null);
 
     this.userChange = new SyncExecutor();
-
     this.sync(sessionResource);
   }
 
@@ -64,8 +63,10 @@ UserInfoIncludes
     }
 
     // TODO: will be changed due wrong origin in authTokens
-    return this.data.authTokens.some(token => token.origin.type === (subType ?? type))
-    || this.data.authTokens.some(token => token.origin.type === type && token.origin.subType === subType);
+    return (
+      this.data.authTokens.some(token => token.origin.type === (subType ?? type))
+      || this.data.authTokens.some(token => token.origin.type === type && token.origin.subType === subType)
+    );
   }
 
   async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
@@ -84,6 +85,7 @@ UserInfoIncludes
       } else {
         this.data.authTokens.push(authToken as UserAuthToken);
       }
+      this.resetIncludes();
     });
     this.sessionDataResource.markOutdated();
 
@@ -95,6 +97,7 @@ UserInfoIncludes
       if (this.data) {
         await this.graphQLService.sdk.authLogout();
         this.setData(null);
+        this.resetIncludes();
       }
     });
     this.sessionDataResource.markOutdated();
@@ -124,5 +127,10 @@ UserInfoIncludes
       customIncludeOriginDetails: true,
       includeMetaParameters: false,
     };
+  }
+
+  protected resetIncludes(): void {
+    const metadata = this.getMetadata();
+    metadata.includes = [...this.defaultIncludes];
   }
 }
