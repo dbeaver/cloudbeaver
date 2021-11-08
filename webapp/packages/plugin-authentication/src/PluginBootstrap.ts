@@ -8,7 +8,7 @@
 
 import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
-import { AuthInfoService } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -42,8 +42,12 @@ export class PluginBootstrap extends Bootstrap {
   register(): void {
     this.menuService.addCreator({
       isApplicable:
-        context => context.get(DATA_CONTEXT_MENU) === MENU_USER_PROFILE
-        && !context.get(DATA_CONTEXT_MENU_NESTED),
+        context => {
+          const profile = context.get(DATA_CONTEXT_MENU) === MENU_USER_PROFILE
+            && !context.get(DATA_CONTEXT_MENU_NESTED);
+
+          return profile && !!this.authInfoService.userInfo?.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);
+        },
       getItems: (context, items) => [
         ...items,
         new MenuBaseItem('change-password', 'authentication_user_password_change_menu_title', undefined, {
