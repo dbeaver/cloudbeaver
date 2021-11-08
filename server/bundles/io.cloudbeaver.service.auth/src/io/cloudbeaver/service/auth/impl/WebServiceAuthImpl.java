@@ -278,7 +278,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (webSession.getUser() == null) {
             return null;
         }
-        return new WebUserInfo(webSession, webSession.getUser());
+        try {
+            // Read user from security controller. It will also read meta parsameters
+            WebUser userWithDetails = CBApplication.getInstance().getSecurityController().getUserById(webSession.getUser().getUserId());
+            return new WebUserInfo(webSession, userWithDetails);
+        } catch (DBCException e) {
+            throw new DBWebException("Error reading user details", e);
+        }
     }
 
     @Override
