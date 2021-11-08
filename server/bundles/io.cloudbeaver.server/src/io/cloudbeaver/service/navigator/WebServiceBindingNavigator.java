@@ -42,6 +42,9 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 env.getArgument("offset"),
                 env.getArgument("limit"),
                 env.getArgument("onlyFolders")))
+        .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
+                getWebSession(env),
+                env.getArgument("nodePath")))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
                 getWebSession(env),
                 env.getArgument("nodePath")))

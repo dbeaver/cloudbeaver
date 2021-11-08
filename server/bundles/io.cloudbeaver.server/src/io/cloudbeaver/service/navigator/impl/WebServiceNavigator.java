@@ -109,6 +109,28 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
+    public List<WebNavigatorNodeInfo> getNavigatorNodeParents(@NotNull WebSession session, String nodePath) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = session.getProgressMonitor();
+
+            DBNModel navigatorModel = session.getNavigatorModel();
+            DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
+            if (node == null) {
+                throw new DBWebException("Node '" + nodePath + "' not found");
+            }
+
+            List<WebNavigatorNodeInfo> nodeParents = new ArrayList<>();
+            for (DBNNode parent = node.getParentNode(); parent != null && !(parent instanceof DBNRoot); parent = parent.getParentNode()) {
+                nodeParents.add(new WebNavigatorNodeInfo(session, parent));
+            }
+
+            return nodeParents;
+        } catch (DBException e) {
+            throw new DBWebException(e, null);
+        }
+    }
+
+    @Override
     @NotNull
     public WebNavigatorNodeInfo getNavigatorNodeInfo(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException {
         try {

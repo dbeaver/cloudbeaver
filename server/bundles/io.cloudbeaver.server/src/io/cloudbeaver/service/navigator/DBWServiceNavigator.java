@@ -39,6 +39,11 @@ public interface DBWServiceNavigator extends DBWService {
         Boolean onlyFolders) throws DBWebException;
 
     @WebAction
+    List<WebNavigatorNodeInfo> getNavigatorNodeParents(
+        @NotNull WebSession session,
+        String nodePath) throws DBWebException;
+
+    @WebAction
     WebNavigatorNodeInfo getNavigatorNodeInfo(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
     @WebAction
