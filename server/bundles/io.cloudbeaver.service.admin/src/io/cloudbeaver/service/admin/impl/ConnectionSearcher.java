@@ -111,7 +111,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
 
         for (DBPDriver driver : availableDrivers) {
             monitor.subTask("Check '" + driver.getName() + "' on '" + hostName + "'");
-            if (!CommonUtils.isEmpty(driver.getDefaultPort())) {
+            if (!CommonUtils.isEmpty(driver.getDefaultPort()) && !isPortInBlockList(CommonUtils.toInt(driver.getDefaultPort()))) {
                 updatePortInfo(portCache, hostName, displayName, driver, checkTimeout);
             }
             monitor.worked(1);
@@ -152,6 +152,20 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         } catch (Exception e) {
             // Ignore
         }
+    }
+
+    private static boolean isPortInBlockList(int portNumber) {
+        // All http(s) and telnet ports are in block lists
+        switch (portNumber) {
+            case 0:
+            case 22:
+            case 80:
+            case 443:
+            case 8080:
+            case 8443:
+                return true;
+        }
+        return false;
     }
 
 }
