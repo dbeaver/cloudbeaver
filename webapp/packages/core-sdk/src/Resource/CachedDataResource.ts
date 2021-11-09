@@ -44,8 +44,8 @@ export abstract class CachedDataResource<
   > {
   protected loaded: boolean;
 
-  constructor(defaultValue: TData) {
-    super(defaultValue, []);
+  constructor(defaultValue: TData, defaultIncludes: ContextArg<TData, TContext>) {
+    super(defaultValue, defaultIncludes as any as string[]);
 
     this.loaded = false;
 

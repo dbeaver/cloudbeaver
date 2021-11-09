@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
@@ -14,6 +15,12 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { UserProfileService } from '../UserProfileService';
 import { UserForm } from './UserForm';
+
+const style = css`
+  Loader {
+    height: 100%;
+  }
+`;
 
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
@@ -26,7 +33,7 @@ export const UserProfileForm = observer(function UserProfileForm() {
     return null;
   }
 
-  return (
+  return styled(style)(
     <Loader state={userInfo}>
       {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} />}
     </Loader>
