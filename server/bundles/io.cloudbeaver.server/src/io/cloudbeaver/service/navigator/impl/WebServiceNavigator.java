@@ -272,7 +272,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     Map<String, Object> options = new LinkedHashMap<>();
                     DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                     objectRenamer.renameObject(commandContext, object, options, newName);
-                    commandContext.saveChanges(session.getProgressMonitor(), options);
+                    try {
+                        commandContext.saveChanges(session.getProgressMonitor(), options);
+                    } catch (DBException e) {
+                        commandContext.resetChanges(true);
+                        throw e;
+                    }
                     return node.getName();
                 }
             }
