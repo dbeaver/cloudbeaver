@@ -9,13 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, IconOrImage, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { UserAuthProviderPanel } from './AuthProviders/UserAuthProvidersPanel';
-import { UserAuthProvidersTab } from './AuthProviders/UserAuthProvidersTab';
 import type { IUserProfileFormState } from './IUserProfileFormState';
 import { UserInfoPanel } from './UserInfo/UserInfoPanel';
 import { UserInfoTab } from './UserInfo/UserInfoTab';
@@ -116,11 +114,13 @@ const formStyles = composes(
 interface Props {
   user: UserInfo;
   state: IUserProfileFormState;
+  onClose?: () => void;
 }
 
 export const UserForm = observer<Props>(function UserForm({
   user,
   state,
+  onClose,
 }) {
   const translate = useTranslate();
   const style = [tabsStyles, UNDERLINE_TAB_STYLES];
@@ -145,7 +145,15 @@ export const UserForm = observer<Props>(function UserForm({
             </TabList>
           </top-bar-tabs>
           <top-bar-actions>
-            {' '}
+            {onClose && (
+              <Button
+                type="button"
+                mod={['outlined']}
+                onClick={onClose}
+              >
+                {translate('ui_processing_cancel')}
+              </Button>
+            )}
           </top-bar-actions>
         </top-bar>
         <content-box>

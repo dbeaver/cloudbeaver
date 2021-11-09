@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -28,6 +29,7 @@ export const UserProfileForm = observer(function UserProfileForm() {
     key: undefined as any,
     includes: ['includeMetaParameters'],
   });
+  const close = useCallback(() => userProfileService.close(true), []);
 
   if (!userProfileService.formState) {
     return null;
@@ -35,7 +37,7 @@ export const UserProfileForm = observer(function UserProfileForm() {
 
   return styled(style)(
     <Loader state={userInfo}>
-      {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} />}
+      {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} onClose={close} />}
     </Loader>
   );
 });
