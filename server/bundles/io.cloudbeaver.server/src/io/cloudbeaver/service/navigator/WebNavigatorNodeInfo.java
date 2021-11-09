@@ -172,7 +172,8 @@ public class WebNavigatorNodeInfo {
     @Property
     public WebDatabaseObjectInfo getObject() {
         if (node instanceof DBNDatabaseNode) {
-            return new WebDatabaseObjectInfo(session, ((DBNDatabaseNode) node).getObject());
+            DBSObject object = ((DBNDatabaseNode) node).getObject();
+            return object == null ? null : new WebDatabaseObjectInfo(session, object);
         }
         return null;
     }
