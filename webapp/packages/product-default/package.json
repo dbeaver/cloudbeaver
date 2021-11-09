@@ -23,6 +23,7 @@
     "@cloudbeaver/core-product": "0.1.0",
     "@cloudbeaver/plugin-administration": "0.1.0",
     "@cloudbeaver/plugin-authentication": "0.1.0",
+    "@cloudbeaver/plugin-authentication-administration": "0.1.0",
     "@cloudbeaver/plugin-connection-custom": "0.1.0",
     "@cloudbeaver/plugin-connection-template": "0.1.0",
     "@cloudbeaver/plugin-data-export": "0.1.0",

@@ -6,16 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
-import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
-import { CommonDialogService } from '../../core-dialogs/src';
-import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
@@ -31,9 +28,7 @@ export class PluginBootstrap extends Bootstrap {
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
     private topNavService: TopNavService,
-    private administrationTopAppBarService: AdministrationTopAppBarService,
     private menuService: MenuService,
-    private readonly serverConfigurationService: ServerConfigurationService,
     private readonly commonDialogService: CommonDialogService,
   ) {
     super();
@@ -77,8 +72,6 @@ export class PluginBootstrap extends Bootstrap {
       }
     );
     this.topNavService.placeholder.add(UserInfo, 4);
-    this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
-    this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
   }
 
   load(): void | Promise<void> { }
