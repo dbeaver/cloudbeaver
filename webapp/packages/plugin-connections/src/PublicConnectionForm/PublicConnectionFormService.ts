@@ -8,8 +8,7 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { ConnectionAuthService, ConnectionFormService, ConnectionInfoResource, IConnectionFormState } from '@cloudbeaver/core-connections';
-import { ConnectionFormState } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -18,6 +17,10 @@ import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
+import { ConnectionAuthService } from '../ConnectionAuthService';
+import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService';
+import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState';
+import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps';
 import { PublicConnectionForm } from './PublicConnectionForm';
 
 const formGetter = () => PublicConnectionForm;

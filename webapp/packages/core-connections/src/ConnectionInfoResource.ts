@@ -28,7 +28,8 @@ import {
   CachedResourceIncludeArgs,
 } from '@cloudbeaver/core-sdk';
 
-import type { DatabaseConnection } from './Administration/ConnectionsResource';
+import type { DatabaseConnection } from './DatabaseConnection';
+import type { IConnectionsResource } from './IConnectionsResource';
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
@@ -45,7 +46,8 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 };
 
 @injectable()
-export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
+export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes>
+  implements IConnectionsResource {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
   readonly onConnectionClose: ISyncExecutor<Connection>;
 
@@ -81,7 +83,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       nodeIdMap: observable,
       updateConnection: action,
       createFromTemplate: action,
-      createConnection: action,
+      create: action,
       createFromNode: action,
       add: action,
     });
@@ -103,17 +105,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return undefined;
   }
 
-  async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
-      templateId,
-      connectionName,
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(),
-    });
-    return this.add(connection);
-  }
-
-  async createConnection(config: ConnectionConfig): Promise<Connection> {
+  async create(config: ConnectionConfig): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnection({
       config,
       ...this.getDefaultIncludes(),
@@ -122,7 +114,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  async testConnection(config: ConnectionConfig): Promise<TestConnectionMutation['connection']> {
+  async test(config: ConnectionConfig): Promise<TestConnectionMutation['connection']> {
     const { connection } = await this.graphQLService.sdk.testConnection({
       config,
     });
@@ -138,6 +130,16 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       ...this.getIncludesMap(),
     });
 
+    return this.add(connection);
+  }
+
+  async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
+      templateId,
+      connectionName,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(),
+    });
     return this.add(connection);
   }
 

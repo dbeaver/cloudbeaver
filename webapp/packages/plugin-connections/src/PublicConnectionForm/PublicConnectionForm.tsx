@@ -11,9 +11,9 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
-import { ConnectionForm } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
+import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
 import { PublicConnectionFormService } from './PublicConnectionFormService';
 
 const styles = css`

@@ -6,35 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject } from 'rxjs';
-
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
-import { ConnectionAuthService } from './ConnectionAuthService';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
 @injectable()
 export class ConnectionsManagerService {
-  onOpenConnection = new Subject<Connection>();
+  readonly connectionExecutor: IExecutor<string | null>;
+
   private disconnecting: boolean;
-  private connectionExecutor: IExecutor<string | null>;
 
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
     private notificationService: NotificationService,
-    private connectionAuthService: ConnectionAuthService,
     private commonDialogService: CommonDialogService
   ) {
     this.disconnecting = false;
     this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
-    this.connectionExecutor.addHandler(this.connectionDialog.bind(this));
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
@@ -88,33 +83,10 @@ export class ConnectionsManagerService {
     return !!this.connectionInfo.values.length;
   }
 
-  private connectionContext() {
+  connectionContext() {
     return {
       connection: null as (Connection | null),
     };
-  }
-
-  private async connectionDialog(connectionId: string | null, context: IExecutionContextProvider<string | null>) {
-    const connection = context.getContext(this.connectionContext);
-
-    if (!connectionId) {
-      if (!this.hasAnyConnection()) {
-        return;
-      }
-      connectionId = this.connectionInfo.values[0].id;
-    }
-
-    try {
-      const tempConnection = await this.connectionAuthService.auth(connectionId);
-
-      if (!tempConnection?.connected) {
-        return;
-      }
-      connection.connection = tempConnection;
-    } catch (exception) {
-      this.notificationService.logException(exception);
-      throw exception;
-    }
   }
 
   private async _closeConnectionAsync(connection: Connection) {
@@ -165,6 +137,5 @@ export class ConnectionsManagerService {
 
   private addConnection(connection: Connection) {
     this.connectionInfo.set(connection.id, connection);
-    this.onOpenConnection.next(connection);
   }
 }

@@ -8,7 +8,7 @@
 
 import { action, makeObservable } from 'mobx';
 
-import { ConnectionAuthService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -37,7 +37,7 @@ export class NavigationTreeService extends View<string> {
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
-    private connectionAuthService: ConnectionAuthService,
+    private connectionsManagerService: ConnectionsManagerService,
     private connectionInfoResource: ConnectionInfoResource,
     private navNodeExtensionsService: NavNodeExtensionsService,
     private navTreeResource: NavTreeResource
@@ -152,7 +152,7 @@ export class NavigationTreeService extends View<string> {
   }
 
   private async tryInitConnection(navNodeId: string): Promise<boolean> {
-    const connection = await this.connectionAuthService.auth(
+    const connection = await this.connectionsManagerService.requireConnection(
       NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
     );
 

@@ -16,10 +16,11 @@ import {
   InfoItem, Loader, TabContainerPanelComponent,
   TextPlaceholder, useMapResource, useTab,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionsResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { ConnectionsResource } from '@cloudbeaver/plugin-connections-administration';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
 import { ConnectionList } from './ConnectionList';

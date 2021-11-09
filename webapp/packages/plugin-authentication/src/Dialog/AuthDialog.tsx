@@ -18,7 +18,7 @@ import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
+// import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
 import { AuthDialogController } from './AuthDialogController';
 import { AuthDialogFooter } from './AuthDialogFooter';
@@ -81,7 +81,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   options,
   rejectDialog,
 }) {
-  const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
+  // const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
   const authProvidersResource = useService(AuthProvidersResource);
   const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
@@ -121,7 +121,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 
   function navToSettings() {
     rejectDialog();
-    authConfigurationsAdministrationNavService.navToSettings();
+    // authConfigurationsAdministrationNavService.navToSettings();
   }
 
   function renderForm(provider: AuthProvider) {

@@ -7,7 +7,7 @@
  */
 
 import {
-  ConnectionAuthService, Connection, ConnectionInfoResource
+  Connection, ConnectionInfoResource, ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -94,7 +94,7 @@ export class NavNodeManagerService extends Bootstrap {
     readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
-    private connectionAuthService: ConnectionAuthService,
+    private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
     private serverService: ServerService,
     navigationService: NavigationService
@@ -322,7 +322,7 @@ export class NavNodeManagerService extends Bootstrap {
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
       let connection: Connection | null;
       try {
-        connection = await this.connectionAuthService.auth(nodeInfo.connection.id);
+        connection = await this.connectionsManagerService.requireConnection(nodeInfo.connection.id);
       } catch (exception) {
         this.notificationService.logException(exception);
         throw exception;

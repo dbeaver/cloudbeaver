@@ -9,13 +9,14 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { DatabaseConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { ConnectionsResource } from '@cloudbeaver/plugin-connections-administration';
 
 interface IStatusMessage {
   status: ENotificationType;

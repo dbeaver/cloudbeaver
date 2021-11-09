@@ -13,7 +13,6 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter } from '@cloudbeaver/core-sdk';
 
-import { getComputed } from './getComputed';
 import type { ILoadableState } from './Loader/Loader';
 import { useObservableRef } from './useObservableRef';
 

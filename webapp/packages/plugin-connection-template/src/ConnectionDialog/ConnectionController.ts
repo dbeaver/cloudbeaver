@@ -9,13 +9,13 @@
 import { observable, makeObservable } from 'mobx';
 
 import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig } from '@cloudbeaver/core-connections';
-import type { IConnectionAuthenticationConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DatabaseAuthModel, DetailsError } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
+import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
@@ -33,7 +33,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-  implements IInitializableController, IDestructibleController, IConnectionController {
+implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
