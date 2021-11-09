@@ -611,6 +611,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    public void addSessionMessage(WebServerMessage message) {
+        synchronized (sessionMessages) {
+            sessionMessages.add(message);
+        }
+    }
+
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
         synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();
