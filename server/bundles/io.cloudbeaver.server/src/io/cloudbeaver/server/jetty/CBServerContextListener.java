@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -24,7 +25,6 @@ import javax.servlet.SessionCookieConfig;
 
 public class CBServerContextListener implements ServletContextListener {
 
-    public static final String CB_SESSION_COOKIE_NAME = "cb-session-id";
     // One week
     //private static final int CB_SESSION_LIFE_TIME = 60 * 60 * 24 * 7;
 
@@ -37,7 +37,7 @@ public class CBServerContextListener implements ServletContextListener {
         //scf.setMaxAge(CB_SESSION_LIFE_TIME);
         scf.setPath(CBApplication.getInstance().getRootURI());
         //scf.setSecure(isSecure);
-        scf.setName(CB_SESSION_COOKIE_NAME);
+        scf.setName(CBConstants.CB_SESSION_COOKIE_NAME);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
