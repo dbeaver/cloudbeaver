@@ -58,7 +58,6 @@ import org.jkiss.dbeaver.registry.ProjectMetadata;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -447,17 +446,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 log.error("Error persisting web session", e);
             }
         }
-        {
-            long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
 
-            SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-            Cookie sessionCookie = new Cookie(SESSION_TEMP_COOKIE, sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime)));
-            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
-            sessionCookie.setPath(CBApplication.getInstance().getRootURI());
-            //sessionCookie.setComment("CB session cookie");
-            response.addCookie(sessionCookie);
-        }
+        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
+        SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
+        WebServiceUtils.addResponseCookie(
+            response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     @Association

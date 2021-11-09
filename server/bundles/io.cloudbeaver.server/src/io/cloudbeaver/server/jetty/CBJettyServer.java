@@ -101,7 +101,18 @@ public class CBJettyServer {
             }
         }
 
-        SessionHandler sessionHandler = new SessionHandler();
+        SessionHandler sessionHandler = new SessionHandler()/* {
+            public HttpCookie access(HttpSession session, boolean secure) {
+                HttpCookie cookie = getSessionCookie(session, _context == null ? "/" : (_context.getContextPath()), secure);
+                return cookie;
+            }
+
+            @Override
+            public int getRefreshCookieAge() {
+                // Refresh cookie always (we need it for FA requests)
+                return 1;
+            }
+        }*/;
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         FileSessionDataStore sessionStore = new FileSessionDataStore();
 

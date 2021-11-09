@@ -52,6 +52,9 @@ import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -343,5 +346,23 @@ public class WebServiceUtils {
                 }
             });
         }
+    }
+
+    public static void addResponseCookie(HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
+        Cookie sessionCookie = new Cookie(cookieName, cookieValue);
+        if (maxSessionIdleTime > 0) {
+            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
+        }
+        sessionCookie.setPath(CBApplication.getInstance().getRootURI());
+        response.addCookie(sessionCookie);
+    }
+
+    public static String getRequestCookie(HttpServletRequest request, String cookieName) {
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(cookieName)) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

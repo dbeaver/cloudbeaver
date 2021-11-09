@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -72,14 +73,17 @@ public class WebSessionManager {
         return true;
     }
 
+    @NotNull
     public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
         return getWebSession(request, response, true);
     }
 
+    @NotNull
     public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
         return getWebSession(request, response, true, errorOnNoFound);
     }
 
+    @NotNull
     public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
@@ -113,6 +117,14 @@ public class WebSessionManager {
         return webSession;
     }
 
+    @Nullable
+    public WebSession getWebSession(@NotNull String sessionId) {
+        synchronized (sessionMap) {
+            return sessionMap.get(sessionId);
+        }
+    }
+
+    @Nullable
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
