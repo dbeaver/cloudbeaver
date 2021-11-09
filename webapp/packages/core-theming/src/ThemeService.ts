@@ -106,8 +106,8 @@ export class ThemeService extends Bootstrap {
     try {
       await this.loadThemeStylesAsync(themeId);
     } catch (e) {
-      if (themeId !== this.defaultThemeId) {
-        return this.changeThemeAsync(this.defaultThemeId); // try to fallback to default theme
+      if (themeId !== defaultThemeSettings.defaultTheme) {
+        return this.changeThemeAsync(defaultThemeSettings.defaultTheme); // try to fallback to default theme
       }
       throw e;
     }
