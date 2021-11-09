@@ -42,7 +42,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   }
 
   getHeaders(): string[] {
-    return this.view.columns.map(column => column.name!).filter(Boolean);
+    return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
   getLongestCells(offset = 0, count?: number): string[] {
