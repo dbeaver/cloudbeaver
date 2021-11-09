@@ -45,11 +45,7 @@ export class AuthenticationService extends Bootstrap {
     const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
 
     if (userAuthConfiguration?.signOutLink) {
-      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, userAuthConfiguration.displayName, 600, 700);
-      if (popup) {
-        popup.blur();
-        window.focus();
-      }
+      this.logoutConfiguration(userAuthConfiguration.id, true);
     }
 
     try {
@@ -60,6 +56,32 @@ export class AuthenticationService extends Bootstrap {
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t logout');
+    }
+  }
+
+  logoutConfiguration(configurationId: string, full: boolean): void {
+    const userAuthConfiguration = this.authInfoService.userAuthConfigurations
+      .find(configuration => configuration.id === configurationId);
+
+    if (userAuthConfiguration?.signOutLink) {
+      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, userAuthConfiguration.displayName, 600, 700);
+
+      if (popup) {
+        popup.blur();
+        window.focus();
+      }
+
+      if (!full) {
+        let maxTime = 1000 / 100 * 10;
+
+        const interval = setInterval(() => {
+          if (popup?.location.href !== userAuthConfiguration.signOutLink || maxTime === 0) {
+            this.userInfoResource.markOutdated();
+            clearInterval(interval);
+          }
+          maxTime--;
+        }, 100);
+      }
     }
   }
 

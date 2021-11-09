@@ -11,8 +11,8 @@ import styled, { css } from 'reshadow';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
-  description?: string;
-  before?: JSX.Element;
+  description?: React.ReactElement | string;
+  before?: React.ReactElement;
   after?: React.ReactElement;
   className?: string;
 }

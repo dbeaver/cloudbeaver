@@ -140,6 +140,10 @@ export const BASE_CONTAINERS_STYLES = composes(
       opacity: 0.9;
     }
 
+    Group[box] GroupTitle {
+      padding: 24px;
+    }
+
     GroupSubTitle {
       composes: theme-typography--caption from global;
       display: block;

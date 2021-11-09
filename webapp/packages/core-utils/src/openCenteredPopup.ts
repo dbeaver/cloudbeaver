@@ -11,12 +11,13 @@ export function openCenteredPopup(
   target?: string,
   width = 500,
   height = 500,
-  features?: string
+  features?: string,
+  replace?: boolean
 ): Window | null {
   const systemZoom = window.top.outerWidth / window.screen.availWidth;
   const top = (window.top.outerHeight - height) / 2 / systemZoom + window.top.screenY;
   const left = (window.top.outerWidth - width) / 2 / systemZoom + window.top.screenX;
   const windowFeatures = `toolbar=no, menubar=no, width=${width / systemZoom}, height=${height / systemZoom}, top=${top}, left=${left}${features}`;
 
-  return window.open(url, target, windowFeatures);
+  return window.open(url, target, windowFeatures, replace);
 }

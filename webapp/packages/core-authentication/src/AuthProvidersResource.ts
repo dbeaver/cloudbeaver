@@ -19,12 +19,14 @@ import {
   ResourceKeyUtils,
   isResourceKeyList,
   CachedMapAllKey,
+  AuthProviderConfiguration as BaseAuthProviderConfiguration,
 } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
 
 export type AuthProvider = AuthProviderInfo;
+export type AuthProviderConfiguration = BaseAuthProviderConfiguration;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {

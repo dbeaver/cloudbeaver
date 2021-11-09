@@ -50,7 +50,7 @@ interface Props {
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
   style?: ComponentStyle;
-  children?: () => React.ReactNode;
+  children?: (() => React.ReactNode) | React.ReactNode;
   onCancel?: () => void;
 }
 
@@ -137,7 +137,11 @@ export const Loader = observer<Props>(function Loader({
 
   if (children && (!loader || !loading)) {
     if (loaded) {
-      return <>{children()}</>;
+      if (typeof children === 'function') {
+        return <>{children()}</>;
+      } else {
+        return <>{children}</>;
+      }
     }
 
     if (!loading) {

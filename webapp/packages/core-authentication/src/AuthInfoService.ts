@@ -80,7 +80,7 @@ export class AuthInfoService {
   }
 
   private async ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    const popup = openCenteredPopup(configuration.signInLink, configuration.displayName, 600, 700);
+    const popup = openCenteredPopup(configuration.signInLink, configuration.displayName, 600, 700, undefined, true);
 
     if (popup) {
       popup.focus();

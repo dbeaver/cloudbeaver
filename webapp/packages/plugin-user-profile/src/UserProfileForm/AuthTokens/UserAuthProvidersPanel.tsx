@@ -13,7 +13,7 @@ import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, TabPanel } 
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
-import { AuthProvidersList } from './AuthProvidersList';
+import { AuthProvidersList } from './ConfigurationsList';
 
 interface Props {
   user: UserInfo;

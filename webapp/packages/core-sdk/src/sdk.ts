@@ -655,6 +655,7 @@ export interface Query {
   navGetStructContainers: DatabaseStructContainers;
   navNodeChildren: NavigatorNodeInfo[];
   navNodeInfo: NavigatorNodeInfo;
+  navNodeParents: NavigatorNodeInfo[];
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: NetworkHandlerDescriptor[];
   readSessionLog: LogEntry[];
@@ -824,6 +825,10 @@ export interface QueryNavNodeChildrenArgs {
 }
 
 export interface QueryNavNodeInfoArgs {
+  nodePath: Scalars['ID'];
+}
+
+export interface QueryNavNodeParentsArgs {
   nodePath: Scalars['ID'];
 }
 

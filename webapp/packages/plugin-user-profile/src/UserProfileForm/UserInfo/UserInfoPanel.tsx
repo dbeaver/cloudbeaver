@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, Loader, ObjectPropertyInfoForm, TabPanel, useDataResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, TabPanel, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
-import { AuthProvidersList } from '../AuthProviders/ConfigurationsList';
+import { AuthTokenList } from '../AuthTokens/AuthTokenList';
 
 interface Props {
   user: UserInfo;
@@ -37,6 +37,7 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
+            <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
             <Container wrap gap>
               <InputField
                 type="text"
@@ -84,7 +85,8 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
             </Loader>
           </Group>
           <Group box medium overflow>
-            <AuthProvidersList user={user} providers={user.linkedAuthProviders} />
+            <GroupTitle>{translate('plugin_user_profile_auth_tokens')}</GroupTitle>
+            <AuthTokenList user={user} />
           </Group>
         </Container>
 

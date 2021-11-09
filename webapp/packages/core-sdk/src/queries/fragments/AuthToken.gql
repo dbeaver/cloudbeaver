@@ -2,6 +2,8 @@ fragment AuthToken on UserAuthToken {
   authProvider
   authConfiguration
   loginTime
+  #userId
+  #displayName
   message
   origin {
     ...ObjectOriginInfo

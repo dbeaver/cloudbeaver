@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { PermissionsResource } from '@cloudbeaver/core-root';
@@ -18,11 +20,13 @@ import {
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
-type NewConfiguration = AdminAuthProviderConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
+export type AuthConfiguration = AdminAuthProviderConfiguration;
+
+type NewConfiguration = AuthConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class AuthConfigurationsResource
-  extends CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables> {
+  extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
   constructor(
     private readonly graphQLService: GraphQLService,
     permissionsResource: PermissionsResource,
@@ -34,7 +38,7 @@ export class AuthConfigurationsResource
       .outdateResource(this);
   }
 
-  async loader(key: ResourceKey<string>): Promise<Map<string, AdminAuthProviderConfiguration>> {
+  async loader(key: ResourceKey<string>): Promise<Map<string, AuthConfiguration>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
     key = this.transformParam(key);
 
@@ -45,26 +49,28 @@ export class AuthConfigurationsResource
         providerId,
       });
 
-      if (all) {
-        this.data.clear();
-      }
+      runInAction(() => {
+        if (all) {
+          this.data.clear();
+        }
 
-      this.updateConfiguration(...configurations);
+        this.updateConfiguration(...configurations);
+      });
     });
 
     return this.data;
   }
 
-  async refreshAll(): Promise<AdminAuthProviderConfiguration[]> {
+  async refreshAll(): Promise<AuthConfiguration[]> {
     await this.refresh(CachedMapAllKey);
     return this.values;
   }
 
-  async saveConfiguration(config: AdminAuthProviderConfiguration): Promise<AdminAuthProviderConfiguration> {
+  async saveConfiguration(config: AuthConfiguration): Promise<AuthConfiguration> {
     await this.performUpdate(config.id, [], async () => {
       const response = await this.graphQLService.sdk.saveAuthProviderConfiguration(config);
 
-      let configuration: AdminAuthProviderConfiguration | NewConfiguration = response.configuration;
+      let configuration: AuthConfiguration | NewConfiguration = response.configuration;
 
       if (!this.data.has(config.id)) {
         configuration = {
@@ -95,7 +101,7 @@ export class AuthConfigurationsResource
     }
   }
 
-  private updateConfiguration(...configurations: AdminAuthProviderConfiguration[]): ResourceKeyList<string> {
+  private updateConfiguration(...configurations: AuthConfiguration[]): ResourceKeyList<string> {
     const key = resourceKeyList(configurations.map(configuration => configuration.id));
 
     const oldConfiguration = this.get(key);
@@ -106,13 +112,13 @@ export class AuthConfigurationsResource
 }
 
 function isNewConfiguration(
-  configuration: AdminAuthProviderConfiguration | NewConfiguration
+  configuration: AuthConfiguration | NewConfiguration
 ): configuration is NewConfiguration {
   return (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL];
 }
 
 export function compareAuthConfigurations(
-  a: AdminAuthProviderConfiguration, b: AdminAuthProviderConfiguration
+  a: AuthConfiguration, b: AuthConfiguration
 ): number {
   if (isNewConfiguration(a) && isNewConfiguration(b)) {
     return b.timestamp - a.timestamp;
