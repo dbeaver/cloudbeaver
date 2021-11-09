@@ -97,18 +97,24 @@ export function useElementsTree(options: IOptions): IElementsTree {
   );
 
   async function loadTree(nodeId: string) {
-    await connectionInfoResource.load(CachedMapAllKey);
-
     let children = [nodeId];
 
     while (children.length > 0) {
       const nextChildren: string[] = [];
 
       for (const child of children) {
+        await connectionInfoResource.load(CachedMapAllKey);
+        await navNodeInfoResource.waitLoad();
+        await navTreeResource.waitLoad();
+
         const nodeState = state.get(child);
         if (!nodeState.expanded && child !== options.root) {
           if (navNodeInfoResource.isOutdated(child)) {
-            await navNodeInfoResource.load(child);
+            const node = navNodeInfoResource.get(child);
+
+            if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+              await navNodeInfoResource.load(child);
+            }
           }
           continue;
         }

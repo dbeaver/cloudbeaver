@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DatabaseConnection } from './Administration/ConnectionsResource';
+import type { DatabaseConnection } from './DatabaseConnection';
 import type { DBDriver } from './DBDriverResource';
 
 export function isJDBCConnection(driver?: DBDriver, connection?: DatabaseConnection): boolean {

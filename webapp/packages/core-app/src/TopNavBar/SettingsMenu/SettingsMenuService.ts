@@ -6,12 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { IComputedMenuItemOptions, IMenuPanel, StaticMenu } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ServerConfigResource, PermissionsService } from '@cloudbeaver/core-root';
-import { ScreenService } from '@cloudbeaver/core-routing';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 @injectable()
@@ -25,10 +23,7 @@ export class SettingsMenuService extends Bootstrap {
   constructor(
     private localizationService: LocalizationService,
     private themeService: ThemeService,
-    private permissionsService: PermissionsService,
     private serverConfigResource: ServerConfigResource,
-    private screenService: ScreenService,
-    private administrationScreenService: AdministrationScreenService,
   ) {
     super();
   }
@@ -38,7 +33,6 @@ export class SettingsMenuService extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    this.addAdministration();
     this.addThemes();
     await this.addLocales();
   }
@@ -49,30 +43,6 @@ export class SettingsMenuService extends Bootstrap {
 
   addMenuItem(panelId: string, options: IComputedMenuItemOptions): void {
     this.menu.addMenuItem(panelId, options);
-  }
-
-  private addAdministration() {
-    this.addMenuItem(
-      SettingsMenuService.settingsMenuToken,
-      {
-        id: 'administrationMenuEnter',
-        order: 0,
-        isHidden: () => !this.permissionsService.has(EAdminPermission.admin)
-          || this.screenService.isActive(AdministrationScreenService.screenName),
-        title: 'administration_menu_enter',
-        onClick: () => this.administrationScreenService.navigateToRoot(),
-      }
-    );
-    this.addMenuItem(
-      SettingsMenuService.settingsMenuToken,
-      {
-        id: 'administrationMenuBack',
-        order: 0,
-        isHidden: () => !this.screenService.isActive(AdministrationScreenService.screenName),
-        title: 'administration_menu_back',
-        onClick: () => this.screenService.navigateToRoot(),
-      }
-    );
   }
 
   private addThemes() {

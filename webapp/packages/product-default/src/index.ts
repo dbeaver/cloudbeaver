@@ -4,9 +4,11 @@ import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
+import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
+import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import dataExport from '@cloudbeaver/plugin-data-export';
 import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
@@ -23,6 +25,7 @@ const PLUGINS: PluginManifest[] = [
   administration,
   spreadsheetNew,
   authentication,
+  authenticationAdministration,
   connectionCustom,
   connectionTemplate,
   dataExport,
@@ -34,6 +37,7 @@ const PLUGINS: PluginManifest[] = [
   userProfile,
   defaultProductManifest,
   connectionPlugin,
+  connectionAdministration,
   productPlugin,
 ];
 

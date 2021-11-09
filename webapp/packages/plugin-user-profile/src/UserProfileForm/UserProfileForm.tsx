@@ -7,6 +7,8 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
@@ -15,20 +17,27 @@ import { useService } from '@cloudbeaver/core-di';
 import { UserProfileService } from '../UserProfileService';
 import { UserForm } from './UserForm';
 
+const style = css`
+  Loader {
+    height: 100%;
+  }
+`;
+
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
   const userInfo = useDataResource(UserProfileForm, UserInfoResource, {
     key: undefined as any,
     includes: ['includeMetaParameters'],
   });
+  const close = useCallback(() => userProfileService.close(true), []);
 
   if (!userProfileService.formState) {
     return null;
   }
 
-  return (
+  return styled(style)(
     <Loader state={userInfo}>
-      {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} />}
+      {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} onClose={close} />}
     </Loader>
   );
 });

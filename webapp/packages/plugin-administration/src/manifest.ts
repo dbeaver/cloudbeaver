@@ -12,6 +12,7 @@ import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/
 import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService';
 import { ServerConfigurationAdministrationNavService } from './ConfigurationWizard/ServerConfigurationAdministrationNavService';
 import { LocaleService } from './LocaleService';
+import { PluginBootstrap } from './PluginBootstrap';
 
 export const manifest: PluginManifest = {
   info: {
@@ -23,5 +24,6 @@ export const manifest: PluginManifest = {
     ServerConfigurationAdministrationNavService,
     ConfigurationWizardPagesBootstrapService,
     LocaleService,
+    PluginBootstrap,
   ],
 };

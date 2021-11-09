@@ -31,7 +31,7 @@ UserInfoIncludes
     sessionResource: SessionResource,
     private sessionDataResource: SessionDataResource
   ) {
-    super(null);
+    super(null, ['customIncludeOriginDetails']);
 
     this.userChange = new SyncExecutor();
     this.sync(sessionResource);
@@ -80,12 +80,12 @@ UserInfoIncludes
         customIncludeOriginDetails: true,
       });
 
+      this.resetIncludes();
       if (this.data === null || link) {
         this.setData(await this.loader());
       } else {
         this.data.authTokens.push(authToken as UserAuthToken);
       }
-      this.resetIncludes();
     });
     this.sessionDataResource.markOutdated();
 
@@ -132,5 +132,11 @@ UserInfoIncludes
   protected resetIncludes(): void {
     const metadata = this.getMetadata();
     metadata.includes = [...this.defaultIncludes];
+  }
+
+  getIncludes(key: void): string[] {
+    key = this.transformParam(key);
+    const metadata = this.getMetadata(key);
+    return metadata.includes;
   }
 }

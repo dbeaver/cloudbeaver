@@ -8,6 +8,7 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -26,15 +27,18 @@ export class UserProfileService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly userInfoResource: UserInfoResource,
   ) {
+    this.formState = null;
+    this.optionsPanelService.closeTask.addHandler(this.closeHandler);
+    this.userInfoResource.onDataUpdate.addHandler(this.userUpdateHandler.bind(this));
+
     makeObservable(this, {
       formState: observable.ref,
       change: action,
       open: action,
       close: action,
     });
-    this.formState = null;
-    this.optionsPanelService.closeTask.addHandler(this.closeHandler);
   }
 
   change(): void {
@@ -88,6 +92,16 @@ export class UserProfileService {
       ExecutorInterrupter.interrupt(contexts);
     }
   };
+
+  private userUpdateHandler() {
+    if (!this.formState || !this.optionsPanelService.isOpen(formGetter)) {
+      return;
+    }
+
+    if (this.userInfoResource.data === null) {
+      this.clearFormState();
+    }
+  }
 
   private clearFormState() {
     this.formState?.dispose();

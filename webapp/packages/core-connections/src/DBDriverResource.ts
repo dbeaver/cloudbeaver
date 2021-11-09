@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -22,8 +23,12 @@ export type DBDriver = DatabaseDriverFragment;
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
-  constructor(private graphQLService: GraphQLService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    permissionsResource: PermissionsResource,
+  ) {
     super();
+    permissionsResource.require(this, EPermission.public);
   }
 
   async loadAll(): Promise<Map<string, DBDriver>> {
