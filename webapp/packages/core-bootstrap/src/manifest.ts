@@ -78,7 +78,7 @@ import {
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
-import { ThemeService } from '@cloudbeaver/core-theming';
+import { ThemeService, ThemeSettingsService } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 
@@ -158,6 +158,7 @@ export const coreManifests: PluginManifest[] = [
       SessionService,
       SettingsMenuService,
       SettingsService,
+      ThemeSettingsService,
       ThemeService,
       ServerService,
     ],
