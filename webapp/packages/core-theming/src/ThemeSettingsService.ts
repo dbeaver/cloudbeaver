@@ -9,13 +9,19 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
-const defaultSettings = {
-  defaultTheme: 'light',
+import { themes } from './themes';
+
+interface IDefaultSettings {
+  defaultTheme: string;
+}
+
+export const defaultThemeSettings: IDefaultSettings = {
+  defaultTheme: themes[0].id,
 };
 
 @injectable()
 export class ThemeSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core.user', defaultSettings);
+  readonly settings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
 
   constructor(private readonly pluginManagerService: PluginManagerService) { }
 }
