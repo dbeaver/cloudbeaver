@@ -289,7 +289,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
-        if (!CommonUtils.isEmpty(config.getDescription())) {
+        if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);

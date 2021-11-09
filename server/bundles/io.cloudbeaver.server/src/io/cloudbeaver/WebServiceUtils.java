@@ -154,16 +154,16 @@ public class WebServiceUtils {
         if (!CommonUtils.isEmpty(config.getUrl())) {
             dsConfig.setUrl(config.getUrl());
         } else {
-            if (!CommonUtils.isEmpty(config.getHost())) {
+            if (config.getHost() != null) {
                 dsConfig.setHostName(config.getHost());
             }
-            if (!CommonUtils.isEmpty(config.getPort())) {
+            if (config.getPort() != null) {
                 dsConfig.setHostPort(config.getPort());
             }
-            if (!CommonUtils.isEmpty(config.getDatabaseName())) {
+            if (config.getDatabaseName() != null) {
                 dsConfig.setDatabaseName(config.getDatabaseName());
             }
-            if (!CommonUtils.isEmpty(config.getServerName())) {
+            if (config.getServerName() != null) {
                 dsConfig.setServerName(config.getServerName());
             }
             dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
