@@ -18,9 +18,11 @@ import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
+import { ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
 const COMMON_STYLES: any[] = [];
+const THEME_SETTINGS_KEY = 'themeSettings';
 
 export interface ITheme {
   name: string;
@@ -29,8 +31,9 @@ export interface ITheme {
   loader: () => Promise<ClassCollection>;
 }
 
-const THEME_SETTINGS_KEY = 'themeSettings';
-const DEFAULT_THEME_ID = 'light';
+interface ISettings {
+  currentThemeId?: string;
+}
 
 @injectable()
 export class ThemeService extends Bootstrap {
@@ -38,33 +41,32 @@ export class ThemeService extends Bootstrap {
     return Array.from(this.themeMap.values());
   }
 
-  get currentThemeId() {
-    return this.settings.currentThemeId;
+  get defaultTheme(): string {
+    return this.themeSettingsService.settings.getValue('defaultTheme');
+  }
+
+  get currentThemeId(): string {
+    return this.settings.currentThemeId || this.defaultTheme;
   }
 
   get currentTheme(): ITheme {
-    let theme = this.themeMap.get(this.settings.currentThemeId);
-    if (!theme) {
-      theme = this.themeMap.get(DEFAULT_THEME_ID)!;
-    }
-
-    return theme;
+    return this.themeMap.get(this.currentThemeId)!;
   }
 
-  private themeMap: Map<string, ITheme> = new Map();
-  private settings = {
-    currentThemeId: DEFAULT_THEME_ID,
-  };
+  private readonly themeMap: Map<string, ITheme> = new Map();
+  private readonly settings: ISettings = {};
 
   constructor(
-    private notificationService: NotificationService,
-    private settingsService: SettingsService
+    private readonly notificationService: NotificationService,
+    private readonly settingsService: SettingsService,
+    private readonly themeSettingsService: ThemeSettingsService,
   ) {
     super();
 
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
       themes: computed,
       currentTheme: computed,
+      defaultTheme: computed,
       themeMap: observable.shallow,
       settings: observable,
       setCurrentThemeId: action,
@@ -76,6 +78,7 @@ export class ThemeService extends Bootstrap {
   }
 
   async load(): Promise<void> {
+    this.setCurrentThemeId(this.defaultTheme);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
     await this.changeThemeAsync(this.currentThemeId);
   }
@@ -94,8 +97,8 @@ export class ThemeService extends Bootstrap {
     try {
       await this.loadThemeStylesAsync(themeId);
     } catch (e) {
-      if (themeId !== DEFAULT_THEME_ID) {
-        return this.changeThemeAsync(DEFAULT_THEME_ID); // try to fallback to default theme
+      if (themeId !== this.defaultTheme) {
+        return this.changeThemeAsync(this.defaultTheme); // try to fallback to default theme
       }
       throw e;
     }
