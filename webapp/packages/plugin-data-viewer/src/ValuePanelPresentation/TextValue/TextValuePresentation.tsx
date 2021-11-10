@@ -41,7 +41,7 @@ const styles = composes(
       overflow: auto;
       flex: 1;
     }
-    content-type {
+    actions {
       display: flex;
       justify-content: center;
       flex: 0;
@@ -144,7 +144,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   return styled(style)(
     <container>
-      <content-type>
+      <actions>
         <TabsState
           container={textValuePresentationService.tabs}
           currentTabId={state.currentContentType}
@@ -153,7 +153,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         >
           <TabList style={[styles, UNDERLINE_TAB_STYLES]} />
         </TabsState>
-      </content-type>
+      </actions>
       {useCodeEditor ? (
         <CodeEditorLoader
           key={readonly ? '1' : '0'}
