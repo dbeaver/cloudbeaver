@@ -32,6 +32,11 @@ const styles = css`
     flex-direction: column;
   }
 
+  Container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, max-content));
+  }
+
   p {
     white-space: pre-wrap;
     line-height: 2;
@@ -127,12 +132,12 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                 <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
                 <Placeholder container={service.pluginsContainer} />
               </Group>
-              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
               <Placeholder
                 container={service.configurationContainer}
                 configurationWizard={configurationWizard}
                 state={service.state}
               />
+              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
             </Container>
           )}
         </Loader>
