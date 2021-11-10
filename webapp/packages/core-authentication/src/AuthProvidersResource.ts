@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
+import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -30,6 +30,10 @@ export type AuthProviderConfiguration = BaseAuthProviderConfiguration;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {
+  get configurable(): AuthProvider[] {
+    return this.values.filter(provider => provider.configurable);
+  }
+
   constructor(
     private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
@@ -43,6 +47,10 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
 
     this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
     this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
+
+    makeObservable(this, {
+      configurable: computed,
+    });
   }
 
   getEnabledProviders(): AuthProvider[] {
