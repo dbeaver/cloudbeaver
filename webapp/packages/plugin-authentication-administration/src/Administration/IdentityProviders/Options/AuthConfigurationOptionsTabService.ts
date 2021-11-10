@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
+import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
 import { authConfigurationContext } from '../Contexts/authConfigurationContext';
-import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormSubmitData } from '../IAuthConfigurationFormProps';
+import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormState, IAuthConfigurationFormSubmitData } from '../IAuthConfigurationFormProps';
 import { AuthConfigurationOptions } from './AuthConfigurationOptions';
 
 @injectable()
@@ -21,6 +21,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   constructor(
     private readonly authConfigurationFormService: AuthConfigurationFormService,
     private readonly authConfigurationsResource: AuthConfigurationsResource,
+    private readonly authProvidersResource: AuthProvidersResource,
   ) {
     super();
   }
@@ -130,7 +131,16 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     }
   }
 
-  private fillConfig(
+  private async setDefaults(state: IAuthConfigurationFormState) {
+    if (state.mode === 'create') {
+      await this.authProvidersResource.loadAll();
+      if (this.authProvidersResource.configurable.length === 1 && !state.config.providerId) {
+        state.config.providerId = this.authProvidersResource.configurable[0].id;
+      }
+    }
+  }
+
+  private async fillConfig(
     { state, updated }: IAuthConfigurationFormFillConfigData,
     contexts: IExecutionContextProvider<IAuthConfigurationFormFillConfigData>
   ) {
@@ -139,6 +149,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     }
 
     if (!state.info) {
+      await this.setDefaults(state);
       return;
     }
 
