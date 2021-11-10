@@ -674,6 +674,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    public Object removeAttribute(String name) {
+        synchronized (attributes) {
+            return attributes.remove(name);
+        }
+    }
+
     public WebAuthInfo getAuthInfo(@Nullable String providerID) {
         synchronized (authTokens) {
 

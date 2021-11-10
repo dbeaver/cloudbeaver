@@ -365,4 +365,29 @@ public class WebServiceUtils {
         }
         return null;
     }
+
+    @NotNull
+    public static String removeSideSlashes(String action) {
+        if (CommonUtils.isEmpty(action)) {
+            return action;
+        }
+        while (action.startsWith("/")) action = action.substring(1);
+        while (action.endsWith("/")) action = action.substring(0, action.length() - 1);
+        return action;
+    }
+
+    @NotNull
+    public static StringBuilder getApiPrefix(String serviceId) {
+        CBApplication application = CBApplication.getInstance();
+        StringBuilder apiPrefix = new StringBuilder();
+        apiPrefix.append(removeSideSlashes(application.getServerURL()));
+        apiPrefix.append("/");
+        String rootURI = removeSideSlashes(application.getRootURI());
+        if (!CommonUtils.isEmpty(rootURI)) {
+            apiPrefix.append(rootURI).append("/");
+        }
+        apiPrefix.append(removeSideSlashes(application.getServicesURI()));
+        apiPrefix.append("/").append(serviceId).append("/");
+        return apiPrefix;
+    }
 }

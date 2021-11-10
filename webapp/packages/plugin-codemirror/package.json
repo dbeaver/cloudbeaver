@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "codemirror": "^5.62.0",
-    "react-codemirror2": "^7.2.1"
+    "react-codemirror2": "^7.2.1",
+    "prettier": "^2.4.1"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.1"
@@ -41,7 +42,6 @@
     "@cloudbeaver/core-utils": "^0.1.0",
     "@cloudbeaver/plugin-administration": "^0.1.0",
     "react": "^16.x.x",
-    "rxjs": "^6.x.x",
     "mobx": "^5.x.x",
     "mobx-react-lite": "^3.x.x",
     "reshadow": "^0.x.x"

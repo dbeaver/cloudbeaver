@@ -444,7 +444,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
-        return CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id);
+        if (CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id)) {
+            try {
+                CBApplication.getInstance().flushConfiguration();
+            } catch (DBException e) {
+                throw new DBWebException("Error saving server configuration", e);
+            }
+            return true;
+        }
+        return false;
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -454,7 +462,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException {
         try {
-            CBAppConfig appConfig = new CBAppConfig();
+            CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
             appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());

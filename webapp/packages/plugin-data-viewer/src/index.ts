@@ -47,10 +47,6 @@ export * from './TableViewer/IDataPresentationActions';
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 
-export * from './TableViewer/TableDataModel/TableColumn';
-export * from './TableViewer/TableDataModel/TableRow';
-export * from './TableViewer/TableDataModel/EditedRow';
-
 export * from './ContainerDataSource';
 export * from './DataPresentationService';
 export * from './getDefaultRowsCount';

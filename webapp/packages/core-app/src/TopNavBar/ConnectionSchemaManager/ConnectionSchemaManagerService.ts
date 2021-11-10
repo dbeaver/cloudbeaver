@@ -142,10 +142,10 @@ export class ConnectionSchemaManagerService extends Bootstrap {
       .addHandler(this.reset.bind(this));
 
     this.navigationTabsService.onTabSelect
-      .subscribe(this.onTabSelect.bind(this));
+      .addHandler(this.onTabSelect.bind(this));
 
     this.navigationTabsService.onTabClose
-      .subscribe(this.onTabClose.bind(this));
+      .addHandler(this.onTabClose.bind(this));
   }
 
   load(): void {}

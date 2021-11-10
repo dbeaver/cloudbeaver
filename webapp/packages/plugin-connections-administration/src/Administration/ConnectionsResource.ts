@@ -7,7 +7,6 @@
  */
 
 import { action, makeObservable } from 'mobx';
-import { Observable, Subject } from 'rxjs';
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import type { DatabaseConnection, IConnectionsResource } from '@cloudbeaver/core-connections';
@@ -36,10 +35,7 @@ export type NewConnection = DatabaseConnectionFragment & { [NEW_CONNECTION_SYMBO
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>
   implements IConnectionsResource {
-  readonly onConnectionCreate: Observable<DatabaseConnection>;
-
   private changed: boolean;
-  private connectionCreateSubject: Subject<DatabaseConnection>;
 
   constructor(
     private graphQLService: GraphQLService,
@@ -57,8 +53,6 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     permissionsResource.require(this, EAdminPermission.admin);
 
     this.changed = false;
-    this.connectionCreateSubject = new Subject<DatabaseConnection>();
-    this.onConnectionCreate = this.connectionCreateSubject.asObservable();
   }
 
   getEmptyConfig(): ConnectionConfig {
@@ -118,7 +112,6 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     this.updateConnection(newConnection);
 
     const observedConnection = this.get(connection.id)!;
-    this.connectionCreateSubject.next(observedConnection);
     return observedConnection;
   }
 
