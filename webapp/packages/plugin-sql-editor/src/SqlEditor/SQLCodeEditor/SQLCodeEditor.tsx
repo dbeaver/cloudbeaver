@@ -34,6 +34,7 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
       }}
       className={props.className}
       readonly={props.readonly}
+      autoFormat={props.autoFormat}
       value={props.value || ''}
     />
   );

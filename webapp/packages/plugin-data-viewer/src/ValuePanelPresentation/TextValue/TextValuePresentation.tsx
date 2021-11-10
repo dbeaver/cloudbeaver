@@ -141,6 +141,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   };
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
+  const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
 
   return styled(style)(
     <container>
@@ -159,6 +160,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           key={readonly ? '1' : '0'}
           readonly={readonly}
           value={stringValue}
+          autoFormat={autoFormat}
           options={{
             mode: state.currentContentType,
             theme: 'material',

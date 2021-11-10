@@ -15,5 +15,6 @@ export interface ISQLCodeEditorProps {
   value?: string;
   dialect?: SqlDialectInfo;
   readonly?: boolean;
+  autoFormat?: boolean;
   className?: string;
 }

@@ -17,10 +17,13 @@
   "dependencies": {
     "codemirror": "^5.62.0",
     "react-codemirror2": "^7.2.1",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "sql-formatter": "^4.0.2"
   },
   "devDependencies": {
-    "@types/codemirror": "^5.60.1"
+    "@types/codemirror": "^5.60.1",
+    "@types/prettier": "^2.4.1",
+    "@types/sql-formatter": "^4.0.1"
   },
   "peerDependencies": {
     "@cloudbeaver/core-administration": "^0.1.0",

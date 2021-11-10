@@ -25,12 +25,19 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ICodeEditorProps } from './ICodeEditorProps';
 import { SqlEditorStyles } from './theme';
+import { useAutoFormat } from './useAutoFormat';
 
 export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) {
-  const { readonly, className, editorDidMount } = props;
+  const { readonly, autoFormat, className, editorDidMount } = props;
 
+  const formatter = useAutoFormat(props.options?.mode);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CodeMirror.Editor | null>(null);
+  let value = props.value;
+
+  if (autoFormat) {
+    value = formatter.format(value);
+  }
 
   useLayoutEffect(() => {
     const observable = wrapperRef.current;
@@ -60,6 +67,7 @@ export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) 
     <code-editor ref={wrapperRef} {...use({ readonly })} className={className}>
       <CodeMirror
         {...props}
+        value={value}
         editorDidMount={handleMount}
         options={{ styleSelectedText: true, ...props.options }}
       />
