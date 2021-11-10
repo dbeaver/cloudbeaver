@@ -7,12 +7,12 @@
  */
 
 import { observable, action, computed, makeObservable } from 'mobx';
-import { Subject } from 'rxjs';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { IActiveView, View } from '@cloudbeaver/core-view';
 
@@ -58,10 +58,8 @@ export class NavigationTabsService extends View<ITab<any>> {
     return this.state.get(userId)!;
   }
 
-  private tabSelectSubject = new Subject<ITab>();
-  private tabCloseSubject = new Subject<ITab | undefined>();
-  readonly onTabSelect = this.tabSelectSubject.asObservable();
-  readonly onTabClose = this.tabCloseSubject.asObservable();
+  readonly onTabSelect: ISyncExecutor<ITab>;
+  readonly onTabClose: ISyncExecutor<ITab | undefined>;
 
   constructor(
     private notificationService: NotificationService,
@@ -71,6 +69,10 @@ export class NavigationTabsService extends View<ITab<any>> {
     private appAuthService: AppAuthService
   ) {
     super();
+
+    this.onTabSelect = new SyncExecutor();
+    this.onTabClose = new SyncExecutor();
+
     makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
       handlers: observable,
       tabsMap: observable,
@@ -149,7 +151,7 @@ export class NavigationTabsService extends View<ITab<any>> {
       this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
       this.userTabsState.history.unshift(tabId);
       this.userTabsState.currentId = tabId;
-      this.tabSelectSubject.next(tab);
+      this.onTabSelect.execute(tab);
     }
 
     if (!skipHandlers) {
@@ -167,7 +169,7 @@ export class NavigationTabsService extends View<ITab<any>> {
       await this.callHandlerCallback(tab, handler => handler.onClose);
     }
 
-    this.tabCloseSubject.next(tab);
+    this.onTabClose.execute(tab);
     this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
     this.tabsMap.delete(tabId);
     this.userTabsState.tabs = this.userTabsState.tabs.filter(id => id !== tabId);
@@ -296,7 +298,7 @@ export class NavigationTabsService extends View<ITab<any>> {
 
     if (tab) {
       this.selectTab(this.userTabsState.currentId);
-      this.tabSelectSubject.next(tab);
+      this.onTabSelect.execute(tab);
     }
   }
 

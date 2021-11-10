@@ -28,7 +28,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.mainMenuService.onConnectionClick.subscribe(this.loadTemplateConnections.bind(this));
+    this.mainMenuService.onConnectionClick.addHandler(this.loadTemplateConnections.bind(this));
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
       id: 'mainMenuConnect',
       order: 1,
