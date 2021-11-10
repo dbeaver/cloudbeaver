@@ -64,7 +64,7 @@ export class AuthenticationService extends Bootstrap {
       .find(configuration => configuration.id === configurationId);
 
     if (userAuthConfiguration?.signOutLink) {
-      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, userAuthConfiguration.displayName, 600, 700);
+      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, `${userAuthConfiguration.displayName}-sign-out`, 600, 700);
 
       if (popup) {
         popup.blur();
