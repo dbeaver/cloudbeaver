@@ -49,7 +49,6 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);
 
-  const identityProviders = providers.resource.values.filter(provider => provider.configurable);
   const edit = state.mode === 'edit';
 
   return styled(style)(
@@ -59,7 +58,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           <Combobox
             name='providerId'
             state={state.config}
-            items={identityProviders}
+            items={providers.resource.configurable}
             keySelector={provider => provider.id}
             valueSelector={provider => provider.label}
             placeholder={translate('administration_identity_providers_choose_provider_placeholder')}

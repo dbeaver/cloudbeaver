@@ -194,7 +194,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }, [value, state, name, menu, context, onSelect]);
 
   const matchItems = useCallback((input?: boolean) => {
-    if (!searchValue) {
+    if (searchValue === null) {
       return;
     }
 
