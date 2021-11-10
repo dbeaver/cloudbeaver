@@ -55,6 +55,16 @@ public class WebUserAuthToken {
     }
 
     @NotNull
+    public String getUserId() {
+        return authInfo.getUserId();
+    }
+
+    @NotNull
+    public String getDisplayName() {
+        return authInfo.getDisplayName();
+    }
+
+    @NotNull
     public String getMessage() {
         return authInfo.getMessage();
     }
