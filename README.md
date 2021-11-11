@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 21.2.2 - 2021-11-11
+- Scripts can be downloaded and uploaded in the SQL Editor.
+- The current user information is available in the Profile at the top menu.
+- Page refresh doesn't affect the navigator tree view.
+- Different bug fixes and improvements are made.
+
 ### CloudBeaver 21.2.1 - 2021-10-29
 - Deleting of roles with assigned users has been prohibited.
 - “Select all” checkboxes have been added to simplify access management.
