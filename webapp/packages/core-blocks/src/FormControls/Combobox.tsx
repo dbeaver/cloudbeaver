@@ -179,15 +179,16 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const handleSelect = useCallback((id: any) => {
     id = id ?? value ?? '';
+    const changed = id !== value;
 
     menu.hide();
-    if (state) {
+    if (state && changed) {
       state[name] = id;
     }
-    if (onSelect) {
+    if (onSelect && changed) {
       onSelect(id, name, value);
     }
-    if (context) {
+    if (context && changed) {
       context.change(id, name);
     }
     setSearchValue(null);
