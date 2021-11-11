@@ -32,11 +32,6 @@ const styles = css`
     flex-direction: column;
   }
 
-  Container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(460px, max-content));
-  }
-
   p {
     white-space: pre-wrap;
     line-height: 2;
@@ -123,9 +118,9 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         )}
         <Loader state={service}>
           {() => styled(style)(
-            <Container wrap gap>
+            <Container wrap gap grid medium>
               <ServerConfigurationInfoForm state={service.state} />
-              <Group form gap medium>
+              <Group form gap>
                 <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
                 <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
                 <ServerConfigurationNavigatorViewForm configs={service.state} />

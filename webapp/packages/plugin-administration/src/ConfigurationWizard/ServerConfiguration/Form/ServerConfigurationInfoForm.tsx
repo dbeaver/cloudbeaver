@@ -25,7 +25,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
 }) {
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
-    <Group form gap medium>
+    <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
       <InputField
         type="text"

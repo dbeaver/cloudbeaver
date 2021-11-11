@@ -53,7 +53,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
   return styled(styles)(
     <>
-      <Group key='authentication' form gap medium>
+      <Group key='authentication' form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
         {localProvider && (
           <>

@@ -23,7 +23,7 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
 }) {
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
-    <Group form gap medium>
+    <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_security')}</GroupTitle>
       <Switch
         name="adminCredentialsSaveEnabled"
