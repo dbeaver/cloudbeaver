@@ -6,22 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { ITab as TabClass } from '@cloudbeaver/core-app';
 import {
-  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, ITabData, TabIcon
+  Tab, TabPanel, TabTitle, TabList, TextPlaceholder, ITabData, TabIcon, TabsState, getComputed
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlEditorNavigatorService } from '../SqlEditorNavigatorService';
+import { SqlEditorTabService } from '../SqlEditorTabService';
 import { SqlResultPanel } from './SqlResultPanel';
+import { SqlResultTabsService } from './SqlResultTabsService';
 
 const styles = composes(
   css`
@@ -31,7 +29,7 @@ const styles = composes(
     TabIcon {
       composes: theme-text-surface from global;
     }
-    tabs {
+    TabList {
       composes: theme-background-background theme-text-text-primary-on-light from global;
     }
   `,
@@ -39,6 +37,7 @@ const styles = composes(
     wrapper {
       overflow: auto;
       display: flex;
+      flex-direction: column;
       flex: 1;
       height: 100%;
       position: relative;
@@ -46,63 +45,71 @@ const styles = composes(
     TabsBox {
       height: 100%;
     }
+    TabList {
+      display: flex;
+    }
   `
 );
 
 interface Props {
-  tab: TabClass<ISqlEditorTabState>;
+  editorId: string;
+  state: ISqlEditorTabState;
+  onTabSelect?: (tabId: string) => void;
+  onTabClose?: (tabId: string) => void;
 }
 
-export const SqlResultTabs = observer<Props>(function SqlDataResult({ tab }) {
+export const SqlResultTabs = observer<Props>(function SqlDataResult({ editorId, state, onTabSelect, onTabClose }) {
   const style = useStyles(styles);
   const translate = useTranslate();
-  const navigatorService = useService(SqlEditorNavigatorService);
+  const sqlResultTabsService = useService(SqlResultTabsService);
+  const sqlEditorTabService = useService(SqlEditorTabService);
 
-  const orderedTabs = useMemo(
-    () => computed(
-      () => tab.handlerState.tabs
-        .slice()
-        .sort((tabA, tabB) => {
-          const resultTabA = tab.handlerState.resultTabs.find(tab => tab.tabId === tabA.id);
-          const resultTabB = tab.handlerState.resultTabs.find(tab => tab.tabId === tabB.id);
+  const orderedTabs = getComputed(() => state.tabs
+    .slice()
+    .sort((tabA, tabB) => {
+      const resultTabA = state.resultTabs.find(tab => tab.tabId === tabA.id);
+      const resultTabB = state.resultTabs.find(tab => tab.tabId === tabB.id);
 
-          if (resultTabA && resultTabB && tabA.order === tabB.order) {
-            return resultTabA.indexInResultSet - resultTabB.indexInResultSet;
-          }
+      if (resultTabA && resultTabB && tabA.order === tabB.order) {
+        return resultTabA.indexInResultSet - resultTabB.indexInResultSet;
+      }
 
-          return tabA.order - tabB.order;
-        })
-    ),
-    [tab]
-  ).get();
+      return tabA.order - tabB.order;
+    }));
 
-  const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(tab.id, tabId);
-  const handleClose = ({ tabId }: ITabData<any>) => navigatorService.closeEditorResult(tab.id, tabId);
+  function handleSelect(tab: ITabData) {
+    sqlEditorTabService.selectResultTab(state, tab.tabId);
+    onTabSelect?.(tab.tabId);
+  }
 
-  if (!tab.handlerState.tabs.length) {
+  function handleClose(tab: ITabData) {
+    sqlResultTabsService.removeResultTab(state, tab.tabId);
+    onTabClose?.(tab.tabId);
+  }
+
+  if (!state.tabs.length) {
     return <TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>;
   }
 
-  const currentId = tab.handlerState.currentTabId || '';
+  const currentId = state.currentTabId || '';
 
   return styled(style)(
     <wrapper>
-      <TabsBox
-        currentTabId={currentId}
-        tabs={orderedTabs.map(result => (
-          <Tab key={result.id} tabId={result.id} onOpen={handleOpen} onClose={handleClose}>
-            <TabIcon icon={result.icon} />
-            <TabTitle>{result.name}</TabTitle>
-          </Tab>
-        ))}
-        style={[styles]}
-      >
+      <TabsState currentTabId={currentId} onChange={handleSelect}>
+        <TabList style={styles}>
+          {orderedTabs.map(result => (
+            <Tab key={result.id} tabId={result.id} style={styles} onClose={handleClose}>
+              <TabIcon icon={result.icon} />
+              <TabTitle>{result.name}</TabTitle>
+            </Tab>
+          ))}
+        </TabList>
         {orderedTabs.map(result => (
           <TabPanel key={result.id} tabId={result.id} lazy>
-            <SqlResultPanel tab={tab} id={result.id} />
+            <SqlResultPanel state={state} id={result.id} />
           </TabPanel>
         ))}
-      </TabsBox>
+      </TabsState>
     </wrapper>
   );
 });

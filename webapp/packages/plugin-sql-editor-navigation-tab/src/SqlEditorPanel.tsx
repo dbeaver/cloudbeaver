@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import {
-  splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles
+  splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, useTab
 } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -29,14 +29,25 @@ const viewerStyles = css`
 `;
 
 export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = function SqlEditorPanel({ tab }) {
-  return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
+  const baseTab = useTab(tab.id);
+  const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
+  // const navigatorService = useService(SqlEditorNavigatorService);
+
+  // const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(editorId, tabId);
+  // const handleClose = ({ tabId }: ITabData<any>) => navigatorService.closeEditorResult(editorId, tabId);
+
+  if (!baseTab.selected) {
+    return null;
+  }
+
+  return styled(styles)(
     <Split split="horizontal" sticky={30}>
       <Pane>
-        <SqlEditorLoader tab={tab} />
+        <SqlEditorLoader state={tab.handlerState} />
       </Pane>
       <ResizerControls />
       <Pane main>
-        <SqlResultTabs tab={tab} />
+        <SqlResultTabs editorId={tab.id} state={tab.handlerState} />
       </Pane>
     </Split>
   );

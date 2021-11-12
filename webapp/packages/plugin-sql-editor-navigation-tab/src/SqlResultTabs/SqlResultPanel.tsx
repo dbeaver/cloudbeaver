@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import type { ITab } from '@cloudbeaver/core-app';
-
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
 import { SqlResultSetPanel } from './SqlResultSetPanel';
@@ -25,15 +23,15 @@ const style = css`
 `;
 
 interface Props {
-  tab: ITab<ISqlEditorTabState>;
+  state: ISqlEditorTabState;
   id: string;
 }
 
-export const SqlResultPanel = observer<Props>(function SqlResultPanel({ tab, id }) {
-  const resultTab = tab.handlerState.resultTabs.find(tab => tab.tabId === id);
+export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, id }) {
+  const resultTab = state.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {
-    const group = tab.handlerState.resultGroups.find(group => group.groupId === resultTab.groupId)!;
+    const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
 
     return styled(style)(
       <result-panel>
@@ -42,7 +40,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ tab, id 
     );
   }
 
-  const executionPlanTab = tab.handlerState.executionPlanTabs.find(tab => tab.tabId === id);
+  const executionPlanTab = state.executionPlanTabs.find(tab => tab.tabId === id);
 
   if (executionPlanTab) {
     return styled(style)(
@@ -52,7 +50,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ tab, id 
     );
   }
 
-  const statisticsTab = tab.handlerState.statisticsTabs.find(tab => tab.tabId === id);
+  const statisticsTab = state.statisticsTabs.find(tab => tab.tabId === id);
 
   if (statisticsTab) {
     return styled(style)(

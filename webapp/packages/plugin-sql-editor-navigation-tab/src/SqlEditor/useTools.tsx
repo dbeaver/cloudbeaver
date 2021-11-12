@@ -8,7 +8,6 @@
 
 import { action } from 'mobx';
 
-import type { ITab } from '@cloudbeaver/core-app';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -26,7 +25,7 @@ interface State {
   downloadScript: () => void;
 }
 
-export function useTools(controller: SqlEditorController, tab: ITab<ISqlEditorTabState>): Readonly<State> {
+export function useTools(controller: SqlEditorController, state: ISqlEditorTabState): Readonly<State> {
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
@@ -106,7 +105,7 @@ export function useTools(controller: SqlEditorController, tab: ITab<ISqlEditorTa
       });
 
       let name = 'script';
-      const connectionId = this.tab.handlerState.executionContext?.connectionId;
+      const connectionId = this.state.executionContext?.connectionId;
 
       if (connectionId) {
         const connection = this.connectionInfoResource.get(connectionId);
@@ -117,5 +116,5 @@ export function useTools(controller: SqlEditorController, tab: ITab<ISqlEditorTa
     },
   }),
   { uploadScript: action.bound, downloadScript: action.bound },
-  { controller, commonDialogService, connectionInfoResource, notificationService, sqlEditorSettingsService, tab });
+  { controller, commonDialogService, connectionInfoResource, notificationService, sqlEditorSettingsService, state });
 }

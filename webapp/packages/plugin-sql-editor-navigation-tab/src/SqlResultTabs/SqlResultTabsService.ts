@@ -21,7 +21,7 @@ export class SqlResultTabsService {
     private sqlExecutionPlanService: SqlExecutionPlanService,
   ) { }
 
-  async removeResultTab(state: ISqlEditorTabState, tabId: string): Promise<void> {
+  removeResultTab(state: ISqlEditorTabState, tabId: string): void {
     const tab = state.tabs.find(tab => tab.id === tabId);
 
     if (tab) {

@@ -18,7 +18,6 @@ import type {
 import { observable, computed, makeObservable, autorun, IReactionDisposer } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
-import type { ITab } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
@@ -36,11 +35,11 @@ const closeCharacters = /[\s()[\]{};:>,=\\*]/;
 @injectable()
 export class SqlEditorController implements IInitializableController, IDestructibleController {
   get dialect(): SqlDialectInfo | undefined {
-    if (!this.tab.handlerState.executionContext) {
+    if (!this.state.executionContext) {
       return undefined;
     }
 
-    return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.executionContext.connectionId);
+    return this.sqlDialectInfoService.getDialectInfo(this.state.executionContext.connectionId);
   }
 
   get readonly(): boolean {
@@ -56,17 +55,17 @@ export class SqlEditorController implements IInitializableController, IDestructi
   }
 
   get isDisabled(): boolean {
-    if (!this.tab.handlerState.executionContext) {
+    if (!this.state.executionContext) {
       return true;
     }
 
-    const context = this.connectionExecutionContextService.get(this.tab.handlerState.executionContext.baseId);
+    const context = this.connectionExecutionContextService.get(this.state.executionContext.baseId);
 
     return context?.executing || false;
   }
 
   get value(): string {
-    return this.tab.handlerState.query;
+    return this.state.query;
   }
 
   get activeSuggest(): boolean {
@@ -107,7 +106,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
 
   private executingScript: boolean;
   private cursor: Position | null;
-  private tab!: ITab<ISqlEditorTabState>;
+  private state!: ISqlEditorTabState;
   private editor?: Editor;
   private reactionDisposer: IReactionDisposer | null;
 
@@ -138,14 +137,14 @@ export class SqlEditorController implements IInitializableController, IDestructi
     });
   }
 
-  init(tab: ITab<ISqlEditorTabState>): void {
-    this.tab = tab;
+  init(state: ISqlEditorTabState): void {
+    this.state = state;
     this.parser.setScript(this.value);
 
     this.reactionDisposer = autorun(() => {
-      if (this.tab.handlerState.executionContext) {
+      if (this.state.executionContext) {
         this.sqlDialectInfoService
-          .loadSqlDialectInfo(this.tab.handlerState.executionContext.connectionId)
+          .loadSqlDialectInfo(this.state.executionContext.connectionId)
           .then(dialect => {
             this.parser.setDialect(dialect || null);
           });
@@ -165,7 +164,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     await this.executeQueryAction(
       this.getSubQuery(),
       query => this.sqlQueryService.executeEditorQuery(
-        this.tab.handlerState,
+        this.state,
         query.query,
         false
       )
@@ -180,7 +179,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     await this.executeQueryAction(
       this.getSubQuery(),
       query => this.sqlQueryService.executeEditorQuery(
-        this.tab.handlerState,
+        this.state,
         query.query,
         true
       )
@@ -195,7 +194,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     await this.executeQueryAction(
       this.getSubQuery(),
       query => this.sqlExecutionPlanService.executeExecutionPlan(
-        this.tab.handlerState,
+        this.state,
         query.query,
       )
     );
@@ -212,7 +211,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
       const queries = this.parser.scripts;
 
       await this.sqlQueryService.executeQueries(
-        this.tab.handlerState,
+        this.state,
         queries.map(query => query.query),
         {
           onQueryExecutionStart: (query, index) => {
@@ -235,7 +234,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   setQuery(query: string): void {
-    this.tab.handlerState.query = query;
+    this.state.query = query;
     this.parser.setScript(query);
   }
 
@@ -275,7 +274,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
 
     let hint: HintFunction | undefined = this.getHandleAutocomplete;
 
-    if (!this.tab.handlerState.executionContext) {
+    if (!this.state.executionContext) {
       hint = undefined;
     }
 
@@ -326,7 +325,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   }
 
   private async getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined> {
-    if (!this.tab.handlerState.executionContext) {
+    if (!this.state.executionContext) {
       return;
     }
 
@@ -336,9 +335,9 @@ export class SqlEditorController implements IInitializableController, IDestructi
 
     let proposals = await this.sqlEditorService
       .getAutocomplete(
-        this.tab.handlerState.executionContext.connectionId,
-        this.tab.handlerState.executionContext.id,
-        this.tab.handlerState.query,
+        this.state.executionContext.connectionId,
+        this.state.executionContext.id,
+        this.state.query,
         cursorPosition,
         undefined,
         !options.completeSingle

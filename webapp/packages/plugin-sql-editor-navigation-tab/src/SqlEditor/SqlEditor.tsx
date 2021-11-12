@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, UploadButton, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
+import { StaticImage, UploadButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -84,25 +84,16 @@ const styles = composes(
   `
 );
 
-export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, className }) {
+export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
   const style = useStyles(styles);
-  const editor = useRef<SQLCodeEditorController>(null);
-  const baseTab = useBaseTab(tab.id);
-  const controller = useController(SqlEditorController, tab);
-  const tools = useTools(controller, tab);
+  const [editor, setEditor] = useState<SQLCodeEditorController | null>(null);
+  const controller = useController(SqlEditorController, state);
+  const tools = useTools(controller, state);
 
   useEffect(() => {
-    if (!baseTab.selected) {
-      return;
-    }
-
-    editor.current?.focus();
-  }, [baseTab.selected]);
-
-  if (!baseTab.selected) {
-    return null;
-  }
+    editor?.focus();
+  }, [editor]);
 
   function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
@@ -164,7 +155,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ tab, cla
         </tools>
       </container>
       <SQLCodeEditorLoader
-        ref={editor}
+        ref={setEditor}
         readonly={controller.readonly}
         bindings={controller.bindings}
         dialect={controller.dialect}

@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ITab } from '@cloudbeaver/core-app';
-
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 
 export interface ISqlEditorProps {
-  tab: ITab<ISqlEditorTabState>;
+  state: ISqlEditorTabState;
   className?: string;
 }
