@@ -43,13 +43,18 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     });
   }
 
-  run<T>(task: () => Promise<T>, cancel?: () => Promise<any> | void): ITask<T> {
+  run<T>(
+    task: () => Promise<T>,
+    cancel?: () => Promise<any> | void,
+    end?: () => Promise<any> | void
+  ): ITask<T> {
     if (!this.context) {
       throw new Error('Execution Context not found');
     }
 
     this.currentTask = this.scheduler
       .schedule(this.contextId, task, { cancel })
+      .finally(end)
       .finally(() => {
         this.currentTask = null;
       });

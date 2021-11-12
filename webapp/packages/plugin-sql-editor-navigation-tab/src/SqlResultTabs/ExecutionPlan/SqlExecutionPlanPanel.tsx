@@ -49,11 +49,11 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  if (data?.process.isInProgress || !data?.executionPlan) {
+  if (data?.task.executing || !data?.executionPlan) {
     return (
       <Loader
-        cancelDisabled={data?.process.getState() !== EDeferredState.PENDING}
-        onCancel={() => data?.process.cancel()}
+        cancelDisabled={!data?.task.cancellable}
+        onCancel={() => data?.task.cancel()}
       />
     );
   }

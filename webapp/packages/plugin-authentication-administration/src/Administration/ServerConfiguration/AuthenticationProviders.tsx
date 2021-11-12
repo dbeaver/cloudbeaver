@@ -7,11 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -52,7 +52,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   }
 
   return styled(styles)(
-    <>
+    <React.Fragment>
       <Group key='authentication' form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
         {localProvider && (
@@ -107,6 +107,6 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       {configurationWizard && localProvider && (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
       )}
-    </>
+    </React.Fragment>
   );
 });

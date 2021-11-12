@@ -15,16 +15,28 @@ export class Task<TValue> implements ITask<TValue> {
   executing: boolean;
 
   get cancellable(): boolean {
-    if (this.cancelled) {
+    if (
+      this.cancelled
+      || (this.externalCancel === undefined && this.executing)
+    ) {
       return false;
     }
 
-    return !this.executing || this.externalCancel !== undefined;
+    if (this.externalCancel !== undefined) {
+      return true;
+    }
+
+    if (this.sourcePromise instanceof Task) {
+      return this.sourcePromise.cancellable;
+    }
+
+    return false;
   }
 
   private resolve!: (value: TValue) => void;
   private reject!: (reason?: any) => void;
   private innerPromise: Promise<TValue>;
+  private sourcePromise: Promise<TValue> | null;
 
   get [Symbol.toStringTag](): string {
     return 'Task';
@@ -38,13 +50,15 @@ export class Task<TValue> implements ITask<TValue> {
       this.reject = reject;
       this.resolve = resolve;
     });
+    this.sourcePromise = null;
     this.cancelled = false;
     this.executing = false;
 
-    makeObservable(this, {
+    makeObservable<this, 'sourcePromise'>(this, {
       cancellable: computed,
       cancelled: observable,
       executing: observable,
+      sourcePromise: observable.ref,
     });
   }
 
@@ -101,11 +115,13 @@ export class Task<TValue> implements ITask<TValue> {
 
     this.executing = true;
 
-    this.task()
+    this.sourcePromise = this.task();
+    this.sourcePromise
       .then(value => this.resolve(value))
       .catch(reason => this.reject(reason))
       .finally(() => {
         this.executing = false;
+        this.sourcePromise = null;
       });
 
     return this;
@@ -125,6 +141,10 @@ export class Task<TValue> implements ITask<TValue> {
 
     if (this.externalCancel) {
       return this.externalCancel();
+    }
+
+    if (this.sourcePromise instanceof Task) {
+      return this.sourcePromise.cancel();
     }
   }
 }

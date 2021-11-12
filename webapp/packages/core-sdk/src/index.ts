@@ -1,3 +1,5 @@
+export * from './AsyncTask/AsyncTask';
+export * from './AsyncTask/AsyncTaskInfoService';
 export * from './Resource/CachedDataResource';
 export * from './Resource/CachedMapResource';
 export * from './Resource/CachedResource';
@@ -15,3 +17,4 @@ export * from './GraphQLService';
 export * from './isObjectPropertyInfoStateEqual';
 export * from './sdk';
 export * from './ServerInternalError';
+export { manifest as coreSDKManifest } from './manifest';

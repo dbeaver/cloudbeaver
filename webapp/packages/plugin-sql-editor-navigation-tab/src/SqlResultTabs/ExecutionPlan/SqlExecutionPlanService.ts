@@ -11,14 +11,14 @@ import { makeObservable, observable } from 'mobx';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, SqlExecutionPlan } from '@cloudbeaver/core-sdk';
-import { EDeferredState, uuid } from '@cloudbeaver/core-utils';
+import type { ITask } from '@cloudbeaver/core-executor';
+import { AsyncTaskInfoService, GraphQLService, SqlExecutionPlan } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { SQLExecutionPlanProcess } from './SQLExecutionPlanProcess';
 
 interface IExecutionPlanData {
-  process: SQLExecutionPlanProcess;
+  task: ITask<SqlExecutionPlan>;
   executionPlan: SqlExecutionPlan | null;
 }
 
@@ -29,6 +29,7 @@ export class SqlExecutionPlanService {
   constructor(
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
+    private asyncTaskInfoService: AsyncTaskInfoService,
     private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
     this.data = new Map();
@@ -52,21 +53,37 @@ export class SqlExecutionPlanService {
     }
 
     const tabId = this.createExecutionPlanTab(editorState, query);
-    const task = new SQLExecutionPlanProcess(this.graphQLService, this.notificationService);
+    editorState.currentTabId = tabId;
+
+    const asyncTask = this.asyncTaskInfoService.create(async () => {
+      const { taskInfo } = await this.graphQLService.sdk.asyncSqlExplainExecutionPlan({
+        connectionId: contextInfo.connectionId,
+        contextId: contextInfo.id,
+        query,
+        configuration: {},
+      });
+
+      return taskInfo;
+    });
+
+    const task = executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(asyncTask);
+        const { result } = await this.graphQLService.sdk.getSqlExecutionPlanResult({ taskId: info.id });
+
+        return result;
+      },
+      () => this.asyncTaskInfoService.cancel(asyncTask.id),
+      () => this.asyncTaskInfoService.remove(asyncTask.id)
+    );
 
     this.data.set(tabId, {
-      process: task,
+      task,
       executionPlan: null,
     });
 
     try {
-      editorState.currentTabId = tabId;
-
-      const executionPlan = await executionContext.run(async () => {
-        await task.start(query, contextInfo);
-
-        return task.promise;
-      }, () => { task.cancel(); });
+      const executionPlan = await task;
 
       const tab = editorState.tabs.find(tab => tab.id === tabId);
 
@@ -75,11 +92,11 @@ export class SqlExecutionPlanService {
       }
 
       this.data.set(tabId, {
-        process: task,
+        task,
         executionPlan,
       });
     } catch (exception) {
-      const cancelled = task.getState() === EDeferredState.CANCELLED;
+      const cancelled = task.cancelled;
       const message = cancelled ? 'Execution plan process has been canceled' : undefined;
       this.notificationService.logException(exception, 'Execution plan Error', message);
       this.removeTab(editorState, tabId);
@@ -114,7 +131,7 @@ export class SqlExecutionPlanService {
     const data = this.data.get(tabId);
 
     if (data) {
-      data.process.cancel();
+      data.task.cancel();
     }
 
     this.data.delete(tabId);

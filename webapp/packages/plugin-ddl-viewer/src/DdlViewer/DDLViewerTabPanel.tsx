@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { DdlViewerController } from './DdlViewerController';
 

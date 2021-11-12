@@ -11,14 +11,13 @@ import { computed, makeObservable, observable } from 'mobx';
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
-import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
@@ -34,6 +33,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   constructor(
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
+    private asyncTaskInfoService: AsyncTaskInfoService,
     private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
     super();
@@ -70,8 +70,6 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     const offset = this.offset;
     const limit = this.count;
 
-    const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
-
     let firstResultId: string | undefined;
 
     if (
@@ -83,25 +81,34 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       firstResultId = prevResults[0].id;
     }
 
-    this.currentTask = executionContext.run(async () => {
-      await fetchTableProcess.start(
-        {
-          connectionId: executionContext.context!.connectionId,
-          contextId: executionContext.context!.id,
-          containerNodePath: options.containerNodePath,
-        },
-        {
+    const task = this.asyncTaskInfoService.create(async () => {
+      const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
+        connectionId: executionContext.context!.connectionId,
+        contextId: executionContext.context!.id,
+        containerNodePath: options.containerNodePath,
+        resultId: firstResultId,
+        filter: {
           offset,
           limit,
           constraints: options.constraints,
           where: options.whereFilter || undefined,
         },
-        this.dataFormat,
-        firstResultId
-      );
+        dataFormat: this.dataFormat,
+      });
 
-      return fetchTableProcess.promise;
-    }, () => { fetchTableProcess.cancel(); });
+      return taskInfo;
+    });
+
+    this.currentTask = executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(task);
+        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+        return result;
+      },
+      () => this.asyncTaskInfoService.cancel(task.id),
+      () => this.asyncTaskInfoService.remove(task.id)
+    );
 
     try {
       const response = await this.currentTask;
@@ -109,7 +116,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       this.requestInfo = {
         requestDuration: response?.duration || 0,
         requestMessage: response?.statusMessage || '',
-        requestFilter: response.filterText || '',
+        requestFilter: response?.filterText || '',
         source: null,
       };
 

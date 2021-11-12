@@ -11,7 +11,7 @@ import { makeObservable, observable } from 'mobx';
 import { ConnectionExecutionContextService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { DatabaseDataAccessMode, DatabaseDataModel, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -41,7 +41,8 @@ export class SqlQueryService {
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource,
     private connectionExecutionContextService: ConnectionExecutionContextService,
-    private sqlQueryResultService: SqlQueryResultService
+    private sqlQueryResultService: SqlQueryResultService,
+    private asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     this.statisticsMap = new Map();
 
@@ -75,7 +76,7 @@ export class SqlQueryService {
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(this.graphQLService, this.notificationService);
+      source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.notificationService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
 
@@ -157,7 +158,7 @@ export class SqlQueryService {
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
-        source = new QueryDataSource(this.graphQLService, this.notificationService);
+        source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.notificationService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       }
       statistics.modelId = model.id;

@@ -15,7 +15,11 @@ export interface IConnectionExecutionContext {
   readonly executing: boolean;
   readonly cancellable: boolean;
 
-  run: <T>(task: () => Promise<T>, cancel?: () => Promise<any> | void) => ITask<T>;
+  run: <T>(
+    task: () => Promise<T>,
+    cancel?: () => Promise<any> | void,
+    end?: () => Promise<any> | void
+  ) => ITask<T>;
   cancel: () => Promise<void>;
   destroy: () => Promise<void>;
   update: (defaultCatalog?: string, defaultSchema?: string) => Promise<void>;

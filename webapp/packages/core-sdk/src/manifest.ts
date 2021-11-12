@@ -8,11 +8,18 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const sqlEditorPluginManifest: PluginManifest = {
+import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService';
+import { EnvironmentService } from './EnvironmentService';
+import { GraphQLService } from './GraphQLService';
+
+export const manifest: PluginManifest = {
   info: {
-    name: 'Sql Editor Plugin',
+    name: 'Core SDK',
   },
 
   providers: [
+    AsyncTaskInfoService,
+    EnvironmentService,
+    GraphQLService,
   ],
 };

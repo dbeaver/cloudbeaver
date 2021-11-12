@@ -76,7 +76,7 @@ import {
   SessionExpireService
 } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
-import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService, ThemeSettingsService } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
@@ -132,10 +132,8 @@ export const coreManifests: PluginManifest[] = [
       ScreenService,
       AppScreenService,
       ContextMenuService,
-      EnvironmentService,
       ExceptionsCatcherService,
       EventsSettingsService,
-      GraphQLService,
       LocalStorageSaveService,
       LocalizationService,
       LogViewerBootstrap,
@@ -163,6 +161,7 @@ export const coreManifests: PluginManifest[] = [
       ServerService,
     ],
   },
+  coreSDKManifest,
   coreAuthenticationManifest,
   coreUIManifest,
   coreViewManifest,

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ddl-viewer",
+  "name": "@cloudbeaver/plugin-sql-editor-navigation-tab",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",
@@ -15,8 +15,8 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "peerDependencies": {
-    "@cloudbeaver/plugin-object-viewer": "^0.1.0",
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "^0.1.0",
+    "@cloudbeaver/plugin-codemirror": "^0.1.0",
+    "@cloudbeaver/plugin-data-viewer": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-di": "^0.1.0",
@@ -31,6 +31,7 @@
     "@cloudbeaver/core-settings": "^0.1.0",
     "@cloudbeaver/core-theming": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0",
+    "@cloudbeaver/core-view": "^0.1.0",
     "react": "^16.x.x",
     "mobx": "^5.x.x",
     "mobx-react-lite": "^3.x.x",

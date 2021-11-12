@@ -11,10 +11,8 @@ import { observable, makeObservable } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
-
-import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -34,6 +32,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
   constructor(
     private graphQLService: GraphQLService,
+    private asyncTaskInfoService: AsyncTaskInfoService,
     private notificationService: NotificationService
   ) {
     super();
@@ -157,8 +156,6 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     }
     const limit = this.count;
 
-    const queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
-
     let firstResultId: string | undefined;
 
     if (
@@ -171,22 +168,34 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       firstResultId = prevResults[0].id;
     }
 
-    this.currentTask = executionContext.run(async () => {
-      await queryExecutionProcess.start(
-        options.query,
-        executionContextInfo,
-        {
+    const task = this.asyncTaskInfoService.create(async () => {
+      const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
+        connectionId: executionContextInfo.connectionId,
+        contextId: executionContextInfo.id,
+        query: options.query,
+        resultId: firstResultId,
+        filter: {
           offset: this.offset,
           limit,
           constraints: options.constraints,
           where: options.whereFilter || undefined,
         },
-        this.dataFormat,
-        firstResultId
-      );
+        dataFormat: this.dataFormat,
+      });
 
-      return await queryExecutionProcess.promise;
-    }, () => { queryExecutionProcess.cancel(); });
+      return taskInfo;
+    });
+
+    this.currentTask = executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(task);
+        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+        return result;
+      },
+      () => this.asyncTaskInfoService.cancel(task.id),
+      () => this.asyncTaskInfoService.remove(task.id)
+    );
 
     try {
       const response = await this.currentTask;

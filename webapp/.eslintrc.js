@@ -113,7 +113,7 @@ module.exports = {
     'react/self-closing-comp': "error",
     'react/jsx-curly-newline': 'error',
     'react/jsx-curly-brace-presence': ['error', "never"],
-    'react/jsx-fragments': ['error', 'syntax'],
+    'react/jsx-fragments': ['off', 'syntax'],
     'react/jsx-equals-spacing': ['error', 'never'],
     'react/jsx-curly-spacing': ['error', { "when": "never", "children": true }],
     'react/jsx-first-prop-new-line': ['warn', 'multiline'],

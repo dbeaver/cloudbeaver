@@ -12,7 +12,7 @@ import { NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
+import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { DdlViewerService } from '../DdlViewerService';
 
