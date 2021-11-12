@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
@@ -44,12 +44,16 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const parameters = useMapResource(
     AuthConfigurationOptions,
     AuthConfigurationParametersResource,
-    state.config.providerId || null
+    state.config.providerId || null,
   );
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);
 
   const edit = state.mode === 'edit';
+
+  const handleProviderSelect = useCallback(() => {
+    state.config.parameters = {};
+  }, [state]);
 
   return styled(style)(
     <SubmittingForm ref={formRef}>
@@ -67,6 +71,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             required
             tiny
             fill
+            onSelect={handleProviderSelect}
           >
             {translate('administration_identity_providers_provider')}
           </Combobox>

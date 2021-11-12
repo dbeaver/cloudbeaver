@@ -134,7 +134,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   private async setDefaults(state: IAuthConfigurationFormState) {
     if (state.mode === 'create') {
       await this.authProvidersResource.loadAll();
-      if (this.authProvidersResource.configurable.length === 1 && !state.config.providerId) {
+      if (this.authProvidersResource.configurable.length > 0 && !state.config.providerId) {
         state.config.providerId = this.authProvidersResource.configurable[0].id;
       }
     }
