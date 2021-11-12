@@ -2,13 +2,13 @@
 <html lang="en" dir="ltr" data-version="<%= htmlWebpackPlugin.options.version %>">
 
 <head>
-      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/head.html.ejs') %>
+      <%= require('html-loader?{"sources":false}!@cloudbeaver/core-blocks/src/HTMLTemplates/head.html.ejs').default %>
       <title>CloudBeaver</title>
 </head>
 
 <body class="theme-typography">
       <div id="root"></div>
-      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/sso.html.ejs') %>
+      <%= require('html-loader?{"sources":false}!@cloudbeaver/core-blocks/src/HTMLTemplates/sso.html.ejs').default %>
 
       <!-- Dependencies -->
       <% if (webpackConfig.mode == 'production') { %>

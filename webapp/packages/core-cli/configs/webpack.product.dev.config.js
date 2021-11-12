@@ -20,8 +20,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   },
   mode: 'development',
   devServer: {
-    socket: 'socket',
+    allowedHosts: 'all',
     hot: true,
+    client: {
+      webSocketURL: 'auto://0.0.0.0:0/ws',
+    },
     proxy: {
       '/api': {
         target: env.server,

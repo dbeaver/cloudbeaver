@@ -16,6 +16,6 @@
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
-    "mobx": "^5.x.x"
+    "mobx": "^6.x.x"
   }
 }

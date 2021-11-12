@@ -30,7 +30,7 @@
     "@cloudbeaver/core-events": "^0.1.0",
     "@cloudbeaver/core-settings": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0",
-    "mobx": "^5.x.x",
+    "mobx": "^6.x.x",
     "mobx-react-lite": "^3.x.x",
     "react": "^16.x.x",
     "reshadow": "^0.x.x"

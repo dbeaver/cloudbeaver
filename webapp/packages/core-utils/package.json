@@ -20,7 +20,7 @@
     "uuid": "^7.0.3"
   },
   "peerDependencies": {
-    "mobx": "^5.x.x"
+    "mobx": "^6.x.x"
   },
   "devDependencies": {
     "@types/uuid": "^7.0.2"
