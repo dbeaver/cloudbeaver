@@ -11,9 +11,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import { SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 enum SQLEditorNavigationAction {
   create,
@@ -110,7 +110,7 @@ export class SqlEditorNavigatorService {
       }
 
       if (data.type === SQLEditorNavigationAction.select) {
-        this.sqlEditorTabService.selectResultTab(tab.handlerState, data.resultId);
+        this.sqlResultTabsService.selectResultTab(tab.handlerState, data.resultId);
       } else if (data.type === SQLEditorNavigationAction.close) {
         this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId);
       }

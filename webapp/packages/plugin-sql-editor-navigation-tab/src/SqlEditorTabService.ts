@@ -27,13 +27,11 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
-import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
@@ -101,10 +99,6 @@ export class SqlEditorTabService extends Bootstrap {
         statisticsTabs: [],
       },
     };
-  }
-
-  selectResultTab(state: ISqlEditorTabState, resultId: string): void {
-    state.currentTabId = resultId;
   }
 
   resetConnectionInfo(state: ISqlEditorTabState): void {

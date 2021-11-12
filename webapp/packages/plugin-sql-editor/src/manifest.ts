@@ -8,11 +8,26 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { SqlDialectInfoService } from './SqlDialectInfoService';
+import { SqlEditorService } from './SqlEditorService';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService';
+import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
+import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
+import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
+import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
+
 export const sqlEditorPluginManifest: PluginManifest = {
   info: {
     name: 'Sql Editor Plugin',
   },
 
   providers: [
+    SqlEditorService,
+    SqlDialectInfoService,
+    SqlQueryResultService,
+    SqlQueryService,
+    SqlExecutionPlanService,
+    SqlResultTabsService,
+    SqlEditorSettingsService,
   ],
 };

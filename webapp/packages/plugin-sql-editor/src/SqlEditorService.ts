@@ -10,8 +10,7 @@ import { ConnectionExecutionContextService, ConnectionsManagerService, IConnecti
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
-
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 @injectable()
 export class SqlEditorService {

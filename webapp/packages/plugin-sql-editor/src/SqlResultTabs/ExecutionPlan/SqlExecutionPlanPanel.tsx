@@ -14,7 +14,6 @@ import { Split, Pane, ResizerControls, splitStyles } from '@cloudbeaver/core-blo
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';

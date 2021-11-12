@@ -16,7 +16,8 @@ import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
-import sqlEditor from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import sqlEditor from '@cloudbeaver/plugin-sql-editor';
+import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import userProfile from '@cloudbeaver/plugin-user-profile';
 
 import { defaultProductManifest } from './manifest';
@@ -34,6 +35,7 @@ const PLUGINS: PluginManifest[] = [
   ddlViewer,
   objectViewer,
   sqlEditor,
+  sqlEditorTab,
   userProfile,
   defaultProductManifest,
   connectionPlugin,

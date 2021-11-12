@@ -17,7 +17,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlEditorTabService } from '../SqlEditorTabService';
 import { SqlResultPanel } from './SqlResultPanel';
 import { SqlResultTabsService } from './SqlResultTabsService';
 
@@ -62,7 +61,6 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ editorId, 
   const style = useStyles(styles);
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);
-  const sqlEditorTabService = useService(SqlEditorTabService);
 
   const orderedTabs = getComputed(() => state.tabs
     .slice()
@@ -78,7 +76,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ editorId, 
     }));
 
   function handleSelect(tab: ITabData) {
-    sqlEditorTabService.selectResultTab(state, tab.tabId);
+    sqlResultTabsService.selectResultTab(state, tab.tabId);
     onTabSelect?.(tab.tabId);
   }
 

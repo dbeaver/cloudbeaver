@@ -16,6 +16,7 @@
   },
   "peerDependencies": {
     "@cloudbeaver/plugin-object-viewer": "^0.1.0",
+    "@cloudbeaver/plugin-sql-editor": "^0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",

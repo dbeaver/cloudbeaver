@@ -21,6 +21,10 @@ export class SqlResultTabsService {
     private sqlExecutionPlanService: SqlExecutionPlanService,
   ) { }
 
+  selectResultTab(state: ISqlEditorTabState, resultId: string): void {
+    state.currentTabId = resultId;
+  }
+
   removeResultTab(state: ISqlEditorTabState, tabId: string): void {
     const tab = state.tabs.find(tab => tab.id === tabId);
 

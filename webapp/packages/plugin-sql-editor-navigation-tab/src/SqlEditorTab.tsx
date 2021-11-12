@@ -14,8 +14,7 @@ import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({
   tab, onSelect, onClose, style,

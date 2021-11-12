@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { IMenuContext, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ActionService, ACTION_EXPORT, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
 import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
-import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_CONNECTION } from '../../plugin-connections/src';
 import { DataExportSettingsService } from './DataExportSettingsService';

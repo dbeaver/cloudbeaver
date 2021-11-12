@@ -9,16 +9,9 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
-import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
-import { SqlEditorService } from './SqlEditorService';
-import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorTabService } from './SqlEditorTabService';
-import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
-import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 export const sqlEditorTabPluginManifest: PluginManifest = {
   info: {
@@ -27,15 +20,8 @@ export const sqlEditorTabPluginManifest: PluginManifest = {
 
   providers: [
     SqlEditorBootstrap,
-    SqlDialectInfoService,
     SqlEditorTabService,
-    SqlQueryResultService,
-    SqlQueryService,
-    SqlExecutionPlanService,
-    SqlResultTabsService,
-    SqlEditorService,
     SqlEditorNavigatorService,
     LocaleService,
-    SqlEditorSettingsService,
   ],
 };

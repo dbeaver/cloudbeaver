@@ -17,7 +17,7 @@ import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dia
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';

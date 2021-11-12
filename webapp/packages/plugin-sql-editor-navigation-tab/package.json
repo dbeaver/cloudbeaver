@@ -15,6 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "peerDependencies": {
+    "@cloudbeaver/plugin-sql-editor": "^0.1.0",
     "@cloudbeaver/plugin-codemirror": "^0.1.0",
     "@cloudbeaver/plugin-data-viewer": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
