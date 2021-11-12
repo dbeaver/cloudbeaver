@@ -118,21 +118,21 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         )}
         <Loader state={service}>
           {() => styled(style)(
-            <Container wrap gap>
+            <Container wrap gap grid medium>
               <ServerConfigurationInfoForm state={service.state} />
-              <Group form gap medium>
+              <Group form gap>
                 <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
                 <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
                 <ServerConfigurationNavigatorViewForm configs={service.state} />
                 <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
                 <Placeholder container={service.pluginsContainer} />
               </Group>
-              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
               <Placeholder
                 container={service.configurationContainer}
                 configurationWizard={configurationWizard}
                 state={service.state}
               />
+              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
             </Container>
           )}
         </Loader>

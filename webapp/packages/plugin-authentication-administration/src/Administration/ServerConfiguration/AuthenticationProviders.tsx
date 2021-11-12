@@ -52,8 +52,8 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   }
 
   return styled(styles)(
-    <Container wrap gap>
-      <Group key='authentication' form gap medium>
+    <>
+      <Group key='authentication' form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
         {localProvider && (
           <>
@@ -104,10 +104,9 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           )}
         </Loader>
       </Group>
-      {configurationWizard && localProvider ? (
+      {configurationWizard && localProvider && (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
-      ) : <Container medium />}
-      <Container medium />
-    </Container>
+      )}
+    </>
   );
 });

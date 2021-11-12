@@ -17,4 +17,5 @@ export interface IContainerProps extends ILayoutSizeProps {
   overflow?: boolean;
   parent?: boolean;
   gap?: boolean;
+  grid?: boolean;
 }

@@ -90,6 +90,34 @@ export const BASE_CONTAINERS_STYLES = composes(
     }
 
     Container, ColoredContainer, Group {
+      &[grid] {
+        display: grid;
+      }
+
+      /* increase css specificity */
+      &[grid]:nth-child(n) {
+        flex-basis: unset;
+        max-width: unset;
+      }
+
+      &[grid][tiny] {
+        grid-template-columns: repeat(auto-fit, minmax(140px, max-content));
+      }
+
+      &[grid][small] {
+        grid-template-columns: repeat(auto-fit, minmax(260px, max-content));
+      }
+
+      &[grid][medium] {
+          grid-template-columns: repeat(auto-fit, minmax(460px, max-content));
+      }
+
+      &[grid][large] {
+        grid-template-columns: repeat(auto-fit, minmax(800px, max-content));
+      }
+    }
+
+    Container, ColoredContainer, Group {
       flex-wrap: wrap;
       flex: 1 1 100%;
 
@@ -103,22 +131,22 @@ export const BASE_CONTAINERS_STYLES = composes(
         flex-basis: auto; /* test for layout */
       }
 
-      &[tiny], & > [tiny] {
+      &[tiny], & > [tiny], &[grid][tiny] > * {
         flex-basis: 140px;
         max-width: 210px;
       }
 
-      &[small], & > [small] {
+      &[small], & > [small], &[grid][small] > * {
         flex-basis: 260px;
         max-width: 390px;
       }
 
-      &[medium], & > [medium] {
+      &[medium], & > [medium], &[grid][medium] > * {
         flex-basis: 460px;
         max-width: 640px;
       }
 
-      &[large], & > [large] {
+      &[large], & > [large], &[grid][large] > * {
         flex-basis: 800px;
         max-width: 800px;
       }
