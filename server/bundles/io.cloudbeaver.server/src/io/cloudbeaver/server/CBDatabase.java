@@ -38,9 +38,13 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
+import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
+import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
+import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
-import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
@@ -49,10 +53,11 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Database management
@@ -61,7 +66,10 @@ public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb_schema_create.sql";
-    private static final String CURRENT_SCHEMA_VERSION = "1.0";
+    public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
+
+    private static final int LEGACY_SCHEMA_VERSION = 1;
+    private static final int CURRENT_SCHEMA_VERSION = 2;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -152,11 +160,23 @@ public class CBDatabase {
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("Connected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
+
+            SQLSchemaManager schemaManager = new SQLSchemaManager(
+                "CB",
+                new ClassLoaderScriptSource(
+                    CBDatabase.class.getClassLoader(),
+                    SCHEMA_CREATE_SQL_PATH,
+                    SCHEMA_UPDATE_SQL_PATH),
+                monitor1 -> connection,
+                new CBSchemaVersionManager(),
+                driver.getScriptDialect().createInstance(),
+                null,
+                CURRENT_SCHEMA_VERSION,
+                0);
+            schemaManager.updateSchema(monitor);
         } catch (SQLException e) {
             throw new DBException("Error connecting to '" + dbURL + "'", e);
         }
-
-        checkDatabaseStructure();
     }
 
     void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
@@ -182,136 +202,6 @@ public class CBDatabase {
                     application.getSecurityController().setUserCredentials(adminName, authProvider, userCredentials);
                 }
             }
-        }
-    }
-
-    private void checkDatabaseStructure() throws DBException {
-        try (Connection connection = cbDataSource.getConnection()) {
-            connection.setAutoCommit(true);
-            String currentSchemaVersion;
-            try (Statement dbStat = connection.createStatement()) {
-                try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_SERVER")) {
-                    if (dbResult.next()) {
-                        currentSchemaVersion = dbResult.getString("SCHEMA_VERSION");
-                    } else {
-                        currentSchemaVersion = "0.beta";
-                    }
-                } catch (SQLException e) {
-                    currentSchemaVersion = null;
-                }
-            }
-
-            if (currentSchemaVersion == null) {
-                createDatabaseSchema(connection, true);
-            } else {
-                if (currentSchemaVersion.equals(CURRENT_SCHEMA_VERSION)) {
-                    // no changes
-                } else if (currentSchemaVersion.endsWith(".beta")) {
-                    // Different beta schema version - recreate schema
-                    createDatabaseSchema(connection, false);
-                    createDatabaseSchema(connection, true);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBException("Error initializing schema", e);
-        }
-    }
-
-    private void createDatabaseSchema(Connection connection, boolean create) throws DBException {
-        if (create) {
-            log.debug("Create database schema");
-        } else {
-            log.debug("Cleanup old database schema");
-        }
-        InputStream ddlStream = getClass().getClassLoader().getResourceAsStream(SCHEMA_CREATE_SQL_PATH);
-        if (ddlStream == null) {
-            throw new DBException("Can't find schema file " + SCHEMA_CREATE_SQL_PATH);
-        }
-        try {
-            connection.setAutoCommit(false);
-
-            Pattern ctPattern = Pattern.compile("CREATE TABLE ([\\w_]+)\\s*\\(");
-            ByteArrayOutputStream ddlBuffer = new ByteArrayOutputStream();
-            IOUtils.copyStream(ddlStream, ddlBuffer);
-            String ddl = new String(ddlBuffer.toByteArray(), StandardCharsets.UTF_8);
-            List<String> dropQueries = new ArrayList<>();
-            for (String line : ddl.split(";")) {
-                line = line.trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
-                if (!create) {
-                    Matcher matcher = ctPattern.matcher(line);
-                    if (matcher.find()) {
-                        dropQueries.add("DROP TABLE " + matcher.group(1));
-                    }
-                    continue;
-                }
-                try (Statement dbStat = connection.createStatement()) {
-                    dbStat.execute(line);
-                }
-            }
-            if (!dropQueries.isEmpty()) {
-                for (String query : dropQueries) {
-                    try (Statement dbStat = connection.createStatement()) {
-                        dbStat.execute(query);
-                    }
-                    catch (SQLException e) {
-                        // Ignore error
-                        log.debug(e.getMessage());
-                    }
-                }
-            }
-            if (create) {
-                // Create server info
-                try (PreparedStatement dbStat = connection.prepareStatement("INSERT INTO CB_SERVER(SERVER_NAME,SERVER_VERSION,SCHEMA_VERSION) VALUES(?,?,?)")) {
-                    dbStat.setString(1, CommonUtils.truncateString(GeneralUtils.getProductName(), 100));
-                    dbStat.setString(2, CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 10));
-                    dbStat.setString(3, CURRENT_SCHEMA_VERSION);
-                    dbStat.execute();
-                }
-                fillInitialData();
-            }
-
-            connection.commit();
-            connection.setAutoCommit(true);
-        } catch (Exception e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                log.error(e);
-            }
-            throw new DBException("Error creating database schema", e);
-        } finally {
-            ContentUtils.close(ddlStream);
-        }
-    }
-
-    private void fillInitialData() throws DBCException {
-        // Fill initial data
-        DBWSecurityController serverController = application.getSecurityController();
-
-        CBDatabaseInitialData initialData = getInitialData();
-        if (initialData == null) {
-            return;
-        }
-
-        String adminName = initialData.getAdminName();
-        String adminPassword = initialData.getAdminPassword();
-
-        if (!CommonUtils.isEmpty(initialData.getRoles())) {
-            // Create roles
-            for (WebRole role : initialData.getRoles()) {
-                serverController.createRole(role, adminName);
-                if (adminName != null) {
-                    serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
-                }
-            }
-        }
-
-        if (!CommonUtils.isEmpty(adminName)) {
-            // Create admin user
-            createAdminUser(adminName, adminPassword);
         }
     }
 
@@ -381,4 +271,70 @@ public class CBDatabase {
             }
         }
     }
+
+    private class CBSchemaVersionManager implements SQLSchemaVersionManager {
+
+        @Override
+        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
+            // Check and update schema
+            try {
+                return CommonUtils.toInt(JDBCUtils.executeQuery(connection,
+                    "SELECT VERSION FROM CB_SCHEMA_INFO"));
+            } catch (SQLException e) {
+                try {
+                    Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
+                        "SELECT SCHEMA_VERSION FROM CB_SERVER"));
+                    // Table CB_SERVER exist - this is a legacy schema
+                    return LEGACY_SCHEMA_VERSION;
+                } catch (SQLException ex) {
+                    // Empty schema. Create it from scratch
+                    return -1;
+                }
+            }
+        }
+
+        @Override
+        public void updateCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
+            if (JDBCUtils.executeUpdate(
+                connection,
+                "UPDATE CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
+                CURRENT_SCHEMA_VERSION) <= 0)
+            {
+                JDBCUtils.executeSQL(
+                    connection,
+                    "INSERT INTO CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)",
+                    CURRENT_SCHEMA_VERSION);
+            }
+        }
+
+        @Override
+        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
+            // Fill initial data
+            DBWSecurityController serverController = application.getSecurityController();
+
+            CBDatabaseInitialData initialData = getInitialData();
+            if (initialData == null) {
+                return;
+            }
+
+            String adminName = initialData.getAdminName();
+            String adminPassword = initialData.getAdminPassword();
+
+            if (!CommonUtils.isEmpty(initialData.getRoles())) {
+                // Create roles
+                for (WebRole role : initialData.getRoles()) {
+                    serverController.createRole(role, adminName);
+                    if (adminName != null) {
+                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                    }
+                }
+            }
+
+            if (!CommonUtils.isEmpty(adminName)) {
+                // Create admin user
+                createAdminUser(adminName, adminPassword);
+            }
+        }
+    }
+
 }
