@@ -39,24 +39,25 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -78,6 +79,8 @@ public class CBDatabase {
     private final CBDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
 
+    private String instanceId;
+
     CBDatabase(CBApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
@@ -85,6 +88,10 @@ public class CBDatabase {
 
     public static CBDatabase getInstance() {
         return CBPlatform.getInstance().getApplication().getDatabase();
+    }
+
+    public String getInstanceId() {
+        return instanceId;
     }
 
     public Connection openConnection() throws SQLException {
@@ -174,7 +181,9 @@ public class CBDatabase {
                 CURRENT_SCHEMA_VERSION,
                 0);
             schemaManager.updateSchema(monitor);
-        } catch (SQLException e) {
+
+            validateInstancePersistentState(connection);
+        } catch (Exception e) {
             throw new DBException("Error connecting to '" + dbURL + "'", e);
         }
     }
@@ -335,6 +344,85 @@ public class CBDatabase {
                 createAdminUser(adminName, adminPassword);
             }
         }
+    }
+
+    //////////////////////////////////////////
+    // Persistence
+
+
+    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException {
+        try (JDBCTransaction txn = new JDBCTransaction(connection)) {
+            checkInstanceRecord(connection);
+            txn.commit();
+        }
+    }
+
+    private void checkInstanceRecord(Connection connection) throws SQLException, IOException {
+        InetAddress localHost = InetAddress.getLocalHost();
+        String hostName = localHost.getHostName();
+        byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
+        String macAddress = CommonUtils.toHexString(hardwareAddress);
+
+        instanceId = getCurrentInstanceId();
+
+        String productName = CommonUtils.truncateString(GeneralUtils.getProductName(), 100);
+        String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
+
+        boolean hasInstanceRecord = JDBCUtils.queryString(connection,
+            "SELECT HOST_NAME FROM CB_INSTANCE WHERE INSTANCE_ID=?", instanceId) != null;
+        if (!hasInstanceRecord) {
+            JDBCUtils.executeSQL(
+                connection,
+                "INSERT INTO CB_INSTANCE (INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME) VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)",
+                instanceId,
+                macAddress,
+                hostName,
+                productName,
+                versionName);
+        } else {
+            JDBCUtils.executeSQL(
+                connection,
+                "UPDATE CB_INSTANCE SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE INSTANCE_ID=?",
+                hostName,
+                productName,
+                versionName,
+                instanceId);
+        }
+        JDBCUtils.executeSQL(connection, "DELETE FROM CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?", instanceId);
+
+        Map<String, String> instanceDetails = new LinkedHashMap<>();
+        for (Map.Entry<Object, Object> spe : System.getProperties().entrySet()) {
+            instanceDetails.put(
+                CommonUtils.truncateString(CommonUtils.toString(spe.getKey()), 32),
+                CommonUtils.truncateString(CommonUtils.toString(spe.getValue()), 255));
+        }
+
+        try (PreparedStatement dbStat = connection.prepareStatement("INSERT INTO CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)")) {
+            dbStat.setString(1, instanceId);
+            for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {
+                dbStat.setString(2, ide.getKey());
+                dbStat.setString(3, ide.getValue());
+                dbStat.execute();
+            }
+        }
+    }
+
+    private String getCurrentInstanceId() throws IOException {
+        // 12 chars - mac address
+        String macAddress = CommonUtils.toHexString(RuntimeUtils.getLocalMacAddress());
+        // 16 chars - workspace ID
+        String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
+        if (workspaceId.length() > 16) {
+            workspaceId = workspaceId.substring(0, 16);
+        }
+
+        StringBuilder id = new StringBuilder(36);
+        id.append(macAddress);
+        id.append(":").append(workspaceId).append(":");
+        while (id.length() < 36) {
+            id.append("X");
+        }
+        return id.toString();
     }
 
 }

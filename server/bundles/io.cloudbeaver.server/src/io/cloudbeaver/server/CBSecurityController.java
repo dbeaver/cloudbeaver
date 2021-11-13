@@ -675,7 +675,8 @@ class CBSecurityController implements DBWSecurityController {
     public void createSession(WebSession session) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT) VALUES(?,?,?,?,?,?)")) {
+                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID) " +
+                    "VALUES(?,?,?,?,?,?,?)")) {
                 dbStat.setString(1, session.getSessionId());
                 WebUser user = session.getUser();
                 if (user == null) {
@@ -696,6 +697,7 @@ class CBSecurityController implements DBWSecurityController {
                 } else {
                     dbStat.setNull(6, Types.VARCHAR);
                 }
+                dbStat.setString(7, database.getInstanceId());
                 dbStat.execute();
             }
         } catch (SQLException e) {
@@ -707,7 +709,7 @@ class CBSecurityController implements DBWSecurityController {
     public void updateSession(WebSession session) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=? WHERE SESSION_ID=?")) {
+                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? WHERE SESSION_ID=?")) {
                 WebUser user = session.getUser();
                 if (user == null) {
                     dbStat.setNull(1, Types.VARCHAR);
@@ -716,18 +718,19 @@ class CBSecurityController implements DBWSecurityController {
                 }
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 if (session.getLastRemoteAddr() != null) {
-                    dbStat.setString(3, session.getLastRemoteAddr());
+                    dbStat.setString(3, CommonUtils.truncateString(session.getLastRemoteAddr(), 128));
                 } else {
                     dbStat.setNull(3, Types.VARCHAR);
                 }
                 if (session.getLastRemoteUserAgent() != null) {
-                    dbStat.setString(4, session.getLastRemoteUserAgent());
+                    dbStat.setString(4, CommonUtils.truncateString(session.getLastRemoteUserAgent(), 255));
                 } else {
                     dbStat.setNull(4, Types.VARCHAR);
                 }
+                dbStat.setString(5, database.getInstanceId());
 
-                dbStat.setString(5, session.getSessionId());
-                if (dbStat.executeUpdate() == 0) {
+                dbStat.setString(6, session.getSessionId());
+                if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Session not exists in database");
                 }
             }

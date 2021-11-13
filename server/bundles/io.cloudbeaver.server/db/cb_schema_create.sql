@@ -10,7 +10,7 @@ CREATE TABLE CB_INSTANCE(
     HOST_NAME VARCHAR(128) NOT NULL,
 
     PRODUCT_NAME VARCHAR(100) NOT NULL,         -- Server product name
-    PRODUCT_VERSION VARCHAR(10) NOT NULL,       -- Server product version
+    PRODUCT_VERSION VARCHAR(32) NOT NULL,       -- Server product version
 
     UPDATE_TIME TIMESTAMP NOT NULL,
 
