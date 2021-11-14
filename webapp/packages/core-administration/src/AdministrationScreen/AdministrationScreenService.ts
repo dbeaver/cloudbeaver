@@ -103,9 +103,9 @@ export class AdministrationScreenService {
 
   navigateToRoot(): void {
     if (this.isConfigurationMode) {
-      this.screenService.navigate(AdministrationScreenService.setupName);
+      this.screenService.navigateToScreen(AdministrationScreenService.setupName);
     } else {
-      this.screenService.navigate(AdministrationScreenService.screenName);
+      this.screenService.navigateToScreen(AdministrationScreenService.screenName);
     }
   }
 
@@ -119,25 +119,25 @@ export class AdministrationScreenService {
 
   navigateToItem(item: string): void {
     if (this.isConfigurationMode) {
-      this.screenService.navigate(AdministrationScreenService.setupItemRouteName, item);
+      this.screenService.navigateToScreen(AdministrationScreenService.setupItemRouteName, item);
     } else {
-      this.screenService.navigate(AdministrationScreenService.itemRouteName, item);
+      this.screenService.navigateToScreen(AdministrationScreenService.itemRouteName, item);
     }
   }
 
   navigateToItemSub(item: string, sub: string, param?: string | null): void {
     if (!param) {
       if (this.isConfigurationMode) {
-        this.screenService.navigate(AdministrationScreenService.setupItemSubRouteName, item, sub);
+        this.screenService.navigateToScreen(AdministrationScreenService.setupItemSubRouteName, item, sub);
       } else {
-        this.screenService.navigate(AdministrationScreenService.itemSubRouteName, item, sub);
+        this.screenService.navigateToScreen(AdministrationScreenService.itemSubRouteName, item, sub);
       }
       return;
     }
     if (this.isConfigurationMode) {
-      this.screenService.navigate(AdministrationScreenService.setupItemSubParamRouteName, item, sub, param);
+      this.screenService.navigateToScreen(AdministrationScreenService.setupItemSubParamRouteName, item, sub, param);
     } else {
-      this.screenService.navigate(AdministrationScreenService.itemSubParamRouteName, item, sub, param);
+      this.screenService.navigateToScreen(AdministrationScreenService.itemSubParamRouteName, item, sub, param);
     }
   }
 

@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext } from 'react';
-
-import type { IDataContext } from '../DataContext/IDataContext';
-
-export const CaptureViewContext = createContext<IDataContext | undefined>(undefined);
+export interface IAdministrationScreenParams {
+  item?: string;
+  sub?: string;
+  param?: string;
+}

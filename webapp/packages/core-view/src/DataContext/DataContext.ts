@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import type { DataContextGetter } from './DataContextGetter';
 import type { IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
@@ -17,6 +19,11 @@ export class DataContext implements IDataContext {
   constructor(fallback?: IDataContextProvider) {
     this.map = new Map();
     this.fallback = fallback;
+
+    makeObservable<this, 'map'>(this, {
+      map: observable.shallow,
+      fallback: observable.ref,
+    });
   }
 
   setFallBack(fallback?: IDataContextProvider): void {
@@ -46,6 +53,12 @@ export class DataContext implements IDataContext {
 
   set<T>(context: DataContextGetter<T>, value: T): this {
     this.map.set(context, value);
+
+    return this;
+  }
+
+  delete(context: DataContextGetter<any>): this {
+    this.map.delete(context);
 
     return this;
   }

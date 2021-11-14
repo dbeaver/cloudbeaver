@@ -88,16 +88,7 @@ export class SqlEditorTabService extends Bootstrap {
 
     return {
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: {
-        query: '',
-        order,
-        executionContext: { ...executionContext.context },
-        tabs: [],
-        resultGroups: [],
-        resultTabs: [],
-        executionPlanTabs: [],
-        statisticsTabs: [],
-      },
+      handlerState: this.sqlEditorService.getState(order, executionContext.context),
     };
   }
 

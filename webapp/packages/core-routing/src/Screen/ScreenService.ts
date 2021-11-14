@@ -17,13 +17,13 @@ import type { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
 export class ScreenService {
-  get screen(): IScreen | undefined {
+  get screen(): IScreen<any> | undefined {
     return this.getScreenByRoute(this.routerService.route);
   }
 
   readonly routeChange: IExecutor;
 
-  private screens = new Map<string, IScreen>();
+  private screens = new Map<string, IScreen<any>>();
   private routeScreenMap = new Map<string, string>();
 
   constructor(
@@ -47,11 +47,15 @@ export class ScreenService {
     }
   }
 
-  navigate(screen: string, item?: string, sub?: string, param?: string): void {
+  navigateToScreen(screen: string, item?: string, sub?: string, param?: string): void {
     this.routerService.router.navigate(screen, { item, sub, param });
   }
 
-  create(screen: IScreen): void {
+  navigate(screen: string, params?: Record<string, any>) {
+    this.routerService.router.navigate(screen, params as any);
+  }
+
+  create<T extends Record<string, any>>(screen: IScreen<T>): void {
     if (this.screens.has(screen.name)) {
       return;
     }
@@ -78,11 +82,11 @@ export class ScreenService {
     return screen?.name === name;
   }
 
-  buildUrl(screen: string): string {
-    return this.routerService.router.buildUrl(screen);
+  buildUrl(screen: string, params?: Record<string, any>): string {
+    return this.routerService.router.buildUrl(screen, params);
   }
 
-  getScreenByRoute(route: string): IScreen | undefined {
+  getScreenByRoute(route: string): IScreen<any> | undefined {
     const screen = this.routeScreenMap.get(route);
     if (!screen) {
       return undefined;

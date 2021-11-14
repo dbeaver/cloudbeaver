@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
@@ -20,6 +20,20 @@ export class SqlEditorService {
     private notificationService: NotificationService,
     private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
+  }
+
+  getState(order: number, contextInfo: IConnectionExecutionContextInfo): ISqlEditorTabState {
+    return {
+
+      query: '',
+      order,
+      executionContext: { ...contextInfo },
+      tabs: [],
+      resultGroups: [],
+      resultTabs: [],
+      executionPlanTabs: [],
+      statisticsTabs: [],
+    };
   }
 
   async getAutocomplete(

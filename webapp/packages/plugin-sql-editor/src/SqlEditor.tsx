@@ -29,11 +29,10 @@ const viewerStyles = css`
 `;
 
 interface Props {
-  editorId: string;
   state: ISqlEditorTabState;
 }
 
-export const SqlEditor = observer<Props>(function SqlEditor({ editorId, state }) {
+export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
 
   return styled(styles)(
@@ -43,7 +42,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ editorId, state })
       </Pane>
       <ResizerControls />
       <Pane main>
-        <SqlResultTabs editorId={editorId} state={state} />
+        <SqlResultTabs state={state} />
       </Pane>
     </Split>
   );

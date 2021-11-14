@@ -18,6 +18,7 @@ import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import userProfile from '@cloudbeaver/plugin-user-profile';
 
 import { defaultProductManifest } from './manifest';
@@ -36,6 +37,7 @@ const PLUGINS: PluginManifest[] = [
   objectViewer,
   sqlEditor,
   sqlEditorTab,
+  sqlEditorScreen,
   userProfile,
   defaultProductManifest,
   connectionPlugin,

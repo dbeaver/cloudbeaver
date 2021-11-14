@@ -54,7 +54,7 @@ export const CaptureView = observer<Props>(function CaptureView({
 
   const handlers = actionItems.reduce((map, item) => ({
     ...map,
-    [item.binding!.id]: item.activate.bind(item.handler, true),
+    [item.binding!.id]: () => item.activate(true),
   }), {});
 
   return styled(styles)(

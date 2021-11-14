@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext } from 'react';
+import { createKeyBinding } from '../createKeyBinding';
 
-import type { IDataContext } from '../DataContext/IDataContext';
-
-export const CaptureViewContext = createContext<IDataContext | undefined>(undefined);
+export const KEY_BINDING_OPEN_IN_TAB = createKeyBinding({
+  id: 'open-in-tab',
+  label: 'ui_rename',
+  keys: 'alt+t',
+});

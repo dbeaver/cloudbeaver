@@ -11,13 +11,15 @@ import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission } from '@cloudbeaver/core-root';
+import type { ScreenComponent } from '@cloudbeaver/core-routing';
 
 import { Administration } from '../Administration/Administration';
 import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationScreenService } from './AdministrationScreenService';
 import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
+import type { IAdministrationScreenParams } from './IAdministrationScreenParams';
 
-export const AdministrationScreen = observer(function AdministrationScreen() {
+export const AdministrationScreen: ScreenComponent<IAdministrationScreenParams> = observer(function AdministrationScreen() {
   const administrationScreenService = useService(AdministrationScreenService);
 
   const handleSelect = useCallback(

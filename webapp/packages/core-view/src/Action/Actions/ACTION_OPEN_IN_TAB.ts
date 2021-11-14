@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext } from 'react';
+import { createAction } from '../createAction';
 
-import type { IDataContext } from '../DataContext/IDataContext';
-
-export const CaptureViewContext = createContext<IDataContext | undefined>(undefined);
+export const ACTION_OPEN_IN_TAB = createAction('open-in-tab', {
+  label: 'ui_open_in_tab',
+});

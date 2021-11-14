@@ -10,14 +10,14 @@ import type { Route, State as RouterState } from 'router5';
 
 export type ScreenRoute = Omit<Route, 'children'>;
 
-export interface IScreen {
+export interface IScreen<T extends Record<string, any> = Record<string, any>> {
   name: string;
   routes: ScreenRoute[];
-  component: ScreenComponent;
+  component: ScreenComponent<T>;
   root?: boolean;
   onActivate?: (state: RouterState, prevState?: RouterState) => void | Promise<void>;
   onDeactivate?: (state: RouterState, nextState: RouterState) => void | Promise<void>;
   canDeActivate?: (state: RouterState, nextState: RouterState) => boolean | Promise<boolean>;
 }
 
-export type ScreenComponent = React.FunctionComponent;
+export type ScreenComponent<T = Record<string, any>> = React.FunctionComponent<T>;
