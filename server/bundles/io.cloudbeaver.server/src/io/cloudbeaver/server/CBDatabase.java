@@ -25,10 +25,7 @@ import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import org.apache.commons.dbcp2.DriverConnectionFactory;
-import org.apache.commons.dbcp2.PoolableConnection;
-import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.code.NotNull;
@@ -78,6 +75,7 @@ public class CBDatabase {
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
+    private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
 
@@ -95,6 +93,9 @@ public class CBDatabase {
     }
 
     public Connection openConnection() throws SQLException {
+        if (exclusiveConnection != null) {
+            return exclusiveConnection;
+        }
         return cbDataSource.getConnection();
     }
 
@@ -103,6 +104,7 @@ public class CBDatabase {
     }
 
     void initialize() throws DBException {
+        log.debug("Initiate management database");
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
@@ -111,7 +113,6 @@ public class CBDatabase {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
 
-        log.debug("Initializing database connection");
         LoggingProgressMonitor monitor = new LoggingProgressMonitor();
 
         String dbUser = databaseConfiguration.getUser();
@@ -152,6 +153,7 @@ public class CBDatabase {
         }
 
         // Create connection pool with custom connection factory
+        log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
         DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
         PoolableConnectionFactory pcf = new PoolableConnectionFactory(conFactory, null);
         pcf.setValidationQuery(databaseConfiguration.getPool().getValidationQuery());
@@ -166,7 +168,7 @@ public class CBDatabase {
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
-            log.debug("Connected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
+            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
             SQLSchemaManager schemaManager = new SQLSchemaManager(
                 "CB",
@@ -184,8 +186,9 @@ public class CBDatabase {
 
             validateInstancePersistentState(connection);
         } catch (Exception e) {
-            throw new DBException("Error connecting to '" + dbURL + "'", e);
+            throw new DBException("Error updating management database schema", e);
         }
+        log.debug("\tManagement database connection established");
     }
 
     void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
@@ -318,30 +321,42 @@ public class CBDatabase {
 
         @Override
         public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
-            // Fill initial data
-            DBWSecurityController serverController = application.getSecurityController();
+            // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
+            exclusiveConnection = new DelegatingConnection<Connection>(connection) {
+                @Override
+                public void close() throws SQLException {
+                    // do nothing
+                }
+            };
 
-            CBDatabaseInitialData initialData = getInitialData();
-            if (initialData == null) {
-                return;
-            }
+            try {
+                // Fill initial data
+                DBWSecurityController serverController = application.getSecurityController();
 
-            String adminName = initialData.getAdminName();
-            String adminPassword = initialData.getAdminPassword();
+                CBDatabaseInitialData initialData = getInitialData();
+                if (initialData == null) {
+                    return;
+                }
 
-            if (!CommonUtils.isEmpty(initialData.getRoles())) {
-                // Create roles
-                for (WebRole role : initialData.getRoles()) {
-                    serverController.createRole(role, adminName);
-                    if (adminName != null) {
-                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                String adminName = initialData.getAdminName();
+                String adminPassword = initialData.getAdminPassword();
+
+                if (!CommonUtils.isEmpty(initialData.getRoles())) {
+                    // Create roles
+                    for (WebRole role : initialData.getRoles()) {
+                        serverController.createRole(role, adminName);
+                        if (adminName != null) {
+                            serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                        }
                     }
                 }
-            }
 
-            if (!CommonUtils.isEmpty(adminName)) {
-                // Create admin user
-                createAdminUser(adminName, adminPassword);
+                if (!CommonUtils.isEmpty(adminName)) {
+                    // Create admin user
+                    createAdminUser(adminName, adminPassword);
+                }
+            } finally {
+                exclusiveConnection = null;
             }
         }
     }
