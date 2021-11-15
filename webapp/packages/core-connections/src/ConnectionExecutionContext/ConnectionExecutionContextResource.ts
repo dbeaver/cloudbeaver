@@ -185,6 +185,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {
   return {
     ...context,
-    baseId: `${context.connectionId}_${context.id}`,
+    baseId: getContextBaseId(context.connectionId, context.id),
   };
+}
+
+export function getContextBaseId(connectionId: string, contextId: string): string {
+  return `${connectionId}_${contextId}`;
 }
