@@ -290,8 +290,9 @@ public class CBDatabase {
         public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
             // Check and update schema
             try {
-                return CommonUtils.toInt(JDBCUtils.executeQuery(connection,
+                int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
                     "SELECT VERSION FROM CB_SCHEMA_INFO"));
+                return version == 0 ? 1 : version;
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
