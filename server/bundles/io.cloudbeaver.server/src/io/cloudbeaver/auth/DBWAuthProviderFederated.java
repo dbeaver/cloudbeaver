@@ -17,6 +17,7 @@
 package io.cloudbeaver.auth;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public interface DBWAuthProviderFederated {
     @NotNull
     String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
-    @NotNull
+    @Nullable
     String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
 }
