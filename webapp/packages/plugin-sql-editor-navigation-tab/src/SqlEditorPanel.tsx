@@ -8,10 +8,12 @@
 
 import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import { useTab } from '@cloudbeaver/core-blocks';
-import { ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
 
 export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = function SqlEditorPanel({ tab }) {
   const baseTab = useTab(tab.id);
+  const viewContext = useCaptureViewContext();
   // const navigatorService = useService(SqlEditorNavigatorService);
 
   // const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(editorId, tabId);
@@ -21,5 +23,7 @@ export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = func
     return null;
   }
 
-  return <SqlEditor editorId={tab.id} state={tab.handlerState} />;
+  viewContext?.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
+
+  return <SqlEditor state={tab.handlerState} />;
 };

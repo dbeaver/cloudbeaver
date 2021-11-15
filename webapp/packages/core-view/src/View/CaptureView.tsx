@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { HotKeys } from 'react-hotkeys';
+import { HotKeys, configure } from 'react-hotkeys';
 import styled, { css } from 'reshadow';
 
 import { getComputed, useFocus } from '@cloudbeaver/core-blocks';
@@ -19,6 +19,10 @@ import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
+
+configure({
+  ignoreTags: [],
+});
 
 const styles = css`
   div {
@@ -54,7 +58,7 @@ export const CaptureView = observer<Props>(function CaptureView({
 
   const handlers = actionItems.reduce((map, item) => ({
     ...map,
-    [item.binding!.id]: item.activate.bind(item.handler, true),
+    [item.binding!.id]: () => item.activate(true),
   }), {});
 
   return styled(styles)(

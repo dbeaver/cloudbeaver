@@ -31,6 +31,8 @@
     "@cloudbeaver/plugin-data-viewer": "0.1.0",
     "@cloudbeaver/plugin-ddl-viewer": "0.1.0",
     "@cloudbeaver/plugin-object-viewer": "0.1.0",
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "0.1.0"
+    "@cloudbeaver/plugin-sql-editor": "0.1.0",
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "0.1.0",
+    "@cloudbeaver/plugin-sql-editor-screen": "0.1.0"
   }
 }

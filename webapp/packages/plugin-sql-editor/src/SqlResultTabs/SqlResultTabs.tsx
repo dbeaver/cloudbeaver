@@ -51,13 +51,12 @@ const styles = composes(
 );
 
 interface Props {
-  editorId: string;
   state: ISqlEditorTabState;
   onTabSelect?: (tabId: string) => void;
   onTabClose?: (tabId: string) => void;
 }
 
-export const SqlResultTabs = observer<Props>(function SqlDataResult({ editorId, state, onTabSelect, onTabClose }) {
+export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
   const style = useStyles(styles);
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);

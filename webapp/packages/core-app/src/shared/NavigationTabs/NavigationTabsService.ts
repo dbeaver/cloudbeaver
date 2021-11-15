@@ -14,7 +14,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { IActiveView, View } from '@cloudbeaver/core-view';
+import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
 
 import type { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
@@ -72,6 +72,8 @@ export class NavigationTabsService extends View<ITab<any>> {
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
+
+    this.registerAction(ACTION_OPEN_IN_TAB);
 
     makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
       handlers: observable,

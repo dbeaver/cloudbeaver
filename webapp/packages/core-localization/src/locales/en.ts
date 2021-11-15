@@ -38,6 +38,7 @@ export const defaultENLocale = [
   ['ui_revoke', 'Revoke'],
   ['ui_grant', 'Grant'],
   ['ui_edit', 'Edit'],
+  ['ui_open_in_tab', 'Open in tab'],
   ['ui_rename', 'Rename'],
   ['ui_rename_processing', 'Renaming...'],
   ['ui_name', 'Name'],

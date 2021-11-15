@@ -51,7 +51,7 @@ export const Body = observer(function Body() {
     <theme ref={ref}>
       <Loader state={permissionsService}>{() => styled(style)(
         <>
-          {Screen && <Screen />}
+          {Screen && <Screen {...screenService.routerService.params} />}
         </>
       )}
       </Loader>

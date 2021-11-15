@@ -201,6 +201,7 @@ export class SqlQueryService {
 
           model = source = undefined;
         }
+        options?.onQueryExecuted?.(query, i, true);
       } catch (exception) {
         if (model) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -215,9 +216,8 @@ export class SqlQueryService {
 
           model = source = undefined;
         }
-        break;
-      } finally {
         options?.onQueryExecuted?.(query, i, false);
+        break;
       }
     }
 

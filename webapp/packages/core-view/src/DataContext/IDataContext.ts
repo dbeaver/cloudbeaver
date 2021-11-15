@@ -11,4 +11,5 @@ import type { IDataContextProvider } from './IDataContextProvider';
 
 export interface IDataContext extends IDataContextProvider {
   set: <T>(context: DataContextGetter<T>, value: T) => this;
+  delete: (context: DataContextGetter<any>) => this;
 }

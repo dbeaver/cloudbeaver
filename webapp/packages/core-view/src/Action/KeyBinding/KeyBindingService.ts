@@ -20,6 +20,13 @@ export class KeyBindingService {
     this.handlers = new Map();
   }
 
+  addKeyBindingHandler(handler: IKeyBindingHandler): void {
+    if (this.handlers.has(handler.id)) {
+      throw new Error(`Key binding handler with same id (${handler.id}) already exists`);
+    }
+    this.handlers.set(handler.id, handler);
+  }
+
   getKeyBindingHandler(context: IDataContextProvider, action: IAction): IKeyBindingHandler | null {
     for (const handler of this.handlers.values()) {
       if (handler.isBindingApplicable(context, action)) {

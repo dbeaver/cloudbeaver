@@ -36,6 +36,7 @@ export const defaultRULocale = [
   ['ui_revoke', 'Запретить'],
   ['ui_grant', 'Разрешить'],
   ['ui_edit', 'Редактировать'],
+  ['ui_open_in_tab', 'Открыть во вкладке'],
   ['ui_rename', 'Переименовать'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
