@@ -46,18 +46,20 @@ const styles = composes(
 `);
 
 interface Props {
-  provider: AuthProvider;
+  providers: AuthProvider[];
   onClose?: () => void;
   className?: string;
 }
 
-export const ConfigurationsList = observer<Props>(function ConfigurationsList({ provider, onClose, className }) {
-  const authInfoService = useService(AuthInfoService);
+export const FederatedConfigurations = observer<Props>(function FederatedConfigurations({ providers, onClose, className }) {
   const translate = useTranslate();
+  const authInfoService = useService(AuthInfoService);
 
   const [search, setSearch] = useState('');
-  const configurations = getComputed(() =>
-    (provider.configurations || [])
+
+  const configurations = getComputed(
+    () => providers.map(provider => provider.configurations || [])
+      .flat()
       .filter(configuration => configuration.signInLink)
   );
 
@@ -74,7 +76,16 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
     });
   });
 
+  function getProviderFor(configuration: AuthProviderConfiguration) {
+    return providers.find(p => p.configurations?.some(c => c.id === configuration.id));
+  }
+
   async function auth(configuration: AuthProviderConfiguration) {
+    const provider = getProviderFor(configuration);
+    if (!provider) {
+      return;
+    }
+
     const user = await authInfoService.sso(provider.id, configuration);
 
     if (user) {
@@ -94,8 +105,10 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
       )}
       <list>
         {filteredConfigurations.map(configuration => {
-          const icon = configuration.iconURL || provider.icon;
-          const title = `${configuration.displayName}\n${configuration.description || ''}`;
+          const provider = getProviderFor(configuration);
+          const icon = configuration.iconURL || provider?.icon;
+          const description = `${configuration.description ? '\n' + configuration.description : ''}${provider?.id ? '\nprovider: ' + provider.id : ''}`;
+          const title = `${configuration.displayName}${description}`;
           return (
             <Link
               key={configuration.id}

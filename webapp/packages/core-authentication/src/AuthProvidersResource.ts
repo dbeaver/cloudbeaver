@@ -31,7 +31,7 @@ export type AuthProviderConfiguration = BaseAuthProviderConfiguration;
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {
   get configurable(): AuthProvider[] {
-    return this.values.filter(provider => provider.configurable);
+    return this.values.filter(isConfigurable);
   }
 
   constructor(
@@ -140,4 +140,8 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
       }
     });
   }
+}
+
+export function isConfigurable(provider: AuthProvider): boolean {
+  return provider.configurable;
 }

@@ -1,4 +1,5 @@
 export default [
+  ['authentication_federated', 'Federated'],
   ['authentication_login_dialog_title', 'Authentication'],
   ['authentication_login', 'Login'],
   ['authentication_logout', 'Logout'],

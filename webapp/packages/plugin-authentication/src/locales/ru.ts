@@ -1,4 +1,5 @@
 export default [
+  ['authentication_federated', 'Федеративная'],
   ['authentication_login_dialog_title', 'Аутентификация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],

@@ -15,21 +15,21 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
+import { CONFIGURABLE_PROVIDERS_ID } from '../CONFIGURABLE_PROVIDERS_ID';
+
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {
-  selectedProvider: AuthProvider | null = null;
+  selectedTab: string | null = null;
+
   isAuthenticating = false;
   credentials = {};
 
   get provider(): AuthProvider | null {
-    return (
-      this.selectedProvider
-      || (
-        this.providers.length > 0
-          ? this.providers[0]
-          : null
-      )
-    );
+    if (!this.selectedTab) {
+      return null;
+    }
+
+    return this.authProvidersResource.get(this.selectedTab) || null;
   }
 
   get isLoading(): boolean {
@@ -80,8 +80,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
-    makeObservable<this, 'admin' | 'defaultProviderId' | 'selectedProvider'>(this, {
-      selectedProvider: observable.ref,
+    makeObservable<this, 'admin' | 'defaultProviderId'>(this, {
+      selectedTab: observable.ref,
       provider: computed,
       isAuthenticating: observable.ref,
       credentials: observable,
@@ -96,6 +96,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
   init(link: boolean, providerId: string | null, onClose: () => void): void {
     this.link = link;
     this.defaultProviderId = providerId;
+    this.selectedTab = this.defaultProviderId;
     this.close = onClose;
     this.loadProviders();
   }
@@ -132,13 +133,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
     }
   };
 
-  selectProvider = (providerId: string): void => {
-    if (providerId === this.selectedProvider?.id) {
+  handleTabChange(tabId: string): void {
+    if (this.selectedTab === tabId) {
       return;
     }
-    this.selectedProvider = this.authProvidersResource.get(providerId) || null;
+
+    this.selectedTab = tabId;
     this.credentials = {};
-  };
+  }
 
   showDetails = (): void => {
     if (this.error.exception) {
@@ -157,13 +159,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   private selectFirstAvailable(): void {
-    if (this.providers.length > 0) {
-      this.selectedProvider = this.providers.find(provider => (
-        this.defaultProviderId !== null
-          ? provider.id === this.defaultProviderId
-          : provider.defaultProvider
-      )) ?? this.providers[0];
+    if (!this.providers.length) {
+      return;
     }
+
+    const firstDefault = this.providers.find(p => p.id === this.defaultProviderId || p.defaultProvider);
+    const provider = firstDefault || this.providers[0];
+
+    this.selectedTab = provider.configurable ? CONFIGURABLE_PROVIDERS_ID : provider.id;
   }
 }
 

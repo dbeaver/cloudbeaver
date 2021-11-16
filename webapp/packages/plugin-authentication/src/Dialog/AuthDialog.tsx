@@ -10,9 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AuthProvider, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProvidersResource, isConfigurable, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader,
+  UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
@@ -20,10 +21,11 @@ import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 // import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
+import { CONFIGURABLE_PROVIDERS_ID } from '../CONFIGURABLE_PROVIDERS_ID';
 import { AuthDialogController } from './AuthDialogController';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
-import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
+import { FederatedConfigurations } from './AuthProviderForm/FederatedConfigurations';
 
 const styles = composes(
   css`
@@ -60,7 +62,7 @@ const styles = composes(
       flex-direction: column;
       padding: 18px 24px;
     }
-    ConfigurationsList {
+    FederatedConfigurations {
       margin-top: 12px;
     }
     ErrorMessage {
@@ -82,11 +84,13 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   rejectDialog,
 }) {
   // const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
+  const style = useStyles(styles, UNDERLINE_TAB_STYLES);
+  const translate = useTranslate();
   const authProvidersResource = useService(AuthProvidersResource);
   const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
   const controller = useController(AuthDialogController, link, providerId, rejectDialog);
-  const translate = useTranslate();
+
   const isAdminPage = administrationScreenService.activeScreen !== null;
 
   if (isAdminPage) {
@@ -97,8 +101,6 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     && controller.provider?.id !== undefined
     && !userInfo.hasToken(controller.provider.id);
 
-  const showTabs = controller.providers.length > 1;
-  const configurable = !!controller.provider?.configurable;
   let providerEnabled = false;
 
   if (controller.provider && (
@@ -108,11 +110,26 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     providerEnabled = true;
   }
 
-  const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
+  const providers: AuthProvider[] = [];
+  const identityProviders: AuthProvider[] = [];
+
+  for (const provider of controller.providers) {
+    if (isConfigurable(provider)) {
+      identityProviders.push(provider);
+    } else {
+      providers.push(provider);
+    }
+  }
+
+  const federated = controller.selectedTab === CONFIGURABLE_PROVIDERS_ID;
+  const showTabs = providers.length > 0 || federated;
+
+  let dialogTitle = `${translate('authentication_login_dialog_title')}${controller.provider?.label ? ': ' + controller.provider.label : ''} `;
   let subTitle = controller.provider?.description;
 
-  if (configurable) {
+  if (federated) {
     subTitle = 'authentication_identity_provider_dialog_subtitle';
+    dialogTitle = `${translate('authentication_login_dialog_title')}: ${translate('authentication_federated')}`;
   }
 
   if (additional) {
@@ -124,28 +141,48 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     // authConfigurationsAdministrationNavService.navToSettings();
   }
 
-  function renderForm(provider: AuthProvider) {
-    if (configurable) {
-      return <ConfigurationsList provider={provider} onClose={rejectDialog} />;
+  function getContent() {
+    if (federated && identityProviders.length) {
+      return styled(style)(
+        <FederatedConfigurations providers={identityProviders} onClose={rejectDialog} />
+      );
     }
 
-    return (
-      <AuthProviderForm
-        provider={provider}
-        credentials={controller.credentials}
-        authenticate={controller.isAuthenticating}
-      />
-    );
+    if (controller.provider) {
+      if (providerEnabled) {
+        return styled(style)(
+          <AuthProviderForm
+            provider={controller.provider}
+            credentials={controller.credentials}
+            authenticate={controller.isAuthenticating}
+          />
+        );
+      } else {
+        return styled(style)(
+          <TextPlaceholder>
+            {translate('authentication_provider_disabled')}
+            <Link onClick={() => navToSettings()}>
+              <Translate token="ui_configure" />
+            </Link>
+          </TextPlaceholder>
+        );
+      }
+    }
+
+    return null;
   }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
-    <TabsState currentTabId={controller.provider?.id} onChange={tabData => controller.selectProvider(tabData.tabId)}>
+    <TabsState
+      currentTabId={controller.selectedTab}
+      onChange={tabData => controller.handleTabChange(tabData.tabId)}
+    >
       <CommonDialogWrapper
         size='large'
         title={dialogTitle}
         icon={controller.provider?.icon}
         subTitle={subTitle}
-        footer={!configurable && (
+        footer={!federated && (
           <AuthDialogFooter
             authAvailable={providerEnabled}
             isAuthenticating={controller.isAuthenticating}
@@ -165,7 +202,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       >
         {showTabs && (
           <TabList aria-label='Auth providers'>
-            {controller.providers.map(provider => (
+            {providers.map(provider => (
               <Tab
                 key={provider.id}
                 tabId={provider.id}
@@ -175,27 +212,23 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
                 <TabTitle>{provider.label}</TabTitle>
               </Tab>
             ))}
+            {identityProviders.length > 0 && (
+              <Tab
+                tabId={CONFIGURABLE_PROVIDERS_ID}
+                title={`${translate('authentication_federated')} ${translate('authentication_login_dialog_title')}`}
+                disabled={controller.isAuthenticating}
+              >
+                <TabTitle>{translate('authentication_federated')}</TabTitle>
+              </Tab>
+            )}
           </TabList>
         )}
-        <SubmittingForm {...use({ form: !configurable })} onSubmit={controller.login}>
-          {controller.provider && (
-            <>
-              {providerEnabled ? (
-                renderForm(controller.provider)
-              ) : (
-                <TextPlaceholder>
-                  {translate('authentication_provider_disabled')}
-                  <Link onClick={() => navToSettings()}>
-                    <Translate token="ui_configure" />
-                  </Link>
-                </TextPlaceholder>
-              )}
-            </>
-          )}
+        <SubmittingForm {...use({ form: !federated })} onSubmit={controller.login}>
+          {!controller.isLoading && getContent()}
           {controller.isLoading && <Loader />}
-          {!controller.isLoading && !controller.provider && (
+          {!controller.isLoading && !controller.provider && !federated && (
             <TextPlaceholder>
-              {controller.providers.length > 0 ? (
+              {providers.length > 0 ? (
                 <>{translate('authentication_select_provider')}</>
               ) : (
                 <>
