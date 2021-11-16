@@ -57,7 +57,7 @@ type AuthProviderInfo {
     # Provider configurations (applicable only if configurable=true)
     configurations: [AuthProviderConfiguration!]
 
-    crdentialProfiles: [AuthProviderCredentialsProfile!]!
+    credentialProfiles: [AuthProviderCredentialsProfile!]!
 
     credentialParameters: [AuthCredentialInfo!]! @deprecated
 }
