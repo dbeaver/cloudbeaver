@@ -12,6 +12,7 @@ import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/T
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { generateTabElement } from './generateTabElement';
 import { TabDefault } from './Tab/TabDefault';
 import { TabsContext } from './TabsContext';
 
@@ -37,20 +38,23 @@ export const TabList = observer<Props>(function TabList({
     return (
       <BaseTabList {...props} {...state.state}>
         {childrenFirst && children}
-        {displayed.map(tabInfo => (
-          <TabDefault
-            key={tabInfo.key}
-            tabId={tabInfo.key}
-            name={tabInfo.name}
-            icon={tabInfo.icon}
-            component={tabInfo.tab?.()}
-            {...state.props}
-            style={style}
-            disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
-            onOpen={tabInfo.onOpen}
-            onClose={tabInfo.onClose}
-          />
-        ))}
+        {displayed.map(generateTabElement(
+          (tabInfo, key) => (
+            <TabDefault
+              key={key}
+              tabId={key}
+              name={tabInfo.name}
+              icon={tabInfo.icon}
+              component={tabInfo.tab?.()}
+              {...state.props}
+              style={style}
+              disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
+              onOpen={tabInfo.onOpen}
+              onClose={tabInfo.onClose}
+            />
+          ),
+          state.props,
+        )).flat()}
         {!childrenFirst && children}
       </BaseTabList>
     );

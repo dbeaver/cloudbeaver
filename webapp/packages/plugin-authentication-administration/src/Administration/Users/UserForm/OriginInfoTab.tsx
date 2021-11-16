@@ -9,23 +9,28 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';
 
 export const OriginInfoTab: TabContainerTabComponent<IUserFormProps> = observer(function OriginInfoTab({
+  tabId,
   user,
   controller,
   editing,
   style,
   ...rest
 }) {
-  const origin = user.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+  const origin = user.origins.find(origin => getOriginTabId('origin', origin) === tabId);
   return styled(useStyles(style))(
-    <Tab {...rest} style={style}>
+    <Tab
+      {...rest}
+      tabId={tabId}
+      style={style}
+    >
       <TabTitle><Translate token={origin?.displayName || 'Origin'} /></TabTitle>
     </Tab>
   );
