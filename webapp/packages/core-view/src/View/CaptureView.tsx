@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { HotKeys } from 'react-hotkeys';
+import { HotKeys, configure } from 'react-hotkeys';
 import styled, { css } from 'reshadow';
 
 import { getComputed, useFocus } from '@cloudbeaver/core-blocks';
@@ -19,6 +19,10 @@ import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
+
+configure({
+  ignoreTags: [],
+});
 
 const styles = css`
   div {

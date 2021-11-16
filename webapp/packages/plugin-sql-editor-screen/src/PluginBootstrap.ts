@@ -42,14 +42,15 @@ export class PluginBootstrap extends Bootstrap {
 
         if (!context.executionContext) {
           this.notificationService.logError({
-            title: 'sd',
+            title: 'sql_editor_screen_no_context_title',
+            message: 'sql_editor_screen_no_context_message',
           });
           return;
         }
 
         const url = this.sqlEditorScreenService.createURL({
           connectionId: context.executionContext.connectionId,
-          contextId: context.executionContext.baseId,
+          contextId: context.executionContext.id,
         });
 
         window.open(url, '_blank')?.focus();

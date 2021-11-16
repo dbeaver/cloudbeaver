@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { SqlEditorScreenBootstrap } from './Screen/SqlEditorScreenBootstrap';
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService';
@@ -19,6 +20,7 @@ export const sqlEditorPagePluginManifest: PluginManifest = {
 
   providers: [
     PluginBootstrap,
+    LocaleService,
     SqlEditorScreenBootstrap,
     SqlEditorScreenService,
   ],

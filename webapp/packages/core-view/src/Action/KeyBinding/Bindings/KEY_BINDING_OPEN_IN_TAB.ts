@@ -11,5 +11,5 @@ import { createKeyBinding } from '../createKeyBinding';
 export const KEY_BINDING_OPEN_IN_TAB = createKeyBinding({
   id: 'open-in-tab',
   label: 'ui_rename',
-  keys: 'alt+t',
+  keys: 'Alt+t',
 });

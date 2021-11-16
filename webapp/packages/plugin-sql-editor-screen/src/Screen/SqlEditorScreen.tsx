@@ -10,8 +10,9 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { Loader, TextPlaceholder, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionExecutionContextService, getContextBaseId, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ISqlEditorTabState, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
@@ -22,11 +23,12 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   connectionId,
   contextId,
 }) {
-  const connectionInfoResource = useMapResource(
-    SqlEditorScreen,
-    ConnectionInfoResource,
-    connectionId
-  );
+  const translate = useTranslate();
+  // const connectionInfoResource = useMapResource(
+  //   SqlEditorScreen,
+  //   ConnectionInfoResource,
+  //   connectionId
+  // );
   const connectionExecutionContextResource = useMapResource(
     SqlEditorScreen,
     ConnectionExecutionContextResource,
@@ -34,24 +36,28 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   );
   const sqlEditorService = useService(SqlEditorService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
-  const context = connectionExecutionContextService.get(contextId);
+  const context = connectionExecutionContextService.get(getContextBaseId(connectionId, contextId));
 
   const state = useObservableRef(() => ({
     state: null as null | ISqlEditorTabState,
-    setState(contextInfo: IConnectionExecutionContextInfo) {
-      this.state = sqlEditorService.getState(0, contextInfo);
+    setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
+      if (contextInfo) {
+        this.state = sqlEditorService.getState(0, contextInfo);
+      } else {
+        this.state = null;
+      }
     },
   }), { state: observable }, false);
 
-  if (context?.context && context.context.baseId !== state.state?.executionContext?.baseId) {
-    state.setState(context.context);
+  if (context?.context?.baseId !== state.state?.executionContext?.baseId) {
+    state.setState(context?.context);
   }
 
   return (
-    <Loader state={[connectionInfoResource, connectionExecutionContextResource]}>
+    <Loader state={[connectionExecutionContextResource]}>
       {state.state
         ? <SqlEditor state={state.state} />
-        : <TextPlaceholder>Context not found</TextPlaceholder>}
+        : <TextPlaceholder>{translate('sql_editor_screen_context_not_found')}</TextPlaceholder>}
     </Loader>
   );
 });
