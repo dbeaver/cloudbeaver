@@ -18,6 +18,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 
+import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';
 
 interface IState {
@@ -28,7 +29,7 @@ interface IState {
   exception: Error | null;
 }
 
-export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfo({
+export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfoPanel({
   tabId,
   user,
 }) {
@@ -45,7 +46,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     exception: null,
   }));
 
-  let origin = user.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+  let origin = user.origins.find(origin => getOriginTabId('origin', origin) === tabId);
 
   if (!origin) {
     origin = user.origins[0];

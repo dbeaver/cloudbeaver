@@ -12,6 +12,7 @@ import styled from 'reshadow';
 
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
+import { generateTabElement } from './generateTabElement';
 import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
@@ -35,23 +36,26 @@ export const TabPanelList = observer<Props>(function TabPanelList({
     throw new Error('Tabs container should be provided for TabPanelList');
   }
 
-  function renderPanel(tabInfo: ITabInfo) {
+  function renderPanel(tabInfo: ITabInfo, key: string) {
     const Panel = tabInfo.panel();
-    return <Panel tabId={tabInfo.key} {...state?.props} />;
+    return <Panel tabId={key} {...state?.props} />;
   }
 
   const displayed = state.container.getDisplayed(state.props);
 
   return styled(styles)(
     <>
-      {displayed.map(tabInfo => (
-        <TabPanel
-          key={tabInfo.key}
-          tabId={tabInfo.key}
-        >
-          {renderPanel(tabInfo)}
-        </TabPanel>
-      ))}
+      {displayed.map(generateTabElement(
+        (tabInfo, key) => (
+          <TabPanel
+            key={key}
+            tabId={key}
+          >
+            {renderPanel(tabInfo, key)}
+          </TabPanel>
+        ),
+        state.props,
+      )).flat()}
       {children}
     </>
   );

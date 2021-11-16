@@ -10,7 +10,8 @@ import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { ConnectionAccess } from './ConnectionAccess';
-import { OriginInfo } from './OriginInfo';
+import { getOriginTabId } from './getOriginTabId';
+import { OriginInfoPanel } from './OriginInfoPanel';
 import { OriginInfoTab } from './OriginInfoTab';
 import { UserFormService } from './UserFormService';
 import { UserInfo } from './UserInfo';
@@ -34,8 +35,17 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'origin',
       order: 2,
+      generator: (tabId, props) => {
+        const origins = props?.user.origins.filter(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+
+        if (origins && origins.length > 0) {
+          return origins.map(origin => getOriginTabId(tabId, origin));
+        }
+
+        return ['origin'];
+      },
       isHidden: (tabId, props) => !props?.user.origins.some(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID),
-      panel: () => OriginInfo,
+      panel: () => OriginInfoPanel,
       tab: () => OriginInfoTab,
     });
     this.userFormService.tabsContainer.add({

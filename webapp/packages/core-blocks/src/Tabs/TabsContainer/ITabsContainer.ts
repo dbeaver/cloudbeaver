@@ -26,6 +26,8 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
   order?: number;
   options?: TOptions;
 
+  generator?: (tabId: string, props?: TProps) => string[];
+
   tab?: () => TabContainerTabComponent<TProps>;
   panel: () => TabContainerPanelComponent<TProps>;
 

@@ -36,5 +36,7 @@ export function useDynamicDataContext(context: IDataContext | undefined): IDataC
     }
   }));
 
+  useEffect(() => () => state.dynamic.flush(), []);
+
   return state.dynamic;
 }
