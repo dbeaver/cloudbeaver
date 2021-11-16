@@ -79,6 +79,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
     private static final String ATTR_LOCALE = "locale";
     private static final String SESSION_TEMP_COOKIE = "cb-session";
+    public static final String USER_PROJECTS_FOLDER = "user-projects";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
@@ -109,6 +110,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
+
+    @NotNull
+    public static File getUserProjectsFolder() {
+        return new File(
+            CBPlatform.getInstance().getWorkspace().getAbsolutePath(), USER_PROJECTS_FOLDER);
+    }
 
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
@@ -242,7 +249,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         if (user != null) {
             projectName = CommonUtils.escapeFileName(user.getUserId());
             projectPath = new File(
-                new File(platform.getWorkspace().getAbsolutePath(), "user-projects"),
+                getUserProjectsFolder(),
                 projectName);
         } else {
             projectName = CommonUtils.escapeFileName(getSessionId());
