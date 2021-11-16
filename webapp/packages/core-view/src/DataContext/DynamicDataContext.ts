@@ -56,6 +56,9 @@ export class DynamicDataContext implements IDataContext {
   }
 
   flush(): void {
+    for (const context of this.contexts) {
+      this.delete(context);
+    }
     this.contexts = [];
   }
 }
