@@ -26,10 +26,7 @@ import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Auth service descriptor
@@ -42,9 +39,49 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private DBWAuthProvider<?> instance;
     private final DBPImage icon;
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
-    private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
+    private final List<CredentialsProfile> credentialProfiles = new ArrayList<>();
     private final boolean configurable;
     private final String[] requiredFeatures;
+
+    public static class CredentialsProfile {
+        private final String id;
+        private final String label;
+        private final String description;
+        private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
+        public CredentialsProfile(IConfigurationElement cfg) {
+            this.id = cfg.getAttribute("id");
+            this.label = cfg.getAttribute("label");
+            this.description = cfg.getAttribute("description");
+            for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfg.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
+                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
+                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
+                for (IConfigurationElement prop : propElements) {
+                    WebAuthProviderPropertyDescriptor propertyDescriptor = new WebAuthProviderPropertyDescriptor(category, prop);
+                    credentialParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
+                }
+            }
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
+            return new ArrayList<>(credentialParameters.values());
+        }
+
+        public WebAuthProviderPropertyDescriptor getCredentialParameter(String id) {
+            return credentialParameters.get(id);
+        }
+    }
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -64,14 +101,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
             }
         }
         for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
-            for (IConfigurationElement propGroup : ArrayUtils.safeArray(credElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
-                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
-                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
-                for (IConfigurationElement prop : propElements) {
-                    WebAuthProviderPropertyDescriptor propertyDescriptor = new WebAuthProviderPropertyDescriptor(category, prop);
-                    credentialParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
-                }
-            }
+            credentialProfiles.add(new CredentialsProfile(credElement));
         }
 
         String rfList = cfg.getAttribute("requiredFeatures");
@@ -107,12 +137,48 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return new ArrayList<>(configurationParameters.values());
     }
 
-    public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
-        return new ArrayList<>(credentialParameters.values());
+    public List<CredentialsProfile> getCredentialProfiles() {
+        return new ArrayList<>(credentialProfiles);
     }
 
-    public WebAuthProviderPropertyDescriptor getCredentialParameter(String id) {
-        return credentialParameters.get(id);
+    public CredentialsProfile getCredentialProfileByParameters(Set<String> keySet) {
+        if (credentialProfiles.size() > 1) {
+            for (CredentialsProfile profile : credentialProfiles) {
+                if (profile.getCredentialParameters().size() == keySet.size()) {
+                    boolean matches = true;
+                    for (String paramName : keySet) {
+                        if (profile.getCredentialParameter(paramName) == null) {
+                            matches = false;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        return profile;
+                    }
+                }
+            }
+        }
+        return credentialProfiles.get(0);
+    }
+
+    public List<WebAuthProviderPropertyDescriptor> getCredentialParameters(Set<String> keySet) {
+        if (credentialProfiles.size() > 1) {
+            for (CredentialsProfile profile : credentialProfiles) {
+                if (profile.getCredentialParameters().size() == keySet.size()) {
+                    boolean matches = true;
+                    for (String paramName : keySet) {
+                        if (profile.getCredentialParameter(paramName) == null) {
+                            matches = false;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        return profile.getCredentialParameters();
+                    }
+                }
+            }
+        }
+        return credentialProfiles.get(0).getCredentialParameters();
     }
 
     @NotNull

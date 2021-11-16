@@ -26,10 +26,10 @@ import org.jkiss.utils.CommonUtils;
  */
 public class WebAuthProviderPropertyDescriptor extends PropertyDescriptor {
 
-    private WebAuthProviderPropertyEncryption encryption;
-    private boolean identifying; // Identifying parameter. Will be used during auth for user search by credentials
-    private boolean admin; // Parameter value can be configured in admin panel
-    private boolean user; // Parameter can be passed by end-user from UI
+    private final WebAuthProviderPropertyEncryption encryption;
+    private final boolean identifying; // Identifying parameter. Will be used during auth for user search by credentials
+    private final boolean admin; // Parameter value can be configured in admin panel
+    private final boolean user; // Parameter can be passed by end-user from UI
 
     public WebAuthProviderPropertyDescriptor(String category, IConfigurationElement config) {
         super(category, config);

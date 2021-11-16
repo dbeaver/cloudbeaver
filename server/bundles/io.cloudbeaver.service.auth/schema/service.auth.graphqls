@@ -36,6 +36,13 @@ type AuthProviderConfiguration {
     metadataLink: String
 }
 
+type AuthProviderCredentialsProfile {
+    id: String
+    label: String
+    description: String
+    credentialParameters: [AuthCredentialInfo!]!
+}
+
 type AuthProviderInfo {
     id: ID!
     label: String!
@@ -50,7 +57,9 @@ type AuthProviderInfo {
     # Provider configurations (applicable only if configurable=true)
     configurations: [AuthProviderConfiguration!]
 
-    credentialParameters: [AuthCredentialInfo!]!
+    crdentialProfiles: [AuthProviderCredentialsProfile!]!
+
+    credentialParameters: [AuthCredentialInfo!]! @deprecated
 }
 
 type UserAuthToken {

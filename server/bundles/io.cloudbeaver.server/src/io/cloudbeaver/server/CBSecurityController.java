@@ -272,9 +272,10 @@ class CBSecurityController implements DBWSecurityController {
     public void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
         try {
+            WebAuthProviderDescriptor.CredentialsProfile credProfile = authProvider.getCredentialProfileByParameters(credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
-                WebAuthProviderPropertyDescriptor property = authProvider.getCredentialParameter(propertyName);
+                WebAuthProviderPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
                 if (property == null) {
                     return null;
                 }
@@ -313,7 +314,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
-        for (WebAuthProviderPropertyDescriptor prop : authProvider.getCredentialParameters()) {
+        for (WebAuthProviderPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
                 Object paramValue = authParameters.get(propId);
