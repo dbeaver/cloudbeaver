@@ -81,7 +81,7 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
-  component: React.FC<any>,
+  component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any
     ? CachedMapResourceKey<TResource> | null | KeyWithIncludes<CachedMapResourceKey<TResource>, TIncludes>
@@ -96,14 +96,14 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
-  component: React.FC<any>,
+  component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any
     ? (
-      ResourceKeyList<CachedMapResourceKey<TResource>>
-      | null
-      | KeyWithIncludes<ResourceKeyList<CachedMapResourceKey<TResource>>, TIncludes>
-    )
+        ResourceKeyList<CachedMapResourceKey<TResource>>
+        | null
+        | KeyWithIncludes<ResourceKeyList<CachedMapResourceKey<TResource>>, TIncludes>
+      )
     : never,
   actions?: TResource extends any
     ? IActions<ResourceKeyList<CachedMapResourceKey<TResource>>, TResource, TIncludes>
@@ -118,7 +118,7 @@ export function useMapResource<
   CachedMapResourceArguments<TResource>
   > = []
 >(
-  component: React.FC<any>,
+  component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: TResource extends any ? IActions<TKeyArg, TResource, TIncludes> : never

@@ -70,6 +70,7 @@ module.exports = {
       }
     ],
     'operator-linebreak': ['warn', 'before'],
+    'multiline-ternary': 'off',
     'no-nested-ternary': 'warn',
     'arrow-parens': ['error', 'as-needed'],
     'comma-dangle': ['warn', { // the rule enforces consistent use of trailing commas in object and array literals

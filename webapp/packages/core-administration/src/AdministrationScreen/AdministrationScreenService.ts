@@ -46,6 +46,10 @@ export class AdministrationScreenService {
   info: IAdministrationScreenInfo;
   itemState: Map<string, any>;
 
+  get isAdministrationPageActive(): boolean {
+    return this.isAdministrationRouteActive(this.screenService.routerService.state.name);
+  }
+
   get activeScreen(): IAdministrationItemRoute | null {
     return this.getScreen(this.screenService.routerService.state);
   }

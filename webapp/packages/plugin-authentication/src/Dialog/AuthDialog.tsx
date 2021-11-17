@@ -9,21 +9,19 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AuthProvider, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
-import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link
-} from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link, useErrorDetails } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 // import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
-import { AuthDialogController } from './AuthDialogController';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
+import { FEDERATED_AUTH } from './FEDERATED_AUTH';
+import { useAuthDialogState } from './useAuthDialogState';
 
 const styles = composes(
   css`
@@ -33,8 +31,8 @@ const styles = composes(
 `,
   css`
     CommonDialogWrapper {
-      min-height: 490px !important;
-      max-height: max(100vh - 48px, 490px) !important;
+      min-height: 520px !important;
+      max-height: max(100vh - 48px, 520px) !important;
     }
     SubmittingForm {
       overflow: auto;
@@ -81,37 +79,29 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   options,
   rejectDialog,
 }) {
+  const state = useAuthDialogState(providerId);
+  const errorDetails = useErrorDetails(state.exception);
   // const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
-  const authProvidersResource = useService(AuthProvidersResource);
-  const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, link, providerId, rejectDialog);
   const translate = useTranslate();
-  const isAdminPage = administrationScreenService.activeScreen !== null;
-
-  if (isAdminPage) {
-    controller.setAdminMode(isAdminPage, providerId);
-  }
 
   const additional = userInfo.data !== null
-    && controller.provider?.id !== undefined
-    && !userInfo.hasToken(controller.provider.id);
+    && state.activeProvider?.id !== undefined
+    && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = controller.providers.length > 1;
-  const configurable = !!controller.provider?.configurable;
-  let providerEnabled = false;
+  const showTabs = (state.providers.length + state.configurations.length) > 1;
+  const federate = state.tabId === FEDERATED_AUTH;
 
-  if (controller.provider && (
-    (isAdminPage && authProvidersResource.isPrimary(controller.provider.id))
-    || authProvidersResource.isAuthEnabled(controller.provider.id)
-  )) {
-    providerEnabled = true;
+  let dialogTitle = translate('authentication_login_dialog_title');
+  let subTitle: string | undefined;
+
+  if (state.activeProvider) {
+    dialogTitle += `: ${state.activeProvider.label}`;
+    subTitle = state.activeProvider.description;
   }
 
-  const dialogTitle = `${controller.provider?.label || ''} ${translate('authentication_login_dialog_title')}`;
-  let subTitle = controller.provider?.description;
-
-  if (configurable) {
+  if (federate) {
+    dialogTitle += `: ${translate('authentication_auth_federated')}`;
     subTitle = 'authentication_identity_provider_dialog_subtitle';
   }
 
@@ -119,43 +109,59 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     subTitle = 'authentication_request_token';
   }
 
-  function navToSettings() {
+  async function login() {
+    await state.login(link);
     rejectDialog();
+  }
+
+  function navToSettings() {
+    // rejectDialog();
     // authConfigurationsAdministrationNavService.navToSettings();
   }
 
-  function renderForm(provider: AuthProvider) {
-    if (configurable) {
-      return <ConfigurationsList provider={provider} onClose={rejectDialog} />;
+  function renderForm(provider: AuthProvider | null) {
+    if (!provider) {
+      return <TextPlaceholder>{translate('authentication_select_provider')}</TextPlaceholder>;
+    }
+
+    if (state.configure) {
+      return (
+         <TextPlaceholder>
+            {translate('authentication_provider_disabled')}
+            <Link onClick={() => navToSettings()}>
+              <Translate token="ui_configure" />
+            </Link>
+         </TextPlaceholder>
+      );
     }
 
     return (
       <AuthProviderForm
         provider={provider}
-        credentials={controller.credentials}
-        authenticate={controller.isAuthenticating}
+        credentials={state.credentials}
+        authenticate={state.authenticating}
       />
     );
   }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
-    <TabsState currentTabId={controller.provider?.id} onChange={tabData => controller.selectProvider(tabData.tabId)}>
+    <TabsState currentTabId={state.tabId} onChange={tabData => state.setTabId(tabData.tabId)}>
       <CommonDialogWrapper
         size='large'
         title={dialogTitle}
-        icon={controller.provider?.icon}
+        icon={state.activeProvider?.icon}
         subTitle={subTitle}
-        footer={!configurable && (
+        footer={!federate && (
           <AuthDialogFooter
-            authAvailable={providerEnabled}
-            isAuthenticating={controller.isAuthenticating}
-            onLogin={controller.login}
+            authAvailable={!state.configure}
+            isAuthenticating={state.authenticating}
+            onLogin={login}
           >
-            {controller.error?.responseMessage && (
+            {state.exception && (
               <ErrorMessage
-                text={controller.error.responseMessage}
-                hasDetails={controller.error.hasDetails}
-                onShowDetails={controller.showDetails}
+                text={errorDetails.details?.message || ''}
+                hasDetails={errorDetails.details?.hasDetails}
+                onShowDetails={errorDetails.open}
               />
             )}
           </AuthDialogFooter>
@@ -165,52 +171,38 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       >
         {showTabs && (
           <TabList aria-label='Auth providers'>
-            {controller.providers.map(provider => (
+            {state.providers.map(provider => (
               <Tab
                 key={provider.id}
                 tabId={provider.id}
                 title={provider.description || provider.label}
-                disabled={controller.isAuthenticating}
+                disabled={state.authenticating}
+                onClick={() => state.setActiveProvider(provider)}
               >
                 <TabTitle>{provider.label}</TabTitle>
               </Tab>
             ))}
+            {state.configurations.length > 0 && (
+              <Tab
+                key={FEDERATED_AUTH}
+                tabId={FEDERATED_AUTH}
+                title={translate('authentication_auth_federated')}
+                disabled={state.authenticating}
+                onClick={() => state.setActiveProvider(null)}
+              >
+                <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
+              </Tab>
+            )}
           </TabList>
         )}
-        <SubmittingForm {...use({ form: !configurable })} onSubmit={controller.login}>
-          {controller.provider && (
-            <>
-              {providerEnabled
-                ? (
-                    renderForm(controller.provider)
-                  )
-                : (
-                <TextPlaceholder>
-                  {translate('authentication_provider_disabled')}
-                  <Link onClick={() => navToSettings()}>
-                    <Translate token="ui_configure" />
-                  </Link>
-                </TextPlaceholder>
-                  )}
-            </>
-          )}
-          {controller.isLoading && <Loader />}
-          {!controller.isLoading && !controller.provider && (
-            <TextPlaceholder>
-              {controller.providers.length > 0
-                ? (
-                <>{translate('authentication_select_provider')}</>
-                  )
-                : (
-                <>
-                  {translate('authentication_configure')}
-                  <Link onClick={() => navToSettings()}>
-                    <Translate token="ui_configure" />
-                  </Link>
-                </>
-                  )}
-            </TextPlaceholder>
-          )}
+        <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
+          <Loader state={state.loadingState}>
+            {() => federate
+              ? (
+                  <ConfigurationsList providers={state.configurations} onClose={rejectDialog} />
+                )
+              : renderForm(state.activeProvider)}
+          </Loader>
         </SubmittingForm>
       </CommonDialogWrapper>
     </TabsState>
