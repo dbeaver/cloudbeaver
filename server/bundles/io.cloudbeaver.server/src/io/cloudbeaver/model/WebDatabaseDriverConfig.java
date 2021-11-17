@@ -171,7 +171,7 @@ public class WebDatabaseDriverConfig {
             cfg.setUrl(driver.getSampleURL());
             cfg.setHostName("localhost");
             cfg.setHostPort(driver.getDefaultPort());
-            cfg.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, cfg));
+            cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
             if (properties == null) {
                 return new WebPropertyInfo[0];

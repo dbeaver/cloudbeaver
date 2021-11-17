@@ -169,7 +169,7 @@ public class WebServiceUtils {
             if (config.getServerName() != null) {
                 dsConfig.setServerName(config.getServerName());
             }
-            dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
+            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
         }
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
