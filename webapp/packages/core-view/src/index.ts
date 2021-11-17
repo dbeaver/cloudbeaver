@@ -4,6 +4,7 @@ export * from './Action/Actions/ACTION_OPEN_IN_TAB';
 export * from './Action/Actions/ACTION_OPEN';
 export * from './Action/Actions/ACTION_REFRESH';
 export * from './Action/Actions/ACTION_RENAME';
+export * from './Action/Actions/ACTION_SAVE';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';
 export * from './Action/KeyBinding/KeyBindingService';
 export * from './Action/KeyBinding/createKeyBinding';

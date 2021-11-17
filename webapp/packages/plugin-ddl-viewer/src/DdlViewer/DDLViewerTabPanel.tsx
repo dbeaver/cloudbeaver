@@ -13,26 +13,40 @@ import styled, { css } from 'reshadow';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
+import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
+import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
 import { DdlViewerController } from './DdlViewerController';
+import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
 const styles = css`
   wrapper {
     flex: 1;
     display: flex;
+    flex-direction: column;
     overflow: auto;
     composes: theme-typography--body1 from global;
   }
+
   SQLCodeEditorLoader {
     height: 100%;
     flex: 1;
     overflow: auto;
   }
+
+  MenuBar {
+    border-top: 1px solid;
+  }
 `;
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
+  const style = useStyles(styles);
   const controller = useController(DdlViewerController, nodeId);
+  const menu = useMenu(MENU_DDL_VIEWER_FOOTER);
 
   useEffect(() => {
     controller.load();
@@ -44,7 +58,10 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
     return <Loader />;
   }
 
-  return styled(styles)(
+  menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
+  menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, controller.metadata);
+
+  return styled(style)(
     <wrapper>
       <SQLCodeEditorLoader
         bindings={{
@@ -55,6 +72,7 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
         readonly
         autoFormat
       />
+      <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
     </wrapper>
   );
 });
