@@ -39,9 +39,7 @@ export class DDLViewerFooterService {
           return !!ddl;
         }
 
-        return [
-          ACTION_SAVE,
-        ].includes(action);
+        return false;
       },
       handler: (context, action) => {
         switch (action) {
@@ -64,16 +62,7 @@ export class DDLViewerFooterService {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => {
-        const node = context.tryGet(DATA_CONTEXT_DDL_VIEWER_NODE);
-        const ddl = context.tryGet(DATA_CONTEXT_DDL_VIEWER_VALUE);
-
-        if (!node || !ddl) {
-          return false;
-        }
-
-        return context.get(DATA_CONTEXT_MENU) === MENU_DDL_VIEWER_FOOTER;
-      },
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_DDL_VIEWER_FOOTER,
       getItems: (context, items) => [
         ...items,
         ACTION_SAVE,
