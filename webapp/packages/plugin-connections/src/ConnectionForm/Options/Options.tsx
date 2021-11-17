@@ -137,6 +137,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 items={drivers}
                 keySelector={driver => driver.id}
                 valueSelector={driver => driver?.name ?? ''}
+                titleSelector={driver => driver.description}
+                iconSelector={driver => driver.icon}
+                searchable={drivers.length > 10}
                 readOnly={readonly || edit || drivers.length < 2}
                 disabled={disabled}
                 tiny

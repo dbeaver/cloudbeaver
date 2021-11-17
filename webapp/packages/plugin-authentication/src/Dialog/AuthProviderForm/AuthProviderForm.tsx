@@ -41,12 +41,11 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
           items={provider.credentialProfiles}
           keySelector={(value, index) => index + ''}
           valueSelector={value => value.label!}
+          titleSelector={value => value.description}
           defaultValue="0"
           disabled={authenticate}
           onSelect={handleProfileSelect}
-        >
-          Profile
-        </Combobox>
+        />
       )}
       {profile.credentialParameters.map(parameter => parameter.user && (
         <InputField
