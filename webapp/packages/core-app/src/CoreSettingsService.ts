@@ -16,6 +16,8 @@ const defaultSettings = {
   'app.logViewer.maxFailedRequests': 3,
   // temporary limit for all nodes children in app
   'app.navigationTree.childrenLimit': 500,
+  'app.metadata.editing': false,
+  'app.metadata.deleting': false,
 };
 
 export type CoreSettings = typeof defaultSettings;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { CoreSettingsService, ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -32,6 +32,7 @@ export class ObjectPropertyTableFooterService {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly coreSettingsService: CoreSettingsService
   ) {
     this.contextMenuService.addPanel(this.objectPropertyTableFooterToken);
 
@@ -44,6 +45,7 @@ export class ObjectPropertyTableFooterService {
       isPresent(context) {
         return context.contextType === ObjectPropertyTableFooterService.objectPropertyContextType;
       },
+      isHidden: () => !this.coreSettingsService.settings.getValue('app.metadata.deleting'),
       isDisabled: context => {
         if (context.data.tableState.selectedList.length === 0) {
           return true;

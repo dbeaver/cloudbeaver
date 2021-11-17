@@ -23,9 +23,16 @@ interface Props {
 export const ObjectPropertyTableFooter = observer<Props>(function ObjectPropertyTableFooter({ nodeIds, tableState, className }) {
   const service = useService(ObjectPropertyTableFooterService);
 
+  const items = service.constructMenuWithContext(nodeIds, tableState);
+  const hidden = items.every(item => item.isHidden);
+
+  if (hidden) {
+    return null;
+  }
+
   return (
     <ToolsPanel className={className}>
-      {service.constructMenuWithContext(nodeIds, tableState).map((topItem, i) => (
+      {items.map((topItem, i) => (
         <ObjectPropertyTableFooterItem key={i} menuItem={topItem} />
       ))}
     </ToolsPanel>

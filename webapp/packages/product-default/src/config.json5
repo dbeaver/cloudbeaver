@@ -9,6 +9,10 @@
             defaultLanguage: "en"
         }, 
         app: {
+            metadata: {
+                editing: false,
+                deleting: false,
+            },
             // Log viewer config
             logViewer: {
                 refreshTimeout: 3000,
