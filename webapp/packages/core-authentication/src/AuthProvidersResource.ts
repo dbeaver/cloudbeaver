@@ -117,7 +117,8 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
 
   private updateConfigurations(key: ResourceKey<string>) {
     const configurations = isResourceKeyList(key)
-      ? this.authConfigurationsResource.get(key) : [this.authConfigurationsResource.get(key)];
+      ? this.authConfigurationsResource.get(key)
+      : [this.authConfigurationsResource.get(key)];
 
     const providerIds = resourceKeyList(
       configurations.filter(Boolean).map(configuration => configuration!.providerId)

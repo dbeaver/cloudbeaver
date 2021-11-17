@@ -95,15 +95,15 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   propertyName?: string;
   items: TValue[];
   searchable?: boolean;
-  defaultValue?: string;
-  keySelector: (item: TValue) => TKey;
+  defaultValue?: TKey;
+  keySelector: (item: TValue, index: number) => TKey;
   valueSelector: (item: TValue) => string;
   onSwitch?: (state: boolean) => void;
 };
 
 type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
   name?: string;
-  value?: string;
+  value?: TKey;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
   onChange?: (value: string, name: string | undefined) => any;
   state?: never;
@@ -159,7 +159,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     value = state[name];
   }
 
-  const selectedItem = items.find(item => keySelector(item) === value);
+  const selectedItem = items.find((item, index) => keySelector(item, index) === value);
 
   let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
 
@@ -199,24 +199,26 @@ export const Combobox: ComboboxType = observer(function Combobox({
       return;
     }
 
-    if (!filteredItems.length) {
+    if (filteredItems.length === 0) {
       setSearchValue(null);
       return;
     }
 
+    const filteredItemIndex = items.indexOf(filteredItems[0]);
+
     if (filteredItems.length === 1) {
-      handleSelect(keySelector(filteredItems[0]));
+      handleSelect(keySelector(filteredItems[0], filteredItemIndex));
       return;
     }
 
     if (filteredItems.length > 0) {
       if (input) {
-        handleSelect(keySelector(filteredItems[0]));
+        handleSelect(keySelector(filteredItems[0], filteredItemIndex));
       } else {
         setSearchValue(null);
       }
     }
-  }, [filteredItems, keySelector, handleSelect, searchValue]);
+  }, [items, filteredItems, keySelector, handleSelect, searchValue]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -266,23 +268,23 @@ export const Combobox: ComboboxType = observer(function Combobox({
           unstable_finalFocusRef={ref}
           unstable_initialFocusRef={ref}
         >
-          {!filteredItems.length ? (
-            <MenuItem id='placeholder' disabled {...menu}>
-              {translate('combobox_no_options_placeholder')}
-            </MenuItem>
-          ) : (
-            filteredItems.map(item => (
-              <MenuItem
-                key={keySelector(item)}
-                id={keySelector(item)}
-                type='button'
-                {...menu}
-                onClick={event => handleSelect(event.currentTarget.id)}
-              >
-                {valueSelector(item)}
-              </MenuItem>
-            ))
-          )}
+          {!filteredItems.length
+            ? (
+                <MenuItem id='placeholder' disabled {...menu}>
+                  {translate('combobox_no_options_placeholder')}
+                </MenuItem>
+              )
+            : (filteredItems.map((item, index) => (
+                <MenuItem
+                  key={keySelector(item, index)}
+                  id={keySelector(item, index)}
+                  type='button'
+                  {...menu}
+                  onClick={event => handleSelect(event.currentTarget.id)}
+                >
+                  {valueSelector(item)}
+                </MenuItem>
+              )))}
         </Menu>
       </input-box>
     </field>

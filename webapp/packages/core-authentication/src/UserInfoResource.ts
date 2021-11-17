@@ -13,6 +13,7 @@ import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, Object
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
+import type { IAuthCredentials } from './IAuthCredentials';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
 
@@ -69,13 +70,13 @@ UserInfoIncludes
     );
   }
 
-  async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
+  async login(provider: string, credentials: IAuthCredentials, link?: boolean): Promise<UserInfo | null> {
     await this.performUpdate(undefined, [], async () => {
       const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
       const { authToken } = await this.graphQLService.sdk.authLogin({
         provider,
-        credentials: processedCredentials,
+        credentials: processedCredentials.credentials,
         linkUser: link,
         customIncludeOriginDetails: true,
       });

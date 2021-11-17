@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import type { AuthProvider } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
+import type { AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
+import { BASE_CONTAINERS_STYLES, Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   provider: AuthProvider;
-  credentials: any;
+  credentials: IAuthCredentials;
   authenticate: boolean;
 }
 
@@ -26,23 +25,39 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
   authenticate,
 }) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
-  const handleChange = useCallback((key: string, value: string | number) => {
-    credentials[key] = value;
-  }, [credentials]);
+
+  function handleProfileSelect() {
+    credentials.credentials = {};
+  }
+
+  const profile = provider.credentialProfiles[credentials.profile as any as number];
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group ref={elementRef} gap small center>
-      {provider.credentialParameters.map(parameter => parameter.user && (
+      {provider.credentialProfiles.length > 1 && (
+        <Combobox
+          name="profile"
+          state={credentials}
+          items={provider.credentialProfiles}
+          keySelector={(value, index) => index + ''}
+          valueSelector={value => value.label!}
+          defaultValue="0"
+          disabled={authenticate}
+          onSelect={handleProfileSelect}
+        >
+          Profile
+        </Combobox>
+      )}
+      {profile.credentialParameters.map(parameter => parameter.user && (
         <InputField
           key={parameter.id}
           title={parameter.description}
           type={parameter.encryption === 'none' ? 'text' : 'password'}
-          name={`authentication_${provider.id}_${parameter.id}`}
-          value={credentials[parameter.id]}
+          name={parameter.id}
+          state={credentials.credentials}
           disabled={authenticate}
           autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
           mod='surface'
-          onChange={value => handleChange(parameter.id, value)}
         >
           {parameter.displayName}
         </InputField>

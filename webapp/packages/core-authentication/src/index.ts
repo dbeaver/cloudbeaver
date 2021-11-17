@@ -6,6 +6,7 @@ export * from './AuthProviderService';
 export * from './AuthProvidersResource';
 export * from './AuthSettingsService';
 export * from './DATA_CONTEXT_USER';
+export * from './IAuthCredentials';
 export * from './AuthConfigurationsResource';
 export * from './AuthConfigurationParametersResource';
 export * from './RolesManagerService';

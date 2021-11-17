@@ -26,6 +26,7 @@ import {
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
+import type { IAuthCredentials } from './IAuthCredentials';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -37,7 +38,7 @@ type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId'>;
 interface UserCreateOptions {
   userId: string;
   roles: string[];
-  credentials: Record<string, any>;
+  credentials: IAuthCredentials;
   metaParameters: Record<string, any>;
   grantedConnections: string[];
 }
@@ -133,13 +134,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     }
   }
 
-  async updateCredentials(userId: string, credentials: Record<string, any>): Promise<void> {
+  async updateCredentials(userId: string, credentials: IAuthCredentials): Promise<void> {
     const processedCredentials = await this.authProviderService.processCredentials(AUTH_PROVIDER_LOCAL_ID, credentials);
 
     await this.graphQLService.sdk.setUserCredentials({
       providerId: AUTH_PROVIDER_LOCAL_ID,
       userId,
-      credentials: processedCredentials,
+      credentials: processedCredentials.credentials,
     });
   }
 

@@ -12,6 +12,7 @@ import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { md5, uuid } from '@cloudbeaver/core-utils';
 
 import { AuthProvider, AuthProvidersResource } from './AuthProvidersResource';
+import type { IAuthCredentials } from './IAuthCredentials';
 
 interface IServiceDescriptionProps {
   configurationWizard: boolean;
@@ -73,17 +74,23 @@ export class AuthProviderService {
     return md5(value).toUpperCase();
   }
 
-  async processCredentials(providerId: string, credentials: Record<string, any>): Promise<Record<string, any>> {
+  async processCredentials(providerId: string, credentials: IAuthCredentials): Promise<IAuthCredentials> {
     const provider = await this.authProvidersResource.load(providerId);
 
     if (!provider) {
       return credentials;
     }
 
-    const credentialsProcessed = { ...credentials };
-    for (const parameter of provider.credentialParameters) {
+    const credentialsProcessed: IAuthCredentials = {
+      profile: credentials.profile,
+      credentials: { ...credentials.credentials },
+    };
+
+    const profile = provider.credentialProfiles[credentials.profile as any as number];
+
+    for (const parameter of profile.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed) {
-        credentialsProcessed[parameter.id] = this.hashValue(credentialsProcessed[parameter.id]);
+        credentialsProcessed.credentials[parameter.id] = this.hashValue(credentialsProcessed.credentials[parameter.id]);
       }
     }
 

@@ -180,31 +180,35 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
         <SubmittingForm {...use({ form: !configurable })} onSubmit={controller.login}>
           {controller.provider && (
             <>
-              {providerEnabled ? (
-                renderForm(controller.provider)
-              ) : (
+              {providerEnabled
+                ? (
+                    renderForm(controller.provider)
+                  )
+                : (
                 <TextPlaceholder>
                   {translate('authentication_provider_disabled')}
                   <Link onClick={() => navToSettings()}>
                     <Translate token="ui_configure" />
                   </Link>
                 </TextPlaceholder>
-              )}
+                  )}
             </>
           )}
           {controller.isLoading && <Loader />}
           {!controller.isLoading && !controller.provider && (
             <TextPlaceholder>
-              {controller.providers.length > 0 ? (
+              {controller.providers.length > 0
+                ? (
                 <>{translate('authentication_select_provider')}</>
-              ) : (
+                  )
+                : (
                 <>
                   {translate('authentication_configure')}
                   <Link onClick={() => navToSettings()}>
                     <Translate token="ui_configure" />
                   </Link>
                 </>
-              )}
+                  )}
             </TextPlaceholder>
           )}
         </SubmittingForm>

@@ -11,6 +11,7 @@ import type { IContainerProps } from './IContainerProps';
 
 export function filterContainerFakeProps<T extends IContainerProps>(props: T): Omit<T, keyof IContainerProps> {
   const {
+    flexStart,
     baseline,
     center,
     vertical,
@@ -18,6 +19,7 @@ export function filterContainerFakeProps<T extends IContainerProps>(props: T): O
     overflow,
     parent,
     gap,
+    grid,
     ...rest
   } = filterLayoutFakeProps(props);
 

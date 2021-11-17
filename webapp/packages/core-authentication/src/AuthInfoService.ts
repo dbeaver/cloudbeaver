@@ -12,6 +12,7 @@ import type { AuthProviderConfiguration, UserInfo } from '@cloudbeaver/core-sdk'
 import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
 import { AuthProvidersResource } from './AuthProvidersResource';
+import type { IAuthCredentials } from './IAuthCredentials';
 import { UserInfoResource } from './UserInfoResource';
 
 @injectable()
@@ -59,7 +60,7 @@ export class AuthInfoService {
     this.activeSSO = null;
   }
 
-  async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
+  async login(provider: string, credentials: IAuthCredentials, link?: boolean): Promise<UserInfo | null> {
     return this.userInfoResource.login(provider, credentials, link);
   }
 

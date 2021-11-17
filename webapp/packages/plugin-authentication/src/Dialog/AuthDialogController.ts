@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AuthProvidersResource, AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -19,7 +19,7 @@ import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 export class AuthDialogController implements IInitializableController, IDestructibleController {
   selectedProvider: AuthProvider | null = null;
   isAuthenticating = false;
-  credentials = {};
+  readonly credentials: IAuthCredentials;
 
   get provider(): AuthProvider | null {
     return (
@@ -80,6 +80,12 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
+    this.admin = false;
+    this.credentials = {
+      profile: '0',
+      credentials: {},
+    };
+
     makeObservable<this, 'admin' | 'defaultProviderId' | 'selectedProvider'>(this, {
       selectedProvider: observable.ref,
       provider: computed,
@@ -89,8 +95,6 @@ export class AuthDialogController implements IInitializableController, IDestruct
       defaultProviderId: observable.ref,
       providers: computed,
     });
-
-    this.admin = false;
   }
 
   init(link: boolean, providerId: string | null, onClose: () => void): void {
@@ -137,7 +141,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
       return;
     }
     this.selectedProvider = this.authProvidersResource.get(providerId) || null;
-    this.credentials = {};
+    this.credentials.profile = '0';
+    this.credentials.credentials = {};
   };
 
   showDetails = (): void => {

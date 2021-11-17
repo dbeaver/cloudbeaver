@@ -29,15 +29,21 @@ query getAuthProviders {
       metadataLink
     }
 
-    credentialParameters {
+    credentialProfiles {
       id
-      displayName
+      label
       description
-      admin
-      user
-      identifying
-      possibleValues
-      encryption
+
+      credentialParameters {
+        id
+        displayName
+        description
+        admin
+        user
+        identifying
+        possibleValues
+        encryption
+      }
     }
   } 
 }

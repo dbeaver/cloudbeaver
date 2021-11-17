@@ -129,7 +129,10 @@ export class UserFormController implements IInitializableController, IDestructib
       if (!this.editing) {
         await this.usersResource.create({
           userId: this.credentials.login,
-          credentials: { password: this.credentials.password },
+          credentials: {
+            profile: '0',
+            credentials: { password: this.credentials.password },
+          },
           roles: this.getGrantedRoles(),
           metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
@@ -138,7 +141,13 @@ export class UserFormController implements IInitializableController, IDestructib
         this.notificationService.logSuccess({ title: 'authentication_administration_user_created' });
       } else {
         if (this.credentials.password) {
-          await this.usersResource.updateCredentials(this.user.userId, { password: this.credentials.password });
+          await this.usersResource.updateCredentials(
+            this.user.userId,
+            {
+              profile: '0',
+              credentials: { password: this.credentials.password },
+            }
+          );
         }
         await this.updateRoles();
         await this.saveConnectionPermissions();
