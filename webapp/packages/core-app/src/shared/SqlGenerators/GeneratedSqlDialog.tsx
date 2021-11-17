@@ -146,7 +146,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
               value={state.query}
               dialect={state.dialect}
               readonly
-              autoFormat
             />
           )}
         </Loader>
