@@ -124,7 +124,7 @@ const styles = composes(
           }
     
           &:not(:empty) + input {
-            padding-left: 36px !important;
+            padding-left: 34px !important;
           }
       }
     }
