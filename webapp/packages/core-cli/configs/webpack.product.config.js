@@ -33,9 +33,7 @@ const excludedFromVendor = [
   'svg-tag-names',
   'html-tags',
   'codemirror',
-  'react-codemirror2',
-  'prettier',
-  'sql-formatter'
+  'react-codemirror2'
 ]
 
 const timestampVersion = withTimestamp(package.version)
@@ -86,6 +84,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       inject: 'body',
       chunks: ['main'],
       version: timestampVersion,
+      title: package.product?.name
     }),
     new HtmlWebpackPlugin({
       filename: 'sso.html',
@@ -93,6 +92,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       inject: 'body',
       chunks: ['sso'],
       version: timestampVersion,
+      title: package.product?.name
     }),
   ],
 })

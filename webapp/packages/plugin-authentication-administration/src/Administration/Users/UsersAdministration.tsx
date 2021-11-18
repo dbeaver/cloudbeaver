@@ -16,6 +16,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { MetaParameters } from './MetaParameters/MetaParameters';
+import { RolesPage } from './Roles/RolesPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersTable } from './UsersTable/UsersTable';
 
@@ -24,6 +25,7 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
+    height: 51px;
   }
   Tab {
     height: 46px!important;
@@ -56,7 +58,8 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
     <TabsState selectedId={subName} onChange={openSub}>
       <ToolsPanel>
         <TabList style={style}>
-          <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item')}</Tab>
+          <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
+          <Tab tabId={EUsersAdministrationSub.Roles} style={style}>{translate('administration_roles_tab_title')}</Tab>
           {/* <Tab
             tabId={EUsersAdministrationSub.MetaProperties}
             style={style}
@@ -67,6 +70,9 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       </ToolsPanel>
       <TabPanel tabId={EUsersAdministrationSub.Users}>
         <UsersTable sub={sub} param={param} />
+      </TabPanel>
+      <TabPanel tabId={EUsersAdministrationSub.Roles}>
+        <RolesPage sub={sub} param={param} />
       </TabPanel>
       <TabPanel tabId={EUsersAdministrationSub.MetaProperties}>
         <MetaParameters />

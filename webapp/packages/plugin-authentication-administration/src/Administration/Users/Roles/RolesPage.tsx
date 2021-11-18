@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -41,51 +41,62 @@ const styles = composes(
       position: relative;
       border: solid 1px;
     }
+    ToolsPanel {
+      border-bottom: none;
+    }
 `);
 
-export const RolesAdministration: AdministrationItemContentComponent = observer(function RolesAdministration({
+interface Props {
+  sub?: IAdministrationItemSubItem;
+  param?: string | null;
+}
+
+export const RolesPage = observer<Props>(function RolesPage({
   sub,
+  param,
 }) {
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const service = useService(CreateRoleService);
 
   const table = useRolesTable();
+  const create = param === 'create';
 
   return styled(style)(
-    <>
-      <ToolsPanel>
-        <ToolsAction
-          title={translate('administration_roles_add_tooltip')}
-          icon="add"
-          viewBox="0 0 24 24"
-          disabled={!!sub || table.processing}
-          onClick={service.create}
-        >
-          {translate('ui_add')}
-        </ToolsAction>
-        <ToolsAction
-          title={translate('administration_roles_refresh_tooltip')}
-          icon="refresh"
-          viewBox="0 0 24 24"
-          disabled={table.processing}
-          onClick={table.update}
-        >
-          {translate('ui_refresh')}
-        </ToolsAction>
-        <ToolsAction
-          title={translate('administration_roles_delete_tooltip')}
-          icon="trash"
-          viewBox="0 0 24 24"
-          disabled={!table.tableState.itemsSelected || table.processing}
-          onClick={table.delete}
-        >
-          {translate('ui_delete')}
-        </ToolsAction>
-      </ToolsPanel>
       <layout-grid>
         <layout-grid-inner>
-          {sub && (
+          <layout-grid-cell {...use({ span: 12 })}>
+            <ToolsPanel>
+              <ToolsAction
+              title={translate('administration_roles_add_tooltip')}
+              icon="add"
+              viewBox="0 0 24 24"
+              disabled={create || table.processing}
+              onClick={service.create}
+              >
+                {translate('ui_add')}
+              </ToolsAction>
+              <ToolsAction
+              title={translate('administration_roles_refresh_tooltip')}
+              icon="refresh"
+              viewBox="0 0 24 24"
+              disabled={table.processing}
+              onClick={table.update}
+              >
+                {translate('ui_refresh')}
+              </ToolsAction>
+              <ToolsAction
+              title={translate('administration_roles_delete_tooltip')}
+              icon="trash"
+              viewBox="0 0 24 24"
+              disabled={!table.tableState.itemsSelected || table.processing}
+              onClick={table.delete}
+              >
+                {translate('ui_delete')}
+              </ToolsAction>
+            </ToolsPanel>
+          </layout-grid-cell>
+          {create && (
             <layout-grid-cell {...use({ span: 12 })}>
               <CreateRole />
             </layout-grid-cell>
@@ -100,6 +111,5 @@ export const RolesAdministration: AdministrationItemContentComponent = observer(
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>
-    </>
   );
 });

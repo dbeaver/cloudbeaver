@@ -41,14 +41,17 @@ const styles = composes(
       font-weight: 500;
     }
     input {
-      padding-right: 12px !important;
+      padding-right: 24px !important;
     }
     MenuButton {
       position: absolute;
       right: 0;
       background: transparent;
       outline: none;
-      padding: 4px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 8px 0 0;
       cursor: pointer;
       &:hover, &:focus {
         opacity: 0.7;
@@ -108,17 +111,22 @@ const styles = composes(
       display: flex;
       align-items: center;
 
-      /* & input-icon {
-        width: 32px;
-        height: 32px;
-        overflow: hidden;
-        flex-shrink: 0;
-
-        & IconOrImage {
-          width: 100%;
-          height: 100%;
-        }
-      }*/
+      & input-icon {
+          position: absolute;
+          left: 0;
+          width: 16px;
+          height: 16px;
+          margin-left: 12px;
+    
+          & IconOrImage {
+            width: 100%;
+            height: 100%;
+          }
+    
+          &:not(:empty) + input {
+            padding-left: 34px !important;
+          }
+      }
     }
   `
 );
@@ -173,7 +181,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   valueSelector = v => v,
   iconSelector,
   titleSelector,
-  onChange = () => {},
+  onChange = () => { },
   onSelect,
   onSwitch,
   ...rest
@@ -312,19 +320,17 @@ export const Combobox: ComboboxType = observer(function Combobox({
     };
   }, [inputRef]);
 
-  // const icon = selectedItem && iconSelector?.(selectedItem);
+  const icon = selectedItem && iconSelector?.(selectedItem);
 
   return styled(useStyles(baseFormControlStyles, styles))(
     <field className={className}>
       {children && <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>}
       <input-box>
-        {/* {icon && (
+        {icon && (
           <input-icon>
-            {typeof icon === 'string'
-              ? <IconOrImage icon={icon} />
-              : icon}
+            {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
           </input-icon>
-        )} */}
+        )}
         <input
           ref={setInputRef}
           role='new'
@@ -370,11 +376,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   {...menu}
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
-                  {icon && (
+                  {iconSelector && (
                     <item-icon>
-                      {typeof icon === 'string'
-                        ? <IconOrImage icon={icon} />
-                        : icon}
+                      {icon && typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
                     </item-icon>
                   )}
                   <item-value>{valueSelector(item)}</item-value>
