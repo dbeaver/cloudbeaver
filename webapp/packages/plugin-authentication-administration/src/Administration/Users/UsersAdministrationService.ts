@@ -7,11 +7,12 @@
  */
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { CreateRoleService } from './Roles/CreateRoleService';
 import { UsersAdministration } from './UsersAdministration';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
@@ -30,7 +31,9 @@ export class UsersAdministrationService extends Bootstrap {
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
     private usersResource: UsersResource,
-    private createUserService: CreateUserService
+    private createUserService: CreateUserService,
+    private readonly rolesResource: RolesResource,
+    private readonly createRoleService: CreateRoleService,
   ) {
     super();
   }
@@ -46,6 +49,15 @@ export class UsersAdministrationService extends Bootstrap {
         {
           name: EUsersAdministrationSub.Users,
           onDeActivate: this.cancelCreate.bind(this),
+        },
+        {
+          name: EUsersAdministrationSub.Roles,
+          onActivate: this.loadRoles.bind(this),
+          onDeActivate: (configurationWizard, outside) => {
+            if (outside) {
+              this.rolesResource.cleanNewFlags();
+            }
+          },
         },
       ],
       getContentComponent: () => UsersAdministration,
@@ -68,6 +80,17 @@ export class UsersAdministrationService extends Bootstrap {
       await this.usersResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading users');
+    }
+  }
+
+  private async loadRoles(param: string | null) {
+    if (param === 'create') {
+      this.createRoleService.fillData();
+    }
+    try {
+      await this.rolesResource.loadAll();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Error occurred while loading roles');
     }
   }
 }

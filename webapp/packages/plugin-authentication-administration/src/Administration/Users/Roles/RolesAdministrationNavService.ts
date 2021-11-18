@@ -6,20 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
+
+import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
 
 @injectable()
 export class RolesAdministrationNavService {
   constructor(
-    private administrationScreenService: AdministrationScreenService
+    private usersAdministrationNavigationService: UsersAdministrationNavigationService
   ) { }
 
   navToRoot(): void {
-    this.administrationScreenService.navigateToItem('roles');
+    this.usersAdministrationNavigationService.navToSub(EUsersAdministrationSub.Roles);
   }
 
   navToCreate(): void {
-    this.administrationScreenService.navigateToItemSub('roles', 'create');
+    this.usersAdministrationNavigationService.navToSub(EUsersAdministrationSub.Roles, 'create');
   }
 }

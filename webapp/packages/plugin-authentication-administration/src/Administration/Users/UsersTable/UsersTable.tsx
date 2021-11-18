@@ -60,6 +60,10 @@ const styles = css`
   Loader {
     height: 100%;
   }
+  
+  ToolsPanel {
+    border-bottom: none;
+  }
 `;
 
 interface Props {
@@ -86,6 +90,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
       return 1;
     }));
 
+  const create = param === 'create';
   const keys = users.map(user => user.userId);
 
   return styled(style)(
@@ -98,7 +103,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 title={translate('authentication_administration_tools_add_tooltip')}
                 icon="add"
                 viewBox="0 0 24 24"
-                disabled={sub && !!createUserService.user}
+                disabled={create && !!createUserService.user}
                 onClick={createUserService.create}
               >
                 {translate('ui_add')}
@@ -126,7 +131,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
           </ToolsPanel>
         </layout-grid-cell>
 
-        {param === 'create' && createUserService.user && (
+        {create && createUserService.user && (
           <layout-grid-cell {...use({ span: 12 })}>
             <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
           </layout-grid-cell>
