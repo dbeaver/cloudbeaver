@@ -11,7 +11,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, Ren
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
-import { CoreSettingsService } from '../../../src/CoreSettingsService';
+import { CoreSettingsService } from '../../CoreSettingsService';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
 import { ENodeFeature } from './ENodeFeature';
