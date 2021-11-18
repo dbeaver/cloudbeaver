@@ -16,14 +16,10 @@
   },
   "dependencies": {
     "codemirror": "^5.63.3",
-    "react-codemirror2": "^7.2.1",
-    "prettier": "^2.4.1",
-    "sql-formatter": "^4.0.2"
+    "react-codemirror2": "^7.2.1"
   },
   "devDependencies": {
-    "@types/codemirror": "^5.60.5",
-    "@types/prettier": "^2.4.1",
-    "@types/sql-formatter": "^4.0.1"
+    "@types/codemirror": "^5.60.5"
   },
   "peerDependencies": {
     "@cloudbeaver/core-administration": "^0.1.0",

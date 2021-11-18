@@ -7,9 +7,6 @@
  */
 
 import type { ModeSpec } from 'codemirror';
-import prettier from 'prettier';
-import parserHTML from 'prettier/parser-html';
-import { format as formatSQL } from 'sql-formatter';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
@@ -30,13 +27,8 @@ export function useAutoFormat(mode: string | ModeSpec<any> | undefined) {
             return JSON.stringify(JSON.parse(value), null, 2);
           case 'text/xml':
           case 'text/html':
-            return prettier.format(value, {
-              plugins: [parserHTML],
-            });
+            return value;
           default:
-            if (this.mode.includes('sql')) {
-              return formatSQL(value);
-            }
             return value;
         }
       } catch {
