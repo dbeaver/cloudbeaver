@@ -11,6 +11,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, Ren
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
+import { CoreSettingsService } from '../../CoreSettingsService';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
 import { ENodeFeature } from './ENodeFeature';
@@ -34,6 +35,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly coreSettingsService: CoreSettingsService
   ) {
     super();
   }
@@ -41,7 +43,7 @@ export class NavNodeContextMenuService extends Bootstrap {
   register(): void {
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
-      isActionApplicable(context, action) {
+      isActionApplicable: (context, action) => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
         if (!node) {
@@ -49,11 +51,23 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_RENAME) {
-          return node.features?.includes(ENodeFeature.canRename) || false;
+          const globalPermission = this.coreSettingsService.settings.getValue('app.metadata.editing');
+
+          if (!globalPermission) {
+            return false;
+          }
+
+          return !!node.features?.includes(ENodeFeature.canRename);
         }
 
         if (action === ACTION_DELETE) {
-          return node.features?.includes(ENodeFeature.canDelete) || false;
+          const globalPermission = this.coreSettingsService.settings.getValue('app.metadata.deleting');
+
+          if (!globalPermission) {
+            return false;
+          }
+
+          return !!node.features?.includes(ENodeFeature.canDelete);
         }
 
         return [
