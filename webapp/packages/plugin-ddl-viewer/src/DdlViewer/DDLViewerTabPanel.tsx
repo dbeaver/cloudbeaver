@@ -53,7 +53,6 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
         value={controller.metadata}
         dialect={controller.dialect}
         readonly
-        autoFormat
       />
     </wrapper>
   );

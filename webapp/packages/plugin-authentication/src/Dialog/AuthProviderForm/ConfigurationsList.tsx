@@ -11,7 +11,7 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthInfoService, AuthProvider, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { Filter, IconOrImage, Link, Cell, getComputed } from '@cloudbeaver/core-blocks';
+import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
@@ -45,36 +45,47 @@ const styles = composes(
     }
 `);
 
-interface Props {
+interface IProviderConfiguration {
   provider: AuthProvider;
+  configuration: AuthProviderConfiguration;
+}
+
+interface Props {
+  providers: AuthProvider[];
   onClose?: () => void;
   className?: string;
 }
 
-export const ConfigurationsList = observer<Props>(function ConfigurationsList({ provider, onClose, className }) {
+export const ConfigurationsList = observer<Props>(function ConfigurationsList({ providers, onClose, className }) {
   const authInfoService = useService(AuthInfoService);
   const translate = useTranslate();
+  const style = useStyles(styles);
 
   const [search, setSearch] = useState('');
-  const configurations = getComputed(() =>
-    (provider.configurations || [])
-      .filter(configuration => configuration.signInLink)
+  const configurations = getComputed<IProviderConfiguration[]>(() => providers.map(
+    provider => (
+      (provider.configurations || [])
+        .filter(configuration => configuration.signInLink)
+        .map(configuration => ({ provider, configuration }))
+    )).flat()
   );
 
   const filteredConfigurations = getComputed(() => {
-    const sortedConfigurations = configurations.slice().sort(comparePublicAuthConfigurations) || [];
+    const sortedConfigurations = configurations
+      .slice()
+      .sort((a, b) => comparePublicAuthConfigurations(a.configuration, b.configuration)) || [];
 
     if (!search) {
       return sortedConfigurations;
     }
 
-    return sortedConfigurations.filter(configuration => {
+    return sortedConfigurations.filter(({ configuration }) => {
       const target = `${configuration.displayName}${configuration.description || ''}`;
       return target.toUpperCase().includes(search.toUpperCase());
     });
   });
 
-  async function auth(configuration: AuthProviderConfiguration) {
+  async function auth({ provider, configuration }: IProviderConfiguration) {
     const user = await authInfoService.sso(provider.id, configuration);
 
     if (user) {
@@ -82,7 +93,18 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
     }
   }
 
-  return styled(useStyles(styles))(
+  if (configurations.length === 0) {
+    return (
+      <TextPlaceholder>
+        {translate('authentication_configure')}
+        <Link>
+          {translate('ui_configure')}
+        </Link>
+      </TextPlaceholder>
+    );
+  }
+
+  return styled(style)(
     <container className={className}>
       {configurations.length >= 10 && (
         <Filter
@@ -93,7 +115,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
         />
       )}
       <list>
-        {filteredConfigurations.map(configuration => {
+        {filteredConfigurations.map(({ provider, configuration }) => {
           const icon = configuration.iconURL || provider.icon;
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (
@@ -101,7 +123,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
               key={configuration.id}
               title={title}
               wrapper
-              onClick={() => auth(configuration)}
+              onClick={() => auth({ provider, configuration })}
             >
               <Cell
                 before={icon ? <IconOrImage icon={icon} /> : undefined}

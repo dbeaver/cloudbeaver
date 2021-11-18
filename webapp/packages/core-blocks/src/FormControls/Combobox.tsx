@@ -17,6 +17,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
+import { IconOrImage } from '../IconOrImage';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
@@ -30,7 +31,7 @@ const styles = composes(
     }
   `,
   css`
-    field  input {
+    field input {
       margin: 0;
     }
     field-label {
@@ -58,21 +59,40 @@ const styles = composes(
       composes: theme-typography--caption theme-elevation-z3 from global;
       display: flex;
       flex-direction: column;
-      width: 100%;
-      max-height: 150px;
+      max-height: 300px;
       overflow: auto;
       outline: none;
       padding: 4px 0;
       z-index: 999;
+      border-radius: 3px;
 
       & MenuItem {
         background: transparent;
-        display: block;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         padding: 4px 12px;
         text-align: left;
         outline: none;
         color: inherit;
         cursor: pointer;
+        gap: 8px;
+
+        & item-icon, & item-title {
+          position: relative;
+        }
+
+        & item-icon {
+          width: 16px;
+          height: 16px;
+          overflow: hidden;
+          flex-shrink: 0;
+
+          & IconOrImage {
+            width: 100%;
+            height: 100%;
+          }
+        } 
       }
     }
     Icon {
@@ -87,6 +107,18 @@ const styles = composes(
       position: relative;
       display: flex;
       align-items: center;
+
+      /* & input-icon {
+        width: 32px;
+        height: 32px;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        & IconOrImage {
+          width: 100%;
+          height: 100%;
+        }
+      }*/
     }
   `
 );
@@ -98,6 +130,8 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   defaultValue?: TKey;
   keySelector: (item: TValue, index: number) => TKey;
   valueSelector: (item: TValue) => string;
+  titleSelector?: (item: TValue) => string | undefined;
+  iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
   onSwitch?: (state: boolean) => void;
 };
 
@@ -137,6 +171,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
   disabled,
   keySelector = v => v,
   valueSelector = v => v,
+  iconSelector,
+  titleSelector,
   onChange = () => {},
   onSelect,
   onSwitch,
@@ -145,12 +181,17 @@ export const Combobox: ComboboxType = observer(function Combobox({
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
-  const ref = useRef<HTMLInputElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
   const menu = useMenuState({
     placement: 'bottom-end',
     currentId: null,
     gutter: 4,
   });
+
+  if (readOnly) {
+    searchable = true;
+  }
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
@@ -170,6 +211,16 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const filteredItems = items.filter(
     item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
   );
+
+  function handleClick() {
+    if (!searchable) {
+      if (menu.visible) {
+        menu.hide();
+      } else {
+        menu.show();
+      }
+    }
+  }
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -227,7 +278,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }, [matchItems]);
 
   useEffect(() => {
-    if (ref.current === document.activeElement) {
+    if (inputRef === document.activeElement) {
       if (inputValue === searchValue) {
         menu.show();
       }
@@ -242,31 +293,63 @@ export const Combobox: ComboboxType = observer(function Combobox({
     onSwitch?.(menu.visible);
   }, [onSwitch, menu.visible]);
 
+  useEffect(() => {
+    if (!inputRef) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (menuRef.current) {
+        const size = inputRef.getBoundingClientRect();
+        menuRef.current.style.width = size.width + 'px';
+      }
+    });
+
+    resizeObserver.observe(inputRef);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [inputRef]);
+
+  // const icon = selectedItem && iconSelector?.(selectedItem);
+
   return styled(useStyles(baseFormControlStyles, styles))(
     <field className={className}>
-      <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>
+      {children && <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>}
       <input-box>
+        {/* {icon && (
+          <input-icon>
+            {typeof icon === 'string'
+              ? <IconOrImage icon={icon} />
+              : icon}
+          </input-icon>
+        )} */}
         <input
-          ref={ref}
+          ref={setInputRef}
           role='new'
           autoComplete="off"
           name={name}
           title={title}
           value={inputValue}
           disabled={disabled}
-          readOnly={readOnly}
+          readOnly={readOnly || !searchable}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          onClick={handleClick}
           {...rest}
+          {...use({ select: !searchable, focus: menu.visible })}
         />
         <MenuButton {...menu} disabled={readOnly || disabled}>
           <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus: menu.visible })} />
         </MenuButton>
         <Menu
           {...menu}
+          ref={menuRef}
           aria-label={propertyName}
-          unstable_finalFocusRef={ref}
-          unstable_initialFocusRef={ref}
+          // unstable_finalFocusRef={inputRef || undefined}
+          // unstable_initialFocusRef={ref}
+          modal
         >
           {!filteredItems.length
             ? (
@@ -274,17 +357,30 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   {translate('combobox_no_options_placeholder')}
                 </MenuItem>
               )
-            : (filteredItems.map((item, index) => (
+            : (filteredItems.map((item, index) => {
+                const icon = iconSelector?.(item);
+                const title = titleSelector?.(item);
+
+                return (
                 <MenuItem
                   key={keySelector(item, index)}
                   id={keySelector(item, index)}
                   type='button'
+                  title={title}
                   {...menu}
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
-                  {valueSelector(item)}
+                  {icon && (
+                    <item-icon>
+                      {typeof icon === 'string'
+                        ? <IconOrImage icon={icon} />
+                        : icon}
+                    </item-icon>
+                  )}
+                  <item-value>{valueSelector(item)}</item-value>
                 </MenuItem>
-              )))}
+                );
+              }))}
         </Menu>
       </input-box>
     </field>

@@ -65,6 +65,8 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             items={providers.resource.configurable}
             keySelector={provider => provider.id}
             valueSelector={provider => provider.label}
+            iconSelector={provider => provider.icon}
+            titleSelector={provider => provider.description}
             placeholder={translate('administration_identity_providers_choose_provider_placeholder')}
             readOnly={state.readonly || edit}
             disabled={state.disabled}

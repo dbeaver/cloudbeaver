@@ -115,7 +115,6 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
           value={payload.script}
           dialect={dialect.dialect}
           readonly
-          autoFormat
         />
       </wrapper>
     </CommonDialogWrapper>

@@ -34,7 +34,7 @@
     }
 
     &:global([disabled]),
-    &:global([readonly]) {
+    &:not([|select]):global([readonly]) {
       opacity: 0.8;
     }
 
@@ -69,7 +69,8 @@
     @include mdc-theme-prop(border-color, background, false);
     @include mdc-theme-prop(background-color, input-background, false);
 
-    &:focus {
+    &:focus,
+    &[|focus] {
       @include mdc-theme-prop(border-color, primary, false);
     }
     // we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug
@@ -84,7 +85,12 @@
       width: 16px;
     }
 
-    &:global([readonly]) {
+    &[|select] {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    &:not([|select]):global([readonly]) {
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
       opacity: 0.8;
@@ -104,7 +110,7 @@
     }
     &:global([data-embedded]) {
       &:global([disabled]),
-      &:global([readonly]) {
+      &:not([|select]):global([readonly]) {
         @include mdc-theme-prop(border-color, background, false);
         @include mdc-theme-prop(background-color, input-background, false);
       }
