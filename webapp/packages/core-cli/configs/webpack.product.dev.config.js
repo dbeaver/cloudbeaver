@@ -61,14 +61,16 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       template: resolve('src/index.html.ejs'), 
       inject: 'body', 
       chunks: ['main'],
-      version: package.version 
+      version: package.version,
+      title: package.product?.name
     }),
     new HtmlWebpackPlugin({
       filename: 'sso.html',
       template: ssoHtmlTemplate,
       inject: 'body',
       chunks: ['sso'],
-      version: package.version
+      version: package.version,
+      title: package.product?.name
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],

@@ -3,7 +3,7 @@
 
 <head>
       <%= require('html-loader?{"sources":false}!@cloudbeaver/core-blocks/src/HTMLTemplates/head.html.ejs').default %>
-      <title>CloudBeaver</title>
+      <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 
 <body class="theme-typography">
