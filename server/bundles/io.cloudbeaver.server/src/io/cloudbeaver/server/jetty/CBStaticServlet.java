@@ -63,7 +63,7 @@ public class CBStaticServlet extends DefaultServlet {
         if (authProviders.length == 1) {
             String authProviderId = authProviders[0];
             WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(authProviderId);
-            if (authProvider.isConfigurable()) {
+            if (authProvider != null && authProvider.isConfigurable()) {
                 String configId = null;
                 AuthProviderConfig activeAuthConfig = null;
                 for (Map.Entry<String, AuthProviderConfig> cfg : appConfig.getAuthProviderConfigurations().entrySet()) {
