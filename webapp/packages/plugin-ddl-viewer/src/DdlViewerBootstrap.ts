@@ -9,6 +9,7 @@
 import { EObjectFeature, NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
+import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
 import { DDLViewerTab } from './DdlViewer/DDLViewerTab';
 import { DDLViewerTabPanel } from './DdlViewer/DDLViewerTabPanel';
 
@@ -18,7 +19,8 @@ const navNodeDDLId = 'object-viewer://ddl';
 export class DdlViewerBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,
-    private readonly navNodeInfoResource: NavNodeInfoResource
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly ddlViewerFooterService: DDLViewerFooterService
   ) {
     super();
   }
@@ -47,7 +49,9 @@ export class DdlViewerBootstrap extends Bootstrap {
         return [...children || [], navNodeDDLId];
       },
     });
+
+    this.ddlViewerFooterService.register();
   }
 
-  load(): void {}
+  load(): void { }
 }
