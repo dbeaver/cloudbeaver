@@ -114,7 +114,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
-  const drivers = driver.resource.values.filter(({ id }) => availableDrivers?.includes(id));
+  const drivers = driver.resource.values
+    .filter(({ id }) => availableDrivers?.includes(id))
+    .sort(driver.resource.compare);
+
   let properties = authModel?.properties;
 
   if (info?.authProperties && info.authProperties.length > 0) {
