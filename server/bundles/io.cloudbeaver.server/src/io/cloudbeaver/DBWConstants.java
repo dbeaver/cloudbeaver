@@ -28,6 +28,13 @@ public class DBWConstants {
     public static final String PERMISSION_EDIT_STRUCTURE = "edit-meta";
     public static final String PERMISSION_EDIT_DATA = "edit-data";
 
+    public static final String STATE_ATTR_SIGN_IN_STATE = "state.signin";
+
+    public enum SignInState {
+        GLOBAL,
+        EMBEDDED
+    }
+
     //public static final String PERMISSION_USER = "user";
 
 }
