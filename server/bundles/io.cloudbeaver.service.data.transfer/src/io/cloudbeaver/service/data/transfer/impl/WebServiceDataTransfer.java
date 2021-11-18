@@ -185,7 +185,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         StreamConsumerSettings settings = new StreamConsumerSettings();
 
         settings.setOutputEncodingBOM(false);
-        settings.setOpenFolderOnFinish(false);
         settings.setOutputFolder(exportFile.getParentFile().getAbsolutePath());
         settings.setOutputFilePattern(exportFile.getName());
 
