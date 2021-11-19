@@ -171,8 +171,14 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
   useEffect(() => {
     if (mapRef) {
       mapRef.invalidateSize();
+
+      if (mapRef.options.crs?.code !== crs.code) {
+        const center = mapRef.getCenter();
+        mapRef.options.crs = crs;
+        mapRef.setView(center);
+      }
     }
-  }, [splitContext.isResizing, splitContext.mode, mapRef]);
+  }, [splitContext.isResizing, splitContext.mode, crs, mapRef]);
 
   return styled(styles)(
     <MapContainer crs={crs} whenCreated={setMapRef} zoom={12}>
