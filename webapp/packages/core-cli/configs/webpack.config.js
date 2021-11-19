@@ -155,11 +155,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(png|jpg|gif)$/i,
-          use: [
-            {
-              loader: 'url-loader',
-            },
-          ],
+          type: 'asset/inline',
         },
       ],
     },
