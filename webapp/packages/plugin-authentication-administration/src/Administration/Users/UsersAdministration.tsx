@@ -48,10 +48,13 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES, tabStyle);
 
   function openSub({ tabId }: ITabData) {
-    if (sub?.name !== tabId) {
-      param = null;
+    if (subName === tabId) {
+      return;
     }
-    usersAdministrationNavigationService.navToSub(tabId as EUsersAdministrationSub, param);
+
+    param = null;
+
+    usersAdministrationNavigationService.navToSub(tabId as EUsersAdministrationSub, param || undefined);
   }
 
   return styled(style)(

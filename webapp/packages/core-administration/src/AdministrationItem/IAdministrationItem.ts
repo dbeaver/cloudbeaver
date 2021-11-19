@@ -94,6 +94,8 @@ export interface IAdministrationItemOptions {
   isHidden?: ((configurationWizard: boolean) => boolean) | boolean;
   isOnlyActive?: ((configurationWizard: boolean) => boolean) | boolean;
   replace?: IAdministrationItemReplaceOptions;
+  defaultSub?: string;
+  defaultParam?: string;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onLoad?: AdministrationItemEvent;

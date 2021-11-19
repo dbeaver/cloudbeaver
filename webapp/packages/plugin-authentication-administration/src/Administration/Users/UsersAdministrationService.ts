@@ -57,6 +57,7 @@ export class UsersAdministrationService extends Bootstrap {
           },
         },
       ],
+      defaultSub: EUsersAdministrationSub.Users,
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
     });

@@ -97,6 +97,32 @@ export class AdministrationScreenService {
     });
   }
 
+  getRouteName(item?: string, sub?: string, param?: string) {
+    if (this.isConfigurationMode) {
+      if (item) {
+        if (sub) {
+          if (param) {
+            return AdministrationScreenService.setupItemSubParamRouteName;
+          }
+          return AdministrationScreenService.setupItemSubRouteName;
+        }
+        return AdministrationScreenService.setupItemRouteName;
+      }
+      return AdministrationScreenService.setupName;
+    } else {
+      if (item) {
+        if (sub) {
+          if (param) {
+            return AdministrationScreenService.itemSubParamRouteName;
+          }
+          return AdministrationScreenService.itemSubRouteName;
+        }
+        return AdministrationScreenService.itemRouteName;
+      }
+      return AdministrationScreenService.screenName;
+    }
+  }
+
   getScreen(state?: RouterState): IAdministrationItemRoute | null {
     if (!state || !this.isAdministrationRouteActive(state.name)) {
       return null;
@@ -106,11 +132,7 @@ export class AdministrationScreenService {
   }
 
   navigateToRoot(): void {
-    if (this.isConfigurationMode) {
-      this.screenService.navigateToScreen(AdministrationScreenService.setupName);
-    } else {
-      this.screenService.navigateToScreen(AdministrationScreenService.screenName);
-    }
+    this.screenService.navigateToScreen(this.getRouteName());
   }
 
   navigateTo(item: string, params?: IRouteParams): void {
@@ -121,28 +143,24 @@ export class AdministrationScreenService {
     }
   }
 
-  navigateToItem(item: string): void {
-    if (this.isConfigurationMode) {
-      this.screenService.navigateToScreen(AdministrationScreenService.setupItemRouteName, item);
-    } else {
-      this.screenService.navigateToScreen(AdministrationScreenService.itemRouteName, item);
-    }
+  navigateToItem(itemName: string): void {
+    const item = this.administrationItemService.getItem(itemName, this.isConfigurationMode);
+
+    this.screenService.navigateToScreen(
+      this.getRouteName(itemName, item?.defaultSub, item?.defaultParam),
+      itemName,
+      item?.defaultSub,
+      item?.defaultParam
+    );
   }
 
-  navigateToItemSub(item: string, sub: string, param?: string | null): void {
-    if (!param) {
-      if (this.isConfigurationMode) {
-        this.screenService.navigateToScreen(AdministrationScreenService.setupItemSubRouteName, item, sub);
-      } else {
-        this.screenService.navigateToScreen(AdministrationScreenService.itemSubRouteName, item, sub);
-      }
-      return;
-    }
-    if (this.isConfigurationMode) {
-      this.screenService.navigateToScreen(AdministrationScreenService.setupItemSubParamRouteName, item, sub, param);
-    } else {
-      this.screenService.navigateToScreen(AdministrationScreenService.itemSubParamRouteName, item, sub, param);
-    }
+  navigateToItemSub(item: string, sub: string, param?: string): void {
+    this.screenService.navigateToScreen(
+      this.getRouteName(item, sub, param),
+      item,
+      sub,
+      param
+    );
   }
 
   getItemState<T>(name: string): T | undefined

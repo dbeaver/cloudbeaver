@@ -31,7 +31,7 @@ export class UsersAdministrationNavigationService {
     this.navToSub(EUsersAdministrationSub.Users, 'create');
   }
 
-  navToSub(sub: EUsersAdministrationSub, param?: string | null): void {
+  navToSub(sub: EUsersAdministrationSub, param?: string): void {
     this.administrationScreenService.navigateToItemSub(
       UsersAdministrationNavigationService.ItemName,
       sub,
