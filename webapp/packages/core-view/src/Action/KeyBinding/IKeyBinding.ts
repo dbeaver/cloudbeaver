@@ -9,5 +9,6 @@
 export interface IKeyBinding {
   id: string;
   label: string;
+  preventDefault?: boolean;
   keys: string | string[];
 }

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { HotKeys, configure } from 'react-hotkeys';
+import { useHotkeys } from 'react-hotkeys-hook';
 import styled, { css } from 'reshadow';
 
 import { getComputed, useFocus } from '@cloudbeaver/core-blocks';
@@ -19,10 +19,6 @@ import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
-
-configure({
-  ignoreTags: [],
-});
 
 const styles = css`
   div {
@@ -48,31 +44,39 @@ export const CaptureView = observer<Props>(function CaptureView({
   const actionItems = getComputed(() => (
     view.actions
       .map(action => actionService.getAction(viewContext, action))
+      .filter(action => action?.binding && !action.isDisabled())
       .filter(Boolean) as IActionItem[]
   ));
 
-  const keyMap = actionItems.reduce((map, item) => ({
-    ...map,
-    [item.binding!.id]: item.binding?.binding.keys,
-  }), {});
+  const keys = actionItems
+    .map(item => item.binding?.binding.keys)
+    .flat()
+    .join(',');
 
-  const handlers = actionItems.reduce((map, item) => ({
-    ...map,
-    [item.binding!.id]: () => item.activate(true),
-  }), {});
+  useHotkeys(keys, (event, handler) => {
+    if (!ref.current?.contains(document.activeElement)) {
+      return;
+    }
+
+    const action = actionItems.find(action => (
+      action.binding?.binding.keys === handler.key
+      || action.binding?.binding.keys.includes(handler.key)
+    ));
+
+    if (action?.binding?.binding.preventDefault) {
+      event.preventDefault();
+    }
+
+    action?.activate(true);
+  }, {
+    enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+  });
 
   return styled(styles)(
     <CaptureViewContext.Provider value={viewContext}>
-      <HotKeys
-        keyMap={keyMap}
-        handlers={handlers}
-        innerRef={ref}
-        className={className}
-        tabIndex={0}
-        allowChanges
-      >
+      <div ref={ref} className={className} tabIndex={0}>
         {children}
-      </HotKeys>
+      </div>
     </CaptureViewContext.Provider>
   );
 });
