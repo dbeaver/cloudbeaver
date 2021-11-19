@@ -44,7 +44,11 @@ public class CBStaticServlet extends DefaultServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getPathInfo();
-        if ((CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html")) && request.getParameterMap().isEmpty()) {
+
+        if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth() &&
+            (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html")) &&
+            request.getParameterMap().isEmpty())
+        {
             if (processSessionStart(request, response)) {
                 return;
             }

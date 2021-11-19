@@ -46,6 +46,9 @@ public class CBAppConfig {
     private boolean supportsUserWorkspaces;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
+
+    private boolean redirectOnFederatedAuth;
+
     private String[] enabledDrivers;
     private String[] disabledDrivers;
     private String defaultAuthProvider;
@@ -64,6 +67,7 @@ public class CBAppConfig {
         this.supportsUserWorkspaces = false;
         this.publicCredentialsSaveEnabled = true;
         this.adminCredentialsSaveEnabled = true;
+        this.redirectOnFederatedAuth = false;
         this.enabledDrivers = new String[0];
         this.disabledDrivers = new String[0];
         this.defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
@@ -83,6 +87,7 @@ public class CBAppConfig {
         this.supportsUserWorkspaces = src.supportsUserWorkspaces;
         this.publicCredentialsSaveEnabled = src.publicCredentialsSaveEnabled;
         this.adminCredentialsSaveEnabled = src.adminCredentialsSaveEnabled;
+        this.redirectOnFederatedAuth = src.redirectOnFederatedAuth;
         this.enabledDrivers = src.enabledDrivers;
         this.disabledDrivers = src.disabledDrivers;
         this.defaultAuthProvider = src.defaultAuthProvider;
@@ -139,6 +144,10 @@ public class CBAppConfig {
 
     public void setAdminCredentialsSaveEnabled(boolean adminCredentialsSaveEnabled) {
         this.adminCredentialsSaveEnabled = adminCredentialsSaveEnabled;
+    }
+
+    public boolean isRedirectOnFederatedAuth() {
+        return redirectOnFederatedAuth;
     }
 
     public String[] getEnabledDrivers() {
