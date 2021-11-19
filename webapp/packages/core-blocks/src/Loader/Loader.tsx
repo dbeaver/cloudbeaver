@@ -176,7 +176,7 @@ export const Loader = observer<Props>(function Loader({
     }
   }
 
-  if ((!isVisible && overlay) || !loading || contextState.state.size > 0) {
+  if ((!isVisible && overlay) || !loading) {
     if (overlay) {
       return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
     }
