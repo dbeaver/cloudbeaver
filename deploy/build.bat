@@ -39,7 +39,7 @@ cd ..\webapp
 
 call yarn
 call lerna bootstrap
-call lerna run build --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
+call lerna run build --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
 
 cd ..\deploy
 
