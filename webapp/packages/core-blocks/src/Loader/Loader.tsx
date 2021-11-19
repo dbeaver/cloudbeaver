@@ -6,16 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { StaticImage } from '../StaticImage';
+import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
 export interface ILoadableState {
@@ -77,6 +80,10 @@ export const Loader = observer<Props>(function Loader({
   children,
   onCancel,
 }) {
+  const context = useContext(LoaderContext);
+  const [loaderId] = useState(() => uuid());
+  const [contextState] = useState<ILoaderContext>(() => ({ state: observable(new Set<string>()) }));
+
   let exception: Error | null = null;
   let reload: (() => void) | undefined;
 
@@ -116,6 +123,7 @@ export const Loader = observer<Props>(function Loader({
   style = useStyles(loaderStyles, style, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
   const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
+  const refLoaderDisplayed = { state: false };
 
   useEffect(() => {
     if (!loading) {
@@ -126,8 +134,27 @@ export const Loader = observer<Props>(function Loader({
     const id = setTimeout(() => {
       setVisible(loading);
     }, 500);
-    return () => clearTimeout(id);
+
+    return () => {
+      clearTimeout(id);
+    };
   }, [loading]);
+
+  useEffect(() => {
+    if (context) {
+      if (refLoaderDisplayed.state) {
+        context.state.add(loaderId);
+      } else {
+        context.state.delete(loaderId);
+      }
+    }
+  });
+
+  useEffect(() => () => {
+    if (context) {
+      context.state.delete(loaderId);
+    }
+  }, []);
 
   if (exception && !loading) {
     return styled(style)(
@@ -135,12 +162,12 @@ export const Loader = observer<Props>(function Loader({
     );
   }
 
-  if (children && (!loader || !loading)) {
+  if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
       if (typeof children === 'function') {
-        return <>{children()}</>;
+        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
       } else {
-        return <>{children}</>;
+        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
       }
     }
 
@@ -149,25 +176,35 @@ export const Loader = observer<Props>(function Loader({
     }
   }
 
-  if ((!isVisible && overlay) || !loading) {
+  if ((!isVisible && overlay) || !loading || contextState.state.size > 0) {
+    if (overlay) {
+      return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
+    }
+
     return null;
   }
 
+  refLoaderDisplayed.state = true;
+
   return styled(style)(
-    <loader className={className} {...use({ small, fullSize, inline })}>
-      <icon><StaticImage icon={spinnerURL} /></icon>
-      {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
-      {onCancel && (
-        <actions>
-          <Button
+    <LoaderContext.Provider value={contextState}>
+      {overlay && children}
+      <loader className={className} {...use({ small, fullSize, inline })}>
+        <icon><StaticImage icon={spinnerURL} /></icon>
+        {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
+        {onCancel && (
+          <actions>
+            <Button
             type="button"
             mod={['unelevated']}
             disabled={cancelDisabled}
             onClick={onCancel}
-          ><Translate token='ui_processing_cancel' />
-          </Button>
-        </actions>
-      )}
-    </loader>
+            >
+              <Translate token='ui_processing_cancel' />
+            </Button>
+          </actions>
+        )}
+      </loader>
+    </LoaderContext.Provider>
   );
 });

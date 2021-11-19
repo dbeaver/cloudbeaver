@@ -11,9 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel
-} from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel, Loader } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -52,15 +50,18 @@ const layoutStyles = composes(
   `
 );
 
+const loaderStyle = css`
+  ExceptionMessage {
+    padding: 24px;
+  }
+`;
+
 const styles = css`
   Table {
     width: 100%;
+    min-height: 140px; /* loader overlay size */
   }
 
-  Loader {
-    height: 100%;
-  }
-  
   ToolsPanel {
     border-bottom: none;
   }
@@ -137,27 +138,29 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
           </layout-grid-cell>
         )}
         <layout-grid-cell {...use({ span: 12 })}>
-          <Table
+          <Loader style={loaderStyle} state={usersResource} overlay>
+            <Table
             keys={keys}
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
             {...use({ size: 'big' })}
-          >
-            <TableHeader>
-              {isLocalProviderAvailable && (
-                <TableColumnHeader min flex centerContent>
-                  <TableSelect />
-                </TableColumnHeader>
-              )}
-              <TableColumnHeader min />
-              <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
-              <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
-              <TableColumnHeader />
-            </TableHeader>
-            <TableBody>
-              {users.map(user => <User key={user.userId} user={user} selectable={isLocalProviderAvailable} />)}
-            </TableBody>
-          </Table>
+            >
+              <TableHeader>
+                {isLocalProviderAvailable && (
+                  <TableColumnHeader min flex centerContent>
+                    <TableSelect />
+                  </TableColumnHeader>
+                )}
+                <TableColumnHeader min />
+                <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+                <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
+                <TableColumnHeader />
+              </TableHeader>
+              <TableBody>
+                {users.map(user => <User key={user.userId} user={user} selectable={isLocalProviderAvailable} />)}
+              </TableBody>
+            </Table>
+          </Loader>
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

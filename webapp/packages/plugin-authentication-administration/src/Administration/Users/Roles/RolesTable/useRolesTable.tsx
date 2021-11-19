@@ -9,17 +9,18 @@
 import { computed, observable } from 'mobx';
 
 import { compareRoles, RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ILoadableState, TableState, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
   tableState: TableState;
   processing: boolean;
   roles: RoleInfo[];
+  state: ILoadableState;
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
@@ -27,15 +28,16 @@ interface State {
 export function useRolesTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
-  const resource = useService(RolesResource);
+  const resource = useMapResource(useRolesTable, RolesResource, CachedMapAllKey);
 
   const translate = useTranslate();
 
   return useObservableRef<State>(() => ({
     tableState: new TableState(),
     processing: false,
+    state: resource,
     get roles() {
-      return resource.values.slice().sort(compareRoles);
+      return resource.resource.values.slice().sort(compareRoles);
     },
     async update() {
       if (this.processing) {
@@ -44,7 +46,7 @@ export function useRolesTable(): Readonly<State> {
 
       try {
         this.processing = true;
-        await resource.refreshAll();
+        await resource.resource.refreshAll();
         notificationService.logSuccess({ title: 'administration_roles_role_list_update_success' });
       } catch (exception) {
         notificationService.logException(exception, 'administration_roles_role_list_update_fail');
@@ -77,7 +79,7 @@ export function useRolesTable(): Readonly<State> {
 
       try {
         this.processing = true;
-        await resource.deleteRole(resourceKeyList(deletionList));
+        await resource.resource.deleteRole(resourceKeyList(deletionList));
 
         this.tableState.unselect();
         this.tableState.unexpand(deletionList);
