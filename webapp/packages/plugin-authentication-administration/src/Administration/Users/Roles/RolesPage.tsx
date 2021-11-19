@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -104,10 +104,10 @@ export const RolesPage = observer<Props>(function RolesPage({
           <layout-grid-cell {...use({ span: 12 })}>
             <RolesTable
               roles={table.roles}
+              state={table.state}
               selectedItems={table.tableState.selected}
               expandedItems={table.tableState.expanded}
             />
-            <Loader loading={table.processing} overlay />
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>

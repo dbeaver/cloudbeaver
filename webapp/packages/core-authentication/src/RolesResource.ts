@@ -15,9 +15,9 @@ import {
   ResourceKeyList,
   ResourceKeyUtils,
   AdminRoleInfoFragment,
-  AdminConnectionGrantInfo
+  AdminConnectionGrantInfo,
+  CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 const NEW_ROLE_SYMBOL = Symbol('new-role');
 
@@ -26,29 +26,17 @@ type NewRole = RoleInfo & { [NEW_ROLE_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class RolesResource extends CachedMapResource<string, RoleInfo> {
-  static keyAll = resourceKeyList(['all'], 'all');
-
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(private graphQLService: GraphQLService) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
   }
 
   async loadAll(): Promise<Map<string, RoleInfo>> {
-    await this.load(RolesResource.keyAll);
+    await this.load(CachedMapAllKey);
     return this.data;
   }
 
   async refreshAll(): Promise<Map<string, RoleInfo>> {
-    await this.refresh(RolesResource.keyAll);
+    await this.refresh(CachedMapAllKey);
     return this.data;
   }
 
@@ -96,11 +84,13 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, RoleInfo>> {
-    const all = ResourceKeyUtils.hasMark(key, RolesResource.keyAll.mark);
+    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
-    await ResourceKeyUtils.forEachAsync(all ? RolesResource.keyAll : key, async key => {
+    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
+      const roleId = all ? undefined : key;
+
       const { roles } = await this.graphQLService.sdk.getRolesList({
-        roleId: !all ? key : undefined,
+        roleId,
       });
 
       if (all) {
@@ -108,10 +98,6 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
       }
 
       this.updateRoles(...roles);
-
-      if (all) {
-        this.loadedKeyMetadata.set(RolesResource.keyAll.list[0], true);
-      }
     });
 
     return this.data;

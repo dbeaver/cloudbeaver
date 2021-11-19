@@ -7,10 +7,9 @@
  */
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, RolesResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 
 import { CreateRoleService } from './Roles/CreateRoleService';
 import { UsersAdministration } from './UsersAdministration';
@@ -29,8 +28,6 @@ export class UsersAdministrationService extends Bootstrap {
 
   constructor(
     private administrationItemService: AdministrationItemService,
-    private notificationService: NotificationService,
-    private usersResource: UsersResource,
     private createUserService: CreateUserService,
     private readonly rolesResource: RolesResource,
     private readonly createRoleService: CreateRoleService,
@@ -62,7 +59,6 @@ export class UsersAdministrationService extends Bootstrap {
       ],
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
-      onActivate: this.loadUsers.bind(this),
     });
     this.userDetailsInfoPlaceholder.add(Origin, 0);
   }
@@ -75,22 +71,9 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 
-  private async loadUsers() {
-    try {
-      await this.usersResource.loadAll();
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Error occurred while loading users');
-    }
-  }
-
   private async loadRoles(param: string | null) {
     if (param === 'create') {
       this.createRoleService.fillData();
-    }
-    try {
-      await this.rolesResource.loadAll();
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Error occurred while loading roles');
     }
   }
 }
