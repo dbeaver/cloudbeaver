@@ -74,7 +74,7 @@ const styles = composes(
         display: flex;
         flex-direction: row;
         align-items: center;
-        padding: 4px 12px;
+        padding: 8px 12px;
         text-align: left;
         outline: none;
         color: inherit;
