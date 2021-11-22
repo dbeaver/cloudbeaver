@@ -26,7 +26,7 @@ public class CBStatusServlet extends DefaultServlet {
         Map<String, Object> infoMap = new LinkedHashMap<>();
         infoMap.put("health", "ok");
         infoMap.put("product.name", GeneralUtils.getProductName());
-        infoMap.put("product.version", GeneralUtils.getProductVersion());
+        infoMap.put("product.version", GeneralUtils.getProductVersion().toString());
         try (JsonWriter writer = new JsonWriter(response.getWriter())) {
             JSONUtils.serializeMap(writer, infoMap);
         }
