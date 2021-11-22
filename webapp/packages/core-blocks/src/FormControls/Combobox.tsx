@@ -65,7 +65,6 @@ const styles = composes(
       max-height: 300px;
       overflow: auto;
       outline: none;
-      padding: 4px 0;
       z-index: 999;
       border-radius: 3px;
 
