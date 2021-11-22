@@ -25,6 +25,8 @@ import { useNavigationTree } from './useNavigationTree';
 const navigationTreeStyles = css`
   CaptureView {
     outline: none;
+    display: flex;
+    flex: 1;
   }
 
   ElementsTree {
