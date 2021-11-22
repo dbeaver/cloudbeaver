@@ -98,6 +98,10 @@ export const TREE_NODE_STYLES = composes(
       align-items: center;
     }
 
+    TreeNodeIcon, TreeNodeExpand, TreeNodeName {
+      position: relative;
+    }
+
     TreeNodeNested {
       box-sizing: border-box;
       padding: 2px 0;

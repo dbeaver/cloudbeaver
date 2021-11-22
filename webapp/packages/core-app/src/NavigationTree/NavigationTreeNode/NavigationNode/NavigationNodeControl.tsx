@@ -42,11 +42,14 @@ const styles = composes(
     portal:focus-within {
       visibility: visible;
     }
-    TreeNodeIcon {
+    portal {
       position: relative;
     }
     TreeNodeName {
       height: 100%;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     status {
       position: absolute;
@@ -110,7 +113,7 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
       <TreeNodeIcon icon={icon}>
         <status {...use({ connected })} />
       </TreeNodeIcon>
-      <TreeNodeName>
+      <TreeNodeName title={node.name}>
         {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
       </TreeNodeName>
       {!editing && (

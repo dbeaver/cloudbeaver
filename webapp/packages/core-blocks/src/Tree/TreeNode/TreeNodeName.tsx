@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
 export const TreeNodeName: React.FC<Props> = function TreeNodeName({
   className,
   children,
+  ...rest
 }) {
-  return <div className={className}>{children}</div>;
+  return <div className={className} {...rest}>{children}</div>;
 };
