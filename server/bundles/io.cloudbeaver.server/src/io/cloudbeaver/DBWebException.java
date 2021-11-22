@@ -43,6 +43,7 @@ public class DBWebException extends DBException implements GraphQLError {
     public static final String ERROR_CODE_LICENSE_DENIED = "licenseRequired";
     public static final String ERROR_CODE_IDENT_REQUIRED = "identRequired";
     public static final String ERROR_CODE_AUTH_REQUIRED = "authRequired";
+    public static final String ERROR_CODE_QUOTA_EXCEEDED = "quotaExceeded";
 
     private List<Object> path;
     private List<SourceLocation> locations;

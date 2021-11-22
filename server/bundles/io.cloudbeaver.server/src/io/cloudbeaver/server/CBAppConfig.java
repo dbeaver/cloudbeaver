@@ -58,6 +58,8 @@ public class CBAppConfig {
     private final Map<String, Object> plugins;
     private final Map<String, AuthProviderConfig> authConfiguration;
 
+    private final Map<String, Object> resourceQuotas;
+
     public CBAppConfig() {
         this.anonymousAccessEnabled = true;
         this.anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
@@ -76,6 +78,7 @@ public class CBAppConfig {
         this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
         this.plugins = new LinkedHashMap<>();
         this.authConfiguration = new LinkedHashMap<>();
+        this.resourceQuotas = new LinkedHashMap<>();
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -96,6 +99,7 @@ public class CBAppConfig {
         this.defaultNavigatorSettings = src.defaultNavigatorSettings;
         this.plugins = new LinkedHashMap<>(src.plugins);
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
+        this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
     }
 
     public boolean isAnonymousAccessEnabled() {
@@ -235,6 +239,18 @@ public class CBAppConfig {
     public <T> T getPluginOption(@NotNull String pluginId, @NotNull String option) {
         return (T)getPluginConfig(pluginId).get(option);
     }
+
+    ////////////////////////////////////////////
+    // Quotas
+
+    public Map<String, Object> getResourceQuotas() {
+        return resourceQuotas;
+    }
+
+    public <T> T getResourceQuota(String quotaId) {
+        return (T) resourceQuotas.get(quotaId);
+    }
+
 
     ////////////////////////////////////////////
     // Auth provider configs

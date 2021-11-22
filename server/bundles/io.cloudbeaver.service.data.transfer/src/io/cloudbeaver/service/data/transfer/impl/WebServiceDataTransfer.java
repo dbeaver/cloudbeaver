@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -28,9 +29,13 @@ import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCResultSet;
+import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.tools.transfer.IDataTransferConsumer;
@@ -55,6 +60,8 @@ import java.util.stream.Collectors;
  * Web service implementation
  */
 public class WebServiceDataTransfer implements DBWServiceDataTransfer {
+
+    public static final String QUOTE_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
 
     private static final Log log = Log.getLog(WebServiceDataTransfer.class);
 
@@ -150,6 +157,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                                 log.error("Error deleting export file " + exportFile.getAbsolutePath());
                             }
                         }
+                        if (e instanceof DBException) {
+                            throw e;
+                        }
                         throw new DBException("Error exporting data", e);
                     }
                     WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(exportFile, parameters);
@@ -181,7 +191,19 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         }
         IStreamDataExporter exporter = (IStreamDataExporter) processorInstance;
 
-        StreamTransferConsumer consumer = new StreamTransferConsumer();
+        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(QUOTE_PROP_FILE_LIMIT);
+
+        StreamTransferConsumer consumer = new StreamTransferConsumer() {
+            @Override
+            public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+                super.fetchRow(session, resultSet);
+                if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
+                    throw new DBQuotaException(
+                        "Data export quota exceeded", QUOTE_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
+                }
+            }
+        };
+
         StreamConsumerSettings settings = new StreamConsumerSettings();
 
         settings.setOutputEncodingBOM(false);
@@ -218,4 +240,5 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         consumer.finishTransfer(monitor, false);
     }
+
 }

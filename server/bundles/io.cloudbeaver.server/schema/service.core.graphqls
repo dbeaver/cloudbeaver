@@ -68,6 +68,7 @@ type AsyncTaskInfo {
 type ServerError {
     message: String
     errorCode: String
+    errorType: String
     stackTrace: String
     causedBy: ServerError
 }
