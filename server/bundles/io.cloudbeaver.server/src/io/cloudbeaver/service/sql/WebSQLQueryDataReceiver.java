@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -26,6 +27,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBindingType;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
@@ -43,11 +45,13 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     private DBDAttributeBinding[] bindings;
     private List<Object[]> rows = new ArrayList<>();
+    private final Number rowLimit;
 
     WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
         this.contextInfo = contextInfo;
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
+        rowLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
     }
 
     public WebSQLQueryResultSet getResultSet() {
@@ -67,6 +71,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     @Override
     public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+
         Object[] row = new Object[bindings.length];
 
         for (int i = 0; i < bindings.length; i++) {
@@ -84,6 +89,11 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         }
 
         rows.add(row);
+
+        if (rowLimit != null && rows.size() > rowLimit.longValue()) {
+            throw new DBQuotaException(
+                "Result set rows quota exceeded", WebSQLConstants.QUOTA_PROP_ROW_LIMIT, rowLimit, rows.size());
+        }
     }
 
     @Override

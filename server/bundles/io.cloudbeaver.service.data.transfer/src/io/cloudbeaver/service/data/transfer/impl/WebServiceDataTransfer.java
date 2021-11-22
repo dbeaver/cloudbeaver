@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
  */
 public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
-    public static final String QUOTE_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
+    public static final String QUOTA_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
 
     private static final Log log = Log.getLog(WebServiceDataTransfer.class);
 
@@ -191,7 +191,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         }
         IStreamDataExporter exporter = (IStreamDataExporter) processorInstance;
 
-        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(QUOTE_PROP_FILE_LIMIT);
+        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(QUOTA_PROP_FILE_LIMIT);
 
         StreamTransferConsumer consumer = new StreamTransferConsumer() {
             @Override
@@ -199,7 +199,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 super.fetchRow(session, resultSet);
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(
-                        "Data export quota exceeded", QUOTE_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
+                        "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
                 }
             }
         };
