@@ -15,6 +15,12 @@ import { AuthProvidersResource } from './AuthProvidersResource';
 import type { IAuthCredentials } from './IAuthCredentials';
 import { UserInfoResource } from './UserInfoResource';
 
+interface IActiveSSOAuthentication {
+  configuration: AuthProviderConfiguration;
+  window: Window;
+  promise: Promise<UserInfo | null>;
+}
+
 @injectable()
 export class AuthInfoService {
   get userInfo(): UserInfo | null {
@@ -50,14 +56,14 @@ export class AuthInfoService {
     return result;
   }
 
-  private activeSSO: Promise<UserInfo | null> | null;
+  private activeSSO: Map<string, IActiveSSOAuthentication>;
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly sessionDataResource: SessionDataResource
   ) {
-    this.activeSSO = null;
+    this.activeSSO = new Map();
   }
 
   async login(provider: string, credentials: IAuthCredentials, link?: boolean): Promise<UserInfo | null> {
@@ -65,33 +71,46 @@ export class AuthInfoService {
   }
 
   async sso(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    if (!this.activeSSO) {
-      this.activeSSO = this.ssoAuth(providerId, configuration);
-    }
-
-    try {
-      return await this.activeSSO;
-    } finally {
-      this.activeSSO = null;
-    }
+    return this.ssoAuth(providerId, configuration);
   }
 
   async logout(): Promise<void> {
     await this.userInfoResource.logout();
   }
 
-  private async ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    const popup = openCenteredPopup(configuration.signInLink, configuration.displayName, 600, 700, undefined, true);
+  private ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
+    const active = this.activeSSO.get(configuration.id);
+
+    if (active) {
+      active.window.focus();
+      return active.promise;
+    }
+
+    const popup = openCenteredPopup(configuration.signInLink, configuration.id, 600, 700, undefined, true);
 
     if (popup) {
       popup.focus();
-      await this.waitWindowsClose(popup);
-      const user = await this.userInfoResource.refresh(undefined, []);
-      await this.sessionDataResource.refresh();
-      return user;
+
+      const task = async () => {
+        await this.waitWindowsClose(popup);
+
+        this.sessionDataResource.markOutdated();
+        const user = await this.userInfoResource.refresh(undefined, []);
+
+        return user;
+      };
+
+      const active: IActiveSSOAuthentication = {
+        configuration,
+        promise: task(),
+        window: popup,
+      };
+
+      this.activeSSO.set(configuration.id, active);
+      return active.promise;
     }
 
-    return null;
+    return Promise.resolve(null);
   }
 
   private async waitWindowsClose(window: Window): Promise<void> {
