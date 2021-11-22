@@ -1,6 +1,7 @@
 package io.cloudbeaver.server.jetty;
 
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.server.CBConstants;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -21,6 +22,7 @@ public class CBStatusServlet extends DefaultServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType(CBConstants.APPLICATION_JSON);
         Map<String, Object> infoMap = new LinkedHashMap<>();
         infoMap.put("health", "ok");
         infoMap.put("product.name", GeneralUtils.getProductName());
