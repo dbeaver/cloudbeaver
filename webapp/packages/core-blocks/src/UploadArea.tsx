@@ -22,7 +22,7 @@ const styles = css`
   }
 `;
 
-export const UploadButton: React.FC<Props> = function UploadButton({ id, reset, className, children, ...rest }) {
+export const UploadArea: React.FC<Props> = function UploadArea({ id, reset, className, children, ...rest }) {
   const _id = id ?? uuid();
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

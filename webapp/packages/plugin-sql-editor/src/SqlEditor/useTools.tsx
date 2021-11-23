@@ -13,89 +13,78 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { download, generateFileName, uploadTextFiles } from '@cloudbeaver/core-utils';
+import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
 import { ScriptImportDialog } from './ScriptImportDialog';
-import type { SqlEditorController } from './SqlEditorController';
 
 interface State {
-  uploadScript: (files: FileList | null) => Promise<void>;
-  downloadScript: () => void;
+  tryReadScript: (file: File, prevScript: string) => Promise<string | null>;
+  readScript: (file: File) => Promise<string | null>;
+  downloadScript: (script: string) => void;
+  checkFileValidity: (file: File) => boolean;
 }
 
-export function useTools(controller: SqlEditorController, state: ISqlEditorTabState): Readonly<State> {
+export function useTools(connectionId: string | undefined): Readonly<State> {
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   return useObservableRef(() => ({
-    async uploadScript(fileList: FileList | null) {
-      if (!fileList) {
-        throw new Error('No files found');
+    async tryReadScript(file: File, prevScript: string) {
+      const valid = this.checkFileValidity(file);
+
+      if (!valid) {
+        return null;
       }
 
-      if (!fileList.length) {
-        return;
-      }
-
-      if (this.controller.value.trim()) {
+      if (prevScript) {
         const result = await this.commonDialogService.open(ScriptImportDialog, null);
 
         if (result === DialogueStateResult.Rejected) {
-          return;
+          return null;
         }
 
         if (result !== DialogueStateResult.Resolved && result) {
-          this.downloadScript();
+          this.downloadScript(prevScript);
         }
       }
 
-      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
-      const aboveMaxSize: File[] = [];
-
-      const files = Array.from(fileList).filter(file => {
-        const size = Math.round(file.size / 1000); // kilobyte
-        const above = size > maxSize;
-
-        if (above) {
-          aboveMaxSize.push(file);
-        }
-
-        return !above;
-      });
-
-      if (aboveMaxSize.length > 0) {
-        const nameList = aboveMaxSize.map(file => `${file.name} (${Math.round(file.size / 1000)}KB)`);
-        const message = `Max size: ${maxSize}KB\nFollowing files exceed max size: "${nameList.join(', ')}"`;
-
-        this.notificationService.logInfo({
-          title: 'sql_editor_upload_script_max_size_title',
-          message,
-          persistent: true,
-        });
-      }
-
-      if (!files.length) {
-        return;
-      }
-
-      const data = uploadTextFiles(files);
-      const process = Array.from(data.values())[0];
-
-      try {
-        const script = await process.promise;
-        controller.setQuery(script);
-      } catch (exception) {
-        this.notificationService.logException(exception, 'Uploading file error');
-      }
+      return this.readScript(file);
     },
 
-    downloadScript() {
-      const script = this.controller.value;
+    async readScript(file: File) {
+      let script = null;
+      try {
+        const process = getTextFileReadingProcess(file);
+        script = await process.promise;
+      } catch (exception) {
+        this.notificationService.logException(exception, 'Uploading script error');
+      }
 
+      return script;
+    },
+
+    checkFileValidity(file: File) {
+      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+      const size = Math.round(file.size / 1000); // kilobyte
+      const aboveMaxSize = size > maxSize;
+
+      if (aboveMaxSize) {
+        this.notificationService.logInfo({
+          title: 'sql_editor_upload_script_max_size_title',
+          message: `Max size: ${maxSize}KB\nFile size: ${size}KB`,
+          persistent: true,
+        });
+
+        return false;
+      }
+
+      return true;
+    },
+
+    downloadScript(script: string) {
       if (!script.trim()) {
         return;
       }
@@ -105,7 +94,6 @@ export function useTools(controller: SqlEditorController, state: ISqlEditorTabSt
       });
 
       let name = 'script';
-      const connectionId = this.state.executionContext?.connectionId;
 
       if (connectionId) {
         const connection = this.connectionInfoResource.get(connectionId);
@@ -115,6 +103,17 @@ export function useTools(controller: SqlEditorController, state: ISqlEditorTabSt
       download(blob, generateFileName(name, '.sql'));
     },
   }),
-  { uploadScript: action.bound, downloadScript: action.bound },
-  { controller, commonDialogService, connectionInfoResource, notificationService, sqlEditorSettingsService, state });
+    {
+      tryReadScript: action.bound,
+      readScript: action.bound,
+      checkFileValidity: action.bound,
+      downloadScript: action.bound,
+    },
+    {
+      commonDialogService,
+      connectionInfoResource,
+      notificationService,
+      sqlEditorSettingsService,
+      connectionId,
+    });
 }
