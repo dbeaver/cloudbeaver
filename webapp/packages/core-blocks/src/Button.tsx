@@ -101,17 +101,20 @@ const buttonMod = {
 type ButtonProps = (
   React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
   & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
+  & React.HTMLAttributes<HTMLDivElement>
 ) & {
   loading?: boolean;
   icon?: string;
   viewBox?: string;
   styles?: ComponentStyle;
   mod?: Array<keyof typeof buttonMod>;
-  tag?: 'button' | 'a';
+  tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
   loader?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement> | (() => Promise<any>);
+  onClick?: React.MouseEventHandler<
+    HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement
+  > | (() => Promise<any>);
   download?: boolean;
 };
 
@@ -134,7 +137,7 @@ export const Button = observer<ButtonProps>(function Button({
   }), {
     loading: observable.ref,
   }, {
-    click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) {
+    click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement>) {
       const returnValue = onClick?.(e);
 
       if (returnValue instanceof Promise) {

@@ -60,6 +60,7 @@ interface Props {
 const spinnerType = {
   primary: '/icons/spinner-primary.svg',
   secondary: '/icons/spinner.svg',
+  small: '/icons/spinner-small.svg',
 };
 
 export const Loader = observer<Props>(function Loader({
@@ -122,7 +123,7 @@ export const Loader = observer<Props>(function Loader({
 
   style = useStyles(loaderStyles, style, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
-  const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
+
   const refLoaderDisplayed = { state: false };
 
   useEffect(() => {
@@ -185,6 +186,12 @@ export const Loader = observer<Props>(function Loader({
   }
 
   refLoaderDisplayed.state = true;
+
+  let spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
+
+  if (small) {
+    spinnerURL = spinnerType.small;
+  }
 
   return styled(style)(
     <LoaderContext.Provider value={contextState}>
