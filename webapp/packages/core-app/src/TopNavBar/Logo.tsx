@@ -22,9 +22,9 @@ export const Logo = observer(function Logo() {
 
   const isSameVersion = backendVersion === frontendVersion;
 
-  const productName = serverService.config.data?.productInfo.description || 'CloudBeaver';
-  const backendVersionTitle = `${productName}: ${backendVersion}`;
-  const commonVersionTitle = `${productName}: ${frontendVersion}(${backendVersion})`;
+  const productName = serverService.config.data?.productInfo.name || 'CloudBeaver';
+  const backendVersionTitle = `${productName} ver. ${backendVersion}`;
+  const commonVersionTitle = `${productName} ver. ${frontendVersion}(${backendVersion})`;
 
   const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
