@@ -22,7 +22,7 @@ interface State {
   tryReadScript: (file: File, prevScript: string) => Promise<string | null>;
   readScript: (file: File) => Promise<string | null>;
   downloadScript: (script: string) => void;
-  isFileValid: (file: File) => boolean;
+  checkFileValidity: (file: File) => boolean;
 }
 
 export function useTools(connectionId: string | undefined): Readonly<State> {
@@ -33,7 +33,7 @@ export function useTools(connectionId: string | undefined): Readonly<State> {
 
   return useObservableRef(() => ({
     async tryReadScript(file: File, prevScript: string) {
-      const valid = this.isFileValid(file);
+      const valid = this.checkFileValidity(file);
 
       if (!valid) {
         return null;
@@ -66,7 +66,7 @@ export function useTools(connectionId: string | undefined): Readonly<State> {
       return script;
     },
 
-    isFileValid(file: File) {
+    checkFileValidity(file: File) {
       const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
       const size = Math.round(file.size / 1000); // kilobyte
       const aboveMaxSize = size > maxSize;
@@ -106,7 +106,7 @@ export function useTools(connectionId: string | undefined): Readonly<State> {
     {
       tryReadScript: action.bound,
       readScript: action.bound,
-      isFileValid: action.bound,
+      checkFileValidity: action.bound,
       downloadScript: action.bound,
     },
     {
