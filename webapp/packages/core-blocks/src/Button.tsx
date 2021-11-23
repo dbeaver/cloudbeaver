@@ -8,7 +8,6 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import type { HTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 import { use } from 'reshadow';
 
@@ -102,7 +101,7 @@ const buttonMod = {
 type ButtonProps = (
   React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
   & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
-  & HTMLAttributes<HTMLDivElement>
+  & React.HTMLAttributes<HTMLDivElement>
 ) & {
   loading?: boolean;
   icon?: string;
