@@ -1,9 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="43" height="42" viewBox="0 0 43 42">
-    <defs>
-        <linearGradient id="prefix__a" x1="59.847%" x2="43.09%" y1="106.152%" y2="60.499%">
-            <stop offset="0%" stop-color="#FFF" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#FFF"/>
-        </linearGradient>
-    </defs>
-    <path fill="none" fill-rule="evenodd" stroke="url(#prefix__a)" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" d="M808.5 476c-9.94 0-18-8.06-18-18s8.06-18 18-18 18 8.06 18 18" transform="translate(-787 -437)"/>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M32 5C17.0883 5 5 17.0883 5 32C5 46.9117 17.0883 59 32 59C46.9117 59 59 46.9117 59 32C59 30.8954 59.8954 30 61 30C62.1046 30 63 30.8954 63 32C63 49.1208 49.1208 63 32 63C14.8792 63 1 49.1208 1 32C1 14.8792 14.8792 1 32 1C33.1046 1 34 1.89543 34 3C34 4.10457 33.1046 5 32 5Z" fill="url(#paint0_radial_257_4)"/>
+  <defs>
+    <radialGradient id="paint0_radial_257_4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(63 32) rotate(180) scale(53.5 52.7883)">
+      <stop offset="0.139672" stop-color="#FFF" stop-opacity="0"/>
+      <stop offset="0.559863" stop-color="#FFF" stop-opacity="0.3"/>
+      <stop offset="0.869303" stop-color="#FFF"/>
+    </radialGradient>
+  </defs>
 </svg>
