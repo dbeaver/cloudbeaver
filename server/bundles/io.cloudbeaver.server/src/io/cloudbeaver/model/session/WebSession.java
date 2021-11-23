@@ -24,6 +24,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.sql.WebSQLConstants;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -52,6 +53,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.ProjectMetadata;
@@ -82,6 +84,8 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     public static final String USER_PROJECTS_FOLDER = "user-projects";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
+
+    private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String id;
     private final long createTime;
@@ -589,8 +593,16 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         AbstractJob job = new AbstractJob(taskName) {
             @Override
             protected IStatus run(DBRProgressMonitor monitor) {
+                int curTaskCount = taskCount.incrementAndGet();
+
                 TaskProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, asyncTask);
                 try {
+                    Number queryLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
+                    if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
+                        throw new DBQuotaException(
+                            "Result set rows quota exceeded", WebSQLConstants.QUOTA_PROP_ROW_LIMIT, queryLimit, curTaskCount);
+                    }
+
                     runnable.run(taskMonitor);
                     asyncTask.setResult(runnable.getResult());
                     asyncTask.setExtendedResult(runnable.getExtendedResults());
@@ -599,8 +611,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 } catch (InvocationTargetException e) {
                     addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     asyncTask.setJobError(e);
+                } finally {
+                    taskCount.decrementAndGet();
                 }
                 return Status.OK_STATUS;
             }

@@ -23,6 +23,7 @@ public class WebSQLConstants {
 
     public static final String QUOTA_PROP_ROW_LIMIT = "sqlResultSetRowsLimit";
     public static final String QUOTA_PROP_MEMORY_LIMIT = "sqlResultSetMemoryLimit";
+    public static final String QUOTA_PROP_QUERY_LIMIT = "sqlMaxRunningQueries";
 
     public static final int BINARY_PREVIEW_LENGTH = 255;
     public static final int BINARY_MAX_LENGTH = 1 * 1024 * 1024;
