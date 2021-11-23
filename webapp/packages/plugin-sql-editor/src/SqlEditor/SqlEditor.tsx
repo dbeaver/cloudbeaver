@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, UploadButton } from '@cloudbeaver/core-blocks';
+import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -89,7 +89,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const style = useStyles(styles);
   const [editor, setEditor] = useState<SQLCodeEditorController | null>(null);
   const controller = useController(SqlEditorController, state);
-  const tools = useTools(controller, state);
+  const tools = useTools(state.executionContext?.connectionId);
 
   useEffect(() => {
     editor?.focus();
@@ -97,6 +97,21 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
 
   function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
+  }
+
+  async function handleScriptUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      throw new Error('File is not found');
+    }
+
+    const prevScript = controller.value.trim();
+    const script = await tools.tryReadScript(file, prevScript);
+
+    if (script) {
+      controller.setQuery(script);
+    }
   }
 
   return styled(style)(
@@ -138,20 +153,20 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           <button
             disabled={!controller.value.trim()}
             title={translate('sql_editor_download_script_tooltip')}
-            onClick={tools.downloadScript}
+            onClick={() => tools.downloadScript(controller.value.trim())}
           >
             <StaticImage icon='/icons/save.svg' />
           </button>
-          <UploadButton
+          <UploadArea
             accept='.sql'
             title={translate('sql_editor_upload_script_tooltip')}
             reset
-            onChange={async event => await tools.uploadScript(event.target.files)}
+            onChange={handleScriptUpload}
           >
             <upload>
               <StaticImage icon='/icons/load.svg' />
             </upload>
-          </UploadButton>
+          </UploadArea>
         </tools>
       </container>
       <SQLCodeEditorLoader

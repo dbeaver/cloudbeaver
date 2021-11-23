@@ -29,4 +29,4 @@ export * from './getUniqueName';
 export * from './isMapsEqual';
 export * from './openCenteredPopup';
 export * from './download';
-export * from './uploadTextFiles';
+export * from './getTextFileReadingProcess';
