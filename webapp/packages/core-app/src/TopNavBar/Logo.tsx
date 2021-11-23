@@ -10,18 +10,21 @@ import { observer } from 'mobx-react-lite';
 
 import { AppLogo } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ServerService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { useAppVersion } from '../useAppVersion';
 
 export const Logo = observer(function Logo() {
+  const serverService = useService(ServerService);
   const screenService = useService(ScreenService);
   const { backendVersion, frontendVersion } = useAppVersion(true);
 
   const isSameVersion = backendVersion === frontendVersion;
 
-  const backendVersionTitle = `CloudBeaver: ${backendVersion}`;
-  const commonVersionTitle = `CloudBeaver: ${frontendVersion}(${backendVersion})`;
+  const productName = serverService.config.data?.productInfo.name || 'Cloudbeaver';
+  const backendVersionTitle = `${productName}: ${backendVersion}`;
+  const commonVersionTitle = `${productName}: ${frontendVersion}(${backendVersion})`;
 
   const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
