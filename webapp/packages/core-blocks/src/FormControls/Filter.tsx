@@ -34,14 +34,17 @@ const styles = css`
   }
   IconButton {
     position: absolute;
-    right: 2px;
-    top: 2px;
+    right: 0;
+    top: 0;
     margin: 0;
     width: 24px;
     height: 24px;
     border-radius: 2px;
     cursor: auto;
+
     &[|toggled] {
+      right: 2px;
+      top: 2px;
       border-radius: unset;
     }
   }
