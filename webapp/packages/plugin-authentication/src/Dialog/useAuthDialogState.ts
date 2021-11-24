@@ -97,6 +97,9 @@ export function useAuthDialogState(providerId: string | null): IState {
 
     get configure(): boolean {
       if (this.activeProvider) {
+        if (this.adminPageActive && authProvidersResource.resource.isPrimary(this.activeProvider.id)) {
+          return false;
+        }
         return !authProvidersResource.resource.isAuthEnabled(this.activeProvider.id);
       }
       return false;
