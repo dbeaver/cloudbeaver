@@ -78,7 +78,7 @@ export class AuthInfoService {
     await this.userInfoResource.logout();
   }
 
-  private ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
+  private async ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
     const active = this.activeSSO.get(configuration.id);
 
     if (active) {
@@ -107,7 +107,11 @@ export class AuthInfoService {
       };
 
       this.activeSSO.set(configuration.id, active);
-      return active.promise;
+      try {
+        return await active.promise;
+      } finally {
+        this.activeSSO.delete(configuration.id);
+      }
     }
 
     return Promise.resolve(null);
