@@ -10,6 +10,7 @@ import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 
@@ -30,13 +31,14 @@ export class ConnectionsAdministrationService extends Bootstrap {
   readonly connectionDetailsPlaceholder = new PlaceholderContainer<IConnectionDetailsPlaceholderProps>();
 
   constructor(
-    private administrationItemService: AdministrationItemService,
-    private notificationService: NotificationService,
-    private connectionsResource: ConnectionsResource,
-    private dbDriverResource: DBDriverResource,
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly notificationService: NotificationService,
+    private readonly connectionsResource: ConnectionsResource,
+    private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
     private readonly sessionDataResource: SessionDataResource,
-    private readonly networkHandlerResource: NetworkHandlerResource
+    private readonly networkHandlerResource: NetworkHandlerResource,
+    private readonly commonDialogService: CommonDialogService
   ) {
     super();
   }
@@ -55,6 +57,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
           name: 'create',
           onActivate: this.activateCreateMethod.bind(this),
           onDeActivate: this.deactivateCreateMethod.bind(this),
+          canDeActivate: this.canDeActivateCreate.bind(this),
         },
       ],
       getContentComponent: () => ConnectionsAdministration,
@@ -95,6 +98,22 @@ export class ConnectionsAdministrationService extends Bootstrap {
     if (outside) {
       this.createConnectionService.close();
     }
+  }
+
+  private async canDeActivateCreate(param: string | null, configuration: boolean) {
+    const formActive = this.createConnectionService.data !== null;
+
+    if (!configuration || !formActive) {
+      return true;
+    }
+
+    const result = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'ui_changes_will_be_lost',
+      message: 'connections_administration_deactivate_message',
+      confirmActionText: 'ui_continue',
+    });
+
+    return result !== DialogueStateResult.Rejected;
   }
 
   private async loadConnections() {
