@@ -101,9 +101,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   private async canDeActivateCreate(param: string | null, configuration: boolean) {
-    const formActive = this.createConnectionService.data !== null;
-
-    if (!configuration || !formActive) {
+    if (!configuration || this.createConnectionService.data === null) {
       return true;
     }
 
