@@ -100,8 +100,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
     }
   }
 
-  private async canDeActivateCreate(param: string | null, configuration: boolean) {
-    if (!configuration || this.createConnectionService.data === null) {
+  private async canDeActivateCreate() {
+    if (this.createConnectionService.data === null) {
       return true;
     }
 
