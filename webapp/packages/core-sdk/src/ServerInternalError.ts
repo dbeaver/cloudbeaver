@@ -9,8 +9,13 @@
 import { DetailsError } from './DetailsError';
 import type { ServerError } from './sdk';
 
+export enum ServerErrorType {
+  'QUOTE_EXCEEDED' = 'quotaExceeded'
+}
+
 export class ServerInternalError extends DetailsError implements ServerError {
   readonly errorCode?: string;
+  readonly errorType?: string;
   readonly stackTrace?: string;
   readonly causedBy?: ServerError;
 
@@ -18,6 +23,7 @@ export class ServerInternalError extends DetailsError implements ServerError {
     super(error.message);
     this.name = 'Server Internal Error';
     this.errorCode = error.errorCode;
+    this.errorType = error.errorType;
     this.stackTrace = error.stackTrace;
     this.causedBy = error.causedBy;
   }

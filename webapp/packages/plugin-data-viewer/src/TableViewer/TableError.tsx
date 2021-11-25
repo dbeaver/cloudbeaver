@@ -12,6 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { ServerErrorType } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
@@ -38,6 +39,7 @@ const style = composes(
       transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out, background 0.3s ease-in-out;
 
       &[|animated] {
+        overflow: hidden;
         pointer-events: auto;
         opacity: 1;
       }
@@ -46,7 +48,14 @@ const style = composes(
         width: 72px;
         height: 72px;
         background: transparent!important;
-        overflow: hidden;
+
+        & IconOrImage {
+            cursor: pointer;
+        }
+
+        & error-message, & controls {
+            display: none;
+        }
       }
       &[|errorHidden] {
         pointer-events: none;
@@ -55,6 +64,7 @@ const style = composes(
     error-body {
       display: flex;
       gap: 24px;
+      align-items: center;
       margin-bottom: 24px;
     }
     error-message {
@@ -63,10 +73,13 @@ const style = composes(
     IconOrImage {
       width: 40px;
       height: 40px;
-      cursor: pointer;
     }
-    Button {
-      margin-right: 16px;
+    controls {
+      display: flex;
+      gap: 16px;
+      & > Button {
+        flex-shrink: 0;
+      }
     }
   `
 );
@@ -112,24 +125,33 @@ export const TableError = observer<Props>(function TableViewer({
   const animated = useStateDelay(!!errorInfo.error && !loading, 1);
 
   const errorHidden = errorInfo.error === null;
+  const quote = error.details?.errorType === ServerErrorType.QUOTE_EXCEEDED;
+
+  let icon = '/icons/error_icon.svg';
+
+  if (quote) {
+    icon = '/icons/info_icon.svg';
+  }
 
   return styled(useStyles(style))(
     <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
       <error-body>
-        <IconOrImage icon='/icons/error_icon.svg' onClick={() => errorInfo.show()} />
+        <IconOrImage icon={icon} title={error.details?.message} onClick={() => errorInfo.show()} />
         <error-message>{error.details?.message}</error-message>
       </error-body>
-      <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
-        {translate('ui_error_close')}
-      </Button>
-      {error.details?.hasDetails && (
-        <Button type='button' mod={['outlined']} onClick={error.open}>
-          {translate('ui_errors_details')}
+      <controls>
+        <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
+          {translate('ui_error_close')}
         </Button>
-      )}
-      <Button type='button' mod={['unelevated']} onClick={() => model.retry()}>
-        {translate('ui_processing_retry')}
-      </Button>
+        {!quote && error.details?.hasDetails && (
+          <Button type='button' mod={['outlined']} onClick={error.open}>
+            {translate('ui_errors_details')}
+          </Button>
+        )}
+        <Button type='button' mod={['unelevated']} onClick={() => model.retry()}>
+          {translate('ui_processing_retry')}
+        </Button>
+      </controls>
     </error>
   );
 });

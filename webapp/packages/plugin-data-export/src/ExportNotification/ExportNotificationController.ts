@@ -14,6 +14,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { ServerInternalError, ServerErrorType } from '@cloudbeaver/core-sdk';
 import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DataExportProcessService, ExportProcess } from '../DataExportProcessService';
@@ -21,6 +22,7 @@ import { DataExportProcessService, ExportProcess } from '../DataExportProcessSer
 interface ExportNotificationStatus {
   title: string;
   status: ENotificationType;
+  message?: string;
 }
 @injectable()
 export class ExportNotificationController implements IInitializableController {
@@ -67,8 +69,23 @@ export class ExportNotificationController implements IInitializableController {
         return { title: 'ui_processing_canceling', status: ENotificationType.Loading };
       case EDeferredState.RESOLVED:
         return { title: 'data_transfer_notification_ready', status: ENotificationType.Info };
-      default:
-        return { title: 'data_transfer_notification_error', status: ENotificationType.Error };
+      case EDeferredState.CANCELLED:
+        return { title: 'data_transfer_notification_cancelled', status: ENotificationType.Info };
+      default: {
+        const error = this.process?.getRejectionReason();
+
+        let title = 'data_transfer_notification_error';
+        let status = ENotificationType.Error;
+        let message = '';
+
+        if (error instanceof ServerInternalError && error.errorType === ServerErrorType.QUOTE_EXCEEDED) {
+          title = 'app_root_quota_exceeded';
+          status = ENotificationType.Info;
+          message = error.message;
+        }
+
+        return { title, status, message };
+      }
     }
   }
 
@@ -108,7 +125,7 @@ export class ExportNotificationController implements IInitializableController {
     this.dataExportProcessService.cancel(this.notification.extraProps.source);
   };
 
-  showDetails= async (): Promise<void> => {
+  showDetails = async (): Promise<void> => {
     this.isDetailsDialogOpen = true;
     try {
       this.notification.showDetails();

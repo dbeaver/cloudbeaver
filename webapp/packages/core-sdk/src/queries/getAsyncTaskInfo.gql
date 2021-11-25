@@ -13,6 +13,7 @@ mutation getAsyncTaskInfo(
         error {
             message
             errorCode
+            errorType
             stackTrace
         }
         taskResult

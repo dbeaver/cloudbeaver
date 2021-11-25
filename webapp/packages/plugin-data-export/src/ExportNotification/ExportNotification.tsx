@@ -21,6 +21,14 @@ import { EDeferredState } from '@cloudbeaver/core-utils';
 import { ExportNotificationController } from './ExportNotificationController';
 
 const styles = css`
+  message {
+    font-size: 16px;
+    opacity: 0.8;
+    overflow: auto;
+    max-height: 100px;
+    word-break: break-word;
+    white-space: pre-line;
+  }
   source-name {
     composes: theme-typography--body2 from global;
     padding-top: 16px;
@@ -44,14 +52,15 @@ export const ExportNotification = observer<Props>(function ExportNotification({
 }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
-  const { title, status } = controller.status;
+  const { title, status, message } = controller.status;
 
   return styled(useStyles(styles))(
     <SnackbarWrapper unclosable={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
-          <source-name as="div">
+          {message && <message>{message}</message>}
+          <source-name>
             {controller.sourceName}
             {controller.task?.context.sourceName && (
               <pre title={controller.task.context.sourceName}>
@@ -61,7 +70,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({
           </source-name>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          {status === ENotificationType.Info && (
+          {status === ENotificationType.Info && controller.downloadUrl && (
             <>
               <Button
                 type="button"

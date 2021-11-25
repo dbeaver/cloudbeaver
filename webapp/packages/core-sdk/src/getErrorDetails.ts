@@ -7,11 +7,13 @@
  */
 
 import { DetailsError } from './DetailsError';
+import { ServerInternalError } from './ServerInternalError';
 
 export interface IErrorDetails {
   name: string;
   message: string;
   hasDetails: boolean;
+  errorType?: string;
 }
 
 export function hasDetails(error: Error): error is DetailsError {
@@ -20,9 +22,16 @@ export function hasDetails(error: Error): error is DetailsError {
 
 export function getErrorDetails(error: Error | DetailsError): IErrorDetails {
   const exceptionMessage = hasDetails(error) ? error.errorMessage : error.message || error.name;
-  return {
+
+  const details: IErrorDetails = {
     name: error.name,
     message: exceptionMessage,
     hasDetails: hasDetails(error),
   };
+
+  if (error instanceof ServerInternalError && error.errorType) {
+    details.errorType = error.errorType;
+  }
+
+  return details;
 }

@@ -1133,6 +1133,7 @@ export interface ServerConfigInput {
 export interface ServerError {
   causedBy?: Maybe<ServerError>;
   errorCode?: Maybe<Scalars['String']>;
+  errorType?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
   stackTrace?: Maybe<Scalars['String']>;
 }
@@ -1695,7 +1696,7 @@ export type GetAsyncTaskInfoMutationVariables = Exact<{
   removeOnFinish: Scalars['Boolean'];
 }>;
 
-export interface GetAsyncTaskInfoMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface GetAsyncTaskInfoMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetNetworkHandlersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2763,6 +2764,7 @@ export const GetAsyncTaskInfoDocument = `
     error {
       message
       errorCode
+      errorType
       stackTrace
     }
     taskResult
