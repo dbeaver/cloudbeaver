@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+theme {
+  color-scheme: dark;
+}
+
 $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
 $mdc-theme-secondary: hsl(240deg, 10%, 15%);
