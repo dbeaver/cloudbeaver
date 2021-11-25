@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { Loader, useAppLoadingScreen, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -16,7 +16,7 @@ import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { composes, ThemeService, useStyles } from '@cloudbeaver/core-theming';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { useAppVersion } from './useAppVersion';
 
@@ -33,10 +33,6 @@ const bodyStyles = composes(
       padding: 0 !important; /* fix additional padding with modal reakit menu */
       flex-direction: column;
       overflow: hidden;
-
-      &[|dark] {
-        color-scheme: dark;
-      }
     }
   `
 );
@@ -47,7 +43,6 @@ export const Body = observer(function Body() {
   const ref = useRef<HTMLDivElement>(null);
   const permissionsService = useDataResource(Body, PermissionsResource, undefined);
   const screenService = useService(ScreenService);
-  const themeService = useService(ThemeService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
 
@@ -60,7 +55,7 @@ export const Body = observer(function Body() {
   });
 
   return styled(style)(
-    <theme ref={ref} {...use({ dark: themeService.currentTheme.id === 'dark' })}>
+    <theme ref={ref}>
       <Loader state={permissionsService}>{() => styled(style)(
         <>
           {Screen && <Screen {...screenService.routerService.params} />}
