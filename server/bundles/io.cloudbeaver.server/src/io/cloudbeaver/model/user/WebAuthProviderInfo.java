@@ -19,13 +19,11 @@ package io.cloudbeaver.model.user;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -84,9 +82,8 @@ public class WebAuthProviderInfo {
         return descriptor.getCredentialProfiles();
     }
 
-    @Deprecated
-    public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
-        return descriptor.getCredentialParameters(Collections.emptySet());
+    public String[] getRequiredFeatures() {
+        return descriptor.getRequiredFeatures();
     }
 
     @Override
