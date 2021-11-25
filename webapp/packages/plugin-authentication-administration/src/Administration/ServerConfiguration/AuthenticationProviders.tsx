@@ -41,8 +41,24 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
-      if (serverConfig.enabledAuthProviders?.length === 0 && localProvider) {
+      const enabledProviders = serverConfig.enabledAuthProviders;
+
+      if (enabledProviders?.length === 0 && localProvider) {
         serverConfig.anonymousAccessEnabled = true;
+      }
+
+      if (enabledProviders?.length && enabledProviders.length > 0) {
+        for (let i = enabledProviders.length - 1; i >= 0; i--) {
+          const provider = providers.resource.get(enabledProviders[i] ?? '');
+
+          if (provider?.requiredFeatures.length) {
+            const unavailable = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+
+            if (unavailable) {
+              enabledProviders.splice(i, 1);
+            }
+          }
+        }
       }
     }],
   });
@@ -75,11 +91,14 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             <>
               {providers.resource.values.map(provider => {
                 const links = authProviderService.getServiceDescriptionLinks(provider);
+                const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+                const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
                 return (
                   <Switch
                     key={provider.id}
                     id={`authProvider_${provider.id}`}
+                    title={tooltip}
                     value={provider.id}
                     name="enabledAuthProviders"
                     state={serverConfig}
@@ -93,6 +112,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                       </>
                     )}
                     mod={['primary']}
+                    disabled={disabled}
                     small
                     autoHide
                   >
