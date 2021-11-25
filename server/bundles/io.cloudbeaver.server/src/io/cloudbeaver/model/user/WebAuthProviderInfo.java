@@ -83,7 +83,8 @@ public class WebAuthProviderInfo {
     }
 
     public String[] getRequiredFeatures() {
-        return descriptor.getRequiredFeatures();
+        String[] rf = descriptor.getRequiredFeatures();
+        return rf == null ? new String[0] : rf;
     }
 
     @Override
