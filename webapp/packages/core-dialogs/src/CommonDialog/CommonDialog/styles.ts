@@ -167,6 +167,7 @@ export const commonDialogBaseStyle = composes(
     dialog-body-overflow {
       position: sticky;
       bottom: 0;
+      left: 0;
       flex-shrink: 0;
       width: 100%;
       height: 24px;

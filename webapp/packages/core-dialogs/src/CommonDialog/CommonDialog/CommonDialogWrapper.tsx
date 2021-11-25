@@ -22,7 +22,7 @@ import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
 export interface CommonDialogWrapperProps {
   size?: 'small' | 'medium' | 'large';
   title?: string;
-  subTitle?: string;
+  subTitle?: string | React.ReactNode;
   'aria-label'?: string;
   icon?: string;
   viewBox?: string;
@@ -81,7 +81,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
               </reject>
             )}
           </header-title>
-          {subTitle && <sub-title>{translate(subTitle)}</sub-title>}
+          {subTitle && <sub-title>{typeof subTitle === 'string' ? translate(subTitle) : subTitle}</sub-title>}
         </header>
         <dialog-body {...use({ 'no-padding': noBodyPadding, 'no-overflow': noOverflow })}>
           <dialog-body-overflow-box>

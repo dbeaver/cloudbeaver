@@ -43,9 +43,8 @@ const styles = css`
     cursor: auto;
 
     &[|toggled] {
-      right: 2px;
-      top: 2px;
-      border-radius: unset;
+      right: 4px;
+      top: 4px;
     }
   }
 `;
@@ -64,8 +63,7 @@ const toggleModeButtonStyle = composes(
 
 const innerInputStyle = css`
   input {
-    height: 28px;
-    padding-right: 24px !important;
+    padding-right: 40px !important;
   }
 `;
 
@@ -77,6 +75,7 @@ interface BaseProps {
   className?: string;
   onToggle?: (status: boolean) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 type ControlledProps = BaseProps & {
@@ -105,6 +104,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   onFilter,
   onToggle,
   onKeyDown,
+  onClick,
 }) {
   const [inputRef] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
@@ -150,7 +150,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   }
 
   return styled(useStyles(styles, toggleMode && toggleModeButtonStyle))(
-    <filter-container className={className}>
+    <filter-container className={className} onClick={onClick}>
       <InputField
         ref={inputRef}
         style={innerInputStyle}

@@ -8,5 +8,4 @@
 
 export interface INodeActions {
   readonly rename?: () => void;
-
 }
