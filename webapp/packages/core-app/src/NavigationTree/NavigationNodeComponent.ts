@@ -14,7 +14,9 @@ interface Props {
   node: NavNode;
   component: React.FC<{
     nodeId: string;
+    expanded?: boolean;
   }>;
+  expanded?: boolean;
 }
 
 export type NavigationNodeComponent = React.FC<Props>;

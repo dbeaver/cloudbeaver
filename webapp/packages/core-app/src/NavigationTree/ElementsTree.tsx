@@ -7,20 +7,20 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
+import { FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
-import { useChildren } from '../shared/useChildren';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
+import { NavigationTreeService } from './NavigationTreeService';
 import { ITreeContext, TreeContext } from './TreeContext';
 import { IElementsTreeCustomRenderer, IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
 
@@ -36,12 +36,18 @@ const styles = css`
     width: 100%;
     min-width: 240px;
   }
+
+  FolderExplorerPath {
+    padding: 0 12px 8px 12px;
+  }
 `;
 
 interface Props {
   root?: string;
   keepData?: boolean;
   selectionTree?: boolean;
+  foldersTree?: boolean;
+  showFolderExplorerPath?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   control?: React.FC<{
     node: NavNode;
@@ -53,6 +59,7 @@ interface Props {
   customSelect?: (node: NavNode, multiple: boolean) => void;
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
+  onClick?: (node: NavNode) => Promise<void> | void;
   onOpen?: (node: NavNode) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => void;
   onFilter?: (node: NavNode, value: string) => void;
@@ -62,8 +69,10 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   root = ROOT_NODE_PATH,
   control,
   keepData,
+  showFolderExplorerPath,
   localState,
   selectionTree = false,
+  foldersTree = false,
   emptyPlaceholder,
   filters,
   renderers,
@@ -71,15 +80,20 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   isGroup,
   customSelect,
   onExpand,
+  onClick,
   onOpen,
   onSelect,
   onFilter,
 }) {
-  const nodeChildren = useChildren(root);
+  const folderExplorer = useFolderExplorer(root);
+  root = folderExplorer.folder;
   const Placeholder = emptyPlaceholder;
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navigationTreeService = useService(NavigationTreeService);
 
-  useMapResource(ElementsTree, NavTreeResource, root);
+  const children = useMapResource(ElementsTree, NavTreeResource, root, {
+    isActive: () => navigationTreeService.loadNestedNodes(root, true),
+  });
 
   const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
 
@@ -99,31 +113,57 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const context = useMemo<ITreeContext>(
     () => ({
       tree,
+      folderExplorer,
       selectionTree,
       control,
       onOpen,
+      onClick: async (node, leaf) => {
+        await onClick?.(node);
+
+        if (!leaf && foldersTree) {
+          await navigationTreeService.loadNestedNodes(root, true);
+          folderExplorer.open(node.id);
+        }
+      },
     }),
-    [control, selectionTree, onOpen]
+    [control, selectionTree, onOpen, onClick, folderExplorer, foldersTree]
   );
 
-  if (!nodeChildren.children || nodeChildren.children.length === 0 || tree.loading) {
-    if (nodeChildren.isLoading() || tree.loading) {
-      return styled(styles)(
-        <center>
-          <Loader />
-        </center>
-      );
-    }
+  const getName = useCallback(
+    (folder: string) => navNodeInfoResource.get(folder)?.name || folder,
+    [navNodeInfoResource]
+  );
 
-    return <Placeholder />;
+  const hasChildren = children.data?.length !== 0;
+  let loading = children.isLoading();
+
+  if (tree.loading && !hasChildren) {
+    return styled(styles)(
+      <center>
+        <Loader />
+      </center>
+    );
+  }
+
+  if (!hasChildren && !loading) {
+    if (folderExplorer.root === folderExplorer.folder) {
+      return <Placeholder />;
+    }
+  }
+
+  if (foldersTree && folderExplorer.root !== root) {
+    loading = false;
   }
 
   return styled(styles)(
     <TreeContext.Provider value={context}>
-      <tree className={className}>
-        <NavigationNodeNested nodeId={root} component={NavigationNodeElement} root />
-        <Loader loading={nodeChildren.isLoading()} overlay />
-      </tree>
+      <FolderExplorer state={folderExplorer}>
+        <tree className={className}>
+          {showFolderExplorerPath && <FolderExplorerPath getName={getName} />}
+          <NavigationNodeNested nodeId={root} component={NavigationNodeElement} foldersTree={foldersTree} root />
+          <Loader loading={loading} overlay={hasChildren} />
+        </tree>
+      </FolderExplorer>
     </TreeContext.Provider>
   );
 });

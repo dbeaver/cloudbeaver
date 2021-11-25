@@ -13,24 +13,55 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
+import type { ITreeNodeState } from './ITreeNodeState';
 import { TreeNodeContext } from './TreeNodeContext';
 
 const KEY = {
   ENTER: 'Enter',
 };
 
-interface Props {
+interface Props extends ITreeNodeState {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
   big?: boolean;
 }
 
 export const TreeNodeControl = observer<Props>(function TreeNodeControl({
+  loading,
+  selected,
+  filterValue,
+  expanded,
+  externalExpanded,
+  leaf,
   onClick,
   className,
   children,
 }) {
   const context = useContext(TreeNodeContext);
+
+  if (loading !== undefined) {
+    context.loading = loading;
+  }
+
+  if (selected !== undefined) {
+    context.selected = selected;
+  }
+
+  if (filterValue !== undefined) {
+    context.filterValue = filterValue;
+  }
+
+  if (expanded !== undefined) {
+    context.expanded = expanded;
+  }
+
+  if (leaf !== undefined) {
+    context.leaf = leaf;
+  }
+
+  if (externalExpanded !== undefined) {
+    context.externalExpanded = externalExpanded;
+  }
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
@@ -47,13 +78,15 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   };
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (onClick) {
+      onClick(event);
+    }
+
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
 
-    if (onClick) {
-      onClick(event);
-    }
+    context.click?.();
   };
 
   const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {

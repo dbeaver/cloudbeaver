@@ -14,19 +14,16 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
+import type { ITreeNodeState } from './ITreeNodeState';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
 import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
-interface Props {
-  loading?: boolean;
-  selected?: boolean;
-  expanded?: boolean;
-  leaf?: boolean;
+interface Props extends ITreeNodeState {
   className?: string;
+  onClick?: (leaf: boolean) => Promise<void> | void;
   onExpand?: () => Promise<void> | void;
   onSelect?: (multiple?: boolean, nested?: boolean) => Promise<void> | void;
   onFilter?: (value: string) => Promise<void> | void;
-  filterValue?: string;
   onOpen?: () => Promise<void> | void;
 }
 
@@ -35,6 +32,7 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
   selected = false,
   filterValue = '',
   expanded = false,
+  externalExpanded,
   leaf = false,
   className,
   children,
@@ -54,6 +52,11 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
 
   const nodeContext = useObservableRef<ITreeNodeContext>(() => ({
     processing: false,
+    async click() {
+      await processAction(async () => {
+        await handlersRef.onClick?.(this.leaf);
+      });
+    },
     async expand() {
       await processAction(async () => {
         await handlersRef.onExpand?.();
@@ -79,18 +82,20 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
     loading: observable.ref,
     selected: observable.ref,
     expanded: observable.ref,
+    externalExpanded: observable.ref,
     leaf: observable.ref,
     filterValue: observable.ref,
   }, {
     loading,
     selected,
     expanded,
+    externalExpanded: externalExpanded || false,
     leaf,
     filterValue,
   });
 
   return styled(useStyles(TREE_NODE_STYLES))(
-    <node {...use({ expanded })} className={className}>
+    <node {...use({ expanded: nodeContext.expanded || nodeContext.externalExpanded })} className={className}>
       <TreeNodeContext.Provider value={nodeContext}>
         {children}
       </TreeNodeContext.Provider>

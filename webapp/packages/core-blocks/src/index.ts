@@ -101,6 +101,7 @@ export * from './FormControls/Checkboxes/Switch';
 export * from './FormControls/Checkboxes/useCheckboxState';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
+
 export * from './Containers/BASE_CONTAINERS_STYLES';
 export * from './Containers/Container';
 export * from './Containers/Group';
@@ -111,6 +112,13 @@ export * from './Containers/GroupTitle';
 export * from './Containers/ColoredContainer';
 export * from './Containers/IContainerProps';
 export * from './Containers/ILayoutSizeProps';
+
+export * from './FolderExplorer/FolderExplorer';
+export * from './FolderExplorer/FolderExplorerContext';
+export * from './FolderExplorer/FolderExplorerPath';
+export * from './FolderExplorer/FolderName';
+export * from './FolderExplorer/useFolderExplorer';
+
 export * from './FormControls/FormBoxElement';
 export * from './FormControls/Combobox';
 export * from './FormControls/FormContext';

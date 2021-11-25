@@ -29,20 +29,28 @@ const styles = css`
 interface Props {
   leaf?: boolean;
   big?: boolean;
+  disabled?: boolean;
   className?: string;
 }
 
 export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   leaf,
   big,
+  disabled,
   className,
 }) {
   const context = useContext(TreeNodeContext);
 
+  if (context.externalExpanded) {
+    disabled = true;
+  }
+
+  leaf = context.leaf || leaf;
+
   const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
-    if (!context.leaf && !leaf) {
+    if (!leaf && !disabled) {
       context.expand();
     }
   };
@@ -56,8 +64,8 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
-      {!loading && !context.leaf && !leaf && big && <Icon name="angle" viewBox="0 0 15 8" />}
-      {!loading && !context.leaf && !leaf && !big && <Icon name="arrow" viewBox="0 0 16 16" />}
+      {!loading && (!leaf || context.externalExpanded) && big && <Icon name="angle" viewBox="0 0 15 8" />}
+      {!loading && (!leaf || context.externalExpanded) && !big && <Icon name="arrow" viewBox="0 0 16 16" />}
     </arrow>
   );
 });

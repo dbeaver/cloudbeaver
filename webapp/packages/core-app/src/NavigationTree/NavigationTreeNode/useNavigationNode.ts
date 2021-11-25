@@ -26,6 +26,7 @@ interface INavigationNode {
   leaf: boolean;
   handleExpand: () => Promise<void>;
   handleOpen: () => Promise<void>;
+  handleClick: (leaf: boolean) => Promise<void>;
   handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
   handleFilter: (value: string) => Promise<void>;
   filterValue: string;
@@ -54,6 +55,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     expanded = false;
   }
 
+  const handleClick = async (leaf: boolean) => contextRef.context?.onClick?.(node, leaf);
   const handleOpen = async () => contextRef.context?.onOpen?.(node);
   const handleExpand = async () => contextRef.context?.tree.expand(node, !expanded);
   const handleSelect = async (
@@ -79,6 +81,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     expanded,
     leaf,
     handleExpand,
+    handleClick,
     handleOpen,
     handleSelect,
     handleFilter,

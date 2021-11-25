@@ -17,10 +17,12 @@ import { NavigationNode } from './NavigationNode';
 
 interface Props {
   nodeId: string;
+  expanded?: boolean;
 }
 
 export const NavigationNodeElement = observer<Props>(function NavigationNodeElement({
   nodeId,
+  expanded,
 }) {
   const context = useContext(TreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -30,7 +32,7 @@ export const NavigationNodeElement = observer<Props>(function NavigationNodeElem
       const CustomRenderer = renderer(nodeId);
 
       if (CustomRenderer) {
-        return <CustomRenderer nodeId={nodeId} component={NavigationNodeElement} />;
+        return <CustomRenderer nodeId={nodeId} expanded={expanded} component={NavigationNodeElement} />;
       }
     }
   }
@@ -42,5 +44,5 @@ export const NavigationNodeElement = observer<Props>(function NavigationNodeElem
   }
 
   // TODO: after node update reference can be lost and NavigationNode skip update
-  return <NavigationNode node={node} component={NavigationNodeElement} />;
+  return <NavigationNode node={node} expanded={expanded} component={NavigationNodeElement} />;
 });

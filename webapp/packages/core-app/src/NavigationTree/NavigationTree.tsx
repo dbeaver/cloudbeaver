@@ -27,6 +27,7 @@ const navigationTreeStyles = css`
     outline: none;
     display: flex;
     flex: 1;
+    flex-direction: column;
   }
 
   ElementsTree {

@@ -107,6 +107,10 @@ export const TREE_NODE_STYLES = composes(
       padding: 2px 0;
       padding-left: 24px;
       display: none;
+
+      &[expanded] {
+        display: block;
+      }
     }
 
     node TreeNodeControl[big] {

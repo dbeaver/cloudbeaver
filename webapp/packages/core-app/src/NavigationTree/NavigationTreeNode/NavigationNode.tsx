@@ -18,6 +18,7 @@ import { useNavigationNode } from './useNavigationNode';
 export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,
   component,
+  expanded: expandedExternal,
 }) {
   const {
     control,
@@ -25,6 +26,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     loading,
     expanded,
     leaf,
+    handleClick,
     handleExpand,
     handleOpen,
     handleSelect,
@@ -39,15 +41,17 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       loading={loading}
       selected={selected}
       expanded={expanded}
+      externalExpanded={expandedExternal}
       leaf={leaf}
       filterValue={filterValue}
       onExpand={handleExpand}
+      onClick={handleClick}
       onOpen={handleOpen}
       onSelect={handleSelect}
       onFilter={handleFilter}
     >
       <Control node={node} />
-      {expanded && <NavigationNodeNested nodeId={node.id} component={component} />}
+      {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} component={component} />}
     </TreeNode>
   );
 });

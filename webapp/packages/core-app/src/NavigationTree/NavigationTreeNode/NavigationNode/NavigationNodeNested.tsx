@@ -20,14 +20,17 @@ interface Props {
   nodeId: string;
   component: React.FC<{
     nodeId: string;
+    expanded?: boolean;
   }>;
   root?: boolean;
+  foldersTree?: boolean;
 }
 
 export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
   nodeId,
   component,
   root,
+  foldersTree,
 }) {
   const styles = useStyles(TREE_NODE_STYLES);
   const treeContext = useContext(TreeContext);
@@ -37,13 +40,15 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
     [nodeId, treeContext?.tree]
   ).get();
 
-  if (children.length === 0) {
-    return null;
-  }
-
   const NavigationNode = component;
 
   if (root) {
+    if (foldersTree && treeContext?.folderExplorer.root !== nodeId) {
+      return styled(styles)(
+        <NavigationNode nodeId={nodeId} expanded />
+      );
+    }
+
     return styled(styles)(
       <>
         {children.map(child => <NavigationNode key={child} nodeId={child} />)}

@@ -7,7 +7,7 @@
  */
 
 import { observable } from 'mobx';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useExecutor, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -24,7 +24,9 @@ export type ElementsTreeCustomRendererComponent = React.FC<{
   nodeId: string;
   component: React.FC<{
     nodeId: string;
+    expanded?: boolean;
   }>;
+  expanded?: boolean;
 }>;
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => ElementsTreeCustomRendererComponent | undefined;
@@ -217,9 +219,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
     await options.onSelect?.(node, selected);
   }
 
+  const renderers = useMemo(() => options.renderers || [], [options.renderers]);
+
   const elementsTree = useObservableRef<IElementsTree>(() => ({
-    root: options.root,
-    renderers: options.renderers || [],
     state,
     loading: options.keepData,
     getNodeState(nodeId: string) {
@@ -268,7 +270,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       await setSelection(node.id, !treeNodeState.selected);
     },
-  }), { root: observable.ref, loading: observable.ref, renderers: observable.ref }, false);
+  }), {
+    root: observable.ref,
+    loading: observable.ref,
+    renderers: observable.ref,
+  }, {
+    root: options.root,
+    renderers,
+  });
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,

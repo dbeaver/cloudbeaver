@@ -12,6 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
@@ -82,10 +83,10 @@ interface Props {
 export const NavigationNodeControl = observer<Props>(function NavigationNodeControl({
   node,
 }) {
-  const context = useContext(TreeNodeContext);
+  const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
-  const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !context.loading);
+  const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
 
   const [editing, setEditing] = useState(false);
 
@@ -103,9 +104,14 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
 
   const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
+  function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
+    EventContext.set(event, EventStopPropagationFlag);
+    treeNodeContext.select();
+  }
+
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    context.select(event.ctrlKey || event.metaKey);
-  }, [context]);
+    treeNodeContext.select(event.ctrlKey || event.metaKey);
+  }, [treeNodeContext]);
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
     <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
@@ -117,8 +123,8 @@ export const NavigationNodeControl = observer<Props>(function NavigationNodeCont
         {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
       </TreeNodeName>
       {!editing && (
-        <portal>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={context.selected} />
+        <portal onClick={handlePortalClick}>
+          <TreeNodeMenu node={node} actions={nodeActions} selected={treeNodeContext.selected} />
         </portal>
       )}
     </TreeNodeControl>

@@ -8,16 +8,20 @@
 
 import { createContext } from 'react';
 
+import type { IFolderExplorerContext } from '@cloudbeaver/core-blocks';
+
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import type { IElementsTree } from './useElementsTree';
 
 export interface ITreeContext {
   tree: IElementsTree;
+  folderExplorer: IFolderExplorerContext;
   selectionTree: boolean;
   control?: React.FC<{
     node: NavNode;
   }>;
   onOpen?: (node: NavNode) => Promise<void> | void;
+  onClick?: (node: NavNode, leaf: boolean) => Promise<void> | void;
 }
 
 export const TreeContext = createContext<ITreeContext | null>(null);

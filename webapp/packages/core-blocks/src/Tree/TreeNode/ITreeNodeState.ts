@@ -6,14 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-interface Props {
+export interface ITreeNodeState {
+  loading?: boolean;
+  selected?: boolean;
+  externalExpanded?: boolean;
   expanded?: boolean;
-  className?: string;
+  leaf?: boolean;
+  filterValue?: string;
 }
-
-export const TreeNodeNested: React.FC<Props> = function TreeNodeNested({
-  className,
-  children,
-}) {
-  return <div className={className}>{children}</div>;
-};

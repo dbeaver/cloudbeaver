@@ -8,18 +8,28 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
+import styled, { css } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
+import { Loader } from '../../Loader/Loader';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
+
+const styles = css`
+  Loader {
+    width: 40px;
+    height: 40px;
+  }
+`;
 
 interface Props {
   group?: boolean;
   onSelect?: () => void;
   selected?: boolean;
   disabled?: boolean;
+  loadIndicator?: boolean;
   className?: string;
 }
 
@@ -28,6 +38,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   group,
   selected,
   disabled,
+  loadIndicator,
   className,
 }) {
   const context = useContext(TreeNodeContext);
@@ -44,13 +55,17 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     EventContext.set(event, EventTreeNodeSelectFlag);
   };
 
-  return (
+  return styled(styles)(
     <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
-      <Checkbox
-        checked={selected ?? context.selected}
-        disabled={disabled}
-        onChange={onSelect ?? (() => context.select(true, group))}
-      />
+      {loadIndicator && context.loading
+        ? <Loader small />
+        : (
+            <Checkbox
+              checked={selected ?? context.selected}
+              disabled={disabled}
+              onChange={onSelect ?? (() => context.select(true, group))}
+            />
+          )}
     </div>
   );
 });
