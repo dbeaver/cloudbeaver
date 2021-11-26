@@ -41,24 +41,16 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
-      const enabledProviders = serverConfig.enabledAuthProviders;
-
-      if (enabledProviders?.length === 0 && localProvider) {
+      if (serverConfig.enabledAuthProviders?.length === 0 && localProvider) {
         serverConfig.anonymousAccessEnabled = true;
       }
 
-      if (enabledProviders?.length && enabledProviders.length > 0) {
-        for (let i = enabledProviders.length - 1; i >= 0; i--) {
-          const provider = providers.resource.get(enabledProviders[i] ?? '');
+      if (serverConfig.enabledAuthProviders?.length) {
+        serverConfig.enabledAuthProviders = serverConfig.enabledAuthProviders.filter(providerId => {
+          const provider = providers.resource.get(providerId)!;
 
-          if (provider?.requiredFeatures.length) {
-            const unavailable = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
-
-            if (unavailable) {
-              enabledProviders.splice(i, 1);
-            }
-          }
-        }
+          return !provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+        });
       }
     }],
   });
