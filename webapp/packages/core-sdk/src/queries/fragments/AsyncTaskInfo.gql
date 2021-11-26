@@ -1,0 +1,13 @@
+fragment AsyncTaskInfo on AsyncTaskInfo {
+  id
+  name
+  running
+  status
+  error {
+    message
+    errorCode
+    errorType
+    stackTrace
+  }
+  taskResult
+}

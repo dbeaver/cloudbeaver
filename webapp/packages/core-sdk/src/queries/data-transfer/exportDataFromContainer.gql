@@ -8,13 +8,6 @@ query exportDataFromContainer(
     containerNodePath: $containerNodePath
     parameters: $parameters
   ) {
-    id
-    running
-    taskResult
-    error {
-      message
-      errorCode
-      stackTrace
-    }
+    ...AsyncTaskInfo
   }
 }

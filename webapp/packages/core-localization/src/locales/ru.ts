@@ -65,5 +65,6 @@ export const defaultRULocale = [
   ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],
   ['app_root_session_expired_reload', 'Перезагрузить'],
+  ['app_root_quota_exceeded', 'Квота превышена'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
 ];

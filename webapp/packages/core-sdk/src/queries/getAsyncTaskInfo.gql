@@ -6,15 +6,6 @@ mutation getAsyncTaskInfo(
         id: $taskId
         removeOnFinish: $removeOnFinish
     ) {
-        id
-        name
-        running
-        status
-        error {
-            message
-            errorCode
-            stackTrace
-        }
-        taskResult
+       ...AsyncTaskInfo
     }
 }

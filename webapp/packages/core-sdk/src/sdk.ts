@@ -1133,6 +1133,7 @@ export interface ServerConfigInput {
 export interface ServerError {
   causedBy?: Maybe<ServerError>;
   errorCode?: Maybe<Scalars['String']>;
+  errorType?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
   stackTrace?: Maybe<Scalars['String']>;
 }
@@ -1634,7 +1635,7 @@ export type ExportDataFromContainerQueryVariables = Exact<{
   parameters: DataTransferParameters;
 }>;
 
-export interface ExportDataFromContainerQuery { taskInfo: { id: string; running: boolean; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface ExportDataFromContainerQuery { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type ExportDataFromResultsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1643,7 +1644,7 @@ export type ExportDataFromResultsQueryVariables = Exact<{
   parameters: DataTransferParameters;
 }>;
 
-export interface ExportDataFromResultsQuery { taskInfo: { id: string; running: boolean; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface ExportDataFromResultsQuery { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1667,6 +1668,8 @@ export interface AdminRoleInfoFragment { roleId: string; roleName?: Maybe<string
 export interface AdminUserInfoFragment { userId: string; grantedRoles: string[]; linkedAuthProviders: string[]; metaParameters?: Maybe<any>; origins: Array<{ type: string; subType?: Maybe<string>; displayName: string; icon?: Maybe<string>; details?: Maybe<Array<{ id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; defaultValue?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; value?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }>> }> }
 
 export interface AllNavigatorSettingsFragment { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }
+
+export interface AsyncTaskInfoFragment { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> }
 
 export interface AuthProviderConfigurationParametersFragment { id?: Maybe<string>; displayName?: Maybe<string>; description?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; value?: Maybe<any>; validValues?: Maybe<Array<Maybe<any>>>; defaultValue?: Maybe<any>; length: ObjectPropertyLength; features: string[]; order: number }
 
@@ -1695,7 +1698,7 @@ export type GetAsyncTaskInfoMutationVariables = Exact<{
   removeOnFinish: Scalars['Boolean'];
 }>;
 
-export interface GetAsyncTaskInfoMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface GetAsyncTaskInfoMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type GetNetworkHandlersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1710,7 +1713,7 @@ export type AsyncReadDataFromContainerMutationVariables = Exact<{
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
-export interface AsyncReadDataFromContainerMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface AsyncReadDataFromContainerMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1721,7 +1724,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
-export interface AsyncSqlExecuteQueryMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; stackTrace?: Maybe<string> }> } }
+export interface AsyncSqlExecuteQueryMutation { taskInfo: { id: string; name?: Maybe<string>; running: boolean; status?: Maybe<string>; taskResult?: Maybe<any>; error?: Maybe<{ message?: Maybe<string>; errorCode?: Maybe<string>; errorType?: Maybe<string>; stackTrace?: Maybe<string> }> } }
 
 export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1948,6 +1951,21 @@ export const AdminUserInfoFragmentDoc = `
   }
 }
     ${ObjectOriginInfoFragmentDoc}`;
+export const AsyncTaskInfoFragmentDoc = `
+    fragment AsyncTaskInfo on AsyncTaskInfo {
+  id
+  name
+  running
+  status
+  error {
+    message
+    errorCode
+    errorType
+    stackTrace
+  }
+  taskResult
+}
+    `;
 export const AuthProviderConfigurationParametersFragmentDoc = `
     fragment AuthProviderConfigurationParameters on ObjectPropertyInfo {
   id
@@ -2672,17 +2690,10 @@ export const ExportDataFromContainerDocument = `
     containerNodePath: $containerNodePath
     parameters: $parameters
   ) {
-    id
-    running
-    taskResult
-    error {
-      message
-      errorCode
-      stackTrace
-    }
+    ...AsyncTaskInfo
   }
 }
-    `;
+    ${AsyncTaskInfoFragmentDoc}`;
 export const ExportDataFromResultsDocument = `
     query exportDataFromResults($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $parameters: DataTransferParameters!) {
   taskInfo: dataTransferExportDataFromResults(
@@ -2691,17 +2702,10 @@ export const ExportDataFromResultsDocument = `
     resultsId: $resultsId
     parameters: $parameters
   ) {
-    id
-    running
-    taskResult
-    error {
-      message
-      errorCode
-      stackTrace
-    }
+    ...AsyncTaskInfo
   }
 }
-    `;
+    ${AsyncTaskInfoFragmentDoc}`;
 export const GetDataTransferProcessorsDocument = `
     query getDataTransferProcessors {
   processors: dataTransferAvailableStreamProcessors {
@@ -2756,19 +2760,10 @@ export const NavGetStructContainersDocument = `
 export const GetAsyncTaskInfoDocument = `
     mutation getAsyncTaskInfo($taskId: String!, $removeOnFinish: Boolean!) {
   taskInfo: asyncTaskInfo(id: $taskId, removeOnFinish: $removeOnFinish) {
-    id
-    name
-    running
-    status
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-    taskResult
+    ...AsyncTaskInfo
   }
 }
-    `;
+    ${AsyncTaskInfoFragmentDoc}`;
 export const GetNetworkHandlersDocument = `
     query getNetworkHandlers {
   handlers: networkHandlers {
@@ -2794,19 +2789,10 @@ export const AsyncReadDataFromContainerDocument = `
     filter: $filter
     dataFormat: $dataFormat
   ) {
-    id
-    name
-    running
-    status
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-    taskResult
+    ...AsyncTaskInfo
   }
 }
-    `;
+    ${AsyncTaskInfoFragmentDoc}`;
 export const AsyncSqlExecuteQueryDocument = `
     mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $resultId: ID, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
   taskInfo: asyncSqlExecuteQuery(
@@ -2817,19 +2803,10 @@ export const AsyncSqlExecuteQueryDocument = `
     filter: $filter
     dataFormat: $dataFormat
   ) {
-    id
-    name
-    running
-    status
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-    taskResult
+    ...AsyncTaskInfo
   }
 }
-    `;
+    ${AsyncTaskInfoFragmentDoc}`;
 export const AsyncSqlExplainExecutionPlanDocument = `
     mutation asyncSqlExplainExecutionPlan($connectionId: ID!, $contextId: ID!, $query: String!, $configuration: Object!) {
   taskInfo: asyncSqlExplainExecutionPlan(
