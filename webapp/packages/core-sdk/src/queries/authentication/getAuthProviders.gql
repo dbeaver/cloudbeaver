@@ -45,5 +45,6 @@ query getAuthProviders {
         encryption
       }
     }
+    requiredFeatures
   } 
 }

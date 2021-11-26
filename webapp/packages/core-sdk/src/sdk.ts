@@ -124,14 +124,13 @@ export interface AuthProviderCredentialsProfile {
 export interface AuthProviderInfo {
   configurable: Scalars['Boolean'];
   configurations?: Maybe<AuthProviderConfiguration[]>;
-  /** @deprecated Field no longer supported */
-  credentialParameters: AuthCredentialInfo[];
   credentialProfiles: AuthProviderCredentialsProfile[];
   defaultProvider: Scalars['Boolean'];
   description?: Maybe<Scalars['String']>;
   icon?: Maybe<Scalars['ID']>;
   id: Scalars['ID'];
   label: Scalars['String'];
+  requiredFeatures: Array<Scalars['String']>;
 }
 
 export interface ConnectionConfig {
@@ -1278,7 +1277,7 @@ export interface GetAuthProviderConfigurationsQuery { configurations: Array<{ pr
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetAuthProvidersQuery { providers: Array<{ id: string; label: string; icon?: Maybe<string>; description?: Maybe<string>; defaultProvider: boolean; configurable: boolean; configurations?: Maybe<Array<{ id: string; displayName: string; iconURL?: Maybe<string>; description?: Maybe<string>; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> }>>; credentialProfiles: Array<{ id?: Maybe<string>; label?: Maybe<string>; description?: Maybe<string>; credentialParameters: Array<{ id: string; displayName: string; description?: Maybe<string>; admin: boolean; user: boolean; identifying: boolean; possibleValues?: Maybe<Array<Maybe<string>>>; encryption?: Maybe<AuthCredentialEncryption> }> }> }> }
+export interface GetAuthProvidersQuery { providers: Array<{ id: string; label: string; icon?: Maybe<string>; description?: Maybe<string>; defaultProvider: boolean; configurable: boolean; requiredFeatures: string[]; configurations?: Maybe<Array<{ id: string; displayName: string; iconURL?: Maybe<string>; description?: Maybe<string>; signInLink?: Maybe<string>; signOutLink?: Maybe<string>; metadataLink?: Maybe<string> }>>; credentialProfiles: Array<{ id?: Maybe<string>; label?: Maybe<string>; description?: Maybe<string>; credentialParameters: Array<{ id: string; displayName: string; description?: Maybe<string>; admin: boolean; user: boolean; identifying: boolean; possibleValues?: Maybe<Array<Maybe<string>>>; encryption?: Maybe<AuthCredentialEncryption> }> }> }> }
 
 export type GetUserProfilePropertiesQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2311,6 +2310,7 @@ export const GetAuthProvidersDocument = `
         encryption
       }
     }
+    requiredFeatures
   }
 }
     `;

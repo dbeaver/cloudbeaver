@@ -133,7 +133,7 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return styled(styles)(
-    <field className={className}>
+    <field className={className} title={rest.title}>
       <switch-body>
         <switch-control>
           <switch-control-track />

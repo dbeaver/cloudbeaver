@@ -44,6 +44,14 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       if (serverConfig.enabledAuthProviders?.length === 0 && localProvider) {
         serverConfig.anonymousAccessEnabled = true;
       }
+
+      if (serverConfig.enabledAuthProviders?.length) {
+        serverConfig.enabledAuthProviders = serverConfig.enabledAuthProviders.filter(providerId => {
+          const provider = providers.resource.get(providerId)!;
+
+          return !provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+        });
+      }
     }],
   });
 
@@ -75,11 +83,14 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             <>
               {providers.resource.values.map(provider => {
                 const links = authProviderService.getServiceDescriptionLinks(provider);
+                const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+                const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
                 return (
                   <Switch
                     key={provider.id}
                     id={`authProvider_${provider.id}`}
+                    title={tooltip}
                     value={provider.id}
                     name="enabledAuthProviders"
                     state={serverConfig}
@@ -93,6 +104,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                       </>
                     )}
                     mod={['primary']}
+                    disabled={disabled}
                     small
                     autoHide
                   >
