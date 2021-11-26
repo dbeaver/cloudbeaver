@@ -59,7 +59,7 @@ type AuthProviderInfo {
 
     credentialProfiles: [AuthProviderCredentialsProfile!]!
 
-    credentialParameters: [AuthCredentialInfo!]! @deprecated
+    requiredFeatures: [String!]!
 }
 
 type UserAuthToken {
