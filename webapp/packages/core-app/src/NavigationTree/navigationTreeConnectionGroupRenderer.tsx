@@ -11,10 +11,10 @@ import styled, { css } from 'reshadow';
 import { Translate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
 import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
-import type { ElementsTreeCustomRendererComponent } from './useElementsTree';
 
-export function navigationTreeConnectionGroupRenderer(nodeId: string): ElementsTreeCustomRendererComponent | undefined {
+export function navigationTreeConnectionGroupRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {
   if (nodeId !== NAVIGATION_TREE_CONNECTION_GROUPS.manageable
   && nodeId !== NAVIGATION_TREE_CONNECTION_GROUPS.unmanageable) {
     return;
@@ -45,9 +45,9 @@ const styles = composes(
   `
 );
 
-const ManageableGroup: ElementsTreeCustomRendererComponent = function ManageableGroup() {
+const ManageableGroup: NavigationNodeRendererComponent = function ManageableGroup() {
   return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_connection_group_user' /></connection-group>);
 };
-const UnManageableGroup: ElementsTreeCustomRendererComponent = function UnManageableGroup() {
+const UnManageableGroup: NavigationNodeRendererComponent = function UnManageableGroup() {
   return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_connection_group_shared' /></connection-group>);
 };

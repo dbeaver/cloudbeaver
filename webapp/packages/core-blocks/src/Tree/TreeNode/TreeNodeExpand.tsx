@@ -41,7 +41,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
 }) {
   const context = useContext(TreeNodeContext);
 
-  if (context.externalExpanded) {
+  if (context.externalExpanded || context.disabled) {
     disabled = true;
   }
 

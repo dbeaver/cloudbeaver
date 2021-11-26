@@ -18,6 +18,7 @@ import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
+import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { NavigationTreeService } from './NavigationTreeService';
@@ -45,18 +46,18 @@ const styles = css`
 interface Props {
   root?: string;
   keepData?: boolean;
+  disabled?: boolean;
   selectionTree?: boolean;
   foldersTree?: boolean;
   showFolderExplorerPath?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
-  control?: React.FC<{
-    node: NavNode;
-  }>;
-  emptyPlaceholder: React.FC;
+  control?: NavTreeControlComponent;
+  emptyPlaceholder?: React.FC;
   className?: string;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
-  customSelect?: (node: NavNode, multiple: boolean) => void;
+  customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
+  beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onClick?: (node: NavNode) => Promise<void> | void;
@@ -66,9 +67,10 @@ interface Props {
 }
 
 export const ElementsTree = observer<Props>(function ElementsTree({
-  root = ROOT_NODE_PATH,
+  root: baseRoot = ROOT_NODE_PATH,
   control,
-  keepData,
+  keepData = false,
+  disabled,
   showFolderExplorerPath,
   localState,
   selectionTree = false,
@@ -78,6 +80,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   renderers,
   className,
   isGroup,
+  beforeSelect,
   customSelect,
   onExpand,
   onClick,
@@ -85,8 +88,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
-  const folderExplorer = useFolderExplorer(root);
-  root = folderExplorer.folder;
+  const folderExplorer = useFolderExplorer(baseRoot);
+  const root = folderExplorer.folder;
   const Placeholder = emptyPlaceholder;
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navigationTreeService = useService(NavigationTreeService);
@@ -98,13 +101,16 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
 
   const tree = useElementsTree({
+    baseRoot,
     root,
+    disabled,
     keepData,
     localState,
     filters: [nameFilter, ...(filters || [])],
     renderers,
     isGroup,
     onFilter,
+    beforeSelect,
     customSelect,
     onExpand,
     onSelect,
@@ -134,10 +140,14 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     [navNodeInfoResource]
   );
 
-  const hasChildren = children.data?.length !== 0;
-  let loading = children.isLoading();
+  const hasChildren = (children.data?.length || 0) > 0;
+  let loading = children.isLoading() || tree.loading;
 
-  if (tree.loading && !hasChildren) {
+  if (foldersTree && folderExplorer.root !== root) {
+    loading = false;
+  }
+
+  if (keepData && loading) {
     return styled(styles)(
       <center>
         <Loader />
@@ -145,14 +155,16 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     );
   }
 
-  if (!hasChildren && !loading) {
-    if (folderExplorer.root === folderExplorer.folder) {
-      return <Placeholder />;
+  if (!hasChildren) {
+    if (loading) {
+      return styled(styles)(
+        <center>
+          <Loader />
+        </center>
+      );
+    } else if (folderExplorer.root === folderExplorer.folder) {
+      return <>{Placeholder && <Placeholder />}</>;
     }
-  }
-
-  if (foldersTree && folderExplorer.root !== root) {
-    loading = false;
   }
 
   return styled(styles)(
@@ -160,7 +172,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       <FolderExplorer state={folderExplorer}>
         <tree className={className}>
           {showFolderExplorerPath && <FolderExplorerPath getName={getName} />}
-          <NavigationNodeNested nodeId={root} component={NavigationNodeElement} foldersTree={foldersTree} root />
+          <NavigationNodeNested nodeId={root} component={NavigationNodeElement} root />
           <Loader loading={loading} overlay={hasChildren} />
         </tree>
       </FolderExplorer>

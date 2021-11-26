@@ -27,6 +27,8 @@ interface Props extends ITreeNodeState {
 }
 
 export const TreeNodeControl = observer<Props>(function TreeNodeControl({
+  group,
+  disabled,
   loading,
   selected,
   filterValue,
@@ -38,6 +40,14 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   children,
 }) {
   const context = useContext(TreeNodeContext);
+
+  if (group !== undefined) {
+    context.group = group;
+  }
+
+  if (disabled !== undefined) {
+    context.disabled = disabled;
+  }
 
   if (loading !== undefined) {
     context.loading = loading;

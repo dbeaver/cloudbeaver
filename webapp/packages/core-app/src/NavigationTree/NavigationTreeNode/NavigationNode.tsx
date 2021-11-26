@@ -21,7 +21,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   expanded: expandedExternal,
 }) {
   const {
+    group,
     control,
+    disabled,
     selected,
     loading,
     expanded,
@@ -38,7 +40,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   return (
     <TreeNode
+      group={group}
       loading={loading}
+      disabled={disabled}
       selected={selected}
       expanded={expanded}
       externalExpanded={expandedExternal}

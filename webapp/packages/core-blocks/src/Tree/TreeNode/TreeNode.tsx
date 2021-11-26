@@ -7,7 +7,7 @@
  */
 
 import { observable } from 'mobx';
-import { memo } from 'react';
+import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -27,9 +27,11 @@ interface Props extends ITreeNodeState {
   onOpen?: () => Promise<void> | void;
 }
 
-export const TreeNode: React.FC<Props> = memo(function TreeNode({
+export const TreeNode: React.FC<Props> = observer(function TreeNode({
+  group = false,
   loading = false,
   selected = false,
+  disabled = false,
   filterValue = '',
   expanded = false,
   externalExpanded,
@@ -78,6 +80,8 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
       });
     },
   }), {
+    group: observable.ref,
+    disabled: observable.ref,
     processing: observable.ref,
     loading: observable.ref,
     selected: observable.ref,
@@ -86,6 +90,8 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
     leaf: observable.ref,
     filterValue: observable.ref,
   }, {
+    group,
+    disabled,
     loading,
     selected,
     expanded,

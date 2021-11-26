@@ -9,12 +9,14 @@
 import { createContext } from 'react';
 
 export interface ITreeNodeContext {
+  disabled: boolean;
   processing: boolean;
   expanded: boolean;
   externalExpanded: boolean;
   loading: boolean;
   selected: boolean;
   leaf: boolean;
+  group: boolean;
   select: (multiple?: boolean, nested?: boolean) => Promise<void>;
   filter: (value: string) => Promise<void>;
   filterValue: string;

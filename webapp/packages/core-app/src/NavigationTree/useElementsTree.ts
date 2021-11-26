@@ -18,18 +18,10 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
 import { NavigationTreeService } from './NavigationTreeService';
 
-export type ElementsTreeCustomRendererComponent = React.FC<{
-  nodeId: string;
-  component: React.FC<{
-    nodeId: string;
-    expanded?: boolean;
-  }>;
-  expanded?: boolean;
-}>;
-
-export type IElementsTreeCustomRenderer = (nodeId: string) => ElementsTreeCustomRendererComponent | undefined;
+export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
 
 export type IElementsTreeFilter = (
   node: NavNode,
@@ -44,12 +36,15 @@ export interface ITreeNodeState {
 }
 
 interface IOptions {
+  baseRoot: string;
   root: string;
+  disabled?: boolean;
   keepData?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
   customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
+  beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
@@ -57,12 +52,16 @@ interface IOptions {
 }
 
 export interface IElementsTree {
+  baseRoot: string;
   root: string;
   loading: boolean;
+  disabled: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
+  isNodeSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
+  isGroup?: (node: NavNode) => boolean;
   filter: (node: NavNode, value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
@@ -82,7 +81,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const state = options.localState || localTreeNodesState;
 
   useUserData<Array<[string, ITreeNodeState]>>(
-    `elements-tree-${options.root}`,
+    `elements-tree-${options.baseRoot}`,
     () => observable([] as any),
     async data => {
       if (options.keepData) {
@@ -198,8 +197,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
     }
 
     const treeNodeState = state.get(nodeId);
+    const selectionState = elementsTree.isNodeSelected(nodeId);
 
-    if (treeNodeState.selected === selected) {
+    if (selectionState === selected) {
       return;
     }
 
@@ -213,9 +213,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       if (children.length === 0) {
         return;
       }
+    } else {
+      treeNodeState.selected = selected;
     }
 
-    treeNodeState.selected = selected;
     await options.onSelect?.(node, selected);
   }
 
@@ -223,9 +224,23 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     state,
-    loading: options.keepData,
+    loading: options.keepData || false,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
+    },
+    isNodeSelected(nodeId: string): boolean {
+      const node = navNodeInfoResource.get(nodeId);
+
+      if (node && elementsTree.isGroup?.(node)) {
+        const children = getNodeChildren(nodeId);
+
+        if (children.length > 0) {
+          return children.every(child => elementsTree.getNodeState(child).selected);
+        } else {
+          return false;
+        }
+      }
+      return this.getNodeState(nodeId).selected;
     },
     getNodeChildren,
     async filter(node: NavNode, value: string) {
@@ -258,24 +273,34 @@ export function useElementsTree(options: IOptions): IElementsTree {
         return;
       }
 
-      const treeNodeState = this.state.get(node.id);
+      if (options.beforeSelect) {
+        await options.beforeSelect(node, multiple, nested);
+      }
+
+      const selected = this.isNodeSelected(node.id);
 
       if (!multiple) {
         await clearSelection(node.id);
 
-        if (treeNodeState.selected) {
+        if (selected) {
           return;
         }
       }
 
-      await setSelection(node.id, !treeNodeState.selected);
+      await setSelection(node.id, !selected);
     },
   }), {
+    isGroup: observable.ref,
+    disabled: observable.ref,
     root: observable.ref,
     loading: observable.ref,
     renderers: observable.ref,
+    baseRoot: observable.ref,
   }, {
+    isGroup: options.isGroup,
+    disabled: options.disabled,
     root: options.root,
+    baseRoot: options.baseRoot,
     renderers,
   });
 

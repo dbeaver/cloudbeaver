@@ -14,23 +14,19 @@ import styled from 'reshadow';
 import { TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
 import { TreeContext } from '../../TreeContext';
 
 interface Props {
   nodeId: string;
-  component: React.FC<{
-    nodeId: string;
-    expanded?: boolean;
-  }>;
+  component: NavTreeNodeComponent;
   root?: boolean;
-  foldersTree?: boolean;
 }
 
 export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
   nodeId,
   component,
   root,
-  foldersTree,
 }) {
   const styles = useStyles(TREE_NODE_STYLES);
   const treeContext = useContext(TreeContext);
@@ -43,7 +39,7 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
   const NavigationNode = component;
 
   if (root) {
-    if (foldersTree && treeContext?.folderExplorer.root !== nodeId) {
+    if (treeContext?.folderExplorer.folder !== treeContext?.folderExplorer.root) {
       return styled(styles)(
         <NavigationNode nodeId={nodeId} expanded />
       );

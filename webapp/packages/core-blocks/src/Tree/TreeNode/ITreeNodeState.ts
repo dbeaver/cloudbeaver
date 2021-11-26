@@ -7,6 +7,8 @@
  */
 
 export interface ITreeNodeState {
+  group?: boolean;
+  disabled?: boolean;
   loading?: boolean;
   selected?: boolean;
   externalExpanded?: boolean;

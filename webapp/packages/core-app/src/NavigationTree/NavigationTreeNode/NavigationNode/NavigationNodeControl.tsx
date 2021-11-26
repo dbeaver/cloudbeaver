@@ -15,11 +15,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
+import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
@@ -76,11 +76,7 @@ const styles = composes(
     }
 `);
 
-interface Props {
-  node: NavNode;
-}
-
-export const NavigationNodeControl = observer<Props>(function NavigationNodeControl({
+export const NavigationNodeControl: NavTreeControlComponent = observer(function NavigationNodeControl({
   node,
 }) {
   const treeNodeContext = useContext(TreeNodeContext);

@@ -34,8 +34,9 @@ export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/MENU_NAV_TREE';
-export * from './NavigationTree/TreeContext';
+export * from './NavigationTree/NavigationNodeComponent';
 export * from './NavigationTree/NavigationTreeService';
+export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/useElementsTree';
 export * from './AppLocaleService';
 

@@ -10,13 +10,24 @@ import type React from 'react';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 
-interface Props {
-  node: NavNode;
-  component: React.FC<{
-    nodeId: string;
-    expanded?: boolean;
-  }>;
+export type NavTreeNodeComponent = React.FC<{
+  nodeId: string;
   expanded?: boolean;
-}
+}>;
 
-export type NavigationNodeComponent = React.FC<Props>;
+export type NavTreeControlComponent = React.FC<{
+  node: NavNode;
+  expanded?: boolean;
+}>;
+
+export type NavigationNodeComponent = React.FC<{
+  node: NavNode;
+  component: NavTreeNodeComponent;
+  expanded?: boolean;
+}>;
+
+export type NavigationNodeRendererComponent = React.FC<{
+  nodeId: string;
+  component: NavTreeNodeComponent;
+  expanded?: boolean;
+}>;

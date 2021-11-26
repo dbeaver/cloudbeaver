@@ -14,12 +14,13 @@ import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
+import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import { TreeContext } from '../TreeContext';
 
 interface INavigationNode {
-  control?: React.FC<{
-    node: NavNode;
-  }>;
+  control?: NavTreeControlComponent;
+  disabled: boolean;
+  group: boolean;
   selected: boolean;
   loading: boolean;
   expanded: boolean;
@@ -45,6 +46,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   const isExpanded = state?.expanded || false;
 
   let leaf = isLeaf(node);
+  const group = contextRef.context?.tree.isGroup?.(node) || false;
   let expanded = isExpanded && !leaf;
 
   if (
@@ -66,17 +68,17 @@ export function useNavigationNode(node: NavNode): INavigationNode {
 
   useEffect(() => () => {
     if (!contextRef.context?.selectionTree) {
-      const state = contextRef.context?.tree.getNodeState(node.id);
-
-      if (state?.selected) {
+      if (contextRef.context?.tree.isNodeSelected(node.id)) {
         contextRef.context?.tree.select(node, true, false);
       }
     }
-  }, [node.id]);
+  }, [node]);
 
   return {
+    group,
     control: contextRef.context?.control,
-    selected: state?.selected || false,
+    disabled: contextRef.context?.tree.disabled || false,
+    selected: contextRef.context?.tree.isNodeSelected(node.id) || false,
     loading,
     expanded,
     leaf,

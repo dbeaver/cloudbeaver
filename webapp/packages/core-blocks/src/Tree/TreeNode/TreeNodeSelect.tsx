@@ -26,7 +26,7 @@ const styles = css`
 
 interface Props {
   group?: boolean;
-  onSelect?: () => void;
+  onSelect?: () => Promise<boolean | void> | boolean | void;
   selected?: boolean;
   disabled?: boolean;
   loadIndicator?: boolean;
@@ -47,6 +47,20 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     throw new Error('Context not provided');
   }
 
+  if (context.disabled) {
+    disabled = context.disabled;
+  }
+
+  if (group === undefined) {
+    group = context.group;
+  }
+
+  async function handleSelect() {
+    await onSelect?.();
+
+    context.select(true, group);
+  }
+
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
     EventContext.set(event, EventTreeNodeSelectFlag);
   };
@@ -63,7 +77,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
             <Checkbox
               checked={selected ?? context.selected}
               disabled={disabled}
-              onChange={onSelect ?? (() => context.select(true, group))}
+              onChange={handleSelect}
             />
           )}
     </div>
