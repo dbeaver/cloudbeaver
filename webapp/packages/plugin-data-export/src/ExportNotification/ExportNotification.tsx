@@ -22,7 +22,7 @@ import { ExportNotificationController } from './ExportNotificationController';
 
 const styles = css`
   message {
-    font-size: 16px;
+    composes: theme-typography--body1 from global;
     opacity: 0.8;
     overflow: auto;
     max-height: 100px;

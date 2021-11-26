@@ -14,15 +14,6 @@ mutation asyncSqlExecuteQuery(
         filter: $filter
         dataFormat: $dataFormat
     ) {
-        id
-        name
-        running
-        status
-        error {
-            message
-            errorCode
-            stackTrace
-        }
-        taskResult
+        ...AsyncTaskInfo
     }
 }

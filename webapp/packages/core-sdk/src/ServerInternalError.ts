@@ -15,7 +15,7 @@ export enum ServerErrorType {
 
 export class ServerInternalError extends DetailsError implements ServerError {
   readonly errorCode?: string;
-  readonly errorType?: string;
+  readonly errorType?: ServerErrorType;
   readonly stackTrace?: string;
   readonly causedBy?: ServerError;
 
@@ -23,7 +23,7 @@ export class ServerInternalError extends DetailsError implements ServerError {
     super(error.message);
     this.name = 'Server Internal Error';
     this.errorCode = error.errorCode;
-    this.errorType = error.errorType;
+    this.errorType = error.errorType as ServerErrorType;
     this.stackTrace = error.stackTrace;
     this.causedBy = error.causedBy;
   }

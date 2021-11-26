@@ -143,7 +143,7 @@ export const TableError = observer<Props>(function TableViewer({
         <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
           {translate('ui_error_close')}
         </Button>
-        {!quote && error.details?.hasDetails && (
+        {error.details?.hasDetails && (
           <Button type='button' mod={['outlined']} onClick={error.open}>
             {translate('ui_errors_details')}
           </Button>

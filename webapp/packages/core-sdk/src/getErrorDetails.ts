@@ -7,13 +7,14 @@
  */
 
 import { DetailsError } from './DetailsError';
+import { ServerErrorType } from './ServerInternalError';
 import { ServerInternalError } from './ServerInternalError';
 
 export interface IErrorDetails {
   name: string;
   message: string;
   hasDetails: boolean;
-  errorType?: string;
+  errorType?: ServerErrorType;
 }
 
 export function hasDetails(error: Error): error is DetailsError {
@@ -31,6 +32,9 @@ export function getErrorDetails(error: Error | DetailsError): IErrorDetails {
 
   if (error instanceof ServerInternalError && error.errorType) {
     details.errorType = error.errorType;
+    if (error.errorType === ServerErrorType.QUOTE_EXCEEDED) {
+      details.hasDetails = false;
+    }
   }
 
   return details;
