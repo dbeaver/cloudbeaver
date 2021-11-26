@@ -44,6 +44,9 @@ const styles = composes(
     ToolsPanel {
       border-bottom: none;
     }
+    [|table] {
+      min-height: 140px; /* loader overlay size */
+    }
 `);
 
 interface Props {
@@ -101,7 +104,7 @@ export const RolesPage = observer<Props>(function RolesPage({
               <CreateRole />
             </layout-grid-cell>
           )}
-          <layout-grid-cell {...use({ span: 12 })}>
+          <layout-grid-cell {...use({ span: 12, table: true })}>
             <RolesTable
               roles={table.roles}
               state={table.state}

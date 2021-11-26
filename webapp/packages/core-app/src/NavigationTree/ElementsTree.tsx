@@ -147,7 +147,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     loading = false;
   }
 
-  if (keepData && loading) {
+  if (keepData && tree.loading) {
     return styled(styles)(
       <center>
         <Loader />

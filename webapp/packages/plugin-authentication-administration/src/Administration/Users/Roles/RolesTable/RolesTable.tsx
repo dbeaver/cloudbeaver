@@ -19,7 +19,6 @@ import { Role } from './Role';
 const styles = css`
   Table {
     width: 100%;
-    min-height: 140px; /* loader overlay size */
   }
 `;
 

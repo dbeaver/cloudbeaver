@@ -59,6 +59,9 @@ const loaderStyle = css`
 const styles = css`
   Table {
     width: 100%;
+  }
+
+  [|table] {
     min-height: 140px; /* loader overlay size */
   }
 
@@ -137,7 +140,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
             <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
           </layout-grid-cell>
         )}
-        <layout-grid-cell {...use({ span: 12 })}>
+        <layout-grid-cell {...use({ span: 12, table: true })}>
           <Loader style={loaderStyle} state={usersResource} overlay>
             <Table
             keys={keys}
