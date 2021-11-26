@@ -7,8 +7,7 @@
  */
 
 import { DetailsError } from './DetailsError';
-import { ServerErrorType } from './ServerInternalError';
-import { ServerInternalError } from './ServerInternalError';
+import { ServerErrorType, ServerInternalError } from './ServerInternalError';
 
 export interface IErrorDetails {
   name: string;
