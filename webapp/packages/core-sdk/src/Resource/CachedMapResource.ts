@@ -296,7 +296,10 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     this.onItemDelete.execute(key);
-    ResourceKeyUtils.forEach(key, key => this.dataDelete(key));
+    ResourceKeyUtils.forEach(key, key => {
+      this.dataDelete(key);
+      this.metadata.delete(key);
+    });
     this.markUpdated(key);
   }
 

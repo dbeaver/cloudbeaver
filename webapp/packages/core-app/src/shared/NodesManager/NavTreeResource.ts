@@ -240,14 +240,16 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       return;
     }
 
-    for (const id of items) {
-      this.data.delete(id);
-    }
-
     const allKeys = resourceKeyList(items);
-    this.navNodeInfoResource.delete(allKeys);
-    this.markUpdated(allKeys);
+
     this.onItemDelete.execute(allKeys);
+    ResourceKeyUtils.forEach(key, key => {
+      this.dataDelete(key);
+      this.metadata.delete(key);
+    });
+    this.markUpdated(allKeys);
+
+    this.navNodeInfoResource.delete(allKeys);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
