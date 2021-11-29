@@ -243,7 +243,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     const allKeys = resourceKeyList(items);
 
     this.onItemDelete.execute(allKeys);
-    ResourceKeyUtils.forEach(key, key => {
+    ResourceKeyUtils.forEach(allKeys, key => {
       this.dataDelete(key);
       this.metadata.delete(key);
     });
