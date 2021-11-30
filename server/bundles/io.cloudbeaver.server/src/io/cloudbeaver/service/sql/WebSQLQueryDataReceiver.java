@@ -92,7 +92,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         if (rowLimit != null && rows.size() > rowLimit.longValue()) {
             throw new DBQuotaException(
-                "Result set rows quota exceeded", WebSQLConstants.QUOTA_PROP_ROW_LIMIT, rowLimit, rows.size());
+                "Result set rows quota exceeded", WebSQLConstants.QUOTA_PROP_ROW_LIMIT, rowLimit.longValue(), rows.size());
         }
     }
 

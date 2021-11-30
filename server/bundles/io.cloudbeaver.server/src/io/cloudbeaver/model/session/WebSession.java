@@ -600,7 +600,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     Number queryLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
                     if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
                         throw new DBQuotaException(
-                            "Maximum simultaneous queries quota exceeded", WebSQLConstants.QUOTA_PROP_QUERY_LIMIT, queryLimit, curTaskCount);
+                            "Maximum simultaneous queries quota exceeded", WebSQLConstants.QUOTA_PROP_QUERY_LIMIT, queryLimit.intValue(), curTaskCount);
                     }
 
                     runnable.run(taskMonitor);
