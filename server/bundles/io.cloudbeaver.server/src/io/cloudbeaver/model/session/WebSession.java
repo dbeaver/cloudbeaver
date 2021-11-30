@@ -65,6 +65,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -116,9 +117,9 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private final SessionContextImpl sessionAuthContext;
 
     @NotNull
-    public static File getUserProjectsFolder() {
+    public static Path getUserProjectsFolder() {
         return new File(
-            CBPlatform.getInstance().getWorkspace().getAbsolutePath(), USER_PROJECTS_FOLDER);
+            CBPlatform.getInstance().getWorkspace().getAbsolutePath(), USER_PROJECTS_FOLDER).toPath();
     }
 
     public WebSession(HttpSession httpSession) {
@@ -249,12 +250,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         DBPProject globalProject = platform.getWorkspace().getActiveProject();
 
         String projectName;
-        File projectPath;
+        Path projectPath;
         if (user != null) {
             projectName = CommonUtils.escapeFileName(user.getUserId());
-            projectPath = new File(
-                getUserProjectsFolder(),
-                projectName);
+            projectPath = getUserProjectsFolder().resolve(projectName);
         } else {
             projectName = CommonUtils.escapeFileName(getSessionId());
             // For anonymous sessions use path of global project

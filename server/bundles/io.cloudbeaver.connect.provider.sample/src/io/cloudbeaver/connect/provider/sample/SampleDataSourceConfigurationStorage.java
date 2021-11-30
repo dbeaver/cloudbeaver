@@ -22,7 +22,8 @@ import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +60,11 @@ public class SampleDataSourceConfigurationStorage implements DBPDataSourceConfig
 
     @Override
     public List<? extends DBPDataSourceContainer> loadDataSources(DBPDataSourceRegistry registry, Map<String, Object> options) throws DBException {
-        File metadataFolder = registry.getProject().getMetadataFolder(false);
-        if (metadataFolder.exists()) {
-            File sampleConfigFile = new File(metadataFolder, SAMPLE_CONFIG_NAME);
-            if (sampleConfigFile.exists()) {
-                log.debug("Loading provided connections from [" + sampleConfigFile.getAbsolutePath() + "]");
+        Path metadataFolder = registry.getProject().getMetadataFolder(false);
+        if (Files.exists(metadataFolder)) {
+            Path sampleConfigFile = metadataFolder.resolve(SAMPLE_CONFIG_NAME);
+            if (Files.exists(sampleConfigFile)) {
+                log.debug("Loading provided connections from [" + sampleConfigFile.toAbsolutePath() + "]");
                 List<? extends DBPDataSourceContainer> dsList = registry.loadDataSourcesFromFile(this, sampleConfigFile);
 //                for (DBPDataSourceContainer ds : dsList) {
 //                    log.debug("\tProvided connection: " + ds.getName());
