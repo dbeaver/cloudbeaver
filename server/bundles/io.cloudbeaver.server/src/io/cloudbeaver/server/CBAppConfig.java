@@ -166,6 +166,10 @@ public class CBAppConfig {
         return ArrayUtils.contains(getEnabledFeatures(), id);
     }
 
+    public boolean isFeaturesEnabled(String[] features) {
+        return ArrayUtils.contains(getEnabledFeatures(), features);
+    }
+
     public String[] getEnabledFeatures() {
         if (enabledFeatures == null) {
             // No config - enable all features (+backward compatibility)
@@ -202,6 +206,11 @@ public class CBAppConfig {
 
     public void setEnabledAuthProviders(String[] enabledAuthProviders) {
         this.enabledAuthProviders = enabledAuthProviders;
+    }
+
+    public String[] getAllAuthProviders() {
+        return WebServiceRegistry.getInstance().getAuthProviders()
+            .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
     }
 
     public DBNBrowseSettings getDefaultNavigatorSettings() {
