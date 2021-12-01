@@ -56,6 +56,7 @@ export const defaultRULocale = [
   ['ui_file', 'Файл'],
   ['ui_changes_will_be_lost', 'Ваши изменения будут потеряны'],
   ['ui_continue', 'Продолжить'],
+  ['ui_authentication', 'Аутентификация'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

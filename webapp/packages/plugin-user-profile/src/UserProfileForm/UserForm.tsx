@@ -9,11 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, Button, IconOrImage, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { AuthenticationPanel } from './Authentication/AuthenticationPanel';
+import { AuthenticationTab } from './Authentication/AuthenticationTab';
 import type { IUserProfileFormState } from './IUserProfileFormState';
 import { UserInfoPanel } from './UserInfo/UserInfoPanel';
 import { UserInfoTab } from './UserInfo/UserInfoTab';
@@ -126,6 +129,8 @@ export const UserForm = observer<Props>(function UserForm({
   const style = [tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
 
+  const localProvider = user.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);
+
   return styled(styles)(
     <flex-box>
       <TabsState>
@@ -141,6 +146,7 @@ export const UserForm = observer<Props>(function UserForm({
             </status-message>
             <TabList style={style} disabled={state.info.disabled}>
               <UserInfoTab style={style} />
+              {localProvider && <AuthenticationTab style={style} />}
               {/* <UserAuthProvidersTab style={style} /> */}
             </TabList>
           </top-bar-tabs>
@@ -158,6 +164,7 @@ export const UserForm = observer<Props>(function UserForm({
         </top-bar>
         <content-box>
           <UserInfoPanel user={user} style={style} />
+          {localProvider && <AuthenticationPanel style={style} />}
           {/* <UserAuthProviderPanel user={user} style={style} /> */}
         </content-box>
       </TabsState>

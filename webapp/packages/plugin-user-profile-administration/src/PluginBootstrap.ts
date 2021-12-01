@@ -6,21 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavService } from '@cloudbeaver/core-app';
+import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-
-import { UserMenu } from './UserMenu/UserMenu';
+import { UserMenu } from '@cloudbeaver/plugin-user-profile';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly topNavService: TopNavService
+    private readonly administrationTopAppBarService: AdministrationTopAppBarService
   ) {
     super();
   }
 
   register(): void {
-    this.topNavService.placeholder.add(UserMenu, 4);
+    this.administrationTopAppBarService.placeholder.add(UserMenu, 4);
   }
 
   load(): void { }
