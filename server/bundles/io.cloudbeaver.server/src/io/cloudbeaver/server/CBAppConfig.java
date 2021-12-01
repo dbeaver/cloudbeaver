@@ -167,7 +167,7 @@ public class CBAppConfig {
     }
 
     public boolean isFeaturesEnabled(String[] features) {
-        return ArrayUtils.contains(getEnabledFeatures(), features);
+        return ArrayUtils.containsAll(getEnabledFeatures(), features);
     }
 
     public String[] getEnabledFeatures() {
