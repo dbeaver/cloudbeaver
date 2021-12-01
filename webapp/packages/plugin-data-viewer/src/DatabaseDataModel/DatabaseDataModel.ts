@@ -117,12 +117,16 @@ implements IDatabaseDataModel<TOptions, TResult> {
     await this.requestDataAction(() => this.source.retry());
   }
 
-  async refresh(): Promise<void> {
-    await this.requestData();
+  async refresh(concurrent?: boolean): Promise<void> {
+    if (concurrent) {
+      await this.source.requestData();
+      return;
+    }
+    await this.requestDataAction(() => this.source.requestData());
   }
 
   async reload(): Promise<void> {
-    await this.requestDataAction(() => this
+    await this.requestDataAction(() => this.source
       .setSlice(0, this.countGain)
       .requestData()
     );
@@ -135,10 +139,6 @@ implements IDatabaseDataModel<TOptions, TResult> {
         .requestData()
       );
     }
-  }
-
-  async requestData(): Promise<void> {
-    await this.requestDataAction(() => this.source.requestData());
   }
 
   cancel(): Promise<void> | void {
@@ -157,8 +157,8 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return action();
   }
 
-  async requestDataAction(action: () => Promise<void> | void, concurrent?: boolean): Promise<void> {
-    if (this.currentTask && !concurrent) {
+  async requestDataAction(action: () => Promise<void> | void): Promise<void> {
+    if (this.currentTask) {
       return this.currentTask;
     }
 

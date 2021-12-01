@@ -70,8 +70,8 @@ export const OrderButton = observer<Props>(function OrderButton({
     const nextOrder = getNextOrder(currentOrder);
     await model.requestDataAction(async () => {
       constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
+      await model.refresh(true);
     });
-    await model.refresh();
   };
 
   return styled(styles)(

@@ -73,14 +73,14 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       return;
     }
 
-    await model.requestDataAction(() =>
-      constraints.deleteDataFilters()
-    );
+    await model.requestDataAction(async () => {
+      constraints.deleteDataFilters();
 
-    const applyNeeded = !!model.requestInfo.requestFilter;
-    if (applyNeeded) {
-      await model.refresh();
-    }
+      const applyNeeded = !!model.requestInfo.requestFilter;
+      if (applyNeeded) {
+        await model.refresh(true);
+      }
+    });
   }, []);
 
   return styled(useStyles(styles))(

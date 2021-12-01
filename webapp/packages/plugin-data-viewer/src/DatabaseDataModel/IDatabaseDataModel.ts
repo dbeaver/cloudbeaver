@@ -43,11 +43,10 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   requestOptionsChange: () => Promise<boolean>;
   requestDataAction: (action: () => Promise<void> | void) => Promise<void>;
   retry: () => Promise<void>;
-  save: (concurrent?: boolean) => Promise<void>;
-  refresh: () => Promise<void>;
+  save: () => Promise<void>;
+  refresh: (concurrent?: boolean) => Promise<void>;
   reload: () => Promise<void>;
   requestDataPortion: (offset: number, count: number) => Promise<void>;
-  requestData: () => Promise<void>;
   cancel: () => Promise<void> | void;
   resetData: () => void;
   dispose: () => Promise<void>;

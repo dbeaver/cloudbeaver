@@ -60,10 +60,10 @@ export class DataGridContextMenuFilterService {
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const columnLabel = data.getColumn(column)?.label || '';
 
-    await model.requestDataAction(() =>
-      constraints.setFilter(columnLabel, operator, filterValue)
-    );
-    await model.refresh();
+    await model.requestDataAction(async () => {
+      constraints.setFilter(columnLabel, operator, filterValue);
+      await model.refresh(true);
+    });
   }
 
   private async getClipboardValue() {
@@ -158,10 +158,10 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-          await model.requestDataAction(() =>
-            constraints.deleteData()
-          );
-          await model.refresh();
+          await model.requestDataAction(async () => {
+            constraints.deleteData();
+            await model.refresh(true);
+          });
         },
       }
     );
@@ -401,10 +401,10 @@ export class DataGridContextMenuFilterService {
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(key.column)?.label || '';
 
-          await model.requestDataAction(() =>
-            constraints.deleteFilter(columnLabel)
-          );
-          await model.refresh();
+          await model.requestDataAction(async () => {
+            constraints.deleteFilter(columnLabel);
+            await model.refresh(true);
+          });
         },
       }
     );
@@ -428,10 +428,10 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-          await model.requestDataAction(() =>
-            constraints.deleteDataFilters()
-          );
-          await model.refresh();
+          await model.requestDataAction(async () => {
+            constraints.deleteDataFilters();
+            await model.refresh(true);
+          });
         },
       }
     );

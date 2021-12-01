@@ -105,7 +105,7 @@ export class SqlQueryService {
       await model
         .setCountGain(getDefaultRowsCount())
         .setSlice(0)
-        .requestData();
+        .refresh();
 
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
     } catch (exception) {
@@ -179,7 +179,7 @@ export class SqlQueryService {
         await model
           .setCountGain(getDefaultRowsCount())
           .setSlice(0)
-          .requestData();
+          .refresh();
 
         statistics.executedQueries++;
         statistics.executeTime += source.requestInfo.requestDuration;
