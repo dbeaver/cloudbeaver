@@ -33,7 +33,9 @@ export class DataGridContextMenuOrderService {
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     const columnLabel = data.getColumn(column)?.label || '';
 
-    constraints.setOrder(columnLabel, order, true);
+    await model.requestDataAction(() =>
+      constraints.setOrder(columnLabel, order, true)
+    );
     await model.refresh();
   }
 
@@ -139,7 +141,9 @@ export class DataGridContextMenuOrderService {
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
           const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
-          constraints.deleteOrders();
+          await context.data.model.requestDataAction(() =>
+            constraints.deleteOrders()
+          );
           await context.data.model.refresh();
         },
       }

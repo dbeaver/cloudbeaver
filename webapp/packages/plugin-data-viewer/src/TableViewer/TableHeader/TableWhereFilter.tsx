@@ -66,18 +66,20 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
     model.refresh();
   }, []);
 
-  const resetFilter = useCallback(() => {
+  const resetFilter = useCallback(async () => {
     const { model, resultIndex } = props;
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
 
-    constraints.deleteDataFilters();
+    await model.requestDataAction(() =>
+      constraints.deleteDataFilters()
+    );
 
     const applyNeeded = !!model.requestInfo.requestFilter;
     if (applyNeeded) {
-      model.refresh();
+      await model.refresh();
     }
   }, []);
 

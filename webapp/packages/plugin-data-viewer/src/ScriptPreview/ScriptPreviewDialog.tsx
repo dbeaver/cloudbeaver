@@ -84,8 +84,8 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
       });
   }, [sqlDialectInfoService, connectionId]);
 
-  const apply = () => {
-    payload.model.source.saveData();
+  const apply = async () => {
+    await payload.model.save();
     rejectDialog();
   };
 

@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DialogComponent } from '../CommonDialog/CommonDialogService';
+import type { DialogComponent, DialogueStateResult } from '../CommonDialog/CommonDialogService';
 import { ConfirmationDialog } from '../CommonDialog/ConfirmationDialog';
 import type { ConfirmationDialogPayload } from '../CommonDialog/ConfirmationDialog';
 
-export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload> = function ConfirmationDialogDelete({
+export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload, DialogueStateResult | string> = function ConfirmationDialogDelete({
   payload,
   ...rest
 }) {

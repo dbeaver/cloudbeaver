@@ -30,10 +30,11 @@ implements IDatabaseDataSource<TOptions, TResult> {
   requestInfo: IRequestInfo;
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
+
   abstract get canCancel(): boolean;
 
   protected disabled: boolean;
-  private activeRequest: Promise<TResult[]> | null;
+  private activeRequest: Promise<TResult[] | null> | null;
   private activeSave: Promise<TResult[]> | null;
   private activeTask: Promise<any> | null;
   private lastAction: () => Promise<void>;
@@ -263,12 +264,13 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.lastAction = this.requestData.bind(this);
 
     try {
-      const promise = this.request(this.results);
+      this.activeRequest = this.requestDataAction();
 
-      if (promise instanceof Promise) {
-        this.activeRequest = promise;
+      const data = await this.activeRequest;
+
+      if (data !== null) {
+        this.setResults(data);
       }
-      this.setResults(await promise);
     } finally {
       this.activeRequest = null;
     }
@@ -314,4 +316,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
   abstract dispose(): Promise<void>;
+
+  async requestDataAction(): Promise<TResult[] | null> {
+    return this.request(this.results);
+  }
 }

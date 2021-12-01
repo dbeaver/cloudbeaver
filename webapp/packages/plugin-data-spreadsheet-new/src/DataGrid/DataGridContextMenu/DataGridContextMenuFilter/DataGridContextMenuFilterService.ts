@@ -60,7 +60,9 @@ export class DataGridContextMenuFilterService {
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const columnLabel = data.getColumn(column)?.label || '';
 
-    constraints.setFilter(columnLabel, operator, filterValue);
+    await model.requestDataAction(() =>
+      constraints.setFilter(columnLabel, operator, filterValue)
+    );
     await model.refresh();
   }
 
@@ -156,7 +158,9 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-          constraints.deleteData();
+          await model.requestDataAction(() =>
+            constraints.deleteData()
+          );
           await model.refresh();
         },
       }
@@ -397,7 +401,9 @@ export class DataGridContextMenuFilterService {
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(key.column)?.label || '';
 
-          constraints.deleteFilter(columnLabel);
+          await model.requestDataAction(() =>
+            constraints.deleteFilter(columnLabel)
+          );
           await model.refresh();
         },
       }
@@ -422,7 +428,9 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-          constraints.deleteDataFilters();
+          await model.requestDataAction(() =>
+            constraints.deleteDataFilters()
+          );
           await model.refresh();
         },
       }
