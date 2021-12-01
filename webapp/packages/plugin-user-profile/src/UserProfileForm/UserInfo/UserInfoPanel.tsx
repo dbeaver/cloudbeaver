@@ -45,7 +45,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 minLength={1}
                 state={user}
                 mod='surface'
-                disabled
                 readOnly
                 required
                 tiny
@@ -59,7 +58,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 minLength={1}
                 state={user}
                 mod='surface'
-                disabled
                 readOnly
                 required
                 tiny
@@ -68,14 +66,12 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 {translate('plugin_user_profile_info_displayName')}
               </InputField>
             </Container>
-
             <Loader state={userMetaParameters} inline>
               {() => userMetaParameters.data.length > 0 && styled(styles)(
                 <Container wrap gap>
                   <ObjectPropertyInfoForm
                     state={user.metaParameters}
                     properties={userMetaParameters.data}
-                    disabled
                     readOnly
                     tiny
                     fill
@@ -89,7 +85,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
             <AuthTokenList user={user} />
           </Group>
         </Container>
-
       </ColoredContainer>
     </TabPanel>
   );

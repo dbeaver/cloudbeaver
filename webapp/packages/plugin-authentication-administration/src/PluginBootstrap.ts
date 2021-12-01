@@ -9,7 +9,7 @@
 import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
-import { UserInfo } from '@cloudbeaver/plugin-authentication';
+import { UserMenu } from '@cloudbeaver/plugin-authentication';
 
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 
@@ -23,7 +23,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void {
-    this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
+    this.administrationTopAppBarService.placeholder.add(UserMenu, 4);
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
   }
 

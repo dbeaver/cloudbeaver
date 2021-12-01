@@ -9,16 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { topMenuStyles } from '@cloudbeaver/core-app';
-import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
 import { IconOrImage } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
-import { ContextMenu } from '@cloudbeaver/core-ui';
-import { useMenu } from '@cloudbeaver/core-view';
-
-import { MENU_USER_PROFILE } from './UserMenu/MENU_USER_PROFILE';
-import { userMenuStyles } from './UserMenu/userMenuStyles';
+import { useTranslate } from '@cloudbeaver/core-localization';
+import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
   user {
@@ -37,24 +31,37 @@ const styles = css`
   }
 `;
 
-export const UserInfo = observer(function UserInfo() {
-  const authInfoService = useService(AuthInfoService);
-  const style = useStyles(styles, userMenuStyles);
-  const menu = useMenu(MENU_USER_PROFILE);
-  menu.context.set(DATA_CONTEXT_USER, authInfoService.userInfo);
+const detachedStyles = composes(
+  css`
+    user {
+      composes: theme-ripple from global;
+    }
+  `,
+  css`
+    user {
+      padding: 0 16px;
+      cursor: pointer;
+    }
+  `
+);
 
-  if (!authInfoService.userInfo) {
-    return null;
-  }
+interface Props {
+  info: IUserInfo;
+  detached?: boolean;
+  tooltip?: string;
+  onClick?: () => void;
+}
+
+export const UserInfo = observer<Props>(function UserInfo({ info, detached, tooltip, onClick }) {
+  const translate = useTranslate();
+  const style = useStyles(styles, detached && detachedStyles);
 
   return styled(style)(
-    <ContextMenu menu={menu} style={[topMenuStyles]} rtl modal>
-      <user>
-        <user-icon>
-          <IconOrImage icon='user' viewBox='0 0 28 28' />
-        </user-icon>
-        <user-name>{authInfoService.userInfo.displayName || authInfoService.userInfo.userId}</user-name>
-      </user>
-    </ContextMenu>
+    <user title={translate(tooltip)} onClick={onClick}>
+      <user-icon>
+        <IconOrImage icon='user' viewBox='0 0 28 28' />
+      </user-icon>
+      <user-name>{info.displayName || info.userId}</user-name>
+    </user>
   );
 });

@@ -58,6 +58,7 @@ export const defaultENLocale = [
   ['ui_file', 'File'],
   ['ui_changes_will_be_lost', 'Your changes will be lost'],
   ['ui_continue', 'Continue'],
+  ['ui_authentication', 'Authentication'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

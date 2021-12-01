@@ -16,8 +16,8 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import { ContentSlider } from './ContentSlider';
 import { DrawerItem } from './DrawerItem';
-import { ItemContent } from './ItemContent';
 
 const tabsStyles = composes(
   css`
@@ -53,7 +53,7 @@ const administrationStyles = composes(
       padding-top: 16px;
       border-right: 2px solid;
     }
-    content {
+    content-container {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -95,13 +95,10 @@ export const Administration = observer<Props>(function Administration({
             />
           ))}
         </TabList>
-        <content ref={contentRef} as='div'>
+        <content-container ref={contentRef} as='div'>
           {children}
-          <ItemContent
-            activeScreen={activeScreen}
-            configurationWizard={configurationWizard}
-          />
-        </content>
+          <ContentSlider activeScreen={activeScreen} configurationWizard={configurationWizard} />
+        </content-container>
       </TabsState>
     </container>
   );
