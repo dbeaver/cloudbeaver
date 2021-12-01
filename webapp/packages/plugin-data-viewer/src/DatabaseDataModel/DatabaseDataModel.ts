@@ -8,10 +8,11 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IDatabaseDataModel } from './IDatabaseDataModel';
+import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
@@ -29,10 +30,18 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.supportedDataFormats;
   }
 
+  readonly onOptionsChange: IExecutor;
+  readonly onRequest: IExecutor<IRequestEventData>;
+
+  private currentTask: Promise<void> | null;
+
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.id = uuid();
     this.source = source;
     this.countGain = 0;
+    this.onOptionsChange = new Executor();
+    this.onRequest = new Executor();
+    this.currentTask = null;
 
     makeObservable(this, {
       countGain: observable,
@@ -94,8 +103,18 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this;
   }
 
+  async requestOptionsChange(): Promise<boolean> {
+    const contexts = await this.onOptionsChange.execute();
+
+    return ExecutorInterrupter.isInterrupted(contexts) === false;
+  }
+
+  async save(): Promise<void> {
+    await this.requestSaveAction(() => this.source.saveData());
+  }
+
   async retry(): Promise<void> {
-    await this.source.retry();
+    await this.requestDataAction(() => this.source.retry());
   }
 
   async refresh(): Promise<void> {
@@ -103,21 +122,23 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   async reload(): Promise<void> {
-    await this
+    await this.requestDataAction(() => this
       .setSlice(0, this.countGain)
-      .requestData();
+      .requestData()
+    );
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
     if (!this.isDataAvailable(offset, count)) {
-      await this.source
+      await this.requestDataAction(() => this.source
         .setSlice(offset, count)
-        .requestData();
+        .requestData()
+      );
     }
   }
 
   async requestData(): Promise<void> {
-    await this.source.requestData();
+    await this.requestDataAction(() => this.source.requestData());
   }
 
   cancel(): Promise<void> | void {
@@ -130,5 +151,33 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   async dispose(): Promise<void> {
     await this.source.dispose();
+  }
+
+  async requestSaveAction(action: () => Promise<void> | void): Promise<void> {
+    return action();
+  }
+
+  async requestDataAction(action: () => Promise<void> | void, concurrent?: boolean): Promise<void> {
+    if (this.currentTask && !concurrent) {
+      return this.currentTask;
+    }
+
+    try {
+      this.currentTask = this.requestDataActionTask(action);
+      return await this.currentTask;
+    } finally {
+      this.currentTask = null;
+    }
+  }
+
+  private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
+    const contexts = await this.onRequest.execute({ type: 'before' });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
+    await action();
+    await this.onRequest.execute({ type: 'after' });
   }
 }

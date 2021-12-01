@@ -13,11 +13,12 @@ import { TLocalizationToken, Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
-import type { DialogComponent } from './CommonDialogService';
+import type { DialogComponent, DialogueStateResult } from './CommonDialogService';
 
 const style = css`
   footer {
     align-items: center;
+    gap: 16px;
   }
 
   fill {
@@ -34,9 +35,11 @@ export interface ConfirmationDialogPayload {
   message: TLocalizationToken;
   confirmActionText?: TLocalizationToken;
   cancelActionText?: TLocalizationToken;
+  extraActionText?: TLocalizationToken;
+  extraStatus?: string;
 }
 
-export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = function ConfirmationDialog({
+export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, DialogueStateResult | string> = function ConfirmationDialog({
   payload,
   resolveDialog,
   rejectDialog,
@@ -64,6 +67,15 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
             <Translate token={cancelActionText || 'ui_processing_cancel'} />
           </Button>
           <fill />
+          {payload.extraStatus !== undefined && (
+            <Button
+              type="button"
+              mod={['outlined']}
+              onClick={() => resolveDialog(payload.extraStatus)}
+            >
+              <Translate token={cancelActionText || 'ui_no'} />
+            </Button>
+          )}
           <Button
             type="button"
             mod={['unelevated']}

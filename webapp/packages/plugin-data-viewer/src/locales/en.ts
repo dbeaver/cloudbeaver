@@ -12,6 +12,8 @@ export default [
   ['data_viewer_action_edit_delete', 'Delete selected'],
   ['data_viewer_action_edit_add', 'Add'],
   ['data_viewer_action_edit_revert', 'Revert selected'],
+  ['data_viewer_result_edited_title', 'Save result set edit'],
+  ['data_viewer_result_edited_message', 'Result set was edited. Do you want to save changes in database?'],
   ['data_viewer_presentation_value_title', 'Value'],
   ['data_viewer_presentation_value_text_title', 'Text'],
   ['data_viewer_presentation_value_text_plain_title', 'Text'],

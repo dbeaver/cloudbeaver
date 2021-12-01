@@ -62,14 +62,16 @@ export const OrderButton = observer<Props>(function OrderButton({
     icon = 'order-arrow-down';
   }
 
-  const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSort = async (e: React.MouseEvent<HTMLDivElement>) => {
     if (loading) {
       return;
     }
 
     const nextOrder = getNextOrder(currentOrder);
-    constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
-    model.refresh();
+    await model.requestDataAction(async () => {
+      constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
+    });
+    await model.refresh();
   };
 
   return styled(styles)(
