@@ -22,6 +22,7 @@ export const slideBoxStyles = composes(
         height: 100%;
         display: inline-block;
         vertical-align:top;
+        white-space: normal;
         transition: transform cubic-bezier(0.4, 0.0, 0.2, 1) 0.6s;
         transform: translateX(calc(-100% + 120px));
 

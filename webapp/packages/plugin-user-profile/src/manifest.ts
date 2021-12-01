@@ -9,7 +9,6 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
 import { UserProfileService } from './UserProfileService';
 
 export const userProfilePlugin: PluginManifest = {
@@ -18,7 +17,6 @@ export const userProfilePlugin: PluginManifest = {
   },
 
   providers: [
-    PluginBootstrap,
     LocaleService,
     UserProfileService,
   ],

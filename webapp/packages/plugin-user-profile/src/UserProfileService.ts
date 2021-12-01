@@ -47,7 +47,7 @@ export class UserProfileService {
     }
   }
 
-  async open(): Promise<boolean> {
+  open = async (): Promise<boolean> => {
     const state = await this.optionsPanelService.open(formGetter);
 
     if (state) {
@@ -55,7 +55,7 @@ export class UserProfileService {
     }
 
     return state;
-  }
+  };
 
   async close(saved?: boolean): Promise<void> {
     if (saved) {

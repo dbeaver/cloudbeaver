@@ -10,14 +10,15 @@ import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, verticalTabStyles, SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
-import { ContentSlider } from './ContentSlider';
 import { DrawerItem } from './DrawerItem';
+import { ItemContent } from './ItemContent';
 
 const tabsStyles = composes(
   css`
@@ -59,6 +60,15 @@ const administrationStyles = composes(
       flex-direction: column;
       overflow: auto;
     }
+    SlideBox {
+      flex: 1;
+    }
+    content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+    }
   `
 );
 
@@ -73,6 +83,9 @@ export const Administration = observer<Props>(function Administration({
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationItemService = useService(AdministrationItemService);
+  const optionsPanelService = useService(OptionsPanelService);
+
+  const OptionsPanel = optionsPanelService.getPanelComponent();
   const items = administrationItemService.getActiveItems(configurationWizard);
   const hasOnlyActive = items.some(filterOnlyActive(configurationWizard));
 
@@ -80,7 +93,7 @@ export const Administration = observer<Props>(function Administration({
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
-  return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
+  return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
     <container>
       <TabsState currentTabId={activeScreen?.item} orientation='vertical'>
         <TabList aria-label="Administration items">
@@ -97,7 +110,23 @@ export const Administration = observer<Props>(function Administration({
         </TabList>
         <content-container ref={contentRef} as='div'>
           {children}
-          <ContentSlider activeScreen={activeScreen} configurationWizard={configurationWizard} />
+          <SlideBox open={optionsPanelService.active}>
+            <SlideElement>
+              <ErrorBoundary remount>
+                <content>
+                  <OptionsPanel />
+                </content>
+              </ErrorBoundary>
+            </SlideElement>
+            <SlideElement>
+              <ErrorBoundary remount>
+                <content>
+                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                </content>
+              </ErrorBoundary>
+              <SlideOverlay onClick={() => optionsPanelService.close()} />
+            </SlideElement>
+          </SlideBox>
         </content-container>
       </TabsState>
     </container>

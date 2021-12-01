@@ -10,28 +10,13 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { UserProfileService } from '@cloudbeaver/plugin-user-profile';
 
-const styles = css`
-  user {
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-  IconOrImage {
-    display: block;
-    width: 24px;
-  }
-  user-name {
-    display: block;
-    line-height: initial;
-    margin-left: 8px;
-  }
-`;
-
-const detachedStyles = composes(
+const styles = composes(
   css`
     user {
       composes: theme-ripple from global;
@@ -39,25 +24,34 @@ const detachedStyles = composes(
   `,
   css`
     user {
+      height: 100%;
+      display: flex;
+      align-items: center;
       padding: 0 16px;
       cursor: pointer;
     }
-  `
-);
+    IconOrImage {
+      display: block;
+      width: 24px;
+    }
+    user-name {
+      display: block;
+      line-height: initial;
+      margin-left: 8px;
+    }
+`);
 
 interface Props {
   info: IUserInfo;
-  detached?: boolean;
-  tooltip?: string;
-  onClick?: () => void;
 }
 
-export const UserInfo = observer<Props>(function UserInfo({ info, detached, tooltip, onClick }) {
+export const UserInfo = observer<Props>(function UserInfo({ info }) {
   const translate = useTranslate();
-  const style = useStyles(styles, detached && detachedStyles);
+  const style = useStyles(styles);
+  const userProfileService = useService(UserProfileService);
 
   return styled(style)(
-    <user title={translate(tooltip)} onClick={onClick}>
+    <user title={translate('plugin_user_profile_menu')} onClick={userProfileService.open}>
       <user-icon>
         <IconOrImage icon='user' viewBox='0 0 28 28' />
       </user-icon>

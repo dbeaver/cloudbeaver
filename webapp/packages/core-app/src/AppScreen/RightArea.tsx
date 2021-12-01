@@ -47,9 +47,6 @@ const styles = composes(
     SlideBox {
       flex: 1;
     }
-    SlideElement {
-      display: flex;
-    }
   `
 );
 
