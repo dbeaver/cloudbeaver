@@ -63,7 +63,6 @@ import org.jkiss.utils.CommonUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -118,8 +117,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
     @NotNull
     public static Path getUserProjectsFolder() {
-        return new File(
-            CBPlatform.getInstance().getWorkspace().getAbsolutePath(), USER_PROJECTS_FOLDER).toPath();
+        return CBPlatform.getInstance().getWorkspace().getAbsolutePath().resolve(USER_PROJECTS_FOLDER);
     }
 
     public WebSession(HttpSession httpSession) {

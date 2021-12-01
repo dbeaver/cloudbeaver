@@ -50,6 +50,9 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.osgi.framework.Bundle;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,7 +74,7 @@ public class CBPlatform extends BasePlatformImpl {
     @Nullable
     private static CBApplication application = null;
 
-    private File tempFolder;
+    private Path tempFolder;
 
     private QMControllerImpl queryManager;
     private QMLogFileWriter qmLogWriter;
@@ -208,8 +211,8 @@ public class CBPlatform extends BasePlatformImpl {
         // Remove temp folder
         if (tempFolder != null) {
 
-            if (!ContentUtils.deleteFileRecursive(tempFolder)) {
-                log.warn("Can't delete temp folder '" + tempFolder.getAbsolutePath() + "'");
+            if (!ContentUtils.deleteFileRecursive(tempFolder.toFile())) {
+                log.warn("Can't delete temp folder '" + tempFolder.toAbsolutePath() + "'");
             }
             tempFolder = null;
         }
@@ -282,18 +285,24 @@ public class CBPlatform extends BasePlatformImpl {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
-            tempFolder = new File(workspace.getAbsolutePath(), WORK_DATA_FOLDER_NAME);
+            tempFolder = workspace.getAbsolutePath().resolve(WORK_DATA_FOLDER_NAME);
         }
-        if (!tempFolder.exists() && !tempFolder.mkdirs()) {
-            log.error("Can't create temp directory!");
-        }
-        File folder = new File(tempFolder, name);
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                log.error("Error creating temp folder '" + folder.getAbsolutePath() + "'");
+        if (!Files.exists(tempFolder)) {
+            try {
+                Files.createDirectories(tempFolder);
+            } catch (IOException e) {
+                log.error("Can't create temp directory " + tempFolder, e);
             }
         }
-        return folder;
+        Path folder = tempFolder.resolve(name);
+        if (!Files.exists(folder)) {
+            try {
+                Files.createDirectories(folder);
+            } catch (IOException e) {
+                log.error("Error creating temp folder '" + folder.toAbsolutePath() + "'", e);
+            }
+        }
+        return folder.toFile();
     }
 
     @NotNull

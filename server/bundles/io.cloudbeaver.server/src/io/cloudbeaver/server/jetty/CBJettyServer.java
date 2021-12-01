@@ -19,7 +19,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 public class CBJettyServer {
@@ -93,11 +95,13 @@ public class CBJettyServer {
 
     private void initSessionManager(ServletContextHandler servletContextHandler) {
         // Init sessions persistence
-        File metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
-        File sessionCacheFolder = new File(metadataFolder, SESSION_CACHE_DIR);
-        if (!sessionCacheFolder.exists()) {
-            if (!sessionCacheFolder.mkdirs()) {
-                log.error("Can't create http session cache directory '" + sessionCacheFolder.getAbsolutePath() + "'");
+        Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
+        Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
+        if (!Files.exists(sessionCacheFolder)) {
+            try {
+                Files.createDirectories(sessionCacheFolder);
+            } catch (IOException e) {
+                log.error("Can't create http session cache directory '" + sessionCacheFolder.toAbsolutePath() + "'", e);
                 return;
             }
         }
@@ -117,7 +121,7 @@ public class CBJettyServer {
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         FileSessionDataStore sessionStore = new FileSessionDataStore();
 
-        sessionStore.setStoreDir(sessionCacheFolder);
+        sessionStore.setStoreDir(sessionCacheFolder.toFile());
         sessionCache.setSessionDataStore(sessionStore);
         sessionHandler.setSessionCache(sessionCache);
         servletContextHandler.setSessionHandler(sessionHandler);

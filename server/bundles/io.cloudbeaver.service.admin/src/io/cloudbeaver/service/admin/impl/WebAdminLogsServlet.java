@@ -14,10 +14,10 @@ import org.jkiss.utils.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class WebAdminLogsServlet extends WebServiceServletBase {
 
@@ -42,8 +42,8 @@ public class WebAdminLogsServlet extends WebServiceServletBase {
         if (logFileName.contains("/") || logFileName.contains("\\")) {
             throw new DBWebException("Bad log file name");
         }
-        File logFile = new File(GeneralUtils.getMetadataFolder(), logFileName);
-        if (!logFile.exists()) {
+        Path logFile = GeneralUtils.getMetadataFolder().resolve(logFileName);
+        if (!Files.exists(logFile)) {
             throw new DBWebException("Log file '" + logFileName + "' not found");
         }
 
@@ -53,7 +53,7 @@ public class WebAdminLogsServlet extends WebServiceServletBase {
         }
         response.setHeader("Content-Disposition", "attachment; filename=\"" + logFileName + "\"");
 
-        try (InputStream is = new FileInputStream(logFile)) {
+        try (InputStream is = Files.newInputStream(logFile)) {
             IOUtils.copyStream(is, response.getOutputStream());
         }
     }
