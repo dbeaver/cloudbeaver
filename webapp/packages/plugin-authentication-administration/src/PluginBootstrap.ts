@@ -6,24 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
-import { UserMenu } from '@cloudbeaver/plugin-authentication';
 
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private administrationTopAppBarService: AdministrationTopAppBarService,
     private readonly serverConfigurationService: ServerConfigurationService,
   ) {
     super();
   }
 
   register(): void {
-    this.administrationTopAppBarService.placeholder.add(UserMenu, 4);
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
   }
 

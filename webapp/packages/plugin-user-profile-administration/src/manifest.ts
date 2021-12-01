@@ -8,18 +8,14 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
-import { UserProfileService } from './UserProfileService';
 
-export const userProfilePlugin: PluginManifest = {
+export const userProfileAdministrationPlugin: PluginManifest = {
   info: {
-    name: 'User profile plugin',
+    name: 'User profile administration plugin',
   },
 
   providers: [
     PluginBootstrap,
-    LocaleService,
-    UserProfileService,
   ],
 };

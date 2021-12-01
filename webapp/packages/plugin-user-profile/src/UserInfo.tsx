@@ -14,7 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { UserProfileService } from '@cloudbeaver/plugin-user-profile';
+
+import { UserProfileService } from './UserProfileService';
 
 const styles = composes(
   css`
@@ -51,7 +52,7 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
   const userProfileService = useService(UserProfileService);
 
   return styled(style)(
-    <user title={translate('plugin_user_profile_menu')} onClick={userProfileService.open}>
+    <user title={translate('plugin_user_profile_menu')} onClick={() => userProfileService.open()}>
       <user-icon>
         <IconOrImage icon='user' viewBox='0 0 28 28' />
       </user-icon>

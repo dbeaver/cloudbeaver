@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
+import { SettingsMenuService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
-import { UserMenu } from './UserMenu/UserMenu';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -23,7 +22,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly authenticationService: AuthenticationService,
     private readonly authInfoService: AuthInfoService,
     private readonly settingsMenuService: SettingsMenuService,
-    private readonly topNavService: TopNavService,
   ) {
     super();
   }
@@ -50,7 +48,6 @@ export class PluginBootstrap extends Bootstrap {
         onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
     );
-    this.topNavService.placeholder.add(UserMenu, 4);
   }
 
   load(): void | Promise<void> { }
