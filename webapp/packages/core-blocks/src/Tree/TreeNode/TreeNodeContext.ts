@@ -10,19 +10,19 @@ import { createContext } from 'react';
 
 export interface ITreeNodeContext {
   disabled: boolean;
-  processing: boolean;
+  readonly processing: boolean;
   expanded: boolean;
   externalExpanded: boolean;
   loading: boolean;
   selected: boolean;
   leaf: boolean;
   group: boolean;
-  select: (multiple?: boolean, nested?: boolean) => Promise<void>;
-  filter: (value: string) => Promise<void>;
+  readonly select: (multiple?: boolean, nested?: boolean) => Promise<void>;
+  readonly filter: (value: string) => Promise<void>;
   filterValue: string;
-  click?: () => Promise<void>;
-  expand: () => Promise<void>;
-  open: () => Promise<void>;
+  readonly click?: () => Promise<void>;
+  readonly expand: () => Promise<void>;
+  readonly open: () => Promise<void>;
 }
 
 export const TreeNodeContext = createContext<ITreeNodeContext>(undefined as any);

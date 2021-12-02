@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
@@ -27,6 +27,10 @@ interface Props extends ITreeNodeState {
   onOpen?: () => Promise<void> | void;
 }
 
+interface IInnerTreeNodeContext extends ITreeNodeContext {
+  inProgress: number;
+}
+
 export const TreeNode: React.FC<Props> = observer(function TreeNode({
   group = false,
   loading = false,
@@ -43,17 +47,20 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   const handlersRef = useObjectRef(handlers);
 
   async function processAction(action: () => Promise<void>) {
-    nodeContext.processing = true;
+    nodeContext.inProgress++;
 
     try {
       await action();
     } finally {
-      nodeContext.processing = false;
+      nodeContext.inProgress--;
     }
   }
 
-  const nodeContext = useObservableRef<ITreeNodeContext>(() => ({
-    processing: false,
+  const nodeContext = useObservableRef<IInnerTreeNodeContext>(() => ({
+    get processing() {
+      return this.inProgress > 0;
+    },
+    inProgress: 0,
     async click() {
       await processAction(async () => {
         await handlersRef.onClick?.(this.leaf);
@@ -82,7 +89,8 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   }), {
     group: observable.ref,
     disabled: observable.ref,
-    processing: observable.ref,
+    processing: computed,
+    inProgress: observable.ref,
     loading: observable.ref,
     selected: observable.ref,
     expanded: observable.ref,

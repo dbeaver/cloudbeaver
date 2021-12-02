@@ -73,7 +73,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
     context.externalExpanded = externalExpanded;
   }
 
-  const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleEnter = async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
@@ -81,13 +81,13 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
     EventContext.set(event, EventTreeNodeSelectFlag);
     switch ((event as unknown as KeyboardEvent).code) {
       case KEY.ENTER:
-        context.select(event.ctrlKey || event.metaKey);
+        await context.select(event.ctrlKey || event.metaKey);
         break;
     }
     return true;
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     if (onClick) {
       onClick(event);
     }
@@ -96,14 +96,14 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
       return;
     }
 
-    context.click?.();
+    await context.click?.();
   };
 
-  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleDbClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
-    context.open();
+    await context.open();
   };
 
   return (

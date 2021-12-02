@@ -47,11 +47,11 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
 
   leaf = context.leaf || leaf;
 
-  const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleExpand = async (event: React.MouseEvent<HTMLDivElement>) => {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
     if (!leaf && !disabled) {
-      context.expand();
+      await context.expand();
     }
   };
 

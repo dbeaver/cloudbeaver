@@ -57,14 +57,14 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     expanded = false;
   }
 
-  const handleClick = async (leaf: boolean) => contextRef.context?.onClick?.(node, leaf);
-  const handleOpen = async () => contextRef.context?.onOpen?.(node);
-  const handleExpand = async () => contextRef.context?.tree.expand(node, !expanded);
+  const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, leaf);
+  const handleOpen = async () => await contextRef.context?.onOpen?.(node);
+  const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
   const handleSelect = async (
     multiple = false,
     nested = false
-  ) => contextRef.context?.tree.select(node, multiple, nested);
-  const handleFilter = async (value: string) => contextRef.context?.tree.filter(node, value);
+  ) => await contextRef.context?.tree.select(node, multiple, nested);
+  const handleFilter = async (value: string) => await contextRef.context?.tree.filter(node, value);
 
   useEffect(() => () => {
     if (!contextRef.context?.selectionTree) {

@@ -58,7 +58,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   async function handleSelect() {
     await onSelect?.();
 
-    context.select(true, group);
+    await context.select(true, group);
   }
 
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
