@@ -194,6 +194,12 @@ extend type Query {
         simpleMode: Boolean
     ): [ SQLCompletionProposal ]
 
+    sqlFormatQuery(
+        connectionId: ID!,
+        contextId: ID!,
+        query: String!
+    ): String!
+
     sqlSupportedOperations(
         connectionId: ID!,
         contextId: ID!,
