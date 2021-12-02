@@ -45,7 +45,7 @@ const style = composes(
       }
       &[|collapsed] {
         pointer-events: auto;
-        width: 72px;
+        width: 92px;
         height: 72px;
         background: transparent!important;
 
