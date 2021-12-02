@@ -66,6 +66,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("simpleMode")
                 )
             )
+            .dataFetcher("sqlFormatQuery", env ->
+                getService(env).formatQuery(
+                    getSQLContext(env),
+                    env.getArgument("query")
+                )
+            )
             .dataFetcher("sqlSupportedOperations", env ->
                 getService(env).getSupportedOperations(
                     getSQLContext(env),
@@ -97,7 +103,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getSQLContext(env),
                     env.getArgument("defaultCatalog"),
                     env.getArgument("defaultSchema"));
-                    return true;
+                return true;
             })
 
             .dataFetcher("sqlResultClose", env ->

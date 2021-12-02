@@ -35,13 +35,11 @@ import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
-import org.jkiss.dbeaver.model.sql.SQLQuery;
-import org.jkiss.dbeaver.model.sql.SQLScriptElement;
-import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.sql.format.SQLFormatUtils;
 import org.jkiss.dbeaver.model.sql.generator.SQLGenerator;
 import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
@@ -149,6 +147,15 @@ public class WebServiceSQL implements DBWServiceSQL {
         } catch (DBException e) {
             throw new DBWebException("Error processing SQL proposals", e);
         }
+    }
+
+    @NotNull
+    public String formatQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String query) throws DBWebException {
+        DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
+        if (dataSource == null) {
+            throw new DBWebException("DataSource is null: can't format SQL query");
+        }
+        return SQLFormatUtils.formatSQL(dataSource, query);
     }
 
     @Override
