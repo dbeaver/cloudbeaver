@@ -50,6 +50,9 @@ public interface DBWServiceSQL extends DBWService {
         Boolean simpleMode) throws DBWebException;
 
     @WebAction
+    String formatQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String query) throws DBWebException;
+
+    @WebAction
     DBCLogicalOperator[] getSupportedOperations(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
