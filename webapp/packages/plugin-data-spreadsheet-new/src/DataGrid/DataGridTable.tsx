@@ -12,11 +12,14 @@ import DataGrid from 'react-data-grid';
 import type { DataGridHandle } from 'react-data-grid';
 import styled from 'reshadow';
 
-import { TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
 import { Executor } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps, IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps,
+  IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -31,6 +34,11 @@ import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
 import { useTableData } from './useTableData';
+
+interface IInnerState {
+  lastCount: number;
+  lastScrollTop: number;
+}
 
 function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
   const target = event.target as HTMLDivElement;
@@ -47,7 +55,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const dataGridRef = useRef<DataGridHandle>(null);
-  const lastCount = useRef<number>(0);
+  const innerState = useObjectRef<IInnerState>(() => ({
+    lastCount: 0,
+    lastScrollTop: 0,
+  }), false);
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
@@ -198,7 +209,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
     if (
       gridDiv
-      && lastCount.current > model.source.count
+      && innerState.lastCount > model.source.count
       && model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
     ) {
       gridDiv.scrollTo({
@@ -206,7 +217,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       });
     }
 
-    lastCount.current = model.source.count;
+    innerState.lastCount = model.source.count;
   }, [model.source.count]);
 
   const handleFocusChange = (position: CellPosition) => {
@@ -229,7 +240,12 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   const handleScroll = useCallback(
     async (event: React.UIEvent<HTMLDivElement>) => {
-      if (!isAtBottom(event)) {
+      const target = event.target as HTMLDivElement;
+      const toBottom = target.scrollTop > innerState.lastScrollTop;
+
+      innerState.lastScrollTop = target.scrollTop;
+
+      if (!toBottom || !isAtBottom(event)) {
         return;
       }
 
