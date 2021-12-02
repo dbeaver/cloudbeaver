@@ -82,7 +82,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   }
 
   return styled(style)(
-    <ColoredContainer parent>
+    <ColoredContainer parent overflow>
       <Group box keepSize large>
         <Table selectedItems={controller.selectedConnections} size='big' onSelect={controller.handleConnectionsAccessChange}>
           <TableHeader>
