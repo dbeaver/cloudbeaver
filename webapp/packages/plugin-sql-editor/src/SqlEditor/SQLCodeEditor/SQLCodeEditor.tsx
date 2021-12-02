@@ -18,6 +18,7 @@ import { SQLCodeEditorController } from './SQLCodeEditorController';
 export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorController>(function SQLCodeEditor(props, ref) {
   const controller = useController(SQLCodeEditorController);
   controller.setDialect(props.dialect);
+  controller.setReadonly(props.readonly || false);
 
   useMemo(() => {
     controller.setBindings(props.bindings);

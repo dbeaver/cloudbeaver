@@ -8,7 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Editor, EditorConfiguration, findModeByName, ModeSpec } from 'codemirror';
+import { Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
@@ -82,7 +82,10 @@ export class SQLCodeEditorController {
     onBeforeChange: () => {},
   };
 
+  private readonlyState: boolean;
+
   constructor() {
+    this.readonlyState = false;
     makeObservable<this, 'dialect' | 'editor'>(this, {
       dialect: observable.ref,
       editor: observable.ref,
@@ -102,9 +105,12 @@ export class SQLCodeEditorController {
         bindings.editorDidMount!(editor, value, cb);
       };
     }
-    if (bindings?.onBeforeChange) {
-      this.bindings.onBeforeChange = bindings.onBeforeChange;
-    }
+    this.bindings.onBeforeChange = (editor: Editor, data: EditorChange, value: string) => {
+      if (this.readonlyState && isCancellable(data)) {
+        data.cancel();
+      }
+      bindings?.onBeforeChange?.(editor, data, value);
+    };
   }
 
   setDialect(dialect?: SqlDialectInfo): void {
@@ -115,6 +121,10 @@ export class SQLCodeEditorController {
     this.dialect = dialect;
   }
 
+  setReadonly(readonly: boolean): void {
+    this.readonlyState = readonly;
+  }
+
   focus(): void {
     this.editor?.focus();
   }
@@ -122,4 +132,13 @@ export class SQLCodeEditorController {
   private handleConfigure(editor: Editor) {
     this.editor = editor;
   }
+}
+
+function isCancellable(obj: EditorChange): obj is EditorChangeCancellable {
+  return (
+    'cancel' in obj
+    && 'update' in obj
+    && typeof (obj as EditorChangeCancellable)['cancel'] === 'function'
+    && typeof (obj as EditorChangeCancellable)['update'] === 'function'
+  );
 }

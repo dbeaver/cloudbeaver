@@ -8,6 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
@@ -23,6 +24,21 @@ export class SqlDialectInfoService {
     makeObservable<SqlDialectInfoService, 'dialectInfo'>(this, {
       dialectInfo: observable,
     });
+  }
+
+  async formatScript(context: IConnectionExecutionContextInfo, query: string): Promise<string> {
+    try {
+      const result = await this.graphQLService.sdk.formatSqlQuery({
+        connectionId: context.connectionId,
+        contextId: context.id,
+        query,
+      });
+
+      return result.query;
+    } catch (error) {
+      this.notificationService.logException(error, 'Failed to format script');
+    }
+    return query;
   }
 
   getDialectInfo(connectionId: string): SqlDialectInfo | undefined {

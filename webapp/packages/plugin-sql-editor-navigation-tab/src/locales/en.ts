@@ -5,6 +5,7 @@ export default [
   ['sql_editor_sql_execution_button_tooltip', 'Execute SQL Statement (Ctrl + Enter)'],
   ['sql_editor_sql_execution_new_tab_button_tooltip', 'Execute SQL Statement in new tab (Ctrl + \\)(Shift + Ctrl + Enter)'],
   ['sql_editor_sql_execution_script_button_tooltip', 'Execute SQL Script (Alt + X)'],
+  ['sql_editor_sql_format_button_tooltip', 'Format SQL Script (Shift + Ctrl + F)'],
   ['sql_editor_sql_statistics_unavailable', 'Statistics is not available'],
   ['sql_editor_sql_execution_queries', 'Queries:'],
   ['sql_editor_sql_execution_executing', 'Executing...'],

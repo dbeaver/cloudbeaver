@@ -683,6 +683,7 @@ export interface Query {
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlEntityQueryGenerators: SqlQueryGenerator[];
+  sqlFormatQuery: Scalars['String'];
   sqlGenerateEntityQuery: Scalars['String'];
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
   sqlSupportedOperations: DataTypeLogicalOperation[];
@@ -920,6 +921,12 @@ export interface QuerySqlDialectInfoArgs {
 
 export interface QuerySqlEntityQueryGeneratorsArgs {
   nodePathList: Array<Scalars['String']>;
+}
+
+export interface QuerySqlFormatQueryArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
 }
 
 export interface QuerySqlGenerateEntityQueryArgs {
@@ -1661,6 +1668,14 @@ export type NavGetStructContainersQueryVariables = Exact<{
 }>;
 
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }>; schemaList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }> } }
+
+export type FormatSqlQueryQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+}>;
+
+export interface FormatSqlQueryQuery { query: string }
 
 export interface AdminRoleInfoFragment { roleId: string; roleName?: Maybe<string>; description?: Maybe<string> }
 
@@ -2757,6 +2772,15 @@ export const NavGetStructContainersDocument = `
   }
 }
     `;
+export const FormatSqlQueryDocument = `
+    query formatSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!) {
+  query: sqlFormatQuery(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+  )
+}
+    `;
 export const GetAsyncTaskInfoDocument = `
     mutation getAsyncTaskInfo($taskId: String!, $removeOnFinish: Boolean!) {
   taskInfo: asyncTaskInfo(id: $taskId, removeOnFinish: $removeOnFinish) {
@@ -3347,6 +3371,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navGetStructContainers(variables: NavGetStructContainersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavGetStructContainersQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navGetStructContainers');
+    },
+    formatSqlQuery(variables: FormatSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<FormatSqlQueryQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'formatSqlQuery');
     },
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAsyncTaskInfoMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAsyncTaskInfo');

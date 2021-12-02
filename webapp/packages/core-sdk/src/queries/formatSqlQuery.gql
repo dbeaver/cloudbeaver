@@ -1,0 +1,11 @@
+query formatSqlQuery(
+    $connectionId: ID!
+    $contextId: ID!
+    $query: String!
+) {
+    query: sqlFormatQuery(
+        connectionId: $connectionId
+        contextId: $contextId
+        query: $query
+    )
+}

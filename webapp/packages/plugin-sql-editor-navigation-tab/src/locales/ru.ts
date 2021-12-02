@@ -5,6 +5,7 @@ export default [
   ['sql_editor_sql_execution_button_tooltip', 'Выполнить SQL Выражение (Ctrl + Enter)'],
   ['sql_editor_sql_execution_new_tab_button_tooltip', 'Выполнить SQL Выражение в новой вкладке (Ctrl + \\)(Shift + Ctrl + Enter)'],
   ['sql_editor_sql_execution_script_button_tooltip', 'Исполнить SQL Скрипт (Alt + X)'],
+  ['sql_editor_sql_format_button_tooltip', 'Форматировать SQL скрипт (Shift + Ctrl + F)'],
   ['sql_editor_sql_statistics_unavailable', 'Статистика не доступна'],
   ['sql_editor_sql_execution_queries', 'Запросы:'],
   ['sql_editor_sql_execution_executing', 'Выполняется...'],

@@ -43,7 +43,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   }
 
   get readonly(): boolean {
-    return this.executingScript;
+    return this.executingScript || this.readonlyState;
   }
 
   get isLineScriptEmpty(): boolean {
@@ -88,6 +88,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
       'Ctrl-\\': () => { this.executeQueryNewTab(); },
       'Shift-Ctrl-Enter': () => { this.executeQueryNewTab(); },
       'Shift-Ctrl-E': () => { this.showExecutionPlan(); },
+      'Shift-Ctrl-F': () => { this.formatScript(); },
 
       'Alt-X': () => { this.executeScript(); },
 
@@ -104,6 +105,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     editorDidMount: this.handleEditorConfigure.bind(this),
   };
 
+  private readonlyState: boolean;
   private executingScript: boolean;
   private cursor: Position | null;
   private state!: ISqlEditorTabState;
@@ -121,17 +123,19 @@ export class SqlEditorController implements IInitializableController, IDestructi
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
     this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
     this.cursor = null;
+    this.readonlyState = false;
     this.executingScript = false;
     this.reactionDisposer = null;
 
     this.parser.setCustomDelimiters(['\n\n']);
 
-    makeObservable<this, 'cursor' | 'executingScript'>(this, {
+    makeObservable<this, 'cursor' | 'executingScript' | 'readonlyState'>(this, {
       dialect: computed,
       isLineScriptEmpty: computed,
       isDisabled: computed,
       value: computed,
       cursor: observable,
+      readonlyState: observable,
       executingScript: observable,
       readonly: computed,
     });
@@ -156,11 +160,34 @@ export class SqlEditorController implements IInitializableController, IDestructi
     this.reactionDisposer?.();
   }
 
-  executeQuery = async (): Promise<void> => {
-    if (this.isDisabled || this.isLineScriptEmpty) {
+  formatScript = async (): Promise<void> => {
+    if (this.isDisabled || this.isScriptEmpty || !this.state.executionContext) {
       return;
     }
 
+    const query = this.value;
+    const script = this.getExecutingQuery(true);
+
+    if (!script) {
+      return;
+    }
+
+    this.beforeExecute();
+    try {
+      this.readonlyState = true;
+      const formatted = await this.sqlDialectInfoService.formatScript(this.state.executionContext, script.query);
+
+      this.setQuery(
+        query.substring(0, script.begin)
+        + formatted
+        + query.substring(script.end)
+      );
+    } finally {
+      this.readonlyState = false;
+    }
+  };
+
+  executeQuery = async (): Promise<void> => {
     await this.executeQueryAction(
       this.getSubQuery(),
       query => this.sqlQueryService.executeEditorQuery(
@@ -172,10 +199,6 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   executeQueryNewTab = async (): Promise<void> => {
-    if (this.isDisabled || this.isLineScriptEmpty) {
-      return;
-    }
-
     await this.executeQueryAction(
       this.getSubQuery(),
       query => this.sqlQueryService.executeEditorQuery(
@@ -187,7 +210,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   showExecutionPlan = async (): Promise<void> => {
-    if (this.isDisabled || this.isLineScriptEmpty || !this.dialect?.supportsExplainExecutionPlan) {
+    if (!this.dialect?.supportsExplainExecutionPlan) {
       return;
     }
 
@@ -242,7 +265,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     query: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<void>
   ): Promise<void> {
-    if (!query) {
+    if (!query || this.isDisabled || this.isLineScriptEmpty) {
       return;
     }
 
@@ -286,20 +309,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
     });
   }
 
-  private getExecutingQuery(): ISQLScriptSegment | undefined {
-    if (!this.editor) {
-      return {
-        begin: 0,
-        end: this.value.length,
-        query: this.value,
-        from: 0,
-        to: this.parser.lineCount,
-        fromPosition: 0,
-        toPosition: this.parser.getScriptLineAtPos(this.value.length)?.end || 0,
-      };
-    }
-
-    if (this.editor.somethingSelected()) {
+  private getExecutingQuery(script: boolean): ISQLScriptSegment | undefined {
+    if (this.editor?.somethingSelected()) {
       const selection = this.editor.getSelection();
       const from = this.editor.getCursor('from');
       const to = this.editor.getCursor('to');
@@ -315,6 +326,18 @@ export class SqlEditorController implements IInitializableController, IDestructi
         to: to.line,
         fromPosition: from.ch,
         toPosition: to.ch,
+      };
+    }
+
+    if (!this.editor || script) {
+      return {
+        begin: 0,
+        end: this.value.length,
+        query: this.value,
+        from: 0,
+        to: this.parser.lineCount,
+        fromPosition: 0,
+        toPosition: this.parser.getScriptLineAtPos(this.value.length)?.end || 0,
       };
     }
 
@@ -498,7 +521,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
   }
 
   private getSubQuery(): ISQLScriptSegment | undefined {
-    const query = this.getExecutingQuery();
+    const query = this.getExecutingQuery(false);
 
     if (!query) {
       return undefined;

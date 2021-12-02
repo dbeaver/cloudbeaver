@@ -72,8 +72,8 @@ const styles = composes(
     }
   
     StaticImage {
-      height: 20px;
-      width: 20px;
+      height: 16px;
+      width: 16px;
       cursor: pointer;
     }
 
@@ -138,6 +138,13 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             onClick={controller.executeScript}
           >
             <StaticImage icon="/icons/sql_script_exec.svg" />
+          </button>
+          <button
+            disabled={controller.isDisabled || controller.isScriptEmpty}
+            title={translate('sql_editor_sql_format_button_tooltip')}
+            onClick={controller.formatScript}
+          >
+            <StaticImage icon="/icons/sql_script_sm.svg" />
           </button>
           {controller.dialect?.supportsExplainExecutionPlan && (
             <button
