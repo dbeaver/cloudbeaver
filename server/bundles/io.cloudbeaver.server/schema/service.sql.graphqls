@@ -209,7 +209,7 @@ extend type Query {
 
     # List of all available entity query generators
     sqlEntityQueryGenerators(nodePathList: [String!]!
-        ): [SQLQueryGenerator!]!
+    ): [SQLQueryGenerator!]!
 
     # Options:
     # fullyQualifiedNames: Boolean
@@ -223,7 +223,7 @@ extend type Query {
         generatorId: String!,
         options: Object!,
         nodePathList: [String!]!
-        ): String!
+    ): String!
 }
 
 extend type Mutation {
