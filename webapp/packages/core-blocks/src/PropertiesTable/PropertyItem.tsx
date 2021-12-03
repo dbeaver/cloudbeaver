@@ -129,6 +129,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const propertyValue = value !== undefined ? value : property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
+  const [valueRef, setValueRef] = useState<HTMLDivElement | null>(null);
+
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
   const handleValueChange = useCallback(
     (value: string) => onValueChange(property.id, value),
@@ -143,8 +145,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   }, [property]);
 
   return styled(useStyles(styles))(
-    <property-item as="div">
-      <property-name as='div' title={property.description} {...use({ error })}>
+    <property-item>
+      <property-name title={property.description} {...use({ error })}>
         <ShadowInput
           ref={keyInputRef}
           type='text'
@@ -157,7 +159,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           {property.displayName || property.key}
         </ShadowInput>
       </property-name>
-      <property-value as='div' title={propertyValue}>
+      <property-value ref={setValueRef} title={propertyValue}>
         <ShadowInput
           type='text'
           name={`${property.id}_value`}
@@ -170,10 +172,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           {propertyValue}
         </ShadowInput>
         {(!readOnly && property.validValues && property.validValues.length > 0) && (
-          <property-select as="div">
+          <property-select>
             <PropertyValueSelector
               propertyName={property.id}
               values={property.validValues}
+              container={valueRef}
               onSelect={handleValueChange}
               onSwitch={setFocus}
             >
@@ -183,7 +186,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
         )}
       </property-value>
       {isDeletable && (
-        <property-remove as="div">
+        <property-remove>
           <button type="button" onClick={handleRemove}><Icon name="reject" viewBox="0 0 11 11" /></button>
         </property-remove>
       )}
