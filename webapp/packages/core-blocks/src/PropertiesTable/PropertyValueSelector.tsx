@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { RefObject, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   useMenuState,
   Menu,
@@ -60,7 +60,7 @@ const styles = composes(
 interface Props {
   propertyName?: string;
   values: string[];
-  containerRef: RefObject<HTMLDivElement>;
+  container: HTMLDivElement | null;
   onSelect: (value: string) => void;
   onSwitch: (state: boolean) => void;
 }
@@ -68,7 +68,7 @@ interface Props {
 export const PropertyValueSelector = observer<Props>(function PropertyValueSelector({
   propertyName,
   values,
-  containerRef,
+  container,
   children,
   onSelect,
   onSwitch,
@@ -87,23 +87,23 @@ export const PropertyValueSelector = observer<Props>(function PropertyValueSelec
   useEffect(() => onSwitch(menu.visible), [menu.visible]);
 
   useEffect(() => {
-    if (!containerRef.current) {
+    if (!container) {
       return;
     }
 
     const resizeObserver = new ResizeObserver(() => {
-      const containerSize = containerRef.current?.getBoundingClientRect();
+      const containerSize = container.getBoundingClientRect();
       if (menuRef.current && containerSize !== undefined) {
         menuRef.current.style.width = containerSize.width + 'px';
       }
     });
 
-    resizeObserver.observe(containerRef.current);
+    resizeObserver.observe(container);
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [containerRef]);
+  }, [container]);
 
   return styled(useStyles(styles))(
     <>

@@ -129,7 +129,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const propertyValue = value !== undefined ? value : property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
-  const valueRef = useRef<HTMLDivElement>(null);
+  const [valueRef, setValueRef] = useState<HTMLDivElement | null>(null);
+
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
   const handleValueChange = useCallback(
     (value: string) => onValueChange(property.id, value),
@@ -158,7 +159,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           {property.displayName || property.key}
         </ShadowInput>
       </property-name>
-      <property-value ref={valueRef} title={propertyValue}>
+      <property-value ref={setValueRef} title={propertyValue}>
         <ShadowInput
           type='text'
           name={`${property.id}_value`}
@@ -175,7 +176,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
             <PropertyValueSelector
               propertyName={property.id}
               values={property.validValues}
-              containerRef={valueRef}
+              container={valueRef}
               onSelect={handleValueChange}
               onSwitch={setFocus}
             >
