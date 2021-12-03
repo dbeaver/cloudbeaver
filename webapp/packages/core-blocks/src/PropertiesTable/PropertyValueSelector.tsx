@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect } from 'react';
+import { RefObject, useCallback, useEffect, useRef } from 'react';
 import {
   useMenuState,
   Menu,
@@ -39,7 +39,7 @@ const styles = composes(
       composes: theme-typography--caption theme-elevation-z3 from global;
       display: flex;
       flex-direction: column;
-      width: 100%;
+      width: max-content;
       outline: none;
       padding: 4px 0;
       z-index: 999;
@@ -60,6 +60,7 @@ const styles = composes(
 interface Props {
   propertyName?: string;
   values: string[];
+  containerRef: RefObject<HTMLDivElement>;
   onSelect: (value: string) => void;
   onSwitch: (state: boolean) => void;
 }
@@ -67,11 +68,15 @@ interface Props {
 export const PropertyValueSelector = observer<Props>(function PropertyValueSelector({
   propertyName,
   values,
+  containerRef,
   children,
   onSelect,
   onSwitch,
 }) {
-  const menu = useMenuState();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menu = useMenuState({
+    placement: 'bottom-end',
+  });
   const handleMenuSelect = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       menu.hide();
@@ -81,10 +86,29 @@ export const PropertyValueSelector = observer<Props>(function PropertyValueSelec
   );
   useEffect(() => onSwitch(menu.visible), [menu.visible]);
 
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      const containerSize = containerRef.current?.getBoundingClientRect();
+      if (menuRef.current && containerSize !== undefined) {
+        menuRef.current.style.width = containerSize.width + 'px';
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [containerRef]);
+
   return styled(useStyles(styles))(
     <>
       <MenuButton {...menu}>{children}</MenuButton>
-      <Menu {...menu} aria-label={propertyName}>
+      <Menu {...menu} ref={menuRef} aria-label={propertyName} modal>
         {menu.visible && values.map(value => (
           <MenuItem key={value} id={value} type='button' {...menu} onClick={handleMenuSelect}>
             {value}
