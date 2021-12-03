@@ -15,8 +15,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-// import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
+import { AuthenticationService } from '../AuthenticationService';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
@@ -81,7 +81,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 }) {
   const state = useAuthDialogState(providerId);
   const errorDetails = useErrorDetails(state.exception);
-  // const authConfigurationsAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
+  const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
   const translate = useTranslate();
 
@@ -115,8 +115,8 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   }
 
   function navToSettings() {
-    // rejectDialog();
-    // authConfigurationsAdministrationNavService.navToSettings();
+    rejectDialog();
+    authenticationService.configureAuthProvider?.();
   }
 
   function renderForm(provider: AuthProvider | null) {
@@ -128,9 +128,11 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       return (
          <TextPlaceholder>
             {translate('authentication_provider_disabled')}
-            <Link onClick={() => navToSettings()}>
-              <Translate token="ui_configure" />
-            </Link>
+            {authenticationService.configureAuthProvider && (
+              <Link onClick={() => navToSettings()}>
+                <Translate token="ui_configure" />
+              </Link>
+            )}
          </TextPlaceholder>
       );
     }

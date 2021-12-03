@@ -22,6 +22,7 @@ interface IAuthenticationAction {
 
 export type Options = {
   onAuthenticate?: () => Promise<any> | void;
+  onClose?: () => Promise<void> | void;
 } & ({
   origin: ObjectOrigin;
 } | {
@@ -51,8 +52,13 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
     async auth() {
       this.authenticating = true;
       try {
-        await authProviderService.requireProvider(this.type, this.subType);
-        await this.onAuthenticate?.();
+        const result = await authProviderService.requireProvider(this.type, this.subType);
+
+        if (result) {
+          await this.onAuthenticate?.();
+        } else {
+          await this.onClose?.();
+        }
       } finally {
         this.authenticating = false;
       }
@@ -64,5 +70,6 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
     type,
     subType,
     onAuthenticate: options.onAuthenticate,
+    onClose: options.onClose,
   }, ['auth']);
 }

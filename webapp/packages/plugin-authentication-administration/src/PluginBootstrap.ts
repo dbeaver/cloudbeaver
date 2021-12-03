@@ -7,20 +7,31 @@
  */
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
+import { ServerConfigurationAdministrationNavService, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
+import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
+import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly serverConfigurationService: ServerConfigurationService,
+    private readonly serverConfigurationAdministrationNavService: ServerConfigurationAdministrationNavService,
+    private readonly authConfigurationsAdministrationNavService: AuthConfigurationsAdministrationNavService,
+    private readonly authenticationService: AuthenticationService
   ) {
     super();
   }
 
   register(): void {
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
+    this.authenticationService.setConfigureAuthProvider(
+      () => this.serverConfigurationAdministrationNavService.navToSettings()
+    );
+    this.authenticationService.setConfigureIdentityProvider(
+      () => this.authConfigurationsAdministrationNavService.navToCreate()
+    );
   }
 
   load(): void | Promise<void> { }

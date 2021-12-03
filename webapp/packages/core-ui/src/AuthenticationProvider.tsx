@@ -25,6 +25,7 @@ const styles = css`
 
 export type Props = {
   onAuthenticate?: () => void;
+  onClose?: () => void;
   children?: () => React.ReactNode;
   className?: string;
 } & ({

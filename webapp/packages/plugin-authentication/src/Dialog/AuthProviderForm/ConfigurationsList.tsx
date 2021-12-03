@@ -17,6 +17,8 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { AuthenticationService } from '../../AuthenticationService';
+
 const styles = composes(
   css`
     Cell {
@@ -58,6 +60,7 @@ interface Props {
 
 export const ConfigurationsList = observer<Props>(function ConfigurationsList({ providers, onClose, className }) {
   const authInfoService = useService(AuthInfoService);
+  const authenticationService = useService(AuthenticationService);
   const translate = useTranslate();
   const style = useStyles(styles);
 
@@ -93,13 +96,20 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
     }
   }
 
+  function navToSettings() {
+    onClose?.();
+    authenticationService.configureIdentityProvider?.();
+  }
+
   if (configurations.length === 0) {
     return (
       <TextPlaceholder>
         {translate('authentication_configure')}
-        <Link>
-          {translate('ui_configure')}
-        </Link>
+        {authenticationService.configureIdentityProvider && (
+          <Link onClick={navToSettings}>
+            {translate('ui_configure')}
+          </Link>
+        )}
       </TextPlaceholder>
     );
   }

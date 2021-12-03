@@ -20,7 +20,11 @@ import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()
 export class AuthenticationService extends Bootstrap {
+  configureAuthProvider: (() => void) | null;
+  configureIdentityProvider: (() => void) | null;
+
   private authPromise: Promise<void> | null;
+
   constructor(
     private readonly screenService: ScreenService,
     private readonly appAuthService: AppAuthService,
@@ -35,6 +39,16 @@ export class AuthenticationService extends Bootstrap {
   ) {
     super();
     this.authPromise = null;
+    this.configureAuthProvider = null;
+    this.configureIdentityProvider = null;
+  }
+
+  setConfigureAuthProvider(action: () => void): void {
+    this.configureAuthProvider = action;
+  }
+
+  setConfigureIdentityProvider(action: () => void): void {
+    this.configureIdentityProvider = action;
   }
 
   async authUser(provider: string | null = null, link?: boolean): Promise<void> {
