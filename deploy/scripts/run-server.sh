@@ -8,4 +8,4 @@ echo "Starting Cloudbeaver Server"
 
 VMARGS_OPTS="${JAVA_OPTS:--Xmx2048M}"
 
-java -jar ${launcherJar} -product io.cloudbeaver.product.ce.product -web-config conf/cloudbeaver.conf -nl en -registryMultiLanguage -vmargs ${VMARGS_OPTS}
+java -jar ${launcherJar} -product io.cloudbeaver.product.ce.product -web-config conf/cloudbeaver.conf -nl en -registryMultiLanguage -vmargs ${VMARGS_OPTS} &> workspace/.metadata/server.log
