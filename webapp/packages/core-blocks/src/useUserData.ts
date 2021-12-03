@@ -11,10 +11,15 @@ import { useEffect, useRef } from 'react';
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-export function useUserData<T>(key: string, defaultValue: () => T, onUpdate: (data: T) => void): T {
+export function useUserData<T>(
+  key: string,
+  defaultValue: () => T,
+  onUpdate: (data: T) => void,
+  validate?: (data: T) => boolean
+): T {
   const userDataService = useService(UserDataService);
   const ref = useRef<T | null>(null);
-  const data = userDataService.getUserData(key, defaultValue);
+  const data = userDataService.getUserData(key, defaultValue, validate);
 
   useEffect(() => {
     if (ref.current !== data) {

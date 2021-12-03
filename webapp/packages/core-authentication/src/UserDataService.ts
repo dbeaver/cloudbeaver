@@ -33,7 +33,7 @@ export class UserDataService {
     );
   }
 
-  getUserData<T>(key: string, defaultValue: () => T): T {
+  getUserData<T>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {
     const userId = this.userInfoResource.getId();
 
     if (!this.userData.has(userId)) {
@@ -43,7 +43,9 @@ export class UserDataService {
     const data = this.userData.get(userId)!;
 
     if (key in data) {
-      return data[key];
+      if (!validate || validate(data[key])) {
+        return data[key];
+      }
     }
 
     data[key] = defaultValue();

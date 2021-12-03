@@ -35,9 +35,17 @@ export interface ITreeNodeState {
   expanded: boolean;
 }
 
+interface IElementsTreeUserState {
+  foldersTree: boolean;
+  showFolderExplorerPath: boolean;
+  nodeState: Array<[string, ITreeNodeState]>;
+}
+
 interface IOptions {
   baseRoot: string;
   root: string;
+  foldersTree: boolean;
+  showFolderExplorerPath: boolean;
   disabled?: boolean;
   keepData?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
@@ -56,6 +64,8 @@ export interface IElementsTree {
   root: string;
   loading: boolean;
   disabled: boolean;
+  foldersTree: boolean;
+  showFolderExplorerPath: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
@@ -79,13 +89,19 @@ export function useElementsTree(options: IOptions): IElementsTree {
     expanded: false,
   })));
   const state = options.localState || localTreeNodesState;
+  let foldersTree = options.foldersTree;
+  let showFolderExplorerPath = options.showFolderExplorerPath;
 
-  useUserData<Array<[string, ITreeNodeState]>>(
+  const userState = useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
-    () => observable([] as any),
+    () => observable<IElementsTreeUserState>({
+      foldersTree,
+      showFolderExplorerPath,
+      nodeState: [],
+    }),
     async data => {
       if (options.keepData) {
-        state.sync(data);
+        state.sync(data.nodeState);
 
         elementsTree.loading = true;
         try {
@@ -94,8 +110,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
           elementsTree.loading = false;
         }
       }
-    }
+    },
+    data => (
+      typeof data === 'object'
+      && Array.isArray(data.nodeState)
+      && typeof data.foldersTree === 'boolean'
+      && typeof data.showFolderExplorerPath === 'boolean'
+    )
   );
+
+  foldersTree = userState.foldersTree;
+  showFolderExplorerPath = userState.showFolderExplorerPath;
 
   async function loadTree(nodeId: string) {
     let children = [nodeId];
@@ -290,6 +315,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
       await setSelection(node.id, !selected);
     },
   }), {
+    foldersTree: observable.ref,
+    showFolderExplorerPath: observable.ref,
     isGroup: observable.ref,
     disabled: observable.ref,
     root: observable.ref,
@@ -300,6 +327,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
     isGroup: options.isGroup,
     disabled: options.disabled,
     root: options.root,
+    foldersTree,
+    showFolderExplorerPath,
     baseRoot: options.baseRoot,
     renderers,
   });

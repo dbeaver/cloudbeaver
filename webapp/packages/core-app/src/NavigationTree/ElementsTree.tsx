@@ -71,9 +71,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   control,
   keepData = false,
   disabled,
-  showFolderExplorerPath,
   localState,
   selectionTree = false,
+  showFolderExplorerPath = false,
   foldersTree = false,
   emptyPlaceholder,
   filters,
@@ -102,6 +102,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   const tree = useElementsTree({
     baseRoot,
+    foldersTree,
+    showFolderExplorerPath,
     root,
     disabled,
     keepData,
@@ -126,13 +128,16 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       onClick: async (node, leaf) => {
         await onClick?.(node);
 
-        if (!leaf && foldersTree) {
-          await navigationTreeService.loadNestedNodes(root, true);
-          folderExplorer.open(node.id);
+        if (!leaf && tree.foldersTree) {
+          const loaded = await navigationTreeService.loadNestedNodes(node.id, true);
+
+          if (loaded) {
+            folderExplorer.open(node.id);
+          }
         }
       },
     }),
-    [control, selectionTree, onOpen, onClick, folderExplorer, foldersTree]
+    [control, selectionTree, onOpen, onClick, folderExplorer]
   );
 
   const getName = useCallback(
@@ -143,7 +148,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const hasChildren = (children.data?.length || 0) > 0;
   let loading = children.isLoading() || tree.loading;
 
-  if (foldersTree && folderExplorer.root !== root) {
+  if (tree.foldersTree && folderExplorer.root !== root) {
     loading = false;
   }
 
@@ -171,7 +176,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     <TreeContext.Provider value={context}>
       <FolderExplorer state={folderExplorer}>
         <tree className={className}>
-          {showFolderExplorerPath && <FolderExplorerPath getName={getName} />}
+          {tree.showFolderExplorerPath && <FolderExplorerPath getName={getName} />}
           <NavigationNodeNested nodeId={root} component={NavigationNodeElement} root />
           <Loader loading={loading} overlay={hasChildren} />
         </tree>
