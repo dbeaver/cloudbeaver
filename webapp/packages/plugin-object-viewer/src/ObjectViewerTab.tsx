@@ -21,11 +21,12 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const { node } = useNode(tab.handlerState.objectId);
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
+  const title = node?.name || tab.handlerState.tabTitle;
 
   return styled(useStyles(style))(
-    <Tab tabId={tab.id} style={style} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} style={style} title={title} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
-      <TabTitle>{node?.name || tab.handlerState.tabTitle}</TabTitle>
+      <TabTitle>{title}</TabTitle>
     </Tab>
   );
 });

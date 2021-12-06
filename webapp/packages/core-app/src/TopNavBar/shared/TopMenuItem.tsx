@@ -27,6 +27,8 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
   const translate = useTranslate();
   const styles = useStyles(style, topMenuStyles);
 
+  const title = translate(menuItem.title);
+
   if (!menuItem.panel) {
     return (
       <TopMenuButton
@@ -54,7 +56,7 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
           <IconOrImage icon={menuItem.icon} />
         </menu-trigger-icon>
       )}
-      <div>{translate(menuItem.title)}</div>
+      <menu-trigger-text title={title}>{title}</menu-trigger-text>
       <Icon name="angle" viewBox="0 0 15 8" />
     </MenuTrigger>
   );

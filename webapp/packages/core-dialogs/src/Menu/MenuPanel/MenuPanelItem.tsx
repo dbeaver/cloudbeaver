@@ -11,7 +11,7 @@ import styled, { use } from 'reshadow';
 
 import { Checkbox, Icon, IconOrImage, Loader, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
-import { Translate } from '@cloudbeaver/core-localization';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { menuPanelStyles } from './menuPanelStyles';
@@ -25,6 +25,9 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
   menuItem,
   style = [],
 }) {
+  const translate = useTranslate();
+
+  const title = translate(menuItem.title);
   let control = null;
 
   if (menuItem.type === 'radio') {
@@ -40,8 +43,8 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
           <IconOrImage icon={menuItem.icon} />
         ) : control}
       </menu-item-content>
-      <menu-item-text>
-        <Translate token={menuItem.title} />
+      <menu-item-text title={title}>
+        {title}
       </menu-item-text>
       <menu-item-content>
         {menuItem.panel && (
