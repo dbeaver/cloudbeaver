@@ -173,7 +173,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         String[] args = Platform.getCommandLineArgs();
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) & args.length > i + 1) {
+            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) && args.length > i + 1) {
                 configPath = args[i + 1];
                 break;
             }
