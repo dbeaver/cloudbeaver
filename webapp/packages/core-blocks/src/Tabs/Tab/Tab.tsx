@@ -51,7 +51,7 @@ export const Tab = observer<TabProps>(function Tab({
             <tab-container>
               {children}
               {onClose && (
-                <tab-action onClick={handleClose}>
+                <tab-action title={translate('ui_close')} onClick={handleClose}>
                   <Icon name="cross-bold" viewBox="0 0 7 8" />
                 </tab-action>
               )}

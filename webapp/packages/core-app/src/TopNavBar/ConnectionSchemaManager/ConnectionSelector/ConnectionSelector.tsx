@@ -22,7 +22,15 @@ import { ConnectionSelectorController } from './ConnectionSelectorController';
 const menuStyles = css`
   Menu {
     max-height: 400px;
+    max-width: 400px;
     overflow: auto;
+    & menu-panel-item {
+        overflow-x: hidden;
+    }
+    & menu-item-text {
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
   }
 `;
 

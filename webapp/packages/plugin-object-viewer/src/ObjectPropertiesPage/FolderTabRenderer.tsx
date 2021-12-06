@@ -61,7 +61,7 @@ const NavNodeTab = observer<INavNodeTabProps>(function NavNodeTab({ nodeId, styl
   )), 300);
 
   return styled(useStyles(style))(
-    <Tab tabId={nodeId}>
+    <Tab tabId={nodeId} title={nodeInfo.node?.name}>
       {nodeInfo.node?.icon && <TabIcon icon={nodeInfo.node.icon} />}
       <TabTitle>{nodeInfo.node?.name}</TabTitle>
       <tab-loader><Loader loading={loading} small /></tab-loader>
