@@ -7,7 +7,7 @@ export default [
   ['sql_editor_sql_execution_script_button_tooltip', 'Execute SQL Script (Alt + X)'],
   ['sql_editor_sql_format_button_tooltip', 'Format SQL Script (Shift + Ctrl + F)'],
   ['sql_editor_sql_statistics_unavailable', 'Statistics is not available'],
-  ['sql_editor_sql_execution_queries', 'Queries:'],
+  ['sql_editor_sql_execution_executed_queries', 'Executed queries:'],
   ['sql_editor_sql_execution_executing', 'Executing...'],
   ['sql_execution_plan_placeholder', 'Execution plan is empty'],
   ['sql_execution_plan_properties_panel_placeholder', 'There are no items to show'],
