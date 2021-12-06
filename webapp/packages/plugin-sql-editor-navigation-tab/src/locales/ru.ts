@@ -7,7 +7,7 @@ export default [
   ['sql_editor_sql_execution_script_button_tooltip', 'Исполнить SQL Скрипт (Alt + X)'],
   ['sql_editor_sql_format_button_tooltip', 'Форматировать SQL скрипт (Shift + Ctrl + F)'],
   ['sql_editor_sql_statistics_unavailable', 'Статистика не доступна'],
-  ['sql_editor_sql_execution_queries', 'Запросы:'],
+  ['sql_editor_sql_execution_executed_queries', 'Выполненные запросы:'],
   ['sql_editor_sql_execution_executing', 'Выполняется...'],
   ['sql_execution_plan_placeholder', 'План выполнения пуст'],
   ['sql_execution_plan_properties_panel_placeholder', 'Информация не доступна'],
