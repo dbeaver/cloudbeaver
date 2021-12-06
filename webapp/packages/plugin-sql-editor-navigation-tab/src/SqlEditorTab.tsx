@@ -35,7 +35,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   return styled(useStyles(style))(
     <Tab tabId={tab.id} style={style} onOpen={handleSelect} onClose={handleClose}>
-      <TabIcon icon='/icons/sql_script.svg' />
+      <TabIcon icon='/icons/sql_script_m.svg' />
       <TabTitle>{name}</TabTitle>
     </Tab>
   );

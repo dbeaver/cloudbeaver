@@ -139,13 +139,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           >
             <StaticImage icon="/icons/sql_script_exec.svg" />
           </button>
-          <button
-            disabled={controller.isDisabled || controller.isScriptEmpty}
-            title={translate('sql_editor_sql_format_button_tooltip')}
-            onClick={controller.formatScript}
-          >
-            <StaticImage icon="/icons/sql_script_sm.svg" />
-          </button>
           {controller.dialect?.supportsExplainExecutionPlan && (
             <button
               disabled={controller.isLineScriptEmpty || controller.isDisabled}
@@ -157,6 +150,13 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           )}
         </actions>
         <tools onMouseDown={preventFocus}>
+          <button
+            disabled={controller.isDisabled || controller.isScriptEmpty}
+            title={translate('sql_editor_sql_format_button_tooltip')}
+            onClick={controller.formatScript}
+          >
+            <StaticImage icon="/icons/sql_script_m.svg" />
+          </button>
           <button
             disabled={!controller.value.trim()}
             title={translate('sql_editor_download_script_tooltip')}
