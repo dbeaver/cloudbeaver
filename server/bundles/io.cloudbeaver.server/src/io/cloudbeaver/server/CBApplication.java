@@ -23,6 +23,7 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -783,6 +784,11 @@ public class CBApplication extends BaseApplicationImpl {
                     Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
                     if(!CommonUtils.isEmpty(resourceQuotas)) {
                         JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
+                    }
+
+                    Map<String, AuthProviderConfig> authProviders = appConfig.getAuthProviderConfigurations();
+                    if(!CommonUtils.isEmpty(authProviders)) {
+                        JSONUtils.serializeProperties(json, CBConstants.PARAM_AUTH_PROVIDERS, authProviders);
                     }
 
                     {
