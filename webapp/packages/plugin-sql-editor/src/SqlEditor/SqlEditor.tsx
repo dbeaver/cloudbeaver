@@ -155,7 +155,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             title={translate('sql_editor_sql_format_button_tooltip')}
             onClick={controller.formatScript}
           >
-            <StaticImage icon="/icons/sql_script_m.svg" />
+            <StaticImage icon="/icons/sql_format_sm.svg" />
           </button>
           <button
             disabled={!controller.value.trim()}
