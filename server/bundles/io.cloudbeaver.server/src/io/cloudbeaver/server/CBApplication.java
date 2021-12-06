@@ -303,6 +303,7 @@ public class CBApplication extends BaseApplicationImpl {
     /**
      * Configures server automatically.
      * Called on startup
+     *
      * @param configPath
      */
     protected void performAutoConfiguration(File configPath) {
@@ -369,7 +370,7 @@ public class CBApplication extends BaseApplicationImpl {
             }
 
             boolean hasLoopbackAddress = false;
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress localInetAddress = enumIpAddr.nextElement();
@@ -496,12 +497,12 @@ public class CBApplication extends BaseApplicationImpl {
             gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
             productConfigPath = getRelativePath(
-                    JSONUtils.getString(
-                            serverConfig,
-                            CBConstants.PARAM_PRODUCT_CONFIGURATION,
-                            CBConstants.DEFAULT_PRODUCT_CONFIGURATION
-                    ),
-                    homeFolder
+                JSONUtils.getString(
+                    serverConfig,
+                    CBConstants.PARAM_PRODUCT_CONFIGURATION,
+                    CBConstants.DEFAULT_PRODUCT_CONFIGURATION
+                ),
+                homeFolder
             );
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
@@ -510,18 +511,18 @@ public class CBApplication extends BaseApplicationImpl {
         // Merge new config with old one
         {
             Map<String, Object> mergedPlugins = Stream.concat(
-                            prevConfig.getPlugins().entrySet().stream(),
-                            appConfiguration.getPlugins().entrySet().stream()
-                    )
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+                    prevConfig.getPlugins().entrySet().stream(),
+                    appConfiguration.getPlugins().entrySet().stream()
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.getPlugins().clear();
             appConfiguration.getPlugins().putAll(mergedPlugins);
 
             Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
-                            prevConfig.getAuthProviderConfigurations().entrySet().stream(),
-                            appConfiguration.getAuthProviderConfigurations().entrySet().stream()
-                    )
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+                    prevConfig.getAuthProviderConfigurations().entrySet().stream(),
+                    appConfiguration.getAuthProviderConfigurations().entrySet().stream()
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.getAuthProviderConfigurations().clear();
             mergedAuthProviders.forEach(appConfiguration::setAuthProviderConfiguration);
         }
@@ -622,8 +623,7 @@ public class CBApplication extends BaseApplicationImpl {
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
         long sessionExpireTime,
-        @NotNull CBAppConfig appConfig) throws DBException
-    {
+        @NotNull CBAppConfig appConfig) throws DBException {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
@@ -670,7 +670,7 @@ public class CBApplication extends BaseApplicationImpl {
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(
                         ds.getId(),
-                        new String[] { anonymousRoleId },
+                        new String[]{anonymousRoleId},
                         adminName);
                 }
             }
@@ -708,39 +708,39 @@ public class CBApplication extends BaseApplicationImpl {
                     json.name(CBConstants.PARAM_DB_CONFIGURATION);
                     json.beginObject();
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_DRIVER_CONFIGURATION,
-                            databaseConfiguration.getDriver()
+                        json,
+                        CBConstants.PARAM_DB_DRIVER_CONFIGURATION,
+                        databaseConfiguration.getDriver()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_URL_CONFIGURATION,
-                            databaseConfiguration.getUrl()
+                        json,
+                        CBConstants.PARAM_DB_URL_CONFIGURATION,
+                        databaseConfiguration.getUrl()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_USER_CONFIGURATION,
-                            databaseConfiguration.getUser()
+                        json,
+                        CBConstants.PARAM_DB_USER_CONFIGURATION,
+                        databaseConfiguration.getUser()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_PW_CONFIGURATION,
-                            databaseConfiguration.getPassword()
+                        json,
+                        CBConstants.PARAM_DB_PW_CONFIGURATION,
+                        databaseConfiguration.getPassword()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION,
-                            databaseConfiguration.isCreateDatabase()
+                        json,
+                        CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION,
+                        databaseConfiguration.isCreateDatabase()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION,
-                            databaseConfiguration.isAllowPublicAccess()
+                        json,
+                        CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION,
+                        databaseConfiguration.isAllowPublicAccess()
                     );
                     JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
-                            databaseConfiguration.getInitialDataConfiguration()
+                        json,
+                        CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
+                        databaseConfiguration.getInitialDataConfiguration()
                     );
 
                     CBDatabaseConfig.Pool pool = databaseConfiguration.getPool();
@@ -748,24 +748,24 @@ public class CBApplication extends BaseApplicationImpl {
                         json.name(CBConstants.PARAM_DB_POOL_CONFIGURATION);
                         json.beginObject();
                         JSONUtils.fieldNE(
-                                json,
-                                CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION,
-                                pool.getMinIdleConnections()
+                            json,
+                            CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION,
+                            pool.getMinIdleConnections()
                         );
                         JSONUtils.fieldNE(
-                                json,
-                                CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION,
-                                pool.getMaxIdleConnections()
+                            json,
+                            CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION,
+                            pool.getMaxIdleConnections()
                         );
                         JSONUtils.fieldNE(
-                                json,
-                                CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION,
-                                pool.getMaxConnections()
+                            json,
+                            CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION,
+                            pool.getMaxConnections()
                         );
                         JSONUtils.fieldNE(
-                                json,
-                                CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
-                                pool.getValidationQuery()
+                            json,
+                            CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
+                            pool.getValidationQuery()
                         );
                         json.endObject();
                     }
@@ -782,12 +782,12 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
                     Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
-                    if(!CommonUtils.isEmpty(resourceQuotas)) {
+                    if (!CommonUtils.isEmpty(resourceQuotas)) {
                         JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
                     }
 
                     Map<String, AuthProviderConfig> authProviders = appConfig.getAuthProviderConfigurations();
-                    if(!CommonUtils.isEmpty(authProviders)) {
+                    if (!CommonUtils.isEmpty(authProviders)) {
                         JSONUtils.serializeProperties(json, CBConstants.PARAM_AUTH_PROVIDERS, authProviders);
                     }
 
