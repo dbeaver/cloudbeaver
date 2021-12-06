@@ -487,24 +487,32 @@ public class CBApplication extends BaseApplicationImpl {
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
 
             // App config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(configProps, "app")), CBAppConfig.class);
+            Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
+            gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
 
             // Database config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
+            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION);
+            gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
             productConfigPath = getRelativePath(
-                JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+                    JSONUtils.getString(
+                            serverConfig,
+                            CBConstants.PARAM_PRODUCT_CONFIGURATION,
+                            CBConstants.DEFAULT_PRODUCT_CONFIGURATION
+                    ),
+                    homeFolder
+            );
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
         }
 
         // Merge new config with old one
         {
-            Map<String, Object> mergedPlugins = Stream.concat(prevConfig.getPlugins().entrySet().stream(),
-                appConfiguration.getPlugins().entrySet().stream()).collect(
-                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            Map<String, Object> mergedPlugins = Stream.concat(
+                            prevConfig.getPlugins().entrySet().stream(),
+                            appConfiguration.getPlugins().entrySet().stream()
+                    )
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.getPlugins().clear();
             appConfiguration.getPlugins().putAll(mergedPlugins);
 
@@ -670,8 +678,10 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
-
+    private void saveRuntimeConfig(String newServerName,
+                                   String newServerURL,
+                                   long sessionExpireTime,
+                                   CBAppConfig appConfig) throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
