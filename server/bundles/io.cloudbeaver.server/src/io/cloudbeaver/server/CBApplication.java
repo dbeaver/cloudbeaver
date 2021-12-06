@@ -507,6 +507,14 @@ public class CBApplication extends BaseApplicationImpl {
                 Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.getPlugins().clear();
             appConfiguration.getPlugins().putAll(mergedPlugins);
+
+            Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
+                            prevConfig.getAuthProviderConfigurations().entrySet().stream(),
+                            appConfiguration.getAuthProviderConfigurations().entrySet().stream()
+                    )
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            appConfiguration.getAuthProviderConfigurations().clear();
+            mergedAuthProviders.forEach(appConfiguration::setAuthProviderConfiguration);
         }
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
