@@ -780,6 +780,11 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
+                    Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
+                    if(!CommonUtils.isEmpty(resourceQuotas)) {
+                        JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
+                    }
+
                     {
                         // Save only differences in def navigator settings
                         DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
