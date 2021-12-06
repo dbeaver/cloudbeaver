@@ -703,6 +703,73 @@ public class CBApplication extends BaseApplicationImpl {
                     if (sessionExpireTime > 0) {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
                     }
+
+                    json.name(CBConstants.PARAM_DB_CONFIGURATION);
+                    json.beginObject();
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_DRIVER_CONFIGURATION,
+                            databaseConfiguration.getDriver()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_URL_CONFIGURATION,
+                            databaseConfiguration.getUrl()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_USER_CONFIGURATION,
+                            databaseConfiguration.getUser()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_PW_CONFIGURATION,
+                            databaseConfiguration.getPassword()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION,
+                            databaseConfiguration.isCreateDatabase()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION,
+                            databaseConfiguration.isAllowPublicAccess()
+                    );
+                    JSONUtils.fieldNE(
+                            json,
+                            CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
+                            databaseConfiguration.getInitialDataConfiguration()
+                    );
+
+                    CBDatabaseConfig.Pool pool = databaseConfiguration.getPool();
+                    if (pool != null) {
+                        json.name(CBConstants.PARAM_DB_POOL_CONFIGURATION);
+                        json.beginObject();
+                        JSONUtils.fieldNE(
+                                json,
+                                CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION,
+                                pool.getMinIdleConnections()
+                        );
+                        JSONUtils.fieldNE(
+                                json,
+                                CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION,
+                                pool.getMaxIdleConnections()
+                        );
+                        JSONUtils.fieldNE(
+                                json,
+                                CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION,
+                                pool.getMaxConnections()
+                        );
+                        JSONUtils.fieldNE(
+                                json,
+                                CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
+                                pool.getValidationQuery()
+                        );
+                        json.endObject();
+                    }
+                    json.endObject();
+
                     json.endObject();
                 }
                 {
