@@ -19,7 +19,7 @@ export class AppLocaleService extends Bootstrap {
     this.localizationService.addProvider(this.provider.bind(this));
   }
 
-  load(): void | Promise<void> {}
+  load(): void | Promise<void> { }
 
   private async provider(locale: string) {
     switch (locale) {
@@ -27,6 +27,8 @@ export class AppLocaleService extends Bootstrap {
         return (await import('./locales/ru')).default;
       case 'it':
         return (await import('./locales/it')).default;
+      case 'zh':
+        return (await import('./locales/zh')).default;
       default:
         return (await import('./locales/en')).default;
     }

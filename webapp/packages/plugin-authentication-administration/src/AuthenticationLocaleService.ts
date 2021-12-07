@@ -27,6 +27,8 @@ export class AuthenticationLocaleService extends Bootstrap {
         return (await import('./locales/ru')).default;
       case 'it':
         return (await import('./locales/it')).default;
+      case 'zh':
+        return (await import('./locales/zh')).default;
       default:
         return (await import('./locales/en')).default;
     }
