@@ -38,22 +38,10 @@ public class ConfigurationUtils {
         if (appConfig == null) {
             return res;
         }
-        res.computeIfAbsent(
-            "anonymousAccessEnabled",
-            v -> appConfig.isAnonymousAccessEnabled()
-        );
-        res.computeIfAbsent(
-            "supportsCustomConnections",
-            v -> appConfig.isSupportsCustomConnections()
-        );
-        res.computeIfAbsent(
-            "publicCredentialsSaveEnabled",
-            v -> appConfig.isPublicCredentialsSaveEnabled()
-        );
-        res.computeIfAbsent(
-            "adminCredentialsSaveEnabled",
-            v -> appConfig.isAdminCredentialsSaveEnabled()
-        );
+        res.put("anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+        res.put("supportsCustomConnections", appConfig.isSupportsCustomConnections());
+        res.put("publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+        res.put("adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
         Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
         if (!CommonUtils.isEmpty(resourceQuotas)) {
@@ -159,14 +147,8 @@ public class ConfigurationUtils {
             CBConstants.PARAM_DB_PW_CONFIGURATION,
             v -> databaseConfiguration.getPassword()
         );
-        res.computeIfAbsent(
-            CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION,
-            v -> databaseConfiguration.isCreateDatabase()
-        );
-        res.computeIfAbsent(
-            CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION,
-            v -> databaseConfiguration.isAllowPublicAccess()
-        );
+        res.put(CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION, databaseConfiguration.isCreateDatabase());
+        res.put(CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION, databaseConfiguration.isAllowPublicAccess());
         res.computeIfAbsent(
             CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
             v -> databaseConfiguration.getInitialDataConfiguration()
@@ -187,18 +169,9 @@ public class ConfigurationUtils {
         if (pool == null) {
             return res;
         } else {
-            res.computeIfAbsent(
-                CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION,
-                v -> pool.getMinIdleConnections()
-            );
-            res.computeIfAbsent(
-                CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION,
-                v -> pool.getMaxIdleConnections()
-            );
-            res.computeIfAbsent(
-                CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION,
-                v -> pool.getMaxConnections()
-            );
+            res.put(CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION, pool.getMinIdleConnections());
+            res.put(CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION, pool.getMaxIdleConnections());
+            res.put(CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION, pool.getMaxConnections());
             res.computeIfAbsent(
                 CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
                 v -> pool.getValidationQuery()
