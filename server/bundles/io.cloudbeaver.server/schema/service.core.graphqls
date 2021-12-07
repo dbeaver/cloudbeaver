@@ -101,6 +101,8 @@ type ProductInfo {
     buildTime: String!
     releaseTime: String!
     licenseInfo: String
+
+    latestVersionInfo: String!
 }
 
 type ServerConfig {

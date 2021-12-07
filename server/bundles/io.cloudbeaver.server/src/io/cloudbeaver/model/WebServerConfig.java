@@ -20,6 +20,8 @@ import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
@@ -177,6 +179,12 @@ public class WebServerConfig {
     @Property
     public WebProductInfo getProductInfo() {
         return new WebProductInfo();
+    }
+
+    @Property
+    public String getLatestVersionInfo() {
+        IProduct product = Platform.getProduct();
+        return CommonUtils.notEmpty(product.getProperty("versionUpdateURL"));
     }
 
 }
