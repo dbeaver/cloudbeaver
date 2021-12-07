@@ -235,7 +235,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     if (this.state.tabs.length) {
       const result = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'sql_editor_close_result_tabs_dialog_title',
-        message: `There are unclosed result tabs:  "${this.state.tabs.length}". Do you want to close these tabs before executing new query?`,
+        message: `Do you want to close ${this.state.tabs.length} tabs before executing script?`,
         confirmActionText: 'ui_yes',
         extraStatus: 'no',
       });
