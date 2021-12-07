@@ -45,6 +45,22 @@ public class CBConstants {
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
     public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
     public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
+    public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
+    public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
+
+    public static final String PARAM_DB_CONFIGURATION = "database";
+    public static final String PARAM_DB_DRIVER_CONFIGURATION = "driver";
+    public static final String PARAM_DB_URL_CONFIGURATION = "url";
+    public static final String PARAM_DB_USER_CONFIGURATION = "user";
+    public static final String PARAM_DB_PW_CONFIGURATION = "password";
+    public static final String PARAM_DB_CREATE_DATABASE_CONFIGURATION = "createDatabase";
+    public static final String PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION = "allowPublicAccess";
+    public static final String PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION = "initialDataConfiguration";
+    public static final String PARAM_DB_POOL_CONFIGURATION = "pool";
+    public static final String PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION = "minIdleConnections";
+    public static final String PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION = "maxIdleConnections";
+    public static final String PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION = "maxConnections";
+    public static final String PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION = "validationQuery";
 
     public static final String PARAM_SESSION_EXPIRE_PERIOD = "expireSessionAfterPeriod";
 
@@ -82,5 +98,5 @@ public class CBConstants {
 
     public static final String CB_SESSION_COOKIE_NAME = "cb-session-id";
 
-    public static final String	APPLICATION_JSON		= "application/json";
+    public static final String APPLICATION_JSON = "application/json";
 }
