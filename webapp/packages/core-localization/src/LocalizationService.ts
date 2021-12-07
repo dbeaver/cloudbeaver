@@ -18,6 +18,7 @@ import type { ILocaleProvider } from './ILocaleProvider';
 import { defaultENLocale } from './locales/en';
 import { defaultITLocale } from './locales/it';
 import { defaultRULocale } from './locales/ru';
+import { defaultZHLocale } from './locales/zh';
 import type { TLocalizationToken } from './TLocalizationToken';
 
 export type ServerLanguageShort = Pick<ServerLanguage, 'isoCode' | 'nativeName'>;
@@ -120,6 +121,8 @@ export class LocalizationService extends Bootstrap {
         return defaultRULocale;
       case 'it':
         return defaultITLocale;
+      case 'zh':
+        return defaultZHLocale;
       default:
         return defaultENLocale;
     }
