@@ -46,7 +46,7 @@ public class CBConstants {
     public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
     public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
-    public static final String PARAM_AUTH_PROVIDERS = "authProviders";
+    public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
 
     public static final String PARAM_DB_CONFIGURATION = "database";
     public static final String PARAM_DB_DRIVER_CONFIGURATION = "driver";

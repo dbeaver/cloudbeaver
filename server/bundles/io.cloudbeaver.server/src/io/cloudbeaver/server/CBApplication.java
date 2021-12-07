@@ -692,148 +692,24 @@ public class CBApplication extends BaseApplicationImpl {
             try (JsonWriter json = gson.newJsonWriter(out)) {
                 json.setLenient(true);
                 json.beginObject();
-                {
-                    json.name("server");
-                    json.beginObject();
-                    if (!CommonUtils.isEmpty(newServerName)) {
-                        JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
-                    }
-                    if (!CommonUtils.isEmpty(newServerURL)) {
-                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
-                    }
-                    if (sessionExpireTime > 0) {
-                        JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
-                    }
 
-                    json.name(CBConstants.PARAM_DB_CONFIGURATION);
-                    json.beginObject();
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_DRIVER_CONFIGURATION,
-                        databaseConfiguration.getDriver()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_URL_CONFIGURATION,
-                        databaseConfiguration.getUrl()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_USER_CONFIGURATION,
-                        databaseConfiguration.getUser()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_PW_CONFIGURATION,
-                        databaseConfiguration.getPassword()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION,
-                        databaseConfiguration.isCreateDatabase()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION,
-                        databaseConfiguration.isAllowPublicAccess()
-                    );
-                    JSONUtils.fieldNE(
-                        json,
-                        CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
-                        databaseConfiguration.getInitialDataConfiguration()
-                    );
-
-                    CBDatabaseConfig.Pool pool = databaseConfiguration.getPool();
-                    if (pool != null) {
-                        json.name(CBConstants.PARAM_DB_POOL_CONFIGURATION);
-                        json.beginObject();
-                        JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION,
-                            pool.getMinIdleConnections()
-                        );
-                        JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION,
-                            pool.getMaxIdleConnections()
-                        );
-                        JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION,
-                            pool.getMaxConnections()
-                        );
-                        JSONUtils.fieldNE(
-                            json,
-                            CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
-                            pool.getValidationQuery()
-                        );
-                        json.endObject();
-                    }
-                    json.endObject();
-
-                    json.endObject();
+                Map<String, Object> serverMap = ConfigurationUtils.serverConfigToMap(
+                    newServerName,
+                    newServerURL,
+                    sessionExpireTime,
+                    databaseConfiguration
+                );
+                if (!CommonUtils.isEmpty(serverMap)) {
+                    JSONUtils.serializeProperties(json, "server", serverMap);
                 }
-                {
-                    json.name("app");
-                    json.beginObject();
-                    JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-                    JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
-                    JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-                    JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
-                    Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
-                    if (!CommonUtils.isEmpty(resourceQuotas)) {
-                        JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
-                    }
-
-                    Map<String, AuthProviderConfig> authProviders = appConfig.getAuthProviderConfigurations();
-                    if (!CommonUtils.isEmpty(authProviders)) {
-                        JSONUtils.serializeProperties(json, CBConstants.PARAM_AUTH_PROVIDERS, authProviders);
-                    }
-
-                    {
-                        // Save only differences in def navigator settings
-                        DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
-
-                        json.name("defaultNavigatorSettings");
-                        json.beginObject();
-                        if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects())
-                            JSONUtils.field(json, "showSystemObjects", navSettings.isShowSystemObjects());
-                        if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects())
-                            JSONUtils.field(json, "showUtilityObjects", navSettings.isShowUtilityObjects());
-                        if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities())
-                            JSONUtils.field(json, "showOnlyEntities", navSettings.isShowOnlyEntities());
-                        if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities())
-                            JSONUtils.field(json, "mergeEntities", navSettings.isMergeEntities());
-                        if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
-                            JSONUtils.field(json, "hideFolders", navSettings.isHideFolders());
-                        if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
-                            JSONUtils.field(json, "hideSchemas", navSettings.isHideSchemas());
-                        if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
-                            JSONUtils.field(json, "hideVirtualModel", navSettings.isHideVirtualModel());
-
-                        json.endObject();
-                    }
-                    if (appConfig.getEnabledFeatures() != null) {
-                        JSONUtils.serializeStringList(json, "enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()), true);
-                    }
-                    if (appConfig.getEnabledAuthProviders() != null) {
-                        JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
-                    }
-
-                    if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
-                        JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
-                    }
-                    if (!CommonUtils.isEmpty(appConfig.getAuthProviderConfigurations())) {
-                        json.name("authConfiguration");
-                        gson.toJson(appConfig.getAuthProviderConfigurations(), Map.class, json);
-                    }
-
-                    json.endObject();
+                Map<String, Object> appMap = ConfigurationUtils.appConfigToMap(appConfig);
+                if (!CommonUtils.isEmpty(appMap)) {
+                    JSONUtils.serializeProperties(json, "app", appMap);
                 }
+
                 json.endObject();
             }
-
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
