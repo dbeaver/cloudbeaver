@@ -17,14 +17,14 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.utils.CommonUtils;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ConfigurationUtils {
@@ -34,7 +34,7 @@ public class ConfigurationUtils {
     }
 
     public static Map<String, Object> appConfigToMap(@Nullable CBAppConfig appConfig) {
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new LinkedHashMap<>();
         if (appConfig == null) {
             return res;
         }
@@ -87,7 +87,7 @@ public class ConfigurationUtils {
     }
 
     public static Map<String, Object> defaultNavigatorSettingsConfigToMap(@Nullable DBNBrowseSettings navSettings) {
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new LinkedHashMap<>();
         if (navSettings == null) {
             return res;
         }
@@ -120,7 +120,7 @@ public class ConfigurationUtils {
                                                         String newServerURL,
                                                         long sessionExpireTime,
                                                         CBDatabaseConfig databaseConfiguration) {
-        Map<String, Object> serverMap = new HashMap<>();
+        Map<String, Object> serverMap = new LinkedHashMap<>();
         if (!CommonUtils.isEmpty(newServerName)) {
             serverMap.put(CBConstants.PARAM_SERVER_NAME, newServerName);
         }
@@ -139,7 +139,7 @@ public class ConfigurationUtils {
     }
 
     public static Map<String, Object> databaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new LinkedHashMap<>();
         if (databaseConfiguration == null) {
             return res;
         }
@@ -179,7 +179,7 @@ public class ConfigurationUtils {
     }
 
     public static Map<String, Object> poolDatabaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new LinkedHashMap<>();
         if (databaseConfiguration == null) {
             return res;
         }
