@@ -496,7 +496,9 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(id);
-        ((DataSourceDescriptor)connectionInfo.getDataSourceContainer()).setNavigatorSettings(settings);
+        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor)connectionInfo.getDataSourceContainer());
+        dataSourceDescriptor.setNavigatorSettings(settings);
+        dataSourceDescriptor.persistConfiguration();
         return connectionInfo;
     }
 
