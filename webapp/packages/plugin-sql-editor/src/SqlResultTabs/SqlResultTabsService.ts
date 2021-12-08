@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { ISqlEditorTabState, ISqlEditorResultTab } from '../ISqlEditorTabState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryResultService } from './SqlQueryResultService';
 import { SqlQueryService } from './SqlQueryService';
@@ -19,7 +21,11 @@ export class SqlResultTabsService {
     private sqlQueryService: SqlQueryService,
     private sqlQueryResultService: SqlQueryResultService,
     private sqlExecutionPlanService: SqlExecutionPlanService,
-  ) { }
+  ) {
+    makeObservable(this, {
+      removeResultTabs: action,
+    });
+  }
 
   selectResultTab(state: ISqlEditorTabState, resultId: string): void {
     state.currentTabId = resultId;
@@ -29,14 +35,26 @@ export class SqlResultTabsService {
     const tab = state.tabs.find(tab => tab.id === tabId);
 
     if (tab) {
-      state.tabs.splice(state.tabs.indexOf(tab), 1);
+      this.removeTab(state, tab);
+    } else {
+      console.warn(`Unable to remove tab. Tab with id="${tabId}" was not found`);
     }
+  }
 
-    this.sqlQueryService.removeStatisticsTab(state, tabId);
-    this.sqlQueryResultService.removeResultTab(state, tabId);
-    this.sqlExecutionPlanService.removeExecutionPlanTab(state, tabId);
+  removeResultTabs(state: ISqlEditorTabState): void {
+    for (const tab of state.tabs.slice()) {
+      this.removeTab(state, tab);
+    }
+  }
 
-    if (state.currentTabId === tabId) {
+  private removeTab(state: ISqlEditorTabState, tab: ISqlEditorResultTab) {
+    state.tabs.splice(state.tabs.indexOf(tab), 1);
+
+    this.sqlQueryService.removeStatisticsTab(state, tab.id);
+    this.sqlQueryResultService.removeResultTab(state, tab.id);
+    this.sqlExecutionPlanService.removeExecutionPlanTab(state, tab.id);
+
+    if (state.currentTabId === tab.id) {
       if (state.tabs.length > 0) {
         state.currentTabId = state.tabs[0].id;
       } else {

@@ -20,6 +20,7 @@ import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
@@ -29,6 +30,7 @@ import { SqlEditorService } from '../SqlEditorService';
 import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
+import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
 const closeCharacters = /[\s()[\]{};:>,=\\*]/;
 
@@ -113,11 +115,13 @@ export class SqlEditorController implements IInitializableController, IDestructi
   private reactionDisposer: IReactionDisposer | null;
 
   constructor(
-    private connectionExecutionContextService: ConnectionExecutionContextService,
-    private sqlQueryService: SqlQueryService,
-    private sqlDialectInfoService: SqlDialectInfoService,
-    private sqlEditorService: SqlEditorService,
-    private sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly sqlQueryService: SqlQueryService,
+    private readonly sqlDialectInfoService: SqlDialectInfoService,
+    private readonly sqlEditorService: SqlEditorService,
+    private readonly sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly sqlResultTabsService: SqlResultTabsService,
+    private readonly commonDialogService: CommonDialogService
   ) {
     this.parser = new SQLParser();
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
@@ -226,6 +230,21 @@ export class SqlEditorController implements IInitializableController, IDestructi
   executeScript = async (): Promise<void> => {
     if (this.isDisabled || this.isScriptEmpty) {
       return;
+    }
+
+    if (this.state.tabs.length) {
+      const result = await this.commonDialogService.open(ConfirmationDialog, {
+        title: 'sql_editor_close_result_tabs_dialog_title',
+        message: `Do you want to close ${this.state.tabs.length} tabs before executing script?`,
+        confirmActionText: 'ui_yes',
+        extraStatus: 'no',
+      });
+
+      if (result === DialogueStateResult.Resolved) {
+        this.sqlResultTabsService.removeResultTabs(this.state);
+      } else if (result === DialogueStateResult.Rejected) {
+        return;
+      }
     }
 
     this.beforeExecute();
