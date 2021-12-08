@@ -33,7 +33,7 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
     throw new Error('Form state should be provided');
   }
 
-  if (features.data.length === 0) {
+  if (features.data.length === 0 || configurationWizard) {
     return null;
   }
 

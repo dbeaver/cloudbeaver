@@ -82,7 +82,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.update.publicCredentialsSaveEnabled ?? this.data?.publicCredentialsSaveEnabled ?? false;
   }
 
-  isFeatureEnabled(feature: string): boolean {
+  isFeatureEnabled(feature: string, serverSide = false): boolean {
+    if (serverSide) {
+      return this.data?.enabledFeatures.includes(feature) || false;
+    }
     return this.enabledFeatures.includes(feature);
   }
 

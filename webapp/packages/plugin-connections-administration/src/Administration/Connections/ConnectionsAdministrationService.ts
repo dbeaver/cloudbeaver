@@ -46,7 +46,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   register(): void {
     this.administrationItemService.create({
       name: 'connections',
-      type: AdministrationItemType.Default,
+      type: AdministrationItemType.Administration,
       order: 2,
       configurationWizardOptions: {
         defaultRoute: { sub: 'create' },

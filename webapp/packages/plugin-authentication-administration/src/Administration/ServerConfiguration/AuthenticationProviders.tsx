@@ -86,6 +86,10 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                 const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
                 const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
+                if (configurationWizard && disabled) {
+                  return null;
+                }
+
                 return (
                   <Switch
                     key={provider.id}

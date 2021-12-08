@@ -9,7 +9,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ScreenService } from '@cloudbeaver/core-routing';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import { AdministrationItemService, filterHiddenAdministrationItem } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
@@ -78,7 +78,7 @@ export class ConfigurationWizardService {
   constructor(
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
-    private screenService: ScreenService
+    private notificationService: NotificationService
   ) {
     makeObservable(this, {
       steps: computed,
@@ -178,6 +178,10 @@ export class ConfigurationWizardService {
     }
 
     this.administrationScreenService.clearItemsState();
-    this.screenService.navigateToRoot();
+    this.administrationScreenService.navigateToRoot();
+    this.notificationService.logSuccess({
+      title: 'administration_configuration_wizard_finish_success_title',
+      message: 'administration_configuration_wizard_finish_success_message',
+    });
   }
 }

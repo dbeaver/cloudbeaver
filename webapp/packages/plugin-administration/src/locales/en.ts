@@ -5,13 +5,13 @@ export default [
   ['administration_configuration_wizard_welcome', 'Welcome'],
   ['administration_configuration_wizard_welcome_step_description', 'Welcome to CloudBeaver'],
   ['administration_configuration_wizard_welcome_title', 'Welcome to CloudBeaver, cloud database management system!'],
-  ['administration_configuration_wizard_welcome_message', 'The easy configuration wizard will guide you through several simple steps to set up the CloudBeaver server. You will need to set server information and administrator credentials. You can also add first database connections here.'],
+  ['administration_configuration_wizard_welcome_message', 'The easy configuration wizard will guide you through several simple steps to set up the CloudBeaver server. You will need to set server information and administrator credentials. You can set up additional server parameters once the easy configuration is completed.'],
   ['administration_configuration_wizard_welcome_note', 'Note: you will be able to change these configuration parameters later on the administration panel.'],
 
   ['administration_configuration_wizard_configuration', 'Server configuration'],
   ['administration_configuration_wizard_configuration_step_description', 'Main server configuration'],
   ['administration_configuration_wizard_configuration_title', 'You can configure the main server parameters here.'],
-  ['administration_configuration_wizard_configuration_message', 'Administrator is a super user who can configure server, set databases connections, manage other users and much more. Please, remember the entered password. It is not possible to recover administrator password automatically.'],
+  ['administration_configuration_wizard_configuration_message', 'You can allow integration to external services such as AWS once the easy configuration is completed.\n\r Administrator is a super user who can configure server, set databases connections, manage other users and much more. Please, remember the entered password. It is not possible to recover administrator password automatically.'],
 
   ['administration_configuration_tools_save_tooltip', 'Save configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Reset changes'],
