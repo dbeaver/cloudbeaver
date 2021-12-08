@@ -47,12 +47,12 @@ public class WebUserInfo {
 
     @Property
     public String getUserId() {
-        return user.getUserId();
+        return user == null ? null : user.getUserId();
     }
 
     @Property
     public String getDisplayName() {
-        return user.getDisplayName();
+        return user == null ? null : user.getDisplayName();
     }
 
     @Property
