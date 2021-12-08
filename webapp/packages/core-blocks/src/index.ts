@@ -65,6 +65,7 @@ export * from './Tabs/TabsContainer/TabsContainer';
 export * from './Tabs/TabsContext';
 export * from './Tabs/TabsState';
 export * from './Tabs/useTabState';
+export * from './Tabs/useTabLocalState';
 
 export * from './Tabs/Tab/BorderTabStyles';
 export * from './Tabs/Tab/Tab';
@@ -146,6 +147,7 @@ export * from './TextPlaceholder';
 export * from './InfoItem';
 export * from './Iframe';
 export * from './useClickEvents';
+export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useDataResource';
 export * from './useExecutor';

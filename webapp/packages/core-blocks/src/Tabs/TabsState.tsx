@@ -144,6 +144,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       dynamic.props,
       valueGetter
     ), []);
+  const getLocalState = useCallback(
+    (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => tabsState.get(
+      tabId,
+      valueGetter
+    ), [tabsState]);
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
@@ -155,6 +160,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     lazy,
     getTabInfo,
     getTabState,
+    getLocalState,
     open: handleOpen,
     close: handleClose,
   }), [

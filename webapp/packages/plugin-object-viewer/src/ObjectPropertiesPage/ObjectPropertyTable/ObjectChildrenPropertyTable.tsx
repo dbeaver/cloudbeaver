@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { DBObject } from '@cloudbeaver/core-app';
-import { TableHeader, TableBody, Table, useTable, getComputed } from '@cloudbeaver/core-blocks';
+import { TableHeader, TableBody, Table, useTable, getComputed, useTabLocalState, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Header } from './Header';
@@ -56,8 +57,11 @@ interface Props {
 export const ObjectChildrenPropertyTable = observer<Props>(function ObjectPropertyTable({
   objects,
 }) {
+  const [scrollBox, setScrollBox] = useState<HTMLDivElement | null>(null);
   const styles = useStyles(style);
   const table = useTable();
+  const state = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
+  useControlledScroll(scrollBox, state);
 
   if (objects.length === 0) {
     return null;
@@ -74,7 +78,7 @@ export const ObjectChildrenPropertyTable = observer<Props>(function ObjectProper
 
   return styled(styles)(
     <wrapper>
-      <table-container>
+      <table-container ref={setScrollBox}>
         <Table selectedItems={table.selected}>
           <TableHeader>
             <Header properties={properties} />
