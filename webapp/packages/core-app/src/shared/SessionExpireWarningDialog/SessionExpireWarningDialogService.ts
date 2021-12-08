@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
@@ -26,6 +27,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
     private sessionExpireService: SessionExpireService,
     private serverConfigResource: ServerConfigResource,
     private sessionResource: SessionResource,
+    private userInfoResource: UserInfoResource
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -41,6 +43,14 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
   private startSessionPolling() {
     const poll = () => {
+      if (
+        !this.serverConfigResource.data?.anonymousAccessEnabled
+        && !this.userInfoResource.data
+        && !this.serverConfigResource.configurationMode
+      ) {
+        return;
+      }
+
       const cookies = getCookies();
       const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
       const sessionExpiredTime = cookies[SESSION_COOKIE_NAME];
