@@ -16,9 +16,11 @@ import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavNodeViewService } from '../shared/NodesManager/NavNodeView/NavNodeViewService';
 import { ElementsTree } from './ElementsTree';
 import { navigationTreeConnectionGroupFilter } from './navigationTreeConnectionGroupFilter';
 import { navigationTreeConnectionGroupRenderer } from './navigationTreeConnectionGroupRenderer';
+import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
 
@@ -59,6 +61,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const navNodeViewService = useService(NavNodeViewService);
 
   const isEnabled = usePermission(EPermission.public);
   const { handleOpen, handleSelect } = useNavigationTree();
@@ -67,6 +70,8 @@ export const NavigationTree = observer(function NavigationTree() {
     connectionInfoResource,
     navNodeInfoResource
   ), [connectionInfoResource, navNodeInfoResource]);
+
+  const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
 
   if (!isEnabled) {
     return null;
@@ -77,7 +82,7 @@ export const NavigationTree = observer(function NavigationTree() {
       <ElementsTree
         root={ROOT_NODE_PATH}
         localState={navTreeService.treeState}
-        filters={[connectionGroupFilter]}
+        filters={[duplicateFilter, connectionGroupFilter]}
         renderers={[navigationTreeConnectionGroupRenderer]}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>

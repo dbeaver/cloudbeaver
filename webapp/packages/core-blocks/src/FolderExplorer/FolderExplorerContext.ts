@@ -11,9 +11,10 @@ import { createContext } from 'react';
 export interface IFolderExplorerContext {
   root: string;
   path: string[];
+  fullPath: string[];
   folder: string;
 
-  open: (folder: string) => void;
+  open: (path: string[], folder: string) => void;
 }
 
 export const FolderExplorerContext = createContext<IFolderExplorerContext | null>(null);

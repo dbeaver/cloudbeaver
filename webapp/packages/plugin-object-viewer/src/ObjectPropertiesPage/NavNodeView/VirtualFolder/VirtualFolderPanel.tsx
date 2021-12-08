@@ -11,12 +11,10 @@ import styled, { css } from 'reshadow';
 
 import { DBObject, DBObjectResource, NavNodeInfoResource, NavNodeTransformViewComponent, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { preloadNodeParents } from '../../../preloadNodeParents';
 import { ObjectChildrenPropertyTable } from '../../ObjectPropertyTable/ObjectChildrenPropertyTable';
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
@@ -36,25 +34,14 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
   const translate = useTranslate();
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const connectionInfoResource = useService(ConnectionInfoResource);
   const tree = useMapResource(VirtualFolderPanel, NavTreeResource, nodeId, {
-    onLoad: async resource => !(await preloadNodeParents(
-      connectionInfoResource,
-      resource,
-      navNodeInfoResource,
-      parents,
-      nodeId)),
+    onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 
   const key = resourceKeyList(tree.data || []);
   const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
-      const preloaded = await preloadNodeParents(connectionInfoResource,
-        tree.resource,
-        navNodeInfoResource,
-        parents,
-        nodeId
-      );
+      const preloaded = await tree.resource.preloadNodeParents(parents, nodeId);
 
       if (!preloaded) {
         return true;

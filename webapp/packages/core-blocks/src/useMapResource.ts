@@ -166,16 +166,20 @@ export function useMapResource<
     async [loadFunctionName](refresh?: boolean) {
       const { resource, actions, prevData, key, includes } = this;
 
-      const active = await actions?.isActive?.(resource);
-
-      if (this.loading || active === false) {
+      if (this.loading) {
         return;
       }
 
-      this.firstRender = false;
-      this.loading = true;
-
       try {
+        const active = await actions?.isActive?.(resource);
+
+        if (active === false) {
+          return;
+        }
+
+        this.firstRender = false;
+        this.loading = true;
+
         const prevent = await actions?.onLoad?.(resource);
 
         if (key === null || prevent === true) {

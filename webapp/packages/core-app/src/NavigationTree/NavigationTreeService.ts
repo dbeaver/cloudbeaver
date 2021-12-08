@@ -11,7 +11,8 @@ import { action, makeObservable } from 'mobx';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IActiveView } from '@cloudbeaver/core-view';
 import { View } from '@cloudbeaver/core-view';
@@ -25,14 +26,14 @@ import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 import type { ITreeNodeState } from './useElementsTree';
 
 export interface INavigationNodeSelectionData {
-  id: string;
-  selected: boolean;
+  id: ResourceKey<string>;
+  selected: boolean[];
 }
 
 @injectable()
 export class NavigationTreeService extends View<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
-  readonly nodeSelectionTask: IExecutor<INavigationNodeSelectionData>;
+  readonly nodeSelectionTask: ISyncExecutor<INavigationNodeSelectionData>;
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,
@@ -45,6 +46,7 @@ export class NavigationTreeService extends View<string> {
     super();
 
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
+      selectNode: action,
       unselectAll: action,
     });
 
@@ -54,7 +56,7 @@ export class NavigationTreeService extends View<string> {
       selected: false,
     }));
 
-    this.nodeSelectionTask = new Executor();
+    this.nodeSelectionTask = new SyncExecutor();
     this.getView = this.getView.bind(this);
   }
 
@@ -66,7 +68,7 @@ export class NavigationTreeService extends View<string> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 
-  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
+  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean, notify = true): Promise<boolean> {
     try {
       if (this.isConnectionNode(id)) {
         const connection = await this.connectionInfoResource.load(
@@ -84,6 +86,8 @@ export class NavigationTreeService extends View<string> {
         }
       }
 
+      await this.navTreeResource.waitLoad();
+
       if (tryConnect && this.navTreeResource.getException(id)) {
         this.navTreeResource.markOutdated(id);
       }
@@ -91,22 +95,24 @@ export class NavigationTreeService extends View<string> {
       await this.navTreeResource.load(id);
       return true;
     } catch (exception) {
-      this.notificationService.logException(exception);
+      if (notify) {
+        this.notificationService.logException(exception);
+      }
     }
     return false;
   }
 
-  async selectNode(id: string, multiple?: boolean): Promise<void> {
+  selectNode(id: string, multiple?: boolean): void {
     if (!multiple) {
-      await this.unselectAll();
+      this.unselectAll();
     }
 
     const metadata = this.treeState.get(id);
     metadata.selected = !metadata.selected;
 
-    await this.nodeSelectionTask.execute({
+    this.nodeSelectionTask.execute({
       id,
-      selected: metadata.selected,
+      selected: [metadata.selected],
     });
   }
 
@@ -136,14 +142,18 @@ export class NavigationTreeService extends View<string> {
     };
   }
 
-  private async unselectAll() {
+  private unselectAll() {
+    const list: string[] = [];
+
     for (const [id, metadata] of this.treeState) {
       metadata.selected = false;
-      await this.nodeSelectionTask.execute({
-        id,
-        selected: false,
-      });
+      list.push(id);
     }
+
+    this.nodeSelectionTask.execute({
+      id: resourceKeyList(list),
+      selected: list.map(() => false),
+    });
   }
 
   private isConnectionNode(navNodeId: string) {

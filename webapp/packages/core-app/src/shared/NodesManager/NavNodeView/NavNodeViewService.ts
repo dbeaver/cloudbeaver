@@ -89,7 +89,7 @@ export class NavNodeViewService {
     this.transformers.push(transform);
   }
 
-  private logDuplicates(nodeId: string, duplicates: string[]) {
+  logDuplicates(nodeId: string, duplicates: string[]) {
     if (duplicates.length > 0 && !this.duplicationNotify.has(nodeId)) {
       this.duplicationNotify.add(nodeId);
       this.notificationService.logError({

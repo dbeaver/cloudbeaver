@@ -18,9 +18,11 @@ import { useNavigationNode } from './useNavigationNode';
 export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,
   component,
+  path,
   expanded: expandedExternal,
 }) {
   const {
+    empty,
     group,
     control,
     disabled,
@@ -34,9 +36,13 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     handleSelect,
     handleFilter,
     filterValue,
-  } = useNavigationNode(node);
+  } = useNavigationNode(node, path);
 
   const Control = control || NavigationNodeControl;
+
+  if (leaf || empty) {
+    expandedExternal = false;
+  }
 
   return (
     <TreeNode
@@ -55,7 +61,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       onFilter={handleFilter}
     >
       <Control node={node} />
-      {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} component={component} />}
+      {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
     </TreeNode>
   );
 });

@@ -15,8 +15,10 @@ import { useService } from '@cloudbeaver/core-di';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
@@ -29,13 +31,6 @@ const styles = css`
   tree {
     position: relative;
     box-sizing: border-box;
-  }
-
-  center {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    min-width: 240px;
   }
 
   FolderExplorerPath {
@@ -90,18 +85,19 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 }) {
   const folderExplorer = useFolderExplorer(baseRoot);
   const root = folderExplorer.folder;
-  const Placeholder = emptyPlaceholder;
+  const fullPath = folderExplorer.fullPath;
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navigationTreeService = useService(NavigationTreeService);
 
   const children = useMapResource(ElementsTree, NavTreeResource, root, {
-    isActive: () => navigationTreeService.loadNestedNodes(root, true),
+    onLoad: async resource => !(await resource.preloadNodeParents(fullPath)),
   });
 
   const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
 
   const tree = useElementsTree({
     baseRoot,
+    folderExplorer,
     foldersTree,
     showFolderExplorerPath,
     root,
@@ -125,14 +121,14 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       selectionTree,
       control,
       onOpen,
-      onClick: async (node, leaf) => {
+      onClick: async (node, path, leaf) => {
         await onClick?.(node);
 
         if (!leaf && tree.foldersTree) {
           const loaded = await navigationTreeService.loadNestedNodes(node.id, true);
 
           if (loaded) {
-            folderExplorer.open(node.id);
+            folderExplorer.open(path, node.id);
           }
         }
       },
@@ -141,46 +137,44 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   );
 
   const getName = useCallback(
-    (folder: string) => navNodeInfoResource.get(folder)?.name || folder,
+    (folder: string) => navNodeInfoResource.get(folder)?.name || 'Not found',
+    [navNodeInfoResource]
+  );
+
+  const canSkip = useCallback(
+    (folder: string) => {
+      const features = navNodeInfoResource.get(folder)?.objectFeatures;
+      return !(
+        features?.includes(EObjectFeature.schema)
+        || features?.includes(EObjectFeature.catalog)
+        || features?.includes(EObjectFeature.dataSource)
+      );
+    },
     [navNodeInfoResource]
   );
 
   const hasChildren = (children.data?.length || 0) > 0;
-  let loading = children.isLoading() || tree.loading;
 
-  if (tree.foldersTree && folderExplorer.root !== root) {
-    loading = false;
-  }
-
-  if (keepData && tree.loading) {
-    return styled(styles)(
-      <center>
-        <Loader />
-      </center>
-    );
-  }
-
-  if (!hasChildren) {
-    if (loading) {
-      return styled(styles)(
-        <center>
-          <Loader />
-        </center>
-      );
-    } else if (folderExplorer.root === folderExplorer.folder) {
-      return <>{Placeholder && <Placeholder />}</>;
-    }
-  }
+  const loaderAvailable = !context.tree.foldersTree || context.folderExplorer.root === root;
 
   return styled(styles)(
-    <TreeContext.Provider value={context}>
-      <FolderExplorer state={folderExplorer}>
-        <tree className={className}>
-          {tree.showFolderExplorerPath && <FolderExplorerPath getName={getName} />}
-          <NavigationNodeNested nodeId={root} component={NavigationNodeElement} root />
-          <Loader loading={loading} overlay={hasChildren} />
-        </tree>
-      </FolderExplorer>
-    </TreeContext.Provider>
+    <ElementsTreeLoader
+      root={root}
+      context={context}
+      emptyPlaceholder={emptyPlaceholder}
+      childrenState={children}
+      hasChildren={hasChildren}
+      keepData={keepData}
+    >
+      <TreeContext.Provider value={context}>
+        <FolderExplorer state={folderExplorer}>
+          <tree className={className}>
+            {tree.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
+            <NavigationNodeNested nodeId={root} component={NavigationNodeElement} path={folderExplorer.path} root />
+            {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
+          </tree>
+        </FolderExplorer>
+      </TreeContext.Provider>
+    </ElementsTreeLoader>
   );
 });

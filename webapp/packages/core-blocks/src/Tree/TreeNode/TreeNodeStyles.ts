@@ -15,6 +15,9 @@ export const TREE_NODE_STYLES = composes(
     TreeNodeControl {
       composes: theme-ripple theme-ripple-selectable from global;
     }
+    TreeNodeNestedMessage {
+      composes: theme-text-text-hint-on-light from global;
+    }
   `,
   css`
     node {
@@ -108,9 +111,19 @@ export const TREE_NODE_STYLES = composes(
       padding-left: 24px;
       display: none;
 
+      &[root] {
+        padding: 0;
+        display: block;
+      }
+
       &[expanded] {
         display: block;
       }
+    }
+
+    TreeNodeNestedMessage {
+      composes: theme-typography--caption from global;
+      padding: 4px 12px;
     }
 
     node TreeNodeControl[big] {

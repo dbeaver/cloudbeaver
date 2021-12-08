@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import styled from 'reshadow';
 
-import { TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
@@ -20,41 +19,37 @@ import { TreeContext } from '../../TreeContext';
 interface Props {
   nodeId: string;
   component: NavTreeNodeComponent;
+  path: string[];
   root?: boolean;
 }
 
 export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
   nodeId,
   component,
+  path,
   root,
 }) {
   const styles = useStyles(TREE_NODE_STYLES);
   const treeContext = useContext(TreeContext);
 
-  const children = useMemo(
-    () => computed(() => treeContext?.tree.getNodeChildren(nodeId) || []),
-    [nodeId, treeContext?.tree]
-  ).get();
+  const nextPath = useMemo(() => [...path, nodeId], [path, nodeId]);
+  const children = getComputed(
+    () => treeContext?.tree.getNodeChildren(nodeId) || []
+  );
 
   const NavigationNode = component;
 
   if (root) {
     if (treeContext?.folderExplorer.folder !== treeContext?.folderExplorer.root) {
       return styled(styles)(
-        <NavigationNode nodeId={nodeId} expanded />
+        <NavigationNode nodeId={nodeId} path={path} expanded />
       );
     }
-
-    return styled(styles)(
-      <>
-        {children.map(child => <NavigationNode key={child} nodeId={child} />)}
-      </>
-    );
   }
 
   return styled(styles)(
-    <TreeNodeNested>
-      {children.map(child => <NavigationNode key={child} nodeId={child} />)}
+    <TreeNodeNested root={root}>
+      {children.map(child => <NavigationNode key={child} nodeId={child} path={nextPath} />)}
     </TreeNodeNested>
   );
 });

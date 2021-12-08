@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { useMemo, useState } from 'react';
 
-import { useExecutor, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { IFolderExplorerContext, useExecutor, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -44,6 +44,7 @@ interface IElementsTreeUserState {
 interface IOptions {
   baseRoot: string;
   root: string;
+  folderExplorer: IFolderExplorerContext;
   foldersTree: boolean;
   showFolderExplorerPath: boolean;
   disabled?: boolean;
@@ -123,6 +124,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
   showFolderExplorerPath = userState.showFolderExplorerPath;
 
   async function loadTree(nodeId: string) {
+    const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);
+
+    if (!preloaded) {
+      return;
+    }
+
     let children = [nodeId];
 
     while (children.length > 0) {
@@ -333,22 +340,51 @@ export function useElementsTree(options: IOptions): IElementsTree {
     renderers,
   });
 
+  function exitNodeFolder(nodeId: string) {
+    runInAction(() => {
+      const folderExplorer = options.folderExplorer;
+
+      if (folderExplorer.fullPath.length === 1) {
+        return;
+      }
+
+      const pathIndex = folderExplorer.fullPath.indexOf(nodeId);
+
+      if (pathIndex >= 0) {
+        folderExplorer.fullPath = folderExplorer.fullPath.slice(0, pathIndex);
+        folderExplorer.folder = folderExplorer.fullPath[pathIndex - 1];
+        folderExplorer.path = folderExplorer.fullPath.slice(0, pathIndex - 1);
+      }
+    });
+  }
+
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
     postHandlers: [function refreshRoot() {
       loadTree(options.root);
     }],
   });
-  // useExecutor({
-  //   executor: navTreeResource.onNodeRefresh,
-  //   postHandlers: [loadTree],
-  // });
+
+  useExecutor({
+    executor: navNodeInfoResource.onItemAdd,
+    handlers: [function exitFolder(key) {
+      ResourceKeyUtils.forEach(key, key => {
+        const children = navTreeResource.get(key);
+
+        if (!children || children.length === 0) {
+          exitNodeFolder(key);
+        }
+      });
+    }],
+  });
 
   useExecutor({
     executor: navNodeInfoResource.onItemDelete,
     handlers: [function deleteNodeState(key) {
-      ResourceKeyUtils.forEach(key, key => {
-        state.delete(key);
+      runInAction(() => {
+        ResourceKeyUtils.forEach(key, key => {
+          state.delete(key);
+        });
       });
     }],
   });
@@ -361,6 +397,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         if (node) {
           await elementsTree.expand(node, false);
+
+          exitNodeFolder(key);
         }
       });
     }],

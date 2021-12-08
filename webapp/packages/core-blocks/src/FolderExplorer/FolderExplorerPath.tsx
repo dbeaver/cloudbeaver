@@ -16,11 +16,13 @@ import { FolderName } from './FolderName';
 
 interface Props {
   getName?: (folder: string) => string;
+  canSkip?: (folder: string) => boolean;
   className?: string;
 }
 
 export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
   getName,
+  canSkip,
   className,
 }) {
   const context = useContext(FolderExplorerContext);
@@ -29,21 +31,58 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
     throw new Error('Folder explorer context should be provided');
   }
 
-  if (context.path.length === 0) {
+  if (context.fullPath.length <= 1) {
     return null;
+  }
+
+  const pathElements: JSX.Element[] = [];
+  let skip = false;
+  let skipTitle = '';
+
+  for (let i = 0; i < context.fullPath.length; i++) {
+    const folder = context.fullPath[i];
+    const path = context.fullPath.slice(0, i);
+    const skipFolder = !canSkip || canSkip(folder);
+
+    if (i === 0 || i === context.fullPath.length - 1 || !skipFolder || context.fullPath.length < 5) {
+      if (skip) {
+        pathElements.push(
+          <FolderName
+            key={i - 1}
+            path={path}
+            title={skipTitle}
+            short
+          />
+        );
+      }
+
+      pathElements.push(
+        <FolderName
+          key={i}
+          folder={folder}
+          path={path}
+          last={i === context.fullPath.length - 1}
+          getName={getName}
+        />
+      );
+      skip = false;
+      skipTitle = '';
+      continue;
+    }
+
+    if (canSkip) {
+      if (skipTitle !== '') {
+        skipTitle += ' > ';
+      }
+      skipTitle += (getName?.(folder) || folder);
+      skip = true;
+      continue;
+    }
   }
 
   return styled(folderExplorerStyles)(
     <folder-explorer-path className={className}>
-      <FolderName folder={context.root} getName={getName} />
-      {context.path.map((folder, i) => (
-        <FolderName
-          key={folder}
-          folder={folder}
-          last={i === context.path.length - 1}
-          getName={getName}
-        />
-      ))}
+      {pathElements}
     </folder-explorer-path>
   );
 });

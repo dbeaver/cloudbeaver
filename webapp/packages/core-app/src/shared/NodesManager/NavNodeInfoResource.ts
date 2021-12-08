@@ -17,7 +17,8 @@ import {
   NavNodeInfoFragment,
   ResourceKeyUtils,
   ICachedMapResourceMetadata,
-  ResourceKeyList
+  ResourceKeyList,
+  resourceKeyList
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -48,6 +49,33 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       exception: null,
       includes: [],
     }));
+  }
+
+  updateNode(key: string, node: NavNode): void;
+  updateNode(key: ResourceKeyList<string>, nodes: NavNode[]): void;
+  updateNode(key: ResourceKey<string>, nodes: NavNode[] | NavNode): void;
+  updateNode(key: ResourceKey<string>, nodes: NavNode[] | NavNode): void {
+    const keyList: string[] = [];
+    const values: NavNode[] = [];
+
+    ResourceKeyUtils.forEach(key, (key, i) => {
+      const value = i === -1 ? (nodes as NavNode) : (nodes as NavNode[])[i];
+      const currentValue = this.get(key);
+
+      if (currentValue && value) {
+        Object.assign(currentValue, value);
+      } else {
+        keyList.push(key);
+        values.push(value);
+      }
+    });
+
+    if (keyList.length > 0) {
+      this.set(resourceKeyList(keyList), values);
+    } else {
+      this.markUpdated(key);
+      this.onItemAdd.execute(key);
+    }
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {

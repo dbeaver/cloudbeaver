@@ -10,15 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ITab, NavNodeInfoResource, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
+import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
 import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { preloadNodeParents } from '../preloadNodeParents';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
 
@@ -74,8 +72,6 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
-  const navNodeInfoResource = useService(NavNodeInfoResource);
-  const connectionInfoResource = useService(ConnectionInfoResource);
   const style = useStyles(verticalTabStyles, styles);
 
   const nodeId = tab.handlerState.objectId;
@@ -84,13 +80,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   let folderId = tab.handlerState.folderId;
 
   const children = useMapResource(ObjectFolders, NavTreeResource, nodeId, {
-    onLoad: async resource => !(await preloadNodeParents(
-      connectionInfoResource,
-      resource,
-      navNodeInfoResource,
-      parents,
-      nodeId
-    )),
+    onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 
   const folders = navNodeViewService.getFolders(nodeId) || [];

@@ -26,6 +26,12 @@ export const folderExplorerStyles = css`
     margin: 0 4px;
     opacity: 0.5;
   }
+
+  folder-explorer-path-element-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   
   folder-explorer-path-element:first-child folder-explorer-path-element-arrow {
     display: none

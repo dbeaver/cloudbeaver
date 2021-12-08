@@ -15,14 +15,32 @@ import { Link } from '../Link';
 import { FolderExplorerContext } from './FolderExplorerContext';
 import { folderExplorerStyles } from './folderExplorerStyles';
 
-interface Props {
-  folder: string;
+interface BaseProps {
+  folder?: string;
+  path: string[];
+  title?: string;
+  short?: boolean;
   last?: boolean;
-  getName?: (folder: string) => string;
+  getName?: (folder: string, path: string[]) => string;
 }
 
-export const FolderName = observer<Props>(function FolderName({
+interface FolderProps extends BaseProps {
+  folder: string;
+  path: string[];
+  title?: string;
+  last?: boolean;
+  getName?: (folder: string, path: string[]) => string;
+}
+
+interface ShortProps extends BaseProps {
+  short: boolean;
+}
+
+export const FolderName = observer<FolderProps | ShortProps>(function FolderName({
   folder,
+  path,
+  title,
+  short,
   last,
   getName,
 }) {
@@ -32,16 +50,31 @@ export const FolderName = observer<Props>(function FolderName({
     throw new Error('Folder explorer context should be provided');
   }
 
-  const name = getName?.(folder) || folder;
+  let name = 'Folder';
+
+  if (short) {
+    name = '...';
+  }
+
+  if (folder !== undefined) {
+    name = getName?.(folder, path) || folder;
+  }
+
+  if (folder === undefined) {
+    folder = path[path.length - 1];
+    path = path.slice(0, path.length - 1);
+  }
 
   return styled(folderExplorerStyles)(
-    <folder-explorer-path-element>
+    <folder-explorer-path-element title={title || name}>
       <folder-explorer-path-element-arrow>
         <Icon name="arrow" viewBox="0 0 16 16" />
       </folder-explorer-path-element-arrow>
-      {last
-        ? name
-        : <Link onClick={() => context.open(folder)}>{name}</Link>}
+      <folder-explorer-path-element-name>
+        {last
+          ? name
+          : <Link onClick={() => context.open(path, folder!)}>{name}</Link>}
+      </folder-explorer-path-element-name>
     </folder-explorer-path-element>
   );
 });

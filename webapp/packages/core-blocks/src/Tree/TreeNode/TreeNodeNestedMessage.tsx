@@ -7,12 +7,10 @@
  */
 
 interface Props {
-  expanded?: boolean;
-  root?: boolean;
   className?: string;
 }
 
-export const TreeNodeNested: React.FC<Props> = function TreeNodeNested({
+export const TreeNodeNestedMessage: React.FC<Props> = function TreeNodeNestedMessage({
   className,
   children,
 }) {

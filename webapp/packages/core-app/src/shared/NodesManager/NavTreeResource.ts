@@ -95,6 +95,41 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.userInfoResource.userChange.addHandler(() => this.clear());
   }
 
+  async preloadNodeParents(
+    parents: string[],
+    nextNode?: string
+  ): Promise<boolean> {
+    if (parents.length === 0) {
+      return true;
+    }
+
+    const first = parents[0];
+    await this.connectionInfo.waitLoad();
+    await this.load(first);
+
+    for (const nodeId of parents) {
+      await this.waitLoad();
+
+      if (!this.navNodeInfoResource.has(nodeId)) {
+        return false;
+      }
+
+      const connection = this.connectionInfo.getConnectionForNode(nodeId);
+
+      if (connection && !connection.connected) {
+        return false;
+      }
+
+      await this.load(nodeId);
+    }
+
+    if (nextNode && !this.navNodeInfoResource.has(nextNode)) {
+      return false;
+    }
+
+    return true;
+  }
+
   async refreshTree(navNodeId: string): Promise<void> {
     await this.graphQLService.sdk.navRefreshNode({
       nodePath: navNodeId,
@@ -128,22 +163,22 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     await this.performUpdate(key, [], async () => {
       await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
-    });
 
-    runInAction(() => {
-      const parents: string[] = [];
-      const deletedIds: string[][] = [];
+      runInAction(() => {
+        const parents: string[] = [];
+        const deletedIds: string[][] = [];
 
-      for (const path of nodePaths) {
-        const node = this.navNodeInfoResource.get(path);
+        for (const path of nodePaths) {
+          const node = this.navNodeInfoResource.get(path);
 
-        if (node) {
-          parents.push(node.parentId);
-          deletedIds.push([path]);
+          if (node) {
+            parents.push(node.parentId);
+            deletedIds.push([path]);
+          }
         }
-      }
 
-      this.deleteInNode(resourceKeyList(parents), deletedIds);
+        this.deleteInNode(resourceKeyList(parents), deletedIds);
+      });
     });
   }
 
@@ -390,7 +425,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         ]), metadata.withDetails);
       }
 
-      this.navNodeInfoResource.set(
+      this.navNodeInfoResource.updateNode(
         resourceKeyList([
           ...data.map(data => data.parentPath),
           ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
@@ -415,7 +450,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         ...data.navNodeChildren.map(node => node.id),
       ]), metadata.withDetails);
 
-      this.navNodeInfoResource.set(
+      this.navNodeInfoResource.updateNode(
         resourceKeyList([
           data.parentPath,
           ...data.navNodeChildren.map(node => node.id),

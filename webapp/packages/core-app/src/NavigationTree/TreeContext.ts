@@ -19,8 +19,8 @@ export interface ITreeContext {
   folderExplorer: IFolderExplorerContext;
   selectionTree: boolean;
   control?: NavTreeControlComponent;
-  onOpen?: (node: NavNode) => Promise<void> | void;
-  onClick?: (node: NavNode, leaf: boolean) => Promise<void> | void;
+  onOpen?: (node: NavNode, path: string[]) => Promise<void> | void;
+  onClick?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
 }
 
 export const TreeContext = createContext<ITreeContext | null>(null);

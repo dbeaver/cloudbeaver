@@ -9,14 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { DBObject, DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { DBObject, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { preloadNodeParents } from '../../preloadNodeParents';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
 
 const styles = css`
@@ -42,27 +39,13 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 }) {
   parents = [...parents, parentId];
   const translate = useTranslate();
-  const navNodeInfoResource = useService(NavNodeInfoResource);
-  const connectionInfoResource = useService(ConnectionInfoResource);
   const tree = useMapResource(ObjectPropertyTable, NavTreeResource, objectId, {
-    onLoad: async resource => !(await preloadNodeParents(
-      connectionInfoResource,
-      resource,
-      navNodeInfoResource,
-      parents,
-      objectId
-    )),
+    onLoad: async resource => !(await resource.preloadNodeParents(parents, objectId)),
   });
   const key = resourceKeyList(tree.data || []);
   const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
-      const preloaded = await preloadNodeParents(
-        connectionInfoResource,
-        tree.resource,
-        navNodeInfoResource,
-        parents,
-        objectId
-      );
+      const preloaded = await tree.resource.preloadNodeParents(parents, objectId);
 
       if (!preloaded) {
         return true;

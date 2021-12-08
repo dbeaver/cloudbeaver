@@ -83,6 +83,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+  const error = getComputed(() => (
+    !!navNodeInfoResource.getException(node.id)
+    || !!navTreeResource.getException(node.id)
+  ));
+  const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
 
   const [editing, setEditing] = useState(false);
 
@@ -94,11 +99,9 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
 
   let icon = node.icon;
 
-  if (navNodeInfoResource.getException(node.id) || navTreeResource.getException(node.id)) {
+  if (error) {
     icon = '/icons/error_icon_sm.svg';
   }
-
-  const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventStopPropagationFlag);

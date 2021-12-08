@@ -8,24 +8,25 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
+import styled from 'reshadow';
 
+import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
+import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
 import { TreeContext } from '../TreeContext';
 import { NavigationNode } from './NavigationNode';
 
-interface Props {
-  nodeId: string;
-  expanded?: boolean;
-}
-
-export const NavigationNodeElement = observer<Props>(function NavigationNodeElement({
+export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({
   nodeId,
+  path,
   expanded,
 }) {
   const context = useContext(TreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const styles = useStyles(TREE_NODE_STYLES);
 
   if (context?.tree.renderers) {
     for (const renderer of context.tree.renderers) {
@@ -40,9 +41,9 @@ export const NavigationNodeElement = observer<Props>(function NavigationNodeElem
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
-    return null;
+    return styled(styles)(<TreeNodeNestedMessage>Node not found</TreeNodeNestedMessage>);
   }
 
   // TODO: after node update reference can be lost and NavigationNode skip update
-  return <NavigationNode node={node} expanded={expanded} component={NavigationNodeElement} />;
+  return <NavigationNode node={node} path={path} expanded={expanded} component={NavigationNodeElement} />;
 });

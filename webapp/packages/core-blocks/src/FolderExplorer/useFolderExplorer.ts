@@ -18,26 +18,17 @@ export function useFolderExplorer(root: string): IFolderExplorerContext {
   const state = useObservableRef<IFolderExplorerContext>(() => ({
     root,
     path: [],
+    fullPath: [root],
     folder: root,
-    open(folder: string) {
-      if (folder === root) {
-        this.path = [];
-        this.folder = folder;
-      } else {
-        const index = this.path.indexOf(folder);
-
-        if (index >= 0) {
-          this.path.splice(index + 1, this.path.length);
-          this.folder = folder;
-        } else {
-          this.path.push(folder);
-          this.folder = folder;
-        }
-      }
+    open(path: string[], folder: string) {
+      this.path = path.slice();
+      this.fullPath = [...path, folder];
+      this.folder = folder;
     },
   }), {
     root: observable,
     path: observable,
+    fullPath: observable,
     folder: observable,
     open: action.bound,
   }, false);

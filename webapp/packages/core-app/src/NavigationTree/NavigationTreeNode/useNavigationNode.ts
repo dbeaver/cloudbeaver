@@ -8,7 +8,7 @@
 
 import { useContext, useEffect } from 'react';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
@@ -25,6 +25,7 @@ interface INavigationNode {
   loading: boolean;
   expanded: boolean;
   leaf: boolean;
+  empty: boolean;
   handleExpand: () => Promise<void>;
   handleOpen: () => Promise<void>;
   handleClick: (leaf: boolean) => Promise<void>;
@@ -33,32 +34,27 @@ interface INavigationNode {
   filterValue: string;
 }
 
-export function useNavigationNode(node: NavNode): INavigationNode {
+export function useNavigationNode(node: NavNode, path: string[]): INavigationNode {
   const contextRef = useObjectRef({
     context: useContext(TreeContext),
   });
   const { isLoading } = useNode(node.id);
-
   const children = useChildren(node.id);
-  const loading = isLoading() || children.isLoading();
-
   const state = contextRef.context?.tree.getNodeState(node.id);
-  const isExpanded = state?.expanded || false;
 
-  let leaf = isLeaf(node);
-  const group = contextRef.context?.tree.isGroup?.(node) || false;
-  let expanded = isExpanded && !leaf;
+  const loading = getComputed(() => isLoading() || children.isLoading());
+  const isExpanded = getComputed(() => state?.expanded || false);
+  const leaf = getComputed(() => isLeaf(node));
+  const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
+  const empty = getComputed(() => children.children?.length === 0);
+  const expanded = getComputed(() => isExpanded && !leaf && !empty);
+  const control = getComputed(() => contextRef.context?.control);
+  const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
+  const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
+  const filterValue = getComputed(() => state?.filter || '');
 
-  if (
-    node.objectFeatures.includes(EObjectFeature.dataSource)
-    && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
-  ) {
-    leaf = false;
-    expanded = false;
-  }
-
-  const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, leaf);
-  const handleOpen = async () => await contextRef.context?.onOpen?.(node);
+  const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, path, leaf);
+  const handleOpen = async () => await contextRef.context?.onOpen?.(node, path);
   const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
   const handleSelect = async (
     multiple = false,
@@ -75,10 +71,11 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   }, [node]);
 
   return {
+    empty,
     group,
-    control: contextRef.context?.control,
-    disabled: contextRef.context?.tree.disabled || false,
-    selected: contextRef.context?.tree.isNodeSelected(node.id) || false,
+    control,
+    disabled,
+    selected,
     loading,
     expanded,
     leaf,
@@ -87,7 +84,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     handleOpen,
     handleSelect,
     handleFilter,
-    filterValue: state?.filter || '',
+    filterValue,
   };
 }
 

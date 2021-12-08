@@ -12,6 +12,7 @@ import type { NavNode } from '../shared/NodesManager/EntityTypes';
 
 export type NavTreeNodeComponent = React.FC<{
   nodeId: string;
+  path: string[];
   expanded?: boolean;
 }>;
 
@@ -23,6 +24,7 @@ export type NavTreeControlComponent = React.FC<{
 export type NavigationNodeComponent = React.FC<{
   node: NavNode;
   component: NavTreeNodeComponent;
+  path: string[];
   expanded?: boolean;
 }>;
 
