@@ -35,7 +35,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   }
 
   const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
-  const externalAuthentication = providers.data.length === 1 && localProvider === undefined;
+  const externalAuthentication = localProvider === undefined;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
 
   useExecutor({
@@ -86,7 +86,13 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                 const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
                 const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
-                if (configurationWizard && disabled) {
+                if (
+                  configurationWizard
+                  && (
+                    disabled
+                    || provider.id !== AUTH_PROVIDER_LOCAL_ID
+                  )
+                ) {
                   return null;
                 }
 
