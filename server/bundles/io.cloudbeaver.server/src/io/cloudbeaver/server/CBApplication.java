@@ -493,7 +493,7 @@ public class CBApplication extends BaseApplicationImpl {
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
 
             // Database config
-            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION);
+            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBDatabase.PARAM_DB_CONFIGURATION);
             gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
             productConfigPath = getRelativePath(
@@ -515,16 +515,14 @@ public class CBApplication extends BaseApplicationImpl {
                     appConfiguration.getPlugins().entrySet().stream()
                 )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.getPlugins().clear();
-            appConfiguration.getPlugins().putAll(mergedPlugins);
+            appConfiguration.setPlugins(mergedPlugins);
 
             Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
                     prevConfig.getAuthProviderConfigurations().entrySet().stream(),
                     appConfiguration.getAuthProviderConfigurations().entrySet().stream()
                 )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.getAuthProviderConfigurations().clear();
-            mergedAuthProviders.forEach(appConfiguration::setAuthProviderConfiguration);
+            appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
         }
 
         if (!CommonUtils.isEmpty(productConfigPath)) {

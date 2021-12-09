@@ -121,7 +121,7 @@ public class ConfigurationUtils {
 
         Map<String, Object> dbMap = ConfigurationUtils.databaseConfigToMap(databaseConfiguration);
         if (!CommonUtils.isEmpty(dbMap)) {
-            serverMap.put(CBConstants.PARAM_DB_CONFIGURATION, dbMap);
+            serverMap.put(CBDatabase.PARAM_DB_CONFIGURATION, dbMap);
         }
         return serverMap;
     }
@@ -132,30 +132,30 @@ public class ConfigurationUtils {
             return res;
         }
         res.computeIfAbsent(
-            CBConstants.PARAM_DB_DRIVER_CONFIGURATION,
+            CBDatabase.PARAM_DB_DRIVER_CONFIGURATION,
             v -> databaseConfiguration.getDriver()
         );
         res.computeIfAbsent(
-            CBConstants.PARAM_DB_URL_CONFIGURATION,
+            CBDatabase.PARAM_DB_URL_CONFIGURATION,
             v -> databaseConfiguration.getUrl()
         );
         res.computeIfAbsent(
-            CBConstants.PARAM_DB_USER_CONFIGURATION,
+            CBDatabase.PARAM_DB_USER_CONFIGURATION,
             v -> databaseConfiguration.getUser()
         );
         res.computeIfAbsent(
-            CBConstants.PARAM_DB_PW_CONFIGURATION,
+            CBDatabase.PARAM_DB_PW_CONFIGURATION,
             v -> databaseConfiguration.getPassword()
         );
-        res.put(CBConstants.PARAM_DB_CREATE_DATABASE_CONFIGURATION, databaseConfiguration.isCreateDatabase());
-        res.put(CBConstants.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION, databaseConfiguration.isAllowPublicAccess());
+        res.put(CBDatabase.PARAM_DB_CREATE_DATABASE_CONFIGURATION, databaseConfiguration.isCreateDatabase());
+        res.put(CBDatabase.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION, databaseConfiguration.isAllowPublicAccess());
         res.computeIfAbsent(
-            CBConstants.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
+            CBDatabase.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
             v -> databaseConfiguration.getInitialDataConfiguration()
         );
         Map<String, Object> poolMap = ConfigurationUtils.poolDatabaseConfigToMap(databaseConfiguration);
         if (!CommonUtils.isEmpty(poolMap)) {
-            res.put(CBConstants.PARAM_DB_POOL_CONFIGURATION, poolMap);
+            res.put(CBDatabase.PARAM_DB_POOL_CONFIGURATION, poolMap);
         }
         return res;
     }
@@ -169,11 +169,11 @@ public class ConfigurationUtils {
         if (pool == null) {
             return res;
         } else {
-            res.put(CBConstants.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION, pool.getMinIdleConnections());
-            res.put(CBConstants.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION, pool.getMaxIdleConnections());
-            res.put(CBConstants.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION, pool.getMaxConnections());
+            res.put(CBDatabase.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION, pool.getMinIdleConnections());
+            res.put(CBDatabase.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION, pool.getMaxIdleConnections());
+            res.put(CBDatabase.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION, pool.getMaxConnections());
             res.computeIfAbsent(
-                CBConstants.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
+                CBDatabase.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
                 v -> pool.getValidationQuery()
             );
         }
