@@ -102,7 +102,7 @@ type ProductInfo {
     releaseTime: String!
     licenseInfo: String
 
-    latestVersionInfo: String!
+    latestVersionInfo: String
 }
 
 type ServerConfig {
