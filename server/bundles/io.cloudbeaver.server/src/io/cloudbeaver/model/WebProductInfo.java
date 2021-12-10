@@ -17,6 +17,7 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.server.CBApplication;
+import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -71,6 +72,12 @@ public class WebProductInfo {
     @Property
     public String getLicenseInfo() {
         return CBApplication.getInstance().getInfoDetails();
+    }
+
+    @Property
+    public String getLatestVersionInfo() {
+        IProduct product = Platform.getProduct();
+        return CommonUtils.notEmpty(product.getProperty("versionUpdateURL"));
     }
 
 }
