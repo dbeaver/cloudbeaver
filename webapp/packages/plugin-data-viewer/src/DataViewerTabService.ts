@@ -40,6 +40,7 @@ export class DataViewerTabService {
       getPanelComponent: () => DataViewerPanel,
       onSelect: this.handleTabSelect.bind(this),
       onRestore: this.handleTabRestore.bind(this),
+      canClose: this.handleTabCanClose.bind(this),
       onClose: this.handleTabClose.bind(this),
     });
   }
@@ -130,6 +131,23 @@ export class DataViewerTabService {
   }
 
   private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
+    return true;
+  }
+
+  private async handleTabCanClose(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
+    const model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
+
+    if (model) {
+      let canClose = false;
+      try {
+        await model.requestDataAction(() => {
+          canClose = true;
+        });
+      } catch {}
+
+      return canClose;
+    }
+
     return true;
   }
 

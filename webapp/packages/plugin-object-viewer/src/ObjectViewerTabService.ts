@@ -48,6 +48,7 @@ export class ObjectViewerTabService {
       onRestore: this.restoreObjectTab.bind(this),
       onSelect: this.selectObjectTab.bind(this),
       onClose: this.closeObjectTab.bind(this),
+      canClose: this.canCloseObjectTab.bind(this),
 
       extensions: [
         connectionProvider(this.getConnection.bind(this)),
@@ -328,6 +329,10 @@ export class ObjectViewerTabService {
       return this.dbObjectPageService.restorePages(tab);
     }
     return false;
+  }
+
+  private async canCloseObjectTab(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
+    return await this.dbObjectPageService.canClosePages(tab);
   }
 
   private async closeObjectTab(tab: ITab<IObjectViewerTabState>) {
