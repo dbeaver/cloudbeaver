@@ -6,11 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DBObject, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { DBObject, DBObjectResource, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -39,10 +42,14 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 }) {
   parents = [...parents, parentId];
   const translate = useTranslate();
+  const navNodeViewService = useService(NavNodeViewService);
   const tree = useMapResource(ObjectPropertyTable, NavTreeResource, objectId, {
     onLoad: async resource => !(await resource.preloadNodeParents(parents, objectId)),
   });
-  const key = resourceKeyList(tree.data || []);
+
+  const { nodes, duplicates } = navNodeViewService.filterDuplicates(tree.data || []);
+
+  const key = resourceKeyList(nodes);
   const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
       const preloaded = await tree.resource.preloadNodeParents(parents, objectId);
@@ -57,12 +64,18 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
     preload: [tree],
   });
 
+  useEffect(() => {
+    untracked(() => {
+      navNodeViewService.logDuplicates(objectId, duplicates);
+    });
+  });
+
   const objects = dbObject.data as DBObject[];
 
   return styled(styles)(
     <Loader state={[tree, dbObject]} style={styles}>{() => styled(styles)(
       <>
-        {!tree.data || tree.data.length === 0 ? (
+        {nodes.length === 0 ? (
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <div>

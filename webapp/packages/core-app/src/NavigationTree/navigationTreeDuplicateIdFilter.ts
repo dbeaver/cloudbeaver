@@ -16,24 +16,12 @@ export function navigationTreeDuplicateFilter(
   navNodeViewService: NavNodeViewService,
 ): IElementsTreeFilter {
   return (node: NavNode, children: string[]) => {
-    const nextChildren: string[] = [];
-    const duplicates: string[] = [];
-
-    for (const child of children) {
-      if (nextChildren.includes(child)) {
-        if (!duplicates.includes(child)) {
-          duplicates.push(child);
-          nextChildren.splice(nextChildren.indexOf(child), 1);
-        }
-      } else {
-        nextChildren.push(child);
-      }
-    }
+    const { nodes, duplicates } = navNodeViewService.filterDuplicates(children);
 
     untracked(() => {
       navNodeViewService.logDuplicates(node.id, duplicates);
     });
 
-    return nextChildren;
+    return nodes;
   };
 }

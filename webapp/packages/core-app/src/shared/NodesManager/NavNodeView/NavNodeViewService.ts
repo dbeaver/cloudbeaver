@@ -14,6 +14,11 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource } from '../NavTreeResource';
 import type { NavNodeTransformView, INavNodeFolderTransform, NavNodeFolderTransformFn } from './IFolderTransform';
 
+export interface INodeDuplicateList {
+  nodes: string[];
+  duplicates: string[];
+}
+
 @injectable()
 export class NavNodeViewService {
   get tabs(): NavNodeTransformView[] {
@@ -53,25 +58,13 @@ export class NavNodeViewService {
           return children;
         }
 
-        const nextChildren: string[] = [];
-        const duplicates: string[] = [];
-
-        for (const child of children) {
-          if (nextChildren.includes(child)) {
-            if (!duplicates.includes(child)) {
-              duplicates.push(child);
-              nextChildren.splice(nextChildren.indexOf(child), 1);
-            }
-          } else {
-            nextChildren.push(child);
-          }
-        }
+        const { nodes, duplicates } = this.filterDuplicates(children);
 
         untracked(() => {
           this.logDuplicates(nodeId, duplicates);
         });
 
-        return nextChildren;
+        return nodes;
       },
     });
   }
@@ -87,6 +80,27 @@ export class NavNodeViewService {
 
   addTransform(transform: INavNodeFolderTransform): void {
     this.transformers.push(transform);
+  }
+
+  filterDuplicates(nodes: string[]): INodeDuplicateList {
+    const nextChildren: string[] = [];
+    const duplicates: string[] = [];
+
+    for (const child of nodes) {
+      if (nextChildren.includes(child)) {
+        if (!duplicates.includes(child)) {
+          duplicates.push(child);
+          nextChildren.splice(nextChildren.indexOf(child), 1);
+        }
+      } else {
+        nextChildren.push(child);
+      }
+    }
+
+    return {
+      nodes: nextChildren,
+      duplicates,
+    };
   }
 
   logDuplicates(nodeId: string, duplicates: string[]) {
