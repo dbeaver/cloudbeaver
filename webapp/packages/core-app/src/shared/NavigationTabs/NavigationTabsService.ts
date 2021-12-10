@@ -168,6 +168,16 @@ export class NavigationTabsService extends View<ITab<any>> {
 
     const tab = this.tabsMap.get(tabId);
     if (tab && !skipHandlers) {
+      const handler = this.handlers.get(tab.handlerId);
+
+      if (handler) {
+        const state = await handler.canClose?.(tab);
+
+        if (state === false) {
+          return;
+        }
+      }
+
       await this.callHandlerCallback(tab, handler => handler.onClose);
     }
 

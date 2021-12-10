@@ -11,7 +11,7 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { DBObject } from '@cloudbeaver/core-app';
-import { TableHeader, TableBody, Table, useTable, getComputed, useTabLocalState, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
+import { TableHeader, TableBody, Table, useTable, useTabLocalState, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Header } from './Header';
@@ -67,13 +67,11 @@ export const ObjectChildrenPropertyTable = observer<Props>(function ObjectProper
     return null;
   }
 
-  const baseObject = getComputed(() => (
-    objects
-      .slice()
-      .sort((a, b) => (a.object?.properties?.length || 0) - (b.object?.properties?.length || 0))
-  ));
+  const baseObject = objects
+    .slice()
+    .sort((a, b) => (a.object?.properties?.length || 0) - (b.object?.properties?.length || 0));
 
-  const nodeIds = getComputed(() => objects.map(object => object.id));
+  const nodeIds = objects.map(object => object.id);
   const properties = baseObject[0].object?.properties || [];
 
   return styled(styles)(

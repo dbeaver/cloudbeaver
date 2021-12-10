@@ -83,6 +83,18 @@ export class DBObjectPageService {
     return true;
   }
 
+  async canClosePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
+    for (const page of this.pages.values()) {
+      const state = await page.canClose?.(tab, this.getPageState(tab, page));
+
+      if (state === false) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async closePages(tab: ITab<IObjectViewerTabState>) {
     await this.callHandlerCallback(tab, page => page.onClose);
   }

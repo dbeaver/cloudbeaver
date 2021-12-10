@@ -136,6 +136,27 @@ export class SqlQueryResultService {
     this.tableViewerStorageService.remove(group.modelId);
   }
 
+  async canCloseResultTab(state: ISqlEditorTabState, tabId: string): Promise<boolean> {
+    const resultTab = state.resultTabs.find(resultTab => resultTab.tabId === tabId);
+    const group = state.resultGroups.find(group => group.groupId === resultTab?.groupId);
+
+    if (resultTab && group) {
+      const model = this.tableViewerStorageService.get(group.modelId);
+
+      if (model) {
+        let canClose = false;
+
+        try {
+          await model.requestDataAction(() => {
+            canClose = true;
+          });
+        } catch {}
+        return canClose;
+      }
+    }
+    return true;
+  }
+
   removeResultTab(state: ISqlEditorTabState, tabId: string): void {
     const resultTab = state.resultTabs.find(resultTab => resultTab.tabId === tabId);
     const group = state.resultGroups.find(group => group.groupId === resultTab?.groupId);

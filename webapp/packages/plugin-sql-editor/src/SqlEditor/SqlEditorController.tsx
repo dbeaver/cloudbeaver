@@ -241,6 +241,12 @@ export class SqlEditorController implements IInitializableController, IDestructi
       });
 
       if (result === DialogueStateResult.Resolved) {
+        const state = await this.sqlResultTabsService.canCloseResultTabs(this.state);
+
+        if (!state) {
+          return;
+        }
+
         this.sqlResultTabsService.removeResultTabs(this.state);
       } else if (result === DialogueStateResult.Rejected) {
         return;

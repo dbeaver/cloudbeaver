@@ -27,6 +27,16 @@ export class SqlResultTabsService {
     });
   }
 
+  async canCloseResultTab(state: ISqlEditorTabState, tabId: string): Promise<boolean> {
+    const tab = state.tabs.find(tab => tab.id === tabId);
+
+    if (tab) {
+      return await this.sqlQueryResultService.canCloseResultTab(state, tab.id);
+    }
+
+    return true;
+  }
+
   selectResultTab(state: ISqlEditorTabState, resultId: string): void {
     state.currentTabId = resultId;
   }
@@ -39,6 +49,18 @@ export class SqlResultTabsService {
     } else {
       console.warn(`Unable to remove tab. Tab with id="${tabId}" was not found`);
     }
+  }
+
+  async canCloseResultTabs(state: ISqlEditorTabState): Promise<boolean> {
+    for (const tab of state.tabs) {
+      const canClose = await this.sqlQueryResultService.canCloseResultTab(state, tab.id);
+
+      if (!canClose) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   removeResultTabs(state: ISqlEditorTabState): void {
