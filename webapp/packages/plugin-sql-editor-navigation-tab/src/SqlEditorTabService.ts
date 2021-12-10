@@ -55,6 +55,7 @@ export class SqlEditorTabService extends Bootstrap {
       getPanelComponent: () => SqlEditorPanel,
       onRestore: this.handleTabRestore.bind(this),
       onClose: this.handleTabClose.bind(this),
+      canClose: this.handleCanTabClose.bind(this),
       extensions: [
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
@@ -250,13 +251,16 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
+  private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
+    return await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+  }
+
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
     if (editorTab.handlerState.executionContext) {
       await this.destroyContext(editorTab.handlerState.executionContext);
     }
-    for (const tab of editorTab.handlerState.tabs) {
-      await this.sqlResultTabsService.removeResultTab(editorTab.handlerState, tab.id);
-    }
+
+    this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
   }
 
   private async destroyContext(contextInfo: IConnectionExecutionContextInfo) {

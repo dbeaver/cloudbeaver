@@ -112,7 +112,11 @@ export class SqlEditorNavigatorService {
       if (data.type === SQLEditorNavigationAction.select) {
         this.sqlResultTabsService.selectResultTab(tab.handlerState, data.resultId);
       } else if (data.type === SQLEditorNavigationAction.close) {
-        this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId);
+        const canClose = await this.sqlResultTabsService.canCloseResultTab(tab.handlerState, data.resultId);
+
+        if (canClose) {
+          this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId);
+        }
       }
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception) {

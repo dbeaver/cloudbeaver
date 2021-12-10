@@ -79,9 +79,13 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     onTabSelect?.(tab.tabId);
   }
 
-  function handleClose(tab: ITabData) {
-    sqlResultTabsService.removeResultTab(state, tab.tabId);
-    onTabClose?.(tab.tabId);
+  async function handleClose(tab: ITabData) {
+    const canClose = await sqlResultTabsService.canCloseResultTab(state, tab.tabId);
+
+    if (canClose) {
+      sqlResultTabsService.removeResultTab(state, tab.tabId);
+      onTabClose?.(tab.tabId);
+    }
   }
 
   if (!state.tabs.length) {
