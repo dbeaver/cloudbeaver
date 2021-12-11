@@ -45,8 +45,6 @@ public class CBConstants {
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
     public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
     public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
-    public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
-    public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
 
     public static final String PARAM_SESSION_EXPIRE_PERIOD = "expireSessionAfterPeriod";
 
@@ -84,5 +82,5 @@ public class CBConstants {
 
     public static final String CB_SESSION_COOKIE_NAME = "cb-session-id";
 
-    public static final String APPLICATION_JSON = "application/json";
+    public static final String	APPLICATION_JSON		= "application/json";
 }

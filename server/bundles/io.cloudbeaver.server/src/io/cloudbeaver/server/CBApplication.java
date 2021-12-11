@@ -23,7 +23,6 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -174,7 +173,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         String[] args = Platform.getCommandLineArgs();
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) && args.length > i + 1) {
+            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) & args.length > i + 1) {
                 configPath = args[i + 1];
                 break;
             }
@@ -303,7 +302,6 @@ public class CBApplication extends BaseApplicationImpl {
     /**
      * Configures server automatically.
      * Called on startup
-     *
      * @param configPath
      */
     protected void performAutoConfiguration(File configPath) {
@@ -370,7 +368,7 @@ public class CBApplication extends BaseApplicationImpl {
             }
 
             boolean hasLoopbackAddress = false;
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress localInetAddress = enumIpAddr.nextElement();
@@ -489,40 +487,26 @@ public class CBApplication extends BaseApplicationImpl {
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
 
             // App config
-            Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
-            gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+            gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(configProps, "app")), CBAppConfig.class);
 
             // Database config
-            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBDatabase.PARAM_DB_CONFIGURATION);
-            gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
+            gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
 
             productConfigPath = getRelativePath(
-                JSONUtils.getString(
-                    serverConfig,
-                    CBConstants.PARAM_PRODUCT_CONFIGURATION,
-                    CBConstants.DEFAULT_PRODUCT_CONFIGURATION
-                ),
-                homeFolder
-            );
+                JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
         }
 
         // Merge new config with old one
         {
-            Map<String, Object> mergedPlugins = Stream.concat(
-                    prevConfig.getPlugins().entrySet().stream(),
-                    appConfiguration.getPlugins().entrySet().stream()
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setPlugins(mergedPlugins);
-
-            Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthProviderConfigurations().entrySet().stream(),
-                    appConfiguration.getAuthProviderConfigurations().entrySet().stream()
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
+            Map<String, Object> mergedPlugins = Stream.concat(prevConfig.getPlugins().entrySet().stream(),
+                appConfiguration.getPlugins().entrySet().stream()).collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            appConfiguration.getPlugins().clear();
+            appConfiguration.getPlugins().putAll(mergedPlugins);
         }
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
@@ -621,7 +605,8 @@ public class CBApplication extends BaseApplicationImpl {
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
         long sessionExpireTime,
-        @NotNull CBAppConfig appConfig) throws DBException {
+        @NotNull CBAppConfig appConfig) throws DBException
+    {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
@@ -668,7 +653,7 @@ public class CBApplication extends BaseApplicationImpl {
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(
                         ds.getId(),
-                        new String[]{anonymousRoleId},
+                        new String[] { anonymousRoleId },
                         adminName);
                 }
             }
@@ -677,10 +662,8 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName,
-                                   String newServerURL,
-                                   long sessionExpireTime,
-                                   CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+
         File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
@@ -690,24 +673,71 @@ public class CBApplication extends BaseApplicationImpl {
             try (JsonWriter json = gson.newJsonWriter(out)) {
                 json.setLenient(true);
                 json.beginObject();
-
-                Map<String, Object> serverMap = ConfigurationUtils.serverConfigToMap(
-                    newServerName,
-                    newServerURL,
-                    sessionExpireTime,
-                    databaseConfiguration
-                );
-                if (!CommonUtils.isEmpty(serverMap)) {
-                    JSONUtils.serializeProperties(json, "server", serverMap);
+                {
+                    json.name("server");
+                    json.beginObject();
+                    if (!CommonUtils.isEmpty(newServerName)) {
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
+                    }
+                    if (!CommonUtils.isEmpty(newServerURL)) {
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
+                    }
+                    if (sessionExpireTime > 0) {
+                        JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+                    }
+                    json.endObject();
                 }
+                {
+                    json.name("app");
+                    json.beginObject();
+                    JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+                    JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
+                    JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+                    JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
-                Map<String, Object> appMap = ConfigurationUtils.appConfigToMap(appConfig);
-                if (!CommonUtils.isEmpty(appMap)) {
-                    JSONUtils.serializeProperties(json, "app", appMap);
+                    {
+                        // Save only differences in def navigator settings
+                        DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
+
+                        json.name("defaultNavigatorSettings");
+                        json.beginObject();
+                        if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects())
+                            JSONUtils.field(json, "showSystemObjects", navSettings.isShowSystemObjects());
+                        if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects())
+                            JSONUtils.field(json, "showUtilityObjects", navSettings.isShowUtilityObjects());
+                        if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities())
+                            JSONUtils.field(json, "showOnlyEntities", navSettings.isShowOnlyEntities());
+                        if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities())
+                            JSONUtils.field(json, "mergeEntities", navSettings.isMergeEntities());
+                        if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
+                            JSONUtils.field(json, "hideFolders", navSettings.isHideFolders());
+                        if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
+                            JSONUtils.field(json, "hideSchemas", navSettings.isHideSchemas());
+                        if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
+                            JSONUtils.field(json, "hideVirtualModel", navSettings.isHideVirtualModel());
+
+                        json.endObject();
+                    }
+                    if (appConfig.getEnabledFeatures() != null) {
+                        JSONUtils.serializeStringList(json, "enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()), true);
+                    }
+                    if (appConfig.getEnabledAuthProviders() != null) {
+                        JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
+                    }
+
+                    if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
+                        JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
+                    }
+                    if (!CommonUtils.isEmpty(appConfig.getAuthProviderConfigurations())) {
+                        json.name("authConfiguration");
+                        gson.toJson(appConfig.getAuthProviderConfigurations(), Map.class, json);
+                    }
+
+                    json.endObject();
                 }
-
                 json.endObject();
             }
+
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
