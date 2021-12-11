@@ -303,6 +303,8 @@ export class AdministrationScreenService {
 
     if (!accessProvided) {
       this.screenService.navigateToRoot();
+
+      this.notificationService.logInfo({ title: 'root_permission_no_permission', uuid: 'no_permission' });
       return false;
     }
     return true;
@@ -325,7 +327,6 @@ export class AdministrationScreenService {
     const administrator = await this.permissionsService.hasAsync(EAdminPermission.admin);
 
     if (!administrator) {
-      this.notificationService.logInfo({ title: 'root_permission_no_permission' });
       return false;
     }
 

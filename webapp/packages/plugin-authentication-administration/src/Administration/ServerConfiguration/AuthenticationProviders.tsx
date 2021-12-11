@@ -34,8 +34,16 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     throw new Error('Form state should be provided');
   }
 
+  const providerList = providers.resource.values.filter(provider => {
+    if (configurationWizard && provider?.configurable) {
+      return false;
+    }
+
+    return true;
+  });
+
   const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
-  const externalAuthentication = localProvider === undefined;
+  const externalAuthentication = localProvider === undefined && providerList.length === 1;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
 
   useExecutor({
@@ -81,7 +89,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         <Loader state={providers} inline>
           {() => styled(styles)(
             <>
-              {providers.resource.values.map(provider => {
+              {providerList.map(provider => {
                 const links = authProviderService.getServiceDescriptionLinks(provider);
                 const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
                 const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';

@@ -56,10 +56,19 @@ export class NotificationService {
       }
     }
 
+    if (options.uuid !== undefined) {
+      const notification = this.notificationList.values.find(notification => notification.uuid === options.uuid);
+
+      if (notification) {
+        return notification;
+      }
+    }
+
     const id = this.notificationNextId++;
 
     const notification: INotification<TProps> = {
       id,
+      uuid: options.uuid,
       title: options.title,
       message: options.message,
       details: options.details,
