@@ -208,6 +208,23 @@ export class ResultSetEditAction
     }
   }
 
+  addCopy(key: IResultSetElementKey): void {
+    this.addRowCopy(key.row);
+  }
+
+  addRowCopy(row: IResultSetRowKey): void {
+    let value = this.data.getRowValue(row);
+
+    const editedValue = this.editorData
+      .get(ResultSetDataKeysUtils.serialize(row));
+
+    if (editedValue) {
+      value = editedValue.update;
+    }
+
+    this.addRow(row, JSON.parse(JSON.stringify(value)));
+  }
+
   delete(...keys: IResultSetElementKey[]): void {
     const reverted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
     const deleted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];

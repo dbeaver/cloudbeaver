@@ -46,6 +46,7 @@ const styles = composes(
     }
     TabList {
       display: flex;
+      overflow: auto;
     }
   `
 );

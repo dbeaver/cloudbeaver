@@ -282,8 +282,14 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   setQuery(query: string): void {
+    const editorPosition = this.editor?.getCursor();
+
     this.state.query = query;
     this.parser.setScript(query);
+
+    if (editorPosition && this.editor) {
+      this.editor.setCursor(editorPosition);
+    }
   }
 
   private async executeQueryAction(

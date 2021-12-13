@@ -11,6 +11,7 @@ export default [
   ['data_viewer_statistics_updated_rows', '更新行：'],
   ['data_viewer_action_edit_delete', '删除选中'],
   ['data_viewer_action_edit_add', '添加'],
+  ['data_viewer_action_edit_add_copy', 'Add copy'],
   ['data_viewer_action_edit_revert', '还原选中'],
   ['data_viewer_result_edited_title', '保存更改'],
   ['data_viewer_result_edited_message', '结果集已编辑。是否将更改保存到数据库？'],
@@ -27,5 +28,4 @@ export default [
   ['data_viewer_script_preview', '脚本'],
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],
-  ['data_viewer_refresh_result_set', 'Refresh result set'],
 ];

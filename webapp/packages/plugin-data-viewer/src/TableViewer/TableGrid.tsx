@@ -54,7 +54,7 @@ export const TableGrid = observer<Props>(function TableGrid({
           DatabaseEditAction
         );
 
-        if (editor?.isEdited()) {
+        if (editor?.isEdited() && model.source.executionContext?.context) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'data_viewer_result_edited_title',
             message: 'data_viewer_result_edited_message',

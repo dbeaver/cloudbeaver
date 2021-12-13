@@ -81,6 +81,63 @@ export class TableFooterMenuService {
       },
     });
     this.registerMenuItem({
+      id: 'table_add_copy',
+      order: 0.55,
+      icon: '/icons/data_add_copy.svg',
+      tooltip: 'data_viewer_action_edit_add_copy',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isHidden(context) {
+        if (context.data.model.isReadonly()) {
+          return true;
+        }
+
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        return !editor?.hasFeature('add');
+      },
+      isDisabled(context) {
+        const select = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseSelectAction
+        );
+
+        const focus = select?.getFocusedElement();
+
+        return (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+          || !focus
+        );
+      },
+      onClick(context) {
+        const editor = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseEditAction
+        );
+
+        if (!editor) {
+          return;
+        }
+
+        const select = context.data.model.source.getActionImplementation(
+          context.data.resultIndex,
+          DatabaseSelectAction
+        );
+
+        const focus = select?.getFocusedElement();
+
+        if (focus) {
+          editor.addCopy(focus);
+        }
+      },
+    });
+    this.registerMenuItem({
       id: 'table_delete',
       order: 0.6,
       icon: '/icons/data_delete.svg',

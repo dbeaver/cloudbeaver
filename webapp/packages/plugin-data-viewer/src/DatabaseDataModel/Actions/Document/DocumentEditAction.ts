@@ -96,6 +96,10 @@ export class DocumentEditAction
     throw new Error('Not implemented');
   }
 
+  addCopy(key: IDocumentElementKey): void {
+    throw new Error('Not implemented');
+  }
+
   delete(key: IDocumentElementKey): void {
     throw new Error('Not implemented');
   }

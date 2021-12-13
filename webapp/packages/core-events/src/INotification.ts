@@ -48,6 +48,7 @@ export type NotificationComponent<
 
 export interface INotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   readonly id: number;
+  readonly uuid?: string;
   type: ENotificationType;
   title: string;
   message?: string;
@@ -64,6 +65,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
 
 export interface INotificationOptions<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   title: string;
+  uuid?: string;
   message?: string;
   details?: string | Error;
   isSilent?: boolean;

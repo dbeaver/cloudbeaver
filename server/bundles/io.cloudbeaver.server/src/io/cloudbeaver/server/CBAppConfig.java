@@ -226,11 +226,6 @@ public class CBAppConfig {
         return plugins;
     }
 
-    public void setPlugins(@NotNull Map<String, Object> plugins) {
-        this.plugins.clear();
-        this.plugins.putAll(plugins);
-    }
-
     public Map<String, Object> getPluginConfig(@NotNull String pluginId) {
         return getPluginConfig(pluginId, false);
     }
@@ -286,13 +281,6 @@ public class CBAppConfig {
     public void setAuthProviderConfiguration(@NotNull String id, @NotNull AuthProviderConfig config) {
         synchronized (authConfiguration) {
             authConfiguration.put(id, config);
-        }
-    }
-
-    public void setAuthProvidersConfiguration(@NotNull Map<String, AuthProviderConfig> authProviders) {
-        synchronized (authConfiguration) {
-            authConfiguration.clear();
-            authConfiguration.putAll(authProviders);
         }
     }
 

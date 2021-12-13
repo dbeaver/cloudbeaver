@@ -77,7 +77,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
     outside: boolean,
     outsideAdminPage: boolean
   ): Promise<void> {
-    if (outsideAdminPage) {
+    // TODO: we have to track users' leaving the page
+    if (outside) {
       this.connectionsResource.cleanNewFlags();
       const updated = await this.connectionsResource.updateSessionConnections();
 
