@@ -48,7 +48,7 @@ public class ConfigurationUtils {
             res.put(CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
         }
 
-        Map<String, AuthProviderConfig> authProviders = appConfig.getAuthProviderConfigurations();
+        Map<String, Object> authProviders = authConfigToMap(appConfig);
         if (!CommonUtils.isEmpty(authProviders)) {
             res.put(CBConstants.PARAM_AUTH_PROVIDERS, authProviders);
         }
@@ -69,6 +69,47 @@ public class ConfigurationUtils {
 
         if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
             res.put("plugins", appConfig.getPlugins());
+        }
+
+        return res;
+    }
+
+    public static Map<String, Object> authConfigToMap(@Nullable CBAppConfig appConfig) {
+        Map<String, Object> res = new LinkedHashMap<>();
+        if (appConfig == null) {
+            return res;
+        }
+
+        Map<String, AuthProviderConfig> authProviders = appConfig.getAuthProviderConfigurations();
+        if (!CommonUtils.isEmpty(authProviders)) {
+            authProviders.forEach((key, value) -> {
+                Map<String, Object> authProviderConfig = new LinkedHashMap<>();
+                authProviderConfig.computeIfAbsent(
+                    "provider",
+                    ignored -> value.getProvider()
+                );
+                authProviderConfig.computeIfAbsent(
+                    "displayName",
+                    ignored -> value.getDisplayName()
+                );
+                authProviderConfig.put(
+                    "disabled",
+                    value.isDisabled()
+                );
+                authProviderConfig.computeIfAbsent(
+                    "iconURL",
+                    ignored -> value.getIconURL()
+                );
+                authProviderConfig.computeIfAbsent(
+                    "description",
+                    ignored -> value.getDescription()
+                );
+                authProviderConfig.computeIfAbsent(
+                    "parameters",
+                    ignored -> value.getParameters()
+                );
+                res.put(key, authProviderConfig);
+            });
         }
 
         return res;
