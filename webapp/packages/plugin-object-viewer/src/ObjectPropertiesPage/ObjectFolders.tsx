@@ -11,10 +11,11 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
-import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, verticalTabStyles } from '@cloudbeaver/core-blocks';
+import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
@@ -73,6 +74,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
   const style = useStyles(verticalTabStyles, styles);
+  const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
@@ -111,7 +113,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
     <Loader state={children} style={style}>{() => styled(style)(
       <>
         {folders.length > 0 ? (
-          <TabsState currentTabId={folderId} orientation='vertical' lazy onChange={openFolder}>
+          <TabsState currentTabId={folderId} orientation='vertical' localState={innerTabState} lazy onChange={openFolder}>
             <vertical-tabs>
               <TabList aria-label="Object folders">
                 {folders.map(folderId => (
