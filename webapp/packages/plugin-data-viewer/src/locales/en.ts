@@ -27,4 +27,5 @@ export default [
   ['data_viewer_script_preview', 'Script'],
   ['data_viewer_script_preview_dialog_title', 'Preview changes'],
   ['data_viewer_script_preview_error_title', "Can't get the script"],
+  ['data_viewer_refresh_result_set', 'Refresh result set'],
 ];

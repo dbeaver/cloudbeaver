@@ -23,4 +23,5 @@ export default [
   ['data_viewer_script_preview', 'Скрипт'],
   ['data_viewer_script_preview_dialog_title', 'Предпросмотр изменений'],
   ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
+  ['data_viewer_refresh_result_set', 'Обновить резалт сет'],
 ];
