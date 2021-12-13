@@ -10,6 +10,7 @@ import { PropsWithChildren, ReactNode, forwardRef } from 'react';
 import styled from 'reshadow';
 
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { TabsState } from '../TabsState';
 
@@ -17,6 +18,7 @@ type TabsBoxProps = PropsWithChildren<{
   currentTabId: string;
   tabs?: ReactNode;
   tabIndex?: number;
+  localState?: MetadataMap<string, any>;
   className?: string;
   style?: ComponentStyle;
 }>;
@@ -25,12 +27,13 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
   currentTabId,
   tabs,
   tabIndex,
+  localState,
   children,
   className,
   style,
 }, ref) {
   return styled(useStyles(style))(
-    <TabsState currentTabId={currentTabId}>
+    <TabsState currentTabId={currentTabId} localState={localState}>
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && <tabs>{tabs}</tabs>}
         <tab-panels>

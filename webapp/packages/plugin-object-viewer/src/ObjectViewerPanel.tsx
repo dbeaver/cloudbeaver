@@ -12,11 +12,12 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabHandlerPanelComponent, NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-app';
-import { Loader, TabsBox, TabPanel, TextPlaceholder, Button, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Loader, TabsBox, TabPanel, TextPlaceholder, Button, useMapResource, useObservableRef, useTabLocalState } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
@@ -50,6 +51,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const dbObjectPagesService = useService(DBObjectPageService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const objectId = tab.handlerState.objectId;
   const connectionId = tab.handlerState.connectionId || null;
@@ -139,6 +141,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
                   onSelect={dbObjectPagesService.selectPage}
                 />
               ))}
+              localState={innerTabState}
               style={styles}
             >
               {pages.map(page => (
