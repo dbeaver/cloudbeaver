@@ -54,6 +54,7 @@ export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabase
   get: (key: TKey) => TValue | undefined;
   set: (key: TKey, value: TValue) => void;
   add: (key?: TKey) => void;
+  addCopy: (key: TKey) => void;
   delete: (key: TKey) => void;
   applyUpdate: (result: TResult) => void;
   revert: (key: TKey) => void;

@@ -42,6 +42,7 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   abstract get(key: TKey): TValue | undefined;
   abstract set(key: TKey, value: TValue): void;
   abstract add(key?: TKey): void;
+  abstract addCopy(key: TKey): void;
   abstract delete(...key: TKey[]): void;
   abstract applyUpdate(result: TResult): void;
   abstract revert(...key: TKey[]): void;

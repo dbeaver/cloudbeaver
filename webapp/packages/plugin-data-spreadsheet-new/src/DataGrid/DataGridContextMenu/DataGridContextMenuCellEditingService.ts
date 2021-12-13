@@ -115,6 +115,22 @@ export class DataGridContextMenuCellEditingService {
     this.dataGridContextMenuService.add(
       this.getMenuEditingToken(),
       {
+        id: 'row_add_copy',
+        order: 5.5,
+        icon: '/icons/data_add_copy_sm.svg',
+        title: 'data_grid_table_editing_row_add_copy',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        onClick(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          editor.addRowCopy(context.data.key.row);
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
+      this.getMenuEditingToken(),
+      {
         id: 'row_delete',
         order: 6,
         icon: '/icons/data_delete_sm.svg',
