@@ -28,4 +28,5 @@ export default [
   ['data_viewer_script_preview', '脚本'],
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],
+  ['data_viewer_refresh_result_set', 'Refresh result set'],
 ];
