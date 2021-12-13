@@ -258,6 +258,13 @@ export const TableViewer = observer<Props>(function TableViewer({
                   presentation={presentation}
                   resultIndex={resultIndex}
                 />
+                <TableError model={dataModel} loading={loading} />
+                <Loader
+                  loading={loading}
+                  cancelDisabled={!dataModel.source.canCancel}
+                  overlay={overlay}
+                  onCancel={() => dataModel.source.cancel()}
+                />
               </pane-content>
             </Pane>
             {valuePanelDisplayed && <ResizerControls />}
@@ -275,13 +282,7 @@ export const TableViewer = observer<Props>(function TableViewer({
               </pane-content>
             </Pane>
           </Split>
-          <TableError model={dataModel} loading={loading} />
-          <Loader
-            loading={loading}
-            cancelDisabled={!dataModel.source.canCancel}
-            overlay={overlay}
-            onCancel={() => dataModel.source.cancel()}
-          />
+
         </table-data>
         <TablePresentationBar
           type={DataPresentationType.toolsPanel}
