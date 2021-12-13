@@ -72,6 +72,20 @@ public class CBDatabase {
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
 
+    static final String PARAM_DB_CONFIGURATION = "database";
+    static final String PARAM_DB_DRIVER_CONFIGURATION = "driver";
+    static final String PARAM_DB_URL_CONFIGURATION = "url";
+    static final String PARAM_DB_USER_CONFIGURATION = "user";
+    static final String PARAM_DB_PW_CONFIGURATION = "password";
+    static final String PARAM_DB_CREATE_DATABASE_CONFIGURATION = "createDatabase";
+    static final String PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION = "allowPublicAccess";
+    static final String PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION = "initialDataConfiguration";
+    static final String PARAM_DB_POOL_CONFIGURATION = "pool";
+    static final String PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION = "minIdleConnections";
+    static final String PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION = "maxIdleConnections";
+    static final String PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION = "maxConnections";
+    static final String PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION = "validationQuery";
+
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
