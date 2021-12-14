@@ -43,14 +43,19 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   });
 
   const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
+  const primaryProvider = providers.resource.get(providers.resource.getPrimary());
   const externalAuthentication = localProvider === undefined && providerList.length === 1;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
 
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
-      if (serverConfig.enabledAuthProviders?.length === 0 && localProvider) {
-        serverConfig.anonymousAccessEnabled = true;
+      if (serverConfig.enabledAuthProviders?.length === 0) {
+        if (localProvider) {
+          serverConfig.anonymousAccessEnabled = true;
+        } else if (primaryProvider) {
+          serverConfig.enabledAuthProviders.push(primaryProvider.id);
+        }
       }
 
       if (serverConfig.enabledAuthProviders?.length) {
@@ -91,8 +96,17 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             <>
               {providerList.map(provider => {
                 const links = authProviderService.getServiceDescriptionLinks(provider);
-                const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+                let disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
                 const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
+
+                if (
+                  !localProvider
+                  && primaryProvider?.id === provider.id
+                  && serverConfig.enabledAuthProviders?.length === 1
+                  && serverConfig.enabledAuthProviders.includes(provider.id)
+                ) {
+                  disabled = true;
+                }
 
                 if (
                   configurationWizard
