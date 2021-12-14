@@ -25,6 +25,7 @@ function getPositionHash(position: CellPosition): string {
 interface IEditingOptions {
   readonly?: boolean;
   onEdit: (position: CellPosition, key?: string) => boolean;
+  onCloseEditor?: (position: CellPosition) => void;
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
@@ -44,12 +45,6 @@ export function useEditing(options: IEditingOptions): IEditingContext {
       if (state.options.readonly) {
         return;
       }
-      // TODO: not works yet
-      switch (key) {
-        case 'Escape':
-          state.editingCells.delete(getPositionHash(position));
-          break;
-      }
 
       if (!state.options.onEdit(position, key)) {
         return;
@@ -62,8 +57,15 @@ export function useEditing(options: IEditingOptions): IEditingContext {
     },
     closeEditor(position: CellPosition) {
       const info = state.editingCells.get(getPositionHash(position));
+
+      if (!info.editing) {
+        return;
+      }
+
       info.editing = false;
       state.editorOpened = false;
+
+      state.options.onCloseEditor?.(position);
     },
     close() {
       state.editingCells.clear();

@@ -8,11 +8,11 @@
 
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useMemo } from 'react';
-import type { CellRendererProps } from 'react-data-grid';
+import { useContext, useEffect } from 'react';
+import type { CalculatedColumn, CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
-import { useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
@@ -65,7 +65,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     editionState: computed,
   }, { row, column, rowIdx });
 
-  const classes = useMemo(() => computed(() => {
+  const classes = getComputed(() => {
     let classes = '';
     if (cellContext.isSelected) {
       classes += ' rdg-cell-custom-selected';
@@ -88,7 +88,32 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
       }
     }
     return classes;
-  }), []).get();
+  });
+
+  function isEditable(column: CalculatedColumn<IResultSetRowKey, unknown>): boolean {
+    if (
+      !editingContext
+      || !tableDataContext
+      || !cellContext.cell
+    ) {
+      return false;
+    }
+
+    const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
+    const value = tableDataContext.getCellValue(cellContext.cell);
+
+    if (!resultColumn || value === undefined) {
+      return false;
+    }
+
+    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
+
+    return !(
+      !column.editable
+      || handleByBooleanFormatter
+      || tableDataContext.format.isReadOnly(cellContext.cell)
+    );
+  }
 
   const state = useObjectRef(() => ({
     mouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -112,27 +137,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     },
     doubleClick(event: React.MouseEvent<HTMLDivElement>) {
       if (
-        !this.editingContext
-        || !this.tableDataContext
+        !this.isEditable(this.column)
         || EventContext.has(event, EventStopPropagationFlag)
-        || !cellContext.cell
-      ) {
-        return;
-      }
-
-      const resultColumn = this.tableDataContext.getColumnInfo(cellContext.cell.column);
-      const value = this.tableDataContext.getCellValue(cellContext.cell);
-
-      if (!resultColumn || value === undefined) {
-        return;
-      }
-
-      const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
-
-      if (
-        !this.column.editable
-        || handleByBooleanFormatter
-        || this.tableDataContext.format.isReadOnly(cellContext.cell)
       ) {
         return;
       }
@@ -147,6 +153,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     dataGridContext,
     editingContext,
     tableDataContext,
+    isEditable,
   }, ['doubleClick', 'mouseUp']);
 
   useEffect(() => () => editingContext?.closeEditor(cellContext.position), []);

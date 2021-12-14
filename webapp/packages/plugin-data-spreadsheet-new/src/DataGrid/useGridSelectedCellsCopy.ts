@@ -16,7 +16,7 @@ import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSele
 import type { ITableData } from './TableDataContext';
 
 const EVENT_KEY_CODE = {
-  C: 'KeyC',
+  C: 'C',
 };
 
 function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): string {
@@ -65,9 +65,6 @@ function getSelectedCellsValue(
   return rowsValues.join('\r\n');
 }
 
-// needed for event.code
-type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
-
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
   resultSetSelectAction: ResultSetSelectAction,
@@ -75,8 +72,8 @@ export function useGridSelectedCellsCopy(
 ) {
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
-  const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
+  const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === EVENT_KEY_CODE.C) {
       const focusedElement = props.resultSetSelectAction.getFocusedElement();
       let value: string | null = null;
 

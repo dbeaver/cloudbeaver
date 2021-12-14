@@ -25,6 +25,7 @@ interface IState {
 
 export interface IMouseHook<T> {
   state: IState;
+  ref: T | null;
   reference: (obj: T) => void;
 }
 
@@ -73,5 +74,5 @@ export function useMouse<T extends HTMLElement>(options: IOptions = {}): IMouseH
     };
   }, [reference]);
 
-  return { state, reference: setReference };
+  return { ref: reference, state, reference: setReference };
 }

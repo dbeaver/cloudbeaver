@@ -74,11 +74,16 @@ export const OrderButton = observer<Props>(function OrderButton({
     });
   };
 
+  function preventFocus(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    event.preventDefault();
+  }
+
   return styled(styles)(
     <order-button
       as='div'
       title={translate('data_grid_table_tooltip_column_header_order')}
       className={className}
+      onMouseDown={preventFocus}
       onClick={handleSort}
       {...use({ disabled: loading })}
     >

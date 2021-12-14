@@ -43,12 +43,21 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
     throw new Error('Contexts required');
   }
 
-  const readonly = getComputed(
-    () => tableDataContext.isReadOnly() || dataGridContext.model.isReadonly()
-  );
+  const readonly = getComputed(() => (
+    tableDataContext.isReadOnly()
+    || dataGridContext.model.isReadonly()
+  ));
+
+  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.preventDefault();
+  }
+
+  function handleClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    selectionContext.selectTable();
+  }
 
   return styled(styles)(
-    <container title={translate('data_grid_table_index_column_tooltip')} onClick={() => selectionContext.selectTable()}>
+    <container title={translate('data_grid_table_index_column_tooltip')} onMouseDown={preventFocus} onClick={handleClick}>
       {readonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
       {props.column.name}
     </container>

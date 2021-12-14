@@ -33,7 +33,8 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
 export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
-  gridDIVElement: React.RefObject<HTMLDivElement | null>
+  gridDIVElement: React.RefObject<HTMLDivElement | null>,
+  onCellKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void
 ): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -77,6 +78,9 @@ export function useTableData(
           editable: true,
           width: Math.min(300, measuredCells[index]),
           headerRenderer: TableColumnHeader,
+          editorOptions: {
+            onCellKeyDown,
+          },
         }));
       columns.unshift(indexColumn);
 

@@ -64,10 +64,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const focusSyncRef = useRef<CellPosition | null>(null);
 
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
   const editingContext = useEditing({
     readonly: model.isReadonly() || model.isDisabled(resultIndex),
     onEdit: (position, key) => {
@@ -80,21 +78,37 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
       const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
-      // TODO: not works yet
       switch (key) {
-        case 'Delete':
         case 'Backspace':
           tableData.editor.set(cellKey, '');
           break;
+        case 'Enter':
+          break;
         default:
           if (key) {
-            tableData.editor.set(cellKey, key);
+            if (/^[a-z0-9]$/i.test(key)) {
+              tableData.editor.set(cellKey, key);
+            } else {
+              return false;
+            }
           }
       }
 
       return true;
     },
+    onCloseEditor: () => {
+      restoreFocus();
+    },
   });
+
+  const tableData = useTableData(model, resultIndex, dataGridDivRef);
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+
+  function restoreFocus() {
+    const gridDiv = gridContainerRef.current;
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('.rdg-focus-sink');
+    focusSink?.focus();
+  }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
@@ -121,7 +135,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }
   }
 
-  const { onKeydownHandler } = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
@@ -133,6 +147,66 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
   });
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    gridSelectedCellCopy.onKeydownHandler(event);
+    const cell = selectionAction.getFocusedElement();
+
+    if (!cell) {
+      return;
+    }
+
+    const idx = tableData.getColumnIndexFromColumnKey(cell.column);
+    const rowIdx = tableData.getRowIndexFromKey(cell.row);
+    const position: CellPosition = { idx, rowIdx };
+
+    if (editingContext.isEditing(position)) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Escape': {
+        tableData.editor.revert(cell);
+        return;
+      }
+      case 'Insert': {
+        if (event.altKey) {
+          if (event.ctrlKey || event.metaKey) {
+            tableData.editor.duplicate(cell);
+          } else {
+            tableData.editor.add(cell);
+          }
+          return;
+        }
+      }
+    }
+    const editingState = tableData.editor.getElementState(cell);
+
+    if (editingState === DatabaseEditChangeType.delete) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Delete': {
+        const editor = tableData.editor;
+        editor.delete(cell);
+
+        if (editingState === DatabaseEditChangeType.add) {
+          if (rowIdx - 1 > 0) {
+            dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx - 1 });
+          }
+        } else {
+          if (rowIdx + 1 < tableData.rows.length) {
+            dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx + 1 });
+          }
+        }
+
+        return;
+      }
+    }
+
+    editingContext.edit({ idx, rowIdx }, event.key);
+  }
 
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
@@ -234,7 +308,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
     selectionAction.focus({
       row,
-      column: column.columnDataIndex ?? { index: 0 },
+      column: { index: 0, ...column.columnDataIndex },
     });
   };
 
@@ -267,7 +341,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     isGridInFocus,
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
-  }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef]);
+    focus: restoreFocus,
+  }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef, restoreFocus]);
 
   if (!tableData.columns.length) {
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
@@ -282,7 +357,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
               ref={setContainersRef}
               className="cb-react-grid-container"
               tabIndex={-1}
-              onKeyDown={onKeydownHandler}
+              onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}
               onMouseMove={onMouseMoveHandler}
             >
@@ -290,7 +365,6 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
                 columns={tableData.columns}
-                cellNavigationMode={editingContext.isEditorActive() ? 'NONE' : 'CHANGE_ROW'}
                 defaultColumnOptions={{
                   minWidth: 50,
                   resizable: true,
