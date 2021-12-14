@@ -8,15 +8,14 @@
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { MenuService, ActionService, DATA_CONTEXT_MENU, MenuSeparatorItem } from '@cloudbeaver/core-view';
+import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
 
-import { DELETE_CONSTRAINTS_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DELETE_CONSTRAINTS_ACTION';
-import { REFRESH_RESULT_SET_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/REFRESH_RESULT_SET_ACTION';
+import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION';
 import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DATA_CONTEXT_TABLE_HEADER_MODEL } from './DATA_CONTEXT_TABLE_HEADER_MODEL';
-import { DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX } from './DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX';
-import { TABLE_HEADER_MENU } from './TABLE_HEADER_MENU';
+import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL';
+import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX';
+import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 import { TableHeaderMenu } from './TableHeaderMenu';
 import { TableWhereFilter } from './TableWhereFilter';
 
@@ -43,9 +42,9 @@ export class TableHeaderService extends Bootstrap {
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
       isActionApplicable(context, action) {
-        const menu = context.find(DATA_CONTEXT_MENU, TABLE_HEADER_MENU);
-        const model = context.tryGet(DATA_CONTEXT_TABLE_HEADER_MODEL);
-        const resultIndex = context.tryGet(DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX);
+        const menu = context.find(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
+        const model = context.tryGet(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL);
+        const resultIndex = context.tryGet(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX);
 
         if (!menu || !model || resultIndex === undefined) {
           return false;
@@ -55,9 +54,9 @@ export class TableHeaderService extends Bootstrap {
       },
       handler: async (context, action) => {
         switch (action) {
-          case DELETE_CONSTRAINTS_ACTION: {
-            const model = context.get(DATA_CONTEXT_TABLE_HEADER_MODEL);
-            const resultIndex = context.get(DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX);
+          case DATA_VIEWER_CONSTRAINTS_DELETE_ACTION: {
+            const model = context.get(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL);
+            const resultIndex = context.get(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX);
             const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
 
             if (constraints) {
@@ -66,29 +65,24 @@ export class TableHeaderService extends Bootstrap {
             }
             break;
           }
-          case REFRESH_RESULT_SET_ACTION: {
-            const model = context.get(DATA_CONTEXT_TABLE_HEADER_MODEL);
-            await model.refresh();
-            break;
-          }
         }
       },
       getActionInfo: (context, action) => {
-        if (context.get(DATA_CONTEXT_MENU) === TABLE_HEADER_MENU) {
+        if (context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU) {
           return { ...action.info, label: '' };
         }
 
         return action.info;
       },
       isDisabled: (context, action) => {
-        const model = context.get(DATA_CONTEXT_TABLE_HEADER_MODEL);
-        const resultIndex = context.get(DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL);
+        const resultIndex = context.get(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX);
 
         if (model.isLoading() || model.isDisabled(resultIndex)) {
           return true;
         }
 
-        if (action === DELETE_CONSTRAINTS_ACTION) {
+        if (action === DATA_VIEWER_CONSTRAINTS_DELETE_ACTION) {
           const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
 
           if (constraints) {
@@ -96,22 +90,15 @@ export class TableHeaderService extends Bootstrap {
           }
         }
 
-        if (action === REFRESH_RESULT_SET_ACTION) {
-          return false;
-        }
-
         return true;
       },
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TABLE_HEADER_MENU,
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU,
       getItems: (context, items) => [
         ...items,
-        DELETE_CONSTRAINTS_ACTION,
-        new MenuSeparatorItem(),
-        REFRESH_RESULT_SET_ACTION,
-
+        DATA_VIEWER_CONSTRAINTS_DELETE_ACTION,
       ],
     });
   }

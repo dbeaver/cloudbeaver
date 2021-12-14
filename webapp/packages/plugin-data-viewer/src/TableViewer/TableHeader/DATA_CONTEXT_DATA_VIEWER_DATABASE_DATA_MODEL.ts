@@ -11,4 +11,4 @@ import { createDataContext } from '@cloudbeaver/core-view';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions';
 
-export const DATA_CONTEXT_TABLE_HEADER_MODEL = createDataContext<IDatabaseDataModel<IDatabaseDataOptions, any>>('table-model');
+export const DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL = createDataContext<IDatabaseDataModel<IDatabaseDataOptions, any>>('data-viewer-database-data-model');

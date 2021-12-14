@@ -21,8 +21,8 @@ interface IState {
   readonly constraints: ResultSetConstraintAction | null;
   readonly disabled: boolean;
   readonly applicableFilter: boolean;
-  changeHandler: (value: string) => void;
-  applyFilter: () => Promise<void>;
+  set: (value: string) => void;
+  apply: () => Promise<void>;
 }
 
 export function useWhereFilter(
@@ -52,7 +52,7 @@ export function useWhereFilter(
       return this.model.source.prevOptions?.whereFilter !== this.model.source.options?.whereFilter
         || this.model.source.options?.whereFilter !== this.model.source.requestInfo.requestFilter;
     },
-    changeHandler(value: string) {
+    set(value: string) {
       if (this.constraints) {
         this.constraints.deleteFilters();
       }
@@ -61,7 +61,7 @@ export function useWhereFilter(
         this.model.source.options.whereFilter = value;
       }
     },
-    async applyFilter() {
+    async apply() {
       if (!this.applicableFilter || this.model.isLoading() || this.model.isDisabled(this.resultIndex)) {
         return;
       }
@@ -74,8 +74,8 @@ export function useWhereFilter(
       constraints: computed,
       disabled: computed,
       applicableFilter: computed,
-      changeHandler: action.bound,
-      applyFilter: action.bound,
+      set: action.bound,
+      apply: action.bound,
     },
     { model, resultIndex });
 }

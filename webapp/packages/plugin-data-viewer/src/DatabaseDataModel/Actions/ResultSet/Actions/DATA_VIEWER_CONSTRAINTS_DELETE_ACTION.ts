@@ -8,8 +8,8 @@
 
 import { createAction } from '@cloudbeaver/core-view';
 
-export const REFRESH_RESULT_SET_ACTION = createAction('refresh-result-set', {
-  label: 'ui_refresh',
-  tooltip: 'data_viewer_refresh_result_set',
-  icon: 'reload',
+export const DATA_VIEWER_CONSTRAINTS_DELETE_ACTION = createAction('data-viewer-constraints-delete', {
+  label: 'data_grid_table_delete_filters_and_orders',
+  tooltip: 'data_grid_table_delete_filters_and_orders',
+  icon: 'erase',
 });

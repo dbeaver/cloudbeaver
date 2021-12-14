@@ -14,9 +14,9 @@ import { composes } from '@cloudbeaver/core-theming';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_TABLE_HEADER_MODEL } from './DATA_CONTEXT_TABLE_HEADER_MODEL';
-import { DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX } from './DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX';
-import { TABLE_HEADER_MENU } from './TABLE_HEADER_MENU';
+import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL';
+import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX';
+import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
 const TABLE_HEADER_MENU_BAR_STYLES = composes(
@@ -87,10 +87,10 @@ export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps>
   model,
   resultIndex,
 }) {
-  const menu = useMenu(TABLE_HEADER_MENU);
+  const menu = useMenu(DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
 
-  menu.context.set(DATA_CONTEXT_TABLE_HEADER_MODEL, model);
-  menu.context.set(DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX, resultIndex);
+  menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL, model);
+  menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX, resultIndex);
 
   return (
     <MenuBar menu={menu} style={TABLE_HEADER_MENU_BAR_STYLES} />

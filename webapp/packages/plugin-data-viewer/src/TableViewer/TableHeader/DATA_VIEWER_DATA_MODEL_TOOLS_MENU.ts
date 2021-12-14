@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createDataContext } from '@cloudbeaver/core-view';
+import { createMenu } from '@cloudbeaver/core-view';
 
-export const DATA_CONTEXT_TABLE_HEADER_RESULT_INDEX = createDataContext<number>('table-result-index');
+export const DATA_VIEWER_DATA_MODEL_TOOLS_MENU = createMenu('data-viewer-data-model-tools', 'Data viewer data model tools menu');

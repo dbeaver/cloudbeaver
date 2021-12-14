@@ -48,8 +48,8 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       disableSave={!state.applicableFilter}
       disabled={state.disabled}
       simple
-      onSave={state.applyFilter}
-      onChange={state.changeHandler}
+      onSave={state.apply}
+      onChange={state.set}
     />
   );
 });
