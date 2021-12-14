@@ -96,7 +96,7 @@ export class DocumentEditAction
     throw new Error('Not implemented');
   }
 
-  addCopy(key: IDocumentElementKey): void {
+  duplicate(key: IDocumentElementKey): void {
     throw new Error('Not implemented');
   }
 
