@@ -4,7 +4,7 @@ export default [
   ['data_grid_table_editing_set_to_null', '设置为NULL'],
   ['data_grid_table_editing_open_inline_editor', '打开內联编辑器'],
   ['data_grid_table_editing_row_add', '添加行'],
-  ['data_grid_table_editing_row_add_copy', 'Add row copy'],
+  ['data_grid_table_editing_row_add_copy', 'Duplicate row'],
   ['data_grid_table_editing_row_delete', '删除当前行'],
   ['data_grid_table_editing_row_revert', '还原值'],
   ['data_grid_table_order', '排序'],

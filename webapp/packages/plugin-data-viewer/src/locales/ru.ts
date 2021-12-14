@@ -11,7 +11,7 @@ export default [
   ['data_viewer_statistics_updated_rows', 'Updated Rows:'],
   ['data_viewer_action_edit_delete', 'Удалить'],
   ['data_viewer_action_edit_add', 'Добавить'],
-  ['data_viewer_action_edit_add_copy', 'Создать копию'],
+  ['data_viewer_action_edit_add_copy', 'Дублировать'],
   ['data_viewer_action_edit_revert', 'Отменить'],
   ['data_viewer_result_edited_title', 'Сохранить изменения'],
   ['data_viewer_result_edited_message', 'Данные результата запроса были изменены. Вы хотите сохранить изменения?'],

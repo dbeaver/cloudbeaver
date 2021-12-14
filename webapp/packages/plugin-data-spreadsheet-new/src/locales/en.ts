@@ -4,7 +4,7 @@ export default [
   ['data_grid_table_editing_set_to_null', 'Set to NULL'],
   ['data_grid_table_editing_open_inline_editor', 'Open inline editor'],
   ['data_grid_table_editing_row_add', 'Add row'],
-  ['data_grid_table_editing_row_add_copy', 'Add row copy'],
+  ['data_grid_table_editing_row_add_copy', 'Duplicate row'],
   ['data_grid_table_editing_row_delete', 'Delete current row'],
   ['data_grid_table_editing_row_revert', 'Revert value'],
   ['data_grid_table_order', 'Sorting'],
