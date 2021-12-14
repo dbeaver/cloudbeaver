@@ -119,6 +119,14 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   async refresh(concurrent?: boolean): Promise<void> {
     if (concurrent) {
+      await this.source.refreshData();
+      return;
+    }
+    await this.requestDataAction(() => this.source.refreshData());
+  }
+
+  async request(concurrent?: boolean): Promise<void> {
+    if (concurrent) {
       await this.source.requestData();
       return;
     }
