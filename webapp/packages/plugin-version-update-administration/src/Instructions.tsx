@@ -18,6 +18,9 @@ import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 const style = css`
+  Group {
+    composes: theme-typography--body2 from global;
+  }
   GroupItem {
     white-space: pre-line;
   }

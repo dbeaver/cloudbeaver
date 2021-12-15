@@ -10,7 +10,7 @@ import { makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapResource } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource } from '@cloudbeaver/core-sdk';
 
 export interface IVersion {
   number: string;
@@ -37,6 +37,11 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     makeObservable(this, {
       latest: observable.ref,
     });
+  }
+
+  async refreshAll(): Promise<Map<string, IVersion>> {
+    await this.refresh(CachedMapAllKey);
+    return this.data;
   }
 
   protected async loader(): Promise<Map<string, IVersion>> {

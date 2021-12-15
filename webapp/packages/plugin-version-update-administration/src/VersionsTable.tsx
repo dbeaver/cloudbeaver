@@ -73,8 +73,7 @@ export const VersionsTable = observer(function VersionsTable() {
 
   const refresh = useCallback(async () => {
     try {
-      versionResource.resource.markOutdated();
-      await versionResource.resource.load(CachedMapAllKey);
+      await versionResource.resource.refreshAll();
       notificationService.logSuccess({ title: 'version_update_versions_refresh_successful' });
     } catch (exception) {
       notificationService.logException(exception, 'version_update_versions_refresh_fail');
@@ -87,7 +86,7 @@ export const VersionsTable = observer(function VersionsTable() {
         <layout-grid-cell {...use({ span: 12 })}>
           <ToolsPanel>
             <ToolsAction
-              title={translate('authentication_administration_tools_refresh_tooltip')}
+              title={translate('ui_refresh')}
               icon="refresh"
               viewBox="0 0 24 24"
               onClick={refresh}

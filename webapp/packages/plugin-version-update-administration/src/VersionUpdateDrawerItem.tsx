@@ -55,7 +55,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
       </content>
       {versionUpdateService.newVersionAvailable && (
         <icon-container title={translate('version_update_new_version_available')}>
-          <IconOrImage icon='order-arrow-up' />
+          <IconOrImage icon='order-arrow-down' />
         </icon-container>
       )}
     </Tab>
