@@ -80,6 +80,8 @@ import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService, ThemeSettingsService } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
+import { coreVersionManifest } from '@cloudbeaver/core-version';
+import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 
 export const coreManifests: PluginManifest[] = [
@@ -165,4 +167,6 @@ export const coreManifests: PluginManifest[] = [
   coreAuthenticationManifest,
   coreUIManifest,
   coreViewManifest,
+  coreVersionManifest,
+  coreVersionUpdateManifest,
 ];
