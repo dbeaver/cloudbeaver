@@ -13,9 +13,12 @@ import type { DataGridHandle } from 'react-data-grid';
 import styled from 'reshadow';
 
 import { TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { ClipboardService } from '@cloudbeaver/core-ui';
 import {
   DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps,
   IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction
@@ -51,6 +54,7 @@ const headerHeight = 28;
 export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, className }) {
   const translate = useTranslate();
 
+  const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
@@ -68,7 +72,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   const editingContext = useEditing({
     readonly: model.isReadonly() || model.isDisabled(resultIndex),
-    onEdit: (position, key) => {
+    onEdit: (position, code, key) => {
       const column = tableData.getColumn(position.idx);
       const row = tableData.getRow(position.rowIdx);
 
@@ -78,7 +82,11 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
       const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
-      switch (key) {
+      if (tableData.isCellReadonly(cellKey)) {
+        return false;
+      }
+
+      switch (code) {
         case 'Backspace':
           tableData.editor.set(cellKey, '');
           break;
@@ -86,7 +94,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           break;
         default:
           if (key) {
-            if (/^[a-z0-9]$/i.test(key)) {
+            if (/^[\d\p{L}]$/iu.test(key) && key.length === 1) {
               tableData.editor.set(cellKey, key);
             } else {
               return false;
@@ -150,6 +158,11 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     gridSelectedCellCopy.onKeydownHandler(event);
+
+    if (EventContext.has(event, EventStopPropagationFlag)) {
+      return;
+    }
+
     const cell = selectionAction.getFocusedElement();
 
     if (!cell) {
@@ -164,7 +177,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       return;
     }
 
-    switch (event.key) {
+    switch (event.nativeEvent.code) {
       case 'Escape': {
         tableData.editor.revert(cell);
         return;
@@ -186,7 +199,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       return;
     }
 
-    switch (event.key) {
+    switch (event.nativeEvent.code) {
       case 'Delete': {
         const editor = tableData.editor;
         editor.delete(cell);
@@ -203,9 +216,22 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
         return;
       }
+      case 'KeyV':{
+        if (event.ctrlKey || event.metaKey) {
+          if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
+            return;
+          }
+
+          clipboardService
+            .read()
+            .then(value => tableData.editor.set(cell, value))
+            .catch();
+        }
+        return;
+      }
     }
 
-    editingContext.edit({ idx, rowIdx }, event.key);
+    editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
 
   useEffect(() => {

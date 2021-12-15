@@ -49,6 +49,7 @@ export interface ITableData {
   isIndexColumn: (columnKey: string) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<IResultSetRowKey, any>>) => boolean;
   isReadOnly: () => boolean;
+  isCellReadonly: (key: Partial<IResultSetElementKey>) => boolean;
 }
 
 export const TableDataContext = createContext<ITableData>(undefined as any);

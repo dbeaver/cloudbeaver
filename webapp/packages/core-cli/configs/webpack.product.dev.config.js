@@ -14,17 +14,17 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const package = require(resolve('package.json'));
 
-const certPath = resolve(__dirname, '../../../../../server-cert.pem')
-const keyPath = resolve(__dirname, '../../../../../server-key.pem')
+const certPath = resolve(__dirname, '../../../../../certs/private.pem')
+const keyPath = resolve(__dirname, '../../../../../certs/private.key')
 let https = false;
 
 
-// if(fs.existsSync(certPath) && fs.existsSync(keyPath)) {
-//   https = {
-//     key: fs.readFileSync(keyPath),
-//     cert: fs.readFileSync(certPath)
-//   }
-// }
+if(fs.existsSync(certPath) && fs.existsSync(keyPath)) {
+  https = {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
+  }
+}
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   entry: {

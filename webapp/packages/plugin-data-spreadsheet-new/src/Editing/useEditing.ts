@@ -24,7 +24,7 @@ function getPositionHash(position: CellPosition): string {
 
 interface IEditingOptions {
   readonly?: boolean;
-  onEdit: (position: CellPosition, key?: string) => boolean;
+  onEdit: (position: CellPosition, code?: string, key?: string) => boolean;
   onCloseEditor?: (position: CellPosition) => void;
 }
 
@@ -41,12 +41,12 @@ export function useEditing(options: IEditingOptions): IEditingContext {
     get readonly() {
       return state.readonly;
     },
-    edit(position: CellPosition, key?: string) {
+    edit(position: CellPosition, code?: string, key?: string) {
       if (state.options.readonly) {
         return;
       }
 
-      if (!state.options.onEdit(position, key)) {
+      if (!state.options.onEdit(position, code, key)) {
         return;
       }
 

@@ -109,9 +109,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
 
     return !(
-      !column.editable
-      || handleByBooleanFormatter
-      || tableDataContext.format.isReadOnly(cellContext.cell)
+      handleByBooleanFormatter
+      || tableDataContext.isCellReadonly(cellContext.cell)
     );
   }
 

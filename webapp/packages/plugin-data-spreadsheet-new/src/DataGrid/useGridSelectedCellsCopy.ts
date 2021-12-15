@@ -9,6 +9,7 @@
 import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
@@ -16,7 +17,7 @@ import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSele
 import type { ITableData } from './TableDataContext';
 
 const EVENT_KEY_CODE = {
-  C: 'C',
+  C: 'KeyC',
 };
 
 function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): string {
@@ -73,7 +74,9 @@ export function useGridSelectedCellsCopy(
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === EVENT_KEY_CODE.C) {
+    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+      EventContext.set(event, EventStopPropagationFlag);
+
       const focusedElement = props.resultSetSelectAction.getFocusedElement();
       let value: string | null = null;
 
