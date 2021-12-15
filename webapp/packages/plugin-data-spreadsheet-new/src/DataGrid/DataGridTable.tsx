@@ -164,6 +164,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }
 
     const cell = selectionAction.getFocusedElement();
+    const activeElements = selectionAction.getActiveElements();
+    const activeRows = selectionAction.getActiveRows();
 
     if (!cell) {
       return;
@@ -179,13 +181,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
     switch (event.nativeEvent.code) {
       case 'Escape': {
-        tableData.editor.revert(cell);
+        tableData.editor.revert(...activeElements);
         return;
       }
       case 'Insert': {
         if (event.altKey) {
           if (event.ctrlKey || event.metaKey) {
-            tableData.editor.duplicate(cell);
+            tableData.editor.duplicate(...activeRows);
           } else {
             tableData.editor.add(cell);
           }
@@ -193,30 +195,39 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         }
       }
     }
-    const editingState = tableData.editor.getElementState(cell);
 
-    if (editingState === DatabaseEditChangeType.delete) {
-      return;
-    }
+    const editingState = tableData.editor.getElementState(cell);
 
     switch (event.nativeEvent.code) {
       case 'Delete': {
-        const editor = tableData.editor;
-        editor.delete(cell);
+        const filteredRows = activeRows
+          .filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
-        if (editingState === DatabaseEditChangeType.add) {
-          if (rowIdx - 1 > 0) {
-            dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx - 1 });
-          }
-        } else {
-          if (rowIdx + 1 < tableData.rows.length) {
-            dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx + 1 });
+        if (filteredRows.length > 0) {
+          const editor = tableData.editor;
+          const firstRow = filteredRows[0];
+          const editingState = tableData.editor.getElementState(firstRow);
+
+          editor.delete(...filteredRows);
+
+          if (editingState === DatabaseEditChangeType.add) {
+            if (rowIdx - 1 > 0) {
+              dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx - 1 });
+            }
+          } else {
+            if (rowIdx + 1 < tableData.rows.length) {
+              dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx + 1 });
+            }
           }
         }
 
         return;
       }
-      case 'KeyV':{
+      case 'KeyV': {
+        if (editingState === DatabaseEditChangeType.delete) {
+          return;
+        }
+
         if (event.ctrlKey || event.metaKey) {
           if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
             return;
@@ -226,9 +237,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
             .read()
             .then(value => tableData.editor.set(cell, value))
             .catch();
+          return;
         }
-        return;
       }
+    }
+
+    if (editingState === DatabaseEditChangeType.delete) {
+      return;
     }
 
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);

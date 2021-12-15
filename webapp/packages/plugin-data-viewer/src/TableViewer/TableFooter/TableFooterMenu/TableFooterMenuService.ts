@@ -366,12 +366,5 @@ function getActiveElements(model: IDatabaseDataModel<any, IDatabaseDataResult>, 
     DatabaseSelectAction
   );
 
-  const selectedElements = select?.getSelectedElements() || [];
-  const focus = select?.getFocusedElement();
-
-  if (selectedElements.length === 0 && focus) {
-    selectedElements.push(focus);
-  }
-
-  return selectedElements;
+  return select?.getActiveElements() ?? [];
 }

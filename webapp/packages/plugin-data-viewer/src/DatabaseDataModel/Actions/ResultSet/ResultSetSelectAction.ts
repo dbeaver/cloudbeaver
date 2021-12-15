@@ -160,6 +160,46 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     return Array.from(this.selectedElements.values()).flat();
   }
 
+  getActiveElements(): IResultSetElementKey[] {
+    const elements = this.getSelectedElements();
+    const focus = this.getFocusedElement();
+
+    if (elements.length === 0 && focus) {
+      return [focus];
+    }
+
+    return elements;
+  }
+
+  getSelectedRows(): IResultSetElementKey[] {
+    const cells: IResultSetElementKey[] = [];
+    const rowsKeys = new Set<string>();
+
+    const elements = this.getSelectedElements();
+
+    for (const cell of elements) {
+      const key = ResultSetDataKeysUtils.serialize(cell.row);
+
+      if (!rowsKeys.has(key)) {
+        cells.push(cell);
+        rowsKeys.add(key);
+      }
+    }
+
+    return cells;
+  }
+
+  getActiveRows(): IResultSetElementKey[] {
+    const elements = this.getSelectedRows();
+    const focus = this.getFocusedElement();
+
+    if (elements.length === 0 && focus) {
+      return [focus];
+    }
+
+    return elements;
+  }
+
   set(key: IResultSetPartialKey, selected: boolean, silent?: boolean): void {
     if (key.row === undefined) {
       for (const row of this.view.rowKeys) {

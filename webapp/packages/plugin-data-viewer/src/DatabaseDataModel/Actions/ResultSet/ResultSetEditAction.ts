@@ -208,11 +208,23 @@ export class ResultSetEditAction
     }
   }
 
-  duplicate(...key: IResultSetElementKey[]): void {
-    this.addRowCopy(...key.map(key => key.row));
+  duplicate(...keys: IResultSetElementKey[]): void {
+    const rows: IResultSetRowKey[] = [];
+    const rowKeys = new Set<string>();
+
+    for (const key of keys) {
+      const serialized = ResultSetDataKeysUtils.serialize(key.row);
+
+      if (!rowKeys.has(serialized)) {
+        rows.push(key.row);
+        rowKeys.add(serialized);
+      }
+    }
+
+    this.duplicateRow(...rows);
   }
 
-  addRowCopy(...rows: IResultSetRowKey[]): void {
+  duplicateRow(...rows: IResultSetRowKey[]): void {
     for (const row of rows) {
       let value = this.data.getRowValue(row);
 

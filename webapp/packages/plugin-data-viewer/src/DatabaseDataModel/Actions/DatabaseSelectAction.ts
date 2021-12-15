@@ -31,6 +31,7 @@ export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataRe
   abstract isElementSelected(key: TKey): boolean;
   abstract getFocusedElement(): TKey | null;
   abstract getSelectedElements(): TKey[];
+  abstract getActiveElements(): TKey[];
   abstract set(key: TKey, selected: boolean): void;
   abstract clear(): void;
 }
