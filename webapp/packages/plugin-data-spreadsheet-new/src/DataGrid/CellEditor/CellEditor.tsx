@@ -41,7 +41,7 @@ export interface IEditorRef {
   focus: () => void;
 }
 
-const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'];
 
 export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
   row,

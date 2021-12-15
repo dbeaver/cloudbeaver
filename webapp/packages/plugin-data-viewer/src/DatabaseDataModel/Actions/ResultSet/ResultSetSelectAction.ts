@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -160,6 +160,46 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     return Array.from(this.selectedElements.values()).flat();
   }
 
+  getActiveElements(): IResultSetElementKey[] {
+    const elements = this.getSelectedElements();
+    const focus = this.getFocusedElement();
+
+    if (elements.length === 0 && focus) {
+      return [focus];
+    }
+
+    return elements;
+  }
+
+  getSelectedRows(): IResultSetElementKey[] {
+    const cells: IResultSetElementKey[] = [];
+    const rowsKeys = new Set<string>();
+
+    const elements = this.getSelectedElements();
+
+    for (const cell of elements) {
+      const key = ResultSetDataKeysUtils.serialize(cell.row);
+
+      if (!rowsKeys.has(key)) {
+        cells.push(cell);
+        rowsKeys.add(key);
+      }
+    }
+
+    return cells;
+  }
+
+  getActiveRows(): IResultSetElementKey[] {
+    const elements = this.getSelectedRows();
+    const focus = this.getFocusedElement();
+
+    if (elements.length === 0 && focus) {
+      return [focus];
+    }
+
+    return elements;
+  }
+
   set(key: IResultSetPartialKey, selected: boolean, silent?: boolean): void {
     if (key.row === undefined) {
       for (const row of this.view.rowKeys) {
@@ -233,7 +273,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       return;
     }
 
-    this.focusedElement = key;
+    this.focusedElement = toJS(key);
     this.actions.execute({
       type: 'focus',
       resultId: this.result.id,

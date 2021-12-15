@@ -208,21 +208,35 @@ export class ResultSetEditAction
     }
   }
 
-  addCopy(key: IResultSetElementKey): void {
-    this.addRowCopy(key.row);
-  }
+  duplicate(...keys: IResultSetElementKey[]): void {
+    const rows: IResultSetRowKey[] = [];
+    const rowKeys = new Set<string>();
 
-  addRowCopy(row: IResultSetRowKey): void {
-    let value = this.data.getRowValue(row);
+    for (const key of keys) {
+      const serialized = ResultSetDataKeysUtils.serialize(key.row);
 
-    const editedValue = this.editorData
-      .get(ResultSetDataKeysUtils.serialize(row));
-
-    if (editedValue) {
-      value = editedValue.update;
+      if (!rowKeys.has(serialized)) {
+        rows.push(key.row);
+        rowKeys.add(serialized);
+      }
     }
 
-    this.addRow(row, JSON.parse(JSON.stringify(value)));
+    this.duplicateRow(...rows);
+  }
+
+  duplicateRow(...rows: IResultSetRowKey[]): void {
+    for (const row of rows) {
+      let value = this.data.getRowValue(row);
+
+      const editedValue = this.editorData
+        .get(ResultSetDataKeysUtils.serialize(row));
+
+      if (editedValue) {
+        value = editedValue.update;
+      }
+
+      this.addRow(row, JSON.parse(JSON.stringify(value)));
+    }
   }
 
   delete(...keys: IResultSetElementKey[]): void {

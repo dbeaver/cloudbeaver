@@ -93,13 +93,18 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
       }
     }
   }
-  const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
-    gridSelectionContext.selectColumn(calculatedColumn.idx, e.ctrlKey || e.metaKey);
-  };
+
+  function preventFocus(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    event.preventDefault();
+  }
+
+  function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    gridSelectionContext.selectColumn(calculatedColumn.idx, event.ctrlKey || event.metaKey);
+  }
 
   return styled(useStyles(headerStyles))(
     <table-header>
-      <shrink-container as='div' title={columnTooltip} onClick={handleColumnSelection}>
+      <shrink-container as='div' title={columnTooltip} onMouseDown={preventFocus} onClick={handleClick}>
         <icon>
           {icon && <StaticImage icon={icon} />}
           {!dataReadonly && columnReadOnly && <readonly-status className='rdg-table-header__readonly-status' />}

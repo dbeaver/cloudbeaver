@@ -101,19 +101,17 @@ export class TableFooterMenuService {
         return !editor?.hasFeature('add');
       },
       isDisabled(context) {
-        const select = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseSelectAction
-        );
-
-        const focus = select?.getFocusedElement();
-
-        return (
+        if (
           context.data.model.isLoading()
           || context.data.model.isDisabled(context.data.resultIndex)
           || !context.data.model.source.hasResult(context.data.resultIndex)
-          || !focus
-        );
+        ) {
+          return true;
+        }
+
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+
+        return selectedElements.length === 0;
       },
       onClick(context) {
         const editor = context.data.model.source.getActionImplementation(
@@ -125,16 +123,9 @@ export class TableFooterMenuService {
           return;
         }
 
-        const select = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseSelectAction
-        );
+        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
-        const focus = select?.getFocusedElement();
-
-        if (focus) {
-          editor.addCopy(focus);
-        }
+        editor.duplicate(...selectedElements);
       },
     });
     this.registerMenuItem({
@@ -375,12 +366,5 @@ function getActiveElements(model: IDatabaseDataModel<any, IDatabaseDataResult>, 
     DatabaseSelectAction
   );
 
-  const selectedElements = select?.getSelectedElements() || [];
-  const focus = select?.getFocusedElement();
-
-  if (selectedElements.length === 0 && focus) {
-    selectedElements.push(focus);
-  }
-
-  return selectedElements;
+  return select?.getActiveElements() ?? [];
 }

@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction, DatabaseSelectAction, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { isBooleanValuePresentationAvailable, DatabaseEditChangeType, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -124,7 +124,7 @@ export class DataGridContextMenuCellEditingService {
         },
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
-          editor.addRowCopy(context.data.key.row);
+          editor.duplicateRow(context.data.key.row);
         },
       }
     );

@@ -33,6 +33,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly results: TResult[];
   readonly offset: number;
   readonly count: number;
+  readonly prevOptions: Readonly<TOptions> | null;
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
@@ -80,6 +81,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   retry: () => Promise<void>;
   runTask: <T>(task: () => Promise<T>) => Promise<T>;
   requestData: () => Promise<void> | void;
+  refreshData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<void> | void;
   clearError: () => void;
