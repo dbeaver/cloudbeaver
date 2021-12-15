@@ -10,10 +10,11 @@ import { computed, makeObservable } from 'mobx';
 import { compare } from 'semver';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IVersion, VersionService } from '@cloudbeaver/core-version';
+import { IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 interface IInstructionProps {
-  versions: IVersion[];
+  version: IVersion;
+  className?: string;
 }
 
 export type InstructionComponent = React.FunctionComponent<IInstructionProps>;
@@ -23,15 +24,16 @@ export class VersionUpdateService {
   instructionGetter: (() => InstructionComponent) | null;
 
   get newVersionAvailable() {
-    if (!this.versionService.current || !this.versionService.latest) {
+    if (!this.versionService.current || !this.versionResource.latest) {
       return false;
     }
 
-    return compare(this.versionService.latest.number, this.versionService.current) === 1;
+    return compare(this.versionResource.latest.number, this.versionService.current) === 1;
   }
 
   constructor(
     private readonly versionService: VersionService,
+    private readonly versionResource: VersionResource,
   ) {
     this.instructionGetter = null;
 

@@ -22,6 +22,8 @@ interface Props {
 const style = css`
   Group {
     composes: theme-typography--body2 from global;
+    list-style-position: inside;
+    height: 100%;
   }
   ReactMarkdown > * {
     margin: 0;
@@ -37,9 +39,9 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const version = versionResource.data;
 
   return styled(styles)(
-    <ColoredContainer wrap gap overflow>
+    <ColoredContainer wrap gap overflow medium fill>
       <Group form gap>
-        <GroupTitle>{version ? `CloudBeaver ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
+        <GroupTitle>{version ? `Changelog ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
         {version && (
           <GroupItem>
             <ReactMarkdown>{version.releaseNotes}</ReactMarkdown>

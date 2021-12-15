@@ -13,7 +13,7 @@ import { BASE_CONTAINERS_STYLES, Cell, IconOrImage } from '@cloudbeaver/core-blo
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { VersionService } from '@cloudbeaver/core-version';
+import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 const style = css`
@@ -28,11 +28,12 @@ export const VersionChecker = observer(function VersionChecker() {
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
   const versionService = useService(VersionService);
+  const versionResource = useService(VersionResource);
 
   const icon = versionUpdateService.newVersionAvailable ? '/icons/info_icon.svg' : '/icons/success_icon.svg';
   const text = versionUpdateService.newVersionAvailable ? 'version_update_new_version_available' : 'version_update_version_is_up_to_date';
-  const description = versionService.current && versionService.latest
-    ? `${translate('version_current')}: ${versionService.current}, ${translate('version_latest')}: ${versionService.latest.number}` : '';
+  const description = versionService.current && versionResource.latest
+    ? `${translate('version_current')}: ${versionService.current}, ${translate('version_latest')}: ${versionResource.latest.number}` : '';
 
   return styled(styles)(
     <Cell

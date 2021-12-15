@@ -12,8 +12,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
-import { IVersion, VersionResource } from './VersionResource';
-
 const VERSION_REGEX = /(\d+\.\d+\.\d+)/;
 
 export interface IProductVersion {
@@ -27,17 +25,11 @@ export class VersionService {
     return this.getProductVersion(true).frontendVersion;
   }
 
-  get latest(): IVersion | undefined {
-    return this.versionResource.values.find(v => v.number === this.versionResource.latest);
-  }
-
   constructor(
     private readonly serverService: ServerService,
-    private readonly versionResource: VersionResource,
   ) {
     makeObservable(this, {
       current: computed,
-      latest: computed,
     });
   }
 

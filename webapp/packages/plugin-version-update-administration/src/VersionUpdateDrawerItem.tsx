@@ -50,7 +50,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
       onOpen={() => onSelect(item.name)}
     >
       <content>
-        <TabIcon icon='/icons/identity_providers.svg' />
+        <TabIcon icon='/icons/version_update.svg' />
         <TabTitle><Translate token='version_update' /></TabTitle>
       </content>
       {versionUpdateService.newVersionAvailable && (

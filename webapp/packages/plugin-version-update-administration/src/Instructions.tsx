@@ -9,13 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle, useMapResource } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { VersionResource } from '@cloudbeaver/core-version';
-import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 const style = css`
   Group {
@@ -24,24 +20,27 @@ const style = css`
   GroupItem {
     white-space: pre-line;
   }
+  ol {
+    margin: 0;
+    padding: 0;
+  }
 `;
 
 export const Instructions = observer(function Instructions() {
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES, style);
-  const versionUpdateService = useService(VersionUpdateService);
-  const versionResource = useMapResource(Instructions, VersionResource, CachedMapAllKey);
 
-  if (!versionUpdateService.instructionGetter) {
-    return null;
-  }
-
-  const Instruction = versionUpdateService.instructionGetter();
   return styled(styles)(
     <Group form gap>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem>
-        <Instruction versions={versionResource.resource.values} />
+        <ol>
+          <li>First, you’ll need to use the <strong>docker ps</strong> command to see a list of all containers currently running on your system.</li>
+          <li>Then, stop the existing container by running the docker stop command.</li>
+          <li>After stopping the running container, you can now use the <strong>docker rm</strong> command to remove it.</li>
+          <li>Next, you can look for the version of the image you need to update to. To download the image from Docker Hub, you can use the <strong>docker pull</strong> command. </li>
+          <li>After downloading the new image, you can use it to recreate the container by executing the docker run command. </li>
+        </ol>
       </GroupItem>
     </Group>
   );

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable, runInAction } from 'mobx';
+import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -25,17 +25,23 @@ interface IVersions {
 
 @injectable()
 export class VersionResource extends CachedMapResource<string, IVersion> {
-  latest: string | null;
+  private latestVersionNumber: string | null;
+
+  get latest() {
+    return this.values.find(v => v.number === this.latestVersionNumber);
+  }
+
   constructor(
     private readonly serverConfigResource: ServerConfigResource
   ) {
     super();
 
-    this.latest = null;
+    this.latestVersionNumber = null;
     this.preloadResource(this.serverConfigResource);
 
-    makeObservable(this, {
-      latest: observable.ref,
+    makeObservable<this, 'latestVersionNumber'>(this, {
+      latestVersionNumber: observable.ref,
+      latest: computed,
     });
   }
 
@@ -50,15 +56,14 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
       return this.data;
     }
 
-    // https://www.npoint.io/docs/20ec48e3408c7e3543dc
-    const response = await fetch('https://api.npoint.io/20ec48e3408c7e3543dc', {
+    const response = await fetch(versionLink, {
       cache: 'no-cache',
     });
 
     const json = await response.json() as IVersions;
 
     if (json.latestVersion) {
-      this.latest = json.latestVersion;
+      this.latestVersionNumber = json.latestVersion;
     }
 
     if (!json.versions) {

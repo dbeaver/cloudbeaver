@@ -11,24 +11,19 @@ import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable, useMapResource } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { VersionResource } from '@cloudbeaver/core-version';
+import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 
 import { Version } from './Version';
 
 const layoutStyles = composes(
   css`
     layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-
-    layout-grid-cell {
-      composes: theme-border-color-background from global;
+      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
     }
   `,
   css`
@@ -64,16 +59,20 @@ const styles = css`
   }
 `;
 
-export const VersionsTable = observer(function VersionsTable() {
+interface Props {
+  versions: IVersion[];
+}
+
+export const VersionsTable = observer<Props>(function VersionsTable({ versions }) {
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, layoutStyles);
   const notificationService = useService(NotificationService);
-  const versionResource = useMapResource(VersionsTable, VersionResource, CachedMapAllKey);
+  const versionResource = useService(VersionResource);
   const table = useTable();
 
   const refresh = useCallback(async () => {
     try {
-      await versionResource.resource.refreshAll();
+      await versionResource.refreshAll();
       notificationService.logSuccess({ title: 'version_update_versions_refresh_successful' });
     } catch (exception) {
       notificationService.logException(exception, 'version_update_versions_refresh_fail');
@@ -96,7 +95,7 @@ export const VersionsTable = observer(function VersionsTable() {
           </ToolsPanel>
         </layout-grid-cell>
         <layout-grid-cell {...use({ span: 12, table: true })}>
-          <Loader style={loaderStyle} state={[versionResource]} overlay>
+          <Loader style={loaderStyle} loading={versionResource.isLoading()} overlay>
             <Table
               selectedItems={table.selected}
               expandedItems={table.expanded}
@@ -108,7 +107,7 @@ export const VersionsTable = observer(function VersionsTable() {
                 <TableColumnHeader>{translate('version_date')}</TableColumnHeader>
               </TableHeader>
               <TableBody>
-                {versionResource.resource.values.map(version => (
+                {versions.map(version => (
                   <Version key={version.number} version={version} />
                 ))}
               </TableBody>
