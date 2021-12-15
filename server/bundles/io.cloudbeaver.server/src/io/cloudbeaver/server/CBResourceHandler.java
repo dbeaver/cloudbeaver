@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPResourceHandler;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.DBNNodeWithResource;
 import org.jkiss.dbeaver.model.navigator.DBNResource;
 
 import java.util.List;
@@ -60,8 +61,9 @@ public class CBResourceHandler implements DBPResourceHandler {
         return null;
     }
 
+    @NotNull
     @Override
-    public String getResourceNodeName(IResource resource) {
+    public String getResourceNodeName(@NotNull IResource resource) {
         return resource.getName();
     }
 
@@ -73,7 +75,7 @@ public class CBResourceHandler implements DBPResourceHandler {
     }
 
     @Override
-    public void updateNavigatorNode(@NotNull DBNResource node, @NotNull IResource resource) {
+    public void updateNavigatorNodeFromResource(@NotNull DBNNodeWithResource node, @NotNull IResource resource) {
     }
 
     @Override
