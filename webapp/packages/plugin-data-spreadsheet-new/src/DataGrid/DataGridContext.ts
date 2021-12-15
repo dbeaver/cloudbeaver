@@ -25,6 +25,7 @@ export interface IDataGridContext {
   isGridInFocus: () => boolean;
   getEditorPortal: () => HTMLDivElement | null;
   getDataGridApi: () => DataGridHandle | null;
+  focus: () => void;
 }
 
 export const DataGridContext = createContext<IDataGridContext>(undefined as any);

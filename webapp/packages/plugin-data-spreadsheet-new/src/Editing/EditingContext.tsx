@@ -10,7 +10,7 @@ import { createContext } from 'react';
 
 export interface IEditingContext {
   readonly readonly: boolean;
-  edit: (position: CellPosition, key?: string) => void;
+  edit: (position: CellPosition, code?: string, key?: string) => void;
   closeEditor: (position: CellPosition) => void;
   close: () => void;
   isEditorActive: () => boolean;

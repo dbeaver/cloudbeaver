@@ -126,7 +126,7 @@ export class DataViewerTabService {
     // TODO: used for initial data fetch, but can repeat request each time data tab is selected,
     //       so probably should be refactored and managed by presentation
     if (model.source.error === null && model.source.results.length === 0) {
-      model.refresh();
+      model.request();
     }
   }
 
@@ -143,7 +143,7 @@ export class DataViewerTabService {
         await model.requestDataAction(() => {
           canClose = true;
         });
-      } catch {}
+      } catch { }
 
       return canClose;
     }

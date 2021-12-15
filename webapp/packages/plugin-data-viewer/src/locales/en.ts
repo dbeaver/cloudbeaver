@@ -11,7 +11,7 @@ export default [
   ['data_viewer_statistics_updated_rows', 'Updated Rows:'],
   ['data_viewer_action_edit_delete', 'Delete selected'],
   ['data_viewer_action_edit_add', 'Add'],
-  ['data_viewer_action_edit_add_copy', 'Add copy'],
+  ['data_viewer_action_edit_add_copy', 'Duplicate'],
   ['data_viewer_action_edit_revert', 'Revert selected'],
   ['data_viewer_result_edited_title', 'Save changes'],
   ['data_viewer_result_edited_message', 'Result set was edited. Do you want to save changes in database?'],
@@ -28,4 +28,5 @@ export default [
   ['data_viewer_script_preview', 'Script'],
   ['data_viewer_script_preview_dialog_title', 'Preview changes'],
   ['data_viewer_script_preview_error_title', "Can't get the script"],
+  ['data_viewer_refresh_result_set', 'Refresh result set'],
 ];

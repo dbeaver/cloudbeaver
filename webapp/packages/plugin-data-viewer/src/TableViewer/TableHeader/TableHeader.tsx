@@ -27,16 +27,18 @@ const styles = css`
 interface Props {
   model: IDatabaseDataModel<any, any>;
   resultIndex: number;
+  className?: string;
 }
 
 export const TableHeader = observer<Props>(function TableHeader({
   model,
   resultIndex,
+  className,
 }) {
   const service = useService(TableHeaderService);
 
   return styled(styles)(
-    <table-header as="div">
+    <table-header className={className}>
       <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} />
     </table-header>
   );

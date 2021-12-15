@@ -62,7 +62,7 @@ export class DataGridContextMenuFilterService {
 
     await model.requestDataAction(async () => {
       constraints.setFilter(columnLabel, operator, filterValue);
-      await model.refresh(true);
+      await model.request(true);
     });
   }
 
@@ -160,7 +160,7 @@ export class DataGridContextMenuFilterService {
 
           await model.requestDataAction(async () => {
             constraints.deleteData();
-            await model.refresh(true);
+            await model.request(true);
           });
         },
       }
@@ -403,7 +403,7 @@ export class DataGridContextMenuFilterService {
 
           await model.requestDataAction(async () => {
             constraints.deleteFilter(columnLabel);
-            await model.refresh(true);
+            await model.request(true);
           });
         },
       }
@@ -430,7 +430,7 @@ export class DataGridContextMenuFilterService {
 
           await model.requestDataAction(async () => {
             constraints.deleteDataFilters();
-            await model.refresh(true);
+            await model.request(true);
           });
         },
       }

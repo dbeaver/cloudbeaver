@@ -23,6 +23,7 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -173,7 +174,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         String[] args = Platform.getCommandLineArgs();
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) & args.length > i + 1) {
+            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) && args.length > i + 1) {
                 configPath = args[i + 1];
                 break;
             }
@@ -302,6 +303,7 @@ public class CBApplication extends BaseApplicationImpl {
     /**
      * Configures server automatically.
      * Called on startup
+     *
      * @param configPath
      */
     protected void performAutoConfiguration(File configPath) {
@@ -368,7 +370,7 @@ public class CBApplication extends BaseApplicationImpl {
             }
 
             boolean hasLoopbackAddress = false;
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress localInetAddress = enumIpAddr.nextElement();
@@ -487,26 +489,40 @@ public class CBApplication extends BaseApplicationImpl {
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
 
             // App config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(configProps, "app")), CBAppConfig.class);
+            Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
+            gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
 
             // Database config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
+            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBDatabase.PARAM_DB_CONFIGURATION);
+            gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
             productConfigPath = getRelativePath(
-                JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+                JSONUtils.getString(
+                    serverConfig,
+                    CBConstants.PARAM_PRODUCT_CONFIGURATION,
+                    CBConstants.DEFAULT_PRODUCT_CONFIGURATION
+                ),
+                homeFolder
+            );
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
         }
 
         // Merge new config with old one
         {
-            Map<String, Object> mergedPlugins = Stream.concat(prevConfig.getPlugins().entrySet().stream(),
-                appConfiguration.getPlugins().entrySet().stream()).collect(
-                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.getPlugins().clear();
-            appConfiguration.getPlugins().putAll(mergedPlugins);
+            Map<String, Object> mergedPlugins = Stream.concat(
+                    prevConfig.getPlugins().entrySet().stream(),
+                    appConfiguration.getPlugins().entrySet().stream()
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            appConfiguration.setPlugins(mergedPlugins);
+
+            Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
+                    prevConfig.getAuthProviderConfigurations().entrySet().stream(),
+                    appConfiguration.getAuthProviderConfigurations().entrySet().stream()
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+            appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
         }
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
@@ -605,8 +621,7 @@ public class CBApplication extends BaseApplicationImpl {
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
         long sessionExpireTime,
-        @NotNull CBAppConfig appConfig) throws DBException
-    {
+        @NotNull CBAppConfig appConfig) throws DBException {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
@@ -653,7 +668,7 @@ public class CBApplication extends BaseApplicationImpl {
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(
                         ds.getId(),
-                        new String[] { anonymousRoleId },
+                        new String[]{anonymousRoleId},
                         adminName);
                 }
             }
@@ -685,6 +700,11 @@ public class CBApplication extends BaseApplicationImpl {
                     if (sessionExpireTime > 0) {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
                     }
+
+                    Map<String, Object> dbMap = ConfigurationUtils.databaseConfigToMap(databaseConfiguration);
+                    if (!CommonUtils.isEmpty(dbMap)) {
+                        JSONUtils.serializeProperties(json, CBDatabase.PARAM_DB_CONFIGURATION, dbMap);
+                    }
                     json.endObject();
                 }
                 {
@@ -694,6 +714,11 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+
+                    Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
+                    if (!CommonUtils.isEmpty(resourceQuotas)) {
+                        JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
+                    }
 
                     {
                         // Save only differences in def navigator settings

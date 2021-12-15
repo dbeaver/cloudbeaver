@@ -45,6 +45,7 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   retry: () => Promise<void>;
   save: () => Promise<void>;
   refresh: (concurrent?: boolean) => Promise<void>;
+  request: (concurrent?: boolean) => Promise<void>;
   reload: () => Promise<void>;
   requestDataPortion: (offset: number, count: number) => Promise<void>;
   cancel: () => Promise<void> | void;

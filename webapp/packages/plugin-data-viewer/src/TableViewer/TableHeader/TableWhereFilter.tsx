@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import { PlaceholderComponent, useObjectRef } from '@cloudbeaver/core-blocks';
+import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
+import { useWhereFilter } from './useWhereFilter';
 
 const styles = composes(
   css`
@@ -37,65 +36,20 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   resultIndex,
 }) {
   const translate = useTranslate();
-  const hasResult = model.source.hasResult(resultIndex);
-  let filterValue = model.source.options?.whereFilter || '';
-  let supported = false;
-
-  if (hasResult) {
-    const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
-    supported = constraints?.supported || false;
-    if (constraints && constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
-      filterValue = model.source.requestInfo.requestFilter;
-    }
-  }
-
-  const setValue = useCallback((filterValue: string) => {
-    model.source.options.whereFilter = filterValue;
-
-    const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
-    constraints?.deleteFilters();
-  }, [model.source.options]);
-
-  const props = useObjectRef({ model, resultIndex, filterValue });
-
-  const handleApply = useCallback(() => {
-    const { model, resultIndex } = props;
-    if (model.isLoading() || model.isDisabled(resultIndex)) {
-      return;
-    }
-    model.refresh();
-  }, []);
-
-  const resetFilter = useCallback(async () => {
-    const { model, resultIndex } = props;
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    if (model.isLoading() || model.isDisabled(resultIndex)) {
-      return;
-    }
-
-    await model.requestDataAction(async () => {
-      constraints.deleteDataFilters();
-
-      const applyNeeded = !!model.requestInfo.requestFilter;
-      if (applyNeeded) {
-        await model.refresh(true);
-      }
-    });
-  }, []);
+  const state = useWhereFilter(model, resultIndex);
 
   return styled(useStyles(styles))(
     <InlineEditor
       name="data_where"
-      value={filterValue}
+      value={state.filter}
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
-      edited={!!filterValue}
-      disableSave={model.source.options?.whereFilter === model.source.requestInfo.requestFilter}
-      disabled={!supported || model.isLoading() || model.isDisabled(resultIndex)}
+      edited={!!state.filter}
+      disableSave={!state.applicableFilter}
+      disabled={state.disabled}
       simple
-      onSave={handleApply}
-      onUndo={resetFilter}
-      onChange={setValue}
+      onSave={state.apply}
+      onChange={state.set}
     />
   );
 });

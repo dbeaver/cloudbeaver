@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable, action } from 'mobx';
+import { observable, makeObservable, action, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -26,6 +26,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   results: TResult[];
   offset: number;
   count: number;
+  prevOptions: Readonly<TOptions> | null;
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
@@ -45,6 +46,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.results = [];
     this.offset = 0;
     this.count = 0;
+    this.prevOptions = null;
     this.options = null;
     this.disabled = false;
     this.activeRequest = null;
@@ -69,6 +71,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       results: observable,
       offset: observable,
       count: observable,
+      prevOptions: observable,
       options: observable,
       requestInfo: observable,
       error: observable.ref,
@@ -276,6 +279,13 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
   }
 
+  async refreshData(): Promise<void> {
+    if (this.prevOptions) {
+      this.options = toJS(this.prevOptions);
+    }
+    await this.requestData();
+  }
+
   async saveData(): Promise<void> {
     if (this.activeRequest) {
       try {
@@ -318,6 +328,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   abstract dispose(): Promise<void>;
 
   async requestDataAction(): Promise<TResult[] | null> {
+    this.prevOptions = toJS(this.options);
     return this.request(this.results);
   }
 }

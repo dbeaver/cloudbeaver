@@ -11,7 +11,7 @@ import type { Column } from 'react-data-grid';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools, uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
@@ -33,7 +33,8 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
 export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
-  gridDIVElement: React.RefObject<HTMLDivElement | null>
+  gridDIVElement: React.RefObject<HTMLDivElement | null>,
+  onCellKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void
 ): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -77,6 +78,9 @@ export function useTableData(
           editable: true,
           width: Math.min(300, measuredCells[index]),
           headerRenderer: TableColumnHeader,
+          editorOptions: {
+            onCellKeyDown,
+          },
         }));
       columns.unshift(indexColumn);
 
@@ -151,6 +155,18 @@ export function useTableData(
     },
     isReadOnly() {
       return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
+    },
+    isCellReadonly(key: Partial<IResultSetElementKey>) {
+      if (!key.column) {
+        return true;
+      }
+
+      const column = this.getColumnByDataIndex(key.column);
+
+      return (
+        !column.editable
+      || this.format.isReadOnly(key)
+      );
     },
   }), {
     columns: computed,

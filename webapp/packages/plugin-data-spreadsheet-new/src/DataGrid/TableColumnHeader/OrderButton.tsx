@@ -70,15 +70,20 @@ export const OrderButton = observer<Props>(function OrderButton({
     const nextOrder = getNextOrder(currentOrder);
     await model.requestDataAction(async () => {
       constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
-      await model.refresh(true);
+      await model.request(true);
     });
   };
+
+  function preventFocus(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    event.preventDefault();
+  }
 
   return styled(styles)(
     <order-button
       as='div'
       title={translate('data_grid_table_tooltip_column_header_order')}
       className={className}
+      onMouseDown={preventFocus}
       onClick={handleSort}
       {...use({ disabled: loading })}
     >

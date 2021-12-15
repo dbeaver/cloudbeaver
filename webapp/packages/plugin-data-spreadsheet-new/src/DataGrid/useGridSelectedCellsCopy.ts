@@ -9,6 +9,7 @@
 import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
@@ -65,9 +66,6 @@ function getSelectedCellsValue(
   return rowsValues.join('\r\n');
 }
 
-// needed for event.code
-type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
-
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
   resultSetSelectAction: ResultSetSelectAction,
@@ -75,8 +73,10 @@ export function useGridSelectedCellsCopy(
 ) {
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
-  const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
+  const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+      EventContext.set(event, EventStopPropagationFlag);
+
       const focusedElement = props.resultSetSelectAction.getFocusedElement();
       let value: string | null = null;
 

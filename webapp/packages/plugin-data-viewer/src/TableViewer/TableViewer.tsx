@@ -77,6 +77,7 @@ const viewerStyles = composes(
       margin: 0;
     }
     TablePresentationBar {
+      padding-top: 40px;
       &:first-child {
         margin-right: 4px;
       }
@@ -235,7 +236,6 @@ export const TableViewer = observer<Props>(function TableViewer({
 
   return styled(styles)(
     <table-viewer className={className}>
-      <TableHeader model={dataModel} resultIndex={resultIndex} />
       <table-content>
         <TablePresentationBar
           type={DataPresentationType.main}
@@ -247,6 +247,7 @@ export const TableViewer = observer<Props>(function TableViewer({
           onPresentationChange={dataTableActions.setPresentation}
         />
         <table-data>
+          <TableHeader model={dataModel} resultIndex={resultIndex} />
           <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
             <Pane>
               <pane-content>
@@ -256,6 +257,13 @@ export const TableViewer = observer<Props>(function TableViewer({
                   dataFormat={dataFormat}
                   presentation={presentation}
                   resultIndex={resultIndex}
+                />
+                <TableError model={dataModel} loading={loading} />
+                <Loader
+                  loading={loading}
+                  cancelDisabled={!dataModel.source.canCancel}
+                  overlay={overlay}
+                  onCancel={() => dataModel.source.cancel()}
                 />
               </pane-content>
             </Pane>
@@ -274,13 +282,7 @@ export const TableViewer = observer<Props>(function TableViewer({
               </pane-content>
             </Pane>
           </Split>
-          <TableError model={dataModel} loading={loading} />
-          <Loader
-            loading={loading}
-            cancelDisabled={!dataModel.source.canCancel}
-            overlay={overlay}
-            onCancel={() => dataModel.source.cancel()}
-          />
+
         </table-data>
         <TablePresentationBar
           type={DataPresentationType.toolsPanel}
