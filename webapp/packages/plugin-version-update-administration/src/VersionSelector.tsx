@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem, GroupTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
@@ -22,26 +22,17 @@ interface Props {
   versions: IVersion[];
 }
 
-const style = composes(
-  css`
-    GroupItem {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    } 
-`,
-  css`
-    Container {
-      composes: theme-typography--body2 from global;
-    }
-    GroupItem {
-      padding: 16px;
-    }
-    Group {
-      list-style-position: inside;
-    }
-    Instruction {
-      white-space: pre-line;
-    }
-`);
+const style = css`
+  Container {
+    composes: theme-typography--body2 from global;
+  }
+  Group {
+    list-style-position: inside;
+  }
+  Instruction {
+    white-space: pre-line;
+  }
+`;
 
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES, style);

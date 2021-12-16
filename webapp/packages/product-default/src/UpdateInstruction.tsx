@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Code } from '@cloudbeaver/core-blocks';
 import type { InstructionComponent } from '@cloudbeaver/core-version-update';
 
 export const UpdateInstruction: InstructionComponent = function UpdateInstruction({ version, className }) {
   return (
     <div className={className}>
-      <code>
+      <Code>
         {`docker stop cloudbeaver
         docker rm cloudbeaver
         docker pull dbeaver/cloudbeaver:${version.number}
         docker run dbeaver/cloudbeaver:${version.number}`}
-      </code>
+      </Code>
     </div>
   );
 };
