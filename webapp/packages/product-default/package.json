@@ -33,7 +33,8 @@
     "@cloudbeaver/plugin-object-viewer": "0.1.0",
     "@cloudbeaver/plugin-sql-editor": "0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "0.1.0",
-    "@cloudbeaver/plugin-sql-editor-screen": "0.1.0"
+    "@cloudbeaver/plugin-sql-editor-screen": "0.1.0",
+    "@cloudbeaver/plugin-version-update-administration": "0.1.0"
   },
   "product": {
     "name": "CloudBeaver Community"

@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { ProductBootstrap } from './ProductBootstrap';
 import { ProductConfigService } from './ProductConfigService';
 
 export const defaultProductManifest: PluginManifest = {
@@ -16,6 +17,7 @@ export const defaultProductManifest: PluginManifest = {
   },
 
   providers: [
+    ProductBootstrap,
     ProductConfigService,
   ],
 };
