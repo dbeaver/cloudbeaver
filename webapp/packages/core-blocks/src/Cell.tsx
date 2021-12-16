@@ -8,12 +8,13 @@
 
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   description?: React.ReactElement | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
+  style?: ComponentStyle;
   className?: string;
 }
 
@@ -54,8 +55,8 @@ const styles = composes(
     }
 `);
 
-export const Cell: React.FC<Props> = function Cell({ before, after, description, className, children }) {
-  return styled(useStyles(styles))(
+export const Cell: React.FC<Props> = function Cell({ before, after, description, style, className, children }) {
+  return styled(useStyles(styles, style))(
     <cell className={className}>
       <main>
         <before>{before}</before>

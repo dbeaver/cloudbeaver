@@ -36,6 +36,7 @@ query serverConfig {
     productInfo {
       id
       version
+      latestVersionInfo
       name
       description
       buildTime
