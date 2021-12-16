@@ -4,11 +4,9 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
-import org.eclipse.jetty.server.ConnectionFactory;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.FileSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
@@ -60,7 +58,7 @@ public class CBJettyServer {
                     wsd.addServlets(application, servletContextHandler);
                 }
 
-                initSessionManager(servletContextHandler);
+                initSessionManager(server, servletContextHandler);
 
                 server.setHandler(servletContextHandler);
 
@@ -93,7 +91,13 @@ public class CBJettyServer {
         }
     }
 
-    private void initSessionManager(ServletContextHandler servletContextHandler) {
+    private void initSessionManager(Server server, ServletContextHandler servletContextHandler) {
+        SessionIdManager sessionIdManager = server.getSessionIdManager();
+        if (sessionIdManager instanceof DefaultSessionIdManager) {
+            // Nullify worker name to avoid dummy prefixes in session ID cookie
+            ((DefaultSessionIdManager) sessionIdManager).setWorkerName("");
+        }
+
         // Init sessions persistence
         Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
         Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
