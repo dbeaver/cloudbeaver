@@ -13,10 +13,10 @@ export const UpdateInstruction: InstructionComponent = function UpdateInstructio
   return (
     <div className={className}>
       <Code>
-        {`docker stop cloudbeaver
-        docker rm cloudbeaver
-        docker pull dbeaver/cloudbeaver:${version.number}
-        docker run dbeaver/cloudbeaver:${version.number}`}
+        {`sudo docker stop cloudbeaver
+        sudo docker rm cloudbeaver
+        sudo docker pull dbeaver/cloudbeaver:${version.number}
+        sudo docker run -ti -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:${version.number}`}
       </Code>
     </div>
   );
