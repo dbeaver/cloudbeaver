@@ -127,13 +127,11 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionAuthContext = new SessionContextImpl(null);
 
-        if (!httpSession.isNew()) {
-            try {
-                // Check persistent state
-                this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
-            } catch (Exception e) {
-                log.error("Error checking session state,", e);
-            }
+        try {
+            // Check persistent state
+            this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
+        } catch (Exception e) {
+            log.error("Error checking session state,", e);
         }
 
         initNavigatorModel();
