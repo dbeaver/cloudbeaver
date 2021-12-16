@@ -39,7 +39,16 @@ public class CBJettyServer {
     public void runServer() {
         CBApplication application = CBApplication.getInstance();
         try {
-            Server server = new Server(application.getServerPort());
+            Server server = new Server(application.getServerPort()) {
+                @Override
+                public void setSessionIdManager(SessionIdManager sessionIdManager) {
+                    if (sessionIdManager instanceof DefaultSessionIdManager) {
+                        // Nullify worker name to avoid dummy prefixes in session ID cookie
+                        ((DefaultSessionIdManager) sessionIdManager).setWorkerName(null);
+                    }
+                    super.setSessionIdManager(sessionIdManager);
+                }
+            };
 
             {
                 // Handler configuration
@@ -92,12 +101,6 @@ public class CBJettyServer {
     }
 
     private void initSessionManager(Server server, ServletContextHandler servletContextHandler) {
-        SessionIdManager sessionIdManager = server.getSessionIdManager();
-        if (sessionIdManager instanceof DefaultSessionIdManager) {
-            // Nullify worker name to avoid dummy prefixes in session ID cookie
-            ((DefaultSessionIdManager) sessionIdManager).setWorkerName("");
-        }
-
         // Init sessions persistence
         Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
         Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
