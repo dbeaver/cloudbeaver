@@ -487,8 +487,10 @@ public class WebSQLProcessor {
                     }
                     Map<DBDAttributeBinding, Object> delKeyAttributes = new LinkedHashMap<>();
 
+                    boolean isDocumentKey = keyAttributes.length == 1 && keyAttributes[0].getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+
                     for (int i = 0; i < allAttributes.length; i++) {
-                        if (ArrayUtils.contains(keyAttributes, allAttributes[i])) {
+                        if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
                                 keyData.get(i));
                             delKeyAttributes.put(allAttributes[i], realCellValue);
