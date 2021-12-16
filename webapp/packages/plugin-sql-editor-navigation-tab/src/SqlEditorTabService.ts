@@ -105,8 +105,10 @@ export class SqlEditorTabService extends Bootstrap {
     for (const tab of tabs) {
       const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.baseId);
 
-      if (!executionContext) {
+      if (!executionContext?.context) {
         this.resetConnectionInfo(tab.handlerState);
+      } else {
+        tab.handlerState.executionContext = { ...executionContext.context };
       }
     }
   }

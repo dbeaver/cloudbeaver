@@ -6,9 +6,6 @@ query executionContextList(
     connectionId: $connectionId
     contextId: $contextId
   ) {
-    id
-    connectionId
-    defaultCatalog
-    defaultSchema
+    ...ExecutionContextInfo
   }
 }

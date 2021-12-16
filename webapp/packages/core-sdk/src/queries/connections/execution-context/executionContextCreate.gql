@@ -8,9 +8,6 @@ mutation executionContextCreate(
     defaultCatalog: $defaultCatalog
     defaultSchema: $defaultSchema
   ) {
-    id
-    connectionId
-    defaultCatalog
-    defaultSchema
+    ...ExecutionContextInfo
   }
 }

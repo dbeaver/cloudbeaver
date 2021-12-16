@@ -1,0 +1,6 @@
+fragment ExecutionContextInfo on SQLContextInfo {
+    id
+    connectionId
+    defaultCatalog
+    defaultSchema
+}

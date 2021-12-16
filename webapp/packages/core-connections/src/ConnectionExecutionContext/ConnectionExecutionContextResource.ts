@@ -56,6 +56,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
       this.updateContexts(baseContext);
 
+      this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       return this.get(baseContext.baseId)!;
     });
   }
@@ -83,6 +84,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       context.defaultSchema = defaultSchema;
     });
 
+    this.markOutdated();
     return context;
   }
 
@@ -100,6 +102,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       });
     });
 
+    this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
     this.delete(contextId);
   }
 
