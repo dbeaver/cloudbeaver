@@ -39,6 +39,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.utils.IOUtils;
 
 import javax.servlet.ServletException;
@@ -51,10 +52,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -66,6 +65,8 @@ public class GraphQLEndpoint extends HttpServlet {
     private static final String HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
 
     private static final String CORE_SCHEMA_FILE_NAME = "schema/schema.graphqls";
+
+    private static final String SESSION_TEMP_COOKIE = "cb-session";
 
     private final GraphQL graphQL;
 
@@ -155,6 +156,8 @@ public class GraphQLEndpoint extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        beforeApiCall(request, response);
+
         String postBody = IOUtils.readToString(request.getReader());
         JsonElement json = gson.fromJson(postBody, JsonElement.class);
         if (json instanceof JsonArray) {
@@ -200,6 +203,8 @@ public class GraphQLEndpoint extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        beforeApiCall(request, response);
+
         String path = request.getPathInfo();
         if (path == null) {
             path = request.getServletPath();
@@ -256,6 +261,16 @@ public class GraphQLEndpoint extends HttpServlet {
         setDevelHeaders(request, response);
         response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
         response.getWriter().print(resString);
+    }
+
+    private void beforeApiCall(HttpServletRequest request, HttpServletResponse response) {
+        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
+        SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
+
+        WebServiceUtils.addResponseCookie(
+            response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     private static class WebInstrumentation extends SimpleInstrumentation {

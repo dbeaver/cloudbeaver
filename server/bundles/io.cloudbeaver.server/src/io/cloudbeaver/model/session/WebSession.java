@@ -32,7 +32,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
@@ -65,7 +64,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -80,7 +78,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private static final Log log = Log.getLog(WebSession.class);
 
     private static final String ATTR_LOCALE = "locale";
-    private static final String SESSION_TEMP_COOKIE = "cb-session";
     public static final String USER_PROJECTS_FOLDER = "user-projects";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
@@ -452,13 +449,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 log.error("Error persisting web session", e);
             }
         }
-
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
-        SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
-        WebServiceUtils.addResponseCookie(
-            response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     @Association
