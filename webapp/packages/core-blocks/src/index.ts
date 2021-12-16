@@ -146,6 +146,7 @@ export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './InfoItem';
 export * from './Iframe';
+export * from './Code';
 export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
