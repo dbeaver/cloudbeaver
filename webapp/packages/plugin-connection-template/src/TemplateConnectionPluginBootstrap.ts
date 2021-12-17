@@ -34,8 +34,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
       order: 1,
       titleGetter: this.getMenuTitle.bind(this),
       onClick: this.openConnectionsDialog.bind(this),
-      isHidden: () => !this.permissionsService.has(EPermission.public),
-      isDisabled: () => !this.templateConnectionsResource.data.length,
+      isHidden: () => !this.permissionsService.has(EPermission.public) || !this.templateConnectionsResource.data.length,
     });
   }
 
