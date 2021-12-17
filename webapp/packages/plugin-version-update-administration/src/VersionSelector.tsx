@@ -57,7 +57,6 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   return styled(styles)(
     <Container gap>
       <Group gap large>
-        <GroupTitle>Commands</GroupTitle>
         <Combobox
           items={versions}
           keySelector={value => value.number}

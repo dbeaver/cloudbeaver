@@ -41,7 +41,7 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   return styled(styles)(
     <ColoredContainer wrap gap overflow medium fill>
       <Group form gap>
-        <GroupTitle>{version ? `Changelog ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
+        <GroupTitle>{version ? `Release notes ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
         {version && (
           <GroupItem>
             <ReactMarkdown>{version.releaseNotes}</ReactMarkdown>
