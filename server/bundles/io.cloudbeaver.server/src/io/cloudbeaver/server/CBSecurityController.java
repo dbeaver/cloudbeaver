@@ -385,6 +385,7 @@ class CBSecurityController implements DBWSecurityController {
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
                     "WHERE USER_ID=? AND PROVIDER_ID=?")) {
                 dbStat.setString(1, userId);
+
                 dbStat.setString(2, authProvider.getId());
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
