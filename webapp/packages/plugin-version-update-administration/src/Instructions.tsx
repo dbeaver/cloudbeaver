@@ -36,10 +36,10 @@ export const Instructions = observer(function Instructions() {
       <GroupItem>
         <ol>
           <li>First, you’ll need to use the <strong>docker ps</strong> command to see a list of all containers currently running on your system.</li>
-          <li>Then, stop the existing container by running the docker stop command.</li>
+          <li>Then, stop the existing container by running the <strong>docker stop</strong> command.</li>
           <li>After stopping the running container, you can now use the <strong>docker rm</strong> command to remove it.</li>
           <li>Next, you can look for the version of the image you need to update to. To download the image from Docker Hub, you can use the <strong>docker pull</strong> command. </li>
-          <li>After downloading the new image, you can use it to recreate the container by executing the docker run command. </li>
+          <li>After downloading the new image, you can use it to recreate the container by executing the <strong>docker run</strong> command. </li>
         </ol>
       </GroupItem>
     </Group>
