@@ -10,29 +10,38 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
-import { Tab, TabTitle, TabIcon, IconOrImage, useMapResource } from '@cloudbeaver/core-blocks';
+import { Tab, TabTitle, TabIcon, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-const styles = css`
-  tab-container {
-    justify-content: space-between;
-  }
-  content {
-    display: flex;
-    align-items: center;
-  }
-  icon-container {
-    display: flex;
-  }
-  IconOrImage {
-    width: 16px;
-  }
-`;
+const styles = composes(
+  css`
+    icon {
+      composes: theme-background-primary from global;
+    }
+`,
+  css`
+    tab-container {
+      justify-content: space-between;
+    }
+    content {
+      display: flex;
+      align-items: center;
+    }
+    icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    IconOrImage {
+      width: 16px;
+    }
+`);
 
 export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(function VersionUpdateDrawerItem({
   item, onSelect, style, disabled,
@@ -54,9 +63,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
         <TabTitle><Translate token='version_update' /></TabTitle>
       </content>
       {versionUpdateService.newVersionAvailable && (
-        <icon-container title={translate('version_update_new_version_available')}>
-          <IconOrImage icon='order-arrow-down' />
-        </icon-container>
+        <icon title={translate('version_update_new_version_available')} />
       )}
     </Tab>
   );
