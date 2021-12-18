@@ -70,6 +70,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public String getHostName() {
+        return CommonUtils.notEmpty(System.getenv("HOSTNAME"));
+    }
+
+    @Property
     public boolean isAnonymousAccessEnabled() {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }
