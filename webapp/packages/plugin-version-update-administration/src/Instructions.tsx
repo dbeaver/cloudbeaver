@@ -20,6 +20,9 @@ const style = css`
   GroupItem {
     white-space: pre-line;
   }
+  h4 {
+    margin-top: 0;
+  }
   ol {
     margin: 0;
     padding: 0;
@@ -34,6 +37,7 @@ export const Instructions = observer(function Instructions() {
     <Group form gap>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem>
+        <h4>The following instructions are only relevant for Mac and Linux systems.</h4>
         <ol>
           <li>First, you’ll need to use the <strong>docker ps</strong> command to see a list of all containers currently running on your system.</li>
           <li>Then, stop the existing container by running the <strong>docker stop</strong> command.</li>

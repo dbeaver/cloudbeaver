@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem, GroupTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
@@ -38,6 +39,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const styles = useStyles(BASE_CONTAINERS_STYLES, style);
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useService(VersionResource);
+  const serverConfigResource = useService(ServerConfigResource);
 
   const [selected, setSelected] = useState('');
 
@@ -69,7 +71,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         </Combobox>
         {version && Instruction && (
           <GroupItem>
-            <Instruction version={version} />
+            <Instruction version={version} hostName={serverConfigResource.data?.hostName} />
           </GroupItem>
         )}
       </Group>
