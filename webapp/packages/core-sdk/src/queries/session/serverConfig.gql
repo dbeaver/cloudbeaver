@@ -5,6 +5,7 @@ query serverConfig {
     workspaceId
     serverURL
     rootURI
+    hostName
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

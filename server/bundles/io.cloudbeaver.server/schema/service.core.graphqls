@@ -114,6 +114,8 @@ type ServerConfig {
 
     rootURI: String!
 
+    hostName: String!
+
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean @deprecated
     supportsCustomConnections: Boolean

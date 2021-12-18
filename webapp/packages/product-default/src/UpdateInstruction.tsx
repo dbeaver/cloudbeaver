@@ -9,12 +9,13 @@
 import { Code } from '@cloudbeaver/core-blocks';
 import type { InstructionComponent } from '@cloudbeaver/core-version-update';
 
-export const UpdateInstruction: InstructionComponent = function UpdateInstruction({ version, className }) {
+export const UpdateInstruction: InstructionComponent = function UpdateInstruction({ version, hostName, className }) {
+  const containerId = hostName || 'cloudbeaver';
   return (
     <div className={className}>
       <Code>
-        {`sudo docker stop cloudbeaver
-        sudo docker rm cloudbeaver
+        {`sudo docker stop ${containerId}
+        sudo docker rm ${containerId}
         sudo docker pull dbeaver/cloudbeaver:${version.number}
         sudo docker run -ti -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:${version.number}`}
       </Code>
