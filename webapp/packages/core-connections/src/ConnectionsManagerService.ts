@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
-import { ContainerResource, ObjectContainer } from './ContainerResource';
+import { ContainerResource, ICatalogData, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
 @injectable()
@@ -48,11 +48,11 @@ export class ConnectionsManagerService {
     objectCatalogId: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
-    const objectContainers = this.connectionObjectContainers.get({ connectionId, catalogId: objectCatalogId });
+    const objectContainers = this.connectionObjectContainers.getCatalogData(connectionId, objectCatalogId);
     if (!objectContainers) {
       return;
     }
-    return objectContainers.find(
+    return objectContainers.schemaList.find(
       objectContainer => objectContainer.name === objectSchemaId || objectContainer.name === objectCatalogId
     );
   }
@@ -130,7 +130,7 @@ export class ConnectionsManagerService {
     }
   }
 
-  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
+  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ICatalogData[]> {
     await this.connectionObjectContainers.load({ connectionId, catalogId });
     return this.connectionObjectContainers.get({ connectionId, catalogId })!;
   }

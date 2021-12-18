@@ -14,7 +14,7 @@ import {
   ObjectContainer,
   DBDriverResource,
   isConnectionProvider, IConnectionProvider,
-  isConnectionSetter, IConnectionSetter
+  isConnectionSetter, IConnectionSetter, ICatalogData
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -90,7 +90,7 @@ export class ConnectionSchemaManagerService extends Bootstrap {
     );
   }
 
-  get objectContainerList(): ObjectContainer[] | undefined {
+  get objectContainerList(): ICatalogData[] | undefined {
     if (!this.currentConnectionId) {
       return;
     }

@@ -19,7 +19,11 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ConnectionInfoResource } from './ConnectionInfoResource';
 
 export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>;
-type DataValue = MetadataMap<string, Record<string, ObjectContainer[]>>;
+export interface ICatalogData {
+  catalog: ObjectContainer;
+  schemaList: ObjectContainer[];
+}
+type DataValue = MetadataMap<string, ICatalogData[]>;
 
 const defaultCatalog = 'default';
 
@@ -45,7 +49,7 @@ string
     private graphQLService: GraphQLService,
     private connectionInfoResource: ConnectionInfoResource
   ) {
-    super(new MetadataMap(() => ({ })));
+    super(new MetadataMap(() => []));
 
     this.metadata = new MetadataMap(() => ({
       outdated: true,
@@ -70,8 +74,17 @@ string
     );
   }
 
-  get({ connectionId, catalogId }: ObjectContainerParams): ObjectContainer[] | undefined {
-    return this.data.get(connectionId)[catalogId ?? defaultCatalog];
+  get({ connectionId, catalogId }: ObjectContainerParams): ICatalogData[] | undefined {
+    return this.data.get(connectionId);
+  }
+
+  getCatalogData(
+    connectionId: string,
+    catalogId: string
+  ): ICatalogData | undefined {
+    const connectionData = this.data.get(connectionId);
+
+    return connectionData.find(catalog => catalog.catalog.name === catalogId);
   }
 
   isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
@@ -127,8 +140,8 @@ string
       connectionId,
       catalogId,
     });
-    const value = this.data.get(connectionId);
-    value[catalogId ?? defaultCatalog] = [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList];
+
+    this.data.set(connectionId, navGetStructContainers.catalogList);
 
     return this.data;
   }

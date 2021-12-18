@@ -16,13 +16,17 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
@@ -50,6 +54,15 @@ public class WebDatabaseObjectInfo {
     ///////////////////////////////////
     // General properties
     ///////////////////////////////////
+
+    @Property
+    public WebNavigatorNodeInfo getNavNode(){
+        DBNModel navigatorModel = session.getNavigatorModel();
+        DBRProgressMonitor monitor = this.session.getProgressMonitor();
+        DBNNode node = navigatorModel.getNodeByObject(monitor, this.object, false);
+        
+        return node == null ? null : new WebNavigatorNodeInfo(session, node);
+    }
 
     @Property
     public String getName() {

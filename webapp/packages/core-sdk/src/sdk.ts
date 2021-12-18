@@ -224,6 +224,11 @@ export interface DatabaseAuthModel {
   properties: ObjectPropertyInfo[];
 }
 
+export interface DatabaseCatalog {
+  catalog: DatabaseObjectInfo;
+  schemaList: DatabaseObjectInfo[];
+}
+
 export interface DatabaseDocument {
   contentType?: Maybe<Scalars['String']>;
   data?: Maybe<Scalars['Object']>;
@@ -237,6 +242,7 @@ export interface DatabaseObjectInfo {
   features?: Maybe<Array<Scalars['String']>>;
   fullyQualifiedName?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  navNode?: Maybe<NavigatorNodeInfo>;
   ordinalPosition?: Maybe<Scalars['Int']>;
   overloadedName?: Maybe<Scalars['String']>;
   properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
@@ -250,8 +256,7 @@ export interface DatabaseObjectInfoPropertiesArgs {
 }
 
 export interface DatabaseStructContainers {
-  catalogList: DatabaseObjectInfo[];
-  schemaList: DatabaseObjectInfo[];
+  catalogList: DatabaseCatalog[];
 }
 
 export interface DriverInfo {
@@ -1668,7 +1673,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
   catalogId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }>; schemaList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]> }> } }
+export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ catalog: { name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]>; navNode?: Maybe<{ id: string }> }; schemaList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]>; navNode?: Maybe<{ id: string }> }> }> } }
 
 export type FormatSqlQueryQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -2763,16 +2768,24 @@ export const NavGetStructContainersDocument = `
     query navGetStructContainers($connectionId: ID!, $catalogId: ID) {
   navGetStructContainers(connectionId: $connectionId, catalog: $catalogId) {
     catalogList {
-      name
-      description
-      type
-      features
-    }
-    schemaList {
-      name
-      description
-      type
-      features
+      catalog {
+        name
+        description
+        type
+        navNode {
+          id
+        }
+        features
+      }
+      schemaList {
+        name
+        description
+        type
+        navNode {
+          id
+        }
+        features
+      }
     }
   }
 }

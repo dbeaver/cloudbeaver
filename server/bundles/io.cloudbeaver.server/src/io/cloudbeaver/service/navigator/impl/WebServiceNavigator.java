@@ -21,10 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.navigator.DBWServiceNavigator;
-import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
-import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.service.navigator.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -33,16 +30,17 @@ import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
-import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
+import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -170,30 +168,72 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public WebStructContainers getStructContainers(WebConnectionInfo connection, String catalog) throws DBWebException {
-
         DBPDataSource dataSource = connection.getDataSource();
+        DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
+        DBCExecutionContextDefaults contextDefaults = executionContext.getContextDefaults();
 
-        ContextDefaultObjectsReader reader = new ContextDefaultObjectsReader(dataSource, executionContext);
-        reader.setReadNodes(false);
-        try {
-            reader.run(connection.getSession().getProgressMonitor());
-        } catch (InvocationTargetException e) {
-            throw new DBWebException("Error reading context defaults", e.getTargetException());
-        } catch (InterruptedException e) {
-            // ignore
-        }
         WebStructContainers structContainers = new WebStructContainers();
-        if (!CommonUtils.isEmpty(reader.getObjectList())) {
-            for (DBSObject node : reader.getObjectList()) {
-                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
-                    continue;
+
+        List<? extends DBSObject> nodes = this.getCatalogs(
+                monitor,
+                connection.getDataSourceContainer().getDataSource(),
+                contextDefaults
+        );
+
+        List<WebCatalog> catalogList = structContainers.getCatalogList();
+
+        for (DBSObject node : nodes) {
+            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+                continue;
+            }
+
+            if(node instanceof DBSCatalog) {
+                WebDatabaseObjectInfo catalogObjectInfo = new WebDatabaseObjectInfo(connection.getSession(), node);
+                WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
+
+                if(contextDefaults.supportsSchemaChange()) {
+                    try {
+
+                        List<WebDatabaseObjectInfo> schemaList = webCatalog.getSchemaList();
+                        Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
+
+                        for (DBSObject schemaObject : objectsCollection) {
+                            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+                                continue;
+                            }
+                            if (schemaObject instanceof DBSSchema) {
+                                schemaList.add(new WebDatabaseObjectInfo(connection.getSession(), schemaObject));
+                            }
+                        }
+                    } catch (DBException e) {
+//                    throw new DBWebException("Error reading schema list", e);
+                        // TODO: we need to log some message to console
+                    }
                 }
-                List<WebDatabaseObjectInfo> objectInfos = node instanceof DBSCatalog ? structContainers.getCatalogList() : structContainers.getSchemaList();
-                objectInfos.add(new WebDatabaseObjectInfo(connection.getSession(), node));
+
+                catalogList.add(webCatalog);
             }
         }
         return structContainers;
+    }
+
+    protected List<? extends DBSObject> getCatalogs(DBRProgressMonitor monitor, DBSObject rootObject, DBCExecutionContextDefaults contextDefaults) throws DBWebException {
+        if (rootObject instanceof DBSObjectContainer) {
+            try {
+                Collection<? extends DBSObject> objectsCollection;
+                if (rootObject instanceof DBSCatalog && contextDefaults != null && !contextDefaults.supportsCatalogChange()) {
+                    objectsCollection = Collections.singletonList(contextDefaults.getDefaultCatalog());
+                } else {
+                    objectsCollection = ((DBSObjectContainer) rootObject).getChildren(monitor);
+                }
+                return new ArrayList(objectsCollection);
+            } catch (DBException e) {
+                throw new DBWebException("Error reading context defaults", e);
+//                return Collections.emptyList();
+            }
+        }
+        return Collections.emptyList();
     }
 
     @Override

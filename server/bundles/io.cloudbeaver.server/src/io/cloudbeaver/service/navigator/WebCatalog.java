@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
@@ -23,19 +24,29 @@ import java.util.List;
 
 
 /**
- * WebStructContainers
+ * WebCatalog
  */
-public class WebStructContainers {
+public class WebCatalog {
 
-    private static final Log log = Log.getLog(WebStructContainers.class);
+    private static final Log log = Log.getLog(WebCatalog.class);
 
-    private List<WebCatalog> catalogList = new ArrayList<>();
+    private WebDatabaseObjectInfo catalog;
+    private List<WebDatabaseObjectInfo> schemaList = new ArrayList<>();
 
-    public List<WebCatalog> getCatalogList() {
-        return catalogList;
+    public WebCatalog(@NotNull WebDatabaseObjectInfo catalog) {
+        this.catalog = catalog;
     }
 
-    public void setCatalogList(List<WebCatalog> catalogList) {
-        this.catalogList = catalogList;
+    @NotNull
+    public WebDatabaseObjectInfo getCatalog() {
+        return catalog;
+    }
+
+    public List<WebDatabaseObjectInfo> getSchemaList() {
+        return schemaList;
+    }
+
+    public void setSchemaList(List<WebDatabaseObjectInfo> schemaList) {
+        this.schemaList = schemaList;
     }
 }
