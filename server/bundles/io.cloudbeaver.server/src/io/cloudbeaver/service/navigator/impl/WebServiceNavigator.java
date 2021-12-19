@@ -305,8 +305,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             Map<String, Object> options = new LinkedHashMap<>();
             for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
                 DBSObject object = ne.getKey().getObject();
-                DBPDataSource dataSource = ((DBNDatabaseNode) object).getDataSource();
-                DBCExecutionContext executionContext = getCommandExecutionContext(dataSource);
+                DBCExecutionContext executionContext = getCommandExecutionContext(object);
                 DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                 ne.getValue().deleteObject(commandContext, object, options);
                 commandContext.saveChanges(session.getProgressMonitor(), options);
