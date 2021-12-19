@@ -64,8 +64,6 @@ public class WebSQLProcessor {
     private final SQLRuleManager ruleManager;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
 
-    private AtomicInteger contextId = new AtomicInteger();
-
     WebSQLProcessor(@NotNull  WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
@@ -110,10 +108,10 @@ public class WebSQLProcessor {
 
     @NotNull
     public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema) throws DBCException {
-        String contextId = String.valueOf(this.contextId.incrementAndGet());
-        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema);
+        UUID uuid = UUID.randomUUID();
+        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, uuid.toString(), defaultCatalog, defaultSchema);
         synchronized (contexts) {
-            contexts.put(contextId, contextInfo);
+            contexts.put(uuid.toString(), contextInfo);
         }
         return contextInfo;
     }

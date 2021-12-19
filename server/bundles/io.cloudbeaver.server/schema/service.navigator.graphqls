@@ -30,8 +30,6 @@ type DatabaseObjectInfo {
     description: String
     # Object type. Java class name in most cases
     type: String
-    # NavigationNodeInfo for object
-    navNode: NavigatorNodeInfo
 
     # Read object properties.
     # Optional parameter 'ids' filters properties by id. null means all properties.
@@ -86,8 +84,8 @@ type NavigatorNodeInfo {
 }
 
 type DatabaseCatalog {
-    catalog: DatabaseObjectInfo!
-    schemaList: [ DatabaseObjectInfo! ]!
+    catalog: NavigatorNodeInfo!
+    schemaList: [ NavigatorNodeInfo! ]!
 }
 
 type DatabaseStructContainers {

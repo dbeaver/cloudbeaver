@@ -56,15 +56,6 @@ public class WebDatabaseObjectInfo {
     ///////////////////////////////////
 
     @Property
-    public WebNavigatorNodeInfo getNavNode(){
-        DBNModel navigatorModel = session.getNavigatorModel();
-        DBRProgressMonitor monitor = this.session.getProgressMonitor();
-        DBNNode node = navigatorModel.getNodeByObject(monitor, this.object, false);
-        
-        return node == null ? null : new WebNavigatorNodeInfo(session, node);
-    }
-
-    @Property
     public String getName() {
         return object.getName();
     }

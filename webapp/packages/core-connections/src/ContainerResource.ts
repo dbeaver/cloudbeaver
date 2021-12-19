@@ -12,13 +12,13 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedDataResource,
-  DatabaseObjectInfo, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
+  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource } from './ConnectionInfoResource';
 
-export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>;
+export type ObjectContainer = NavNodeInfoFragment;
 export interface ICatalogData {
   catalog: ObjectContainer;
   schemaList: ObjectContainer[];
@@ -139,6 +139,7 @@ string
     const { navGetStructContainers } = await this.graphQLService.sdk.navGetStructContainers({
       connectionId,
       catalogId,
+      withDetails: false,
     });
 
     this.data.set(connectionId, navGetStructContainers.catalogList);

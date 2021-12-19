@@ -30,23 +30,23 @@ public class WebCatalog {
 
     private static final Log log = Log.getLog(WebCatalog.class);
 
-    private WebDatabaseObjectInfo catalog;
-    private List<WebDatabaseObjectInfo> schemaList = new ArrayList<>();
+    private WebNavigatorNodeInfo catalog;
+    private List<WebNavigatorNodeInfo> schemaList = new ArrayList<>();
 
-    public WebCatalog(@NotNull WebDatabaseObjectInfo catalog) {
+    public WebCatalog(@NotNull WebNavigatorNodeInfo catalog) {
         this.catalog = catalog;
     }
 
     @NotNull
-    public WebDatabaseObjectInfo getCatalog() {
+    public WebNavigatorNodeInfo getCatalog() {
         return catalog;
     }
 
-    public List<WebDatabaseObjectInfo> getSchemaList() {
+    public List<WebNavigatorNodeInfo> getSchemaList() {
         return schemaList;
     }
 
-    public void setSchemaList(List<WebDatabaseObjectInfo> schemaList) {
+    public void setSchemaList(List<WebNavigatorNodeInfo> schemaList) {
         this.schemaList = schemaList;
     }
 }

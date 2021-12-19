@@ -225,8 +225,8 @@ export interface DatabaseAuthModel {
 }
 
 export interface DatabaseCatalog {
-  catalog: DatabaseObjectInfo;
-  schemaList: DatabaseObjectInfo[];
+  catalog: NavigatorNodeInfo;
+  schemaList: NavigatorNodeInfo[];
 }
 
 export interface DatabaseDocument {
@@ -242,7 +242,6 @@ export interface DatabaseObjectInfo {
   features?: Maybe<Array<Scalars['String']>>;
   fullyQualifiedName?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
-  navNode?: Maybe<NavigatorNodeInfo>;
   ordinalPosition?: Maybe<Scalars['Int']>;
   overloadedName?: Maybe<Scalars['String']>;
   properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
@@ -1672,9 +1671,10 @@ export interface RemoveDataTransferFileQuery { result?: Maybe<boolean> }
 export type NavGetStructContainersQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   catalogId?: Maybe<Scalars['ID']>;
+  withDetails: Scalars['Boolean'];
 }>;
 
-export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ catalog: { name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]>; navNode?: Maybe<{ id: string }> }; schemaList: Array<{ name?: Maybe<string>; description?: Maybe<string>; type?: Maybe<string>; features?: Maybe<string[]>; navNode?: Maybe<{ id: string }> }> }> } }
+export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<{ catalog: { id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> }; schemaList: Array<{ id: string; name?: Maybe<string>; hasChildren?: Maybe<boolean>; nodeType?: Maybe<string>; icon?: Maybe<string>; folder?: Maybe<boolean>; inline?: Maybe<boolean>; navigable?: Maybe<boolean>; features?: Maybe<string[]>; object?: Maybe<{ features?: Maybe<string[]> }>; nodeDetails?: Maybe<Array<{ id?: Maybe<string>; category?: Maybe<string>; dataType?: Maybe<string>; description?: Maybe<string>; displayName?: Maybe<string>; length: ObjectPropertyLength; features: string[]; value?: Maybe<any>; order: number }>> }> }> } }
 
 export type FormatSqlQueryQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -2766,31 +2766,19 @@ export const RemoveDataTransferFileDocument = `
 }
     `;
 export const NavGetStructContainersDocument = `
-    query navGetStructContainers($connectionId: ID!, $catalogId: ID) {
+    query navGetStructContainers($connectionId: ID!, $catalogId: ID, $withDetails: Boolean!) {
   navGetStructContainers(connectionId: $connectionId, catalog: $catalogId) {
     catalogList {
       catalog {
-        name
-        description
-        type
-        navNode {
-          id
-        }
-        features
+        ...NavNodeInfo
       }
       schemaList {
-        name
-        description
-        type
-        navNode {
-          id
-        }
-        features
+        ...NavNodeInfo
       }
     }
   }
 }
-    `;
+    ${NavNodeInfoFragmentDoc}`;
 export const FormatSqlQueryDocument = `
     query formatSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!) {
   query: sqlFormatQuery(

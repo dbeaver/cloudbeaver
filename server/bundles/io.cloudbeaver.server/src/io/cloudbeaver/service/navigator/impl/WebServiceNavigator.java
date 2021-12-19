@@ -23,6 +23,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.*;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -189,30 +190,36 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
 
             if(node instanceof DBSCatalog) {
-                WebDatabaseObjectInfo catalogObjectInfo = new WebDatabaseObjectInfo(connection.getSession(), node);
-                WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
+                WebNavigatorNodeInfo catalogObjectInfo = this.getNodeFromObject(connection.getSession(), node);
 
-                if(contextDefaults.supportsSchemaChange()) {
-                    try {
+                if (catalogObjectInfo != null) {
+                    WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
 
-                        List<WebDatabaseObjectInfo> schemaList = webCatalog.getSchemaList();
-                        Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
+                    if (contextDefaults.supportsSchemaChange()) {
+                        try {
+                            List<WebNavigatorNodeInfo> schemaList = webCatalog.getSchemaList();
+                            Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
 
-                        for (DBSObject schemaObject : objectsCollection) {
-                            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
-                                continue;
+                            for (DBSObject schemaObject : objectsCollection) {
+                                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+                                    continue;
+                                }
+                                if (schemaObject instanceof DBSSchema) {
+                                    WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(), schemaObject);
+
+                                    if(schemaNodeInfo != null){
+                                        schemaList.add(schemaNodeInfo);
+                                    }
+                                }
                             }
-                            if (schemaObject instanceof DBSSchema) {
-                                schemaList.add(new WebDatabaseObjectInfo(connection.getSession(), schemaObject));
-                            }
+                        } catch (DBException e) {
+//                          throw new DBWebException("Error reading schema list", e);
+                            // TODO: we need to log some message to console
                         }
-                    } catch (DBException e) {
-//                    throw new DBWebException("Error reading schema list", e);
-                        // TODO: we need to log some message to console
                     }
-                }
 
-                catalogList.add(webCatalog);
+                    catalogList.add(webCatalog);
+                }
             }
         }
         return structContainers;
@@ -234,6 +241,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
         }
         return Collections.emptyList();
+    }
+
+    @Nullable
+    protected WebNavigatorNodeInfo getNodeFromObject(WebSession session, DBSObject object){
+        DBNModel navigatorModel = session.getNavigatorModel();
+        DBRProgressMonitor monitor = session.getProgressMonitor();
+        DBNNode node = navigatorModel.getNodeByObject(monitor, object, false);
+
+        return node == null ? null : new WebNavigatorNodeInfo(session, node);
     }
 
     @Override
@@ -289,7 +305,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             Map<String, Object> options = new LinkedHashMap<>();
             for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
                 DBSObject object = ne.getKey().getObject();
-                DBCExecutionContext executionContext = getCommandExecutionContext(object);
+                DBPDataSource dataSource = ((DBNDatabaseNode) object).getDataSource();
+                DBCExecutionContext executionContext = getCommandExecutionContext(dataSource);
                 DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                 ne.getValue().deleteObject(commandContext, object, options);
                 commandContext.saveChanges(session.getProgressMonitor(), options);
