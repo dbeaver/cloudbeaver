@@ -38,8 +38,8 @@ export const Instructions = observer(function Instructions() {
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem>
         <h4>
-          Our team suggests not to downgrade to ensure that the version transition process will not affect the program's functionality.<br />
-          The following instructions are only relevant if you run CloudBeaver as a Docker container.
+          We highly recommend avoiding product downgrade. We cannot guarantee the proper work of the application after this procedure.<br />
+          The following instructions apply only when you run CloudBeaver in a Docker container.
         </h4>
         <ol>
           <li>Stop the existing container by running the <strong>docker stop</strong> command.</li>
