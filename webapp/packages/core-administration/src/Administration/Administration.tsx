@@ -50,7 +50,7 @@ const administrationStyles = composes(
       overflow: hidden;
     }
     TabList {
-      width: 250px;
+      width: 240px;
       padding-top: 16px;
       border-right: 2px solid;
     }
