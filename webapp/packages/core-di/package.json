@@ -15,7 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "inversify": "^5.0.1"
+    "inversify": "^6.0.1"
   },
   "peerDependencies": {
     "@cloudbeaver/core-utils": "^0.1.0",
