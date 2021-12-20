@@ -6,15 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-/* eslint-disable import/first */
-// Must be the first import
-// if (process.env.NODE_ENV === 'development') {
-//   // Must use require here as import statements are only allowed
-//   // to exist at the top of a file.
-//   // eslint-disable-next-line global-require
-//   require('preact/debug');
-// }
-
 import ReactDOM from 'react-dom';
 
 import { Body } from '@cloudbeaver/core-app';

@@ -40,6 +40,12 @@ export class DataViewerDataChangeConfirmationService {
   contexts: IExecutionContextProvider<IRequestEventData<any, any>>
   ) {
     if (type === 'before') {
+      const confirmationContext = contexts.getContext(SaveConfirmedContext);
+
+      if (confirmationContext.confirmed === false) {
+        return;
+      }
+
       const results = model.getResults();
 
       try {
@@ -50,19 +56,23 @@ export class DataViewerDataChangeConfirmationService {
           );
 
           if (editor?.isEdited() && model.source.executionContext?.context) {
-            const result = await this.commonDialogService.open(ConfirmationDialog, {
-              title: 'data_viewer_result_edited_title',
-              message: 'data_viewer_result_edited_message',
-              confirmActionText: 'ui_yes',
-              extraStatus: 'no',
-            });
-
-            if (result === DialogueStateResult.Rejected) {
-              ExecutorInterrupter.interrupt(contexts);
-            } else if (result === DialogueStateResult.Resolved) {
+            if (confirmationContext.confirmed) {
               await model.save();
             } else {
-              editor.clear();
+              const result = await this.commonDialogService.open(ConfirmationDialog, {
+                title: 'data_viewer_result_edited_title',
+                message: 'data_viewer_result_edited_message',
+                confirmActionText: 'ui_yes',
+                extraStatus: 'no',
+              });
+
+              if (result === DialogueStateResult.Rejected) {
+                ExecutorInterrupter.interrupt(contexts);
+              } else if (result === DialogueStateResult.Resolved) {
+                await model.save();
+              } else {
+                editor.clear();
+              }
             }
           }
         }
@@ -72,4 +82,22 @@ export class DataViewerDataChangeConfirmationService {
       }
     }
   }
+}
+
+interface ISaveConfirmedContext{
+  confirmed: boolean | null;
+  setConfirmed: (state: boolean) => void;
+}
+
+function SaveConfirmedContext(): ISaveConfirmedContext {
+  let confirmed = null as boolean | null;
+
+  return {
+    get confirmed() {
+      return confirmed;
+    },
+    setConfirmed(state) {
+      confirmed = state;
+    },
+  };
 }
