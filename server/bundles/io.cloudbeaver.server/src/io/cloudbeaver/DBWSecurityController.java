@@ -52,6 +52,10 @@ public interface DBWSecurityController {
 
     void setUserMeta(String userId, Map<String, Object> metaParameters) throws DBCException;
 
+    Map<String, Object> getUserParameters(String userId) throws DBCException;
+
+    void setUserParameter(String userId, String name, Object value) throws DBCException;
+
     ///////////////////////////////////////////
     // Credentials
 

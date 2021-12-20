@@ -265,6 +265,63 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public Map<String, Object> getUserParameters(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            // Read users
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER_PARAMETERS  WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        result.put(
+                            dbResult.getString(1),
+                            dbResult.getString(2));
+                    }
+                }
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    @Override
+    public void setUserParameter(String userId, String name, Object value) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                if (value == null) {
+                    // Delete old metas
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_USER_PARAMETERS WHERE USER_ID=? AND PARAM_ID=?")) {
+                        dbStat.setString(1, userId);
+                        dbStat.setString(2, name);
+                        dbStat.execute();
+                    }
+                } else {
+                    // Update/Insert parameter
+                    boolean updated;
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE INTO CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?")) {
+                        dbStat.setString(1, userId);
+                        dbStat.setString(2, CommonUtils.toString(value));
+                        dbStat.setString(3, name);
+                        updated = dbStat.executeUpdate() > 0;
+                    }
+                    if (!updated) {
+                        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO INTO CB_USER_PARAMETERS (USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)")) {
+                            dbStat.setString(1, userId);
+                            dbStat.setString(2, name);
+                            dbStat.setString(3, CommonUtils.toString(value));
+                            dbStat.executeUpdate();
+                        }
+                    }
+                }
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
     ///////////////////////////////////////////
     // Credentials
 
