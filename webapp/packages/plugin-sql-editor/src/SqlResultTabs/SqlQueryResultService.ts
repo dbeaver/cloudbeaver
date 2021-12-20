@@ -271,7 +271,7 @@ export class SqlQueryResultService {
     });
   }
 
-  private getTabNameForOrder(
+  getTabNameForOrder(
     order: number,
     indexInResultSet: number,
     results: number,

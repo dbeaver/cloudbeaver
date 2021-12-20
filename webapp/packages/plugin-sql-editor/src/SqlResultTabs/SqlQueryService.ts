@@ -12,7 +12,7 @@ import { ConnectionExecutionContextService, ConnectionInfoResource } from '@clou
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
-import { DatabaseDataAccessMode, DatabaseDataModel, DataViewerDataChangeConfirmationService, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, IRequestEventData, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataAccessMode, DatabaseDataModel, DatabaseEditAction, DataViewerDataChangeConfirmationService, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, IRequestEventData, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
@@ -110,6 +110,11 @@ export class SqlQueryService {
         .setSlice(0)
         .request();
 
+      model.setName(this.sqlQueryResultService.getTabNameForOrder(
+        tabGroup.nameOrder,
+        0,
+        model.getResults().length
+      ));
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
     } catch (exception) {
       // remove group if execution was cancelled
@@ -194,6 +199,13 @@ export class SqlQueryService {
 
         if (source.results.some(result => result.data)) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+          model.setName(this.sqlQueryResultService.getTabNameForOrder(
+            tabGroup.nameOrder,
+            0,
+            model.getResults().length,
+            statisticsTab.order,
+            i + 1
+          ));
           this.switchTabToActiveRequest(editorState, tabGroup, model);
           this.sqlQueryResultService.updateGroupTabs(
             editorState,
@@ -244,8 +256,19 @@ export class SqlQueryService {
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>
   ) {
     model.onRequest.addPostHandler(({ type }) => {
-      if (type === 'before') {
-        if (this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId !== tabGroup.groupId) {
+      if (type === 'on') {
+        const edited = model
+          .getResults()
+          .some((r, index) => {
+            const editor = model.source.getActionImplementation(
+              index,
+              DatabaseEditAction
+            );
+    
+            return editor?.isEdited() && model.source.executionContext?.context;
+          });
+
+        if (edited && this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId !== tabGroup.groupId) {
           this.sqlQueryResultService.selectFirstResult(editorState, tabGroup.groupId);
         }
       }

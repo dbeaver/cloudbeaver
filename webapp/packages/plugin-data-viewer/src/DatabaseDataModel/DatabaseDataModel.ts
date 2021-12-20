@@ -19,6 +19,7 @@ import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from '
 export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
 implements IDatabaseDataModel<TOptions, TResult> {
   id: string;
+  name: string | null;
   source: IDatabaseDataSource<TOptions, TResult>;
   countGain: number;
 
@@ -37,6 +38,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.id = uuid();
+    this.name = null;
     this.source = source;
     this.countGain = 0;
     this.onOptionsChange = new Executor();
@@ -70,6 +72,11 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   getResult(index: number): TResult | null {
     return this.source.getResult(index);
+  }
+
+  setName(name: string | null){
+    this.name = name;
+    return this;
   }
 
   setResults(results: TResult[]): this {
@@ -183,7 +190,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
-    const contexts = await this.onRequest.execute({ type: 'before', model: this });
+    let contexts = await this.onRequest.execute({ type: 'on', model: this });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
+    contexts = await this.onRequest.execute({ type: 'before', model: this });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;

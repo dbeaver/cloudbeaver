@@ -13,12 +13,13 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export interface IRequestEventData<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
-  type: 'before' | 'after';
+  type: 'before' | 'after' | 'on';
   model: IDatabaseDataModel<TOptions, TResult>;
 }
 
 export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
+  readonly name: string | null;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
@@ -27,6 +28,7 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
+  setName: (name: string | null) => this;
   isReadonly: () => boolean;
   isDisabled: (resultIndex: number) => boolean;
   isLoading: () => boolean;
