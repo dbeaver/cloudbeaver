@@ -69,7 +69,7 @@ public class WebUserInfo {
                 linkedProviders = CBApplication.getInstance().getSecurityController()
                     .getUserLinkedProviders(session.getUser().getUserId());
             } catch (DBCException e) {
-                throw new DBWebException("Error reading user linked providers");
+                throw new DBWebException("Error reading user linked providers", e);
             }
         }
         return Arrays.asList(linkedProviders);
@@ -78,6 +78,15 @@ public class WebUserInfo {
     @Property
     public Map<String, String> getMetaParameters() {
         return user.getMetaParameters();
+    }
+
+    @Property
+    public Map<String, Object> getConfigurationParameters() throws DBWebException {
+        try {
+            return CBApplication.getInstance().getSecurityController().getUserParameters(user.getUserId());
+        } catch (DBCException e) {
+            throw new DBWebException("Error reading user parameters", e);
+        }
     }
 
 }

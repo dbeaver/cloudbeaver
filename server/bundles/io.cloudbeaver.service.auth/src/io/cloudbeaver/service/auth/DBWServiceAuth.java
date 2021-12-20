@@ -59,4 +59,11 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction()
     WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession);
+
+    @WebAction()
+    boolean setUserConfigurationParameter(
+        @NotNull WebSession webSession,
+        @NotNull String name,
+        @Nullable String value) throws DBWebException;
+
 }
