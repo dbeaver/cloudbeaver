@@ -11,8 +11,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    'plugin:@typescript-eslint/recommended',
-    'standard-with-typescript'
+    'plugin:@typescript-eslint/recommended'
   ],
 
   settings: {

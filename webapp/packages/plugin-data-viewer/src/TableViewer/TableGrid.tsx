@@ -9,13 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseEditAction } from '../DatabaseDataModel/Actions/DatabaseEditAction';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
 import type { IDataTableActions } from './IDataTableActions';
@@ -43,37 +39,6 @@ export const TableGrid = observer<Props>(function TableGrid({
   presentation,
   resultIndex,
 }) {
-  const commonDialogService = useService(CommonDialogService);
-
-  useExecutor({
-    executor: model.onRequest,
-    handlers: [async function checkUnsavedData(data, contexts) {
-      if (data.type === 'before') {
-        const editor = model.source.getActionImplementation(
-          resultIndex,
-          DatabaseEditAction
-        );
-
-        if (editor?.isEdited() && model.source.executionContext?.context) {
-          const result = await commonDialogService.open(ConfirmationDialog, {
-            title: 'data_viewer_result_edited_title',
-            message: 'data_viewer_result_edited_message',
-            confirmActionText: 'ui_yes',
-            extraStatus: 'no',
-          });
-
-          if (result === DialogueStateResult.Rejected) {
-            ExecutorInterrupter.interrupt(contexts);
-          } else if (result === DialogueStateResult.Resolved) {
-            await model.save();
-          } else {
-            editor.clear();
-          }
-        }
-      }
-    }],
-  });
-
   if (
     (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)
     || !model.source.hasResult(resultIndex)

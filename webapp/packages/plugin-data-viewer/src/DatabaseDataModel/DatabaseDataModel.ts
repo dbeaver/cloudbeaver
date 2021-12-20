@@ -19,6 +19,7 @@ import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from '
 export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
 implements IDatabaseDataModel<TOptions, TResult> {
   id: string;
+  name: string | null;
   source: IDatabaseDataSource<TOptions, TResult>;
   countGain: number;
 
@@ -31,12 +32,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   readonly onOptionsChange: IExecutor;
-  readonly onRequest: IExecutor<IRequestEventData>;
+  readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
   private currentTask: Promise<void> | null;
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.id = uuid();
+    this.name = null;
     this.source = source;
     this.countGain = 0;
     this.onOptionsChange = new Executor();
@@ -64,8 +66,17 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.offset <= offset && this.source.count >= count;
   }
 
+  getResults(): TResult[] {
+    return this.source.results;
+  }
+
   getResult(index: number): TResult | null {
     return this.source.getResult(index);
+  }
+
+  setName(name: string | null){
+    this.name = name;
+    return this;
   }
 
   setResults(results: TResult[]): this {
@@ -179,13 +190,19 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
-    const contexts = await this.onRequest.execute({ type: 'before' });
+    let contexts = await this.onRequest.execute({ type: 'on', model: this });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
+    contexts = await this.onRequest.execute({ type: 'before', model: this });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
     await action();
-    await this.onRequest.execute({ type: 'after' });
+    await this.onRequest.execute({ type: 'after', model: this });
   }
 }

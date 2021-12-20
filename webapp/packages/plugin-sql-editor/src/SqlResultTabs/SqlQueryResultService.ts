@@ -182,7 +182,7 @@ export class SqlQueryResultService {
     }
   }
 
-  private selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
+  selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
     const mainTab = editorState.resultTabs.filter(
       resultTab => resultTab.groupId === groupId
     )
@@ -271,7 +271,7 @@ export class SqlQueryResultService {
     });
   }
 
-  private getTabNameForOrder(
+  getTabNameForOrder(
     order: number,
     indexInResultSet: number,
     results: number,

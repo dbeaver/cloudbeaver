@@ -318,4 +318,17 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             .toArray(WebPropertyInfo[]::new);
     }
 
+    @Override
+    public boolean setUserConfigurationParameter(@NotNull WebSession webSession, @NotNull String name, @Nullable String value) throws DBWebException {
+        try {
+            CBApplication.getInstance().getSecurityController().setUserParameter(
+                webSession.getUser().getUserId(),
+                name,
+                value);
+            return true;
+        } catch (DBCException e) {
+            throw new DBWebException("Error setting user parameter", e);
+        }
+    }
+
 }

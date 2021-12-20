@@ -26,6 +26,12 @@ generates:
         inputValue: false
         object: false
       maybeValue: T # T | null
+      declarationKind:
+        union: type
+        type: interface
+        input: interface
+        scalar: interface
+        arguments: interface
       scalars:
         Object: any
         JSON: "{ [key: string]: any }"

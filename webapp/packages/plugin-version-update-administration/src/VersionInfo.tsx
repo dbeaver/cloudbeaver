@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import ReactMarkdown from 'react-markdown';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem, GroupTitle, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, Group, GroupItem, GroupTitle, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { VersionResource } from '@cloudbeaver/core-version';
@@ -24,6 +24,7 @@ const style = css`
     composes: theme-typography--body2 from global;
     list-style-position: inside;
     height: 100%;
+    max-height: 300px;
   }
   ReactMarkdown > * {
     margin: 0;
@@ -39,8 +40,8 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const version = versionResource.data;
 
   return styled(styles)(
-    <ColoredContainer wrap gap overflow medium fill>
-      <Group form gap>
+    <Container wrap gap overflow medium fill>
+      <Group form gap overflow>
         <GroupTitle>{version ? `Release notes ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
         {version && (
           <GroupItem>
@@ -48,6 +49,6 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
           </GroupItem>
         )}
       </Group>
-    </ColoredContainer>
+    </Container>
   );
 });

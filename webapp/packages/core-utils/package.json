@@ -15,14 +15,14 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@types/md5": "^2.2.1",
+    "@types/md5": "^2.3.1",
     "md5": "^2.3.0",
-    "uuid": "^7.0.3"
+    "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "mobx": "^6.x.x"
   },
   "devDependencies": {
-    "@types/uuid": "^7.0.2"
+    "@types/uuid": "^8.3.3"
   }
 }

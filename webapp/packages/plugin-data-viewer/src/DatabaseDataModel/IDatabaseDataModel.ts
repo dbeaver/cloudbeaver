@@ -12,25 +12,29 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export interface IRequestEventData {
-  type: 'before' | 'after';
+export interface IRequestEventData<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+  type: 'before' | 'after' | 'on';
+  model: IDatabaseDataModel<TOptions, TResult>;
 }
 
 export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
+  readonly name: string | null;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
   readonly countGain: number;
 
   readonly onOptionsChange: IExecutor;
-  readonly onRequest: IExecutor<IRequestEventData>;
+  readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
+  setName: (name: string | null) => this;
   isReadonly: () => boolean;
   isDisabled: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
 
+  getResults: () => TResult[];
   getResult: (index: number) => TResult | null;
 
   setAccess: (access: DatabaseDataAccessMode) => this;

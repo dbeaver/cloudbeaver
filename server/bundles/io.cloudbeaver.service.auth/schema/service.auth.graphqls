@@ -98,6 +98,9 @@ type UserInfo {
 
     # User profile properties map
     metaParameters: Object!
+
+    # USer configuiraiton parameters
+    configurationParameters: Object!
 }
 
 extend type Query {
@@ -119,5 +122,12 @@ extend type Query {
     authChangeLocalPassword(oldPassword: String!, newPassword: String!): Boolean!
 
     listUserProfileProperties: [ObjectPropertyInfo!]!
+
+}
+
+extend type Mutation {
+
+    # Set user config parameter. If parameter value is null then removes the parameter
+    setUserConfigurationParameter(name: String!, value: Object): Boolean!
 
 }

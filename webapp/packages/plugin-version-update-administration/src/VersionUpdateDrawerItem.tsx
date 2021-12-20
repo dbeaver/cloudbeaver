@@ -28,15 +28,15 @@ const styles = composes(
     tab-container {
       justify-content: space-between;
     }
-    content {
-      display: flex;
-      align-items: center;
+    TabTitle {
+      flex: 1;
     }
     icon {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      margin-right: 12px;
     }
     IconOrImage {
       width: 16px;
@@ -58,10 +58,8 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
       style={styles}
       onOpen={() => onSelect(item.name)}
     >
-      <content>
-        <TabIcon icon='/icons/version_update.svg' />
-        <TabTitle><Translate token='version_update' /></TabTitle>
-      </content>
+      <TabIcon icon='/icons/version_update.svg' />
+      <TabTitle><Translate token='version_update' /></TabTitle>
       {versionUpdateService.newVersionAvailable && (
         <icon title={translate('version_update_new_version_available')} />
       )}
