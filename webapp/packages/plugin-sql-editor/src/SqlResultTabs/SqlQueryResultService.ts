@@ -182,7 +182,7 @@ export class SqlQueryResultService {
     }
   }
 
-  private selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
+  selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
     const mainTab = editorState.resultTabs.filter(
       resultTab => resultTab.groupId === groupId
     )

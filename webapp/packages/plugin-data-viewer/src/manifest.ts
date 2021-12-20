@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DataPresentationService } from './DataPresentationService';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
+import { DataViewerDataChangeConfirmationService } from './DataViewerDataChangeConfirmationService';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
 import { LocaleService } from './LocaleService';
@@ -41,6 +42,7 @@ export const manifest: PluginManifest = {
     DataValuePanelService,
     TextValuePresentationService,
     ScriptPreviewService,
+    DataViewerDataChangeConfirmationService,
     TextValuePresentationBootstrap,
     ImageValuePresentationBootstrap,
     BooleanValuePresentationBootstrap,

@@ -11,6 +11,7 @@ export default [
   ['data_viewer_statistics_updated_rows', 'Righe Aggiornate:'],
   ['data_viewer_result_edited_title', 'Save changes'],
   ['data_viewer_result_edited_message', 'Result set was edited. Do you want to save changes in database?'],
+  ['data_viewer_data_save_error_title', 'Error occurred while saving changes'],
   ['data_viewer_presentation_value_title', 'Valore'],
   ['data_viewer_presentation_value_text_title', 'Testo'],
   ['data_viewer_presentation_value_text_plain_title', 'Testo'],

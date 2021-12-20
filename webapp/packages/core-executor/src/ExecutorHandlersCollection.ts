@@ -59,6 +59,10 @@ implements IExecutorHandlersCollection<T, TResult> {
     return this;
   }
 
+  hasHandler(handler: IExecutorHandler<T, TResult>): boolean {
+    return this.handlers.includes(handler);
+  }
+
   addHandler(handler: IExecutorHandler<T, TResult>): this {
     this.handlers.push(handler);
     return this;

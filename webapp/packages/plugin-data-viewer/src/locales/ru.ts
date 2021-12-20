@@ -15,6 +15,7 @@ export default [
   ['data_viewer_action_edit_revert', 'Отменить'],
   ['data_viewer_result_edited_title', 'Сохранить изменения'],
   ['data_viewer_result_edited_message', 'Данные результата запроса были изменены. Вы хотите сохранить изменения?'],
+  ['data_viewer_data_save_error_title', 'Ошибка сохранения изменений'],
   ['data_viewer_presentation_value_title', 'Значение'],
   ['data_viewer_presentation_value_text_title', 'Текст'],
   ['data_viewer_presentation_value_image_title', 'Изображение'],

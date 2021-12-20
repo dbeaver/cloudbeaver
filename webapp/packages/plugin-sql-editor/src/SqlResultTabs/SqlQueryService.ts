@@ -12,9 +12,9 @@ import { ConnectionExecutionContextService, ConnectionInfoResource } from '@clou
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
-import { DatabaseDataAccessMode, DatabaseDataModel, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataAccessMode, DatabaseDataModel, DataViewerDataChangeConfirmationService, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, IRequestEventData, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
 import { SqlQueryResultService } from './SqlQueryResultService';
 
@@ -43,6 +43,7 @@ export class SqlQueryService {
     private connectionExecutionContextService: ConnectionExecutionContextService,
     private sqlQueryResultService: SqlQueryResultService,
     private asyncTaskInfoService: AsyncTaskInfoService,
+    private dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService
   ) {
     this.statisticsMap = new Map();
 
@@ -78,7 +79,9 @@ export class SqlQueryService {
     if (inNewTab || !tabGroup) {
       source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.notificationService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+      this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+      this.switchTabToActiveRequest(editorState, tabGroup, model);
 
       isNewTabCreated = true;
     } else {
@@ -160,6 +163,7 @@ export class SqlQueryService {
       if (!model || !source) {
         source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.notificationService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+        this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       }
       statistics.modelId = model.id;
 
@@ -190,6 +194,7 @@ export class SqlQueryService {
 
         if (source.results.some(result => result.data)) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+          this.switchTabToActiveRequest(editorState, tabGroup, model);
           this.sqlQueryResultService.updateGroupTabs(
             editorState,
             model,
@@ -231,5 +236,19 @@ export class SqlQueryService {
   removeStatisticsTab(state: ISqlEditorTabState, tabId: string): void {
     this.sqlQueryResultService.removeStatisticsTab(state, tabId);
     this.statisticsMap.delete(tabId);
+  }
+
+  private switchTabToActiveRequest(
+    editorState: ISqlEditorTabState,
+    tabGroup: IResultGroup,
+    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>
+  ) {
+    model.onRequest.addPostHandler(({ type }) => {
+      if (type === 'before') {
+        if (this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId !== tabGroup.groupId) {
+          this.sqlQueryResultService.selectFirstResult(editorState, tabGroup.groupId);
+        }
+      }
+    });
   }
 }

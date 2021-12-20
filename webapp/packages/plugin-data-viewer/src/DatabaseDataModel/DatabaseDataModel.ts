@@ -31,7 +31,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   readonly onOptionsChange: IExecutor;
-  readonly onRequest: IExecutor<IRequestEventData>;
+  readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
   private currentTask: Promise<void> | null;
 
@@ -62,6 +62,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   isDataAvailable(offset: number, count: number): boolean {
     return this.source.offset <= offset && this.source.count >= count;
+  }
+
+  getResults(): TResult[] {
+    return this.source.results;
   }
 
   getResult(index: number): TResult | null {
@@ -179,13 +183,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
-    const contexts = await this.onRequest.execute({ type: 'before' });
+    const contexts = await this.onRequest.execute({ type: 'before', model: this });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
     await action();
-    await this.onRequest.execute({ type: 'after' });
+    await this.onRequest.execute({ type: 'after', model: this });
   }
 }
