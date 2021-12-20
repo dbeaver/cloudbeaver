@@ -37,7 +37,10 @@ export const Instructions = observer(function Instructions() {
     <Group form gap>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem>
-        <h4>The following instructions are only relevant for Mac and Linux systems.</h4>
+        <h4>
+          Our team suggests not to downgrade to ensure that the version transition process will not affect the program's functionality.<br />
+          The following instructions are only relevant if you run CloudBeaver as a Docker container.
+        </h4>
         <ol>
           <li>Stop the existing container by running the <strong>docker stop</strong> command.</li>
           <li>Use the <strong>docker rm</strong> command to remove it.</li>

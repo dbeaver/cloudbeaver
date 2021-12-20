@@ -8,64 +8,37 @@
 
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
+import { gte } from 'semver';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { TabsState, TabList, Tab, TabPanel, ToolsPanel, UNDERLINE_TAB_STYLES, BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { VersionResource } from '@cloudbeaver/core-version';
+import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
-import { EVersionUpdate } from './EVersionUpdate';
 import { Instructions } from './Instructions';
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
-import { VersionsTable } from './VersionsTable';
 
-const tabsStyles = css`
+const styles = css`
   ColoredContainer {
     list-style-position: inside;
-  }
-  TabList {
-    position: relative;
-    flex-shrink: 0;
-    align-items: center;
-    height: 51px;
-  }
-  Tab {
-    height: 46px!important;
-    text-transform: uppercase;
-    font-weight: 500 !important;
-  }
-  TabPanel {
-    flex-direction: column;
   }
 `;
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
-  const tabStyle = [tabsStyles, UNDERLINE_TAB_STYLES];
-  const translate = useTranslate();
-  const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES, tabStyle);
+  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const versionService = useService(VersionService);
   const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey);
 
+  const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
+
   return styled(style)(
-    <TabsState selectedId={EVersionUpdate.INFO} lazy>
-      <ToolsPanel>
-        <TabList style={style}>
-          <Tab tabId={EVersionUpdate.INFO} style={style}>{translate('version_update_info')}</Tab>
-          <Tab tabId={EVersionUpdate.VERSIONS} style={style}>{translate('versions')}</Tab>
-        </TabList>
-      </ToolsPanel>
-      <TabPanel tabId={EVersionUpdate.INFO}>
-        <ColoredContainer wrap gap overflow parent>
-          <VersionChecker />
-          <Instructions />
-          <VersionSelector versions={versionResource.resource.values} />
-        </ColoredContainer>
-      </TabPanel>
-      <TabPanel tabId={EVersionUpdate.VERSIONS}>
-        <VersionsTable versions={versionResource.resource.values} />
-      </TabPanel>
-    </TabsState>
+    <ColoredContainer wrap gap overflow parent>
+      <VersionChecker />
+      <Instructions />
+      <VersionSelector versions={versions} />
+    </ColoredContainer>
   );
 });
