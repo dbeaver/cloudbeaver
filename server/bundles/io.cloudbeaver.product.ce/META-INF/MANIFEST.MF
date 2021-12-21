@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.product.ce;singleton:=true
-Bundle-Version: 21.2.4.qualifier
-Bundle-Release-Date: 20211212
+Bundle-Version: 21.3.0.qualifier
+Bundle-Release-Date: 20211227
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
