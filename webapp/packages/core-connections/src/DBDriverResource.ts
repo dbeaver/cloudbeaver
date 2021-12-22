@@ -24,7 +24,7 @@ export type DBDriver = DatabaseDriverFragment;
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     permissionsResource: PermissionsResource,
   ) {
     super();
@@ -62,6 +62,10 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
       if (all) {
         this.resetIncludes();
         this.data.clear();
+      }
+
+      if (driverId && !drivers.some(driver => driver.id === driverId)) {
+        throw new Error('Driver is not found');
       }
 
       this.updateDriver(...drivers);

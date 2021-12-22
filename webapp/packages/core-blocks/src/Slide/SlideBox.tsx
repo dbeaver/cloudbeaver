@@ -19,17 +19,22 @@ export const SlideBox: React.FC<Props> = function SlideBox({ children, className
   useEffect(() => {
     const div = divRef.current;
 
-    if (div) {
-      function handleScroll() {
-        if (div) {
-          div.scrollLeft = 0;
-          div.scrollTop = 0;
-        }
+    function handleScroll() {
+      if (div) {
+        div.scrollLeft = 0;
+        div.scrollTop = 0;
       }
-      div.addEventListener('scroll', handleScroll);
-
-      return () => { div.removeEventListener('scroll', handleScroll); };
     }
+
+    if (div) {
+      div.addEventListener('scroll', handleScroll);
+    }
+
+    return () => { 
+      if (div) {
+        div.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, []);
 
   return (

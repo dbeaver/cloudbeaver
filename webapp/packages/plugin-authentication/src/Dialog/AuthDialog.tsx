@@ -126,14 +126,14 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 
     if (state.configure) {
       return (
-         <TextPlaceholder>
-            {translate('authentication_provider_disabled')}
-            {authenticationService.configureAuthProvider && (
-              <Link onClick={() => navToSettings()}>
-                <Translate token="ui_configure" />
-              </Link>
-            )}
-         </TextPlaceholder>
+        <TextPlaceholder>
+          {translate('authentication_provider_disabled')}
+          {authenticationService.configureAuthProvider && (
+            <Link onClick={() => { navToSettings(); }}>
+              <Translate token="ui_configure" />
+            </Link>
+          )}
+        </TextPlaceholder>
       );
     }
 
@@ -147,7 +147,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
-    <TabsState currentTabId={state.tabId} onChange={tabData => state.setTabId(tabData.tabId)}>
+    <TabsState currentTabId={state.tabId} onChange={tabData => { state.setTabId(tabData.tabId); }}>
       <CommonDialogWrapper
         size='large'
         title={dialogTitle}
@@ -179,7 +179,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
                 tabId={provider.id}
                 title={provider.description || provider.label}
                 disabled={state.authenticating}
-                onClick={() => state.setActiveProvider(provider)}
+                onClick={() => { state.setActiveProvider(provider); }}
               >
                 <TabTitle>{provider.label}</TabTitle>
               </Tab>
@@ -190,7 +190,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
                 tabId={FEDERATED_AUTH}
                 title={translate('authentication_auth_federated')}
                 disabled={state.authenticating}
-                onClick={() => state.setActiveProvider(null)}
+                onClick={() => { state.setActiveProvider(null); }}
               >
                 <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
               </Tab>
@@ -201,8 +201,8 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
           <Loader state={state.loadingState}>
             {() => federate
               ? (
-                  <ConfigurationsList providers={state.configurations} onClose={rejectDialog} />
-                )
+                <ConfigurationsList providers={state.configurations} onClose={rejectDialog} />
+              )
               : renderForm(state.activeProvider)}
           </Loader>
         </SubmittingForm>
