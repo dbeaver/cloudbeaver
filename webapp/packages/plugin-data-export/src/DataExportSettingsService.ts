@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   disabled: false,
@@ -17,7 +17,9 @@ export type DataExportSettings = typeof defaultSettings;
 
 @injectable()
 export class DataExportSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('plugin_data_export', defaultSettings);
+  readonly settings: PluginSettings<DataExportSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getPluginSettings('plugin_data_export', defaultSettings);
+  }
 }

@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   'app.logViewer.refreshTimeout': 3000,
@@ -24,7 +24,9 @@ export type CoreSettings = typeof defaultSettings;
 
 @injectable()
 export class CoreSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
+  readonly settings: PluginSettings<CoreSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
+  }
 }

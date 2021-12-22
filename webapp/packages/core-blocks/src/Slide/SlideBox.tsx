@@ -6,14 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useRef } from 'react';
+
 interface Props {
   open?: boolean;
   className?: string;
 }
 
 export const SlideBox: React.FC<Props> = function SlideBox({ children, className }) {
+  const divRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className={className}>
+    <div ref={divRef} className={className}>
       {children}
     </div>
   );

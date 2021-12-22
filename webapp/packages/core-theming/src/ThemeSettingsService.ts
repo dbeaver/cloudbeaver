@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 import { themes } from './themes';
 
@@ -21,7 +21,9 @@ export const defaultThemeSettings: IDefaultSettings = {
 
 @injectable()
 export class ThemeSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
+  readonly settings: PluginSettings<IDefaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
+  }
 }

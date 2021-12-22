@@ -29,7 +29,7 @@ interface TabsState {
 const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
 @injectable()
-export class NavigationTabsService extends View<ITab<any>> {
+export class NavigationTabsService extends View<ITab> {
   handlers = new Map<string, TabHandler>();
   tabsMap = new Map<string, ITab>();
   state = new Map<string, TabsState>();
@@ -58,21 +58,23 @@ export class NavigationTabsService extends View<ITab<any>> {
     return this.state.get(userId)!;
   }
 
+  readonly navigationTabContext: () => ITabNavigationContext;
   readonly onTabSelect: ISyncExecutor<ITab>;
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
 
   constructor(
-    private notificationService: NotificationService,
-    private autoSaveService: LocalStorageSaveService,
-    private userInfoResource: UserInfoResource,
-    private administrationScreenService: AdministrationScreenService,
-    private appAuthService: AppAuthService
+    private readonly notificationService: NotificationService,
+    private readonly autoSaveService: LocalStorageSaveService,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly appAuthService: AppAuthService
   ) {
     super();
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
 
+    this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);
 
     makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
@@ -204,7 +206,7 @@ export class NavigationTabsService extends View<ITab<any>> {
     }
   }
 
-  getView = (): IActiveView<ITab<any>> | null => {
+  getView = (): IActiveView<ITab> | null => {
     const tab = this.getTab(this.currentTabId);
 
     if (!tab) {
@@ -313,8 +315,6 @@ export class NavigationTabsService extends View<ITab<any>> {
       this.onTabSelect.execute(tab);
     }
   }
-
-  navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
     const handler = this.handlers.get(tab.handlerId);

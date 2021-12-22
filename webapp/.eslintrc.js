@@ -26,13 +26,24 @@ module.exports = {
     ecmaVersion: 2019,
     sourceType: "module",
     // tsconfigRootDir: __dirname,
-    // project: './packages/**/tsconfig.json',
+    project: './packages/**/tsconfig.json',
     ecmaFeatures: {
       jsx: true
     }
   },
 
   rules: {
+    "comma-spacing": "off",
+    "default-param-last": "off",
+    "func-call-spacing": "off",
+    "keyword-spacing": "off",
+    "no-duplicate-imports": "off",
+    "object-curly-spacing": "off",
+    "quotes": "off",
+    "space-before-function-paren": "off",
+    "space-infix-ops": "off",
+
+    "@typescript-eslint/indent": ["error", 2],
     '@typescript-eslint/no-invalid-void-type': 'off',
     '@typescript-eslint/dot-notation': 'off',
     '@typescript-eslint/no-throw-literal': 'off',
@@ -40,11 +51,8 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-implied-eval': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
-    '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-    '@typescript-eslint/prefer-includes': 'off',
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
-    '@typescript-eslint/prefer-readonly': 'off',
     '@typescript-eslint/prefer-reduce-type-parameter': 'off',
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/require-array-sort-compare': 'off',
@@ -53,6 +61,43 @@ module.exports = {
     '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/no-for-in-array': 'off',
+
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    "@typescript-eslint/semi": ["error", "always"],
+    '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'allow' }],
+    "@typescript-eslint/member-delimiter-style": ['warn', {
+      "multiline": {
+        "delimiter": "semi",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",
+        "requireLast": false
+      }
+    }],
+
+    "@typescript-eslint/comma-spacing": ["error"],
+    "@typescript-eslint/default-param-last": ["error"],
+    "@typescript-eslint/func-call-spacing": ["error"],
+    "@typescript-eslint/keyword-spacing": ["error"],
+    "@typescript-eslint/no-duplicate-imports": ["error"],
+    "@typescript-eslint/object-curly-spacing": ["error", 'always'],
+    "@typescript-eslint/quotes": ["error", "single"],
+    "@typescript-eslint/space-before-function-paren": ["error" , {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+    "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
+    "@typescript-eslint/no-confusing-non-null-assertion": ["warn"],
+    "@typescript-eslint/no-confusing-void-expression": ["warn"],
+    "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["warn"],
+    "@typescript-eslint/no-unnecessary-condition": ["error"],
+    "@typescript-eslint/no-unnecessary-type-arguments": ["warn"],
+    "@typescript-eslint/non-nullable-type-assertion-style": ["warn"],
+    "@typescript-eslint/prefer-function-type": ["warn"],
+    "@typescript-eslint/prefer-includes": ["warn"],
+    "@typescript-eslint/prefer-readonly": ["warn"],
 
 
     'import/no-duplicates': 'off',
@@ -139,25 +184,6 @@ module.exports = {
       "ignoreCase": true,
       "noSortAlphabetically": true,
       "reservedFirst": true,
-    }],
-
-    '@typescript-eslint/no-use-before-define': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
-    "@typescript-eslint/semi": ["error", "always"],
-    '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'allow' }],
-    '@typescript-eslint/space-before-function-paren': ["error", { "anonymous": "always", "named": "never", "asyncArrow": "always" }],
-    "@typescript-eslint/member-delimiter-style": ['warn', {
-      "multiline": {
-        "delimiter": "semi",
-        "requireLast": true
-      },
-      "singleline": {
-        "delimiter": "semi",
-        "requireLast": false
-      }
     }],
   }
 }

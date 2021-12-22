@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   maxFileSize: 100, // kilobyte
@@ -15,7 +15,9 @@ const defaultSettings = {
 
 @injectable()
 export class SqlEditorSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core.app.sqlEditor', defaultSettings);
+  readonly settings: PluginSettings<typeof defaultSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) { 
+    this.settings = this.pluginManagerService.getPluginSettings('core.app.sqlEditor', defaultSettings);
+  }
 }

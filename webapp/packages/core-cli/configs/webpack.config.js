@@ -2,6 +2,7 @@ const { resolve, join } = require('path')
 const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
@@ -92,7 +93,7 @@ module.exports = (env, argv) => {
   }
 
   var babelLoader = {
-    loader: 'babel-loader',
+    loader: require.resolve('babel-loader'),
     options: {
       configFile: join(__dirname, 'babel.config.js'),
     },
@@ -110,10 +111,16 @@ module.exports = (env, argv) => {
       },
       fallback: {
         path: require.resolve("path-browserify"),
-      }
+      },
+      plugins: [
+        PnpWebpackPlugin,
+      ],
     },
     resolveLoader: {
       modules: nodeModules,
+      plugins: [
+        PnpWebpackPlugin.moduleLoader(module),
+      ],
     },
     module: {
       rules: [
@@ -126,6 +133,7 @@ module.exports = (env, argv) => {
           test: /\.(ts|js)x?$/,
           exclude: /node_modules/,
           use: [
+            'thread-loader',
             babelLoader,
           ],
         },
@@ -157,14 +165,18 @@ module.exports = (env, argv) => {
     },
     devtool: devTool,
     plugins: [
-      // new ESLintPlugin(options), //TODO: maybe later
       new ForkTsCheckerWebpackPlugin({
         typescript: {
           diagnosticOptions: {
             semantic: true,
             syntactic: true,
           },
+          build: true,
+          mode: "write-references",
         },
+        // eslint: {
+        //   files: './src/**/*.{ts,tsx,js,jsx}'
+        // }
       }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
