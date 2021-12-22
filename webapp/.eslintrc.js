@@ -89,7 +89,7 @@ module.exports = {
     "@typescript-eslint/keyword-spacing": ["error"],
     "@typescript-eslint/no-duplicate-imports": ["error"],
     "@typescript-eslint/object-curly-spacing": ["error", 'always'],
-    "@typescript-eslint/quotes": ["error", "single"],
+    "@typescript-eslint/quotes": ["error", "single", { "avoidEscape": true }],
     "@typescript-eslint/space-before-function-paren": ["error" , {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
     "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
     "@typescript-eslint/no-confusing-non-null-assertion": ["warn"],

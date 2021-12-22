@@ -29,6 +29,7 @@ export class ConnectionFormState implements IConnectionFormState {
 
   statusMessage: string | null;
   configured: boolean;
+  initError: Error | null;
 
   get loading(): boolean {
     return this.loadConnectionTask.executing || this.submittingTask.executing;
@@ -75,14 +76,16 @@ export class ConnectionFormState implements IConnectionFormState {
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
 
   private stateInfo: IFormStateInfo | null;
-  private loadConnectionTask: IExecutor<IConnectionFormState>;
-  private formStateTask: IExecutor<IConnectionFormState>;
+  private readonly loadConnectionTask: IExecutor<IConnectionFormState>;
+  private readonly formStateTask: IExecutor<IConnectionFormState>;
   private _availableDrivers: string[];
 
   constructor(
     service: ConnectionFormService,
     resource: IConnectionsResource
   ) {
+    this.initError = null;
+
     makeObservable<IConnectionFormState, '_availableDrivers' | 'stateInfo'>(this, {
       mode: observable,
       type: observable,
@@ -94,6 +97,7 @@ export class ConnectionFormState implements IConnectionFormState {
       configured: observable,
       readonly: computed,
       stateInfo: observable,
+      initError: observable.ref,
     });
 
     this.resource = resource;
@@ -141,9 +145,15 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   async loadConnectionInfo(): Promise<DatabaseConnection | undefined> {
-    await this.loadConnectionTask.execute(this);
+    try {
+      await this.loadConnectionTask.execute(this);
+      this.initError = null;
 
-    return this.info;
+      return this.info;
+    } catch (exception) {
+      this.initError = exception;
+      throw exception;
+    }
   }
 
   async load(): Promise<void> {

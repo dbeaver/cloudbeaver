@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader } from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader, ErrorMessage, useErrorDetails } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -131,6 +131,7 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
   const style = [tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
+  const error = useErrorDetails(state.initError);
 
   useExecutor({
     executor: state.submittingTask,
@@ -148,6 +149,16 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
   useEffect(() => {
     state.loadConnectionInfo();
   }, []);
+
+  if (state.initError) {
+    return styled(styles)(
+      <ErrorMessage
+        text={error.details?.message || ''}
+        hasDetails={error.details?.hasDetails}
+        onShowDetails={error.open}
+      />
+    );
+  }
 
   if (!state.configured) {
     return styled(styles)(
