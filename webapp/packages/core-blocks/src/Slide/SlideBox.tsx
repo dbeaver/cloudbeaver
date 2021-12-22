@@ -6,14 +6,34 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useEffect, useRef } from 'react';
+
 interface Props {
   open?: boolean;
   className?: string;
 }
 
 export const SlideBox: React.FC<Props> = function SlideBox({ children, className }) {
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const div = divRef.current;
+
+    if (div) {
+      function handleScroll() {
+        if (div) {
+          div.scrollLeft = 0;
+          div.scrollTop = 0;
+        }
+      }
+      div.addEventListener('scroll', handleScroll);
+
+      return () => { div.removeEventListener('scroll', handleScroll); };
+    }
+  }, []);
+
   return (
-    <div className={className}>
+    <div ref={divRef} className={className}>
       {children}
     </div>
   );

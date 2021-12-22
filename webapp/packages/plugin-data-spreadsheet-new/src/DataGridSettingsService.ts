@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   hidden: false,
@@ -17,7 +17,9 @@ export type DataGridSettings = typeof defaultSettings;
 
 @injectable()
 export class DataGridSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
+  readonly settings: PluginSettings<DataGridSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
+  }
 }

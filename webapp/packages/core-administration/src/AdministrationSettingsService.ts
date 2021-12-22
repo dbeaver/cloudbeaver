@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   baseFeatures: [] as string[],
@@ -17,9 +17,11 @@ export type AdministrationSettings = typeof defaultSettings;
 
 @injectable()
 export class AdministrationSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core.administration', defaultSettings);
+  readonly settings: PluginSettings<AdministrationSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) { 
+    this.settings = this.pluginManagerService.getPluginSettings('core.administration', defaultSettings);
+  }
 
   isBase(feature: string): boolean {
     return this.getBase().includes(feature);

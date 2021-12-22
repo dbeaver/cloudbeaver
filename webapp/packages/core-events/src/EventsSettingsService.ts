@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   notificationsPool: 5,
@@ -19,7 +19,9 @@ export type EventsSettings = typeof defaultSettings;
 
 @injectable()
 export class EventsSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core_events', defaultSettings);
+  readonly settings: PluginSettings<EventsSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) { 
+    this.settings = this.pluginManagerService.getPluginSettings('core_events', defaultSettings);
+  }
 }

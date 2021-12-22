@@ -15,7 +15,8 @@
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "version:new": "yarn version --no-git-tag-version"
+    "version:new": "yarn version --no-git-tag-version",
+    "postinstall": "rimraf node_modules/.cache"
   },
   "dependencies": {
     "@cloudbeaver/core-bootstrap": "0.1.0",

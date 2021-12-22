@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   baseAuthProvider: undefined as undefined | string,
@@ -18,7 +18,9 @@ export type AuthSettings = typeof defaultSettings;
 
 @injectable()
 export class AuthSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core.authentication', defaultSettings);
+  readonly settings: PluginSettings<AuthSettings>;
 
-  constructor(private pluginManagerService: PluginManagerService) { }
+  constructor(private readonly pluginManagerService: PluginManagerService) { 
+    this.settings = this.pluginManagerService.getPluginSettings('core.authentication', defaultSettings);
+  }
 }

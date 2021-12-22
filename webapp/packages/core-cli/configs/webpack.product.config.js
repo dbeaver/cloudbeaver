@@ -49,6 +49,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     library: package.name,
     libraryTarget: 'umd',
     path: outputDir,
+    pathinfo: false,
   },
   optimization: {
     minimize: true,

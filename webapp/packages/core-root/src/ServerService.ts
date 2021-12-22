@@ -15,13 +15,14 @@ import { SessionService } from './SessionService';
 
 @injectable()
 export class ServerService {
-  readonly settings = new ServerSettingsService(this.sessionService.settings);
+  readonly settings: ServerSettingsService;
 
   private lastConfig: any = null;
   constructor(
     readonly config: ServerConfigResource,
-    private sessionService: SessionService
+    private readonly sessionService: SessionService
   ) {
+    this.settings =  new ServerSettingsService(this.sessionService.settings);
     this.config.onDataUpdate.addHandler(this.refreshConfigAsync.bind(this));
   }
 
