@@ -100,6 +100,7 @@ module.exports = {
     "@typescript-eslint/prefer-readonly": ["warn"],
 
 
+    'arrow-spacing': 'error',
     'import/no-duplicates': 'off',
     'import/export': 'off',
     'standard/no-callback-literal': 'off',
