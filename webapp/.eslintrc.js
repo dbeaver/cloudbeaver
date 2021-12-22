@@ -44,6 +44,7 @@ module.exports = {
     "space-infix-ops": "off",
     "space-after-keywords": "off",
     "no-inner-declarations": "off",
+    "no-constant-condition": "off",
 
     "@typescript-eslint/indent": ["error", 2],
     '@typescript-eslint/no-invalid-void-type': 'off',
@@ -94,7 +95,7 @@ module.exports = {
     "@typescript-eslint/no-confusing-non-null-assertion": ["warn"],
     "@typescript-eslint/no-confusing-void-expression": ["warn"],
     "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["warn"],
-    "@typescript-eslint/no-unnecessary-condition": ["error"],
+    "@typescript-eslint/no-unnecessary-condition": ["warn", {"allowConstantLoopConditions": true}],
     "@typescript-eslint/no-unnecessary-type-arguments": ["warn"],
     "@typescript-eslint/non-nullable-type-assertion-style": ["warn"],
     "@typescript-eslint/prefer-function-type": ["warn"],
