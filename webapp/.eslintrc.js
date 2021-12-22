@@ -42,6 +42,8 @@ module.exports = {
     "quotes": "off",
     "space-before-function-paren": "off",
     "space-infix-ops": "off",
+    "space-after-keywords": "off",
+    "no-inner-declarations": "off",
 
     "@typescript-eslint/indent": ["error", 2],
     '@typescript-eslint/no-invalid-void-type': 'off',
