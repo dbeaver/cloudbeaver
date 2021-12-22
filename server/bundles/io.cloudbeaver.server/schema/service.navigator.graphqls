@@ -90,6 +90,9 @@ type DatabaseCatalog {
 
 type DatabaseStructContainers {
     catalogList: [ DatabaseCatalog! ]!
+    schemaList: [ NavigatorNodeInfo! ]!
+    supportsCatalogChange: Boolean!
+    supportsSchemaChange: Boolean!
 }
 
 ####################################################

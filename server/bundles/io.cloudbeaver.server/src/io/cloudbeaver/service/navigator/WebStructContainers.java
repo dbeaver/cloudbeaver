@@ -30,12 +30,28 @@ public class WebStructContainers {
     private static final Log log = Log.getLog(WebStructContainers.class);
 
     private List<WebCatalog> catalogList = new ArrayList<>();
+    private List<WebNavigatorNodeInfo> schemaList = new ArrayList<>();
+    private boolean supportsCatalogChange = false;
+    private boolean supportsSchemaChange = false;
 
     public List<WebCatalog> getCatalogList() {
         return catalogList;
     }
+    public List<WebNavigatorNodeInfo> getSchemaList() {
+        return schemaList;
+    }
 
     public void setCatalogList(List<WebCatalog> catalogList) {
         this.catalogList = catalogList;
+    }
+    public void setSchemaList(List<WebNavigatorNodeInfo> schemaList) {
+        this.schemaList = schemaList;
+    }
+
+    public void setSupportsCatalogChange(boolean support) {
+        this.supportsCatalogChange = support;
+    }
+    public void setSupportsSchemaChange(boolean support) {
+        this.supportsSchemaChange = support;
     }
 }

@@ -8,5 +8,10 @@ query navGetStructContainers($connectionId: ID!, $catalogId: ID, $withDetails: B
           ...NavNodeInfo
       }
     }
+    schemaList {
+        ...NavNodeInfo
+    }
+    supportsCatalogChange
+    supportsSchemaChange
   }
 }

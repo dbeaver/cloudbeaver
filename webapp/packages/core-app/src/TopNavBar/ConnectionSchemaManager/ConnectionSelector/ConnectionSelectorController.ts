@@ -66,6 +66,10 @@ export class ConnectionSelectorController {
         this.connectionSelectorService.currentObjectSchemaId !== undefined
         || this.connectionSelectorService.currentObjectCatalogId !== undefined
       )
+      && (
+        !!this.connectionSelectorService.objectContainerList?.supportsCatalogChange
+        || !!this.connectionSelectorService.objectContainerList?.supportsSchemaChange
+      )
     );
   }
 
@@ -180,7 +184,24 @@ export class ConnectionSelectorController {
 
     const items: IMenuItem[] = [];
 
-    for (const catalogData of this.connectionSelectorService.objectContainerList) {
+    for (const schema of this.connectionSelectorService.objectContainerList.schemaList) {
+      if (!schema.name) {
+        continue;
+      }
+
+      const title = schema.name;
+
+      items.push({
+        id: title,
+        title,
+        icon: 'schema_system',
+        onClick: async () => {
+          await this.connectionSelectorService.selectSchema(schema.name!);
+        },
+      });
+    }
+
+    for (const catalogData of this.connectionSelectorService.objectContainerList.catalogList) {
       const catalog = catalogData.catalog;
       if (!catalog.name) {
         continue;

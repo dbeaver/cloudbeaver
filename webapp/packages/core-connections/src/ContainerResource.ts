@@ -23,7 +23,15 @@ export interface ICatalogData {
   catalog: ObjectContainer;
   schemaList: ObjectContainer[];
 }
-type DataValue = MetadataMap<string, ICatalogData[]>;
+
+export interface IStructContainers {
+  catalogList: ICatalogData[];
+  schemaList: ObjectContainer[];
+  supportsCatalogChange: boolean;
+  supportsSchemaChange: boolean;
+}
+
+type DataValue = MetadataMap<string, IStructContainers>;
 
 const defaultCatalog = 'default';
 
@@ -46,10 +54,15 @@ string
   metadata: MetadataMap<string, ObjectContainerMetadata>;
 
   constructor(
-    private graphQLService: GraphQLService,
-    private connectionInfoResource: ConnectionInfoResource
+    private readonly graphQLService: GraphQLService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
-    super(new MetadataMap(() => []));
+    super(new MetadataMap(() => ({
+      catalogList: [],
+      schemaList: [],
+      supportsCatalogChange: false,
+      supportsSchemaChange: false,
+    })));
 
     this.metadata = new MetadataMap(() => ({
       outdated: true,
@@ -74,7 +87,7 @@ string
     );
   }
 
-  get({ connectionId, catalogId }: ObjectContainerParams): ICatalogData[] | undefined {
+  get({ connectionId, catalogId }: ObjectContainerParams): IStructContainers | undefined {
     return this.data.get(connectionId);
   }
 
@@ -84,7 +97,7 @@ string
   ): ICatalogData | undefined {
     const connectionData = this.data.get(connectionId);
 
-    return connectionData.find(catalog => catalog.catalog.name === catalogId);
+    return connectionData.catalogList.find(catalog => catalog.catalog.name === catalogId);
   }
 
   isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
@@ -142,7 +155,12 @@ string
       withDetails: false,
     });
 
-    this.data.set(connectionId, navGetStructContainers.catalogList);
+    this.data.set(connectionId, {
+      catalogList: navGetStructContainers.catalogList,
+      schemaList: navGetStructContainers.schemaList,
+      supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
+      supportsSchemaChange: navGetStructContainers.supportsSchemaChange,
+    });
 
     return this.data;
   }
