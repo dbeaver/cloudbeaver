@@ -487,7 +487,7 @@ public class WebSQLProcessor {
                     }
                     Map<DBDAttributeBinding, Object> delKeyAttributes = new LinkedHashMap<>();
 
-                    boolean isDocumentKey = keyAttributes.length == 1 && keyAttributes[0].getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+                    boolean isDocumentKey = keyAttributes.length == 1 && keyAttributes[0].getDataKind() == DBPDataKind.DOCUMENT;
 
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
