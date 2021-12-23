@@ -171,8 +171,8 @@ module.exports = (env, argv) => {
             semantic: true,
             syntactic: true,
           },
-          build: true,
-          mode: "write-references",
+          // build: true,
+          // mode: "write-references",
         },
         // eslint: {
         //   files: './src/**/*.{ts,tsx,js,jsx}'

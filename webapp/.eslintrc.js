@@ -25,7 +25,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2019,
     sourceType: "module",
-    // tsconfigRootDir: __dirname,
+    tsconfigRootDir: __dirname,
     project: './packages/**/tsconfig.json',
     ecmaFeatures: {
       jsx: true
@@ -93,7 +93,7 @@ module.exports = {
     "@typescript-eslint/space-before-function-paren": ["error" , {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
     "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
     "@typescript-eslint/no-confusing-non-null-assertion": ["warn"],
-    "@typescript-eslint/no-confusing-void-expression": ["warn"],
+    "@typescript-eslint/no-confusing-void-expression": "off",
     "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["warn"],
     "@typescript-eslint/no-unnecessary-condition": ["warn", {"allowConstantLoopConditions": true}],
     "@typescript-eslint/no-unnecessary-type-arguments": ["warn"],
