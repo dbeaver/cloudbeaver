@@ -62,7 +62,7 @@ export class SqlQueryService {
     inNewTab: boolean
   ): Promise<void> {
     const contextInfo = editorState.executionContext;
-    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.baseId);
+    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
     if (!contextInfo || !executionContext) {
       console.error('executeEditorQuery executionContext is not provided');
@@ -134,7 +134,7 @@ export class SqlQueryService {
     options?: IQueryExecutionOptions
   ): Promise<void> {
     const contextInfo = editorState.executionContext;
-    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.baseId);
+    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
     if (!contextInfo || !executionContext) {
       console.error('executeEditorQuery executionContext is not provided');

@@ -103,10 +103,12 @@ export class SqlEditorTabService extends Bootstrap {
     );
 
     for (const tab of tabs) {
-      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.baseId);
+      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.id);
 
-      if (!executionContext) {
+      if (!executionContext?.context) {
         this.resetConnectionInfo(tab.handlerState);
+      } else {
+        tab.handlerState.executionContext = { ...executionContext.context };
       }
     }
   }
@@ -117,7 +119,7 @@ export class SqlEditorTabService extends Bootstrap {
     );
 
     for (const tab of tabs) {
-      if (ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.baseId)) {
+      if (ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.id)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
@@ -135,7 +137,6 @@ export class SqlEditorTabService extends Bootstrap {
         || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.id)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.baseId)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
@@ -151,7 +152,7 @@ export class SqlEditorTabService extends Bootstrap {
     if (tab.handlerState.executionContext) {
       await this.connectionInfo.load(CachedMapAllKey);
       await this.connectionExecutionContextResource.loadAll();
-      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.baseId);
+      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
 
       if (!executionContext) {
         this.resetConnectionInfo(tab.handlerState);
@@ -208,7 +209,7 @@ export class SqlEditorTabService extends Bootstrap {
       return false;
     }
 
-    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.baseId);
+    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
 
     if (!executionContext) {
       return false;
@@ -232,7 +233,7 @@ export class SqlEditorTabService extends Bootstrap {
       return false;
     }
 
-    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.baseId);
+    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
 
     if (!executionContext) {
       return false;
@@ -264,13 +265,13 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async destroyContext(contextInfo: IConnectionExecutionContextInfo) {
-    const executionContext = this.connectionExecutionContextService.get(contextInfo.baseId);
+    const executionContext = this.connectionExecutionContextService.get(contextInfo.id);
 
     if (executionContext) {
       try {
         await executionContext.destroy();
       } catch (exception) {
-        this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.baseId}`, '', true);
+        this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.id}`, '', true);
       }
     }
   }

@@ -45,7 +45,7 @@ export class SqlExecutionPlanService {
   ): Promise<void> {
     const contextInfo = editorState.executionContext;
 
-    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.baseId);
+    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
     if (!contextInfo || !executionContext) {
       console.error('executeExecutionPlan executionContext is not provided');

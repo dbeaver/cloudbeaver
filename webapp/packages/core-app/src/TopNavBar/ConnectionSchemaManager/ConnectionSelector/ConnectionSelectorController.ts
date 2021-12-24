@@ -66,6 +66,10 @@ export class ConnectionSelectorController {
         this.connectionSelectorService.currentObjectSchemaId !== undefined
         || this.connectionSelectorService.currentObjectCatalogId !== undefined
       )
+      && (
+        !!this.connectionSelectorService.objectContainerList?.supportsCatalogChange
+        || !!this.connectionSelectorService.objectContainerList?.supportsSchemaChange
+      )
     );
   }
 
@@ -178,37 +182,62 @@ export class ConnectionSelectorController {
       return [];
     }
 
-    const list = this.connectionSelectorService.objectContainerList
-      .filter(item => !!item.name)
-      .map(item => {
-        const isCatalog = item.features?.includes(EObjectFeature.catalog);
-        const catalogName = isCatalog ? item.name : this.connectionSelectorService.currentObjectCatalogId;
-        const schemaName = !isCatalog ? item.name : this.connectionSelectorService.currentObjectSchemaId;
+    const items: IMenuItem[] = [];
 
-        const title = NodeManagerUtils.concatSchemaAndCatalog(
-          catalogName,
-          schemaName
-        );
+    for (const schema of this.connectionSelectorService.objectContainerList.schemaList) {
+      if (!schema.name) {
+        continue;
+      }
 
-        const handler = isCatalog
-          ? () => this.connectionSelectorService.selectCatalog(catalogName!)
-          : () => this.connectionSelectorService.selectSchema(schemaName!);
+      const title = schema.name;
 
-        let icon = 'database';
+      items.push({
+        id: title,
+        title,
+        icon: 'schema_system',
+        onClick: async () => {
+          await this.connectionSelectorService.selectSchema(schema.name!);
+        },
+      });
+    }
 
-        if (catalogName && schemaName) {
-          icon = 'schema_system';
+    for (const catalogData of this.connectionSelectorService.objectContainerList.catalogList) {
+      const catalog = catalogData.catalog;
+      if (!catalog.name) {
+        continue;
+      }
+
+      if (catalogData.schemaList.length === 0) {
+        items.push({
+          id: catalog.name,
+          title: catalog.name,
+          icon: 'database',
+          onClick: () => this.connectionSelectorService.selectCatalog(catalog.name!),
+        });
+      }
+
+      for (const schema of catalogData.schemaList) {
+        if (!schema.name) {
+          continue;
         }
 
-        const menuItem: IMenuItem = {
+        const title = NodeManagerUtils.concatSchemaAndCatalog(
+          catalog.name,
+          schema.name
+        );
+
+        items.push({
           id: title,
           title,
-          icon,
-          onClick: handler,
-        };
-        return menuItem;
-      });
+          icon: 'schema_system',
+          onClick: async () => {
+            await this.connectionSelectorService.selectCatalog(catalog.name!);
+            await this.connectionSelectorService.selectSchema(schema.name!);
+          },
+        });
+      }
+    }
 
-    return list;
+    return items;
   }
 }

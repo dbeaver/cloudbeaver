@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
-import { ContainerResource, ObjectContainer } from './ContainerResource';
+import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
 @injectable()
@@ -25,8 +25,8 @@ export class ConnectionsManagerService {
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
-    private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService
   ) {
     this.disconnecting = false;
     this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
@@ -48,11 +48,11 @@ export class ConnectionsManagerService {
     objectCatalogId: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
-    const objectContainers = this.connectionObjectContainers.get({ connectionId, catalogId: objectCatalogId });
+    const objectContainers = this.connectionObjectContainers.getCatalogData(connectionId, objectCatalogId);
     if (!objectContainers) {
       return;
     }
-    return objectContainers.find(
+    return objectContainers.schemaList.find(
       objectContainer => objectContainer.name === objectSchemaId || objectContainer.name === objectCatalogId
     );
   }
@@ -130,7 +130,7 @@ export class ConnectionsManagerService {
     }
   }
 
-  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
+  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<IStructContainers> {
     await this.connectionObjectContainers.load({ connectionId, catalogId });
     return this.connectionObjectContainers.get({ connectionId, catalogId })!;
   }

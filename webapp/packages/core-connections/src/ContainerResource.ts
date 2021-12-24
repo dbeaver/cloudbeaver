@@ -12,14 +12,26 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedDataResource,
-  DatabaseObjectInfo, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
+  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource } from './ConnectionInfoResource';
 
-export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>;
-type DataValue = MetadataMap<string, Record<string, ObjectContainer[]>>;
+export type ObjectContainer = NavNodeInfoFragment;
+export interface ICatalogData {
+  catalog: ObjectContainer;
+  schemaList: ObjectContainer[];
+}
+
+export interface IStructContainers {
+  catalogList: ICatalogData[];
+  schemaList: ObjectContainer[];
+  supportsCatalogChange: boolean;
+  supportsSchemaChange: boolean;
+}
+
+type DataValue = MetadataMap<string, IStructContainers>;
 
 const defaultCatalog = 'default';
 
@@ -42,10 +54,15 @@ string
   metadata: MetadataMap<string, ObjectContainerMetadata>;
 
   constructor(
-    private graphQLService: GraphQLService,
-    private connectionInfoResource: ConnectionInfoResource
+    private readonly graphQLService: GraphQLService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
-    super(new MetadataMap(() => ({ })));
+    super(new MetadataMap(() => ({
+      catalogList: [],
+      schemaList: [],
+      supportsCatalogChange: false,
+      supportsSchemaChange: false,
+    })));
 
     this.metadata = new MetadataMap(() => ({
       outdated: true,
@@ -70,8 +87,17 @@ string
     );
   }
 
-  get({ connectionId, catalogId }: ObjectContainerParams): ObjectContainer[] | undefined {
-    return this.data.get(connectionId)[catalogId ?? defaultCatalog];
+  get({ connectionId, catalogId }: ObjectContainerParams): IStructContainers | undefined {
+    return this.data.get(connectionId);
+  }
+
+  getCatalogData(
+    connectionId: string,
+    catalogId: string
+  ): ICatalogData | undefined {
+    const connectionData = this.data.get(connectionId);
+
+    return connectionData.catalogList.find(catalog => catalog.catalog.name === catalogId);
   }
 
   isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
@@ -126,9 +152,15 @@ string
     const { navGetStructContainers } = await this.graphQLService.sdk.navGetStructContainers({
       connectionId,
       catalogId,
+      withDetails: false,
     });
-    const value = this.data.get(connectionId);
-    value[catalogId ?? defaultCatalog] = [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList];
+
+    this.data.set(connectionId, {
+      catalogList: navGetStructContainers.catalogList,
+      schemaList: navGetStructContainers.schemaList,
+      supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
+      supportsSchemaChange: navGetStructContainers.supportsSchemaChange,
+    });
 
     return this.data;
   }

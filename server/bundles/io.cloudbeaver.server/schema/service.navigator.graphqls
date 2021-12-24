@@ -83,9 +83,16 @@ type NavigatorNodeInfo {
     navigable: Boolean
 }
 
+type DatabaseCatalog {
+    catalog: NavigatorNodeInfo!
+    schemaList: [ NavigatorNodeInfo! ]!
+}
+
 type DatabaseStructContainers {
-    catalogList: [ DatabaseObjectInfo! ]!
-    schemaList: [ DatabaseObjectInfo! ]!
+    catalogList: [ DatabaseCatalog! ]!
+    schemaList: [ NavigatorNodeInfo! ]!
+    supportsCatalogChange: Boolean!
+    supportsSchemaChange: Boolean!
 }
 
 ####################################################

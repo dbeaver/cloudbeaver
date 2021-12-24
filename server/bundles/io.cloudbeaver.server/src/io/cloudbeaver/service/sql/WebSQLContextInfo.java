@@ -51,8 +51,6 @@ public class WebSQLContextInfo {
 
     private final WebSQLProcessor processor;
     private final String id;
-    private DBSCatalog defaultCatalog;
-    private String defaultSchema;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
@@ -70,75 +68,9 @@ public class WebSQLContextInfo {
                     catalogName,
                     null,
                     schemaName);
-                setContextDefaults(catalogName, schemaName);
             } catch (DBException e) {
                 log.error("Error settings ");
             }
-        }
-    }
-
-    private void setContextDefaults(String catalogName, String schemaName) throws DBCException {
-        DBPDataSource dataSource = this.processor.getConnection().getDataSource();
-
-        DBSObject defaultObject = null;
-        DBRProgressMonitor monitor = this.processor.getWebSession().getProgressMonitor();
-        if (CommonUtils.isEmpty(catalogName) && CommonUtils.isEmpty(schemaName)) {
-            ContextDefaultObjectsReader defaultObjectsReader = new ContextDefaultObjectsReader(
-                dataSource,
-                DBUtils.getOrOpenDefaultContext(dataSource, false)
-            );
-            defaultObjectsReader.setReadNodes(false);
-            try {
-                defaultObjectsReader.run(monitor);
-            } catch (InvocationTargetException e) {
-                log.error("Error reading context defaults", e.getTargetException());
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            catalogName = defaultObjectsReader.getDefaultCatalogName();
-            defaultObject = defaultObjectsReader.getDefaultObject();
-        } else {
-            DBCExecutionContextDefaults contextDefaults = processor.getExecutionContext().getContextDefaults();
-            if (contextDefaults != null) {
-                defaultCatalog = contextDefaults.getDefaultCatalog();
-            }
-        }
-
-        if (defaultObject instanceof DBSCatalog) {
-            this.defaultCatalog = (DBSCatalog) defaultObject;
-        } else if (defaultObject instanceof DBSSchema) {
-            this.defaultCatalog = DBUtils.getParentOfType(DBSCatalog.class, defaultObject);
-            this.defaultSchema = defaultObject.getName();
-        } else {
-            if (defaultObject == null && (!CommonUtils.isEmpty(catalogName) || !CommonUtils.isEmpty(schemaName))) {
-                String childObjectName = CommonUtils.toString(catalogName, schemaName);
-                DBSObjectContainer objectContainer = DBUtils.getAdapter(DBSObjectContainer.class, dataSource);
-                if (objectContainer != null) {
-                    try {
-                        DBSObject childObject = null;
-                        if (schemaName != null && defaultCatalog != null) {
-                            childObject = defaultCatalog.getChild(monitor, schemaName);
-                        } else {
-                            childObject = objectContainer.getChild(monitor, childObjectName);
-                        }
-                        if (childObject == null) {
-                            log.debug("Can't find child '" + childObjectName + "'");
-                        } else if (childObject instanceof DBSCatalog) {
-                            defaultCatalog = (DBSCatalog) childObject;
-                        } else if (childObject instanceof DBSSchema) {
-                            this.defaultCatalog = DBUtils.getParentOfType(DBSCatalog.class, childObject);
-                            this.defaultSchema = childObject.getName();
-                        }
-                    } catch (DBException e) {
-                        log.error("Error reading default object '" + childObjectName + "'", e);
-                    }
-                }
-            }
-        }
-
-        if (defaultSchema == null && schemaName != null) {
-            defaultSchema = schemaName;
         }
     }
 
@@ -155,43 +87,43 @@ public class WebSQLContextInfo {
     }
 
     public String getDefaultCatalog() {
-        return defaultCatalog == null ? null : defaultCatalog.getName();
+        DBCExecutionContextDefaults contextDefaults = processor.getExecutionContext().getContextDefaults();
+
+        if(contextDefaults != null) {
+            DBSCatalog catalog = contextDefaults.getDefaultCatalog();
+
+            return catalog == null ? null : catalog.getName();
+        }
+
+        return null;
+    }
+
+    @WebAction
+    public String getDefaultSchema() {
+        DBCExecutionContextDefaults contextDefaults = processor.getExecutionContext().getContextDefaults();
+
+        if(contextDefaults != null) {
+            DBSSchema schema = contextDefaults.getDefaultSchema();
+
+            return schema == null ? null : schema.getName();
+        }
+
+        return null;
     }
 
     public void setDefaults(String catalogName, String schemaName) throws DBWebException, DBCException {
-        String oldCatalogName = defaultCatalog == null ? null : defaultCatalog.getName();
-        setContextDefaults(catalogName, schemaName);
+        String oldCatalogName = this.getDefaultCatalog();
         try {
             DBExecUtils.setExecutionContextDefaults(
                 processor.getWebSession().getProgressMonitor(),
                 processor.getConnection().getDataSource(),
                 processor.getExecutionContext(),
-                defaultCatalog == null ? null : defaultCatalog.getName(),
+                catalogName,
                 oldCatalogName,
                 schemaName);
         } catch (DBException e) {
             throw new DBWebException("Error ", e);
         }
-    }
-
-    @WebAction
-    public String getDefaultSchema() {
-        if (defaultSchema == null) {
-            try {
-                DBCExecutionContext defaultContext = DBUtils.getOrOpenDefaultContext(
-                    defaultCatalog != null ? defaultCatalog : processor.getConnection().getDataSource(), false);
-                DBSObject ao = DBUtils.getActiveInstanceObject(defaultContext);
-                if (ao instanceof DBSSchema) {
-                    defaultSchema = ao.getName();
-                } else {
-                    defaultSchema = "";
-                }
-            } catch (DBCException e) {
-                log.error(e);
-                return null;
-            }
-        }
-        return CommonUtils.isEmpty(defaultSchema) ? null : defaultSchema;
     }
 
     @NotNull

@@ -49,7 +49,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     },
   }), { state: observable }, false);
 
-  if (context?.context?.baseId !== state.state?.executionContext?.baseId) {
+  if (context?.context?.id !== state.state?.executionContext?.id) {
     state.setState(context?.context);
   }
 

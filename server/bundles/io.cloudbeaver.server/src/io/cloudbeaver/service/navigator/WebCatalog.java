@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
@@ -23,35 +24,29 @@ import java.util.List;
 
 
 /**
- * WebStructContainers
+ * WebCatalog
  */
-public class WebStructContainers {
+public class WebCatalog {
 
-    private static final Log log = Log.getLog(WebStructContainers.class);
+    private static final Log log = Log.getLog(WebCatalog.class);
 
-    private List<WebCatalog> catalogList = new ArrayList<>();
+    private WebNavigatorNodeInfo catalog;
     private List<WebNavigatorNodeInfo> schemaList = new ArrayList<>();
-    private boolean supportsCatalogChange = false;
-    private boolean supportsSchemaChange = false;
 
-    public List<WebCatalog> getCatalogList() {
-        return catalogList;
+    public WebCatalog(@NotNull WebNavigatorNodeInfo catalog) {
+        this.catalog = catalog;
     }
+
+    @NotNull
+    public WebNavigatorNodeInfo getCatalog() {
+        return catalog;
+    }
+
     public List<WebNavigatorNodeInfo> getSchemaList() {
         return schemaList;
     }
 
-    public void setCatalogList(List<WebCatalog> catalogList) {
-        this.catalogList = catalogList;
-    }
     public void setSchemaList(List<WebNavigatorNodeInfo> schemaList) {
         this.schemaList = schemaList;
-    }
-
-    public void setSupportsCatalogChange(boolean support) {
-        this.supportsCatalogChange = support;
-    }
-    public void setSupportsSchemaChange(boolean support) {
-        this.supportsSchemaChange = support;
     }
 }

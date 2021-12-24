@@ -56,7 +56,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
       this.updateContexts(baseContext);
 
-      return this.get(baseContext.baseId)!;
+      this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
+      return this.get(baseContext.id)!;
     });
   }
 
@@ -83,6 +84,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       context.defaultSchema = defaultSchema;
     });
 
+    this.markOutdated();
     return context;
   }
 
@@ -100,6 +102,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       });
     });
 
+    this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
     this.delete(contextId);
   }
 
@@ -156,7 +159,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
             const connection = this.connectionInfoResource.get(connectionId);
             return context.connectionId === connectionId && !connection?.connected;
           })
-        )).map(context => context.baseId)
+        )).map(context => context.id)
       )
     );
   }
@@ -167,13 +170,13 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         flat(ResourceKeyUtils.map(
           key,
           connectionId => this.values.filter(context => context.connectionId === connectionId)
-        )).map(context => context.baseId)
+        )).map(context => context.id)
       )
     );
   }
 
   private updateContexts(...contexts: IConnectionExecutionContextInfo[]): ResourceKeyList<string> {
-    const key = resourceKeyList(contexts.map(context => context.baseId));
+    const key = resourceKeyList(contexts.map(context => context.id));
 
     const oldContexts = this.get(key);
     this.set(key, oldContexts.map((context, i) => ({ ...context, ...contexts[i] })));
@@ -185,7 +188,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {
   return {
     ...context,
-    baseId: getContextBaseId(context.connectionId, context.id),
   };
 }
 
