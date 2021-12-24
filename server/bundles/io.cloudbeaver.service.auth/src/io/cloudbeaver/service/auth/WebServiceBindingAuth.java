@@ -58,11 +58,12 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             ))
             .dataFetcher("listUserProfileProperties",
                 env -> getService(env).listUserProfileProperties(getWebSession(env)))
+        ;
+        model.getMutationType()
             .dataFetcher("setUserConfigurationParameter",
                 env -> getService(env).setUserConfigurationParameter(getWebSession(env),
                     env.getArgument("name"),
                     env.getArgument("value")))
         ;
-
     }
 }
