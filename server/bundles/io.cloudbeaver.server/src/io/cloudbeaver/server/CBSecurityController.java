@@ -300,7 +300,7 @@ class CBSecurityController implements DBWSecurityController {
                 } else {
                     // Update/Insert parameter
                     boolean updated;
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE INTO CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?")) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?")) {
                         dbStat.setString(1, userId);
                         dbStat.setString(2, CommonUtils.toString(value));
                         dbStat.setString(3, name);
