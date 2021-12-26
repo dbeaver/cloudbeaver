@@ -17,7 +17,7 @@ export const UpdateInstruction: InstructionComponent = function UpdateInstructio
         {`sudo docker stop ${containerId}
         sudo docker rm ${containerId}
         sudo docker pull dbeaver/cloudbeaver:${version.number}
-        sudo docker run -ti -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:${version.number}`}
+        sudo docker run -d --restart unless-stopped -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:${version.number}`}
       </Code>
     </div>
   );
