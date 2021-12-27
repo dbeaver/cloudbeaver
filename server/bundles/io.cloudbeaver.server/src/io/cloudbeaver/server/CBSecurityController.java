@@ -275,8 +275,8 @@ class CBSecurityController implements DBWSecurityController {
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         result.put(
-                            dbResult.getString(1),
-                            dbResult.getString(2));
+                            dbResult.getString(2),
+                            dbResult.getString(3));
                     }
                 }
             }
@@ -301,13 +301,13 @@ class CBSecurityController implements DBWSecurityController {
                     // Update/Insert parameter
                     boolean updated;
                     try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?")) {
-                        dbStat.setString(1, userId);
-                        dbStat.setString(2, CommonUtils.toString(value));
+                        dbStat.setString(1, CommonUtils.toString(value));
+                        dbStat.setString(2, userId);
                         dbStat.setString(3, name);
                         updated = dbStat.executeUpdate() > 0;
                     }
                     if (!updated) {
-                        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO INTO CB_USER_PARAMETERS (USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)")) {
+                        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_PARAMETERS (USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)")) {
                             dbStat.setString(1, userId);
                             dbStat.setString(2, name);
                             dbStat.setString(3, CommonUtils.toString(value));
