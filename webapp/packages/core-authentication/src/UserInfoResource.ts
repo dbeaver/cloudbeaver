@@ -25,6 +25,7 @@ void,
 UserInfoIncludes
 > {
   readonly userChange: ISyncExecutor<string>;
+  readonly authenticationChange: ISyncExecutor<'login' | 'logout'>;
 
   constructor(
     private graphQLService: GraphQLService,
@@ -35,6 +36,8 @@ UserInfoIncludes
     super(null, ['customIncludeOriginDetails']);
 
     this.userChange = new SyncExecutor();
+    this.authenticationChange = new SyncExecutor();
+
     this.sync(sessionResource);
   }
 
@@ -89,6 +92,7 @@ UserInfoIncludes
       }
     });
     this.sessionDataResource.markOutdated();
+    this.authenticationChange.execute('login');
 
     return this.data;
   }
@@ -102,6 +106,7 @@ UserInfoIncludes
       }
     });
     this.sessionDataResource.markOutdated();
+    this.authenticationChange.execute('logout');
   }
 
   protected async loader(key: void, includes?: string[]): Promise<UserInfo | null> {
@@ -113,7 +118,7 @@ UserInfoIncludes
     return (user as UserInfo | null) ?? null;
   }
 
-  protected setData(data: UserInfo|null): void {
+  protected setData(data: UserInfo | null): void {
     const prevUserId = this.getId();
     this.data = data;
     const currentUserId = this.getId();
@@ -126,6 +131,7 @@ UserInfoIncludes
   private getDefaultIncludes(): UserInfoIncludes {
     return {
       customIncludeOriginDetails: true,
+      includeConfigurationParameters: false,
       includeMetaParameters: false,
     };
   }

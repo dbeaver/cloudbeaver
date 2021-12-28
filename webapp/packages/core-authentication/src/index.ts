@@ -14,4 +14,5 @@ export * from './RolesResource';
 export * from './UserDataService';
 export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
+export * from './UserConfigurationParametersResource';
 export * from './UsersResource';
