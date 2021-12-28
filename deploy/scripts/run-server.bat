@@ -8,9 +8,4 @@ IF NOT EXIST workspace\.metadata (
     copy conf\initial-data-sources.conf workspace\GlobalConfiguration\.dbeaver\data-sources.json
 )
 
-SET VMARGS_OPTS = ""
-If Not Defined JAVA_OPTS (
-    SET VMARGS_OPTS = "-Xmx2048M"
-)
-
-java -jar %launcherJar% -product io.cloudbeaver.product.ce.product -web-config conf/cloudbeaver.conf -nl en -registryMultiLanguage -vmargs %VMARGS_OPTS%
+java %JAVA_OPTS% -jar %launcherJar% -product io.cloudbeaver.product.ce.product -web-config conf/cloudbeaver.conf -nl en -registryMultiLanguage
