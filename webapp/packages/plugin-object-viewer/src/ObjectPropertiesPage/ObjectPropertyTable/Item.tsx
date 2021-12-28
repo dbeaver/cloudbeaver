@@ -54,6 +54,12 @@ const itemStyles = css`
     menu-icon {
       padding-right: 8px;
     }
+    menu-name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 500px;
+    }
     TableColumnValue:not(:hover):not([|menuOpened]) {
       & Icon {
         opacity: 0;
@@ -185,7 +191,7 @@ const ItemName = observer<IItemNameProps>(function ItemName({
             <menu-icon><Icon name="snack" viewBox="0 0 16 10" /></menu-icon>
           </ContextMenu>
         )}
-        <menu-name>{name}</menu-name>
+        <menu-name title={name}>{name}</menu-name>
       </menu-box>
     </TableColumnValue>
   );
