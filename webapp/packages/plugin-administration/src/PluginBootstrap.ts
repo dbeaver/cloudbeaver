@@ -26,53 +26,38 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: (context) => {
-        if (context.get(DATA_CONTEXT_MENU) !== TOP_NAV_BAR_SETTINGS_MENU) {
-          return false;
+      isApplicable: (context) => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      getItems: (context, items) => {
+        const administrationScreen = this.screenService.isActive(AdministrationScreenService.screenName);
+
+        if (this.permissionsService.has(EAdminPermission.admin) && !administrationScreen) {
+          return [
+            ...items,
+            new MenuBaseItem(
+              'administrationMenuEnter',
+              'administration_menu_enter',
+              'administration_menu_enter',
+              { onSelect: () => this.administrationScreenService.navigateToRoot() }
+            )
+          ]
         }
 
-        return this.permissionsService.has(EAdminPermission.admin) && !this.screenService.isActive(AdministrationScreenService.screenName);
-      },
-      getItems: (context, items) => {
-        return [
-          ...items,
-          new MenuBaseItem(
-            'administrationMenuEnter',
-            'administration_menu_enter',
-            'administration_menu_enter',
-            { onSelect: () => this.administrationScreenService.navigateToRoot() }
-          )
-        ]
-      },
-      orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'administrationMenuEnter');
-
-        if (index > -1) {
-          const item = items.splice(index, 1);
-          items.unshift(item[0]);
+        if (administrationScreen) {
+          return [
+            ...items,
+            new MenuBaseItem(
+              'administrationMenuBack',
+              'administration_menu_back',
+              'administration_menu_back',
+              { onSelect: () => this.screenService.navigateToRoot() }
+            )
+          ]
         }
 
         return items;
-      }
-    });
-
-    this.menuService.addCreator({
-      isApplicable: (context) => {
-        return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && this.screenService.isActive(AdministrationScreenService.screenName);
-      },
-      getItems: (context, items) => {
-        return [
-          ...items,
-          new MenuBaseItem(
-            'administrationMenuBack',
-            'administration_menu_back',
-            'administration_menu_back',
-            { onSelect: () => this.screenService.navigateToRoot() }
-          )
-        ]
       },
       orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'administrationMenuBack');
+        const index = items.findIndex(item => item.id === 'administrationMenuBack' || item.id === 'administrationMenuEnter');
 
         if (index > -1) {
           const item = items.splice(index, 1);

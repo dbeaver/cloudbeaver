@@ -18,8 +18,7 @@ import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
-import { defaultThemeSettings } from './ThemeSettingsService';
-import { ThemeSettingsService } from './ThemeSettingsService';
+import { defaultThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
 const COMMON_STYLES: any[] = [];

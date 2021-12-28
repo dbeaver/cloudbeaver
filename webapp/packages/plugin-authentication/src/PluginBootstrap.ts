@@ -29,49 +29,36 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: (context) => {
-        if (context.get(DATA_CONTEXT_MENU) !== TOP_NAV_BAR_SETTINGS_MENU) {
-          return false;
-        }
+      isApplicable: (context) => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      getItems: (context, items) => {
+        if (this.serverConfigResource.enabledAuthProviders.length > 0 && !this.authInfoService.userInfo) {
+          return [
+            ...items,
+            new MenuBaseItem(
+              'login',
+              'authentication_login',
+              'authentication_login',
+              { onSelect: () => this.authDialogService.showLoginForm(false, null, true) }
+            )
+          ]
+        };
 
-        return this.serverConfigResource.enabledAuthProviders.length > 0 && !this.authInfoService.userInfo
-      },
-      getItems: (context, items) => [
-        ...items,
-        new MenuBaseItem(
-          'login',
-          'authentication_login',
-          'authentication_login',
-          { onSelect: () => this.authDialogService.showLoginForm(false, null, true) }
-        )
-      ],
-      orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'login')
-
-        if (index > -1) {
-          const item = items.splice(index, 1);
-          items.push(item[0]);
+        if (this.authInfoService.userInfo) {
+          return [
+            ...items,
+            new MenuBaseItem(
+              'logout',
+              'authentication_logout',
+              'authentication_logout',
+              { onSelect: this.authenticationService.logout.bind(this.authenticationService) }
+            )
+          ]
         }
 
         return items;
-      }
-    });
-
-    this.menuService.addCreator({
-      isApplicable: (context) => {
-        return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && !!this.authInfoService.userInfo;
       },
-      getItems: (context, items) => [
-        ...items,
-        new MenuBaseItem(
-          'logout',
-          'authentication_logout',
-          'authentication_logout',
-          { onSelect: this.authenticationService.logout.bind(this.authenticationService) }
-        )
-      ],
       orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'logout')
+        const index = items.findIndex(item => item.id === 'logout' || item.id === 'login')
 
         if (index > -1) {
           const item = items.splice(index, 1);

@@ -19,4 +19,4 @@ export const TopNavBar = function TopNavBar() {
       <Placeholder container={topNavBarService.placeholder} />
     </TopAppBar>
   );
-}
+};
