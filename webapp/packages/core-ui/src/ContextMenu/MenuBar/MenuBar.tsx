@@ -8,21 +8,29 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import { MenuSeparator } from 'reakit';
+import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
-import { IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuService, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
+import { ContextMenu } from '../MenuTrigger';
 import { MenuBarItem } from './MenuBarItem';
+
+interface INestedMenuSettings extends MenuInitialState {
+  onVisibleSwitch?: (visible: boolean) => void;
+}
 
 interface IMenuBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   menu: IMenuData;
+  nestedMenuSettings?: INestedMenuSettings;
   style?: ComponentStyle;
 }
 
 export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar({
   menu,
+  nestedMenuSettings,
   style,
   ...props
 }, ref) {
@@ -40,6 +48,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar(
           key={item.id}
           item={item}
           menuData={menu}
+          nestedMenuSettings={nestedMenuSettings}
           style={style}
         />
       ))}
@@ -50,15 +59,32 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar(
 interface IMenuBarElementProps {
   item: IMenuItem;
   menuData: IMenuData;
+  nestedMenuSettings?: INestedMenuSettings;
   style?: ComponentStyle;
 }
 
-const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ item, style }) {
+const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
+  item,
+  menuData,
+  nestedMenuSettings,
+  style
+}) {
   const styles = useStyles(style);
 
   const onClick = useCallback(() => {
     item.events?.onSelect?.();
   }, [item]);
+
+  if (item instanceof MenuSubMenuItem) {
+    return styled(styles)(
+      <SubMenuItem
+        item={item}
+        menuData={menuData}
+        style={style}
+        nestedMenuSettings={nestedMenuSettings}
+      />
+    );
+  }
 
   if (item instanceof MenuSeparatorItem) {
     return styled(styles)(
@@ -125,5 +151,50 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
       onClick={handleClick}
       {...use({ hidden: item.hidden })}
     />
+  );
+});
+
+interface ISubMenuItemProps {
+  item: MenuSubMenuItem;
+  menuData: IMenuData;
+  nestedMenuSettings?: INestedMenuSettings;
+  style?: ComponentStyle;
+}
+
+const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
+  item,
+  menuData,
+  nestedMenuSettings,
+  style
+}) {
+  const styles = useStyles(style);
+  const menuService = useService(MenuService);
+  const subMenuData = useMenu(item.menu, menuData.context);
+
+  const handler = menuService.getHandler(menuData.context);
+  const loading = handler?.isLoading?.(menuData.context);
+  const disabled = handler?.isDisabled?.(menuData.context);
+
+  subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
+
+  return styled(styles)(
+    <ContextMenu
+      menu={subMenuData}
+      style={style}
+      disclosure
+      {...nestedMenuSettings}
+    >
+      <MenuBarItem
+        id={item.id}
+        aria-label={item.menu.label}
+        label={item.menu.label}
+        icon={item.menu.icon}
+        title={item.menu.tooltip || item.menu.label}
+        loading={loading}
+        disabled={disabled}
+        style={style}
+        {...use({ hidden: item.hidden })}
+      />
+    </ContextMenu>
   );
 });

@@ -82,11 +82,10 @@ export class ThemeService extends Bootstrap {
     });
   }
 
-  register(): void {
-    this.loadAllThemes();
-  }
+  register(): void { }
 
   async load(): Promise<void> {
+    this.loadAllThemes();
     this.setCurrentThemeId(this.defaultThemeId);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
     await this.changeThemeAsync(this.currentThemeId);

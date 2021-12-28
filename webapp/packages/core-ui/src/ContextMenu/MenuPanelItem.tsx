@@ -40,7 +40,7 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
   loading = useStateDelay(loading, 100);
 
   return styled(useStyles(menuPanelStyles, style))(
-    <menu-panel-item title={tooltip}>
+    <menu-panel-item title={tooltip ? translate(tooltip) : title}>
       <menu-item-content>
         {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
       </menu-item-content>

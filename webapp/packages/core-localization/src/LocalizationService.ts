@@ -10,7 +10,7 @@ import { action, observable, makeObservable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ServerService, SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionResource } from '@cloudbeaver/core-root';
 import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
@@ -38,10 +38,10 @@ export class LocalizationService extends Bootstrap {
   private localeProviders: ILocaleProvider[] = [];
 
   constructor(
-    private notificationService: NotificationService,
-    private sessionResource: SessionResource,
-    private serverService: ServerService,
-    private settingsService: SettingsService
+    private readonly notificationService: NotificationService,
+    private readonly sessionResource: SessionResource,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly settingsService: SettingsService
   ) {
     super();
 
@@ -133,7 +133,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   private async setLocale(key: string) {
-    const config = await this.serverService.config.load();
+    const config = await this.serverConfigResource.load();
 
     if (!config) {
       throw new Error('Can\'t get server settings');

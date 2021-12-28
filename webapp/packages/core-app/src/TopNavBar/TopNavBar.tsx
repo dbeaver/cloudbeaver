@@ -11,7 +11,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { TopNavService } from './TopNavBarService';
 
-export function TopNavBar() {
+export const TopNavBar = function TopNavBar() {
   const topNavBarService = useService(TopNavService);
 
   return (

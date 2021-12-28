@@ -11,20 +11,27 @@ import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
 
 export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
+  private readonly isDisabled?: () => boolean;
+
   readonly label: string;
   readonly icon?: string;
   readonly tooltip?: string;
   readonly hidden?: boolean;
-  readonly disabled?: boolean;
+
+  get disabled(): boolean {
+    return this.isDisabled?.() ?? false;
+  }
 
   constructor(
     id: string,
     label: string,
     tooltip?: string,
-    events?: IMenuItemEvents
+    events?: IMenuItemEvents,
+    isDisabled?: () => boolean
   ) {
     super(id, events);
     this.label = label;
     this.tooltip = tooltip;
+    this.isDisabled = isDisabled;
   }
 }
