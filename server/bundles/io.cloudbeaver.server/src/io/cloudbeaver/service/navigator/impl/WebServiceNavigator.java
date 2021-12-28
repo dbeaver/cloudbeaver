@@ -21,7 +21,10 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.navigator.*;
+import io.cloudbeaver.service.navigator.DBWServiceNavigator;
+import io.cloudbeaver.service.navigator.WebCatalog;
+import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
+import io.cloudbeaver.service.navigator.WebStructContainers;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -172,12 +175,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         DBPDataSource dataSource = connection.getDataSource();
         DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
-        DBCExecutionContextDefaults contextDefaults = executionContext.getContextDefaults();
+        if (executionContext == null) {
+            throw new DBWebException("No default execution context for " + connection.getName());
+        }
+        DBCExecutionContextDefaults<?, ?> contextDefaults = executionContext.getContextDefaults();
 
         WebStructContainers structContainers = new WebStructContainers();
 
-        structContainers.setSupportsCatalogChange(contextDefaults.supportsCatalogChange());
-        structContainers.setSupportsSchemaChange(contextDefaults.supportsSchemaChange());
+        structContainers.setSupportsCatalogChange(contextDefaults != null && contextDefaults.supportsCatalogChange());
+        structContainers.setSupportsSchemaChange(contextDefaults != null && contextDefaults.supportsSchemaChange());
 
         List<? extends DBSObject> nodes = this.getCatalogs(
                 monitor,
@@ -199,7 +205,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (catalogObjectInfo != null) {
                     WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
 
-                    if (contextDefaults.supportsSchemaChange()) {
+                    if (contextDefaults != null && contextDefaults.supportsSchemaChange()) {
                         try {
                             List<WebNavigatorNodeInfo> schemasList = webCatalog.getSchemaList();
                             Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
@@ -224,7 +230,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
                     catalogList.add(webCatalog);
                 }
-            } else if(node instanceof DBSSchema && contextDefaults.supportsSchemaChange()) {
+            } else if(node instanceof DBSSchema && contextDefaults != null && contextDefaults.supportsSchemaChange()) {
                 WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(), node);
 
                 if(schemaNodeInfo != null){
@@ -235,7 +241,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         return structContainers;
     }
 
-    protected List<? extends DBSObject> getCatalogs(DBRProgressMonitor monitor, DBSObject rootObject, DBCExecutionContextDefaults contextDefaults) throws DBWebException {
+    protected List<? extends DBSObject> getCatalogs(DBRProgressMonitor monitor, DBSObject rootObject, DBCExecutionContextDefaults<?, ?> contextDefaults) throws DBWebException {
         if (rootObject instanceof DBSObjectContainer) {
             try {
                 Collection<? extends DBSObject> objectsCollection;
@@ -244,7 +250,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 } else {
                     objectsCollection = ((DBSObjectContainer) rootObject).getChildren(monitor);
                 }
-                return new ArrayList(objectsCollection);
+                return new ArrayList<>(objectsCollection);
             } catch (DBException e) {
                 throw new DBWebException("Error reading context defaults", e);
 //                return Collections.emptyList();
