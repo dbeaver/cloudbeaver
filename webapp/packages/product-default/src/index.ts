@@ -5,6 +5,8 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
+import theme from '@cloudbeaver/plugin-theme';
+import localization from '@cloudbeaver/plugin-localization';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
@@ -22,6 +24,8 @@ import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import userProfile from '@cloudbeaver/plugin-user-profile';
 import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administration';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
+import settingsMenu from '@cloudbeaver/plugin-settings-menu';
+import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 
 import { defaultProductManifest } from './manifest';
 
@@ -30,6 +34,8 @@ const PLUGINS: PluginManifest[] = [
   spreadsheetNew,
   authentication,
   authenticationAdministration,
+  theme,
+  localization,
   connectionCustom,
   connectionTemplate,
   dataExport,
@@ -47,6 +53,8 @@ const PLUGINS: PluginManifest[] = [
   connectionAdministration,
   versionUpdate,
   productPlugin,
+  settingsMenu,
+  settingsMenuAdministration,
 ];
 
 bootstrap(PLUGINS);

@@ -10,7 +10,6 @@ import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbe
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { Logo } from './Logo';
-import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 
 @injectable()
 export class AdministrationTopAppBarBootstrapService extends Bootstrap {
@@ -23,9 +22,8 @@ export class AdministrationTopAppBarBootstrapService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.administrationTopAppBarService.placeholder.add(Logo, 0);
-    this.administrationTopAppBarService.placeholder.add(SettingsMenu, 4);
     this.wizardTopAppBarService.placeholder.add(Logo, 0);
   }
 
-  load(): void | Promise<void> {}
+  load(): void | Promise<void> { }
 }

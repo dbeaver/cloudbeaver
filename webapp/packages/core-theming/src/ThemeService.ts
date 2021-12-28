@@ -18,8 +18,7 @@ import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
-import { defaultThemeSettings } from './ThemeSettingsService';
-import { ThemeSettingsService } from './ThemeSettingsService';
+import { defaultThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
 const COMMON_STYLES: any[] = [];
@@ -82,11 +81,10 @@ export class ThemeService extends Bootstrap {
     });
   }
 
-  register(): void {
-    this.loadAllThemes();
-  }
+  register(): void { }
 
   async load(): Promise<void> {
+    this.loadAllThemes();
     this.setCurrentThemeId(this.defaultThemeId);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
     await this.changeThemeAsync(this.currentThemeId);

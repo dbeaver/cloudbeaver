@@ -9,21 +9,27 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { ContextMenu } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
+import { Icon } from '@cloudbeaver/core-blocks';
+import { topMenuStyles } from '@cloudbeaver/core-app';
 
-import { topMenuStyles } from '../shared/topMenuStyles';
-import { SettingsMenuService } from './SettingsMenuService';
 import { settingsMenuStyles } from './settingsMenuStyles';
+import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU';
 
 export const SettingsMenu = observer(function SettingsMenu() {
-  const settingsMenuService = useService(SettingsMenuService);
+  const menu = useMenu(TOP_NAV_BAR_SETTINGS_MENU);
 
   return styled(useStyles(settingsMenuStyles))(
-    <MenuTrigger panel={settingsMenuService.getMenu()} style={[topMenuStyles, settingsMenuStyles]} placement='bottom-end' modal rtl>
+    <ContextMenu
+      menu={menu}
+      style={[topMenuStyles, settingsMenuStyles]}
+      placement='bottom-end'
+      modal
+      rtl
+    >
       <Icon name="settings" viewBox="0 0 28 28" />
-    </MenuTrigger>
+    </ContextMenu>
   );
 });

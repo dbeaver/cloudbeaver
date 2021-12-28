@@ -13,7 +13,6 @@ import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector
 import { Fill } from './Fill';
 import { Logo } from './Logo';
 import { MainMenu } from './MainMenu/MainMenu';
-import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 
 @injectable()
 export class TopNavService {
@@ -24,6 +23,5 @@ export class TopNavService {
     this.placeholder.add(MainMenu, 1);
     this.placeholder.add(ConnectionSelector, 2);
     this.placeholder.add(Fill, 3);
-    this.placeholder.add(SettingsMenu, 4);
   }
 }
