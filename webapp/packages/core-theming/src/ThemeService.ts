@@ -13,7 +13,7 @@ import './styles/main/app-loading-screen.css';
 import './styles/main/elevation.scss';
 import './styles/main/typography.scss';
 import './styles/main/color.scss';
-import { UserConfigurationParametersResource } from '@cloudbeaver/core-authentication';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
@@ -70,12 +70,12 @@ export class ThemeService extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly settingsService: SettingsService,
     private readonly themeSettingsService: ThemeSettingsService,
-    private readonly userConfigurationParametersResource: UserConfigurationParametersResource
+    private readonly userInfoResource: UserInfoResource
   ) {
     super();
 
-    this.userConfigurationParametersResource.onDataUpdate.addHandler(() => {
-      const theme = this.userConfigurationParametersResource.get(THEME_KEY);
+    this.userInfoResource.onDataUpdate.addHandler(() => {
+      const theme = this.userInfoResource.getConfigurationParameter(THEME_KEY);
       if (theme && theme !== this.currentThemeId) {
         this.tryChangeTheme(theme);
       }
@@ -98,7 +98,7 @@ export class ThemeService extends Bootstrap {
   async load(): Promise<void> {
     this.setCurrentThemeId(this.defaultThemeId);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
-    await this.tryChangeTheme(this.userConfigurationParametersResource.get(THEME_KEY) || this.currentThemeId);
+    await this.tryChangeTheme(this.userInfoResource.getConfigurationParameter(THEME_KEY) || this.currentThemeId);
   }
 
   getThemeStyles(themeId: string): ClassCollection[] {
@@ -113,8 +113,8 @@ export class ThemeService extends Bootstrap {
 
   async changeTheme(themeId: string): Promise<void> {
     await this.tryChangeTheme(themeId);
-    if (this.userConfigurationParametersResource.parametersAvailable) {
-      await this.userConfigurationParametersResource.add(THEME_KEY, themeId);
+    if (this.userInfoResource.parametersAvailable) {
+      await this.userInfoResource.setConfigurationParameter(THEME_KEY, themeId);
     }
   }
 

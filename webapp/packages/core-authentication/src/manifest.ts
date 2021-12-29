@@ -17,7 +17,6 @@ import { AuthProvidersResource } from './AuthProvidersResource';
 import { AuthSettingsService } from './AuthSettingsService';
 import { RolesManagerService } from './RolesManagerService';
 import { RolesResource } from './RolesResource';
-import { UserConfigurationParametersResource } from './UserConfigurationParametersResource';
 import { UserDataService } from './UserDataService';
 import { UserInfoResource } from './UserInfoResource';
 import { UserMetaParametersResource } from './UserMetaParametersResource';
@@ -42,6 +41,5 @@ export const manifest: PluginManifest = {
     UserInfoResource,
     UsersResource,
     UserMetaParametersResource,
-    UserConfigurationParametersResource,
   ],
 };
