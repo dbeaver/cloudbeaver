@@ -17,8 +17,6 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -26,6 +24,8 @@ import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
@@ -44,7 +44,7 @@ public class LocalAuthProvider implements DBAAuthProvider<LocalAuthSession> {
     public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull DBASession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(PROVIDER_ID);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
         Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider);
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
@@ -82,7 +82,7 @@ public class LocalAuthProvider implements DBAAuthProvider<LocalAuthSession> {
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
         String userName = webSession.getUser().getUserId();
 
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(PROVIDER_ID);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
         Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider);
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");

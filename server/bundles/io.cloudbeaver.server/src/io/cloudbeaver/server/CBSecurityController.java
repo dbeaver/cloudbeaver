@@ -23,8 +23,6 @@ import io.cloudbeaver.DBWSecuritySubjectType;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -34,6 +32,8 @@ import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -327,7 +327,7 @@ class CBSecurityController implements DBWSecurityController {
     // Credentials
 
     @Override
-    public void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, AuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
         try {
             DBAAuthCredentialsProfile credProfile = authProvider.getCredentialProfileByParameters(credentials.keySet());
@@ -370,7 +370,7 @@ class CBSecurityController implements DBWSecurityController {
 
     @Nullable
     @Override
-    public String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    public String getUserByCredentials(AuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
@@ -437,7 +437,7 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
-    public Map<String, Object> getUserCredentials(String userId, WebAuthProviderDescriptor authProvider) throws DBCException {
+    public Map<String, Object> getUserCredentials(String userId, AuthProviderDescriptor authProvider) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
@@ -955,7 +955,7 @@ class CBSecurityController implements DBWSecurityController {
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
-                    for (WebAuthProviderDescriptor authProvider : WebServiceRegistry.getInstance().getAuthProviders()) {
+                    for (AuthProviderDescriptor authProvider : AuthProviderRegistry.getInstance().getAuthProviders()) {
                         if (!registeredProviders.contains(authProvider.getId())) {
                             dbStat.setString(1, authProvider.getId());
                             dbStat.executeUpdate();

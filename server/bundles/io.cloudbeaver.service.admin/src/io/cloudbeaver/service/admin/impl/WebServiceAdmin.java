@@ -30,7 +30,10 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.*;
+import io.cloudbeaver.registry.WebFeatureRegistry;
+import io.cloudbeaver.registry.WebPermissionDescriptor;
+import io.cloudbeaver.registry.WebServiceDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
@@ -49,6 +52,8 @@ import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -255,7 +260,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException {
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
@@ -389,7 +394,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<WebPropertyInfo> listAuthProviderConfigurationParameters(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid provider ID " + providerId);
         }
@@ -403,7 +408,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (providerId != null && !providerId.equals(cfg.getValue().getProvider())) {
                 continue;
             }
-            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(cfg.getValue().getProvider());
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(cfg.getValue().getProvider());
             if (authProvider != null) {
                 result.add(new WebAuthProviderConfiguration(authProvider, cfg.getKey(), cfg.getValue()));
             }
@@ -421,7 +426,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @Nullable String iconURL,
         @Nullable String description,
         @Nullable Map<String, Object> parameters) throws DBWebException {
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
         }

@@ -23,8 +23,6 @@ import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -43,6 +41,8 @@ import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -222,7 +222,7 @@ public class CBDatabase {
         // Associate all auth credentials with admin user
         for (WebAuthInfo ai : authInfoList) {
             if (!ai.getAuthProvider().equals(LocalAuthProvider.PROVIDER_ID)) {
-                WebAuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
+                AuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
                     application.getSecurityController().setUserCredentials(adminName, authProvider, userCredentials);
@@ -266,7 +266,7 @@ public class CBDatabase {
             credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
             credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
 
-            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
             if (authProvider != null) {
                 serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
             }

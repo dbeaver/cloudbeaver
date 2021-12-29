@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.registry.RegistryConstants;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.*;
 
@@ -32,8 +32,6 @@ public class WebServiceRegistry {
     private static final Log log = Log.getLog(WebServiceRegistry.class);
 
     private static final String TAG_SERVICE = "service"; //$NON-NLS-1$
-    private static final String TAG_AUTH_MODEL = "authProvider"; //$NON-NLS-1$
-    private static final String TAG_AUTH_MODEL_DISABLE = "authProviderDisable"; //$NON-NLS-1$
 
     private static WebServiceRegistry instance = null;
 
@@ -48,7 +46,7 @@ public class WebServiceRegistry {
     private final List<WebServiceDescriptor> webServices = new ArrayList<>();
     private DBWServiceBinding[] webServiceInstances;
 
-    private final Map<String, WebAuthProviderDescriptor> authProviders = new LinkedHashMap<>();
+    private final Map<String, AuthProviderDescriptor> authProviders = new LinkedHashMap<>();
     private final Map<String, WebValueSerializerDescriptor> valueSerializers = new HashMap<>();
 
     private WebServiceRegistry() {
@@ -62,21 +60,6 @@ public class WebServiceRegistry {
                 if (TAG_SERVICE.equals(ext.getName())) {
                     this.webServices.add(
                         new WebServiceDescriptor(ext));
-                } else if (TAG_AUTH_MODEL.equals(ext.getName())) {
-                    WebAuthProviderDescriptor providerDescriptor = new WebAuthProviderDescriptor(ext);
-                    this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
-                }
-            }
-
-            for (IConfigurationElement ext : extConfigs) {
-                // Disable auth providers
-                if (TAG_AUTH_MODEL_DISABLE.equals(ext.getName())) {
-                    String providerId = ext.getAttribute(RegistryConstants.ATTR_ID);
-                    if (!this.authProviders.containsKey(providerId)) {
-                        log.warn("Can't disable auth provider '" + providerId + "' - no such provider found");
-                    } else {
-                        this.authProviders.remove(providerId);
-                    }
                 }
             }
         }
@@ -124,14 +107,6 @@ public class WebServiceRegistry {
 
     public DBWServiceBinding[] getWebServiceInstances() {
         return webServiceInstances;
-    }
-
-    public List<WebAuthProviderDescriptor> getAuthProviders() {
-        return new ArrayList<>(authProviders.values());
-    }
-
-    public WebAuthProviderDescriptor getAuthProvider(String id) {
-        return authProviders.get(id);
     }
 
     public DBWValueSerializer<?> createValueSerializer(String valueType) {

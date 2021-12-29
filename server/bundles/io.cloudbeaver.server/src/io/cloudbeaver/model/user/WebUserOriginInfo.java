@@ -24,7 +24,6 @@ import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -33,6 +32,7 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -48,10 +48,10 @@ public class WebUserOriginInfo implements WebObjectOrigin {
 
     private final WebSession session;
     private final WebUser user;
-    private final WebAuthProviderDescriptor authProvider;
+    private final AuthProviderDescriptor authProvider;
     private boolean selfIdentity;
 
-    public WebUserOriginInfo(WebSession session, WebUser user, WebAuthProviderDescriptor authProvider, boolean selfIdentity) {
+    public WebUserOriginInfo(WebSession session, WebUser user, AuthProviderDescriptor authProvider, boolean selfIdentity) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;

@@ -34,7 +34,9 @@
             <premission id="data.delete" label="Data delete"/>
             <premission id="sql.execute" label="SQL execute"/>
         </service>
+    </extension>
 
+    <extension point="org.jkiss.dbeaver.auth.provider">
         <authProvider id="local" label="Local" description="Local name/password based authentication" class="io.cloudbeaver.auth.provider.local.LocalAuthProvider">
             <credentials>
                 <propertyGroup label="General">

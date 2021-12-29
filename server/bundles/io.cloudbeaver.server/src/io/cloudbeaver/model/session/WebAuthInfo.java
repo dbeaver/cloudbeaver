@@ -20,13 +20,13 @@ import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
 
     private final WebSession session;
     private final WebUser user;
-    private final WebAuthProviderDescriptor authProvider;
+    private final AuthProviderDescriptor authProvider;
     private WebAuthProviderConfiguration authProviderConfiguration;
     private DBASession authSession;
     private final OffsetDateTime loginTime;
@@ -52,7 +52,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
     public WebAuthInfo(
         @NotNull WebSession session,
         @NotNull WebUser user,
-        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull AuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull DBASession authSession,
         @NotNull OffsetDateTime loginTime)
@@ -113,7 +113,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
         return userIdentity;
     }
 
-    public WebAuthProviderDescriptor getAuthProviderDescriptor() {
+    public AuthProviderDescriptor getAuthProviderDescriptor() {
         return authProvider;
     }
 

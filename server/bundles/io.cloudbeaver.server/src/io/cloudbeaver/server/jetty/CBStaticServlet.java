@@ -4,8 +4,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
@@ -17,6 +15,8 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -66,7 +66,7 @@ public class CBStaticServlet extends DefaultServlet {
         String[] authProviders = appConfig.getEnabledAuthProviders();
         if (authProviders.length == 1) {
             String authProviderId = authProviders[0];
-            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(authProviderId);
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
             if (authProvider != null && authProvider.isConfigurable()) {
                 String configId = null;
                 AuthProviderConfig activeAuthConfig = null;

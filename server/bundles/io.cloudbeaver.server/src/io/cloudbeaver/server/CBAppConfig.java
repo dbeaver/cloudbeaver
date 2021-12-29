@@ -19,13 +19,13 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebFeatureRegistry;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.Collections;
@@ -198,8 +198,8 @@ public class CBAppConfig {
     public String[] getEnabledAuthProviders() {
         if (enabledAuthProviders == null) {
             // No config - enable all providers (+backward compatibility)
-            return WebServiceRegistry.getInstance().getAuthProviders()
-                .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
+            return AuthProviderRegistry.getInstance().getAuthProviders()
+                .stream().map(AuthProviderDescriptor::getId).toArray(String[]::new);
         }
         return enabledAuthProviders;
     }
@@ -209,8 +209,8 @@ public class CBAppConfig {
     }
 
     public String[] getAllAuthProviders() {
-        return WebServiceRegistry.getInstance().getAuthProviders()
-            .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
+        return AuthProviderRegistry.getInstance().getAuthProviders()
+            .stream().map(AuthProviderDescriptor::getId).toArray(String[]::new);
     }
 
     public DBNBrowseSettings getDefaultNavigatorSettings() {

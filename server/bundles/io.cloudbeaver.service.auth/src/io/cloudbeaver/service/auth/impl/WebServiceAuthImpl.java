@@ -27,8 +27,6 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
@@ -42,6 +40,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -67,7 +67,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
@@ -229,7 +229,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
     }
 
-    private boolean isAdminAuthTry(@NotNull WebAuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
+    private boolean isAdminAuthTry(@NotNull AuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
         DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
         boolean isAdmin = false;
 
@@ -294,7 +294,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthProviderInfo[] getAuthProviders() {
-        return WebServiceRegistry.getInstance().getAuthProviders()
+        return AuthProviderRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);
     }

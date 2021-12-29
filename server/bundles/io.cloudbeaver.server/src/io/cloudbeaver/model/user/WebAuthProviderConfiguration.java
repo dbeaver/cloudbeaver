@@ -18,11 +18,11 @@ package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.auth.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.Map;
 
@@ -33,11 +33,11 @@ public class WebAuthProviderConfiguration {
 
     private static final Log log = Log.getLog(WebAuthProviderConfiguration.class);
 
-    private final WebAuthProviderDescriptor providerDescriptor;
+    private final AuthProviderDescriptor providerDescriptor;
     private final String id;
     private final AuthProviderConfig config;
 
-    public WebAuthProviderConfiguration(WebAuthProviderDescriptor providerDescriptor, String id, AuthProviderConfig config) {
+    public WebAuthProviderConfiguration(AuthProviderDescriptor providerDescriptor, String id, AuthProviderConfig config) {
         this.providerDescriptor = providerDescriptor;
         this.id = id;
         this.config = config;

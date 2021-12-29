@@ -19,11 +19,11 @@ package io.cloudbeaver;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.Map;
 import java.util.Set;
@@ -62,19 +62,19 @@ public interface DBWSecurityController {
     /**
      * Sets user redentials for specified provider
      */
-    void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException;
+    void setUserCredentials(String userId, AuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException;
 
     /**
      * Find user with matching credentials.
      * It doesn't check credentials like passwords, just searches user id by identifying credentials.
      */
     @Nullable
-    String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
+    String getUserByCredentials(AuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
 
     /**
      * Get user credentials for specified provider
      */
-    Map<String, Object> getUserCredentials(String userId, WebAuthProviderDescriptor authProvider) throws DBCException;
+    Map<String, Object> getUserCredentials(String userId, AuthProviderDescriptor authProvider) throws DBCException;
 
     /**
      * Returns list of auth provider IDs associated with this user
