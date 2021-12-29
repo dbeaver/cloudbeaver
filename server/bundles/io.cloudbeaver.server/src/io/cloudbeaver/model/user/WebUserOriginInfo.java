@@ -18,8 +18,7 @@ package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.DBWAuthProvider;
-import io.cloudbeaver.auth.DBWAuthProviderExternal;
+import io.cloudbeaver.auth.DBAAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -31,7 +30,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.lang.reflect.ParameterizedType;
@@ -101,12 +101,12 @@ public class WebUserOriginInfo implements WebObjectOrigin {
                 throw new DBException("Session not authorized in auth provider '" + authProvider.getId() + "'");
             }
             DBASession authSession = authInfo.getAuthSession();
-            DBWAuthProvider<?> authProvider = this.authProvider.getInstance();
-            if (authSession != null && authProvider instanceof DBWAuthProviderExternal) {
+            DBAAuthProvider<?> authProvider = this.authProvider.getInstance();
+            if (authSession != null && authProvider instanceof DBAAuthProviderExternal) {
                 if (!isValidSessionType(authSession, authProvider)) {
                     return new WebPropertyInfo[0];
                 }
-                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(
+                DBPObject userDetails = ((DBAAuthProviderExternal) authProvider).getUserDetails(
                     session.getProgressMonitor(),
                     session,
                     authSession,
@@ -122,7 +122,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
         return new WebPropertyInfo[0];
     }
 
-    private static boolean isValidSessionType(DBASession authSession, DBWAuthProvider<?> authProvider) {
+    private static boolean isValidSessionType(DBASession authSession, DBAAuthProvider<?> authProvider) {
         Type providerSuperClass = authProvider.getClass().getGenericSuperclass();
         if (providerSuperClass instanceof ParameterizedType) {
             Type[] typeArguments = ((ParameterizedType) providerSuperClass).getActualTypeArguments();

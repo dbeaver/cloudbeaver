@@ -16,30 +16,32 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
-import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.util.Map;
 
 /**
- * Auth provider
+ * Local auth provider
  */
-public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
+public class LocalAuthProvider implements DBAAuthProvider<LocalAuthSession> {
 
     public static final String PROVIDER_ID = "local";
     public static final String CRED_USER = "user";
     public static final String CRED_PASSWORD = "password";
 
     @Override
-    public LocalAuthSession openSession(@NotNull WebSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull DBASession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(PROVIDER_ID);
@@ -56,7 +58,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
         if (CommonUtils.isEmpty(clientPassword)) {
             throw new DBException("No user password provided");
         }
-        String clientPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, clientPassword);
+        String clientPasswordHash = AuthPropertyEncryption.hash.encrypt(userName, clientPassword);
         if (!storedPasswordHash.equals(clientPasswordHash)) {
             throw new DBException("Invalid user name or password");
         }
@@ -64,12 +66,12 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
     }
 
     @Override
-    public void closeSession(@NotNull WebSession mainSession, LocalAuthSession localAuthSession) throws DBException {
+    public void closeSession(@NotNull DBASession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 
     @Override
-    public void refreshSession(@NotNull WebSession mainSession, LocalAuthSession localAuthSession) throws DBException {
+    public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull DBASession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 
@@ -92,7 +94,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
         if (CommonUtils.isEmpty(oldPassword)) {
             throw new DBException("No user password provided");
         }
-        String oldPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, oldPassword);
+        String oldPasswordHash = AuthPropertyEncryption.hash.encrypt(userName, oldPassword);
         if (!storedPasswordHash.equals(oldPasswordHash)) {
             throw new DBException("Invalid user name or password");
         }

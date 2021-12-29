@@ -20,8 +20,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.auth.DBWAuthProvider;
-import io.cloudbeaver.auth.DBWAuthProviderExternal;
+import io.cloudbeaver.auth.DBAAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -40,7 +39,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -92,9 +92,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
-            DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
-            DBWAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBWAuthProviderExternal<?> ?
-                (DBWAuthProviderExternal<?>) authProviderInstance : null;
+            DBAAuthProvider<?> authProviderInstance = authProvider.getInstance();
+            DBAAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBAAuthProviderExternal<?> ?
+                (DBAAuthProviderExternal<?>) authProviderInstance : null;
             Map<String, Object> userCredentials;
 
             if (authProviderExternal != null) {
@@ -205,10 +205,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
 
             authSession = authProviderInstance.openSession(
+                webSession.getProgressMonitor(),
                 webSession,
                 providerConfig,
-                userCredentials
-            );
+                userCredentials);
 
             WebAuthInfo authInfo = new WebAuthInfo(
                 webSession,

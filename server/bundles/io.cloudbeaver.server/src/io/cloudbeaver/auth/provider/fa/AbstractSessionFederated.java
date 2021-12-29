@@ -17,13 +17,10 @@
 
 package io.cloudbeaver.auth.provider.fa;
 
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.access.DBASessionFederated;
-import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
+import org.jkiss.dbeaver.model.auth.*;
 
 import java.util.Map;
 
@@ -32,11 +29,11 @@ public abstract class AbstractSessionFederated implements DBASessionFederated {
     @NotNull
     protected final Map<String, Object> authParameters;
     @NotNull
-    protected final WebSession parentSession;
+    protected final DBASession parentSession;
     @NotNull
     protected final DBAAuthSpace space;
 
-    protected AbstractSessionFederated(@NotNull WebSession parentSession, @NotNull DBAAuthSpace space, @NotNull Map<String, Object> authParameters) {
+    protected AbstractSessionFederated(@NotNull DBASession parentSession, @NotNull DBAAuthSpace space, @NotNull Map<String, Object> authParameters) {
         this.parentSession = parentSession;
         this.space = space;
         this.authParameters = authParameters;
@@ -46,6 +43,12 @@ public abstract class AbstractSessionFederated implements DBASessionFederated {
     @Override
     public DBAAuthSpace getSessionSpace() {
         return space;
+    }
+
+    @NotNull
+    @Override
+    public DBASessionContext getSessionContext() {
+        return this.parentSession.getSessionContext();
     }
 
     @Override

@@ -24,7 +24,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ import java.util.Map;
  * External auth provider.
  * Authenticates user using external user identity
  */
-public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBWAuthProvider<AUTH_SESSION> {
+public interface DBAAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBAAuthProvider<AUTH_SESSION> {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database

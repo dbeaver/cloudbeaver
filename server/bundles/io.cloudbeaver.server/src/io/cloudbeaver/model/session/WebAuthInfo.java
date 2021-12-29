@@ -17,15 +17,15 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWUserIdentity;
-import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.access.DBASession;
-import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.time.OffsetDateTime;
@@ -132,7 +132,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
     void closeAuth() {
         if (authProvider != null && authSession != null) {
             try {
-                DBWAuthProvider authProviderInstance = this.authProvider.getInstance();
+                DBAAuthProvider authProviderInstance = this.authProvider.getInstance();
                 authProviderInstance.closeSession(session, authSession);
             } catch (Exception e) {
                 log.error(e);

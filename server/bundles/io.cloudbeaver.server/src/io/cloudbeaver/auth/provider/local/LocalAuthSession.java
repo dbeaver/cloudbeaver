@@ -16,23 +16,23 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.access.DBASession;
-import org.jkiss.dbeaver.model.access.DBASessionPrincipal;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
+import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.auth.DBASessionContext;
+import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
 
 /**
  * Local auth provider
  */
 public class LocalAuthSession implements DBASession {
 
-    private final WebSession webSession;
+    private final DBASession webSession;
     private final String userId;
 
-    LocalAuthSession(WebSession webSession, String userId) {
+    LocalAuthSession(DBASession webSession, String userId) {
         this.webSession = webSession;
         this.userId = userId;
     }
@@ -45,6 +45,12 @@ public class LocalAuthSession implements DBASession {
     @Override
     public DBAAuthSpace getSessionSpace() {
         return webSession.getSingletonProject();
+    }
+
+    @NotNull
+    @Override
+    public DBASessionContext getSessionContext() {
+        return webSession.getSessionContext();
     }
 
     @Override
@@ -66,7 +72,7 @@ public class LocalAuthSession implements DBASession {
     @Nullable
     @Override
     public DBPProject getSingletonProject() {
-        return null;
+        return webSession.getSingletonProject();
     }
 
 }

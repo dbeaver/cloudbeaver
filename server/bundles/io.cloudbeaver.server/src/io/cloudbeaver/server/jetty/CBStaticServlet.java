@@ -1,7 +1,6 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.auth.DBWAuthProvider;
 import io.cloudbeaver.auth.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
@@ -17,6 +16,7 @@ import org.eclipse.jetty.server.ResourceService;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -86,7 +86,7 @@ public class CBStaticServlet extends DefaultServlet {
                 try {
                     // We have the only provider
                     // Forward to signon URL
-                    DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
+                    DBAAuthProvider<?> authProviderInstance = authProvider.getInstance();
                     if (authProviderInstance instanceof DBWAuthProviderFederated) {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {

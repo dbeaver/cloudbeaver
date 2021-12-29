@@ -24,12 +24,13 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
-import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
+import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -329,10 +330,10 @@ class CBSecurityController implements DBWSecurityController {
     public void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
         try {
-            WebAuthProviderDescriptor.CredentialsProfile credProfile = authProvider.getCredentialProfileByParameters(credentials.keySet());
+            DBAAuthCredentialsProfile credProfile = authProvider.getCredentialProfileByParameters(credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
-                WebAuthProviderPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
+                AuthPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
                 if (property == null) {
                     return null;
                 }
@@ -371,14 +372,14 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
-        for (WebAuthProviderPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
+        for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
                 Object paramValue = authParameters.get(propId);
                 if (paramValue == null) {
                     throw new DBCException("Authentication parameter '" + prop.getId() + "' is missing");
                 }
-                if (prop.getEncryption() == WebAuthProviderPropertyEncryption.hash) {
+                if (prop.getEncryption() == AuthPropertyEncryption.hash) {
                     throw new DBCException("Hash encryption can't be used in identifying credentials");
                 }
                 identCredentials.put(propId, paramValue);
