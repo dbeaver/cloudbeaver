@@ -46,19 +46,15 @@ export const InlineEditorStyles = composes(
     position: relative;
     height: 100%;
     flex: 1;
+    display: flex;
 
-    & input {
-      color: inherit;
-      background: inherit;
-      letter-spacing: inherit;
-      outline: none;
+    & input, & input[disabled], & input[readonly] {
       border: none;
-      padding-left: 8px;
-      padding-right: 8px;
-      padding-top: 1px; /* because of -1px top */
-      line-height: 24px;
+      border-radius: unset;
       width: 100%;
       height: 100%;
+      min-height: unset;
+      padding: 0 8px;
     }
   }
   

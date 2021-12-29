@@ -67,7 +67,6 @@ export const ITEM_LIST_STYLES = composes(
       }
 
       & input {
-        padding: 4px 8px;
         padding-right: 32px;
       }
 
@@ -77,7 +76,7 @@ export const ITEM_LIST_STYLES = composes(
         align-items: center;
         height: 100%;
         top: 0;
-        right: 2.5px;
+        right: 4px;
 
         & ListSearchButton {
           position: relative;

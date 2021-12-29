@@ -165,7 +165,6 @@ export const InputField: InputFieldType = observer(function InputField({
       <input-container>
         <input
           ref={ref}
-          role='new'
           {...rest}
           type={passwordRevealed ? 'text' : rest.type}
           name={name}
