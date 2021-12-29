@@ -38,6 +38,7 @@ export const defaultITLocale = [
   ['ui_no_items_placeholder', 'Non ci sono ancora elementi.'],
   ['ui_search_no_result_placeholder', 'Nessun risultato trovato.'],
   ['ui_save_reminder', 'Ci sono modifiche non salvate.'],
+  ['ui_settings', 'Settings'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

@@ -2,7 +2,6 @@
 export * from './CoreSettingsService';
 export * from './AppScreen/AppScreenService';
 export * from './TopNavBar/MainMenu/MainMenuService';
-export * from './TopNavBar/SettingsMenu/SettingsMenuService';
 export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/TopNavBarService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
@@ -59,7 +58,6 @@ export * from './useAppVersion';
 
 // components
 export * from './Body';
-export * from './TopNavBar/SettingsMenu/SettingsMenu';
 export * from './TopNavBar/Logo';
 
 // Interfaces

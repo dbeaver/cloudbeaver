@@ -22,22 +22,23 @@ interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLBu
   style?: ComponentStyle;
 }
 
-export const MenuBarItem = observer<Props>(function MenuBarItem({
+export const MenuBarItem = observer<Props, HTMLButtonElement>(function MenuBarItem({
   label,
   loading = false,
   icon,
   viewBox = '0 0 24 24',
   style = [],
   ...rest
-}) {
+}, ref) {
   const translate = useTranslate();
   loading = useStateDelay(loading, 100);
 
+  const title = translate(rest.title);
   return styled(useStyles(style))(
-    <menu-bar-item as='button' {...rest} title={translate(rest.title)}>
+    <menu-bar-item as='button' ref={ref} {...rest} title={title} aria-label={title}>
       {loading && <Loader small fullSize />}
       {!loading && icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {label && <item-label><Translate token={label} /></item-label>}
     </menu-bar-item>
   );
-});
+}, { forwardRef: true });

@@ -9,7 +9,7 @@
 import { css } from 'reshadow';
 
 export const settingsMenuStyles = css`
-  MenuTrigger {
+  ContextMenu {
     padding: 0 16px !important;
     height: 48px;
     cursor: pointer;

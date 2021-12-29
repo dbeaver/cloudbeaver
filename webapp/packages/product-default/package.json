@@ -22,6 +22,8 @@
     "@cloudbeaver/core-bootstrap": "0.1.0",
     "@cloudbeaver/core-di": "0.1.0",
     "@cloudbeaver/core-product": "0.1.0",
+    "@cloudbeaver/plugin-theme": "0.1.0",
+    "@cloudbeaver/plugin-localization": "0.1.0",
     "@cloudbeaver/plugin-administration": "0.1.0",
     "@cloudbeaver/plugin-authentication": "0.1.0",
     "@cloudbeaver/plugin-authentication-administration": "0.1.0",
@@ -35,7 +37,9 @@
     "@cloudbeaver/plugin-sql-editor": "0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "0.1.0",
     "@cloudbeaver/plugin-sql-editor-screen": "0.1.0",
-    "@cloudbeaver/plugin-version-update-administration": "0.1.0"
+    "@cloudbeaver/plugin-version-update-administration": "0.1.0",
+    "@cloudbeaver/plugin-settings-menu": "0.1.0",
+    "@cloudbeaver/plugin-settings-menu-administration": "0.1.0"
   },
   "product": {
     "name": "CloudBeaver Community"
