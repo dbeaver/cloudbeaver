@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.auth.DBAAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -326,11 +327,32 @@ class CBSecurityController implements DBWSecurityController {
     ///////////////////////////////////////////
     // Credentials
 
+    private static DBAAuthCredentialsProfile getCredentialProfileByParameters(DBAAuthProviderDescriptor authProvider, Set<String> keySet) {
+        List<DBAAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
+        if (credentialProfiles.size() > 1) {
+            for (DBAAuthCredentialsProfile profile : credentialProfiles) {
+                if (profile.getCredentialParameters().size() == keySet.size()) {
+                    boolean matches = true;
+                    for (String paramName : keySet) {
+                        if (profile.getCredentialParameter(paramName) == null) {
+                            matches = false;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        return profile;
+                    }
+                }
+            }
+        }
+        return credentialProfiles.get(0);
+    }
+
     @Override
-    public void setUserCredentials(String userId, AuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, DBAAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
         try {
-            DBAAuthCredentialsProfile credProfile = authProvider.getCredentialProfileByParameters(credentials.keySet());
+            DBAAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
@@ -370,7 +392,7 @@ class CBSecurityController implements DBWSecurityController {
 
     @Nullable
     @Override
-    public String getUserByCredentials(AuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    public String getUserByCredentials(DBAAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
@@ -437,7 +459,7 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
-    public Map<String, Object> getUserCredentials(String userId, AuthProviderDescriptor authProvider) throws DBCException {
+    public Map<String, Object> getUserCredentials(String userId, DBAAuthProviderDescriptor authProvider) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +

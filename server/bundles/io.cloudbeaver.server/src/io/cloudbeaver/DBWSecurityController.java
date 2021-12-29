@@ -22,8 +22,9 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsManager;
+import org.jkiss.dbeaver.model.auth.DBAAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,7 @@ import java.util.Set;
 /**
  * Admin interface
  */
-public interface DBWSecurityController {
+public interface DBWSecurityController extends DBAAuthCredentialsManager {
 
     ///////////////////////////////////////////
     // Users
@@ -60,21 +61,9 @@ public interface DBWSecurityController {
     // Credentials
 
     /**
-     * Sets user redentials for specified provider
+     * Sets user credentials for specified provider
      */
-    void setUserCredentials(String userId, AuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException;
-
-    /**
-     * Find user with matching credentials.
-     * It doesn't check credentials like passwords, just searches user id by identifying credentials.
-     */
-    @Nullable
-    String getUserByCredentials(AuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
-
-    /**
-     * Get user credentials for specified provider
-     */
-    Map<String, Object> getUserCredentials(String userId, AuthProviderDescriptor authProvider) throws DBCException;
+    void setUserCredentials(String userId, DBAAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException;
 
     /**
      * Returns list of auth provider IDs associated with this user
