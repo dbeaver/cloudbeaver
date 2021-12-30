@@ -13,6 +13,7 @@ import './styles/main/app-loading-screen.css';
 import './styles/main/elevation.scss';
 import './styles/main/typography.scss';
 import './styles/main/color.scss';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
@@ -21,6 +22,7 @@ import { themes } from './themes';
 import { defaultThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
+const THEME_KEY = 'appTheme';
 const COMMON_STYLES: any[] = [];
 const THEME_SETTINGS_KEY = 'themeSettings';
 
@@ -68,8 +70,16 @@ export class ThemeService extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly settingsService: SettingsService,
     private readonly themeSettingsService: ThemeSettingsService,
+    private readonly userInfoResource: UserInfoResource
   ) {
     super();
+
+    this.userInfoResource.onDataUpdate.addHandler(() => {
+      const theme = this.userInfoResource.getConfigurationParameter(THEME_KEY);
+      if (theme && theme !== this.currentThemeId) {
+        this.tryChangeTheme(theme);
+      }
+    });
 
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
       themes: computed,
@@ -81,13 +91,15 @@ export class ThemeService extends Bootstrap {
     });
   }
 
-  register(): void { }
+  register(): void {
+    this.loadAllThemes();
+  }
 
   async load(): Promise<void> {
-    this.loadAllThemes();
     this.setCurrentThemeId(this.defaultThemeId);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
-    await this.changeThemeAsync(this.currentThemeId);
+    await this.userInfoResource.load(undefined, ['includeConfigurationParameters']);
+    await this.tryChangeTheme(this.userInfoResource.getConfigurationParameter(THEME_KEY) || this.currentThemeId);
   }
 
   getThemeStyles(themeId: string): ClassCollection[] {
@@ -100,16 +112,24 @@ export class ThemeService extends Bootstrap {
     return [...COMMON_STYLES, theme.styles as ClassCollection];
   }
 
-  async changeThemeAsync(themeId: string): Promise<void> {
+  async changeTheme(themeId: string): Promise<void> {
+    await this.tryChangeTheme(themeId);
+    if (this.userInfoResource.parametersAvailable) {
+      await this.userInfoResource.setConfigurationParameter(THEME_KEY, themeId);
+    }
+  }
+
+  private async tryChangeTheme(themeId: string): Promise<void> {
     try {
       await this.loadThemeStylesAsync(themeId);
     } catch (e) {
       if (themeId !== defaultThemeSettings.defaultTheme) {
-        return this.changeThemeAsync(defaultThemeSettings.defaultTheme); // try to fallback to default theme
+        return this.tryChangeTheme(defaultThemeSettings.defaultTheme); // try to fallback to default theme
       }
       throw e;
     }
-    return this.setCurrentThemeId(themeId);
+
+    this.setCurrentThemeId(themeId);
   }
 
   private setCurrentThemeId(themeId: string) {

@@ -45,7 +45,7 @@ export class PluginBootstrap extends Bootstrap {
           theme.name,
           theme.name,
           {
-            onSelect: () => this.themeService.changeThemeAsync(theme.id)
+            onSelect: () => this.themeService.changeTheme(theme.id)
           },
           () => this.themeService.currentThemeId === theme.id,
         ))

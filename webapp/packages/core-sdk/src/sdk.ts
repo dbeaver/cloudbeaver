@@ -1378,11 +1378,12 @@ export type DeleteAuthProviderConfigurationQuery = { deleteAuthProviderConfigura
 
 export type GetActiveUserQueryVariables = Exact<{
   includeMetaParameters: Scalars['Boolean'];
+  includeConfigurationParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 
-export type GetActiveUserQuery = { user?: { userId: string; displayName?: string; linkedAuthProviders: Array<string>; metaParameters?: any; authTokens: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
+export type GetActiveUserQuery = { user?: { userId: string; displayName?: string; linkedAuthProviders: Array<string>; metaParameters?: any; configurationParameters?: any; authTokens: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -1498,6 +1499,14 @@ export type SetConnectionsQueryVariables = Exact<{
 
 
 export type SetConnectionsQuery = { grantedConnections?: boolean };
+
+export type SetUserConfigurationParameterMutationVariables = Exact<{
+  name: Scalars['String'];
+  value?: InputMaybe<Scalars['Object']>;
+}>;
+
+
+export type SetUserConfigurationParameterMutation = { setUserConfigurationParameter: boolean };
 
 export type SetUserCredentialsQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2467,12 +2476,13 @@ export const DeleteAuthProviderConfigurationDocument = `
 }
     `;
 export const GetActiveUserDocument = `
-    query getActiveUser($includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+    query getActiveUser($includeMetaParameters: Boolean!, $includeConfigurationParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   user: activeUser {
     userId
     displayName
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
+    configurationParameters @include(if: $includeConfigurationParameters)
     authTokens {
       ...AuthToken
     }
@@ -2635,6 +2645,11 @@ export const SetConnectionsDocument = `
     subjectId: $userId
     connections: $connections
   )
+}
+    `;
+export const SetUserConfigurationParameterDocument = `
+    mutation setUserConfigurationParameter($name: String!, $value: Object) {
+  setUserConfigurationParameter(name: $name, value: $value)
 }
     `;
 export const SetUserCredentialsDocument = `
@@ -3468,6 +3483,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setConnections(variables: SetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetConnectionsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnections');
+    },
+    setUserConfigurationParameter(variables: SetUserConfigurationParameterMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetUserConfigurationParameterMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetUserConfigurationParameterMutation>(SetUserConfigurationParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserConfigurationParameter');
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetUserCredentialsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserCredentials');

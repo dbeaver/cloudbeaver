@@ -6,10 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable, runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ObjectOrigin, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -26,16 +28,25 @@ UserInfoIncludes
 > {
   readonly userChange: ISyncExecutor<string>;
 
+  get parametersAvailable() {
+    return this.data !== null;
+  }
+
   constructor(
-    private graphQLService: GraphQLService,
-    private authProviderService: AuthProviderService,
+    private readonly graphQLService: GraphQLService,
+    private readonly authProviderService: AuthProviderService,
     sessionResource: SessionResource,
-    private sessionDataResource: SessionDataResource
+    private readonly sessionDataResource: SessionDataResource
   ) {
-    super(null, ['customIncludeOriginDetails']);
+    super(null, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
     this.userChange = new SyncExecutor();
+
     this.sync(sessionResource);
+
+    makeObservable(this, {
+      parametersAvailable: computed,
+    });
   }
 
   isLinked(provideId: string): boolean {
@@ -104,6 +115,52 @@ UserInfoIncludes
     this.sessionDataResource.markOutdated();
   }
 
+  async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
+    await this.graphQLService.sdk.setUserConfigurationParameter({
+      name: key,
+      value,
+    });
+
+    if (this.data) {
+      this.data.configurationParameters[key] = value;
+    }
+
+    return this.data;
+  }
+
+  async deleteConfigurationParameter(key: ResourceKey<string>): Promise<UserInfo | null> {
+    if (isResourceKeyList(key)) {
+      const keyList: string[] = [];
+      for (const item of key.list) {
+        await this.graphQLService.sdk.setUserConfigurationParameter({
+          name: item,
+          value: null,
+        });
+
+        keyList.push(item);
+      }
+
+      runInAction(() => {
+        for (const item of keyList) {
+          delete this.data?.configurationParameters[item];
+        }
+      });
+    } else {
+      await this.graphQLService.sdk.setUserConfigurationParameter({
+        name: key,
+        value: null,
+      });
+
+      delete this.data?.configurationParameters[key];
+    }
+
+    return this.data;
+  }
+
+  getConfigurationParameter(key: string): any {
+    return this.data?.configurationParameters[key];
+  }
+
   protected async loader(key: void, includes?: string[]): Promise<UserInfo | null> {
     const { user } = await this.graphQLService.sdk.getActiveUser({
       ...this.getDefaultIncludes(),
@@ -113,7 +170,7 @@ UserInfoIncludes
     return (user as UserInfo | null) ?? null;
   }
 
-  protected setData(data: UserInfo|null): void {
+  protected setData(data: UserInfo | null): void {
     const prevUserId = this.getId();
     this.data = data;
     const currentUserId = this.getId();
@@ -126,6 +183,7 @@ UserInfoIncludes
   private getDefaultIncludes(): UserInfoIncludes {
     return {
       customIncludeOriginDetails: true,
+      includeConfigurationParameters: false,
       includeMetaParameters: false,
     };
   }
