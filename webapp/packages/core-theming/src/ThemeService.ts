@@ -98,6 +98,7 @@ export class ThemeService extends Bootstrap {
   async load(): Promise<void> {
     this.setCurrentThemeId(this.defaultThemeId);
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
+    await this.userInfoResource.load(undefined, ['includeConfigurationParameters']);
     await this.tryChangeTheme(this.userInfoResource.getConfigurationParameter(THEME_KEY) || this.currentThemeId);
   }
 
