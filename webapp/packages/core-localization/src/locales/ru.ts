@@ -58,6 +58,7 @@ export const defaultRULocale = [
   ['ui_continue', 'Продолжить'],
   ['ui_authentication', 'Аутентификация'],
   ['ui_settings', 'Настройки'],
+  ['ui_expand', 'Развернуть'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

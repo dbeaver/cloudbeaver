@@ -57,7 +57,7 @@ export const Connection = observer<Props>(function Connection({ connection }) {
       <TableColumnValue centerContent flex expand>
         <StaticImage icon={icon} />
       </TableColumnValue>
-      <TableColumnValue expand>{connection.name}</TableColumnValue>
+      <TableColumnValue title={connection.name} expand ellipsis>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
       <TableColumnValue flex>
         <Placeholder

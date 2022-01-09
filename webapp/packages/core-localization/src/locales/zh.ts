@@ -60,6 +60,7 @@ export const defaultZHLocale = [
   ['ui_continue', '继续'],
   ['ui_authentication', '认证'],
   ['ui_settings', 'Settings'],
+  ['ui_expand', 'Expand'],
 
   ['root_permission_denied', "您没有权限"],
   ['root_permission_no_permission', "您没有权限执行此操作"],

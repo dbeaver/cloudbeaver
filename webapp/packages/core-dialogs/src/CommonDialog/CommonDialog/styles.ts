@@ -45,6 +45,7 @@ export const commonDialogBaseStyle = composes(
       border: none;
       height: auto;
       max-height: 100%;
+      max-width: 748px;
       border-radius: 0.25rem;
       padding: 0px;
 
@@ -133,7 +134,6 @@ export const commonDialogBaseStyle = composes(
       flex: 1;
       box-sizing: content-box;
       display: flex;
-      max-width: 748px;
       max-height: 100%;
       overflow: auto;
     }
@@ -179,11 +179,15 @@ export const commonDialogBaseStyle = composes(
     sub-title {
       composes: theme-typography--caption from global;
       grid-column: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     reject {
       cursor: pointer;
       width: 18px;
       height: 18px;
+      flex-shrink: 0;
     }
     footer {
       display: flex;

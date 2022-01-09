@@ -18,6 +18,7 @@ import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 interface Props {
   onExpand?: (item: any, state: boolean) => void;
@@ -30,6 +31,7 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({
   className,
   disabled,
 }) {
+  const translate = useTranslate();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const styles = useStyles();
@@ -53,7 +55,7 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({
   }, [tableContext, context, onExpand, disabled]);
 
   return styled(styles)(
-    <table-item-expand-box className={className} onClick={handleClick}>
+    <table-item-expand-box className={className} title={translate('ui_expand')} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
     </table-item-expand-box>
   );

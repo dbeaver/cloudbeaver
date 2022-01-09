@@ -60,6 +60,7 @@ export const defaultENLocale = [
   ['ui_continue', 'Continue'],
   ['ui_authentication', 'Authentication'],
   ['ui_settings', 'Settings'],
+  ['ui_expand', 'Expand'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
