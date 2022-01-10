@@ -82,7 +82,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   large,
   mod,
   embedded,
-  onChange = () => {},
+  onChange = () => { },
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const context = useContext(FormContext);
@@ -106,7 +106,6 @@ export const Textarea: TextareaType = observer(function Textarea({
       <field-label as='label' title={rest.title}>{children}</field-label>
       <textarea
         {...rest}
-        role='new'
         value={value ?? ''}
         name={name}
         data-embedded={embedded}

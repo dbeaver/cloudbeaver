@@ -57,6 +57,7 @@ export const ITEM_LIST_STYLES = composes(
       z-index: 1;
     }
     list-search {
+      composes: theme-typography--body1 from global;
       position: sticky;
       top: 0;
       padding: 16px 24px;
@@ -67,8 +68,7 @@ export const ITEM_LIST_STYLES = composes(
       }
 
       & input {
-        padding: 4px 8px;
-        padding-right: 32px;
+        padding: 4px 32px 4px 8px;
       }
 
       & search-button {
@@ -76,8 +76,9 @@ export const ITEM_LIST_STYLES = composes(
         display: flex;
         align-items: center;
         height: 100%;
-        top: 0;
-        right: 2.5px;
+        top: 50%;
+        right: 4px;
+        transform: translateY(-50%);
 
         & ListSearchButton {
           position: relative;

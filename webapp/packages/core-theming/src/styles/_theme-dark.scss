@@ -27,6 +27,9 @@ $color-status: #a08600;
 $link-color: $mdc-theme-primary;
 $link-color-focus: #3f96d1;
 
+$input-color: $mdc-theme-on-secondary;
+$input-color-disabled: darken($input-color, 10%);
+$input-color-readonly: darken($input-color, 5%);
 $input-border: #585958;
 $input-border-disabled: darken($input-border, 10%);
 $input-border-readonly: darken($input-border, 5%);
@@ -46,25 +49,25 @@ $mdc-theme-text-colors: (
     primary: rgba(black, 0.87),
     secondary: rgba(black, 0.45),
     hint: rgba(black, 0.45),
-    disabled: rgba(black, 0.20),
+    disabled: rgba(black, 0.2),
     icon: rgba(black, 0.38),
   ),
 );
 
 $mdc-ripple-dark-ink-opacities: (
   hover: 0.04,
-  focus: 0.10,
-  press: 0.10,
+  focus: 0.1,
+  press: 0.1,
   selected: 0.06,
-  activated: 0.10,
+  activated: 0.1,
 ) !default;
 
 $mdc-ripple-light-ink-opacities: (
   hover: 0.04,
-  focus: 0.10,
-  press: 0.10,
+  focus: 0.1,
+  press: 0.1,
   selected: 0.06,
-  activated: 0.10,
+  activated: 0.1,
 ) !default;
 
 $theme-name: "dark";

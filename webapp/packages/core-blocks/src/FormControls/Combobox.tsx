@@ -332,7 +332,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
         )}
         <input
           ref={setInputRef}
-          role='new'
           autoComplete="off"
           name={name}
           title={title}

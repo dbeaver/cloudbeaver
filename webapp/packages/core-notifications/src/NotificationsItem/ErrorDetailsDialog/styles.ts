@@ -22,9 +22,7 @@ export const styles = css`
     white-space: pre-wrap;
   }
   textarea {
-    width: 100%;
-    min-height: 270px;
-    resize: vertical;
+    min-height: 270px !important;
   }
   message {
     overflow: auto;
