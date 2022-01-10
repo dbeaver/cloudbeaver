@@ -34,7 +34,6 @@ const tableFooterStyles = composes(
       width: 80px;
       box-sizing: border-box;
       padding: 4px 7px;
-      border: none;
       font-size: 13px;
       line-height: 24px;
     }
