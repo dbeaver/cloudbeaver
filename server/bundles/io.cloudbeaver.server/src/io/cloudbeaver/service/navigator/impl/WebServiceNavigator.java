@@ -66,7 +66,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBNModel navigatorModel = session.getNavigatorModel();
             if (isRootPath) {
                 DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getSingletonProject());
-                nodeChildren = projectNode.getDatabases().getChildren(monitor);
+                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, projectNode.getDatabases(), true);
                 if (SHOW_EXTRA_NODES) {
                     // Inject extra nodes. Disabled because we use different root path for extra nodes
                     List<DBNNode> extraNodes = projectNode.getExtraNodes();
@@ -82,7 +82,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
                 }
-                nodeChildren = parentNode.getChildren(monitor);
+                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, true);
             }
             if (nodeChildren == null) {
                 return EMPTY_NODE_LIST;
