@@ -41,7 +41,6 @@ const styles = composes(
       font-weight: 500;
     }
     input {
-      font-size: 12px;
       padding-right: 24px !important;
     }
     MenuButton {

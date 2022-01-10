@@ -18,7 +18,6 @@ import { FormContext } from './FormContext';
 
 const styles = css`
   textarea {
-    font-size: 12px;
     line-height: 19px;
   }
   field[|embedded] {

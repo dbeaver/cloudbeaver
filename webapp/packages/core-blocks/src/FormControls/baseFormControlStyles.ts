@@ -42,5 +42,9 @@ export const baseFormControlStyles = composes(
       composes: theme-typography--caption from global;
       padding-top: 4px;
     }
+
+    input, textarea {
+      font-size: 12px;
+    }
   `
 );
