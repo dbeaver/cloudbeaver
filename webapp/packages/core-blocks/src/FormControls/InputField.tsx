@@ -51,6 +51,9 @@ const INPUT_FIELD_STYLES = composes(
         height: 100%;
       }
     }
+    input {
+      font-size: 12px;
+    }
     input[disabled] + icon-container {
       cursor: auto;
       opacity: 0.8;

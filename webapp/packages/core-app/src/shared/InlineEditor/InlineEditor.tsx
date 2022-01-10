@@ -8,9 +8,8 @@
 
 import { observer } from 'mobx-react-lite';
 import {
-  useEffect, useRef, useCallback, ChangeEvent
+  useEffect, useRef, useCallback, ChangeEvent, useImperativeHandle
 } from 'react';
-import { useImperativeHandle } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Icon, IconOrImage, Loader, useObjectRef } from '@cloudbeaver/core-blocks';
