@@ -49,6 +49,7 @@ export const InlineEditorStyles = composes(
     display: flex;
 
     & input, & input[disabled], & input[readonly] {
+      font-size: inherit;
       border: none;
       border-radius: unset;
       width: 100%;
