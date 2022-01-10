@@ -49,8 +49,8 @@ export const Role = observer<Props>(function Role({ role }) {
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue expand>{role.roleId}</TableColumnValue>
-      <TableColumnValue>{role.roleName || ''}</TableColumnValue>
+      <TableColumnValue title={role.roleId} ellipsis expand>{role.roleId}</TableColumnValue>
+      <TableColumnValue title={role.roleName} ellipsis>{role.roleName || ''}</TableColumnValue>
       <TableColumnValue title={role.description} ellipsis>{role.description || ''}</TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={service.roleDetailsInfoPlaceholder} role={role} />

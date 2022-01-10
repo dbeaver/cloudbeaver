@@ -55,6 +55,9 @@ const styles = composes(
     table-container {
       overflow: auto;
     }
+    Table {
+      width: 100%;
+    }
     GrantedConnectionsTableHeader {
       flex: 0 0 auto;
     }

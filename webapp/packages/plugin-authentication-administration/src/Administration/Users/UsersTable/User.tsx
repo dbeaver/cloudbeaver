@@ -35,6 +35,7 @@ interface Props {
 
 export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
+  const roles = user.grantedRoles.join(', ');
 
   return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
@@ -46,8 +47,8 @@ export const User = observer<Props>(function User({ user, selectable }) {
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue expand>{user.userId}</TableColumnValue>
-      <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
+      <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
+      <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
       </TableColumnValue>

@@ -32,6 +32,9 @@ const styles = composes(
     }
   `,
   css`
+    Table {
+      width: 100%;
+    }
     StaticImage {
       display: flex;
       width: 24px;
@@ -48,7 +51,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   const driversResource = useService(DBDriverResource);
   const getConnectionPermission = useCallback(
     (connectionId: string) => controller.grantedConnections
-      ?.find(connectionPermission => connectionPermission.connectionId === connectionId),
+      .find(connectionPermission => connectionPermission.connectionId === connectionId),
     [controller.grantedConnections]);
   const loading = controller.isLoading;
   const cloudExists = controller.connections.some(isCloudConnection);
@@ -90,7 +93,6 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
             <TableColumnHeader min />
             <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
             <TableColumnHeader>{translate('authentication_administration_user_connections_access_granted_by')}</TableColumnHeader>
-            <TableColumnHeader />
           </TableHeader>
           <TableBody>
             {cloudExists && (
@@ -125,11 +127,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
                     />
                   </TableColumnValue>
                   <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
-                  <TableColumnValue>{connection.name}</TableColumnValue>
-                  <TableColumnValue>
+                  <TableColumnValue title={connection.name} ellipsis>{connection.name}</TableColumnValue>
+                  <TableColumnValue title={grantedBy}>
                     {grantedBy}
                   </TableColumnValue>
-                  <TableColumnValue />
                 </TableItem>
               );
             })}
