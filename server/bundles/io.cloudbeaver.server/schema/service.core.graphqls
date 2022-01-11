@@ -237,6 +237,12 @@ enum NetworkHandlerType {
     CONFIG
 }
 
+enum NetworkHandlerAuthType {
+    PASSWORD,
+    PUBLIC_KEY,
+    AGENT
+}
+
 type NetworkHandlerDescriptor {
     id: ID!
     codeName: String!
@@ -250,8 +256,10 @@ type NetworkHandlerDescriptor {
 type NetworkHandlerConfig {
     id: ID!
     enabled: Boolean!
+    authType: NetworkHandlerAuthType!
     userName: String
     password: String
+    key: String
     savePassword: Boolean!
     properties: Object!
 }
@@ -350,8 +358,10 @@ input NavigatorSettingsInput {
 input NetworkHandlerConfigInput {
     id: ID!
     enabled: Boolean
+    authType: NetworkHandlerAuthType
     userName: String
     password: String
+    key: String
     savePassword: Boolean
     properties: Object
 }

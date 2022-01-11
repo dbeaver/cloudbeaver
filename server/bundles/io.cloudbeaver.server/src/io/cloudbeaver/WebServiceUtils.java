@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
@@ -219,6 +220,9 @@ public class WebServiceUtils {
         if (cfgInput.isEnabled() != null) {
             handlerConfig.setEnabled(cfgInput.isEnabled());
         }
+        if (cfgInput.getAuthType() != null) {
+            handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE, cfgInput.getAuthType());
+        }
         if (cfgInput.isSavePassword() != null) {
             handlerConfig.setSavePassword(cfgInput.isSavePassword());
         } else {
@@ -229,6 +233,9 @@ public class WebServiceUtils {
         }
         if (cfgInput.getPassword() != null) {
             handlerConfig.setPassword(cfgInput.getPassword());
+        }
+        if (cfgInput.getKey() != null) {
+            handlerConfig.setProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
         }
         if (cfgInput.getProperties() != null) {
             handlerConfig.setProperties(cfgInput.getProperties());

@@ -19,6 +19,7 @@ package io.cloudbeaver.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
+import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
@@ -51,12 +52,21 @@ public class WebNetworkHandlerConfig {
         return configuration.isEnabled();
     }
 
+    public String getAuthType() {
+        return configuration.getStringProperty(SSHConstants.PROP_AUTH_TYPE);
+    }
+
     public String getUserName() {
         return configuration.getUserName();
     }
 
     public String getPassword() {
         return CommonUtils.isEmpty(configuration.getPassword()) ? null : "";
+    }
+
+
+    public String getKey() {
+        return configuration.getStringProperty(SSHConstants.PROP_KEY_VALUE);
     }
 
     public boolean isSavePassword() {

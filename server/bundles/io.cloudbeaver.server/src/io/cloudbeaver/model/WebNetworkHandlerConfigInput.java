@@ -49,12 +49,20 @@ public class WebNetworkHandlerConfigInput {
         }
     }
 
+    public String getAuthType() {
+        return JSONUtils.getString(cfg, "authType");
+    }
+
     public String getUserName() {
         return JSONUtils.getString(cfg, "userName");
     }
 
     public String getPassword() {
         return JSONUtils.getString(cfg, "password");
+    }
+
+    public String getKey() {
+        return JSONUtils.getString(cfg, "key");
     }
 
     public Boolean isSavePassword() {
