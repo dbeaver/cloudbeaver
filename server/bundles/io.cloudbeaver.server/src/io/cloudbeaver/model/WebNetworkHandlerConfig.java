@@ -66,7 +66,7 @@ public class WebNetworkHandlerConfig {
 
 
     public String getKey() {
-        return configuration.getStringProperty(SSHConstants.PROP_KEY_VALUE);
+        return CommonUtils.isEmpty(configuration.getSecureProperty(SSHConstants.PROP_KEY_VALUE)) ? null : "";
     }
 
     public boolean isSavePassword() {

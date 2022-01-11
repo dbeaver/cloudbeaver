@@ -235,7 +235,7 @@ public class WebServiceUtils {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
         if (cfgInput.getKey() != null) {
-            handlerConfig.setProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
+            handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
         }
         if (cfgInput.getProperties() != null) {
             handlerConfig.setProperties(cfgInput.getProperties());
