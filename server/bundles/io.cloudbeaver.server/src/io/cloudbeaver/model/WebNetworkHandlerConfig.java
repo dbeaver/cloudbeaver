@@ -52,8 +52,8 @@ public class WebNetworkHandlerConfig {
         return configuration.isEnabled();
     }
 
-    public String getAuthType() {
-        return configuration.getStringProperty(SSHConstants.PROP_AUTH_TYPE);
+    public SSHConstants.AuthType getAuthType() {
+        return CommonUtils.valueOf(SSHConstants.AuthType.class, configuration.getStringProperty(SSHConstants.PROP_AUTH_TYPE), SSHConstants.AuthType.PASSWORD);
     }
 
     public String getUserName() {

@@ -221,7 +221,8 @@ public class WebServiceUtils {
             handlerConfig.setEnabled(cfgInput.isEnabled());
         }
         if (cfgInput.getAuthType() != null) {
-            handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE, cfgInput.getAuthType());
+            handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE,
+                CommonUtils.valueOf(SSHConstants.AuthType.class, cfgInput.getAuthType(), SSHConstants.AuthType.PASSWORD));
         }
         if (cfgInput.isSavePassword() != null) {
             handlerConfig.setSavePassword(cfgInput.isSavePassword());
