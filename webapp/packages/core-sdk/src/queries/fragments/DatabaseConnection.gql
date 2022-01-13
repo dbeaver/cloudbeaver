@@ -38,8 +38,10 @@ fragment DatabaseConnection on ConnectionInfo {
   networkHandlersConfig {
     id
     enabled
+    authType
     userName @include(if: $customIncludeNetworkHandlerCredentials)
     password @include(if: $customIncludeNetworkHandlerCredentials)
+    key @include(if: $customIncludeNetworkHandlerCredentials)
     savePassword
     properties @include(if: $customIncludeNetworkHandlerCredentials)
   }

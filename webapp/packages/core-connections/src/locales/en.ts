@@ -58,6 +58,8 @@ export default [
   ['connections_network_handler_ssh_tunnel_port', 'Port'],
   ['connections_network_handler_ssh_tunnel_user', 'User'],
   ['connections_network_handler_ssh_tunnel_password', 'Password'],
+  ['connections_network_handler_ssh_tunnel_auth_type', 'Authentication method'],
+  ['connections_network_handler_ssh_tunnel_private_key', 'Private key'],
   ['connections_driver_search_placeholder', 'Type driver name...'],
   ['connections_not_found', 'No database connections were found'],
 

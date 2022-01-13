@@ -8,17 +8,22 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField, FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container } from '@cloudbeaver/core-blocks';
+import {
+  Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
+  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea, UploadArea, Combobox
+} from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { authTypes } from './AuthTypes';
 
 const SSH_STYLES = css`
   SubmittingForm {
@@ -66,12 +71,28 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const translate = useTranslate();
   const disabled = formDisabled || loading;
   const enabled = state.enabled || false;
+  const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
   const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
   let passwordHint = '';
 
   if (initialConfig?.password === '') {
     passwordHint = '••••••';
   }
+
+  const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      throw new Error('File is not found');
+    }
+
+    const process = getTextFileReadingProcess(file);
+    const key = await process.promise;
+
+    if (key) {
+      state.key = key;
+    }
+  };
 
   return styled(styles)(
     <SubmittingForm>
@@ -85,6 +106,17 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
           >
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </Switch>
+          <Combobox
+            name="authType"
+            state={state}
+            items={authTypes}
+            keySelector={value => value.key}
+            valueSelector={value => value.label}
+            disabled={disabled || readonly || !enabled}
+            tiny
+          >
+            {translate('connections_network_handler_ssh_tunnel_auth_type')}
+          </Combobox>
           <Container wrap gap>
             <InputField
               type="text"
@@ -124,7 +156,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="password"
               name="password"
-              placeholder={passwordHint}
+              placeholder={keyAuth ? undefined : passwordHint}
               autoComplete='new-password'
               state={state}
               disabled={disabled || !enabled}
@@ -132,8 +164,36 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               mod='surface'
               tiny
             >
-              {translate('connections_network_handler_ssh_tunnel_password')}
+              {keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password')}
             </InputField>
+            {keyAuth && (
+              <>
+                <Textarea
+                  name='key'
+                  state={state}
+                  disabled={disabled || !enabled}
+                  readOnly={readonly}
+                  medium
+                >
+                  {translate('connections_network_handler_ssh_tunnel_private_key')}
+                </Textarea>
+                <GroupItem>
+                  <UploadArea
+                    accept='.txt, .ssh'
+                    reset
+                    disabled={disabled || !enabled}
+                    onChange={handleKeyUpload}
+                  >
+                    <Button
+                      tag='div'
+                      mod={['outlined']}
+                    >
+                      {translate('ui_file')}
+                    </Button>
+                  </UploadArea>
+                </GroupItem>
+              </>
+            )}
           </Container>
           {credentialsSavingEnabled && (
             <FieldCheckbox
@@ -147,8 +207,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
           <GroupItem>
             <Button
               type='button'
-              mod={['outlined']}
-              disabled={disabled || !enabled || !passwordFilled}
+              mod={['unelevated']}
+              disabled={disabled || !enabled || (!keyAuth && !passwordFilled)}
               loader
               onClick={testConnection}
             >

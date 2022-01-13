@@ -9,7 +9,7 @@
 import { DatabaseConnection, DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -81,11 +81,12 @@ export class ConnectionSSHTabService extends Bootstrap {
       state.config.networkHandlersConfig.push({
         id: SSH_TUNNEL_ID,
         enabled: false,
+        authType: NetworkHandlerAuthType.Password,
         password: '',
         savePassword: true,
         userName: '',
+        key: '',
         ...initialConfig,
-
         properties: {
           port: 22,
           host: '',
@@ -122,8 +123,11 @@ export class ConnectionSSHTabService extends Bootstrap {
           if (!handler.userName?.length) {
             validation.error("Field SSH 'User' can't be empty");
           }
-          if (!handler.password?.length) {
+          if (handler.authType === NetworkHandlerAuthType.Password && !handler.password?.length) {
             validation.error("Field SSH 'Password' can't be empty");
+          }
+          if (handler.authType === NetworkHandlerAuthType.PublicKey && !handler.key?.length) {
+            validation.error("Field SSH 'Private key' can't be empty");
           }
         }
 
