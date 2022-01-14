@@ -73,9 +73,11 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const enabled = state.enabled || false;
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
   const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
+  const testAvailable = keyAuth ? !!state.key?.length : passwordFilled;
+  const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
   let passwordHint = '';
 
-  if (initialConfig?.password === '') {
+  if (initialConfig?.password === '' && initialConfig.authType === state.authType) {
     passwordHint = '••••••';
   }
 
@@ -125,6 +127,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
+              required
               small
             >
               {translate('connections_network_handler_ssh_tunnel_host')}
@@ -136,6 +139,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
+              required
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_port')}
@@ -156,15 +160,16 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="password"
               name="password"
-              placeholder={keyAuth ? undefined : passwordHint}
+              placeholder={passwordHint}
               autoComplete='new-password'
               state={state}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
+              required={!keyAuth}
               tiny
             >
-              {keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password')}
+              {passwordLabel}
             </InputField>
             {keyAuth && (
               <>
@@ -173,6 +178,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                   state={state}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
+                  required
                   medium
                 >
                   {translate('connections_network_handler_ssh_tunnel_private_key')}
@@ -201,14 +207,15 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               name="savePassword"
               state={state}
               disabled={disabled || !enabled || readonly}
-            >{translate('connections_connection_edit_save_credentials')}
+            >
+              {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>
           )}
           <GroupItem>
             <Button
               type='button'
               mod={['unelevated']}
-              disabled={disabled || !enabled || (!keyAuth && !passwordFilled)}
+              disabled={disabled || !enabled || !testAvailable}
               loader
               onClick={testConnection}
             >

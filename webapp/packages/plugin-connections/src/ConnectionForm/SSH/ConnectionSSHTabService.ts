@@ -199,9 +199,11 @@ export class ConnectionSSHTabService extends Bootstrap {
     );
 
     if (handler.enabled !== initialConfig?.enabled
+      || handler.authType !== initialConfig?.authType
       || handler.savePassword !== initialConfig?.savePassword
       || handler.userName !== initialConfig?.userName
       || passwordChanged
+      || handler.key !== initialConfig?.key
       || handler.properties?.host !== initialConfig?.properties?.host
       || port !== formPort) {
       return true;

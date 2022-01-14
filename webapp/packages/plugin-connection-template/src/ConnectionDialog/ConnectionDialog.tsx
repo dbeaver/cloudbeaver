@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
@@ -62,11 +60,6 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
     subtitle = controller.template.name;
   }
 
-  const networkHandlers = useMemo(() => computed(() => controller.template?.networkHandlersConfig
-    .filter(handler => handler.enabled && !handler.savePassword)
-    .map(handler => handler.id)
-  ), [controller.template?.networkHandlersConfig]);
-
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       size='large'
@@ -102,7 +95,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
           <ConnectionAuthenticationForm
             config={controller.config}
             authModelId={controller.authModel.id}
-            networkHandlers={networkHandlers.get()}
+            networkHandlers={controller.networkHandlers}
             formId={controller.template?.id}
             allowSaveCredentials={credentialsSavingEnabled}
             disabled={controller.isConnecting}

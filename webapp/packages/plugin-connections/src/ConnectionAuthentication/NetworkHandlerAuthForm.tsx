@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, FieldCheckbox, GroupItem, GroupTitle, InputField, Textarea, UploadArea, useMapResource } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
 interface Props {
   id: string;
@@ -28,7 +29,8 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
 
   if (!networkHandlersConfig.some(state => state.id === id)) {
     networkHandlersConfig.push({
-      id: id,
+      id,
+      authType: NetworkHandlerAuthType.Password,
       userName: '',
       password: '',
       savePassword: false,
@@ -36,6 +38,24 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
   }
 
   const state = networkHandlersConfig.find(state => state.id === id)!;
+
+  const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      throw new Error('File is not found');
+    }
+
+    const process = getTextFileReadingProcess(file);
+    const key = await process.promise;
+
+    if (key) {
+      state.key = key;
+    }
+  };
+
+  const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
+  const passwordLabel = keyAuth ? 'Passphrase' : translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password');
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
@@ -56,8 +76,34 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
         disabled={disabled}
         mod='surface'
       >
-        {translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password')}
+        {passwordLabel}
       </InputField>
+      {keyAuth && (
+        <>
+          <Textarea
+            name='key'
+            state={state}
+            disabled={disabled}
+          >
+            {translate('connections_network_handler_ssh_tunnel_private_key')}
+          </Textarea>
+          <GroupItem>
+            <UploadArea
+              accept='.txt, .ssh'
+              reset
+              disabled={disabled}
+              onChange={handleKeyUpload}
+            >
+              <Button
+                tag='div'
+                mod={['outlined']}
+              >
+                {translate('ui_file')}
+              </Button>
+            </UploadArea>
+          </GroupItem>
+        </>
+      )}
       {allowSaveCredentials && (
         <FieldCheckbox
           id={id + ' savePassword'}
