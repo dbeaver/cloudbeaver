@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, computed } from 'mobx';
 
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig } from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DatabaseAuthModel, DetailsError } from '@cloudbeaver/core-sdk';
+import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
@@ -33,7 +33,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
@@ -67,6 +67,16 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     return this.dbDrivers.get(this.template.driverId);
   }
 
+  get networkHandlers(): string[] {
+    if (!this.template) {
+      return [];
+    }
+
+    return this.template.networkHandlersConfig
+      .filter(handler => handler.enabled && !handler.savePassword)
+      .map(handler => handler.id)
+  }
+
   constructor(
     private dbDriverResource: DBDriverResource,
     private connectionInfoResource: ConnectionInfoResource,
@@ -84,6 +94,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       config: observable,
       hasDetails: observable,
       responseMessage: observable,
+      networkHandlers: computed
     });
   }
 
@@ -143,6 +154,29 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       networkHandlersConfig: [],
       saveCredentials: false,
     };
+
+    if (this.template.authNeeded) {
+      const property = this.template.authProperties?.find(property => property.id === USER_NAME_PROPERTY_ID);
+
+      if (property?.value) {
+        this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
+      }
+    }
+
+    for (const id of this.networkHandlers) {
+      const handler = this.template.networkHandlersConfig.find(handler => handler.id === id);
+
+      if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
+        this.config.networkHandlersConfig.push({
+          id: handler.id,
+          authType: handler.authType,
+          userName: handler.userName,
+          password: handler.password,
+          key: handler.key,
+          savePassword: handler.savePassword,
+        });
+      }
+    }
 
     this.step = ConnectionStep.Connection;
     if (!this.authModel) {

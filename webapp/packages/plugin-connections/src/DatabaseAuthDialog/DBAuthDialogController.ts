@@ -8,16 +8,14 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, ConnectionInitConfig, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionInitConfig, DBDriverResource, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
-
-const USER_NAME_PROPERTY_ID = 'userName';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
@@ -121,11 +119,13 @@ export class DBAuthDialogController implements IInitializableController, IDestru
       for (const id of this.networkHandlers) {
         const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
 
-        if (handler?.userName) {
+        if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
           this.config.networkHandlersConfig.push({
             id: handler.id,
+            authType: handler.authType,
             userName: handler.userName,
             password: handler.password,
+            key: handler.key,
             savePassword: handler.savePassword,
           });
         }
