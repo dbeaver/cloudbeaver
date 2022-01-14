@@ -186,7 +186,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }, [handleClose])
 
-
   const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
   const getTabState = useCallback(
     (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => dynamic.container?.getTabState(

@@ -8,7 +8,6 @@
 
 import { createAction } from "@cloudbeaver/core-view";
 
-
 export const ACTION_TAB_CLOSE = createAction('tab-close', {
   label: 'ui_close',
   tooltip: 'ui_close',

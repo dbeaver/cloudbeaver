@@ -8,7 +8,6 @@
 
 import { createAction } from "@cloudbeaver/core-view";
 
-
 export const ACTION_TAB_CLOSE_OTHERS = createAction('tab-close-others', {
   label: 'Close others',
 });

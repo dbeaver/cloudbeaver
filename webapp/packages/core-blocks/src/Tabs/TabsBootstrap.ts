@@ -19,7 +19,6 @@ import { DATA_CONTEXT_TAB } from "./Tab/DATA_CONTEXT_TAB";
 import { DATA_CONTEXT_TABS_CONTEXT } from "./Tab/DATA_CONTEXT_TABS_CONTEXT";
 import { MENU_TAB } from "./Tab/MENU_TAB";
 
-
 @injectable()
 export class TabsBootstrap extends Bootstrap {
   constructor(

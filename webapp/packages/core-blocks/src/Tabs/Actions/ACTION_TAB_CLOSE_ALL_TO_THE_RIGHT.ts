@@ -8,7 +8,6 @@
 
 import { createAction } from "@cloudbeaver/core-view";
 
-
 export const ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT = createAction('tab-close-all-to-the-right', {
   label: 'Close Tabs to the Right',
 });
