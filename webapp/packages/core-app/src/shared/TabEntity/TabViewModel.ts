@@ -8,7 +8,7 @@
 
 import type { ReactElement } from 'react';
 
-import type { ITab } from '@cloudbeaver/core-blocks';
+import type { ITab } from '@cloudbeaver/core-ui';
 import { Entity, inject, injectable } from '@cloudbeaver/core-di';
 
 import { ITabContainerEntity, TabContainerToken } from './TabContainerToken';

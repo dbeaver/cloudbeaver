@@ -10,7 +10,8 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TabList, TabsState, Textarea, UNDERLINE_TAB_STYLES, useObservableRef } from '@cloudbeaver/core-blocks';
+import { TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_CONTAINERS_STYLES, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';

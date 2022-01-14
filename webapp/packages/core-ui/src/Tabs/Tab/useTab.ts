@@ -9,9 +9,8 @@
 import { useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 
-import { useExecutor } from '../../useExecutor';
-import { useObjectRef } from '../../useObjectRef';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 

@@ -11,9 +11,10 @@ import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
-  InputField, Link, ObjectPropertyInfoForm, SubmittingForm, TabContainerPanelComponent,
+  InputField, Link, ObjectPropertyInfoForm, SubmittingForm,
   Textarea, useClipboard, useMapResource, useObjectPropertyCategories
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';

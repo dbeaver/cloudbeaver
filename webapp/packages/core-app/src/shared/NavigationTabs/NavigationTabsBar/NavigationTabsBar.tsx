@@ -11,9 +11,8 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import {
-  TextPlaceholder, TabsBox, TabPanel, useExecutor
-} from '@cloudbeaver/core-blocks';
+import { TabsBox, TabPanel } from '@cloudbeaver/core-ui';
+import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -78,6 +77,8 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
         tabs={navigation.tabIdList.map(tabId => (
           <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
         ))}
+        tabList={navigation.tabIdList}
+        enabledBaseActions
         style={styles}
         tabIndex={0}
       >

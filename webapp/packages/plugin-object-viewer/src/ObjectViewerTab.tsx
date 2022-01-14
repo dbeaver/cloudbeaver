@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { TabHandlerTabComponent, useNode } from '@cloudbeaver/core-app';
-import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-blocks';
+import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-ui';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';

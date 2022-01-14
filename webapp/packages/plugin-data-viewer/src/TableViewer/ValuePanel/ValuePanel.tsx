@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
+import { TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 

@@ -12,10 +12,10 @@ import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  InfoItem, Loader, TabContainerPanelComponent,
-  TextPlaceholder, useMapResource, useTab,
+  InfoItem, Loader, TextPlaceholder, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';

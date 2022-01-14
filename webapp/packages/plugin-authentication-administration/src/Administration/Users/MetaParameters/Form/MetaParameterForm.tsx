@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
+import { UNDERLINE_TAB_STYLES, TabList, TabsState } from '@cloudbeaver/core-ui';
+import { BASE_CONTAINERS_STYLES, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';

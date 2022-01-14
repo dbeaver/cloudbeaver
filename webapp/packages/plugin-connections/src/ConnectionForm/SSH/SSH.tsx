@@ -15,7 +15,7 @@ import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
   FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea, UploadArea, Combobox
 } from '@cloudbeaver/core-blocks';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';

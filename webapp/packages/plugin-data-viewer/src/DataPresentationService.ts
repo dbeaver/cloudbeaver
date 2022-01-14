@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TabProps } from '@cloudbeaver/core-blocks';
+import type { TabProps } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 

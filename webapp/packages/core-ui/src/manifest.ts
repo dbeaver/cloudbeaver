@@ -7,6 +7,7 @@
  */
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
+import { TabsBootstrap } from './Tabs/TabsBootstrap';
 
 import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap';
 import { ClipboardService } from './Clipboard/ClipboardService';
@@ -23,5 +24,6 @@ export const manifest: PluginManifest = {
     OptionsPanelService,
     ClipboardBootstrap,
     ClipboardService,
+    TabsBootstrap
   ],
 };

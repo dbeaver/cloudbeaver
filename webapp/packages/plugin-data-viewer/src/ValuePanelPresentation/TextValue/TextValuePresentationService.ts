@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-blocks';
+import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()

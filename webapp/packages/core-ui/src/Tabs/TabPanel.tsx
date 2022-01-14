@@ -9,7 +9,8 @@
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
-import { ErrorBoundary } from '../ErrorBoundary';
+import { ErrorBoundary } from '@cloudbeaver/core-blocks';
+
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';

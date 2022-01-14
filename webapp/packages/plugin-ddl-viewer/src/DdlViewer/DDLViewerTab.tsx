@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-blocks';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({

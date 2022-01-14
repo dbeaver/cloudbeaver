@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { TabTitle, Tab, TabContainerTabComponent, useMapResource } from '@cloudbeaver/core-blocks';
+import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
+import { useMapResource } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';

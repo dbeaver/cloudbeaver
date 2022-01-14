@@ -8,7 +8,7 @@
 
 import { action, computed, observable, makeObservable } from 'mobx';
 
-import type { ITab, ITabContainer } from '@cloudbeaver/core-blocks';
+import type { ITab, ITabContainer } from '@cloudbeaver/core-ui';
 import { Entity, IServiceInjector, MixinProvider } from '@cloudbeaver/core-di';
 
 import { ITabContainerEntity, TabContainerToken } from './TabContainerToken';

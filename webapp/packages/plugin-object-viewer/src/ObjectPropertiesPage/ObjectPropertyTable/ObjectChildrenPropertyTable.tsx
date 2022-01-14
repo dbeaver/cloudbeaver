@@ -11,7 +11,8 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { DBObject } from '@cloudbeaver/core-app';
-import { TableHeader, TableBody, Table, useTable, useTabLocalState, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
+import { useTabLocalState } from '@cloudbeaver/core-ui';
+import { TableHeader, TableBody, Table, useTable, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Header } from './Header';

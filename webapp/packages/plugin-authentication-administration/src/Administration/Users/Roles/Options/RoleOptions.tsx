@@ -10,9 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Group,
-  InputField, SubmittingForm, TabContainerPanelComponent, Textarea,
+  InputField, SubmittingForm, Textarea,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';

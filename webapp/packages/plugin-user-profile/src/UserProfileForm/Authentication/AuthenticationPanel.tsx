@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, TabPanel } from '@cloudbeaver/core-blocks';
+import { TabPanel } from '@cloudbeaver/core-ui';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container } from '@cloudbeaver/core-blocks';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { ChangePassword } from './ChangePassword/ChangePassword';

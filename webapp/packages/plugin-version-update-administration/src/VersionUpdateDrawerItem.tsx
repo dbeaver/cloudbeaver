@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
-import { Tab, TabTitle, TabIcon, useMapResource } from '@cloudbeaver/core-blocks';
+import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
+import { useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';

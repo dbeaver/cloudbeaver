@@ -14,6 +14,8 @@ import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 
+export type TabDirection = 'left' | 'right';
+
 export interface ITabsContext<T = Record<string, any>> {
   state: TabStateReturn;
   tabsState: MetadataMap<string, any>;
@@ -22,11 +24,16 @@ export interface ITabsContext<T = Record<string, any>> {
   openExecutor: IExecutor<ITabData<T>>;
   closeExecutor: IExecutor<ITabData<T>>;
   lazy: boolean;
+  tabList?: string[];
+  enabledBaseActions?: boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
   getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;
   getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;
   open: (tabId: string) => void;
   close: (tabId: string) => void;
+  closeAll: () => void;
+  closeAllToTheDirection: (tabId: string, direction: TabDirection) => void;
+  closeOthers: (tabId: string) => void;
 }
 
 export const TabsContext = createContext<ITabsContext<any> | undefined>(
