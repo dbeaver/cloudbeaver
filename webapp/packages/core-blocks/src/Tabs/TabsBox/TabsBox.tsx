@@ -19,6 +19,8 @@ type TabsBoxProps = PropsWithChildren<{
   tabs?: ReactNode;
   tabIndex?: number;
   localState?: MetadataMap<string, any>;
+  tabList?: string[];
+  enabledBaseActions?: boolean;
   className?: string;
   style?: ComponentStyle;
 }>;
@@ -28,12 +30,14 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
   tabs,
   tabIndex,
   localState,
+  tabList,
+  enabledBaseActions,
   children,
   className,
   style,
 }, ref) {
   return styled(useStyles(style))(
-    <TabsState currentTabId={currentTabId} localState={localState}>
+    <TabsState currentTabId={currentTabId} localState={localState} tabList={tabList} enabledBaseActions={enabledBaseActions}>
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && <tabs>{tabs}</tabs>}
         <tab-panels>

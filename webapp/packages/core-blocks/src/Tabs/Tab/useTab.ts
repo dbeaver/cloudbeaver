@@ -51,14 +51,14 @@ export function useTab(
     getInfo: () => state.getTabInfo(tabId),
     selected: state.state.selectedId === tabId,
     handleOpen: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      // TODO: probably should use special flag
       if (EventContext.has(e, EventStopPropagationFlag)) {
         return;
       }
       onClick?.(tabId);
       state.open(tabId);
     },
-    handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
+    handleClose: () => {
       state.close(tabId);
     },
   });

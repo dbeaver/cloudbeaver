@@ -16,6 +16,7 @@ import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { useObjectRef } from '../useObjectRef';
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { TabsContext, ITabsContext } from './TabsContext';
+import type { TabDirection } from './TabsContext';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
@@ -27,6 +28,8 @@ type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWith
   localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
+  tabList?: string[];
+  enabledBaseActions?: boolean;
   onChange?: (tab: ITabData<T>) => void;
   onClose?: (tab: ITabData<T>) => void;
 }>;
@@ -40,6 +43,8 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   children,
   lazy = false,
   manual,
+  tabList,
+  enabledBaseActions,
   onChange: onOpen,
   onClose,
   ...rest
@@ -77,6 +82,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabsState,
     container,
     state,
+    tabList,
   });
 
   if (currentTabId !== undefined) {
@@ -136,6 +142,51 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     props: dynamic.props,
   }), []);
 
+  const closeAll = useCallback(async () => {
+    if (dynamic.tabList) {
+      for (const tab of dynamic.tabList) {
+        await handleClose(tab);
+      }
+    }
+  }, [handleClose])
+
+  const closeAllToTheDirection = useCallback(async (tabId: string, direction: TabDirection) => {
+    if (dynamic.tabList) {
+      const index = dynamic.tabList.indexOf(tabId);
+
+      if (index === -1) {
+        return;
+      }
+
+      let start = index + 1;
+      let end = dynamic.tabList.length;
+
+      if (direction === 'left') {
+        start = 0;
+        end = index;
+      }
+
+      for (let i = start; i < end; i++) {
+        await handleClose(dynamic.tabList[i]);
+      }
+    }
+  }, [handleClose])
+
+  const closeOthers = useCallback(async (tabId: string) => {
+    if (dynamic.tabList) {
+      const index = dynamic.tabList.indexOf(tabId);
+
+      if (index > -1) {
+        for (const tab of dynamic.tabList) {
+          if (tab !== tabId) {
+            await handleClose(tab);
+          }
+        }
+      }
+    }
+  }, [handleClose])
+
+
   const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
   const getTabState = useCallback(
     (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => dynamic.container?.getTabState(
@@ -158,11 +209,16 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     openExecutor,
     closeExecutor,
     lazy,
+    tabList,
+    enabledBaseActions,
     getTabInfo,
     getTabState,
     getLocalState,
     open: handleOpen,
     close: handleClose,
+    closeAll,
+    closeAllToTheDirection,
+    closeOthers,
   }), [
     ...Object.values(state),
     tabsState,
@@ -171,10 +227,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     closeExecutor,
     openExecutor,
     lazy,
+    tabList,
+    enabledBaseActions,
     getTabInfo,
     getTabState,
     handleClose,
     handleOpen,
+    closeAll,
+    closeAllToTheDirection,
+    closeOthers,
   ]);
 
   return (

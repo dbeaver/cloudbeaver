@@ -77,6 +77,7 @@ export * from './Tabs/Tab/useTab';
 export * from './Tabs/Tab/verticalRotatedTabStyles';
 export * from './Tabs/Tab/UnderlineTabStyles';
 export * from './Tabs/Tab/verticalTabStyles';
+export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';
 export * from './Tabs/TabsBox/TabsBoxFromArray';

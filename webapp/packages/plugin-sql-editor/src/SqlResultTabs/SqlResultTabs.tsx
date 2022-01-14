@@ -94,10 +94,11 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   const currentId = state.currentTabId || '';
+  const tabList = orderedTabs.map(tab => tab.id);
 
   return styled(style)(
     <wrapper>
-      <TabsState currentTabId={currentId} onChange={handleSelect}>
+      <TabsState currentTabId={currentId} tabList={tabList} enabledBaseActions onChange={handleSelect}>
         <TabList style={styles}>
           {orderedTabs.map(result => (
             <Tab key={result.id} tabId={result.id} style={styles} title={result.name} onClose={handleClose}>

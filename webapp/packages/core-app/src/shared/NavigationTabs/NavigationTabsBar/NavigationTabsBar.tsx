@@ -78,6 +78,8 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
         tabs={navigation.tabIdList.map(tabId => (
           <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
         ))}
+        tabList={navigation.tabIdList}
+        enabledBaseActions
         style={styles}
         tabIndex={0}
       >
