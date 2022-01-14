@@ -8,6 +8,7 @@
 
 import { createAction } from "@cloudbeaver/core-view";
 
-export const ACTION_TAB_CLOSE_ALL = createAction('tab-close-all', {
-  label: 'Close all',
+export const ACTION_TAB_CLOSE_ALL_TO_THE_LEFT = createAction('tab-close-all-to-the-left', {
+  label: 'ui_close_all_to_the_left',
+  tooltip: 'ui_close_all_to_the_left'
 });

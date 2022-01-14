@@ -12,11 +12,10 @@ import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   TextPlaceholder,
   Loader,
-  useTab,
-  TabContainerPanelComponent,
   useMapResource,
   BASE_CONTAINERS_STYLES,
   ColoredContainer,

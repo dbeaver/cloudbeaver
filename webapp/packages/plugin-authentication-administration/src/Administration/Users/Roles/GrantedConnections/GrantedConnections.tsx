@@ -11,10 +11,10 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  InfoItem, Loader, TabContainerPanelComponent,
-  TextPlaceholder, useMapResource, useTab,
+  InfoItem, Loader, TextPlaceholder, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';

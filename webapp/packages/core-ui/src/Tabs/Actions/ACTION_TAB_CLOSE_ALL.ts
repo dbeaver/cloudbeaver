@@ -6,6 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createMenu } from "@cloudbeaver/core-view";
+import { createAction } from "@cloudbeaver/core-view";
 
-export const MENU_TAB = createMenu('tab-menu', 'Tab menu');
+export const ACTION_TAB_CLOSE_ALL = createAction('tab-close-all', {
+  label: 'ui_close_all',
+  tooltip: 'ui_close_all'
+});

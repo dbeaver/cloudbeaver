@@ -16,7 +16,7 @@ import {
   TableItem, TableColumnValue, TableItemSelect, StaticImage,
   TextPlaceholder, ColoredContainer, BASE_CONTAINERS_STYLES, Group
 } from '@cloudbeaver/core-blocks';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';

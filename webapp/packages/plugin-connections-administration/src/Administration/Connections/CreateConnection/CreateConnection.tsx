@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  TabsState, TabList, IconButton, Loader, StaticImage, Icon, UNDERLINE_TAB_STYLES, TabPanelList, useMapResource
-} from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList } from '@cloudbeaver/core-ui';
+import { IconButton, Loader, StaticImage, Icon, useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';

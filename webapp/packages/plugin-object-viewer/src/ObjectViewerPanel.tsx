@@ -12,7 +12,8 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabHandlerPanelComponent, NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-app';
-import { Loader, TabsBox, TabPanel, TextPlaceholder, Button, useMapResource, useObservableRef, useTabLocalState } from '@cloudbeaver/core-blocks';
+import { TabsBox, TabPanel, useTabLocalState } from '@cloudbeaver/core-ui';
+import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';

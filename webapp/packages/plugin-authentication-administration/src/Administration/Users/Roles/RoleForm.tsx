@@ -11,10 +11,8 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { RoleInfo } from '@cloudbeaver/core-authentication';
-import {
-  TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder,
-  useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage
-} from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, } from '@cloudbeaver/core-ui';
+import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -122,7 +120,7 @@ interface Props {
 export const RoleForm = observer<Props>(function RoleForm({
   state,
   onCancel,
-  onSave = () => {},
+  onSave = () => { },
   className,
 }) {
   const translate = useTranslate();

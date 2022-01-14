@@ -12,10 +12,10 @@ import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import {
   InputField,
   SubmittingForm,
-  TabContainerPanelComponent,
   useMapResource,
   ColoredContainer,
   BASE_CONTAINERS_STYLES,

@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage, TextPlaceholder, Link, useErrorDetails } from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';

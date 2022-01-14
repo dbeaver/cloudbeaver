@@ -9,9 +9,8 @@
 import { useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 
-import { useExecutor } from '../../useExecutor';
-import { useObjectRef } from '../../useObjectRef';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 
@@ -51,14 +50,14 @@ export function useTab(
     getInfo: () => state.getTabInfo(tabId),
     selected: state.state.selectedId === tabId,
     handleOpen: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      // TODO: probably should use special flag
       if (EventContext.has(e, EventStopPropagationFlag)) {
         return;
       }
       onClick?.(tabId);
       state.open(tabId);
     },
-    handleClose: () => {
+    handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
       state.close(tabId);
     },
   });

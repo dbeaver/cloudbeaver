@@ -7,7 +7,7 @@
  */
 
 import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
-import { useTab } from '@cloudbeaver/core-blocks';
+import { useTab } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
 

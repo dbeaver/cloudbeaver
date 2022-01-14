@@ -9,12 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  Tab, TabPanel, TabTitle, TabList, TextPlaceholder, ITabData, TabIcon, TabsState, getComputed
-} from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { ITabData, TabsState, TabIcon, TabTitle, TabList, Tab, TabPanel } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlResultPanel } from './SqlResultPanel';

@@ -8,7 +8,8 @@
 
 import { action, computed, observable } from 'mobx';
 
-import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
+import { useTabState } from '@cloudbeaver/core-ui';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';

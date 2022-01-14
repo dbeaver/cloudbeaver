@@ -9,8 +9,7 @@
 import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { IconOrImage } from '../../IconOrImage';
+import { IconOrImage } from '@cloudbeaver/core-blocks';
 
 interface IProps {
   icon?: string;

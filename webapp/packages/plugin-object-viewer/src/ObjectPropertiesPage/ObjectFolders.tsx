@@ -11,7 +11,8 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
-import { ITabData, Loader, TabList, TabPanel, TabsState, TextPlaceholder, useMapResource, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-blocks';
+import { ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';

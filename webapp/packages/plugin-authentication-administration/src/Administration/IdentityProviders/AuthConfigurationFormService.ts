@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PlaceholderContainer, TabsContainer } from '@cloudbeaver/core-blocks';
+import { TabsContainer } from '@cloudbeaver/core-ui';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';

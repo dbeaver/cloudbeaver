@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from "@cloudbeaver/core-view";
+import { createDataContext } from '@cloudbeaver/core-view';
 
-export const ACTION_TAB_CLOSE_OTHERS = createAction('tab-close-others', {
-  label: 'Close others',
-});
+export const DATA_CONTEXT_TAB_ID = createDataContext<string>('tab-id');

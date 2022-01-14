@@ -9,11 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  TabsState, TabList,
-  Loader, SubmittingForm, Button,
-  useFocus, TabPanelList, UNDERLINE_TAB_STYLES, StatusMessage
-} from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, TabPanelList, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { Loader, SubmittingForm, Button, useFocus, StatusMessage } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';

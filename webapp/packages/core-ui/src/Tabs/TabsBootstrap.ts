@@ -9,13 +9,12 @@
 import { Bootstrap, injectable } from "@cloudbeaver/core-di";
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from "@cloudbeaver/core-view";
 
-import type { TabDirection } from "./TabsContext";
 import { ACTION_TAB_CLOSE } from "./Actions/ACTION_TAB_CLOSE";
 import { ACTION_TAB_CLOSE_ALL } from "./Actions/ACTION_TAB_CLOSE_ALL";
 import { ACTION_TAB_CLOSE_ALL_TO_THE_LEFT } from "./Actions/ACTION_TAB_CLOSE_ALL_TO_THE_LEFT";
 import { ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT } from "./Actions/ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT";
 import { ACTION_TAB_CLOSE_OTHERS } from "./Actions/ACTION_TAB_CLOSE_OTHERS";
-import { DATA_CONTEXT_TAB } from "./Tab/DATA_CONTEXT_TAB";
+import { DATA_CONTEXT_TAB_ID } from "./Tab/DATA_CONTEXT_TAB_ID";
 import { DATA_CONTEXT_TABS_CONTEXT } from "./Tab/DATA_CONTEXT_TABS_CONTEXT";
 import { MENU_TAB } from "./Tab/MENU_TAB";
 
@@ -34,7 +33,7 @@ export class TabsBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         const menu = context.find(DATA_CONTEXT_MENU, MENU_TAB);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        const tab = context.tryGet(DATA_CONTEXT_TAB);
+        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
 
         if (!menu || !state?.tabList || !tab) {
           return false;
@@ -62,7 +61,7 @@ export class TabsBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         const state = context.get(DATA_CONTEXT_TABS_CONTEXT);
-        const tab = context.get(DATA_CONTEXT_TAB);
+        const tab = context.get(DATA_CONTEXT_TAB_ID);
 
         switch (action) {
           case ACTION_TAB_CLOSE:
@@ -75,11 +74,11 @@ export class TabsBootstrap extends Bootstrap {
             state.closeAll();
             break;
           case ACTION_TAB_CLOSE_ALL_TO_THE_LEFT:
-          case ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT: {
-            const direction: TabDirection = action === ACTION_TAB_CLOSE_ALL_TO_THE_LEFT ? 'left' : 'right';
-            state.closeAllToTheDirection(tab, direction);
+            state.closeAllToTheDirection(tab, 'left');
             break;
-          }
+          case ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT:
+            state.closeAllToTheDirection(tab, 'right');
+            break;
           default:
             break;
         }

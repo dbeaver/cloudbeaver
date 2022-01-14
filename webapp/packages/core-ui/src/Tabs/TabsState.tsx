@@ -13,10 +13,10 @@ import { useTabState } from 'reakit/Tab';
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
-import { useObjectRef } from '../useObjectRef';
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { TabsContext, ITabsContext } from './TabsContext';
 import type { TabDirection } from './TabsContext';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 

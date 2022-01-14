@@ -42,7 +42,7 @@ import {
   SessionExpireWarningDialogService
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
-import { BlocksLocaleService, TabsBootstrap } from '@cloudbeaver/core-blocks';
+import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -159,7 +159,6 @@ export const coreManifests: PluginManifest[] = [
       ThemeSettingsService,
       ThemeService,
       ServerService,
-      TabsBootstrap
     ],
   },
   coreSDKManifest,

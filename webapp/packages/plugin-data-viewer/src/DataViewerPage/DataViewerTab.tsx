@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { NavNodeManagerService } from '@cloudbeaver/core-app';
-import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';

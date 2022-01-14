@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TabPanelElement } from '@cloudbeaver/core-blocks';
+import type { TabPanelElement } from '@cloudbeaver/core-ui';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 export function TabContext(injector: IServiceInjector, Panel: TabPanelElement) {

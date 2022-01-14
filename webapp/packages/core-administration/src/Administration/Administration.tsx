@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, verticalTabStyles, SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles } from '@cloudbeaver/core-blocks';
+import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';

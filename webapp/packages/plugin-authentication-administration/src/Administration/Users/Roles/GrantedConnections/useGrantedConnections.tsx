@@ -9,7 +9,8 @@
 import { action, computed, observable } from 'mobx';
 
 import { RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { useObservableRef, useTabState } from '@cloudbeaver/core-blocks';
+import { useTabState } from '@cloudbeaver/core-ui';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isArraysEqual } from '@cloudbeaver/core-utils';

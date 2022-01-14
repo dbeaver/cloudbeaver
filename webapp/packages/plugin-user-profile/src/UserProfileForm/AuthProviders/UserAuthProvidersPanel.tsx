@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, TabPanel } from '@cloudbeaver/core-blocks';
+import { TabPanel } from '@cloudbeaver/core-ui';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 

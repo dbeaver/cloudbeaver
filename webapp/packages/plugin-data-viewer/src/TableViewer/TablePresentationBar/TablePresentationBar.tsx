@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 import { use } from 'reshadow';
 
-import { ITabData, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-blocks';
+import { TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';

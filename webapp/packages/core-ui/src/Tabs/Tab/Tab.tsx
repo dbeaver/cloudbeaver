@@ -13,16 +13,16 @@ import styled from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { Icon } from '@cloudbeaver/core-blocks';
 
-import { Icon } from '../../Icon';
 import { TabContext } from '../TabContext';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 import { MENU_TAB } from './MENU_TAB';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
-import { DATA_CONTEXT_TAB } from './DATA_CONTEXT_TAB';
+import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
+import { ContextMenu } from '../../ContextMenu/MenuTrigger';
 
 export const Tab = observer<TabProps>(function Tab({
   tabId,
@@ -42,7 +42,7 @@ export const Tab = observer<TabProps>(function Tab({
   const info = getInfo();
 
   menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
-  menu.context.set(DATA_CONTEXT_TAB, tabId);
+  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
   const showMenu = menu.getItems().length > 0;
   const actionsEnabled = !!onClose || showMenu;

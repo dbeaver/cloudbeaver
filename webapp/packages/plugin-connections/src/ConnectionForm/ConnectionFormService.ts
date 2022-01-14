@@ -8,7 +8,8 @@
 
 import { observable } from 'mobx';
 
-import { PlaceholderContainer, TabsContainer } from '@cloudbeaver/core-blocks';
+import { TabsContainer } from '@cloudbeaver/core-ui';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';

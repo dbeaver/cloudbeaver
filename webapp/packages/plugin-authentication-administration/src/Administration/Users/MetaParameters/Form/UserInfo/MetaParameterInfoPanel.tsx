@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, Loader, ObjectPropertyInfoForm, TabPanel, useDataResource } from '@cloudbeaver/core-blocks';
+import { TabPanel } from '@cloudbeaver/core-ui';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, Loader, ObjectPropertyInfoForm, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
