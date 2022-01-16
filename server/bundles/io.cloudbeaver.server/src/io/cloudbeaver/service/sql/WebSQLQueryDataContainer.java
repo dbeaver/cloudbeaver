@@ -42,7 +42,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
 
     private final DBPDataSource dataSource;
     private final String query;
-    private final DBSDataContainer queryDataContainer;
+    private final SQLQueryDataContainer queryDataContainer;
 
     public WebSQLQueryDataContainer(DBPDataSource dataSource, String query) {
         this.dataSource = dataSource;
@@ -73,7 +73,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     @Nullable
     @Override
     public String getDescription() {
-        return null;
+        return queryDataContainer.getDescription();
     }
 
     @Nullable
@@ -83,8 +83,8 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     }
 
     @Override
-    public int getSupportedFeatures() {
-        return DATA_SELECT | DATA_FILTER | DATA_COUNT;
+    public String[] getSupportedFeatures() {
+        return queryDataContainer.getSupportedFeatures();
     }
 
     @NotNull
