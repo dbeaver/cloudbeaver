@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { TabsContext, ITabsContext } from './TabsContext';
 import type { TabDirection } from './TabsContext';
-import { useObjectRef } from '@cloudbeaver/core-blocks';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
@@ -82,7 +82,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabsState,
     container,
     state,
-    tabList,
+    tabList
   });
 
   if (currentTabId !== undefined) {
@@ -144,11 +144,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   const closeAll = useCallback(async () => {
     if (dynamic.tabList) {
-      for (const tab of dynamic.tabList) {
+      for (const tab of dynamic.tabList.slice()) {
         await handleClose(tab);
       }
     }
-  }, [handleClose])
+  }, [handleClose]);
 
   const closeAllToTheDirection = useCallback(async (tabId: string, direction: TabDirection) => {
     if (dynamic.tabList) {
@@ -158,33 +158,22 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
         return;
       }
 
-      let start = index + 1;
-      let end = dynamic.tabList.length;
+      const tabs = direction === 'left' ? dynamic.tabList.slice(0, index) : dynamic.tabList.slice(index + 1);
 
-      if (direction === 'left') {
-        start = 0;
-        end = index;
-      }
-
-      for (let i = start; i < end; i++) {
-        await handleClose(dynamic.tabList[i]);
+      for (const tab of tabs) {
+        await handleClose(tab);
       }
     }
-  }, [handleClose])
+  }, [handleClose]);
 
   const closeOthers = useCallback(async (tabId: string) => {
     if (dynamic.tabList) {
-      const index = dynamic.tabList.indexOf(tabId);
-
-      if (index > -1) {
-        for (const tab of dynamic.tabList) {
-          if (tab !== tabId) {
-            await handleClose(tab);
-          }
-        }
+      const tabs = dynamic.tabList.filter(tab => tab !== tabId);
+      for (const tab of tabs) {
+        await handleClose(tab);
       }
     }
-  }, [handleClose])
+  }, [handleClose]);
 
   const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
   const getTabState = useCallback(
