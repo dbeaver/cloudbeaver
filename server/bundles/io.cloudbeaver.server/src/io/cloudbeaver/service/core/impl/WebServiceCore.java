@@ -431,11 +431,9 @@ public class WebServiceCore implements DBWServiceCore {
                     monitor.subTask("Initialize tunnel");
 
                     DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
-                    configuration.setUserName(nhConfig.getUserName());
-                    configuration.setPassword(nhConfig.getPassword());
+                    WebServiceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
-                    configuration.setProperties(nhConfig.getProperties());
                     tunnel.initializeHandler(monitor, DBWorkbench.getPlatform(), configuration, connectionConfig);
                     monitor.worked(1);
                     // Get info

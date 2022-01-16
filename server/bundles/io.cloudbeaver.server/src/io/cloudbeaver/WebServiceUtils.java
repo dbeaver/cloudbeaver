@@ -216,10 +216,14 @@ public class WebServiceUtils {
         }
     }
 
-    private static void updateHandlerConfig(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
+    public static void updateHandlerConfig(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
         if (cfgInput.isEnabled() != null) {
             handlerConfig.setEnabled(cfgInput.isEnabled());
         }
+        if (cfgInput.getProperties() != null) {
+            handlerConfig.setProperties(cfgInput.getProperties());
+        }
+
         if (cfgInput.getAuthType() != null) {
             handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE,
                 CommonUtils.valueOf(SSHConstants.AuthType.class, cfgInput.getAuthType(), SSHConstants.AuthType.PASSWORD));
@@ -237,9 +241,6 @@ public class WebServiceUtils {
         }
         if (cfgInput.getKey() != null) {
             handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
-        }
-        if (cfgInput.getProperties() != null) {
-            handlerConfig.setProperties(cfgInput.getProperties());
         }
     }
 
