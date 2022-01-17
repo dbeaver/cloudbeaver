@@ -23,7 +23,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { authTypes } from './AuthTypes';
+import { authTypes } from './authTypes';
 
 const SSH_STYLES = css`
   SubmittingForm {
