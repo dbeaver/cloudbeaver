@@ -82,7 +82,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
                 }
-                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, true);
+                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, false);
             }
             if (nodeChildren == null) {
                 return EMPTY_NODE_LIST;
