@@ -14,7 +14,7 @@ import {
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, Radio, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Checkbox, getComputed, Radio, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuData, IMenuItem, MenuSubMenuItem, useMenu, IMenuSubMenuItem, MenuActionItem, IMenuActionItem, MenuSeparatorItem, MenuService, DATA_CONTEXT_MENU_NESTED, MenuBaseItem } from '@cloudbeaver/core-view';
@@ -61,7 +61,7 @@ export const ContextMenu = React.forwardRef<ButtonHTMLAttributes<any>, IContextM
 
   const handleItemClose = useCallback(() => {
     menu.hide();
-  }, [menu.hide]);
+  }, [menu]);
 
   useEffect(() => {
     propsRef.onVisibleSwitch?.(menu.visible);
@@ -130,9 +130,13 @@ const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
     visible = false;
   }
 
+  const hasBindings = getComputed(() => items.some(
+    item => item instanceof MenuActionItem && item.action.binding !== null
+  ));
+
   return styled(styles)(
     <Menu {...menu} aria-label={menuData.menu.label} visible={visible}>
-      <menu-box dir={rtl ? 'rtl' : undefined}>
+      <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
         {items.map(item => (
           <MenuPanelElement
             key={item.id}
@@ -312,6 +316,7 @@ const MenuActionItemRenderer = observer<IMenuActionItemProps>(function MenuActio
       <MenuPanelItem
         label={actionInfo.label}
         icon={actionInfo.icon}
+        binding={item.action.binding?.binding.label}
         tooltip={actionInfo.tooltip}
         loading={loading}
         style={style}

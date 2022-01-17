@@ -48,7 +48,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
   const copy = useClipboard();
   const copyHandler = useCallback(
     () => copy(error.textToCopy, true),
-    []
+    [error, copy]
   );
 
   return styled(useStyles(styles))(

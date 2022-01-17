@@ -47,7 +47,7 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
       <menu-item-text title={title}>
         {title}
       </menu-item-text>
-      <menu-item-binding>
+      <menu-item-binding title={binding}>
         {binding}
       </menu-item-binding>
       <menu-item-content>

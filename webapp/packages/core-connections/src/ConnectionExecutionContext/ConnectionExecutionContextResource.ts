@@ -26,8 +26,8 @@ import type { IConnectionExecutionContextInfo } from './IConnectionExecutionCont
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
   constructor(
-    private graphQLService: GraphQLService,
-    private connectionInfoResource: ConnectionInfoResource,
+    private readonly graphQLService: GraphQLService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     permissionsResource: PermissionsResource
   ) {
     super();
@@ -191,6 +191,10 @@ function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInf
   };
 }
 
+
+/**
+ * @deprecated contextId is unique, function don't needed anymore
+ */
 export function getContextBaseId(connectionId: string, contextId: string): string {
   return `${connectionId}_${contextId}`;
 }

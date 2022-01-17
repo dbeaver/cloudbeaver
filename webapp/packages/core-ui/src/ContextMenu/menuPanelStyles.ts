@@ -53,10 +53,16 @@ export const menuPanelStyles = composes(
         margin-top: -12px;
       }
     }
+
     menu-box {
       display: flex;
       flex-direction: column;
+
+      &:not([|hasBindings]) menu-item-binding {
+        width: 0;
+      }
     }
+
     MenuItem, MenuItemCheckbox, MenuItemRadio {
       display: flex;
       align-items: center;
@@ -108,6 +114,9 @@ export const menuPanelStyles = composes(
         flex: 1;
         text-align: right;
         padding-left: 32px;
+        width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       & menu-item-content {
         width: 24px;
