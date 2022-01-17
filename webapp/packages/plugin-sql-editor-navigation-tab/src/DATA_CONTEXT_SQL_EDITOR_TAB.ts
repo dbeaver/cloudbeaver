@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createKeyBinding } from '../createKeyBinding';
+import { createDataContext } from '@cloudbeaver/core-view';
 
-export const KEY_BINDING_OPEN_IN_TAB = createKeyBinding({
-  id: 'open-in-tab',
-  label: 'Alt + T',
-  keys: 'alt+t',
-  preventDefault: true,
-});
+
+export const DATA_CONTEXT_SQL_EDITOR_TAB = createDataContext<boolean>('sql-editor-tab');

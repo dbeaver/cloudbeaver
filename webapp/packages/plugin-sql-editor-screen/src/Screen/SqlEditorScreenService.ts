@@ -21,7 +21,7 @@ export class SqlEditorScreenService {
     this.screen = {
       name: 'sql-editor',
       routes: [
-        { name: 'sql-editor', path: '/sql-editor/:connectionId/:contextId' },
+        { name: 'sql-editor', path: '/sql-editor/:contextId' },
       ],
       component: SqlEditorScreen,
     };

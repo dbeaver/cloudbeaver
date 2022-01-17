@@ -23,6 +23,10 @@ export * from './Tabs/useTabState';
 export * from './Tabs/useTabLocalState';
 
 export * from './Tabs/Tab/BorderTabStyles';
+export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
+export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
+export * from './Tabs/Tab/MENU_TAB';
+export * from './Tabs/Tab/Tab';
 export * from './Tabs/Tab/Tab';
 export * from './Tabs/Tab/TabDefault';
 export * from './Tabs/Tab/TabIcon';

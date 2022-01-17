@@ -9,12 +9,14 @@
 import type { PropsWithChildren } from 'react';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 
 export type TabProps = PropsWithChildren<{
   tabId: string;
   title?: string;
+  menuContext?: IDataContext;
   disabled?: boolean;
   className?: string;
   style?: ComponentStyle;

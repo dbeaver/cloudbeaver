@@ -27,6 +27,7 @@ import { useTab } from './useTab';
 export const Tab = observer<TabProps>(function Tab({
   tabId,
   title,
+  menuContext,
   disabled,
   className,
   children,
@@ -38,7 +39,7 @@ export const Tab = observer<TabProps>(function Tab({
   const translate = useTranslate();
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose, onClick);
-  const menu = useMenu(MENU_TAB);
+  const menu = useMenu(MENU_TAB, menuContext);
   const info = getInfo();
 
   const [menuOpened, switchState] = useState(false);

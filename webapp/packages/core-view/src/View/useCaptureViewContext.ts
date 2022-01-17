@@ -12,13 +12,9 @@ import type { IDataContext } from '../DataContext/IDataContext';
 import { useDynamicDataContext } from '../DataContext/useDynamicDataContext';
 import { CaptureViewContext } from './CaptureViewContext';
 
-export function useCaptureViewContext(): IDataContext | undefined {
+export function useCaptureViewContext(
+  capture: (context: IDataContext | undefined) => void
+): void {
   const context = useContext(CaptureViewContext);
-  const dynamic = useDynamicDataContext(context);
-
-  if (context === undefined) {
-    return undefined;
-  }
-
-  return dynamic;
+  useDynamicDataContext(context, capture);
 }

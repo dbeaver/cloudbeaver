@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import type { DataContextGetter } from './DataContextGetter';
 import type { IDataContext } from './IDataContext';
@@ -21,6 +21,8 @@ export class DynamicDataContext implements IDataContext {
 
     makeObservable(this, {
       fallback: observable.ref,
+      flush: action,
+      set: action,
     });
   }
 
@@ -29,7 +31,9 @@ export class DynamicDataContext implements IDataContext {
   }
 
   set<T>(context: DataContextGetter<T>, value: T): this {
-    this.contexts.push(context);
+    if (!this.contexts.includes(context)){
+      this.contexts.push(context);
+    }
     this.fallback.set(context, value);
     return this;
   }

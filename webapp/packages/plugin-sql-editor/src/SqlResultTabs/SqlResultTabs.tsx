@@ -13,10 +13,11 @@ import { TextPlaceholder, getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { ITabData, TabsState, TabIcon, TabTitle, TabList, Tab, TabPanel } from '@cloudbeaver/core-ui';
+import { ITabData, TabsState, TabList, TabPanel } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlResultPanel } from './SqlResultPanel';
+import { SqlResultTab } from './SqlResultTab';
 import { SqlResultTabsService } from './SqlResultTabsService';
 
 const styles = composes(
@@ -100,10 +101,12 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
       <TabsState currentTabId={currentId} tabList={tabList} enabledBaseActions onChange={handleSelect}>
         <TabList style={styles}>
           {orderedTabs.map(result => (
-            <Tab key={result.id} tabId={result.id} style={styles} title={result.name} onClose={handleClose}>
-              <TabIcon icon={result.icon} />
-              <TabTitle>{result.name}</TabTitle>
-            </Tab>
+            <SqlResultTab
+              key={result.id}
+              result={result}
+              style={styles}
+              onClose={handleClose}
+            />
           ))}
         </TabList>
         {orderedTabs.map(result => (

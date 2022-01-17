@@ -9,10 +9,9 @@
 import { useState } from 'react';
 
 import { DataContext } from './DataContext';
-import type { IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
 
-export function useDataContext(fallback?: IDataContextProvider): IDataContext {
+export function useDataContext(fallback?: IDataContextProvider): DataContext {
   const [context] = useState(() => new DataContext());
 
   context.setFallBack(fallback);

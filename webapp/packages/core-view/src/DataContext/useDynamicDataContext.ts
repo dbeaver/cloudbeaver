@@ -6,37 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
 import { useEffect } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
 import { DataContext } from './DataContext';
-import type { DataContextGetter } from './DataContextGetter';
 import { DynamicDataContext } from './DynamicDataContext';
 import type { IDataContext } from './IDataContext';
 
-export function useDynamicDataContext(context: IDataContext | undefined): IDataContext {
+export function useDynamicDataContext(
+  context: IDataContext | undefined,
+  capture: (context: IDataContext) => void
+): void {
   const state = useObjectRef(() => ({
     dynamic: new DynamicDataContext(context || new DataContext()),
-    contexts: [] as Array<DataContextGetter<any>>,
   }));
 
   if (context) {
     state.dynamic.setFallBack(context);
   }
-  state.contexts = state.dynamic.contexts;
-  state.dynamic.flush();
 
-  useEffect(action(() => {
-    for (const context of state.contexts) {
-      if (!state.dynamic.contexts.includes(context)) {
-        state.dynamic.delete(context);
-      }
-    }
-  }));
+  state.dynamic.flush();
+  capture(state.dynamic);
 
   useEffect(() => () => state.dynamic.flush(), []);
-
-  return state.dynamic;
 }

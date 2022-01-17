@@ -7,6 +7,5 @@
  */
 
 export interface ISqlEditorScreenParams {
-  readonly connectionId: string;
   readonly contextId: string;
 }

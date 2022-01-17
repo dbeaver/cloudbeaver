@@ -8,8 +8,10 @@
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ActionService, ACTION_OPEN_IN_TAB, KeyBindingService, KEY_BINDING_OPEN_IN_TAB } from '@cloudbeaver/core-view';
+import { MENU_TAB } from '@cloudbeaver/core-ui';
+import { ActionService, ACTION_OPEN_IN_TAB, DATA_CONTEXT_MENU, IDataContextProvider, KeyBindingService, KEY_BINDING_OPEN_IN_TAB, MenuSeparatorItem, MenuService, IAction } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService';
 
@@ -19,7 +21,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
     private readonly sqlEditorScreenService: SqlEditorScreenService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly menuService: MenuService
   ) {
     super();
   }
@@ -31,32 +34,49 @@ export class PluginBootstrap extends Bootstrap {
         action === ACTION_OPEN_IN_TAB
         && contexts.has(DATA_CONTEXT_SQL_EDITOR_STATE)
       ),
-      handler: (context, action) => { },
+      isDisabled: (context, action) => context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE)?.executionContext === undefined,
+      handler: this.openTab.bind(this),
     });
+
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor',
       binding: KEY_BINDING_OPEN_IN_TAB,
       isBindingApplicable: (contexts, action) => action === ACTION_OPEN_IN_TAB,
-      handler: (contexts, action) => {
-        const context = contexts.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-
-        if (!context.executionContext) {
-          this.notificationService.logError({
-            title: 'sql_editor_screen_no_context_title',
-            message: 'sql_editor_screen_no_context_message',
-          });
-          return;
-        }
-
-        const url = this.sqlEditorScreenService.createURL({
-          connectionId: context.executionContext.connectionId,
-          contextId: context.executionContext.id,
-        });
-
-        window.open(url, '_blank')?.focus();
-      },
+      handler: this.openTab.bind(this),
+    });
+    
+    this.menuService.addCreator({
+      isApplicable: context => (
+        context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE) !== undefined
+        && context.has(DATA_CONTEXT_SQL_EDITOR_TAB)
+        && context.get(DATA_CONTEXT_MENU) === MENU_TAB
+      ),
+      getItems: (context, items) => [
+        ACTION_OPEN_IN_TAB,
+        ...(items.length > 0 ? [ new MenuSeparatorItem()] : []),
+        ...items,
+      ],
     });
   }
+
+  private openTab(contexts: IDataContextProvider, action: IAction) {
+    const context = contexts.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+    if (!context.executionContext) {
+      this.notificationService.logError({
+        title: 'sql_editor_screen_no_context_title',
+        message: 'sql_editor_screen_no_context_message',
+      });
+      return;
+    }
+
+    const url = this.sqlEditorScreenService.createURL({
+      contextId: context.executionContext.id,
+    });
+
+    window.open(url, '_blank')?.focus();
+  }
+
 
   async load(): Promise<void> { }
 }

@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { Loader, TextPlaceholder, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource, ConnectionExecutionContextService, getContextBaseId, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionExecutionContextService, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
@@ -20,7 +20,6 @@ import { ISqlEditorTabState, SqlEditor, SqlEditorService } from '@cloudbeaver/pl
 import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
 
 export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer(function SqlEditorScreen({
-  connectionId,
   contextId,
 }) {
   const translate = useTranslate();
@@ -36,7 +35,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   );
   const sqlEditorService = useService(SqlEditorService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
-  const context = connectionExecutionContextService.get(getContextBaseId(connectionId, contextId));
+  const context = connectionExecutionContextService.get(contextId);
 
   const state = useObservableRef(() => ({
     state: null as null | ISqlEditorTabState,
