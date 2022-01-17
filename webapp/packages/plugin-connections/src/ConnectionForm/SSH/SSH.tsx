@@ -186,7 +186,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                 <GroupItem>
                   <UploadArea
                     accept='.txt, .ssh'
-                    disabled={disabled || !enabled}
+                    disabled={disabled || readonly || !enabled}
                     reset
                     onChange={handleKeyUpload}
                   >
