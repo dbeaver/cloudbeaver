@@ -15,11 +15,11 @@ import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
   FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea, UploadArea, Combobox
 } from '@cloudbeaver/core-blocks';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -180,8 +180,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                 <GroupItem>
                   <UploadArea
                     accept='.txt, .ssh'
-                    reset
                     disabled={disabled || !enabled}
+                    reset
                     onChange={handleKeyUpload}
                   >
                     <Button
