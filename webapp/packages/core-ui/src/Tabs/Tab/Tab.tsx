@@ -7,22 +7,22 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
-import styled from 'reshadow';
+import styled, { use } from 'reshadow';
 
+import { Icon } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { useMenu } from '@cloudbeaver/core-view';
-import { Icon } from '@cloudbeaver/core-blocks';
 
+import { ContextMenu } from '../../ContextMenu/MenuTrigger';
 import { TabContext } from '../TabContext';
+import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
+import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
+import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
-import { MENU_TAB } from './MENU_TAB';
-import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
-import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
-import { ContextMenu } from '../../ContextMenu/MenuTrigger';
 
 export const Tab = observer<TabProps>(function Tab({
   tabId,
@@ -40,6 +40,8 @@ export const Tab = observer<TabProps>(function Tab({
   const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose, onClick);
   const menu = useMenu(MENU_TAB);
   const info = getInfo();
+
+  const [menuOpened, switchState] = useState(false);
 
   menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
   menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
@@ -71,8 +73,8 @@ export const Tab = observer<TabProps>(function Tab({
                   <Icon name="cross-bold" viewBox="0 0 7 8" />
                 </tab-action>
               )}
-              <portal>
-                <ContextMenu menu={menu} placement='bottom-start' modal disclosure>
+              <portal {...use({ menuOpened })}>
+                <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
                   <tab-action>
                     <Icon name="dots" viewBox="0 0 32 32" />
                   </tab-action>

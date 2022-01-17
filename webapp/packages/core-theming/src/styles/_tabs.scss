@@ -61,7 +61,7 @@
     }
 
     &:not(:only-child) {
-      padding-right: 8px;
+      padding-right: 14px;
     }
   }
 
@@ -71,6 +71,7 @@
   }
 
   Tab:global([aria-selected="true"]) + tab-actions portal,
+  tab-inner portal[|menuOpened],
   tab-inner:hover portal,
   tab-inner:focus-within portal {
     visibility: visible;

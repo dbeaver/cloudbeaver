@@ -6,21 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TLocalizationToken } from "@cloudbeaver/core-localization";
-import { NetworkHandlerAuthType } from "@cloudbeaver/core-sdk";
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 
 interface IAuthType {
-  key: NetworkHandlerAuthType,
-  label: TLocalizationToken
+  key: NetworkHandlerAuthType;
+  label: TLocalizationToken;
 }
 
 export const authTypes: IAuthType[] = [
   {
     key: NetworkHandlerAuthType.Password,
-    label: 'Password'
+    label: 'Password',
   },
   {
     key: NetworkHandlerAuthType.PublicKey,
-    label: 'Public Key'
-  }
+    label: 'Public Key',
+  },
 ];
