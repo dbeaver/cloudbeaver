@@ -16,13 +16,15 @@ const package = require(resolve('package.json'));
 
 const certPath = resolve(__dirname, '../../../../../certs/private.pem')
 const keyPath = resolve(__dirname, '../../../../../certs/private.key')
-let https = false;
-
+let server = undefined;
 
 if(fs.existsSync(certPath) && fs.existsSync(keyPath)) {
-  https = {
-    key: fs.readFileSync(keyPath),
-    cert: fs.readFileSync(certPath),
+  server = {
+    type: 'https',
+    options: {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    }
   }
 }
 
@@ -33,13 +35,12 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   },
   mode: 'development',
   devServer: {
-    https,
     allowedHosts: 'all',
     // port: 8080,
-    hot: true,
     client: {
       webSocketURL: 'auto://0.0.0.0:0/ws',
     },
+    server,
     proxy: {
       '/api': {
         target: env.server,
