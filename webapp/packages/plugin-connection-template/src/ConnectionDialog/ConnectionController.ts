@@ -172,7 +172,6 @@ export class ConnectionController
           authType: handler.authType,
           userName: handler.userName,
           password: handler.password,
-          key: handler.key,
           savePassword: handler.savePassword,
         });
       }

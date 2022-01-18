@@ -119,15 +119,16 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     for (const handler of config.networkHandlersConfig) {
       if (handler.enabled && this.isChanged(handler, info)) {
+        if (handler.authType === NetworkHandlerAuthType.PublicKey && !handler.key?.length) {
+          validation.error("Field SSH 'Private key' can't be empty");
+        }
+
         if (handler.savePassword) {
           if (!handler.userName?.length) {
             validation.error("Field SSH 'User' can't be empty");
           }
           if (handler.authType === NetworkHandlerAuthType.Password && !handler.password?.length) {
             validation.error("Field SSH 'Password' can't be empty");
-          }
-          if (handler.authType === NetworkHandlerAuthType.PublicKey && !handler.key?.length) {
-            validation.error("Field SSH 'Private key' can't be empty");
           }
         }
 
@@ -160,7 +161,7 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     for (const handler of state.config.networkHandlersConfig) {
       if (this.isChanged(handler, state.info)) {
-        configs.push({ ...handler });
+        configs.push({ ...handler, key: handler.authType === NetworkHandlerAuthType.PublicKey ? handler.key : undefined });
       }
       if (handler.enabled && !handler.savePassword) {
         credentialsState.requireNetworkHandler(handler.id);

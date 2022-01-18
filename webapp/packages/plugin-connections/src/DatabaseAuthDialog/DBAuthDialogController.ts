@@ -125,7 +125,6 @@ export class DBAuthDialogController implements IInitializableController, IDestru
             authType: handler.authType,
             userName: handler.userName,
             password: handler.password,
-            key: handler.key,
             savePassword: handler.savePassword,
           });
         }
