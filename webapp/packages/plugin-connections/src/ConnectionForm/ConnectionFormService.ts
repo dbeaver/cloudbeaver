@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
@@ -143,7 +143,7 @@ export class ConnectionFormService {
 
     if (credentialsState.networkHandlers.length > 0) {
       if (!config.networkHandlersConfig) {
-        config.networkHandlersConfig = [];
+        config.networkHandlersConfig = toJS(data.state.config.networkHandlersConfig) || [];
       }
 
       config.networkHandlersConfig = observable(config.networkHandlersConfig);
