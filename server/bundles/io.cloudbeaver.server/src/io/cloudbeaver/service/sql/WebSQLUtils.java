@@ -73,7 +73,7 @@ public class WebSQLUtils {
             else if (dbValue instanceof DBDDocument) {
                 return serializeDocumentValue(session, (DBDDocument) dbValue);
             } else if (dbValue instanceof DBDComplexValue) {
-                return serializeComplexValue(session, (DBDComplexValue)dbValue, dataFormat);
+                return serializeComplexValue(session, type, (DBDComplexValue)dbValue, dataFormat);
             } else if (dbValue instanceof DBGeometry) {
                 return serializeGeometryValue((DBGeometry)dbValue);
             } else if (dbValue instanceof DBDContent) {
@@ -83,8 +83,12 @@ public class WebSQLUtils {
         return cellValue;
     }
 
-    private static Object serializeComplexValue(WebSession session, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
+    private static Object serializeComplexValue(WebSession session, DBSTypedObject type, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
         if (value instanceof DBDCollection) {
+            if (type instanceof DBDAttributeBinding) {
+                DBDValueHandler valueHandler = ((DBDAttributeBinding) type).getValueHandler();
+                return valueHandler.getValueDisplayString(type, value, DBDDisplayFormat.EDIT);
+            }
             DBDCollection collection = (DBDCollection) value;
             int size = collection.getItemCount();
             Object[] items = new Object[size];
