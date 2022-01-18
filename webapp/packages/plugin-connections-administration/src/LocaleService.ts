@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2019-2021 DBeaver Corp
+ * Copyright (C) 2019-2022 DBeaver Corp
  *
  * All Rights Reserved
  *
