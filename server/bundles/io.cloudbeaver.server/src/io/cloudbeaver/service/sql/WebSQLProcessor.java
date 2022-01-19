@@ -642,7 +642,8 @@ public class WebSQLProcessor {
         @Nullable WebDataFormat dataFormat) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
-        for (int i = 0; i < MAX_RESULTS_COUNT; i++) {
+        int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
+        for (int i = 0; i < maxResultsCount; i++) {
             WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
             if (hasResultSet) {
                 DBCResultSet resultSet = dbStat.openResultSet();
@@ -766,5 +767,10 @@ public class WebSQLProcessor {
 
     ///////////////////////////////////////////////////////
     // Utils
-
+    private static int resolveMaxResultsCount(@Nullable DBPDataSource dataSource) {
+        if (dataSource == null) {
+            return MAX_RESULTS_COUNT;
+        }
+        return dataSource.getInfo().supportsMultipleResults() ? MAX_RESULTS_COUNT : 1;
+    }
 }
