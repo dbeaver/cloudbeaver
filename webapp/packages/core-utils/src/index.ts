@@ -30,3 +30,4 @@ export * from './isMapsEqual';
 export * from './openCenteredPopup';
 export * from './download';
 export * from './getTextFileReadingProcess';
+export * from './getTextBetween';
