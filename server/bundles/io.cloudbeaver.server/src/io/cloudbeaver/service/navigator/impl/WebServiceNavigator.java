@@ -205,7 +205,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (catalogObjectInfo != null) {
                     WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
 
-                    if (contextDefaults != null && contextDefaults.supportsSchemaChange()) {
+                    if (contextDefaults != null && contextDefaults.supportsSchemaChange() && contextDefaults.getDefaultCatalog().getName() == node.getName()) {
                         try {
                             List<WebNavigatorNodeInfo> schemasList = webCatalog.getSchemaList();
                             Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
@@ -217,7 +217,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                                 if (schemaObject instanceof DBSSchema) {
                                     WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(), schemaObject);
 
-                                    if(schemaNodeInfo != null){
+                                    if (schemaNodeInfo != null) {
                                         schemasList.add(schemaNodeInfo);
                                     }
                                 }

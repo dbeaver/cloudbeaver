@@ -51,10 +51,7 @@ export class ConnectionSelectorController {
       !this.optionsPanelService.active
       && (
         this.connectionSelectorService.currentConnectionId !== null
-        || (
-          this.connectionSelectorService.currentConnectionId === null
-          && this.connectionSelectorService.isConnectionChangeable
-        )
+        || this.connectionSelectorService.isConnectionChangeable
       )
     );
   }
@@ -110,11 +107,11 @@ export class ConnectionSelectorController {
   }
 
   constructor(
-    private connectionSelectorService: ConnectionSchemaManagerService,
-    private dbDriverResource: DBDriverResource,
-    private connectionInfo: ConnectionInfoResource,
-    private connectionsManagerService: ConnectionsManagerService,
-    private optionsPanelService: OptionsPanelService,
+    private readonly connectionSelectorService: ConnectionSchemaManagerService,
+    private readonly dbDriverResource: DBDriverResource,
+    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly optionsPanelService: OptionsPanelService,
   ) {
     makeObservable<ConnectionSelectorController, 'currentObjectContainerIcon'>(this, {
       currentConnection: computed,
@@ -182,9 +179,45 @@ export class ConnectionSelectorController {
       return [];
     }
 
+    const schemaList = this.connectionSelectorService.objectContainerList.schemaList
+      .slice()
+      .sort((a, b) => {
+        if (a.name === b.name){
+          return 0;
+        }
+      
+        if (a.name === this.connectionSelectorService.currentObjectSchemaId) {
+          return -1;
+        }
+      
+        if (b.name === this.connectionSelectorService.currentObjectSchemaId) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+    const catalogList = this.connectionSelectorService.objectContainerList.catalogList
+      .slice()
+      .sort((a, b) => {
+        if (a.catalog.name === b.catalog.name){
+          return 0;
+        }
+        
+        if (a.catalog.name === this.connectionSelectorService.currentObjectCatalogId) {
+          return -1;
+        }
+        
+        if (b.catalog.name === this.connectionSelectorService.currentObjectCatalogId) {
+          return 1;
+        }
+  
+        return 0;
+      });
+
     const items: IMenuItem[] = [];
 
-    for (const schema of this.connectionSelectorService.objectContainerList.schemaList) {
+    for (const schema of schemaList) {
       if (!schema.name) {
         continue;
       }
@@ -201,7 +234,7 @@ export class ConnectionSelectorController {
       });
     }
 
-    for (const catalogData of this.connectionSelectorService.objectContainerList.catalogList) {
+    for (const catalogData of catalogList) {
       const catalog = catalogData.catalog;
       if (!catalog.name) {
         continue;
