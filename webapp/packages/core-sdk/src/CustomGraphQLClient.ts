@@ -84,10 +84,6 @@ function isClientError(obj: any): obj is ClientError {
   return obj instanceof ClientError || obj.response;
 }
 
-function isObjectError(obj: any) {
-  if (!isClientError(obj)) {
-    return false;
-  }
-
+function isObjectError(obj: ClientError) {
   return obj.response.data !== undefined && !!obj.response.errors;
 }
