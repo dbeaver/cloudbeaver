@@ -6,20 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GraphQLClient } from 'graphql-request';
-import { ClientError } from 'graphql-request';
+import { GraphQLClient, ClientError } from 'graphql-request';
 import type { Variables } from 'graphql-request/dist/types';
 import type * as Dom from 'graphql-request/dist/types.dom';
 
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
+import { PlainGQLError } from './PlainGQLError';
 
 export class CustomGraphQLClient extends GraphQLClient {
   get blockReason(): Error | string | null {
     return this.requestsBlockedReason;
   }
 
-  private interceptors: IResponseInterceptor[] = [];
+  private readonly interceptors: IResponseInterceptor[] = [];
   private isRequestsBlocked = false;
   private requestsBlockedReason: Error | string | null = null;
 
@@ -27,7 +27,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  request<T extends any, V = Variables>(
+  request<T, V = Variables>(
     query: string,
     variables?: V,
     requestHeaders?: Dom.RequestInit['headers']
@@ -67,8 +67,13 @@ export class CustomGraphQLClient extends GraphQLClient {
       return response.data as T;
     } catch (error) {
       if (isClientError(error)) {
-        throw new GQLError(error);
+        if (isObjectError(error)) {
+          throw new GQLError(error);
+        } else {
+          throw new PlainGQLError(error);
+        }
       }
+
       throw error;
     }
   }
@@ -77,4 +82,12 @@ export class CustomGraphQLClient extends GraphQLClient {
 function isClientError(obj: any): obj is ClientError {
   // in es5 build `instanceof ClientError` always false, so we try to determine by checking response property
   return obj instanceof ClientError || obj.response;
+}
+
+function isObjectError(obj: any) {
+  if (!isClientError(obj)) {
+    return false;
+  }
+
+  return obj.response.data !== undefined && !!obj.response.errors;
 }
