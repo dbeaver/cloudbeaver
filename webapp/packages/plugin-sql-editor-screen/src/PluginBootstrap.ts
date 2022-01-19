@@ -9,7 +9,7 @@
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { MENU_TAB } from '@cloudbeaver/core-ui';
-import { ActionService, ACTION_OPEN_IN_TAB, DATA_CONTEXT_MENU, IDataContextProvider, KeyBindingService, KEY_BINDING_OPEN_IN_TAB, MenuSeparatorItem, MenuService, IAction } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_OPEN_IN_TAB, DATA_CONTEXT_MENU, IDataContextProvider, KeyBindingService, KEY_BINDING_OPEN_IN_TAB, MenuService, IAction } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -53,7 +53,6 @@ export class PluginBootstrap extends Bootstrap {
       ),
       getItems: (context, items) => [
         ACTION_OPEN_IN_TAB,
-        ...(items.length > 0 ? [ new MenuSeparatorItem()] : []),
         ...items,
       ],
     });

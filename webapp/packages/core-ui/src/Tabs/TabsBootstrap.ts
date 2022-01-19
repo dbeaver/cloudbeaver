@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from "@cloudbeaver/core-di";
-import { ActionService, DATA_CONTEXT_MENU, MenuService } from "@cloudbeaver/core-view";
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ActionService, DATA_CONTEXT_MENU, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
-import { ACTION_TAB_CLOSE } from "./Actions/ACTION_TAB_CLOSE";
-import { ACTION_TAB_CLOSE_ALL } from "./Actions/ACTION_TAB_CLOSE_ALL";
-import { ACTION_TAB_CLOSE_ALL_TO_THE_LEFT } from "./Actions/ACTION_TAB_CLOSE_ALL_TO_THE_LEFT";
-import { ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT } from "./Actions/ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT";
-import { ACTION_TAB_CLOSE_OTHERS } from "./Actions/ACTION_TAB_CLOSE_OTHERS";
-import { DATA_CONTEXT_TAB_ID } from "./Tab/DATA_CONTEXT_TAB_ID";
-import { DATA_CONTEXT_TABS_CONTEXT } from "./Tab/DATA_CONTEXT_TABS_CONTEXT";
-import { MENU_TAB } from "./Tab/MENU_TAB";
+import { ACTION_TAB_CLOSE } from './Actions/ACTION_TAB_CLOSE';
+import { ACTION_TAB_CLOSE_ALL } from './Actions/ACTION_TAB_CLOSE_ALL';
+import { ACTION_TAB_CLOSE_ALL_TO_THE_LEFT } from './Actions/ACTION_TAB_CLOSE_ALL_TO_THE_LEFT';
+import { ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT } from './Actions/ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT';
+import { ACTION_TAB_CLOSE_OTHERS } from './Actions/ACTION_TAB_CLOSE_OTHERS';
+import { DATA_CONTEXT_TAB_ID } from './Tab/DATA_CONTEXT_TAB_ID';
+import { DATA_CONTEXT_TABS_CONTEXT } from './Tab/DATA_CONTEXT_TABS_CONTEXT';
+import { MENU_TAB } from './Tab/MENU_TAB';
 
 @injectable()
 export class TabsBootstrap extends Bootstrap {
@@ -24,7 +24,7 @@ export class TabsBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService
   ) {
-    super()
+    super();
   }
 
   register(): void | Promise<void> {
@@ -88,7 +88,7 @@ export class TabsBootstrap extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => {
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        return !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB
+        return !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB;
       },
       getItems: (context, items) => [
         ...items,
@@ -96,8 +96,26 @@ export class TabsBootstrap extends Bootstrap {
         ACTION_TAB_CLOSE_ALL,
         ACTION_TAB_CLOSE_OTHERS,
         ACTION_TAB_CLOSE_ALL_TO_THE_LEFT,
-        ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT
+        ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT,
       ],
+      orderItems: (context, items) => {
+        const actions = menuExtractActions(items, [
+          ACTION_TAB_CLOSE,
+          ACTION_TAB_CLOSE_ALL,
+          ACTION_TAB_CLOSE_OTHERS,
+          ACTION_TAB_CLOSE_ALL_TO_THE_LEFT,
+          ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT,
+        ]);
+
+        if (actions.length > 0) {
+          if (items.length > 0){
+            items.push(new MenuSeparatorItem());
+          }
+          items.push(...actions);
+        }
+
+        return items;
+      },
     });
   }
 

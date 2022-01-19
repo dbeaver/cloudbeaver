@@ -20,9 +20,9 @@ import { DataExportDialog } from './Dialog/DataExportDialog';
 @injectable()
 export class DataExportMenuService {
   constructor(
-    private commonDialogService: CommonDialogService,
-    private tableFooterMenuService: TableFooterMenuService,
-    private dataExportSettingsService: DataExportSettingsService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly tableFooterMenuService: TableFooterMenuService,
+    private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
   ) { }
