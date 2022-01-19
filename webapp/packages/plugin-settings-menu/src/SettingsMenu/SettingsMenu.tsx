@@ -9,17 +9,17 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { topMenuStyles } from '@cloudbeaver/core-app';
+import { Icon } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
-import { Icon } from '@cloudbeaver/core-blocks';
-import { topMenuStyles } from '@cloudbeaver/core-app';
 
 import { settingsMenuStyles } from './settingsMenuStyles';
 import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU';
 
 export const SettingsMenu = observer(function SettingsMenu() {
-  const menu = useMenu(TOP_NAV_BAR_SETTINGS_MENU);
+  const menu = useMenu({ menu: TOP_NAV_BAR_SETTINGS_MENU });
 
   return styled(useStyles(settingsMenuStyles))(
     <ContextMenu

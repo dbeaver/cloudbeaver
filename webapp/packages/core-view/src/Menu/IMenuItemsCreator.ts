@@ -7,6 +7,7 @@
  */
 
 import type { IAction } from '../Action/IAction';
+import type { DataContextGetter } from '../DataContext/DataContextGetter';
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import type { IMenu } from './IMenu';
 import type { IMenuItem } from './MenuItem/IMenuItem';
@@ -14,6 +15,8 @@ import type { IMenuItem } from './MenuItem/IMenuItem';
 export type MenuCreatorItem = IMenuItem | IAction | IMenu;
 
 export interface IMenuItemsCreator {
+  menus?: IMenu[];
+  contexts?: DataContextGetter<any>[];
   isApplicable?: (context: IDataContextProvider) => boolean;
   getItems: (
     context: IDataContextProvider,

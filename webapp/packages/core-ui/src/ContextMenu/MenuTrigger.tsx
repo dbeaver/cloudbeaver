@@ -348,7 +348,7 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
 ) {
   const menuService = useService(MenuService);
   const menu = useMenuState();
-  const subMenuData = useMenu(subMenu.menu, menuData.context);
+  const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
 
   const handler = menuService.getHandler(subMenuData.context);

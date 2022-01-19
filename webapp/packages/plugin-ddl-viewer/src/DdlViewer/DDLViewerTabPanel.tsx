@@ -46,7 +46,7 @@ const styles = css`
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
   const style = useStyles(styles);
   const controller = useController(DdlViewerController, nodeId);
-  const menu = useMenu(MENU_DDL_VIEWER_FOOTER);
+  const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
   useEffect(() => {
     controller.load();

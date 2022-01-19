@@ -32,6 +32,7 @@ export * from './Menu/MenuItem/MenuLazyItem';
 export * from './Menu/MenuItem/MenuSeparatorItem';
 export * from './Menu/MenuItem/MenuSubMenuItem';
 export * from './Menu/createMenu';
+export * from './Menu/DATA_CONTEXT_MENU_LOCAL';
 export * from './Menu/DATA_CONTEXT_MENU_NESTED';
 export * from './Menu/DATA_CONTEXT_MENU';
 export * from './Menu/IMenu';

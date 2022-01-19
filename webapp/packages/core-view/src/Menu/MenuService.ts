@@ -13,6 +13,8 @@ import { isAction } from '../Action/createAction';
 import type { IAction } from '../Action/IAction';
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { isMenu } from './createMenu';
+import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU';
+import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';
 import type { IMenuHandler } from './IMenuHandler';
 import type { IMenuItemsCreator, MenuCreatorItem } from './IMenuItemsCreator';
 import type { IMenuActionItem } from './MenuItem/IMenuActionItem';
@@ -22,8 +24,8 @@ import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem';
 
 @injectable()
 export class MenuService {
-  private handlers: Map<string, IMenuHandler>;
-  private creators: IMenuItemsCreator[];
+  private readonly handlers: Map<string, IMenuHandler>;
+  private readonly creators: IMenuItemsCreator[];
 
   constructor(
     private readonly actionService: ActionService,
@@ -102,6 +104,32 @@ export class MenuService {
   }
 }
 
-function filterApplicable(context: IDataContextProvider): (creator: IMenuItemsCreator) => boolean {
-  return (creator: IMenuItemsCreator) => creator.isApplicable?.(context) ?? true;
+function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsCreator) => boolean {
+  const local = contexts.get(DATA_CONTEXT_MENU_LOCAL);
+
+  return (creator: IMenuItemsCreator) => {
+    if (local) {
+      if (!creator.menus && !creator.contexts) {
+        return false;
+      }
+
+      if (creator.menus) {
+        const applicable = creator.menus.some(menu => contexts.find(DATA_CONTEXT_MENU, menu));
+
+        if (!applicable) {
+          return false;
+        }
+      }
+
+      if (creator.contexts) {
+        const applicable = creator.contexts.some(context => contexts.has(context));
+
+        if (!applicable) {
+          return false;
+        }
+      }
+    }
+
+    return creator.isApplicable?.(contexts) ?? true;
+  };
 }

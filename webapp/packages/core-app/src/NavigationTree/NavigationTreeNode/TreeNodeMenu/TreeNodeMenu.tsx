@@ -35,7 +35,7 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   selected,
 }) {
   const connectionsInfoResource = useService(ConnectionInfoResource);
-  const menu = useMenu(MENU_NAV_TREE);
+  const menu = useMenu({ menu: MENU_NAV_TREE });
   menu.context.set(DATA_CONTEXT_NAV_NODE, node);
   menu.context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions);
 

@@ -87,7 +87,7 @@ export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps>
   model,
   resultIndex,
 }) {
-  const menu = useMenu(DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
+  const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
 
   menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL, model);
   menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX, resultIndex);

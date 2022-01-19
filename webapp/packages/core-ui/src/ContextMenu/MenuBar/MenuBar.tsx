@@ -67,7 +67,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
   item,
   menuData,
   nestedMenuSettings,
-  style
+  style,
 }) {
   const styles = useStyles(style);
 
@@ -165,11 +165,11 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   item,
   menuData,
   nestedMenuSettings,
-  style
+  style,
 }) {
   const styles = useStyles(style);
   const menuService = useService(MenuService);
-  const subMenuData = useMenu(item.menu, menuData.context);
+  const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
 
   const handler = menuService.getHandler(menuData.context);
   const loading = handler?.isLoading?.(menuData.context);

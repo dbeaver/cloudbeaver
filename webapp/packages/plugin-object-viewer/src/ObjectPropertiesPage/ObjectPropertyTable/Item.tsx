@@ -150,7 +150,7 @@ const ItemName = observer<IItemNameProps>(function ItemName({
   property,
 }) {
   const connectionsInfoResource = useService(ConnectionInfoResource);
-  const menu = useMenu(MENU_NAV_TREE);
+  const menu = useMenu({ menu: MENU_NAV_TREE });
   menu.context.set(DATA_CONTEXT_NAV_NODE, node);
 
   const connection = connectionsInfoResource.getConnectionForNode(node.id);

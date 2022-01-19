@@ -24,7 +24,7 @@ import { userMenuStyles } from './userMenuStyles';
 export const UserMenu = observer(function UserMenu() {
   const style = useStyles(userMenuStyles);
   const authInfoService = useService(AuthInfoService);
-  const menu = useMenu(MENU_USER_PROFILE);
+  const menu = useMenu({ menu: MENU_USER_PROFILE });
 
   menu.context.set(DATA_CONTEXT_USER, authInfoService.userInfo);
 

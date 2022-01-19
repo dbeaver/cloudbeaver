@@ -23,7 +23,6 @@
 hs_err_pid*
 
 # web
-/sources/web/node_modules/
 dist/
 
 ## IDEA configs

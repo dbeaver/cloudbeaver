@@ -10,6 +10,7 @@ import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { IDataContext } from '../DataContext/IDataContext';
+import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';
 import type { IMenu } from './IMenu';
 import type { IMenuItem } from './MenuItem/IMenuItem';
 import { MenuService } from './MenuService';
@@ -22,9 +23,17 @@ export interface IMenuData {
   getItems: () => IMenuItem[];
 }
 
-export function useMenu(menu: IMenu, menuContext?: IDataContext): IMenuData {
+interface IMenuOptions {
+  menu: IMenu;
+  context?: IDataContext;
+  local?: boolean;
+}
+
+export function useMenu(options: IMenuOptions): IMenuData {
   const menuService = useService(MenuService);
-  const context = useMenuContext(menu, menuContext);
+  const context = useMenuContext(options.menu, options.context);
+
+  context.set(DATA_CONTEXT_MENU_LOCAL, options.local);
 
   return useObjectRef(() => ({
     isAvailable() {
@@ -34,7 +43,7 @@ export function useMenu(menu: IMenu, menuContext?: IDataContext): IMenuData {
       return menuService.getMenu(this.context);
     },
   }), {
-    menu,
+    menu: options.menu,
     context,
   }, ['isAvailable', 'getItems']);
 }
