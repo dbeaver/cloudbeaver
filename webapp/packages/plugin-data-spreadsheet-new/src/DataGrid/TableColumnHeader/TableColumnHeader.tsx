@@ -94,17 +94,14 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
     }
   }
 
-  function preventFocus(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    event.preventDefault();
-  }
-
   function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     gridSelectionContext.selectColumn(calculatedColumn.idx, event.ctrlKey || event.metaKey);
+    dataGridContext.focus();
   }
 
   return styled(useStyles(headerStyles))(
     <table-header>
-      <shrink-container as='div' title={columnTooltip} onMouseDown={preventFocus} onClick={handleClick}>
+      <shrink-container as='div' title={columnTooltip} onClick={handleClick}>
         <icon>
           {icon && <StaticImage icon={icon} />}
           {!dataReadonly && columnReadOnly && <readonly-status className='rdg-table-header__readonly-status' />}
