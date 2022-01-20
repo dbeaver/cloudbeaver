@@ -10,13 +10,12 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled from 'reshadow';
 
-import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, ComponentStyle, joinStyles } from '@cloudbeaver/core-theming';
 
-import { TopMenuButton } from './TopMenuButton';
 import { topMenuStyles } from './topMenuStyles';
+import { TopNavButton } from './TopNavButton';
 
 interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   menuItem: IMenuItem;
@@ -31,13 +30,12 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
 
   if (!menuItem.panel) {
     return (
-      <TopMenuButton
+      <TopNavButton
         {...props}
+        title={title}
         disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
-      >
-        {translate(menuItem.title)}
-      </TopMenuButton>
+      />
     );
   }
 
@@ -49,15 +47,16 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
       style={joinStyles(style, topMenuStyles)}
       placement="bottom-end"
       modal
+      disclosure
       onClick={() => menuItem.onClick?.()}
     >
-      {menuItem.icon && (
-        <menu-trigger-icon>
-          <IconOrImage icon={menuItem.icon} />
-        </menu-trigger-icon>
-      )}
-      <menu-trigger-text title={title}>{title}</menu-trigger-text>
-      <Icon name="angle" viewBox="0 0 15 8" />
+      
+      <TopNavButton
+        title={title}
+        icon={menuItem.icon}
+        style={style}
+        menu
+      />
     </MenuTrigger>
   );
 });

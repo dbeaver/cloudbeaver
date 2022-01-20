@@ -19,6 +19,10 @@ export const topMenuStyles = composes(
     checkbox {
       composes: theme-checkbox_surface from global;
     }
+
+    Button {
+      composes: theme-ripple from global;
+    }
   `,
   css`
     menu-box {
@@ -27,21 +31,16 @@ export const topMenuStyles = composes(
     menu-box menu-panel-item {
       border-color: #ffffff !important;
     }
-    MenuTrigger {
+    MenuTrigger, Button {
       height: 100%;
       padding: 0 16px !important;
       padding-right: 0!important;
-
-      &:before {
-        display: none;
-      }
   
       & box > div {
         display: block;
       }
       & box > Icon {
         background: #47a0dd;
-        margin-left: 16px;
         width: 16px;
         height: 100%;
         padding: 0 16px;
@@ -54,9 +53,10 @@ export const topMenuStyles = composes(
         margin-right: 8px;
       }
       & menu-trigger-text {
-          max-width: 240px;
-          overflow-x: hidden;
-          text-overflow: ellipsis;
+        max-width: 240px;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        padding-right: 16px;
       }
       &:hover box > Icon,
       &:global([aria-expanded="true"]) box > Icon {
