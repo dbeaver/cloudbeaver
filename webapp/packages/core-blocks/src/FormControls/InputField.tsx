@@ -62,6 +62,7 @@ const INPUT_FIELD_STYLES = composes(
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
+  labelTooltip?: string;
   mod?: 'surface';
   ref?: React.Ref<HTMLInputElement>;
   style?: ComponentStyle;
@@ -105,6 +106,7 @@ export const InputField: InputFieldType = observer(function InputField({
   children,
   className,
   description,
+  labelTooltip,
   mod,
   fill,
   small,
@@ -161,7 +163,7 @@ export const InputField: InputFieldType = observer(function InputField({
 
   return styled(styles)(
     <field className={className} {...use({ small, medium, large, tiny })}>
-      <field-label title={rest.title}>{children}{required && ' *'}</field-label>
+      <field-label title={labelTooltip || rest.title}>{children}{required && ' *'}</field-label>
       <input-container>
         <input
           ref={ref}
