@@ -128,6 +128,8 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
           return false;
         }
       }
+    } else if (creator.menus || creator.contexts) {
+      return false;
     }
 
     return creator.isApplicable?.(contexts) ?? true;
