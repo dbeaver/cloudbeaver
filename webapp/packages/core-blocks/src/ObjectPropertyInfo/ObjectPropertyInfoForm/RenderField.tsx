@@ -179,7 +179,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (state !== undefined) {
       return (
         <Textarea
-          title={property.description}
+          title={state[property.id!]}
+          labelTooltip={property.description || property.displayName}
           name={property.id!}
           state={state}
           disabled={disabled}
@@ -194,7 +195,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
     return (
       <Textarea
-        title={property.description}
+        title={value}
+        labelTooltip={property.description || property.displayName}
         name={property.id!}
         value={value}
         disabled={disabled}
@@ -211,7 +213,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     return (
       <InputField
         type={password ? 'password' : 'text'}
-        title={property.description}
+        title={state[property.id!]}
+        labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
         defaultValue={defaultValue}
@@ -231,7 +234,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   return (
     <InputField
       type={password ? 'password' : 'text'}
-      title={property.description}
+      title={value}
+      labelTooltip={property.description || property.displayName}
       name={property.id!}
       value={value}
       defaultValue={defaultValue}
