@@ -100,10 +100,10 @@ export function useMapResource<
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any
     ? (
-        ResourceKeyList<CachedMapResourceKey<TResource>>
-        | null
-        | KeyWithIncludes<ResourceKeyList<CachedMapResourceKey<TResource>>, TIncludes>
-      )
+      ResourceKeyList<CachedMapResourceKey<TResource>>
+      | null
+      | KeyWithIncludes<ResourceKeyList<CachedMapResourceKey<TResource>>, TIncludes>
+    )
     : never,
   actions?: TResource extends any
     ? IActions<ResourceKeyList<CachedMapResourceKey<TResource>>, TResource, TIncludes>
@@ -129,7 +129,7 @@ export function useMapResource<
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as TIncludes;
-  const [loadFunctionName] = useState(component.name + '_' + resource.getName());
+  const [loadFunctionName] = useState(`${component.name}.useDataResource(${resource.getName()}).load`);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
     key = keyObj.key;

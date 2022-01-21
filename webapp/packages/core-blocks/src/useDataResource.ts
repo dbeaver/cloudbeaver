@@ -21,6 +21,8 @@ interface KeyWithIncludes<TKey, TIncludes> {
 }
 
 interface IActions<TResource> {
+  active?: boolean;
+  isActive?: (resource: TResource) => Promise<boolean> | boolean;
   onLoad?: (resource: TResource) => Promise<any> | any;
   onData?: (
     data: CachedResourceData<TResource>,
@@ -77,7 +79,7 @@ export function useDataResource<
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as TIncludes;
-  const [loadFunctionName] = useState(component.name);
+  const [loadFunctionName] = useState(`${component.name}.useDataResource(${resource.getName()}).load`);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
     key = keyObj.key;
@@ -95,16 +97,22 @@ export function useDataResource<
     firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     async [loadFunctionName](refresh?: boolean) {
-      const { loading, resource, actions, prevData } = refObj;
+      const { key, includes, loading, resource, actions, prevData } = this;
 
       if (loading) {
         return;
       }
 
-      this.firstRender = false;
-      this.loading = true;
-
       try {
+        const active = await actions?.isActive?.(resource);
+
+        if (active === false || actions?.active === false) {
+          return;
+        }
+
+        this.firstRender = false;
+        this.loading = true;
+
         await actions?.onLoad?.(resource);
 
         if (key === null) {
