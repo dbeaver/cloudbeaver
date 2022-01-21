@@ -21,19 +21,30 @@ export class GQLError extends DetailsError {
   isTextBody = false; // true when server returns not GQLError object but plain text or html error
 
   constructor(clientError: ClientError) {
-    super(clientError.message);
+    let message = clientError.message;
+
+    if (typeof clientError.response.error === 'string') {
+      message = clientError.response.error;
+    } else if (clientError.response.errors && clientError.response.errors.length > 0){
+      message = clientError.response.errors
+        .map(e => e.message)
+        .join('\n');
+    } else {
+      message = 'unknown error';
+    }
+
+    super(message);
     this.name = 'Server Error';
     this.response = clientError.response;
     this.request = clientError.request;
+    
     if (typeof clientError.response.error === 'string') {
       this.isTextBody = true;
-      this.errorMessage = clientError.response.error;
     } else {
-      this.errorMessage = clientError.response.errors?.map(e => e.message).join('\n') || 'unknown error';
-
       const firstError = clientError.response.errors?.[0];
       this.errorCode = firstError?.extensions?.webErrorCode;
     }
+    this.errorMessage = message;
   }
 
   hasDetails(): boolean {
