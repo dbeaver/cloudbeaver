@@ -7,8 +7,8 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
@@ -27,20 +27,21 @@ export class PluginBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.menuService.setHandler({
       id: 'localization-menu',
-      isApplicable: (context) => context.get(DATA_CONTEXT_MENU) === LOCALIZATION_MENU,
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === LOCALIZATION_MENU,
       isLoading: () => this.serverConfigResource.isLoading(),
       handler: () => this.serverConfigResource.load(),
-    })
+    });
 
     this.menuService.addCreator({
-      isApplicable: context => {
-        return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && !!this.serverConfigResource.data?.supportedLanguages.length
-      },
+      isApplicable: context => (
+        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU
+        && !!this.serverConfigResource.data?.supportedLanguages.length
+      ),
       getItems(context, items) {
         return [
           ...items,
-          LOCALIZATION_MENU
-        ]
+          LOCALIZATION_MENU,
+        ];
       },
     });
 
@@ -57,18 +58,20 @@ export class PluginBootstrap extends Bootstrap {
           const label = lang.nativeName || lang.isoCode;
 
           return new MenuBaseItem(
-            lang.isoCode,
-            label,
-            label,
+            {
+              id: lang.isoCode,
+              label,
+              tooltip: label,
+            },
             { onSelect: () => this.localizationService.changeLocaleAsync(lang.isoCode) },
-            () => this.localizationService.getCurrentLanguage() === lang.isoCode
-          )
-        })
+            { isDisabled: () => this.localizationService.getCurrentLanguage() === lang.isoCode }
+          );
+        });
 
         return [
           ...items,
-          ...languages
-        ]
+          ...languages,
+        ];
       },
     });
   }

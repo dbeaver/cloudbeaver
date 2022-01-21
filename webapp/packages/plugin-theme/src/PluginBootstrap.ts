@@ -24,36 +24,41 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: (context) => {
-        return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && this.themeService.themes.length > 0;
-      },
+      isApplicable: context => (
+        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU 
+        && this.themeService.themes.length > 0
+      ),
       getItems(context, items) {
         return [
           ...items,
-          THEME_MENU
-        ]
+          THEME_MENU,
+        ];
       },
     });
 
     this.menuService.addCreator({
       isApplicable(context) {
-        return context.get(DATA_CONTEXT_MENU) === THEME_MENU
+        return context.get(DATA_CONTEXT_MENU) === THEME_MENU;
       },
       getItems: (context, items) => {
         const themes = this.themeService.themes.map(theme => new MenuBaseItem(
-          theme.id,
-          theme.name,
-          theme.name,
           {
-            onSelect: () => this.themeService.changeTheme(theme.id)
+            id: theme.id,
+            label: theme.name,
+            tooltip: theme.name,
           },
-          () => this.themeService.currentThemeId === theme.id,
-        ))
+          {
+            onSelect: () => this.themeService.changeTheme(theme.id),
+          },
+          {
+            isDisabled: () => this.themeService.currentThemeId === theme.id,
+          }
+        ));
 
         return [
           ...items,
-          ...themes
-        ]
+          ...themes,
+        ];
       },
     });
   }

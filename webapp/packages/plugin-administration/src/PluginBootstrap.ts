@@ -26,7 +26,7 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: (context) => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
       getItems: (context, items) => {
         const administrationScreen = this.screenService.isActive(AdministrationScreenService.screenName);
 
@@ -34,24 +34,28 @@ export class PluginBootstrap extends Bootstrap {
           return [
             ...items,
             new MenuBaseItem(
-              'administrationMenuEnter',
-              'administration_menu_enter',
-              'administration_menu_enter',
+              {
+                id: 'administrationMenuEnter',
+                label: 'administration_menu_enter',
+                tooltip: 'administration_menu_enter', 
+              },
               { onSelect: () => this.administrationScreenService.navigateToRoot() }
-            )
-          ]
+            ),
+          ];
         }
 
         if (administrationScreen) {
           return [
             ...items,
             new MenuBaseItem(
-              'administrationMenuBack',
-              'administration_menu_back',
-              'administration_menu_back',
+              {
+                id: 'administrationMenuBack',
+                label: 'administration_menu_back',
+                tooltip: 'administration_menu_back',
+              },
               { onSelect: () => this.screenService.navigateToRoot() }
-            )
-          ]
+            ),
+          ];
         }
 
         return items;
@@ -65,7 +69,7 @@ export class PluginBootstrap extends Bootstrap {
         }
 
         return items;
-      }
+      },
     });
   }
 

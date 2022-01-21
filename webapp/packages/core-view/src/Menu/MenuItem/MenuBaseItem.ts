@@ -6,9 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IMenuBaseItem } from './IMenuBaseItem';
+import type { IMenuBaseItem, IMenuBaseItemOptions } from './IMenuBaseItem';
 import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
+
+interface IMenuBaseItemPropertyGetters {
+  isDisabled?: () => boolean;
+}
 
 export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
   private readonly isDisabled?: () => boolean;
@@ -23,15 +27,14 @@ export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
   }
 
   constructor(
-    id: string,
-    label: string,
-    tooltip?: string,
+    options: IMenuBaseItemOptions,
     events?: IMenuItemEvents,
-    isDisabled?: () => boolean
+    getters?: IMenuBaseItemPropertyGetters,
   ) {
-    super(id, events);
-    this.label = label;
-    this.tooltip = tooltip;
-    this.isDisabled = isDisabled;
+    super(options.id, events);
+    this.label = options.label;
+    this.icon = options.icon;
+    this.tooltip = options.tooltip;
+    this.isDisabled = getters?.isDisabled;
   }
 }

@@ -8,8 +8,8 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { ProductInfoDialog } from './ProductInfoDialog';
@@ -26,18 +26,23 @@ export class ProductBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: (context) => {
-        return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && !!this.serverConfigResource.data?.productInfo
-      },
+      isApplicable: context => (
+        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU 
+        && !!this.serverConfigResource.data?.productInfo
+      ),
       getItems: (context, items) => [
         ...items,
         new MenuBaseItem(
-          'productInfo',
-          'app_product_info',
-          'app_product_info',
-          { onSelect: () => this.commonDialogService.open(ProductInfoDialog, null) }
-        )
-      ]
+          {
+            id: 'productInfo',
+            label: 'app_product_info',
+            tooltip: 'app_product_info',
+          },
+          { 
+            onSelect: () => this.commonDialogService.open(ProductInfoDialog, null), 
+          }
+        ),
+      ],
 
     });
   }

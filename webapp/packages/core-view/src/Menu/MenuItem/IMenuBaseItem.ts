@@ -8,10 +8,19 @@
 
 import type { IMenuItem } from './IMenuItem';
 
-export interface IMenuBaseItem extends IMenuItem {
-  label: string;
+interface IMenuBaseItemCommonProperties {
+  label?: string;
   icon?: string;
   tooltip?: string;
   hidden?: boolean;
   disabled?: boolean;
+}
+
+export interface IMenuBaseItemOptions extends IMenuBaseItemCommonProperties {
+  id: string;
+  label: string;
+}
+
+export interface IMenuBaseItem extends IMenuItem, IMenuBaseItemCommonProperties {
+  label: string;
 }

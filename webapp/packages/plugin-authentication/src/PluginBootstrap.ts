@@ -29,36 +29,40 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: (context) => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
       getItems: (context, items) => {
         if (this.serverConfigResource.enabledAuthProviders.length > 0 && !this.authInfoService.userInfo) {
           return [
             ...items,
             new MenuBaseItem(
-              'login',
-              'authentication_login',
-              'authentication_login',
+              {
+                id: 'login',
+                label: 'authentication_login',
+                tooltip: 'authentication_login',
+              },
               { onSelect: () => this.authDialogService.showLoginForm(false, null, true) }
-            )
-          ]
-        };
+            ),
+          ];
+        }
 
         if (this.authInfoService.userInfo) {
           return [
             ...items,
             new MenuBaseItem(
-              'logout',
-              'authentication_logout',
-              'authentication_logout',
+              {
+                id: 'logout',
+                label: 'authentication_logout',
+                tooltip: 'authentication_logout',
+              },
               { onSelect: this.authenticationService.logout.bind(this.authenticationService) }
-            )
-          ]
+            ),
+          ];
         }
 
         return items;
       },
       orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'logout' || item.id === 'login')
+        const index = items.findIndex(item => item.id === 'logout' || item.id === 'login');
 
         if (index > -1) {
           const item = items.splice(index, 1);
@@ -66,7 +70,7 @@ export class PluginBootstrap extends Bootstrap {
         }
 
         return items;
-      }
+      },
     });
   }
 
