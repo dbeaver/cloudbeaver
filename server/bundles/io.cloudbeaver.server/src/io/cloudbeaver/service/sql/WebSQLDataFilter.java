@@ -26,12 +26,12 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Web SQL data filter.
@@ -103,42 +103,71 @@ public class WebSQLDataFilter {
     {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
-        if (!CommonUtils.isEmpty(constraints)) {
-            List<DBDAttributeConstraint> dbdConstraints = new ArrayList<>();
-            for (WebSQLDataFilterConstraint webConstr : constraints) {
-                DBDAttributeConstraint dbConstraint;
-                DBSAttributeBase attribute = null;
-                if (dataContainer instanceof DBSEntity) {
-                    attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
-                }
-                if (attribute == null && resultInfo != null) {
-                    attribute = resultInfo.getAttribute(webConstr.getAttribute());
-                }
-                if (attribute == null) {
-                    dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
-                } else {
-                    dbConstraint = new DBDAttributeConstraint(attribute, -1);
-                }
-
-                dbConstraint.setPlainNameReference(true);
-
-                if (webConstr.getOrderPosition() != null) {
-                    dbConstraint.setOrderPosition(webConstr.getOrderPosition());
-                }
-                if (webConstr.getOrderAsc() != null) {
-                    dbConstraint.setOrderDescending(!webConstr.getOrderAsc());
-                }
-                dbConstraint.setCriteria(webConstr.getCriteria());
-                if (webConstr.getOperator() != null) {
-                    dbConstraint.setOperator(CommonUtils.valueOf(DBCLogicalOperator.class, webConstr.getOperator()));
-                }
-                if (webConstr.getValue() != null) {
-                    dbConstraint.setValue(webConstr.getValue());
-                }
-                dbdConstraints.add(dbConstraint);
-            }
-            dataFilter.addConstraints(dbdConstraints);
+        if (CommonUtils.isEmpty(constraints)) {
+            return dataFilter;
         }
+        dataFilter.addConstraints(mapWebConstrainsToDbdConstrains(monitor, resultInfo, dataContainer));
         return dataFilter;
+    }
+
+
+    private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(@NotNull DBRProgressMonitor monitor,
+                                                                         @Nullable WebSQLResultsInfo resultInfo,
+                                                                         @NotNull DBSDataContainer dataContainer) throws DBException {
+        List<DBDAttributeConstraint> constraints = generateEmptyConstrains(monitor, resultInfo, dataContainer);
+        fillEmptyConstrains(constraints);
+        return constraints;
+    }
+
+    public List<DBDAttributeConstraint> generateEmptyConstrains(@NotNull DBRProgressMonitor monitor,
+                                                                @Nullable WebSQLResultsInfo resultInfo,
+                                                                @NotNull DBSDataContainer dataContainer) throws DBException {
+        List<? extends DBSAttributeBase> result = new ArrayList<>();
+        if (dataContainer instanceof DBSEntity) {
+            List<? extends DBSEntityAttribute> attributes = ((DBSEntity) dataContainer).getAttributes(monitor);
+            if (attributes != null) {
+                result = attributes;
+            }
+        } else if (resultInfo != null) {
+            result = Arrays.asList(resultInfo.getAttributes());
+        }
+        return result.stream()
+                .map(attribute -> new DBDAttributeConstraint(attribute, -1))
+                .collect(Collectors.toList());
+    }
+
+    private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) {
+        Map<String, DBDAttributeConstraint> dbdConstraintByAttributeName = emptyConstraints.stream()
+                .collect(Collectors.toMap(DBDAttributeConstraint::getAttributeName, Function.identity()));
+        for (WebSQLDataFilterConstraint webConstr : constraints) {
+            DBDAttributeConstraint dbConstr;
+            if(dbdConstraintByAttributeName.containsKey(webConstr.getAttribute())) {
+                dbConstr = dbdConstraintByAttributeName.get(webConstr.getAttribute());
+            } else {
+                dbConstr = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
+                emptyConstraints.add(dbConstr);
+            }
+            fillEmptyConstraint(dbConstr, webConstr);
+        }
+    }
+
+    private DBDAttributeConstraint fillEmptyConstraint(@NotNull DBDAttributeConstraint dbConstr,
+                                                       @NotNull WebSQLDataFilterConstraint webConstr) {
+        dbConstr.setPlainNameReference(true);
+
+        if (webConstr.getOrderPosition() != null) {
+            dbConstr.setOrderPosition(webConstr.getOrderPosition());
+        }
+        if (webConstr.getOrderAsc() != null) {
+            dbConstr.setOrderDescending(!webConstr.getOrderAsc());
+        }
+        dbConstr.setCriteria(webConstr.getCriteria());
+        if (webConstr.getOperator() != null) {
+            dbConstr.setOperator(CommonUtils.valueOf(DBCLogicalOperator.class, webConstr.getOperator()));
+        }
+        if (webConstr.getValue() != null) {
+            dbConstr.setValue(webConstr.getValue());
+        }
+        return dbConstr;
     }
 }
