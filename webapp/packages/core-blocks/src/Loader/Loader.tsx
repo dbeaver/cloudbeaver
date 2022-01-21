@@ -60,7 +60,8 @@ interface Props {
 const spinnerType = {
   primary: '/icons/spinner-primary.svg',
   secondary: '/icons/spinner.svg',
-  small: '/icons/spinner-small.svg',
+  primarySmall: '/icons/spinner-primary-small.svg',
+  secondarySmall: '/icons/spinner-small.svg',
 };
 
 export const Loader = observer<Props>(function Loader({
@@ -187,10 +188,12 @@ export const Loader = observer<Props>(function Loader({
 
   refLoaderDisplayed.state = true;
 
-  let spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
-
-  if (small) {
-    spinnerURL = spinnerType.small;
+  let spinnerURL: string;
+  
+  if (secondary || overlay) {
+    spinnerURL = small ? spinnerType.secondarySmall : spinnerType.secondary;
+  } else {
+    spinnerURL = small ? spinnerType.primarySmall : spinnerType.primary;
   }
 
   return styled(style)(
@@ -202,10 +205,10 @@ export const Loader = observer<Props>(function Loader({
         {onCancel && (
           <actions>
             <Button
-            type="button"
-            mod={['unelevated']}
-            disabled={cancelDisabled}
-            onClick={onCancel}
+              type="button"
+              mod={['unelevated']}
+              disabled={cancelDisabled}
+              onClick={onCancel}
             >
               <Translate token='ui_processing_cancel' />
             </Button>
