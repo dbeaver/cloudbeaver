@@ -48,16 +48,13 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
     || dataGridContext.model.isReadonly()
   ));
 
-  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    event.preventDefault();
-  }
-
   function handleClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     selectionContext.selectTable();
+    dataGridContext.focus();
   }
 
   return styled(styles)(
-    <container title={translate('data_grid_table_index_column_tooltip')} onMouseDown={preventFocus} onClick={handleClick}>
+    <container title={translate('data_grid_table_index_column_tooltip')} onClick={handleClick}>
       {readonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
       {props.column.name}
     </container>
