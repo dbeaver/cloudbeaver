@@ -4,7 +4,7 @@ module.exports = {
 
   plugins: [
     '@typescript-eslint',
-    'eslint-plugin-import-helpers',
+    'eslint-plugin-import-helpers'
   ],
 
   extends: [

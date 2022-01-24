@@ -3,9 +3,15 @@
   "files": [
     "typings.d.ts"
   ],
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/.*/"
+  ],
   "compilerOptions": {
+    "baseUrl": ".",
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
@@ -42,6 +48,9 @@
     "types": [
       "reflect-metadata",
       "node"
-    ]
-  }
+    ],
+  },
+  "references": [
+      { "path": "./packages/*" }
+  ]
 }
