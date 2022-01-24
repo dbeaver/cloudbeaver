@@ -115,7 +115,8 @@ extend type Query {
 
     navRefreshNode( nodePath: ID! ): Boolean
 
-    navGetStructContainers( connectionId: ID!, catalog: ID ): DatabaseStructContainers!
+    # contextId currently not using
+    navGetStructContainers( connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
 }
 

@@ -29,11 +29,12 @@ export interface IStructContainers {
   schemaList: ObjectContainer[];
   supportsCatalogChange: boolean;
   supportsSchemaChange: boolean;
+  activeCatalog: string | undefined;
 }
 
-type DataValue = MetadataMap<string, IStructContainers>;
+type DataValue = Map<string, IStructContainers>;
 
-const defaultCatalog = 'default';
+const defaultCatalog = undefined;
 
 interface ObjectContainerParams {
   connectionId: string;
@@ -41,8 +42,8 @@ interface ObjectContainerParams {
 }
 
 interface ObjectContainerMetadata extends ICachedResourceMetadata {
-  outdatedData: string[];
-  loadingData: string[];
+  outdatedData: (string | undefined)[];
+  loadingData: (string | undefined)[];
 }
 
 @injectable()
@@ -57,12 +58,7 @@ string
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource
   ) {
-    super(new MetadataMap(() => ({
-      catalogList: [],
-      schemaList: [],
-      supportsCatalogChange: false,
-      supportsSchemaChange: false,
-    })));
+    super(new Map());
 
     this.metadata = new MetadataMap(() => ({
       outdated: true,
@@ -97,11 +93,17 @@ string
   ): ICatalogData | undefined {
     const connectionData = this.data.get(connectionId);
 
-    return connectionData.catalogList.find(catalog => catalog.catalog.name === catalogId);
+    return connectionData?.catalogList.find(catalog => catalog.catalog.name === catalogId);
   }
 
   isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
-    return (catalogId ?? defaultCatalog) in this.data.get(connectionId);
+    const container = this.data.get(connectionId);
+
+    if (!container) {
+      return false;
+    }
+
+    return container.activeCatalog === (catalogId ?? defaultCatalog);
   }
 
   isOutdated(param: ObjectContainerParams): boolean {
@@ -160,6 +162,7 @@ string
       schemaList: navGetStructContainers.schemaList,
       supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
       supportsSchemaChange: navGetStructContainers.supportsSchemaChange,
+      activeCatalog: catalogId || undefined,
     });
 
     return this.data;

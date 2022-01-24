@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
@@ -23,58 +23,36 @@ import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
-const styles = composes(
-  css`
-    status {
-      composes: theme-background-positive theme-border-color-surface from global;
-    }
-  `,
-  css`
-    TreeNodeControl {
-      opacity: 1;
-      transition: opacity 0.2s ease;
+const styles = css`
+  TreeNodeControl {
+    opacity: 1;
+    transition: opacity 0.2s ease;
 
-      &[|outdated] {
-        opacity: 0.5;
-      }
+    &[|outdated] {
+      opacity: 0.5;
     }
-    TreeNodeControl:hover > portal, 
-    TreeNodeControl:global([aria-selected=true]) > portal,
-    portal:focus-within {
-      visibility: visible;
-    }
-    portal {
-      position: relative;
-    }
-    TreeNodeName {
-      height: 100%;
-      max-width: 250px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    status {
-      position: absolute;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      bottom: 0;
-      right: 0;
-      box-sizing: border-box;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;      
-      border: 1px solid;
-
-      &[|connected] {
-        opacity: 1;
-      }
-    }    
-    portal {
-      box-sizing: border-box;
-      margin-left: auto !important;
-      margin-right: 16px !important;
-      visibility: hidden;
-    }
-`);
+  }
+  TreeNodeControl:hover > portal, 
+  TreeNodeControl:global([aria-selected=true]) > portal,
+  portal:focus-within {
+    visibility: visible;
+  }
+  portal {
+    position: relative;
+  }
+  TreeNodeName {
+    height: 100%;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } 
+  portal {
+    box-sizing: border-box;
+    margin-left: auto !important;
+    margin-right: 16px !important;
+    visibility: hidden;
+  }
+`;
 
 export const NavigationNodeControl: NavTreeControlComponent = observer(function NavigationNodeControl({
   node,
@@ -116,7 +94,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
     <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={icon}>
-        <status {...use({ connected })} />
+        <ConnectionMark connected={connected} />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
         {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}

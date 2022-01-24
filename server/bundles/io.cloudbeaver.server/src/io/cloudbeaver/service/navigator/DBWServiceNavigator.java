@@ -50,7 +50,7 @@ public interface DBWServiceNavigator extends DBWService {
     boolean refreshNavigatorNode(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
     @WebAction
-    WebStructContainers getStructContainers(WebConnectionInfo connectionInfo, String catalog) throws DBWebException;
+    WebStructContainers getStructContainers(WebConnectionInfo connectionInfo, String contextId, String catalog) throws DBWebException;
 
     @WebAction
     String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;

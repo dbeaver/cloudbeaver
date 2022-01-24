@@ -2,6 +2,7 @@
 export * from './CoreSettingsService';
 export * from './AppScreen/AppScreenService';
 export * from './TopNavBar/MainMenu/MainMenuService';
+export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerBootstrap';
 export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/TopNavBarService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';

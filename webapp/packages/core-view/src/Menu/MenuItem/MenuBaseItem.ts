@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IMenuBaseItem, IMenuBaseItemOptions } from './IMenuBaseItem';
+import type { MenuBaseItemIconComponent, IMenuBaseItem, IMenuBaseItemOptions } from './IMenuBaseItem';
 import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
 
 interface IMenuBaseItemPropertyGetters {
   isDisabled?: () => boolean;
+  iconComponent?: () => MenuBaseItemIconComponent;
 }
 
 export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
@@ -21,6 +22,7 @@ export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
   readonly icon?: string;
   readonly tooltip?: string;
   readonly hidden?: boolean;
+  readonly iconComponent?: () => MenuBaseItemIconComponent;
 
   get disabled(): boolean {
     return this.isDisabled?.() ?? false;
@@ -36,5 +38,6 @@ export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
     this.icon = options.icon;
     this.tooltip = options.tooltip;
     this.isDisabled = getters?.isDisabled;
+    this.iconComponent = getters?.iconComponent;
   }
 }

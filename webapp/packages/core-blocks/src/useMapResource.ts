@@ -21,6 +21,7 @@ interface IActions<
   TResource extends CachedMapResource<any, any, any>,
   TIncludes
 > {
+  active?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
   onLoad?: (resource: TResource) => Promise<boolean | void> | boolean | void;
   onData?: (
@@ -173,7 +174,7 @@ export function useMapResource<
       try {
         const active = await actions?.isActive?.(resource);
 
-        if (active === false) {
+        if (active === false || actions?.active === false) {
           return;
         }
 

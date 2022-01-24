@@ -15,7 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuService, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
-import { ContextMenu } from '../MenuTrigger';
+import { ContextMenu } from '../ContextMenu';
 import { MenuBarItem } from './MenuBarItem';
 
 interface INestedMenuSettings extends MenuInitialState {

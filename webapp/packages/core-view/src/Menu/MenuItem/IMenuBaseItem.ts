@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
 import type { IMenuItem } from './IMenuItem';
 
 interface IMenuBaseItemCommonProperties {
@@ -14,6 +16,15 @@ interface IMenuBaseItemCommonProperties {
   tooltip?: string;
   hidden?: boolean;
   disabled?: boolean;
+  iconComponent?: () => MenuBaseItemIconComponent;
+}
+
+export type MenuBaseItemIconComponent = React.FC<IIconComponentProps>;
+
+export interface IIconComponentProps {
+  item: IMenuBaseItem;
+  style?: ComponentStyle;
+  className?: string;
 }
 
 export interface IMenuBaseItemOptions extends IMenuBaseItemCommonProperties {

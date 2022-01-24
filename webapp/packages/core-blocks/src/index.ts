@@ -15,6 +15,7 @@ export { ITEM_LIST_STYLES } from './ItemList/styles';
 export * from './layout/AppLogo';
 export * from './layout/TopAppBar';
 export * from './Loader/Loader';
+export * from './Marks/ConnectionMark';
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 

@@ -171,7 +171,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public WebStructContainers getStructContainers(WebConnectionInfo connection, String catalog) throws DBWebException {
+    public WebStructContainers getStructContainers(WebConnectionInfo connection, String contextId, String catalog) throws DBWebException {
         DBPDataSource dataSource = connection.getDataSource();
         DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
@@ -205,7 +205,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (catalogObjectInfo != null) {
                     WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
 
-                    if (contextDefaults != null && contextDefaults.supportsSchemaChange() && contextDefaults.getDefaultCatalog().getName() == node.getName()) {
+                    if (
+                        contextDefaults != null && contextDefaults.supportsSchemaChange()
+                        && (
+                            contextDefaults.getDefaultCatalog().getName() == node.getName()
+                            || catalog == node.getName()
+                        )
+                    ) {
                         try {
                             List<WebNavigatorNodeInfo> schemasList = webCatalog.getSchemaList();
                             Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);

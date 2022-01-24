@@ -16,7 +16,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { ContextMenu } from '../../ContextMenu/MenuTrigger';
+import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';

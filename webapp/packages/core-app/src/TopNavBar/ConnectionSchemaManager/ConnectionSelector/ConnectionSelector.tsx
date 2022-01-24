@@ -9,15 +9,22 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { useMapResource } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { useController } from '@cloudbeaver/core-di';
+import { getComputed, useDataResource, useMapResource } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, ContainerResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { EPermission, usePermission } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { ContextMenu, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 
-import { TopMenuItem } from '../../shared/TopMenuItem';
-import { ConnectionSelectorController } from './ConnectionSelectorController';
+import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
+import { topMenuStyles } from '../../shared/topMenuStyles';
+import { TopNavButton } from '../../shared/TopNavButton';
+import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
+import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from '../MENU_CONNECTION_DATA_CONTAINER_SELECTOR';
+import { MENU_CONNECTION_SELECTOR } from '../MENU_CONNECTION_SELECTOR';
 
 const menuStyles = css`
   Menu {
@@ -34,13 +41,19 @@ const menuStyles = css`
   }
 `;
 
+const removeDisableEffect = css`
+  Button:disabled, Button[aria-disabled="true"] {
+    opacity: 1;
+  }
+`;
+
 const connectionMenu = css`
   MenuItem IconOrImage {
     background-color: #fff;
     padding: 2px;
     border-radius: 2px;
   }
-  menu-trigger-icon {
+  menu-trigger-icon:not([|loading]) {
     background-color: #fff;
     border-radius: 4px;
     padding: 1px;
@@ -65,27 +78,108 @@ const styles = css`
 `;
 export const ConnectionSelector = observer(function ConnectionSelector() {
   const style = useStyles(styles);
-  const controller = useController(ConnectionSelectorController);
+  const connectionsMenu = useMenu({ menu: MENU_CONNECTION_SELECTOR, local: true });
+  const dataContainerMenu = useMenu({ menu: MENU_CONNECTION_DATA_CONTAINER_SELECTOR, local: true });
+  const connectionSelectorService = useService(ConnectionSchemaManagerService);
+  const optionsPanelService = useService(OptionsPanelService);
   const isEnabled = usePermission(EPermission.public);
-  const driver = useMapResource(ConnectionSelector, DBDriverResource, CachedMapAllKey, {
+
+  const drivers = useMapResource(ConnectionSelector, DBDriverResource, CachedMapAllKey, {
     isActive: () => isEnabled,
   });
-  const ConnectionMenu = TopMenuItem;
-  const SchemaOrCatalogMenu = TopMenuItem;
+  
+  const connections = useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
+    isActive: () => isEnabled,
+  });
 
-  if (!isEnabled || !driver.isLoaded()) {
+  const connection = connectionSelectorService.currentConnection;
+  const driver = drivers.resource.get(connection?.driverId || '');
+  const connectionId = connection?.id;
+
+  const contextsActive = getComputed(() => (
+    isEnabled 
+    && connection?.connected === true
+    && !!connectionId
+  ));
+
+  useDataResource(ConnectionSelector, ContainerResource, { 
+    connectionId: connectionId!,
+    catalogId: connectionSelectorService.currentObjectCatalogId,
+  }, {
+    active: contextsActive,
+  });
+
+  const objectContainerIcon = getComputed(() => {
+    if (connectionSelectorService.currentObjectSchema?.object?.features?.includes(EObjectFeature.schema)) {
+      // TODO move such kind of icon paths to a set of constants
+      return 'schema_system';
+    }
+    if (connectionSelectorService.currentObjectCatalog?.object?.features?.includes(EObjectFeature.catalog)) {
+      return 'database';
+    }
+    return 'database';
+  });
+
+  const objectContainerName = getComputed(() => {
+    const value = NodeManagerUtils.concatSchemaAndCatalog(
+      connectionSelectorService.currentObjectCatalogId,
+      connectionSelectorService.currentObjectSchemaId
+    );
+
+    if (!value) {
+      return 'app_topnavbar_connection_schema_manager_not_selected';
+    }
+
+    return value;
+  });
+
+  const isVisible = getComputed(() => (
+    !optionsPanelService.active
+    && (
+      connectionSelectorService.isConnectionChangeable
+      || connectionSelectorService.currentConnectionId !== null
+    )
+  ));
+
+  if (!isEnabled || !drivers.isLoaded() || !connections.isLoaded()) {
     return null;
   }
 
   return styled(style)(
-    <connection-selector {...use({ isVisible: controller.isConnectionSelectorVisible })}>
-      <ConnectionMenu menuItem={controller.connectionMenu} style={[menuStyles, connectionMenu]} />
-      {controller.isObjectContainerSelectorVisible && (
-        <SchemaOrCatalogMenu
-          menuItem={controller.objectContainerMenu}
-          style={menuStyles}
+    <connection-selector {...use({ isVisible })}>
+      <ContextMenu 
+        menu={connectionsMenu}
+        placement="bottom-end"
+        style={[menuStyles, connectionMenu, topMenuStyles, removeDisableEffect]}
+        disclosure
+        modal
+      >
+        <TopNavButton 
+          title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
+          icon={driver?.icon}
+          style={[menuStyles, connectionMenu, removeDisableEffect]}
+          menu={connectionSelectorService.isConnectionChangeable}
+          secondary
         />
-      )}
+      </ContextMenu>
+      <ContextMenu 
+        menu={dataContainerMenu}
+        placement="bottom-end"
+        style={[menuStyles, topMenuStyles]}
+        disclosure
+        modal
+      >
+        <TopNavButton 
+          title={objectContainerName}
+          icon={objectContainerIcon}
+          style={[menuStyles, removeDisableEffect]}
+          menu={
+            connectionSelectorService.isObjectCatalogChangeable 
+            || connectionSelectorService.isObjectSchemaChangeable
+          }
+          secondary
+        />
+      </ContextMenu>
     </connection-selector>
   );
 });

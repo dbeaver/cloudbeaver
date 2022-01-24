@@ -14,12 +14,11 @@ import {
   ObjectContainer,
   DBDriverResource,
   isConnectionProvider, IConnectionProvider,
-  isConnectionSetter, IConnectionSetter, IStructContainers
+  isConnectionSetter, IConnectionSetter, IStructContainers, Connection
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 
 import type { ITab } from '../../shared/NavigationTabs/ITab';
 import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
@@ -45,7 +44,7 @@ interface IActiveItem<T> {
 }
 
 @injectable()
-export class ConnectionSchemaManagerService extends Bootstrap {
+export class ConnectionSchemaManagerService {
   get currentConnectionId(): string | null | undefined {
     if (!this.activeItem?.getCurrentConnectionId) {
       return null;
@@ -65,6 +64,14 @@ export class ConnectionSchemaManagerService extends Bootstrap {
       return;
     }
     return this.activeItem.getCurrentSchemaId(this.activeItem.context);
+  }
+
+  get currentConnection(): Connection | undefined {
+    if (!this.currentConnectionId) {
+      return;
+    }
+
+    return this.connectionInfo.get(this.currentConnectionId);
   }
 
   get currentObjectCatalog(): ObjectContainer | undefined {
@@ -102,53 +109,62 @@ export class ConnectionSchemaManagerService extends Bootstrap {
   }
 
   get isConnectionChangeable(): boolean {
-    return !!this.activeItem?.changeConnectionId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeConnectionId;
   }
 
   get isObjectCatalogChangeable(): boolean {
-    return !!this.activeItem?.changeCatalogId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return (
+      !!this.activeItem?.changeCatalogId
+      && !!this.objectContainerList?.supportsCatalogChange
+    );
   }
 
   get isObjectSchemaChangeable(): boolean {
-    return !!this.activeItem?.changeSchemaId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return (
+      !!this.activeItem?.changeSchemaId
+      && !!this.objectContainerList?.supportsSchemaChange
+    );
   }
 
+  get isChangingConnection(): boolean {
+    return this.changingConnection;
+  }
+
+  get isChangingConnectionContainer(): boolean {
+    return this.changingConnectionContainer;
+  }
+
+  private changingConnection: boolean;
+  private changingConnectionContainer: boolean;
   private activeItem: IActiveItem<any> | null = null;
   private activeItemHistory: Array<IActiveItem<any>> = [];
 
   constructor(
-    private navigationTabsService: NavigationTabsService,
-    private connectionInfo: ConnectionInfoResource,
-    private connectionsManagerService: ConnectionsManagerService,
-    private dbDriverResource: DBDriverResource,
-    private notificationService: NotificationService,
-    private sessionDataResource: SessionDataResource
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly dbDriverResource: DBDriverResource,
+    private readonly notificationService: NotificationService
   ) {
-    super();
-    makeObservable<ConnectionSchemaManagerService, 'activeItem' | 'activeItemHistory'>(this, {
+    this.changingConnection = false;
+    this.changingConnectionContainer = false;
+
+    makeObservable<ConnectionSchemaManagerService, 'activeItem' | 'activeItemHistory' | 'changingConnection' | 'changingConnectionContainer'>(this, {
       currentObjectCatalog: computed,
       currentObjectSchema: computed,
       objectContainerList: computed,
+      currentConnectionId: computed,
+      currentObjectCatalogId: computed,
+      currentObjectSchemaId: computed,
+      isConnectionChangeable: computed,
+      isObjectCatalogChangeable: computed,
+      isObjectSchemaChangeable: computed,
+      changingConnection: observable,
+      changingConnectionContainer: observable,
       activeItem: observable,
       activeItemHistory: observable,
     });
   }
-
-  register(): void {
-    this.sessionDataResource.onDataUpdate
-      .addHandler(this.reset.bind(this));
-
-    this.navigationTabsService.onTabSelect
-      .addHandler(this.onTabSelect.bind(this));
-
-    this.navigationTabsService.onTabClose
-      .addHandler(this.onTabClose.bind(this));
-  }
-
-  load(): void {}
 
   /**
    * Trigger when user select connection in dropdown
@@ -157,8 +173,17 @@ export class ConnectionSchemaManagerService extends Bootstrap {
     if (!this.activeItem?.changeConnectionId) {
       return;
     }
-    await this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
-    await this.updateContainer(connectionId);
+    try {
+      this.changingConnection = true;
+      await this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
+      await this.updateContainer(connectionId);
+    } finally {
+      this.changingConnection = false;
+    }
+  }
+
+  async onConnectionUpdate(): Promise<void> {
+    await this.updateContainer(this.currentConnectionId);
   }
 
   /**
@@ -168,8 +193,14 @@ export class ConnectionSchemaManagerService extends Bootstrap {
     if (!this.activeItem?.changeCatalogId) {
       throw new Error('The try to change catalog without connection');
     }
-    await this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
-    await this.updateContainer(this.currentConnectionId, catalogId);
+
+    try {
+      this.changingConnectionContainer = true;
+      await this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
+      await this.updateContainer(this.currentConnectionId, catalogId);
+    } finally {
+      this.changingConnectionContainer = false;
+    }
   }
 
   /**
@@ -179,12 +210,38 @@ export class ConnectionSchemaManagerService extends Bootstrap {
     if (!this.activeItem?.changeSchemaId) {
       throw new Error('The try to change schema without connection');
     }
-    await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
+    try {
+      this.changingConnectionContainer = true;
+      await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
+    } finally {
+      this.changingConnectionContainer = false;
+    }
   }
 
-  private reset() {
+  reset() {
     this.activeItem = null;
     this.activeItemHistory = [];
+  }
+
+  onTabSelect(tab: ITab) {
+    const item: IActiveItem<ITab> = {
+      id: tab.id,
+      context: tab,
+    };
+    const handler = this.navigationTabsService.getTabHandler(tab.handlerId);
+
+    if (handler?.extensions) {
+      this.setExtensions(item, handler.extensions);
+    }
+
+    this.setActiveItem(item);
+  }
+
+  onTabClose(tab: ITab | undefined) {
+    if (!tab) {
+      return;
+    }
+    this.removeActiveItem(tab.id);
   }
 
   private async updateContainer(connectionId?: string | null, catalogId?: string): Promise<void> {
@@ -211,6 +268,10 @@ export class ConnectionSchemaManagerService extends Bootstrap {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
 
+    if (!connection.connected) {
+      return;
+    }
+
     try {
       await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
     } catch (exception) {
@@ -221,27 +282,6 @@ export class ConnectionSchemaManagerService extends Bootstrap {
         true
       );
     }
-  }
-
-  private onTabSelect(tab: ITab) {
-    const item: IActiveItem<ITab> = {
-      id: tab.id,
-      context: tab,
-    };
-    const handler = this.navigationTabsService.getTabHandler(tab.handlerId);
-
-    if (handler?.extensions) {
-      this.setExtensions(item, handler.extensions);
-    }
-
-    this.setActiveItem(item);
-  }
-
-  private onTabClose(tab: ITab | undefined) {
-    if (!tab) {
-      return;
-    }
-    this.removeActiveItem(tab.id);
   }
 
   private setExtensions<T>(item: IActiveItem<T>, extensions: Array<IExtension<T>>) {

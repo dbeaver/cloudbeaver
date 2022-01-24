@@ -39,7 +39,8 @@ import {
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
   SessionExpiredDialogService,
-  SessionExpireWarningDialogService
+  SessionExpireWarningDialogService,
+  ConnectionSchemaManagerBootstrap
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -120,6 +121,7 @@ export const coreManifests: PluginManifest[] = [
       SessionExpiredDialogService,
       ConnectionsLocaleService,
       ConnectionDialogsService,
+      ConnectionSchemaManagerBootstrap,
       ConnectionSchemaManagerService,
       ConnectionInfoResource,
       BlocksLocaleService,

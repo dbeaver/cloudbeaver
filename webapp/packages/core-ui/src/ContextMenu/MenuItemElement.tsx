@@ -15,7 +15,7 @@ import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { menuPanelStyles } from './menuPanelStyles';
 
-interface MenuPanelItemProps {
+interface IMenuItemElementProps {
   label: string;
   tooltip?: string;
   binding?: string;
@@ -25,7 +25,7 @@ interface MenuPanelItemProps {
   style?: ComponentStyle;
 }
 
-export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({
+export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItemElement({
   label,
   tooltip,
   binding,

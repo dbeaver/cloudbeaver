@@ -54,6 +54,7 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
             ))
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
                 getWebConnection(env),
+                env.getArgument("contextId"),
                 env.getArgument("catalog")
             ));
         model.getMutationType()

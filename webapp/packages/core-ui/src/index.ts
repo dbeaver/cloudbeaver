@@ -1,8 +1,8 @@
 export * from './Clipboard/ClipboardBootstrap';
 export * from './Clipboard/ClipboardService';
 
-export * from './ContextMenu/MenuPanelItem';
-export * from './ContextMenu/MenuTrigger';
+export * from './ContextMenu/MenuItemElement';
+export * from './ContextMenu/ContextMenu';
 export * from './ContextMenu/MenuBar/MenuBar';
 export * from './ContextMenu/MenuBar/MENU_BAR_DEFAULT_STYLES';
 
