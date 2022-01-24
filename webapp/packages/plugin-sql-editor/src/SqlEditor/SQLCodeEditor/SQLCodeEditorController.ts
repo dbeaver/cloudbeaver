@@ -21,6 +21,7 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 interface ISqlModeOptions {
   keywords: Record<string, boolean>;
   builtin: Record<string, boolean>;
+  support: Record<string, boolean>;
 }
 
 const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
@@ -48,31 +49,36 @@ export class SQLCodeEditorController {
       return name;
     }
 
+    const support: Record<string, boolean> = {};
     const keywords: Record<string, boolean> = {};
     const builtin: Record<string, boolean> = {};
 
-    if (this.dialect?.dataTypes) {
-      for (const key of this.dialect.dataTypes) {
-        builtin[key.toLowerCase()] = true;
-      }
+    for (const key of this.dialect.dataTypes) {
+      builtin[key.toLowerCase()] = true;
     }
 
-    if (this.dialect?.functions) {
-      for (const key of this.dialect.functions) {
-        builtin[key.toLowerCase()] = true;
-      }
+    for (const key of this.dialect.functions) {
+      builtin[key.toLowerCase()] = true;
     }
 
-    if (this.dialect?.reservedWords) {
-      for (const key of this.dialect.reservedWords) {
-        keywords[key.toLowerCase()] = true;
-      }
+    for (const key of this.dialect.reservedWords) {
+      keywords[key.toLowerCase()] = true;
+    }
+
+    if (this.dialect.quoteStrings.flat().includes('"')) {
+      support['doubleQuote'] = true;
+    }
+
+    if (this.dialect.singleLineComments.includes('#')) {
+      support['commentHash'] = true;
+      support['commentSpaceRequired'] = true;
     }
 
     return {
       name,
       keywords,
       builtin,
+      support,
     };
   }
 
