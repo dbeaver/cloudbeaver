@@ -303,7 +303,7 @@ public class GraphQLEndpoint extends HttpServlet {
                 if (exception instanceof InvocationTargetException) {
                     exception = ((InvocationTargetException) exception).getTargetException();
                 }
-                log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "', " + handlerParameters.getArgumentValues(), exception);
+                log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/, exception);
 
                 // Log in session
                 WebSession webSession = WebServiceBindingBase.findWebSession(handlerParameters.getDataFetchingEnvironment());
