@@ -127,7 +127,7 @@ public class CBDatabase {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
 
-        LoggingProgressMonitor monitor = new LoggingProgressMonitor();
+        LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
