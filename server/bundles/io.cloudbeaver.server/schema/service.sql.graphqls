@@ -175,6 +175,17 @@ type SQLQueryGenerator {
 }
 
 ####################################################
+# SQL Query info
+####################################################
+type SQLScriptInfo {
+    queries: [ SQLScriptQuery! ]!
+}
+
+type SQLScriptQuery {
+    start: Int!
+    end: Int!
+}
+####################################################
 # Query and Mutation
 ####################################################
 
@@ -224,6 +235,11 @@ extend type Query {
         options: Object!,
         nodePathList: [String!]!
     ): String!
+
+    sqlParseScript(
+        connectionId: ID!,
+        script: String!
+    ): SQLScriptInfo!
 }
 
 extend type Mutation {

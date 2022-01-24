@@ -127,4 +127,6 @@ public interface DBWServiceSQL extends DBWService {
     @WebAction
     WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
 
+    @WebAction
+    WebSQLScriptInfo parseSqlScript(@NotNull WebSQLProcessor processor, @NotNull String sqlScript) throws DBWebException;
 }

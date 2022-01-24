@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -396,5 +397,18 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (WebSQLExecutionPlan) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Override
+    public WebSQLScriptInfo parseSqlScript(@NotNull WebSQLProcessor processor, @NotNull String sqlScript) throws DBWebException {
+        DBPDataSource dataSource = processor.getConnection().getDataSourceContainer().getDataSource();
+        if (dataSource == null) {
+            throw new DBWebException("Data source was not found");
+        }
+        List<SQLScriptElement> queries = SQLScriptParser.parseScript(dataSource, sqlScript);
+        List<WebSQLQueryInfo> queriesInfo = queries.stream()
+                .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getLength() + query.getOffset()))
+                .collect(Collectors.toList());
+        return new WebSQLScriptInfo(queriesInfo);
     }
 }
