@@ -178,7 +178,7 @@ type SQLQueryGenerator {
 # SQL Query info
 ####################################################
 type SQLScriptInfo {
-    queries: [ SQLScriptQuery ]
+    queries: [ SQLScriptQuery! ]!
 }
 
 type SQLScriptQuery {
@@ -238,8 +238,8 @@ extend type Query {
 
     sqlParseScript(
         connectionId: ID!,
-        script: String
-    ): SQLScriptInfo
+        script: String!
+    ): SQLScriptInfo!
 }
 
 extend type Mutation {
