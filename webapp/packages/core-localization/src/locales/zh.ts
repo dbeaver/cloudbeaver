@@ -13,6 +13,7 @@ export const defaultZHLocale = [
   ['ui_processing_ok', '好'],
   ['ui_processing_create', '创建'],
   ['ui_processing_save', '保存'],
+  ['ui_processing_saved', 'Saved'],
   ['ui_configure', '配置'],
   ['ui_apply', '应用'],
   ['ui_error_message', '错误：'],
