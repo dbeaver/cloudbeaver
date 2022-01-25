@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
@@ -72,14 +72,11 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const disabled = formDisabled || loading;
   const enabled = state.enabled || false;
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
-  const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
+  const passwordFilled = (initialConfig?.password === null && state.password !== '') || !!state.password?.length;
   const testAvailable = keyAuth ? !!state.key?.length : passwordFilled;
   const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
-  let passwordHint = '';
-
-  if (initialConfig?.password === '' && initialConfig.authType === state.authType) {
-    passwordHint = '••••••';
-  }
+  const passwordSaved = initialConfig?.password === '' && initialConfig.authType === state.authType;
+  const keySaved = initialConfig?.key === '';
 
   const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -95,6 +92,10 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
       state.key = key;
     }
   };
+
+  const authTypeChangeHandler = useCallback(() => {
+    state.password = '';
+  }, []);
 
   return styled(styles)(
     <SubmittingForm>
@@ -116,6 +117,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             valueSelector={value => value.label}
             disabled={disabled || readonly || !enabled}
             tiny
+            onSelect={authTypeChangeHandler}
           >
             {translate('connections_network_handler_ssh_tunnel_auth_type')}
           </Combobox>
@@ -153,6 +155,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
+              required={state.savePassword}
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
@@ -160,13 +163,13 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="password"
               name="password"
-              placeholder={passwordHint}
               autoComplete='new-password'
               state={state}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
-              required={!keyAuth}
+              required={!keyAuth && state.savePassword}
+              description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
             >
               {passwordLabel}
@@ -178,6 +181,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                   state={state}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
+                  description={keySaved ? translate('ui_processing_saved') : undefined}
                   required
                   medium
                 >

@@ -44,6 +44,7 @@ const styles = css`
 `;
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> & ILayoutSizeProps & {
+  description?: string;
   labelTooltip?: string;
   mod?: 'surface';
   style?: ComponentStyle;
@@ -82,6 +83,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   small,
   medium,
   large,
+  description,
   labelTooltip,
   mod,
   embedded,
@@ -106,7 +108,12 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   return styled(useStyles(baseFormControlStyles, styles, style))(
     <field className={className} {...use({ tiny, small, medium, large, embedded })}>
-      <field-label as='label' title={labelTooltip || rest.title}>{children}{required && ' *'}</field-label>
+      <field-label
+        as='label'
+        title={labelTooltip || rest.title}
+      >
+        {children}{required && ' *'}
+      </field-label>
       <textarea
         {...rest}
         value={value ?? ''}
@@ -115,6 +122,11 @@ export const Textarea: TextareaType = observer(function Textarea({
         onChange={handleChange}
         {...use({ mod })}
       />
+      {description && (
+        <field-description>
+          {description}
+        </field-description>
+      )}
     </field>
   );
 });
