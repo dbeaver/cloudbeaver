@@ -88,7 +88,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     isActive: () => isEnabled,
   });
   
-  const connections = useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
+  useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
     isActive: () => isEnabled,
   });
 
@@ -146,7 +146,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     )
   ));
 
-  if (!isEnabled || !drivers.isLoaded() || !connections.isLoaded()) {
+  if (!isEnabled) {
     return null;
   }
 
