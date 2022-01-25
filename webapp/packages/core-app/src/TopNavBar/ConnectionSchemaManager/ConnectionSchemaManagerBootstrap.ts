@@ -20,6 +20,13 @@ import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR';
 
 @injectable()
 export class ConnectionSchemaManagerBootstrap extends Bootstrap {
+  get connectionSelectorLoading(): boolean {
+    return (
+      this.connectionSchemaManagerService.isChangingConnection
+      || this.connectionsManagerService.containerContainers.isLoading()
+    );
+  }
+
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -31,8 +38,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   }
 
   register(): void {
-    // this.sessionDataResource.onDataUpdate
-    //   .addHandler(this.connectionSchemaManagerService.reset.bind(this.connectionSchemaManagerService));
 
     this.connectionInfoResource.onDataUpdate
       .addHandler(this.connectionSchemaManagerService.onConnectionUpdate.bind(this.connectionSchemaManagerService));
@@ -42,16 +47,17 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.navigationTabsService.onTabClose
       .addHandler(this.connectionSchemaManagerService.onTabClose.bind(this.connectionSchemaManagerService));
+
+    this.navigationTabsService.onUnload
+      .addHandler(this.connectionSchemaManagerService.reset.bind(this.connectionSchemaManagerService));
       
     this.menuService.setHandler({
       id: 'connection-selector-base',
       isApplicable: context => context.find(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
-      isLoading: () => (
-        this.connectionSchemaManagerService.isChangingConnection
-        || this.connectionsManagerService.connectionObjectContainers.isLoading()
-      ),
+      isLoading: () => this.connectionSelectorLoading,
       isDisabled: () => (
         !this.connectionSchemaManagerService.isConnectionChangeable
+        || this.connectionSelectorLoading
         || !this.connectionsManagerService.hasAnyConnection()
         || this.connectionSchemaManagerService.isChangingConnectionContainer
       ),
@@ -102,14 +108,17 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       isApplicable: context => context.find(DATA_CONTEXT_MENU, MENU_CONNECTION_DATA_CONTAINER_SELECTOR),
       isDisabled: () => (
         !this.connectionSchemaManagerService.currentConnection?.connected
-        || this.connectionsManagerService.connectionObjectContainers.isLoading()
-        || this.connectionSchemaManagerService.isChangingConnection
+        || this.connectionSelectorLoading
+        || this.connectionSchemaManagerService.isChangingConnectionContainer
         || (
           !this.connectionSchemaManagerService.isObjectCatalogChangeable
           && !this.connectionSchemaManagerService.isObjectSchemaChangeable
         )
       ),
-      isLoading: () => this.connectionSchemaManagerService.isChangingConnectionContainer,
+      isLoading: () => (
+        !this.connectionSelectorLoading 
+        && this.connectionSchemaManagerService.isChangingConnectionContainer
+      ),
       isHidden: () => (
         !this.connectionSchemaManagerService.objectContainerList
         || (
@@ -256,8 +265,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               }, 
               {
                 onSelect: async () => {
-                  await this.connectionSchemaManagerService.selectCatalog(catalog.name!);
-                  await this.connectionSchemaManagerService.selectSchema(schema.name!);
+                  await this.connectionSchemaManagerService.selectSchema(schema.name!, catalog.name!);
                 },
               },
               {

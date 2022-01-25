@@ -61,6 +61,7 @@ export class NavigationTabsService extends View<ITab> {
   readonly navigationTabContext: () => ITabNavigationContext;
   readonly onTabSelect: ISyncExecutor<ITab>;
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
+  readonly onUnload: ISyncExecutor;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -73,6 +74,7 @@ export class NavigationTabsService extends View<ITab> {
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
+    this.onUnload = new SyncExecutor();
 
     this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);
@@ -268,6 +270,7 @@ export class NavigationTabsService extends View<ITab> {
     // if (this.administrationScreenService.publicDisabled) {
     //   return;
     // }
+    this.onUnload.execute();
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
         if (tab.restored) {

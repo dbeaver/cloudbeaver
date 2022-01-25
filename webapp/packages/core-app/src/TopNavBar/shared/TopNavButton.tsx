@@ -71,9 +71,9 @@ export const TopNavButton = observer<IProps, HTMLButtonElement>(function TopNavB
   return styled(styles)(
     <Button type="button" {...props} ref={ref}>
       <box>
-        {icon && (
+        {(icon || loading) && (
           <menu-trigger-icon {...use({ loading })}>
-            <Loader secondary={secondary} loading={loading} small><IconOrImage icon={icon} /></Loader>
+            <Loader secondary={secondary} loading={loading} small>{icon && <IconOrImage icon={icon} />}</Loader>
           </menu-trigger-icon>
         )}
         <menu-trigger-text title={title}>{title}</menu-trigger-text>

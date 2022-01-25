@@ -94,29 +94,34 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
 
   const connection = connectionSelectorService.currentConnection;
   const driver = drivers.resource.get(connection?.driverId || '');
-  const connectionId = connection?.id;
 
   const contextsActive = getComputed(() => (
     isEnabled 
     && connection?.connected === true
-    && !!connectionId
+    && !!connectionSelectorService.activeConnectionId
   ));
 
   useDataResource(ConnectionSelector, ContainerResource, { 
-    connectionId: connectionId!,
-    catalogId: connectionSelectorService.currentObjectCatalogId,
+    connectionId: connectionSelectorService.activeConnectionId!,
+    catalogId: connectionSelectorService.activeObjectCatalogId,
   }, {
     active: contextsActive,
   });
 
   const objectContainerIcon = getComputed(() => {
+    if (!connectionSelectorService.currentObjectSchema && !connectionSelectorService.currentObjectCatalog) {
+      return undefined;
+    }
+
     if (connectionSelectorService.currentObjectSchema?.object?.features?.includes(EObjectFeature.schema)) {
       // TODO move such kind of icon paths to a set of constants
       return 'schema_system';
     }
+
     if (connectionSelectorService.currentObjectCatalog?.object?.features?.includes(EObjectFeature.catalog)) {
       return 'database';
     }
+
     return 'database';
   });
 

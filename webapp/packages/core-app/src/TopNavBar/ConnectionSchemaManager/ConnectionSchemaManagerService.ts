@@ -45,24 +45,47 @@ interface IActiveItem<T> {
 
 @injectable()
 export class ConnectionSchemaManagerService {
-  get currentConnectionId(): string | null | undefined {
+  get activeConnectionId(): string | null | undefined {
+  
     if (!this.activeItem?.getCurrentConnectionId) {
       return null;
     }
+
     return this.activeItem.getCurrentConnectionId(this.activeItem.context);
   }
 
-  get currentObjectCatalogId(): string | undefined {
+  get currentConnectionId(): string | null | undefined {
+    if (this.pendingConnectionId !== null) {
+      return this.pendingConnectionId;
+    }
+
+    return this.activeConnectionId;
+  }
+
+  get activeObjectCatalogId(): string | undefined {
     if (!this.activeItem?.getCurrentCatalogId) {
       return;
     }
+
     return this.activeItem.getCurrentCatalogId(this.activeItem.context);
   }
 
+  get currentObjectCatalogId(): string | undefined {
+    if (this.pendingCatalogId !== null) {
+      return this.pendingCatalogId;
+    }
+    return this.activeObjectCatalogId;
+  }
+
   get currentObjectSchemaId(): string | undefined {
+    if (this.pendingSchemaId !== null) {
+      return this.pendingSchemaId;
+    }
+
     if (!this.activeItem?.getCurrentSchemaId) {
       return;
     }
+
     return this.activeItem.getCurrentSchemaId(this.activeItem.context);
   }
 
@@ -86,7 +109,7 @@ export class ConnectionSchemaManagerService {
   }
 
   get currentObjectSchema(): ObjectContainer | undefined {
-    if (!this.currentConnectionId || !this.currentObjectSchemaId || !this.currentObjectCatalogId) {
+    if (!this.currentConnectionId || !this.currentObjectSchemaId) {
       return;
     }
 
@@ -102,7 +125,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionsManagerService.connectionObjectContainers.get({
+    return this.connectionsManagerService.containerContainers.get({
       connectionId: this.currentConnectionId,
       catalogId: this.currentObjectCatalogId,
     });
@@ -134,6 +157,9 @@ export class ConnectionSchemaManagerService {
     return this.changingConnectionContainer;
   }
 
+  private pendingConnectionId: string | null;
+  private pendingCatalogId: string | null | undefined;
+  private pendingSchemaId: string | null | undefined;
   private changingConnection: boolean;
   private changingConnectionContainer: boolean;
   private activeItem: IActiveItem<any> | null = null;
@@ -148,13 +174,27 @@ export class ConnectionSchemaManagerService {
   ) {
     this.changingConnection = false;
     this.changingConnectionContainer = false;
+    this.pendingConnectionId = null;
+    this.pendingCatalogId = null;
+    this.pendingSchemaId = null;
 
-    makeObservable<ConnectionSchemaManagerService, 'activeItem' | 'activeItemHistory' | 'changingConnection' | 'changingConnectionContainer'>(this, {
+    makeObservable<
+    ConnectionSchemaManagerService, 
+    'activeItem' 
+    | 'activeItemHistory' 
+    | 'changingConnection' 
+    | 'changingConnectionContainer' 
+    | 'pendingConnectionId'
+    | 'pendingCatalogId'
+    | 'pendingSchemaId'
+    >(this, {
       currentObjectCatalog: computed,
       currentObjectSchema: computed,
       objectContainerList: computed,
       currentConnectionId: computed,
+      activeConnectionId: computed,
       currentObjectCatalogId: computed,
+      activeObjectCatalogId: computed,
       currentObjectSchemaId: computed,
       isConnectionChangeable: computed,
       isObjectCatalogChangeable: computed,
@@ -163,6 +203,9 @@ export class ConnectionSchemaManagerService {
       changingConnectionContainer: observable,
       activeItem: observable,
       activeItemHistory: observable,
+      pendingConnectionId: observable,
+      pendingCatalogId: observable,
+      pendingSchemaId: observable,
     });
   }
 
@@ -175,10 +218,16 @@ export class ConnectionSchemaManagerService {
     }
     try {
       this.changingConnection = true;
+      this.pendingConnectionId = connectionId;
+      this.pendingSchemaId = undefined;
+      this.pendingCatalogId = undefined;
       await this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
       await this.updateContainer(connectionId);
     } finally {
       this.changingConnection = false;
+      this.pendingConnectionId = null;
+      this.pendingSchemaId = null;
+      this.pendingCatalogId = null;
     }
   }
 
@@ -189,16 +238,26 @@ export class ConnectionSchemaManagerService {
   /**
    * Trigger when user select catalog in dropdown
    */
-  async selectCatalog(catalogId: string): Promise<void> {
+  async selectCatalog(catalogId: string, resetSchemaId = true): Promise<void> {
     if (!this.activeItem?.changeCatalogId) {
       throw new Error('The try to change catalog without connection');
     }
 
     try {
       this.changingConnectionContainer = true;
+      this.pendingCatalogId = catalogId;
+
+      if (resetSchemaId) {
+        this.pendingSchemaId = undefined;
+      }
+
       await this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
       await this.updateContainer(this.currentConnectionId, catalogId);
     } finally {
+      if (resetSchemaId) {
+        this.pendingSchemaId = null;
+      }
+      this.pendingCatalogId = null;
       this.changingConnectionContainer = false;
     }
   }
@@ -206,14 +265,22 @@ export class ConnectionSchemaManagerService {
   /**
    * Trigger when user select schema in dropdown
    */
-  async selectSchema(schemaId: string): Promise<void> {
+  async selectSchema(schemaId: string, catalogId?: string): Promise<void> {
     if (!this.activeItem?.changeSchemaId) {
       throw new Error('The try to change schema without connection');
     }
+
     try {
       this.changingConnectionContainer = true;
+      this.pendingSchemaId = schemaId;
+
+      if (catalogId) {
+        await this.selectCatalog(catalogId, false);
+      }
+
       await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
     } finally {
+      this.pendingSchemaId = null;
       this.changingConnectionContainer = false;
     }
   }

@@ -24,7 +24,7 @@ export class ConnectionsManagerService {
 
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
-    readonly connectionObjectContainers: ContainerResource,
+    readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService
   ) {
@@ -45,16 +45,30 @@ export class ConnectionsManagerService {
 
   getObjectContainerById(
     connectionId: string,
-    objectCatalogId: string,
+    objectCatalogId?: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
-    const objectContainers = this.connectionObjectContainers.getCatalogData(connectionId, objectCatalogId);
-    if (!objectContainers) {
-      return;
+    if (objectCatalogId){
+      const objectContainers = this.containerContainers.getCatalogData(connectionId, objectCatalogId);
+
+      if (!objectContainers) {
+        return;
+      }
+
+      if (!objectSchemaId) {
+        return objectContainers.catalog;
+      }
+      
+      return objectContainers.schemaList.find(
+        objectContainer => objectContainer.name === objectSchemaId
+      );
     }
-    return objectContainers.schemaList.find(
-      objectContainer => objectContainer.name === objectSchemaId || objectContainer.name === objectCatalogId
-    );
+
+    if (objectSchemaId) {
+      return this.containerContainers.getSchema(connectionId, objectSchemaId);
+    }
+
+    return undefined;
   }
 
   async deleteConnection(id: string): Promise<void> {
@@ -131,8 +145,8 @@ export class ConnectionsManagerService {
   }
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<IStructContainers> {
-    await this.connectionObjectContainers.load({ connectionId, catalogId });
-    return this.connectionObjectContainers.get({ connectionId, catalogId })!;
+    await this.containerContainers.load({ connectionId, catalogId });
+    return this.containerContainers.get({ connectionId, catalogId })!;
   }
 
   private addConnection(connection: Connection) {

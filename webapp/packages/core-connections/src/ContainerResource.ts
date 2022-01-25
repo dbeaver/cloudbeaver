@@ -87,6 +87,15 @@ string
     return this.data.get(connectionId);
   }
 
+  getSchema(
+    connectionId: string,
+    schemaId: string
+  ): ObjectContainer | undefined {
+    const connectionData = this.data.get(connectionId);
+
+    return connectionData?.schemaList.find(schema => schema.name === schemaId);
+  }
+
   getCatalogData(
     connectionId: string,
     catalogId: string
