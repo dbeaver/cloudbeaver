@@ -8,7 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable } from 'codemirror';
+import { Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable, StringStream } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
@@ -19,9 +19,10 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 interface ISqlModeOptions {
-  keywords: Record<string, boolean>;
-  builtin: Record<string, boolean>;
-  support: Record<string, boolean>;
+  keywords?: Record<string, boolean>;
+  builtin?: Record<string, boolean>;
+  support?: Record<string, boolean>;
+  hooks?: Record<string, any>;
 }
 
 const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
@@ -52,6 +53,7 @@ export class SQLCodeEditorController {
     const support: Record<string, boolean> = {};
     const keywords: Record<string, boolean> = {};
     const builtin: Record<string, boolean> = {};
+    const hooks: Record<string, any> = {};
 
     for (const key of this.dialect.dataTypes) {
       builtin[key.toLowerCase()] = true;
@@ -66,7 +68,8 @@ export class SQLCodeEditorController {
     }
 
     if (this.dialect.quoteStrings.flat().includes('"')) {
-      support['doubleQuote'] = true;
+      hooks['"'] = hookIdentifierDoublequote;
+      // support['doubleQuote'] = true;
     }
 
     if (this.dialect.singleLineComments.includes('#')) {
@@ -79,6 +82,7 @@ export class SQLCodeEditorController {
       keywords,
       builtin,
       support,
+      hooks,
     };
   }
 
@@ -147,4 +151,18 @@ function isCancellable(obj: EditorChange): obj is EditorChangeCancellable {
     && typeof (obj as EditorChangeCancellable)['cancel'] === 'function'
     && typeof (obj as EditorChangeCancellable)['update'] === 'function'
   );
+}
+
+
+// "identifier"
+function hookIdentifierDoublequote(stream: StringStream) {
+  // Standard SQL /SQLite identifiers
+  // ref: http://web.archive.org/web/20160813185132/http://savage.net.au/SQL/sql-99.bnf.html#delimited%20identifier
+  // ref: http://sqlite.org/lang_keywords.html
+  let ch;
+  while ((ch = stream.next()) != null) {
+    if (ch == '"' && !stream.eat('"')) {return 'variable-2';}
+  }
+  stream.backUp(stream.current().length - 1);
+  return stream.eatWhile(/\w/) ? 'variable-2' : null;
 }
