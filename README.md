@@ -21,7 +21,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
-### CloudBeaver 21.3.3 - 2021-01-25
+### CloudBeaver 21.3.3 - 2022-01-25
 - SSH public key support is added.
 - New tab's context menu allows users to close all opened tabs or a group of tabs.
 - Theme settings can be configured and saved for every user separately.
