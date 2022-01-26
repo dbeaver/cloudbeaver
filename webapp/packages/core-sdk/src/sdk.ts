@@ -742,6 +742,7 @@ export interface Query {
   sqlFormatQuery: Scalars['String'];
   sqlGenerateEntityQuery: Scalars['String'];
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
+  sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
   tryFederatedLogin: UserAuthToken;
@@ -909,6 +910,7 @@ export interface QueryMetadataGetNodeDdlArgs {
 export interface QueryNavGetStructContainersArgs {
   catalog?: InputMaybe<Scalars['ID']>;
   connectionId: Scalars['ID'];
+  contextId?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -1044,6 +1046,12 @@ export interface QuerySqlGenerateEntityQueryArgs {
 export interface QuerySqlListContextsArgs {
   connectionId?: InputMaybe<Scalars['ID']>;
   contextId?: InputMaybe<Scalars['ID']>;
+}
+
+
+export interface QuerySqlParseScriptArgs {
+  connectionId: Scalars['ID'];
+  script: Scalars['String'];
 }
 
 
@@ -1201,6 +1209,15 @@ export interface SqlResultSet {
   hasMoreData?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
+}
+
+export interface SqlScriptInfo {
+  queries: Array<SqlScriptQuery>;
+}
+
+export interface SqlScriptQuery {
+  end: Scalars['Int'];
+  start: Scalars['Int'];
 }
 
 export interface ServerConfig {
@@ -1855,15 +1872,6 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean; supportsSchemaChange: boolean; catalogList: Array<{ catalog: { id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> }>; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> } };
 
-export type FormatSqlQueryQueryVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  query: Scalars['String'];
-}>;
-
-
-export type FormatSqlQueryQuery = { query: string };
-
 export type AdminRoleInfoFragment = { roleId: string; roleName?: string; description?: string };
 
 export type AdminUserInfoFragment = { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
@@ -1889,6 +1897,8 @@ export type NavNodeInfoFragment = { id: string; name?: string; hasChildren?: boo
 export type NavNodePropertiesFragment = { id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number };
 
 export type ObjectOriginInfoFragment = { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> };
+
+export type SqlScriptInfoFragment = { queries: Array<{ start: number; end: number }> };
 
 export type SessionStateFragment = { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string };
 
@@ -2051,25 +2061,6 @@ export type NavRenameNodeMutationVariables = Exact<{
 
 export type NavRenameNodeMutation = { navRenameNode?: string };
 
-export type QuerySqlCompletionProposalsQueryVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  position: Scalars['Int'];
-  query: Scalars['String'];
-  simple?: InputMaybe<Scalars['Boolean']>;
-  maxResults?: InputMaybe<Scalars['Int']>;
-}>;
-
-
-export type QuerySqlCompletionProposalsQuery = { sqlCompletionProposals?: Array<{ cursorPosition?: number; displayString: string; icon?: string; nodePath?: string; replacementLength: number; replacementOffset: number; replacementString: string; score?: number; type: string }> };
-
-export type QuerySqlDialectInfoQueryVariables = Exact<{
-  connectionId: Scalars['ID'];
-}>;
-
-
-export type QuerySqlDialectInfoQuery = { dialect?: { name: string; dataTypes: Array<string>; functions: Array<string>; reservedWords: Array<string>; quoteStrings: Array<Array<string>>; singleLineComments: Array<string>; multiLineComments: Array<Array<string>>; catalogSeparator?: string; structSeparator?: string; scriptDelimiter?: string; supportsExplainExecutionPlan: boolean } };
-
 export type ConfigureServerQueryVariables = Exact<{
   configuration: ServerConfigInput;
 }>;
@@ -2130,6 +2121,42 @@ export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
 
 export type TouchSessionMutation = { touchSession?: boolean };
+
+export type FormatSqlQueryQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+}>;
+
+
+export type FormatSqlQueryQuery = { query: string };
+
+export type ParseSqlScriptQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  script: Scalars['String'];
+}>;
+
+
+export type ParseSqlScriptQuery = { scriptInfo: { queries: Array<{ start: number; end: number }> } };
+
+export type QuerySqlCompletionProposalsQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  position: Scalars['Int'];
+  query: Scalars['String'];
+  simple?: InputMaybe<Scalars['Boolean']>;
+  maxResults?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type QuerySqlCompletionProposalsQuery = { proposals?: Array<{ cursorPosition?: number; displayString: string; icon?: string; nodePath?: string; replacementLength: number; replacementOffset: number; replacementString: string; score?: number; type: string }> };
+
+export type QuerySqlDialectInfoQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+}>;
+
+
+export type QuerySqlDialectInfoQuery = { dialect?: { name: string; dataTypes: Array<string>; functions: Array<string>; reservedWords: Array<string>; quoteStrings: Array<Array<string>>; singleLineComments: Array<string>; multiLineComments: Array<Array<string>>; catalogSeparator?: string; structSeparator?: string; scriptDelimiter?: string; supportsExplainExecutionPlan: boolean } };
 
 export type SqlEntityQueryGeneratorsQueryVariables = Exact<{
   nodePathList: Array<Scalars['String']> | Scalars['String'];
@@ -2392,6 +2419,14 @@ export const NavNodeInfoFragmentDoc = `
   }
 }
     ${NavNodePropertiesFragmentDoc}`;
+export const SqlScriptInfoFragmentDoc = `
+    fragment SQLScriptInfo on SQLScriptInfo {
+  queries {
+    start
+    end
+  }
+}
+    `;
 export const SessionStateFragmentDoc = `
     fragment SessionState on SessionInfo {
   createTime
@@ -3004,15 +3039,6 @@ export const NavGetStructContainersDocument = `
   }
 }
     ${NavNodeInfoFragmentDoc}`;
-export const FormatSqlQueryDocument = `
-    query formatSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!) {
-  query: sqlFormatQuery(
-    connectionId: $connectionId
-    contextId: $contextId
-    query: $query
-  )
-}
-    `;
 export const GetAsyncTaskInfoDocument = `
     mutation getAsyncTaskInfo($taskId: String!, $removeOnFinish: Boolean!) {
   taskInfo: asyncTaskInfo(id: $taskId, removeOnFinish: $removeOnFinish) {
@@ -3246,45 +3272,6 @@ export const NavRenameNodeDocument = `
   navRenameNode(nodePath: $nodePath, newName: $newName)
 }
     `;
-export const QuerySqlCompletionProposalsDocument = `
-    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $simple: Boolean, $maxResults: Int) {
-  sqlCompletionProposals(
-    connectionId: $connectionId
-    contextId: $contextId
-    query: $query
-    position: $position
-    maxResults: $maxResults
-    simpleMode: $simple
-  ) {
-    cursorPosition
-    displayString
-    icon
-    nodePath
-    replacementLength
-    replacementOffset
-    replacementString
-    score
-    type
-  }
-}
-    `;
-export const QuerySqlDialectInfoDocument = `
-    query querySqlDialectInfo($connectionId: ID!) {
-  dialect: sqlDialectInfo(connectionId: $connectionId) {
-    name
-    dataTypes
-    functions
-    reservedWords
-    quoteStrings
-    singleLineComments
-    multiLineComments
-    catalogSeparator
-    structSeparator
-    scriptDelimiter
-    supportsExplainExecutionPlan
-  }
-}
-    `;
 export const ConfigureServerDocument = `
     query configureServer($configuration: ServerConfigInput!) {
   configureServer(configuration: $configuration)
@@ -3388,6 +3375,61 @@ export const SessionStateDocument = `
 export const TouchSessionDocument = `
     mutation touchSession {
   touchSession
+}
+    `;
+export const FormatSqlQueryDocument = `
+    query formatSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!) {
+  query: sqlFormatQuery(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+  )
+}
+    `;
+export const ParseSqlScriptDocument = `
+    query parseSQLScript($connectionId: ID!, $script: String!) {
+  scriptInfo: sqlParseScript(connectionId: $connectionId, script: $script) {
+    ...SQLScriptInfo
+  }
+}
+    ${SqlScriptInfoFragmentDoc}`;
+export const QuerySqlCompletionProposalsDocument = `
+    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $simple: Boolean, $maxResults: Int) {
+  proposals: sqlCompletionProposals(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+    position: $position
+    maxResults: $maxResults
+    simpleMode: $simple
+  ) {
+    cursorPosition
+    displayString
+    icon
+    nodePath
+    replacementLength
+    replacementOffset
+    replacementString
+    score
+    type
+  }
+}
+    `;
+export const QuerySqlDialectInfoDocument = `
+    query querySqlDialectInfo($connectionId: ID!) {
+  dialect: sqlDialectInfo(connectionId: $connectionId) {
+    name
+    dataTypes
+    functions
+    reservedWords
+    quoteStrings
+    singleLineComments
+    multiLineComments
+    catalogSeparator
+    structSeparator
+    scriptDelimiter
+    supportsExplainExecutionPlan
+  }
 }
     `;
 export const SqlEntityQueryGeneratorsDocument = `
@@ -3610,9 +3652,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navGetStructContainers(variables: NavGetStructContainersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavGetStructContainersQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navGetStructContainers');
     },
-    formatSqlQuery(variables: FormatSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<FormatSqlQueryQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'formatSqlQuery');
-    },
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAsyncTaskInfoMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAsyncTaskInfo');
     },
@@ -3667,12 +3706,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navRenameNode(variables: NavRenameNodeMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavRenameNodeMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRenameNode');
     },
-    querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlCompletionProposalsQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlCompletionProposals');
-    },
-    querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlDialectInfoQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlDialectInfo');
-    },
     configureServer(variables: ConfigureServerQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ConfigureServerQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'configureServer');
     },
@@ -3702,6 +3735,18 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     touchSession(variables?: TouchSessionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<TouchSessionMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<TouchSessionMutation>(TouchSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'touchSession');
+    },
+    formatSqlQuery(variables: FormatSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<FormatSqlQueryQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'formatSqlQuery');
+    },
+    parseSQLScript(variables: ParseSqlScriptQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ParseSqlScriptQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ParseSqlScriptQuery>(ParseSqlScriptDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'parseSQLScript');
+    },
+    querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlCompletionProposalsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlCompletionProposals');
+    },
+    querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<QuerySqlDialectInfoQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlDialectInfo');
     },
     sqlEntityQueryGenerators(variables: SqlEntityQueryGeneratorsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SqlEntityQueryGeneratorsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<SqlEntityQueryGeneratorsQuery>(SqlEntityQueryGeneratorsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlEntityQueryGenerators');

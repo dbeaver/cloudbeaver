@@ -14,6 +14,11 @@ type RequireOne<T, K extends keyof T> = {
   [P in K]-?: T[P]
 };
 
+export interface IQueryInfo {
+  start: number;
+  end: number;
+}
+
 export interface ISQLScriptSegment {
   query: string;
 
@@ -69,13 +74,17 @@ export class SQLParser {
     return this.lines.length;
   }
 
+  get actualScript(): string {
+    return this.script;
+  }
+
   private dialect: SqlDialectInfo | null;
   private _scripts: ISQLScriptSegment[];
   private script: string;
   private parsedScript: string;
   private lines: ISQLScriptLine[];
   private customScriptDelimiters: string[];
-  private customQuotes: string[][];
+  private readonly customQuotes: string[][];
 
   constructor() {
     this.dialect = null;
@@ -232,6 +241,30 @@ export class SQLParser {
         }
       }
     }
+  }
+
+  setQueries(queries: IQueryInfo[]): this {
+    this.update();
+    this._scripts = [];
+
+    for (const query of queries) {
+      const from = this.getScriptLineAtPos(query.start);
+      const to = this.getScriptLineAtPos(query.end);
+      
+      if (from && to) {
+        this._scripts.push({
+          query: this.script.substring(query.start, query.end),
+          begin: query.start,
+          end: query.end,
+          from: from.index,
+          to: to.index,
+          fromPosition: query.start - from.begin,
+          toPosition: query.end - to.begin,
+        });
+      }
+    }
+
+    return this;
   }
 
   private update() {

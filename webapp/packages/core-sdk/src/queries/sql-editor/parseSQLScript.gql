@@ -1,0 +1,11 @@
+query parseSQLScript(
+    $connectionId: ID!
+    $script: String!
+) {
+    scriptInfo: sqlParseScript(
+        connectionId: $connectionId
+        script: $script
+    ) {
+        ...SQLScriptInfo
+    }
+}

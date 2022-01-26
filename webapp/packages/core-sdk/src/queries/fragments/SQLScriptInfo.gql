@@ -1,0 +1,6 @@
+fragment SQLScriptInfo on SQLScriptInfo {
+  queries {
+    start
+    end
+  }
+}

@@ -74,7 +74,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     return true;
   }
 
-  private parser: SQLParser;
+  private readonly parser: SQLParser;
 
   readonly options: EditorConfiguration = {
     theme: 'material',
@@ -124,8 +124,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
     private readonly commonDialogService: CommonDialogService
   ) {
     this.parser = new SQLParser();
-    this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
-    this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
+    this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete.bind(this), 1000 / 3);
+    this.updateParserScriptsThrottle = throttleAsync(this.updateParserScriptsThrottle.bind(this), 1000 / 2);
     this.cursor = null;
     this.readonlyState = false;
     this.executingScript = false;
@@ -153,8 +153,9 @@ export class SqlEditorController implements IInitializableController, IDestructi
       if (this.state.executionContext) {
         this.sqlDialectInfoService
           .loadSqlDialectInfo(this.state.executionContext.connectionId)
-          .then(dialect => {
+          .then(async dialect => {
             this.parser.setDialect(dialect || null);
+            await this.updateParserScriptsThrottle();
           });
       }
     });
@@ -256,6 +257,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     this.beforeExecute();
     try {
       this.executingScript = true;
+      await this.updateParserScripts();
       const queries = this.parser.scripts;
 
       await this.sqlQueryService.executeQueries(
@@ -282,13 +284,33 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   setQuery(query: string): void {
-    const editorPosition = this.editor?.getCursor();
-
     this.state.query = query;
     this.parser.setScript(query);
+    this.updateParserScriptsThrottle();
+    this.highlightActiveQuery();
+  }
 
-    if (editorPosition && this.editor) {
-      this.editor.setCursor(editorPosition);
+  private async updateParserScriptsThrottle() {
+    await this.updateParserScripts();
+  }
+
+  private async updateParserScripts() {
+    const connectionId = this.state.executionContext?.connectionId;
+    const script = this.parser.actualScript;
+    
+    if (!connectionId) { 
+      return;
+    }
+
+    const { queries } = await this.sqlEditorService
+      .parseSQLScript(
+        connectionId,
+        script
+      );
+    
+    if (this.parser.actualScript === script) {
+      this.parser.setQueries(queries);
+      this.highlightActiveQuery();
     }
   }
 
@@ -386,12 +408,13 @@ export class SqlEditorController implements IInitializableController, IDestructi
     const cursor = editor.getCursor('from');
     const cursorPosition = getAbsolutePosition(editor, cursor);
     const [from, to, word] = getWordRange(editor, cursor);
+    const query = this.state.query;
 
-    let proposals = await this.sqlEditorService
+    let { proposals } = await this.sqlEditorService
       .getAutocomplete(
         this.state.executionContext.connectionId,
         this.state.executionContext.id,
-        this.state.query,
+        query,
         cursorPosition,
         undefined,
         !options.completeSingle
@@ -433,8 +456,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
       }
 
       const lastChange = changes[changes.length - 1];
-      const origin = lastChange?.origin || '';
-      const change = lastChange?.text[0] || '';
+      const origin = lastChange.origin || '';
+      const change = lastChange.text[0] || '';
 
       const nextCursor = editor.getCursor('from');
 
@@ -460,7 +483,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
       this.cursor = { ...newCursor };
 
       if (editor.state.completionActive) {
-        if (newCursor.ch !== cursor?.ch || newCursor.line !== cursor.line) {
+        if (newCursor.ch !== cursor.ch || newCursor.line !== cursor.line) {
           const ch = newCursor.ch > cursor.ch
             ? editor.getRange(cursor, newCursor)
             : editor.getRange(newCursor, cursor);
@@ -559,7 +582,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
     }
 
     // TODO: should be moved to SQLParser
-    if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect?.scriptDelimiter)) {
+    if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect.scriptDelimiter)) {
       query.query = query.query.slice(0, query.query.length - this.dialect.scriptDelimiter.length);
     }
 

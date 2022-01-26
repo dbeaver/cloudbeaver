@@ -6,7 +6,7 @@ query querySqlCompletionProposals(
     $simple: Boolean
     $maxResults: Int
 ) {
-    sqlCompletionProposals(
+    proposals: sqlCompletionProposals(
         connectionId: $connectionId
         contextId: $contextId
         query: $query

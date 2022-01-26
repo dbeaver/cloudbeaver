@@ -9,16 +9,16 @@
 import { ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
+import { GraphQLService, QuerySqlCompletionProposalsQuery, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 @injectable()
 export class SqlEditorService {
   constructor(
-    private gql: GraphQLService,
-    private connectionsManagerService: ConnectionsManagerService,
-    private notificationService: NotificationService,
-    private connectionExecutionContextService: ConnectionExecutionContextService
+    private readonly gql: GraphQLService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly notificationService: NotificationService,
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService
   ) {
   }
 
@@ -36,6 +36,18 @@ export class SqlEditorService {
     };
   }
 
+  async parseSQLScript(
+    connectionId: string,
+    script: string
+  ): Promise<SqlScriptInfoFragment> {
+    const result = await this.gql.sdk.parseSQLScript({
+      connectionId,
+      script,
+    });
+
+    return result.scriptInfo;
+  }
+
   async getAutocomplete(
     connectionId: string,
     contextId: string,
@@ -43,7 +55,7 @@ export class SqlEditorService {
     cursor: number,
     maxResults?: number,
     simple?: boolean,
-  ): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
+  ): Promise<QuerySqlCompletionProposalsQuery> {
     const result = await this.gql.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
@@ -53,7 +65,7 @@ export class SqlEditorService {
       simple,
     });
 
-    return result.sqlCompletionProposals;
+    return result;
   }
 
   async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
