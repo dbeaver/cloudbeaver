@@ -10,20 +10,17 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { DATA_CONTEXT_NAV_NODE, TabHandlerTabComponent, useNode } from '@cloudbeaver/core-app';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
+import { TabHandlerTabComponent, useNode } from '@cloudbeaver/core-app';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-ui';
 import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
 export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({
   tab, handler, onSelect, onClose, style,
 }) {
-  const connectionsInfoResource = useService(ConnectionInfoResource);
+  // const connectionsInfoResource = useService(ConnectionInfoResource);
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
@@ -31,14 +28,14 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
   const title = node?.name || tab.handlerState.tabTitle;
 
-  if (node){
-    tabMenuContext.set(DATA_CONTEXT_NAV_NODE, node);
-    const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  // if (node){
+  //   tabMenuContext.set(DATA_CONTEXT_NAV_NODE, node);
+  //   const connection = connectionsInfoResource.getConnectionForNode(node.id);
 
-    if (connection) {
-      tabMenuContext.set(DATA_CONTEXT_CONNECTION, connection);
-    }
-  }
+  //   if (connection) {
+  //     tabMenuContext.set(DATA_CONTEXT_CONNECTION, connection);
+  //   }
+  // }
 
   return styled(useStyles(style))(
     <Tab
