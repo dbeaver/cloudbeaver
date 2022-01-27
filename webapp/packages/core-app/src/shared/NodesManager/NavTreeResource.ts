@@ -52,12 +52,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   constructor(
-    private graphQLService: GraphQLService,
-    private navNodeInfoResource: NavNodeInfoResource,
-    private coreSettingsService: CoreSettingsService,
-    private sessionDataResource: SessionDataResource,
-    private connectionInfo: ConnectionInfoResource,
-    private userInfoResource: UserInfoResource,
+    private readonly graphQLService: GraphQLService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly coreSettingsService: CoreSettingsService,
+    private readonly sessionDataResource: SessionDataResource,
+    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly userInfoResource: UserInfoResource,
     permissionsResource: PermissionsResource,
   ) {
     super();
@@ -379,8 +379,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
       const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
 
-      if (connectionInfo.nodePath) {
-        this.deleteInNode(folder, [connectionInfo.nodePath]);
+      if (nodePath) {
+        this.deleteInNode(folder, [nodePath]);
       }
     });
   }

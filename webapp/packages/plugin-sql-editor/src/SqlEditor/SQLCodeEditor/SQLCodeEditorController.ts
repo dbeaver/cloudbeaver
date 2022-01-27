@@ -77,6 +77,8 @@ export class SQLCodeEditorController {
       support['commentSpaceRequired'] = true;
     }
 
+    support['ODBCdotTable'] = true;
+
     return {
       name,
       keywords,

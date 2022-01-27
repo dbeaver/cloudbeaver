@@ -6,21 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { connectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, connectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { IExtension } from '@cloudbeaver/core-extensions';
 
 import { objectCatalogProvider } from './extensions/IObjectCatalogProvider';
 import { objectSchemaProvider } from './extensions/IObjectSchemaProvider';
 import { NavNodeManagerService } from './NavNodeManagerService';
-import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
 export class NavNodeExtensionsService {
   readonly extensions: Array<IExtension<string>>;
 
   constructor(
-    private navNodeManagerService: NavNodeManagerService
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     this.extensions = [
       connectionProvider(this.getConnection.bind(this)),
@@ -30,14 +30,7 @@ export class NavNodeExtensionsService {
   }
 
   getConnection(navNodeId: string) {
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(navNodeId);
-
-    if (!nodeInfo.connectionId) {
-      return;
-    }
-    // connection node id differs from connection id
-    return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
+    return this.connectionInfoResource.getConnectionForNode(navNodeId)?.id;
   }
 
   getDBObjectCatalog(navNodeId: string) {

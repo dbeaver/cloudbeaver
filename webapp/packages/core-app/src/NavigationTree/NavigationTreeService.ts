@@ -22,7 +22,6 @@ import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensio
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
-import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 import type { ITreeNodeState } from './useElementsTree';
 
 export interface INavigationNodeSelectionData {
@@ -36,12 +35,12 @@ export class NavigationTreeService extends View<string> {
   readonly nodeSelectionTask: ISyncExecutor<INavigationNodeSelectionData>;
 
   constructor(
-    private navNodeManagerService: NavNodeManagerService,
-    private notificationService: NotificationService,
-    private connectionsManagerService: ConnectionsManagerService,
-    private connectionInfoResource: ConnectionInfoResource,
-    private navNodeExtensionsService: NavNodeExtensionsService,
-    private navTreeResource: NavTreeResource
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly notificationService: NotificationService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly navNodeExtensionsService: NavNodeExtensionsService,
+    private readonly navTreeResource: NavTreeResource
   ) {
     super();
 
@@ -71,15 +70,19 @@ export class NavigationTreeService extends View<string> {
   async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean, notify = true): Promise<boolean> {
     try {
       if (this.isConnectionNode(id)) {
-        const connection = await this.connectionInfoResource.load(
-          NodeManagerUtils.connectionNodeIdToConnectionId(id)
-        );
+        let connection = this.connectionInfoResource.getConnectionForNode(id);
+
+        if (connection) {
+          connection = await this.connectionInfoResource.load(connection.id);
+        } else {
+          return false;
+        }
 
         if (!connection.connected && !tryConnect) {
           return false;
         }
 
-        const connected = await this.tryInitConnection(id);
+        const connected = await this.tryInitConnection(connection.id);
 
         if (!connected) {
           return false;
@@ -161,10 +164,8 @@ export class NavigationTreeService extends View<string> {
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
-  private async tryInitConnection(navNodeId: string): Promise<boolean> {
-    const connection = await this.connectionsManagerService.requireConnection(
-      NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
-    );
+  private async tryInitConnection(connectionId: string): Promise<boolean> {
+    const connection = await this.connectionsManagerService.requireConnection(connectionId);
 
     return connection?.connected || false;
   }

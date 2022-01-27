@@ -8,7 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-app';
+import type { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
@@ -25,10 +25,10 @@ export class DdlViewerController implements IInitializableController, IDestructi
   private nodeId!: string;
 
   constructor(
-    private ddlViewerService: DdlViewerService,
-    private navNodeManagerService: NavNodeManagerService,
-    private sqlDialectInfoService: SqlDialectInfoService,
-    private notificationService: NotificationService
+    private readonly ddlViewerService: DdlViewerService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly sqlDialectInfoService: SqlDialectInfoService,
+    private readonly notificationService: NotificationService
   ) {
     makeObservable(this, {
       isLoading: observable,
@@ -61,11 +61,10 @@ export class DdlViewerController implements IInitializableController, IDestructi
   }
 
   private async loadDialect(nodeId: string): Promise<void> {
-    const { connectionId } = this.navNodeManagerService.getNodeContainerInfo(nodeId);
-    if (!connectionId) {
-      return;
+    const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
+
+    if (connection) {
+      this.dialect = await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
     }
-    const connection = NodeManagerUtils.connectionNodeIdToConnectionId(connectionId);
-    this.dialect = await this.sqlDialectInfoService.loadSqlDialectInfo(connection);
   }
 }

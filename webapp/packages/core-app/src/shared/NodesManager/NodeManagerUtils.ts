@@ -7,15 +7,6 @@
  */
 
 export const NodeManagerUtils = {
-  /**
-   * connectionId should be in format postgres-jdbc-17015e17226-60ea13802381a3ab
-   *
-   * @param connectionNodeId example: database://postgres-jdbc-17015e17226-60ea13802381a3ab
-   */
-  connectionNodeIdToConnectionId(connectionNodeId: string): string {
-    return connectionNodeId.replace('database://', '');
-  },
-
   parentsFromPath(nodeId: string): string[] {
     const parts = nodeId
       .replace('//', '\\')

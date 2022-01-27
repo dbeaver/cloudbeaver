@@ -90,13 +90,13 @@ export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
 
   constructor(
-    private permissionsService: PermissionsService,
+    private readonly permissionsService: PermissionsService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
-    private connectionsManagerService: ConnectionsManagerService,
-    private notificationService: NotificationService,
-    private serverService: ServerService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly notificationService: NotificationService,
+    private readonly serverService: ServerService,
     navigationService: NavigationService
   ) {
     super();
@@ -240,15 +240,7 @@ export class NavNodeManagerService extends Bootstrap {
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
-    let connection: Connection | undefined;
-
-    const nodeInfo = this.getNodeContainerInfo(nodeId);
-
-    if (nodeInfo.connectionId) {
-      // connection node id differs from connection id
-      const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
-      connection = this.connectionInfo.get(connectionId);
-    }
+    const connection = this.connectionInfo.getConnectionForNode(nodeId);
 
     if (NodeManagerUtils.isDatabaseObject(nodeId) && connection?.connected) {
       const node = await this.loadNode({ nodeId, parentId });
