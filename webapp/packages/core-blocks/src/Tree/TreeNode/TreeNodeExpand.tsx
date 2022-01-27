@@ -8,8 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { getComputed, Icon, Loader } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
