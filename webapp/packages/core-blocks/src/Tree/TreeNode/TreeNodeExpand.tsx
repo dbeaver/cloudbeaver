@@ -64,8 +64,11 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
-      {!loading && (!leaf || context.externalExpanded) && big && <Icon name="angle" viewBox="0 0 15 8" />}
-      {!loading && (!leaf || context.externalExpanded) && !big && <Icon name="arrow" viewBox="0 0 16 16" />}
+      {!loading && (!leaf || context.externalExpanded) && (
+        big 
+          ? <Icon name="angle" viewBox="0 0 15 8" />
+          : <Icon name="arrow" viewBox="0 0 16 16" />
+      )}
     </arrow>
   );
 });

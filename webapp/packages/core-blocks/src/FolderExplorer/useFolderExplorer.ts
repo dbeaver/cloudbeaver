@@ -10,9 +10,9 @@ import { action, observable } from 'mobx';
 import { useContext } from 'react';
 
 import { useObservableRef } from '../useObservableRef';
-import { FolderExplorerContext, IFolderExplorerContext } from './FolderExplorerContext';
+import { FolderExplorerContext, IFolderExplorerContext, IFolderExplorerOptions } from './FolderExplorerContext';
 
-export function useFolderExplorer(root: string): IFolderExplorerContext {
+export function useFolderExplorer(root: string, options: IFolderExplorerOptions = {}): IFolderExplorerContext {
   const context = useContext(FolderExplorerContext);
 
   const state = useObservableRef<IFolderExplorerContext>(() => ({
@@ -20,6 +20,7 @@ export function useFolderExplorer(root: string): IFolderExplorerContext {
     path: [],
     fullPath: [root],
     folder: root,
+    options,
     open(path: string[], folder: string) {
       this.path = path.slice();
       this.fullPath = [...path, folder];
@@ -30,6 +31,7 @@ export function useFolderExplorer(root: string): IFolderExplorerContext {
     path: observable,
     fullPath: observable,
     folder: observable,
+    options: observable.ref,
     open: action.bound,
   }, false);
 

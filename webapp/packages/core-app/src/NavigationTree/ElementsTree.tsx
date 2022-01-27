@@ -89,8 +89,45 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navigationTreeService = useService(NavigationTreeService);
 
+  const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
+    path = [...path];
+
+    if (!tree.foldersTree) {
+      return;
+    }
+    
+    while (folderExplorer.options.expandFoldersWithSingleElement) {
+      const children = navigationTreeService.getChildren(nodeId);
+            
+      if (children?.length === 1) {
+        const nextNodeId = children[0];
+        const loaded = await navigationTreeService.loadNestedNodes(nextNodeId, false);
+
+        if (!loaded) {
+          break;
+        }
+
+        path.push(nodeId);
+        nodeId = nextNodeId;
+      } else { 
+        break;
+      }
+    }
+
+    folderExplorer.open(path, nodeId);
+    
+  }, []);
+
   const children = useMapResource(ElementsTree, NavTreeResource, root, {
-    onLoad: async resource => !(await resource.preloadNodeParents(fullPath)),
+    onLoad: async resource => {
+      const preload = await resource.preloadNodeParents(fullPath);
+
+      if (!preload) {
+        return false;
+      }
+
+      await autoOpenFolders(root, folderExplorer.path);
+    },
   });
 
   const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
@@ -125,10 +162,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         await onClick?.(node);
 
         if (!leaf && tree.foldersTree) {
-          const loaded = await navigationTreeService.loadNestedNodes(node.id, true);
+          const nodeId = node.id;
+          const loaded =  await navigationTreeService.loadNestedNodes(nodeId, true);
 
           if (loaded) {
-            folderExplorer.open(path, node.id);
+            await autoOpenFolders(nodeId, path);
           }
         }
       },

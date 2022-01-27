@@ -36,8 +36,6 @@ export interface ITreeNodeState {
 }
 
 interface IElementsTreeUserState {
-  foldersTree: boolean;
-  showFolderExplorerPath: boolean;
   nodeState: Array<[string, ITreeNodeState]>;
 }
 
@@ -90,14 +88,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
     expanded: false,
   })));
   const state = options.localState || localTreeNodesState;
-  let foldersTree = options.foldersTree;
-  let showFolderExplorerPath = options.showFolderExplorerPath;
+  const foldersTree = options.foldersTree;
+  const showFolderExplorerPath = options.showFolderExplorerPath;
 
-  const userState = useUserData<IElementsTreeUserState>(
+  useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
     () => observable<IElementsTreeUserState>({
-      foldersTree,
-      showFolderExplorerPath,
       nodeState: [],
     }),
     async data => {
@@ -115,13 +111,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
     data => (
       typeof data === 'object'
       && Array.isArray(data.nodeState)
-      && typeof data.foldersTree === 'boolean'
-      && typeof data.showFolderExplorerPath === 'boolean'
     )
   );
-
-  foldersTree = userState.foldersTree;
-  showFolderExplorerPath = userState.showFolderExplorerPath;
 
   async function loadTree(nodeId: string) {
     const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);

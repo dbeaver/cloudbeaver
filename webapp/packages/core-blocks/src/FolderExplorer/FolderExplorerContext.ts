@@ -8,11 +8,16 @@
 
 import { createContext } from 'react';
 
+export interface IFolderExplorerOptions {
+  expandFoldersWithSingleElement?: boolean;
+}
+
 export interface IFolderExplorerContext {
   root: string;
   path: string[];
   fullPath: string[];
   folder: string;
+  options: IFolderExplorerOptions;
 
   open: (path: string[], folder: string) => void;
 }
