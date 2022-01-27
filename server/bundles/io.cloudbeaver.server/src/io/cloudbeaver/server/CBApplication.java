@@ -79,6 +79,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     private String serverURL;
     private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
+    private String serverHost = null;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
     private String rootURI = CBConstants.DEFAULT_ROOT_URI;
@@ -111,8 +112,14 @@ public class CBApplication extends BaseApplicationImpl {
         return serverURL;
     }
 
+    // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
     public int getServerPort() {
         return serverPort;
+    }
+
+    // The network interface this connector binds to as an IP address or a hostname.  If null or 0.0.0.0, then bind to all interfaces.
+    public String getServerHost() {
+        return serverHost;
     }
 
     public String getServerName() {
@@ -235,7 +242,7 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("\tDrivers storage: " + new File(driversLocation).getAbsolutePath());
         //log.debug("\tDrivers root: " + driversLocation);
         //log.debug("\tProduct details: " + application.getInfoDetails());
-        log.debug("\tBase port: " + serverPort);
+        log.debug("\tListen port: " + serverPort + (CommonUtils.isEmpty(serverHost) ? " on all interfaces" : " on " + serverHost));
         log.debug("\tBase URI: " + servicesURI);
         if (develMode) {
             log.debug("\tDevelopment mode");
@@ -468,10 +475,15 @@ public class CBApplication extends BaseApplicationImpl {
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
+            serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
             if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
                 serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
             } else if (serverURL == null) {
-                serverURL = "http://" + InetAddress.getLocalHost().getHostName() + ":" + serverPort;
+                String hostName = serverHost;
+                if (CommonUtils.isEmpty(hostName)) {
+                    hostName = InetAddress.getLocalHost().getHostName();
+                }
+                serverURL = "http://" + hostName + ":" + serverPort;
             }
 
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
@@ -565,7 +577,7 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     private void runWebServer() {
-        log.debug("Starting Jetty server (" + serverPort + ") ");
+        log.debug("Starting Jetty server (" + serverPort + " on " + (CommonUtils.isEmpty(serverHost) ? "all interfaces" : serverHost) + ") ");
         new CBJettyServer().runServer();
     }
 

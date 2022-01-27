@@ -16,8 +16,10 @@ import org.eclipse.jetty.servlet.ServletMapping;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -39,16 +41,15 @@ public class CBJettyServer {
     public void runServer() {
         CBApplication application = CBApplication.getInstance();
         try {
-            Server server = new Server(application.getServerPort()) {
-                @Override
-                public void setSessionIdManager(SessionIdManager sessionIdManager) {
-                    if (sessionIdManager instanceof DefaultSessionIdManager) {
-                        // Nullify worker name to avoid dummy prefixes in session ID cookie
-                        ((DefaultSessionIdManager) sessionIdManager).setWorkerName(null);
-                    }
-                    super.setSessionIdManager(sessionIdManager);
-                }
-            };
+            JettyServer server;
+            int serverPort = application.getServerPort();
+            String serverHost = application.getServerHost();
+            if (CommonUtils.isEmpty(serverHost)) {
+                server = new JettyServer(serverPort);
+            } else {
+                server = new JettyServer(
+                    InetSocketAddress.createUnresolved(serverHost, serverPort));
+            }
 
             {
                 // Handler configuration
@@ -134,4 +135,22 @@ public class CBJettyServer {
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 
+    private static class JettyServer extends Server {
+        public JettyServer(int serverPort) {
+            super(serverPort);
+        }
+
+        public JettyServer(InetSocketAddress addr) {
+            super(addr);
+        }
+
+        @Override
+        public void setSessionIdManager(SessionIdManager sessionIdManager) {
+            if (sessionIdManager instanceof DefaultSessionIdManager) {
+                // Nullify worker name to avoid dummy prefixes in session ID cookie
+                ((DefaultSessionIdManager) sessionIdManager).setWorkerName(null);
+            }
+            super.setSessionIdManager(sessionIdManager);
+        }
+    }
 }

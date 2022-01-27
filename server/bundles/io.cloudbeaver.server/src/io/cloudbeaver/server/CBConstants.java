@@ -37,6 +37,7 @@ public class CBConstants {
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 
     public static final String PARAM_SERVER_PORT = "serverPort";
+    public static final String PARAM_SERVER_HOST = "serverHost";
     public static final String PARAM_SERVER_NAME = "serverName";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
     public static final String PARAM_SERVER_URL = "serverURL";
