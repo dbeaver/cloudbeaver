@@ -1,4 +1,4 @@
-package io.cloudbeaver.server.jetty;
+package io.cloudbeaver.server.servlets;
 
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.server.CBConstants;

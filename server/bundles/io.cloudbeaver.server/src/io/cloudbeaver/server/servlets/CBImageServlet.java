@@ -1,4 +1,4 @@
-package io.cloudbeaver.server.jetty;
+package io.cloudbeaver.server.servlets;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.jkiss.dbeaver.Log;

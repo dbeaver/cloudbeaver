@@ -27,6 +27,9 @@ import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
+import io.cloudbeaver.server.servlets.CBImageServlet;
+import io.cloudbeaver.server.servlets.CBStaticServlet;
+import io.cloudbeaver.server.servlets.CBStatusServlet;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -50,6 +53,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
+import javax.servlet.Servlet;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -778,6 +782,21 @@ public class CBApplication extends BaseApplicationImpl {
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // License management
+
+    public Servlet createServletStatic() {
+        return new CBStaticServlet();
+    }
+
+    public Servlet createServletStatus() {
+        return new CBStatusServlet();
+    }
+
+    public Servlet createServletImage() {
+        return new CBImageServlet();
     }
 
     ////////////////////////////////////////////////////////////////////////

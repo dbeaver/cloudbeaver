@@ -1,4 +1,4 @@
-package io.cloudbeaver.server.jetty;
+package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.DBWAuthProviderFederated;
