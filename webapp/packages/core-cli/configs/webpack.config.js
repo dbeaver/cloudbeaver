@@ -171,7 +171,7 @@ module.exports = (env, argv) => {
             semantic: true,
             syntactic: true,
           },
-          // build: true,
+          build: true,
           // mode: "write-references",
         },
         // eslint: {
