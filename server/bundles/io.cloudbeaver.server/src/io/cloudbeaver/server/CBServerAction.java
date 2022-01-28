@@ -25,10 +25,12 @@ import java.util.Map;
  */
 public class CBServerAction {
 
-    private final String actionId;
-    private final Map<String, String> parameters;
+    private static final String PARAM_ACTION_PARAMETERS = "action-parameters";
 
-    public CBServerAction(String actionId, Map<String, String> parameters) {
+    private final String actionId;
+    private final Map<String, Object> parameters;
+
+    public CBServerAction(String actionId, Map<String, Object> parameters) {
         this.actionId = actionId;
         this.parameters = parameters;
     }
@@ -37,22 +39,22 @@ public class CBServerAction {
         return actionId;
     }
 
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 
-    public String getParameter(String param) {
-        return parameters.get(param);
+    public <T> T getParameter(String param) {
+        return (T)parameters.get(param);
     }
 
-    public void saveInSession(WebSession session, String actionType) {
-        session.setAttribute(actionType, this);
+    public void saveInSession(WebSession session) {
+        session.setAttribute(PARAM_ACTION_PARAMETERS, this);
     }
 
-    public static CBServerAction fromSession(WebSession session, String actionType, boolean remove) {
-        CBServerAction action = session.getAttribute(actionType);
+    public static CBServerAction fromSession(WebSession session, boolean remove) {
+        CBServerAction action = session.getAttribute(PARAM_ACTION_PARAMETERS);
         if (action != null && remove) {
-            session.removeAttribute(actionType);
+            session.removeAttribute(PARAM_ACTION_PARAMETERS);
         }
         return action;
     }
