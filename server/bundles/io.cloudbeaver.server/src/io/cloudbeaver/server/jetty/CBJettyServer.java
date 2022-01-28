@@ -3,6 +3,8 @@ package io.cloudbeaver.server.jetty;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.servlets.CBImageServlet;
+import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -57,9 +59,9 @@ public class CBJettyServer {
                 servletContextHandler.setResourceBase(application.getContentRoot());
                 String rootURI = application.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
-                servletContextHandler.addServlet(new ServletHolder("static", application.createServletStatic()), "/*");
-                servletContextHandler.addServlet(new ServletHolder("status", application.createServletStatus()), "/status");
-                servletContextHandler.addServlet(new ServletHolder("images", application.createServletImage()), application.getServicesURI() + "images/*");
+                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), "/*");
+                servletContextHandler.addServlet(new ServletHolder("status", new CBStaticServlet()), "/status");
+                servletContextHandler.addServlet(new ServletHolder("images", new CBImageServlet()), application.getServicesURI() + "images/*");
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener());
 

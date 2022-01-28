@@ -4,6 +4,8 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.DBWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebHandlerRegistry;
+import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
@@ -13,6 +15,7 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.ResourceService;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -43,6 +46,15 @@ public class CBStaticServlet extends DefaultServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        for (WebServletHandlerDescriptor handler : WebHandlerRegistry.getInstance().getServletHandlers()) {
+            try {
+                if (handler.getInstance().handleRequest(this, request, response)) {
+                    return;
+                }
+            } catch (DBException e) {
+                log.warn("Servlet handler '" + handler.getId() + "' failed", e);
+            }
+        }
         String uri = request.getPathInfo();
 
         if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth() &&

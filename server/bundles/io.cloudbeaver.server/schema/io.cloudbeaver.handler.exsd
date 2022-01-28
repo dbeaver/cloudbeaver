@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.handler" name="Web handlers"/>
+      </appInfo>
+      <documentation>
+         Web feature
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="servletHandler"/>
+         </sequence>
+      </complexType>
+      <complexType>
+         <sequence>
+            <element ref="sessionHandler"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="servletHandler">
+      <annotation>
+         <documentation>
+            Web handler description
+         </documentation>
+      </annotation>
+   </element>
+
+   <element name="sessionHandler">
+      <annotation>
+         <documentation>
+            Web handler description
+         </documentation>
+      </annotation>
+   </element>
+
+</schema>

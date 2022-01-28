@@ -31,6 +31,8 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +81,15 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         ;
 
         model.getMutationType()
-            .dataFetcher("openSession", env -> getService(env).openSession(
-                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env), false),
-                env.getArgument("defaultLocale")))
+            .dataFetcher("openSession", env -> {
+                HttpServletRequest servletRequest = GraphQLEndpoint.getServletRequest(env);
+                HttpServletResponse servletResponse = GraphQLEndpoint.getServletResponse(env);
+                return getService(env).openSession(
+                    sessionManager.getWebSession(servletRequest, servletResponse, false),
+                    env.getArgument("defaultLocale"),
+                    servletRequest,
+                    servletResponse);
+            })
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))

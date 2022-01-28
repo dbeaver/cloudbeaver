@@ -22,6 +22,8 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebHandlerRegistry;
+import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
@@ -152,7 +154,20 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebSession openSession(@NotNull WebSession webSession, @Nullable String defaultLocale) {
+    public WebSession openSession(
+        @NotNull WebSession webSession,
+        @Nullable String defaultLocale,
+        @NotNull HttpServletRequest servletRequest,
+        @NotNull HttpServletResponse servletResponse) throws DBWebException
+    {
+        for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+            try {
+                hd.getInstance().handleSessionOpen(webSession, servletRequest, servletResponse);
+            } catch (Exception e) {
+                log.error("Error calling session handler '" + hd.getId() + "'", e);
+                webSession.addSessionError(e);
+            }
+        }
         webSession.setLocale(defaultLocale);
         return webSession;
     }
@@ -169,7 +184,20 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public boolean closeSession(HttpServletRequest request) {
-        return CBPlatform.getInstance().getSessionManager().closeSession(request);
+        WebSession webSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
+        if (webSession != null) {
+            for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+                try {
+                    hd.getInstance().handleSessionClose(webSession);
+                } catch (Exception e) {
+                    log.error("Error calling session handler '" + hd.getId() + "'", e);
+                    webSession.addSessionError(e);
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     @Override

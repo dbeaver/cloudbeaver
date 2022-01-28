@@ -51,7 +51,7 @@ public class WebSessionManager {
     public WebSessionManager() {
     }
 
-    public boolean closeSession(@NotNull HttpServletRequest request) {
+    public WebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
             WebSession webSession;
@@ -61,10 +61,10 @@ public class WebSessionManager {
             if (webSession != null) {
                 log.debug("> Close session '" + session.getId() + "'");
                 webSession.close();
-                return true;
+                return webSession;
             }
         }
-        return false;
+        return null;
     }
 
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
