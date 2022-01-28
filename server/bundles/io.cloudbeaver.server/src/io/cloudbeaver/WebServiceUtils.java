@@ -23,6 +23,7 @@ import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
@@ -57,10 +58,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Various constants
@@ -399,4 +397,13 @@ public class WebServiceUtils {
         apiPrefix.append("/").append(serviceId).append("/");
         return apiPrefix;
     }
+
+    public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource) {
+        Map<String, Object> actionParameters = new HashMap<>();
+        actionParameters.put("action", "open-sql-editor");
+        actionParameters.put("connection-id", dataSource.getId());
+        actionParameters.put("editor-name", dataSource.getName() + "-sql");
+        WebActionParameters.saveToSession(webSession, actionParameters);
+    }
+
 }

@@ -14,45 +14,33 @@
  * is strictly forbidden unless prior written permission is obtained
  * from DBeaver Corp.
  */
-package io.cloudbeaver.server;
-
-import io.cloudbeaver.model.session.WebSession;
+package io.cloudbeaver.model.session;
 
 import java.util.Map;
 
 /**
- * Server custom action
+ * Web action parameters
  */
-public class CBServerAction {
+public class WebActionParameters {
 
-    private static final String PARAM_ACTION_PARAMETERS = "server-action";
+    private static final String PARAM_ACTION_PARAMETERS = "action-parameters";
 
-    private final String actionId;
     private final Map<String, Object> parameters;
 
-    public CBServerAction(String actionId, Map<String, Object> parameters) {
-        this.actionId = actionId;
+    private WebActionParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
-    }
-
-    public String getActionId() {
-        return actionId;
     }
 
     public Map<String, Object> getParameters() {
         return parameters;
     }
 
-    public <T> T getParameter(String param) {
-        return (T)parameters.get(param);
+    public static void saveToSession(WebSession session, Map<String, Object> parameters) {
+        session.setAttribute(PARAM_ACTION_PARAMETERS, new WebActionParameters(parameters));
     }
 
-    public void saveInSession(WebSession session) {
-        session.setAttribute(PARAM_ACTION_PARAMETERS, this);
-    }
-
-    public static CBServerAction fromSession(WebSession session, boolean remove) {
-        CBServerAction action = session.getAttribute(PARAM_ACTION_PARAMETERS);
+    public static WebActionParameters fromSession(WebSession session, boolean remove) {
+        WebActionParameters action = session.getAttribute(PARAM_ACTION_PARAMETERS);
         if (action != null && remove) {
             session.removeAttribute(PARAM_ACTION_PARAMETERS);
         }

@@ -24,7 +24,6 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.CBServerAction;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -686,7 +685,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
     @Property
     public Map<String, Object> getActionParameters() {
-        CBServerAction action = CBServerAction.fromSession(this, false);
+        WebActionParameters action = WebActionParameters.fromSession(this, true);
         return action == null ? null : action.getParameters();
     }
 
