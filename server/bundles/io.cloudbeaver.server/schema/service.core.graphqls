@@ -152,6 +152,7 @@ type SessionInfo {
 
     serverMessages: [ ServerMessage ]
     connections: [ ConnectionInfo! ]!
+    actionParameters: Object!
 }
 
 ####################################################
