@@ -163,7 +163,7 @@ export function useDataResource<
     },
     get exception() {
       refObj.exceptionObserved = true;
-      return refObj.exception || resource.getException(key);
+      return refObj.exception || resource.getException(refObj.key);
     },
     get data() {
       return refObj.resource.data;

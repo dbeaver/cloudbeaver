@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter } from '@cloudbeaver/core-sdk';
+import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import type { ILoadableState } from './Loader/Loader';
 import { useObservableRef } from './useObservableRef';
@@ -248,10 +248,14 @@ export function useMapResource<
     },
     get exception() {
       refObj.exceptionObserved = true;
-      return refObj.exception || resource.getException(key);
+      return refObj.exception || resource.getException(refObj.key);
     },
     get data() {
-      if (refObj.key === null) {
+      if (refObj.key === null || !resource.isLoaded(refObj.key, refObj.includes as any)) {
+        if (isResourceKeyList(refObj.key)) {
+          return [];
+        }
+
         return undefined;
       }
 
@@ -262,7 +266,7 @@ export function useMapResource<
         return true;
       }
 
-      return resource.isOutdated(key);
+      return resource.isOutdated(refObj.key);
     },
     isLoaded() {
       if (refObj.key === null) {
