@@ -61,7 +61,7 @@ export class NavigationTabsService extends View<ITab> {
   readonly navigationTabContext: () => ITabNavigationContext;
   readonly onTabSelect: ISyncExecutor<ITab>;
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
-  readonly onUnload: ISyncExecutor;
+  readonly onInit: ISyncExecutor<boolean>;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -74,7 +74,7 @@ export class NavigationTabsService extends View<ITab> {
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
-    this.onUnload = new SyncExecutor();
+    this.onInit = new SyncExecutor();
 
     this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);
@@ -270,7 +270,7 @@ export class NavigationTabsService extends View<ITab> {
     // if (this.administrationScreenService.publicDisabled) {
     //   return;
     // }
-    this.onUnload.execute();
+    this.onInit.execute(false);
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
         if (tab.restored) {
@@ -289,6 +289,12 @@ export class NavigationTabsService extends View<ITab> {
 
     if (!this.appAuthService.authenticated) {
       return;
+    }
+    
+    this.onInit.execute(true);
+
+    for (const handler of this.handlers.values()) {
+      await handler.onNavInit?.();
     }
 
     const removedTabs: string[] = [];

@@ -48,8 +48,12 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     this.navigationTabsService.onTabClose
       .addHandler(this.connectionSchemaManagerService.onTabClose.bind(this.connectionSchemaManagerService));
 
-    this.navigationTabsService.onUnload
-      .addHandler(this.connectionSchemaManagerService.reset.bind(this.connectionSchemaManagerService));
+    this.navigationTabsService.onInit
+      .addHandler(state => {
+        if (!state) {
+          this.connectionSchemaManagerService.reset.bind(this.connectionSchemaManagerService);
+        }
+      });
       
     this.menuService.setHandler({
       id: 'connection-selector-base',

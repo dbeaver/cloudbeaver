@@ -11,11 +11,11 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TabsBox, TabPanel } from '@cloudbeaver/core-ui';
 import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { TabsBox, TabPanel } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
@@ -78,9 +78,9 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
           <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
         ))}
         tabList={navigation.tabIdList}
-        enabledBaseActions
         style={styles}
         tabIndex={0}
+        enabledBaseActions
       >
         {navigation.tabIdList.map(tabId => (
           <TabPanel key={tabId} tabId={tabId} lazy>
