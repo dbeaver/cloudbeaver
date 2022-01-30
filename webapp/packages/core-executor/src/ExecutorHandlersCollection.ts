@@ -15,11 +15,18 @@ implements IExecutorHandlersCollection<T, TResult> {
   postHandlers: Array<IExecutorHandler<T, TResult>> = [];
   chain: Array<IChainLink<T, TResult>> = [];
   readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
-  private links: Map<IExecutorHandlersCollection<any, TResult>, IExecutorHandlersCollection<T, TResult>>;
+  protected initialDataGetter: (() => T) | null;
+  private readonly links: Map<IExecutorHandlersCollection<any, TResult>, IExecutorHandlersCollection<T, TResult>>;
 
   constructor() {
     this.links = new Map();
     this.collections = [];
+    this.initialDataGetter = null;
+  }
+
+  setInitialDataGetter(getter: (() => T) | null): this {
+    this.initialDataGetter = getter;
+    return this;
   }
 
   addCollection(collection: IExecutorHandlersCollection<T, TResult>): this {
@@ -65,6 +72,7 @@ implements IExecutorHandlersCollection<T, TResult> {
 
   addHandler(handler: IExecutorHandler<T, TResult>): this {
     this.handlers.push(handler);
+    this.executeHandlerWithInitialData(handler);
     return this;
   }
 
@@ -79,5 +87,11 @@ implements IExecutorHandlersCollection<T, TResult> {
 
   removePostHandler(handler: IExecutorHandler<T, TResult>): void {
     this.postHandlers = this.postHandlers.filter(h => h !== handler);
+  }
+
+  protected executeHandlerWithInitialData(handler: IExecutorHandler<T, TResult>) {
+    if (!this.initialDataGetter) {
+      return;
+    }
   }
 }

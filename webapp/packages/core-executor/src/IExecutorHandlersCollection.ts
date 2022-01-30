@@ -24,6 +24,8 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
   readonly chain: Array<IChainLink<T, TResult>>;
   readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
 
+  setInitialDataGetter(getter: () => T): this;
+
   before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
   next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
   addCollection: (collection: IExecutorHandlersCollection<T, TResult>) => this;

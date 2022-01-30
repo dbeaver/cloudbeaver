@@ -22,10 +22,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     return this.scheduler.executing;
   }
 
-  private scheduler: TaskScheduler<T>;
+  private readonly scheduler: TaskScheduler<T>;
 
   constructor(
-    private defaultData: T | null = null,
+    private readonly defaultData: T | null = null,
     isBlocked: BlockedExecution<T> | null = null
   ) {
     super();
@@ -143,5 +143,25 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
       return this.defaultData;
     }
     return data;
+  }
+
+  protected executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
+    if (!this.initialDataGetter) {
+      return;
+    }
+
+    const data = this.initialDataGetter();
+    
+    this.scheduler.schedule(data, async () => {
+      const context = new ExecutionContext(data);
+      
+      try {
+        await handler(data, context);
+      } finally {
+        await this.executeHandlers(data, context, this.postHandlers);
+      }
+
+      return context;
+    });
   }
 }

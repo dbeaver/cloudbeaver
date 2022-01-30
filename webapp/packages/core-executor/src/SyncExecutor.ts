@@ -18,7 +18,7 @@ import type { ISyncExecutor } from './ISyncExecutor';
 
 export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implements ISyncExecutor<T> {
   constructor(
-    private defaultData: T | null = null
+    private readonly defaultData: T | null = null
   ) {
     super();
   }
@@ -130,5 +130,20 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
       return this.defaultData;
     }
     return data;
+  }
+
+  protected executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
+    if (!this.initialDataGetter) {
+      return;
+    }
+
+    const data = this.initialDataGetter();
+    const context = new ExecutionContext(data);
+
+    try {
+      handler(data, context);
+    } finally {
+      this.executeHandlers(data, context, this.postHandlers);
+    }
   }
 }
