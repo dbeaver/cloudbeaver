@@ -40,6 +40,10 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
     }
   }
 
+  if (tab.handlerState.name) {
+    name = tab.handlerState.name;
+  }
+
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 

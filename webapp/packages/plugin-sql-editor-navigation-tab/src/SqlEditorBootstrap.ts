@@ -10,26 +10,31 @@ import {
   MainMenuService,
   EObjectFeature,
   ConnectionSchemaManagerService,
-  isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE
+  isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
 import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
+import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU_NESTED, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
+import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
 @injectable()
 export class SqlEditorBootstrap extends Bootstrap {
   constructor(
-    private mainMenuService: MainMenuService,
-    private sqlEditorNavigatorService: SqlEditorNavigatorService,
-    private connectionSchemaManagerService: ConnectionSchemaManagerService,
-    private viewService: ViewService,
+    private readonly mainMenuService: MainMenuService,
+    private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private readonly viewService: ViewService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly sessionActionService: SessionActionService,
   ) {
     super();
   }
@@ -73,8 +78,16 @@ export class SqlEditorBootstrap extends Bootstrap {
       handler: async (context, action) => {
         const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
 
-        this.sqlEditorNavigatorService.openNewEditor(connection?.id);
+        this.sqlEditorNavigatorService.openNewEditor(undefined, connection?.id);
       },
+    });
+
+    this.navigationTabsService.onInit.addHandler(state => {
+      if (state) {
+        this.sessionActionService.onAction.addHandler(this.handleAction);
+      } else {
+        this.sessionActionService.onAction.removeHandler(this.handleAction);
+      }
     });
   }
 
@@ -108,6 +121,18 @@ export class SqlEditorBootstrap extends Bootstrap {
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
 
-    this.sqlEditorNavigatorService.openNewEditor(connectionId, catalogId, schemaId);
+    this.sqlEditorNavigatorService.openNewEditor(undefined, connectionId, catalogId, schemaId);
   }
+
+  private readonly handleAction: IExecutorHandler<ISessionAction | null, any> = (data, contexts) => {
+    const processInfo = contexts.getContext(sessionActionContext);
+
+    if (isSessionActionOpenSQLEditor(data)) {
+      try {
+        this.sqlEditorNavigatorService.openNewEditor(data['editor-name'], data['connection-id']);
+      } finally {
+        processInfo.process();
+      }
+    }
+  };
 }

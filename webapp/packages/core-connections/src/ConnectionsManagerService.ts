@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
@@ -30,6 +31,7 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
     this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
+    this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {

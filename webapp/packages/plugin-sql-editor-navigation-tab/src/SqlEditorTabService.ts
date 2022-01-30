@@ -38,9 +38,9 @@ export class SqlEditorTabService extends Bootstrap {
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
   constructor(
-    private navigationTabsService: NavigationTabsService,
-    private notificationService: NotificationService,
-    private sqlEditorService: SqlEditorService,
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly notificationService: NotificationService,
+    private readonly sqlEditorService: SqlEditorService,
     private readonly sqlResultTabsService: SqlResultTabsService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
@@ -60,7 +60,7 @@ export class SqlEditorTabService extends Bootstrap {
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
-        connectionSetter(this.setConnectionId.bind(this)),
+        connectionSetter((connectionId, tab) => this.setConnectionId(tab, connectionId)),
         objectCatalogSetter(this.setObjectCatalogId.bind(this)),
         objectSchemaSetter(this.setObjectSchemaId.bind(this)),
       ],
@@ -74,22 +74,16 @@ export class SqlEditorTabService extends Bootstrap {
 
   load(): void {}
 
-  async createNewEditor(
+  createNewEditor(
+    name?: string,
     connectionId?: string,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<ITabOptions<ISqlEditorTabState> | null> {
-    const executionContext = await this.sqlEditorService.initContext(connectionId, catalogId, schemaId);
-
-    if (!executionContext?.context) {
-      return null;
-    }
+  ): ITabOptions<ISqlEditorTabState> | null {
 
     const order = this.getFreeEditorId();
 
     return {
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(order, executionContext.context),
+      handlerState: this.sqlEditorService.getState(order, name, connectionId),
     };
   }
 
@@ -140,6 +134,8 @@ export class SqlEditorTabService extends Bootstrap {
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.connectionId)
         || !Array.isArray(tab.handlerState.tabs)
         || !Array.isArray(tab.handlerState.executionPlanTabs)
         || !Array.isArray(tab.handlerState.resultGroups)
@@ -182,9 +178,14 @@ export class SqlEditorTabService extends Bootstrap {
     return tab.handlerState.executionContext?.defaultSchema;
   }
 
-  private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
+  async setConnectionId(
+    tab: ITab<ISqlEditorTabState>, 
+    connectionId: string, 
+    catalogId?: string,
+    schemaId?: string
+  ) {
     try {
-      const executionContext = await this.sqlEditorService.initContext(connectionId);
+      const executionContext = await this.sqlEditorService.initContext(connectionId, catalogId, schemaId);
 
       if (!executionContext?.context) {
         return false;
@@ -218,7 +219,7 @@ export class SqlEditorTabService extends Bootstrap {
     try {
       await executionContext.update(
         containerId,
-        tab.handlerState.executionContext?.defaultSchema,
+        tab.handlerState.executionContext.defaultSchema,
       );
       tab.handlerState.executionContext.defaultCatalog = containerId;
       return true;

@@ -22,12 +22,18 @@ export class SqlEditorService {
   ) {
   }
 
-  getState(order: number, contextInfo: IConnectionExecutionContextInfo): ISqlEditorTabState {
+  getState(
+    order: number, 
+    name?: string, 
+    connectionId?: string, 
+    contextInfo?: IConnectionExecutionContextInfo
+  ): ISqlEditorTabState {
     return {
-
+      name,
       query: '',
       order,
-      executionContext: { ...contextInfo },
+      connectionId,
+      executionContext: contextInfo ? { ...contextInfo } : undefined,
       tabs: [],
       resultGroups: [],
       resultTabs: [],
@@ -68,24 +74,24 @@ export class SqlEditorService {
     return result;
   }
 
-  async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
-    if (!state.executionContext) {
-      console.error('executeEditorQuery executionContext is not provided');
-      return;
-    }
+  // async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
+  //   if (!state.executionContext) {
+  //     console.error('executeEditorQuery executionContext is not provided');
+  //     return;
+  //   }
 
-    const context = await this.initContext(
-      state.executionContext.connectionId,
-      state.executionContext.defaultCatalog,
-      state.executionContext.defaultSchema
-    );
+  //   const context = await this.initContext(
+  //     state.executionContext.connectionId,
+  //     state.executionContext.defaultCatalog,
+  //     state.executionContext.defaultSchema
+  //   );
 
-    if (!context) {
-      return;
-    }
+  //   if (!context) {
+  //     return;
+  //   }
 
-    return context;
-  }
+  //   return context;
+  // }
 
   async initContext(
     connectionId?: string,
@@ -93,6 +99,7 @@ export class SqlEditorService {
     schemaId?: string
   ): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
+    
     if (!connection) {
       return null;
     }

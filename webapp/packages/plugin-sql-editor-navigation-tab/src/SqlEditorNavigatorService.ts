@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavigationTabsService } from '@cloudbeaver/core-app';
+import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
-import { SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
+import { ISqlEditorTabState, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 
@@ -28,6 +28,7 @@ export interface SQLEditorActionContext {
 export interface SQLCreateAction extends SQLEditorActionContext {
   type: SQLEditorNavigationAction.create;
 
+  name?: string;
   connectionId?: string;
   catalogId?: string;
   schemaId?: string;
@@ -45,9 +46,9 @@ export class SqlEditorNavigatorService {
   private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
 
   constructor(
-    private navigationTabsService: NavigationTabsService,
-    private notificationService: NotificationService,
-    private sqlEditorTabService: SqlEditorTabService,
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly notificationService: NotificationService,
+    private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly sqlResultTabsService: SqlResultTabsService,
     navigationService: NavigationService
   ) {
@@ -59,9 +60,10 @@ export class SqlEditorNavigatorService {
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string): Promise<void> {
+  async openNewEditor(name?: string, connectionId?: string, catalogId?: string, schemaId?: string): Promise<void> {
     await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
+      name,
       connectionId,
       catalogId,
       schemaId,
@@ -91,20 +93,26 @@ export class SqlEditorNavigatorService {
     try {
       const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
 
+      let tab: ITab<ISqlEditorTabState> | null = null;
+
       if (data.type === SQLEditorNavigationAction.create) {
-        const tabOptions = await this.sqlEditorTabService.createNewEditor(
-          data.connectionId,
-          data.catalogId,
-          data.schemaId
+        const tabOptions = this.sqlEditorTabService.createNewEditor(
+          data.name,
+          data.connectionId
         );
 
         if (tabOptions) {
-          tabInfo.openNewTab(tabOptions);
+          tab = tabInfo.openNewTab(tabOptions);
+        }
+
+        if (tab && data.connectionId) {
+          await this.sqlEditorTabService.setConnectionId(tab, data.connectionId, data.catalogId, data.schemaId);
         }
         return;
       }
 
-      const tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => tab.id === data.editorId));
+      tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => tab.id === data.editorId));
+
       if (!tab) {
         return;
       }

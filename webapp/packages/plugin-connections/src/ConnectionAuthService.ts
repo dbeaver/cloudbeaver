@@ -18,11 +18,11 @@ import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 @injectable()
 export class ConnectionAuthService {
   constructor(
-    private connectionInfoResource: ConnectionInfoResource,
-    private commonDialogService: CommonDialogService,
-    private authProviderService: AuthProviderService,
-    private connectionsManagerService: ConnectionsManagerService,
-    private notificationService: NotificationService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly authProviderService: AuthProviderService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly notificationService: NotificationService,
   ) {
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
   }
@@ -76,10 +76,6 @@ export class ConnectionAuthService {
     }
 
     connection = await this.connectionInfoResource.load(connectionId);
-
-    if (!connection) {
-      return null;
-    }
 
     const networkHandlers = connection.networkHandlersConfig
       .filter(handler => handler.enabled && !handler.savePassword)

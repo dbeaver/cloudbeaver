@@ -19,7 +19,7 @@ interface ISessionActionContext {
 @injectable()
 export class SessionActionService {
   private actionToProcess: ISessionAction | null;
-  private readonly onAction: IExecutor<ISessionAction | null>;
+  readonly onAction: IExecutor<ISessionAction | null>;
 
   constructor(
     readonly session: SessionResource
