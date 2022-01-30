@@ -16,25 +16,41 @@ import {
 import { ServerConfigResource } from './ServerConfigResource';
 
 export type SessionState = SessionStateFragment;
+export interface ISessionAction {
+  action: string;
+  [key: string]: any;
+}
 
 @injectable()
-export class SessionResource extends CachedDataResource<SessionState | null, void> {
+export class SessionResource extends CachedDataResource<SessionState | null> {
+  private action: ISessionAction | null;
   private defaultLocale: string | undefined;
+
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
   ) {
     super(null);
 
+    this.action = null;
     this.sync(serverConfigResource);
+  }
+
+  processAction(): ISessionAction | null {
+    try {
+      return this.action;
+    } finally {
+      this.action = null;
+    }
   }
 
   setDefaultLocale(defaultLocale?: string): void {
     this.defaultLocale = defaultLocale;
   }
 
+  //! this method results in onDataUpdate handler skipping
   async refreshSilent(): Promise<void> {
-    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
+    const session = await this.loader();
 
     this.setData(session);
   }
@@ -54,5 +70,13 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
 
     return session;
+  }
+
+  protected setData(data: SessionState | null) { 
+    if (!this.action) {
+      this.action = data?.actionParameters;
+    }
+
+    this.data = data;
   }
 }

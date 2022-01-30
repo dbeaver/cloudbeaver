@@ -61,20 +61,7 @@ import { NotificationService, ExceptionsCatcherService, EventsSettingsService } 
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
-import {
-  NetworkStateService,
-  SessionService,
-  ServerService,
-  PermissionsService,
-  SessionSettingsService,
-  ServerSettingsService,
-  ServerConfigResource,
-  FeaturesResource,
-  PermissionsResource,
-  SessionDataResource,
-  SessionResource,
-  SessionExpireService
-} from '@cloudbeaver/core-root';
+import { coreRootManifest } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
@@ -93,7 +80,6 @@ export const coreManifests: PluginManifest[] = [
 
     providers: [
       RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
-      NetworkStateService,
       AdministrationLocaleService,
       AdministrationSettingsService,
       AdministrationTopAppBarService,
@@ -106,17 +92,8 @@ export const coreManifests: PluginManifest[] = [
       ProductSettingsService,
       ProductManagerService,
       PluginManagerService,
-      ServerSettingsService,
-      ServerConfigResource,
-      FeaturesResource,
-      PermissionsResource,
-      SessionResource,
-      SessionDataResource,
-      SessionSettingsService,
-      PermissionsService,
       CoreSettingsService,
       CommonDialogService,
-      SessionExpireService,
       SessionExpireWarningDialogService,
       SessionExpiredDialogService,
       ConnectionsLocaleService,
@@ -156,11 +133,9 @@ export const coreManifests: PluginManifest[] = [
       NavTreeResource,
       DBObjectResource,
       NotificationService,
-      SessionService,
       SettingsService,
       ThemeSettingsService,
       ThemeService,
-      ServerService,
     ],
   },
   coreSDKManifest,
@@ -169,4 +144,5 @@ export const coreManifests: PluginManifest[] = [
   coreViewManifest,
   coreVersionManifest,
   coreVersionUpdateManifest,
+  coreRootManifest,
 ];

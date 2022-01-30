@@ -33,9 +33,9 @@ export class LocalizationService extends Bootstrap {
   };
 
   // observable.shallow - don't treat locales as observables
-  private localeMap: Map<string, Map<string, string>> = new Map();
+  private readonly localeMap: Map<string, Map<string, string>> = new Map();
 
-  private localeProviders: ILocaleProvider[] = [];
+  private readonly localeProviders: ILocaleProvider[] = [];
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -107,7 +107,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   private async syncLanguage() {
-    await this.sessionResource.refreshSilent(); // TODO: remove
+    // await this.sessionResource.refreshSilent(); // TODO: remove
     const session = this.sessionResource.data;
 
     if (session) {
