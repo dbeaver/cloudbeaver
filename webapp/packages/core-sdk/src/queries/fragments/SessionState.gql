@@ -3,4 +3,5 @@ fragment SessionState on SessionInfo {
   lastAccessTime
   cacheExpired
   locale
+  actionParameters
 }

@@ -1285,6 +1285,7 @@ export interface ServerMessage {
 }
 
 export interface SessionInfo {
+  actionParameters?: Maybe<Scalars['Object']>;
   cacheExpired: Scalars['Boolean'];
   connections: Array<ConnectionInfo>;
   createTime: Scalars['String'];
@@ -1900,7 +1901,7 @@ export type ObjectOriginInfoFragment = { type: string; subType?: string; display
 
 export type SqlScriptInfoFragment = { queries: Array<{ start: number; end: number }> };
 
-export type SessionStateFragment = { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string };
+export type SessionStateFragment = { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string; actionParameters?: any };
 
 export type UserConnectionAuthPropertiesFragment = { id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number };
 
@@ -2092,7 +2093,7 @@ export type OpenSessionMutationVariables = Exact<{
 }>;
 
 
-export type OpenSessionMutation = { session: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string } };
+export type OpenSessionMutation = { session: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string; actionParameters?: any } };
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
@@ -2115,7 +2116,7 @@ export type SessionPermissionsQuery = { permissions: Array<string> };
 export type SessionStateQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type SessionStateQuery = { sessionState: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string } };
+export type SessionStateQuery = { sessionState: { createTime: string; lastAccessTime: string; cacheExpired: boolean; locale: string; actionParameters?: any } };
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -2433,6 +2434,7 @@ export const SessionStateFragmentDoc = `
   lastAccessTime
   cacheExpired
   locale
+  actionParameters
 }
     `;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
