@@ -67,19 +67,19 @@ export function useOptions(state: IConnectionFormState) {
         },
       } = refObject;
 
-      if (config.host === prevDriver?.defaultServer) {
+      if (!prevDriver || config.host === prevDriver.defaultServer) {
         config.host = driver?.defaultServer || 'localhost';
       }
 
-      if (config.port === prevDriver?.defaultPort) {
+      if (!prevDriver || config.port === prevDriver.defaultPort) {
         config.port = driver?.defaultPort;
       }
 
-      if (config.databaseName === prevDriver?.defaultDatabase) {
+      if (!prevDriver || config.databaseName === prevDriver.defaultDatabase) {
         config.databaseName = driver?.defaultDatabase;
       }
 
-      if (config.url === prevDriver?.sampleURL) {
+      if (!prevDriver || config.url === prevDriver.sampleURL) {
         config.url = driver?.sampleURL;
       }
 
@@ -87,12 +87,10 @@ export function useOptions(state: IConnectionFormState) {
 
       if (driver?.id !== prevDriver?.id && !info) {
         for (const property of Object.keys(config.credentials)) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete config.credentials[property];
         }
 
         for (const property of Object.keys(config.providerProperties)) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete config.providerProperties[property];
         }
 

@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import {
   InputField,
   SubmittingForm,
@@ -32,6 +31,7 @@ import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocal
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -115,7 +115,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const originLocal = !info || isLocalConnection(info);
 
   const drivers = driver.resource.values
-    .filter(({ id }) => availableDrivers?.includes(id))
+    .filter(({ id }) => availableDrivers.includes(id))
     .sort(driver.resource.compare);
 
   let properties = authModel?.properties;
@@ -125,8 +125,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   // TODO we need to get these values other way
-  const providerPropertiesWithoutBoolean = driver.data?.providerProperties?.slice().filter(property => property.dataType !== 'Boolean');
-  const booleanProviderProperties = driver.data?.providerProperties?.slice().filter(property => property.dataType === 'Boolean');
+  const providerPropertiesWithoutBoolean = driver.data?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
+  const booleanProviderProperties = driver.data?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange}>
@@ -139,7 +139,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 state={config}
                 items={drivers}
                 keySelector={driver => driver.id}
-                valueSelector={driver => driver?.name ?? ''}
+                valueSelector={driver => driver.name ?? ''}
                 titleSelector={driver => driver.description}
                 iconSelector={driver => driver.icon}
                 searchable={drivers.length > 10}
@@ -194,7 +194,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
-                // autoHide={} // maybe better to use autoHide
+                // autoHide // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
               </FieldCheckbox>
