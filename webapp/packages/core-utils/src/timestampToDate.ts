@@ -6,12 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ILayoutSizeProps {
-  keepSize?: boolean;
-  tiny?: boolean;
-  small?: boolean;
-  medium?: boolean;
-  large?: boolean;
-  maximum?: boolean;
-  fill?: boolean;
+export function timestampToDate(timestamp: number) {
+  return new Date(timestamp).toLocaleString();
 }

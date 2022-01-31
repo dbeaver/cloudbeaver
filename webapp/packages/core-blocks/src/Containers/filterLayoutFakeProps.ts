@@ -15,6 +15,7 @@ export function filterLayoutFakeProps<T extends ILayoutSizeProps>(props: T): Omi
     small,
     medium,
     large,
+    maximum,
     fill,
     ...rest
   } = props;

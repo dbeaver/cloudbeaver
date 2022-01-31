@@ -31,3 +31,4 @@ export * from './openCenteredPopup';
 export * from './download';
 export * from './getTextFileReadingProcess';
 export * from './getTextBetween';
+export * from './timestampToDate';
