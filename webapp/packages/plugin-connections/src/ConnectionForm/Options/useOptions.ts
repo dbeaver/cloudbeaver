@@ -67,6 +67,10 @@ export function useOptions(state: IConnectionFormState) {
         },
       } = refObject;
 
+      if (info) {
+        return;
+      }
+      
       if (!prevDriver || config.host === prevDriver.defaultServer) {
         config.host = driver?.defaultServer || 'localhost';
       }
@@ -85,7 +89,7 @@ export function useOptions(state: IConnectionFormState) {
 
       this.updateNameTemplate(driver);
 
-      if (driver?.id !== prevDriver?.id && !info) {
+      if (driver?.id !== prevDriver?.id) {
         for (const property of Object.keys(config.credentials)) {
           delete config.credentials[property];
         }
@@ -96,6 +100,7 @@ export function useOptions(state: IConnectionFormState) {
 
         config.authModelId = driver?.defaultAuthModel;
       }
+      
     },
     setAuthModel(model: DatabaseAuthModel) {
       // const {
