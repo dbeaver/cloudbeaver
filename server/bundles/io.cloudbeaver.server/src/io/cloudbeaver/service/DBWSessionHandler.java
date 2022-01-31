@@ -31,6 +31,12 @@ public interface DBWSessionHandler {
     boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response)
         throws DBException, IOException;
 
+    default boolean handleSessionAuth(WebSession webSession)
+        throws DBException, IOException
+    {
+        return false;
+    }
+
     boolean handleSessionClose(WebSession webSession)
         throws DBException, IOException;
 

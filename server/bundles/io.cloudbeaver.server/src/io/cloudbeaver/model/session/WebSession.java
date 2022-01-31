@@ -21,6 +21,8 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebHandlerRegistry;
+import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
@@ -233,6 +235,14 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         refreshSessionAuth();
 
         initNavigatorModel();
+
+        for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+            try {
+                hd.getInstance().handleSessionAuth(this);
+            } catch (Exception e) {
+                log.error("Error calling session handler '" + hd.getId() + "'", e);
+            }
+        }
     }
 
     private void initNavigatorModel() {
