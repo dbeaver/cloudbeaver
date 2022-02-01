@@ -1,5 +1,7 @@
 export default [
   ['sql_editor_menu', 'SQL Editor'],
+  ['sql_editor_restore_message', 'Do you want to restore connection?'],
+  ['sql_editor_restore', 'Restore'],
   ['sql_editor_placeholder', 'Execute query with Ctrl+Enter to see results'],
   ['sql_editor_execution_plan_button_tooltip', 'Explain execution plan (Shift + Ctrl + E)'],
   ['sql_editor_sql_execution_button_tooltip', 'Execute SQL Statement (Ctrl + Enter)'],

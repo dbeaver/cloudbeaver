@@ -1,5 +1,7 @@
 export default [
   ['sql_editor_menu', 'SQL Редактор'],
+  ['sql_editor_restore_message', 'Вы хотите восстановить подключение?'],
+  ['sql_editor_restore', 'Восстановить'],
   ['sql_editor_placeholder', 'Нажмите Ctrl+Enter, чтобы выполнить запрос и увидеть результат'],
   ['sql_editor_execution_plan_button_tooltip', 'Посмотреть информацию о плане выполнения запроса (Shift + Ctrl + E)'],
   ['sql_editor_sql_execution_button_tooltip', 'Выполнить SQL Выражение (Ctrl + Enter)'],

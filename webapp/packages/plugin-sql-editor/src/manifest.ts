@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
@@ -22,6 +23,7 @@ export const sqlEditorPluginManifest: PluginManifest = {
   },
 
   providers: [
+    LocaleService,
     SqlEditorService,
     SqlDialectInfoService,
     SqlQueryResultService,
