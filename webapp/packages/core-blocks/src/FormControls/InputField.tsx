@@ -60,7 +60,7 @@ const INPUT_FIELD_STYLES = composes(
     }
 `);
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> & ILayoutSizeProps & {
   description?: string;
   labelTooltip?: string;
   mod?: 'surface';

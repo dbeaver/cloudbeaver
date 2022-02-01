@@ -9,9 +9,18 @@
 
 import { action, computed, makeObservable, observable } from 'mobx';
 
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+
 type Key = string | string[];
 
+interface IData {
+  key: string;
+  value: boolean;
+}
+
 export class TableState {
+  readonly onExpand: IExecutor<IData>;
+
   selected: Map<string, boolean>;
   expanded: Map<string, boolean>;
 
@@ -26,7 +35,16 @@ export class TableState {
       .map(([key]) => key);
   }
 
+  get expandedList(): string[] {
+    return Array
+      .from(this.expanded)
+      .filter(([_, value]) => value)
+      .map(([key]) => key);
+  }
+
   constructor() {
+    this.onExpand = new Executor();
+
     this.selected = new Map();
     this.expanded = new Map();
 
@@ -35,9 +53,15 @@ export class TableState {
       expanded: observable,
       itemsSelected: computed,
       selectedList: computed,
+      expandedList: computed,
       unselect: action,
       unexpand: action,
     });
+  }
+
+  expand(key: string, value: boolean) {
+    this.expanded.set(key, value);
+    this.onExpand.execute({ key, value });
   }
 
   unselect(key?: Key): Map<string, boolean> {
@@ -70,5 +94,10 @@ export class TableState {
     }
 
     return this.expanded;
+  }
+
+  reset() {
+    this.unexpand();
+    this.unselect();
   }
 }

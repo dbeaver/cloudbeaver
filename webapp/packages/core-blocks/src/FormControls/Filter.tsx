@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
 import { useFocus } from '../useFocus';
 import { InputField } from './InputField';
 
-const styles = css`
+const filterStyles = css`
   filter-container {
     position: relative;
     min-width: 24px;
@@ -73,6 +73,7 @@ interface BaseProps {
   disabled?: boolean;
   max?: boolean;
   className?: string;
+  style?: ComponentStyle;
   onToggle?: (status: boolean) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -101,11 +102,13 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   max,
   className,
+  style,
   onFilter,
   onToggle,
   onKeyDown,
   onClick,
 }) {
+  const styles = useStyles(filterStyles, style, toggleMode && toggleModeButtonStyle);
   const [inputRef] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
 
@@ -149,11 +152,11 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     value = state[name];
   }
 
-  return styled(useStyles(styles, toggleMode && toggleModeButtonStyle))(
+  return styled(styles)(
     <filter-container className={className} onClick={onClick}>
       <InputField
         ref={inputRef}
-        style={innerInputStyle}
+        style={[innerInputStyle, style]}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
