@@ -19,6 +19,10 @@ export * from './Marks/ConnectionMark';
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 
+export * from './Overlay/Overlay';
+export * from './Overlay/OverlayActions';
+export * from './Overlay/OverlayMessage';
+
 export * from './Placeholder/Placeholder';
 export * from './Placeholder/PlaceholderContainer';
 
