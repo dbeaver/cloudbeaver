@@ -19,6 +19,7 @@ import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
+import { getSqlEditorName } from './getSqlEditorName';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({
   tab, onSelect, onClose, style,
@@ -30,19 +31,9 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
 
   const connectionInfo = useService(ConnectionInfoResource);
-  let name = `sql-${tab.handlerState.order}`;
 
-  if (tab.handlerState.executionContext) {
-    const connection = connectionInfo.get(tab.handlerState.executionContext.connectionId);
-
-    if (connection) {
-      name = `sql-${tab.handlerState.order} (${connection.name})`;
-    }
-  }
-
-  if (tab.handlerState.name) {
-    name = tab.handlerState.name;
-  }
+  const connection = connectionInfo.get(tab.handlerState.executionContext?.connectionId || '');
+  const name = getSqlEditorName(tab.handlerState, connection);
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;

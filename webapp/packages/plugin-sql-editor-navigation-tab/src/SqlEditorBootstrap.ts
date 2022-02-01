@@ -12,15 +12,18 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { isConnectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ActionService, DATA_CONTEXT_MENU_NESTED, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
+import { getSqlEditorName } from './getSqlEditorName';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
@@ -35,6 +38,8 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly sessionActionService: SessionActionService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     super();
   }
@@ -51,10 +56,27 @@ export class SqlEditorBootstrap extends Bootstrap {
     );
 
     this.menuService.addCreator({
-      isApplicable: context => {
-        const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+      isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE),
+      getItems: (context, items) => [
+        ...items,
+        ACTION_RENAME,
+      ],
+      orderItems: (context, items) => {
+        const actions = menuExtractActions(items, [
+          ACTION_RENAME,
+        ]);
 
-        if (!connection) {
+        if (actions.length > 0) {
+          items.unshift(...actions);
+        }
+
+        return items;
+      },
+    });
+
+    this.menuService.addCreator({
+      isApplicable: context => {
+        if (!context.has(DATA_CONTEXT_CONNECTION)) {
           return false;
         }
 
@@ -74,11 +96,33 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
-      isActionApplicable: (context, action) => action === ACTION_SQL_EDITOR_OPEN,
+      isActionApplicable: (context, action) => [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN].includes(action),
       handler: async (context, action) => {
-        const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+        switch (action) {
+          case ACTION_RENAME: {
+            const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+            const connection = this.connectionInfoResource.get(state.executionContext?.connectionId || '');
 
-        this.sqlEditorNavigatorService.openNewEditor(undefined, connection?.id);
+            const name = getSqlEditorName(state, connection);
+
+            const result = await this.commonDialogService.open(RenameDialog, {
+              value: name,
+              objectName: name,
+              icon: '/icons/sql_script_m.svg',
+            });
+
+            if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              state.name = result;
+            }
+            break;
+          }
+          case ACTION_SQL_EDITOR_OPEN: {
+            const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+
+            this.sqlEditorNavigatorService.openNewEditor(undefined, connection?.id);
+            break;
+          }
+        }
       },
     });
 
