@@ -8,7 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import type { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
