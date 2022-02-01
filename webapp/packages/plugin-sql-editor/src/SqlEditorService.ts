@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
@@ -18,7 +18,8 @@ export class SqlEditorService {
     private readonly gql: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly notificationService: NotificationService,
-    private readonly connectionExecutionContextService: ConnectionExecutionContextService
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
   }
 
@@ -74,24 +75,35 @@ export class SqlEditorService {
     return result;
   }
 
-  // async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
-  //   if (!state.executionContext) {
-  //     console.error('executeEditorQuery executionContext is not provided');
-  //     return;
-  //   }
+  async resetExecutionContext(state: ISqlEditorTabState) {
+    if (state.executionContext) {
+      await this.destroyContext(state.executionContext);
+    }
 
-  //   const context = await this.initContext(
-  //     state.executionContext.connectionId,
-  //     state.executionContext.defaultCatalog,
-  //     state.executionContext.defaultSchema
-  //   );
+    state.executionContext = undefined;
+  }
 
-  //   if (!context) {
-  //     return;
-  //   }
+  async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
+    if (!state.executionContext) {
+      console.error('executeEditorQuery executionContext is not provided');
+      return;
+    }
 
-  //   return context;
-  // }
+    const context = await this.initContext(
+      state.executionContext.connectionId,
+      state.executionContext.defaultCatalog,
+      state.executionContext.defaultSchema
+    );
+
+    if (!context?.context) {
+      await this.resetExecutionContext(state);
+      return;
+    }
+
+    state.executionContext = { ...context.context };
+
+    return context;
+  }
 
   async initContext(
     connectionId?: string,
@@ -112,6 +124,20 @@ export class SqlEditorService {
         `Failed to create context for ${connection.name} connection`,
       );
       return null;
+    }
+  }
+
+  async destroyContext(contextInfo: IConnectionExecutionContextInfo) {
+    await this.connectionExecutionContextResource.loadAll();
+
+    const executionContext = this.connectionExecutionContextService.get(contextInfo.id);
+
+    if (executionContext) {
+      try {
+        await executionContext.destroy();
+      } catch (exception) {
+        this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.id}`, '', true);
+      }
     }
   }
 }

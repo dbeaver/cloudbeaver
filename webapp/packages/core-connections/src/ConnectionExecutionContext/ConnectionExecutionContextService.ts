@@ -16,11 +16,11 @@ import { ConnectionExecutionContextResource } from './ConnectionExecutionContext
 
 @injectable()
 export class ConnectionExecutionContextService {
-  private contexts: MetadataMap<string, ConnectionExecutionContext>;
+  private readonly contexts: MetadataMap<string, ConnectionExecutionContext>;
   protected scheduler: TaskScheduler<string>;
 
   constructor(
-    private connectionExecutionContextResource: ConnectionExecutionContextResource
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
     this.contexts = new MetadataMap(contextId => new ConnectionExecutionContext(
       this.scheduler,
