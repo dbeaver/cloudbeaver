@@ -361,7 +361,9 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 attrDisposer.getValue().apply(attrValue);
             }
             attributeDisposers.clear();
-            attributes.clear();
+            // Remove all non-persistent attributes
+            attributes.entrySet().removeIf(
+                entry -> !(entry.getValue() instanceof PersistentAttribute));
         }
     }
 
@@ -661,13 +663,20 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     @SuppressWarnings("unchecked")
     public <T> T getAttribute(String name) {
         synchronized (attributes) {
-            return (T) attributes.get(name);
+            Object value = attributes.get(name);
+            if (value instanceof PersistentAttribute) {
+                value = ((PersistentAttribute) value).value;
+            }
+            return (T) value;
         }
     }
 
     public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
         synchronized (attributes) {
-            T value = (T) attributes.get(name);
+            Object value = attributes.get(name);
+            if (value instanceof PersistentAttribute) {
+                value = ((PersistentAttribute) value).value;
+            }
             if (value == null) {
                 value = creator.apply(null);
                 if (value != null) {
@@ -677,12 +686,19 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     }
                 }
             }
-            return value;
+            return (T)value;
         }
     }
 
     public void setAttribute(String name, Object value) {
+        setAttribute(name, value, false);
+    }
+
+    public void setAttribute(String name, Object value, boolean persistent) {
         synchronized (attributes) {
+            if (persistent) {
+                value = new PersistentAttribute(value);
+            }
             attributes.put(name, value);
         }
     }
@@ -866,4 +882,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             asyncTask.setStatus(name);
         }
     }
+
+    private class PersistentAttribute {
+        private final Object value;
+        public PersistentAttribute(Object value) {
+            this.value = value;
+        }
+    }
+
 }
