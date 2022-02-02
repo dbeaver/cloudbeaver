@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { SessionResource } from '@cloudbeaver/core-root';
 import type { AuthProviderConfiguration, UserInfo } from '@cloudbeaver/core-sdk';
 import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
@@ -56,12 +56,12 @@ export class AuthInfoService {
     return result;
   }
 
-  private activeSSO: Map<string, IActiveSSOAuthentication>;
+  private readonly activeSSO: Map<string, IActiveSSOAuthentication>;
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
-    private readonly sessionDataResource: SessionDataResource
+    private readonly sessionResource: SessionResource
   ) {
     this.activeSSO = new Map();
   }
@@ -94,8 +94,8 @@ export class AuthInfoService {
       const task = async () => {
         await this.waitWindowsClose(popup);
 
-        this.sessionDataResource.markOutdated();
-        const user = await this.userInfoResource.refresh(undefined, []);
+        this.sessionResource.markOutdated();
+        const user = await this.userInfoResource.load(undefined, []);
 
         return user;
       };
