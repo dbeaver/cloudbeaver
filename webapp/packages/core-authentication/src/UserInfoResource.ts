@@ -10,7 +10,7 @@ import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
-import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
+import { SessionResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ObjectOrigin, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
@@ -35,8 +35,7 @@ UserInfoIncludes
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,
-    sessionResource: SessionResource,
-    private readonly sessionDataResource: SessionDataResource
+    private readonly sessionResource: SessionResource
   ) {
     super(null, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
@@ -99,7 +98,7 @@ UserInfoIncludes
         this.data.authTokens.push(authToken as UserAuthToken);
       }
     });
-    this.sessionDataResource.markOutdated();
+    this.sessionResource.markOutdated();
 
     return this.data;
   }
@@ -112,7 +111,7 @@ UserInfoIncludes
         this.resetIncludes();
       }
     });
-    this.sessionDataResource.markOutdated();
+    this.sessionResource.markOutdated();
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
