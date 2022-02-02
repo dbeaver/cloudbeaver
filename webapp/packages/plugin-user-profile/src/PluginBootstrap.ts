@@ -20,7 +20,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void {
-    this.topNavService.placeholder.add(UserMenu, 4);
+    this.topNavService.placeholder.add(UserMenu, 5);
   }
 
   load(): void { }

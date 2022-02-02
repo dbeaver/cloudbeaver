@@ -9,7 +9,7 @@
 import { TopNavService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { SettingsMenu } from './SettingsMenu/SettingsMenu';
+import { Help } from './Help';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -19,9 +19,9 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
-    this.topNavService.placeholder.add(SettingsMenu, 6);
-  }
+  async load(): Promise<void> { }
 
-  load(): void | Promise<void> { }
+  register(): void {
+    this.topNavService.placeholder.add(Help, 4);
+  }
 }
