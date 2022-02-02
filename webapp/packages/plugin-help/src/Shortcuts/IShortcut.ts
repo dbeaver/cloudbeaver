@@ -8,13 +8,7 @@
 
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-export interface IShortcutBody {
-  code: string;
-  and?: IShortcutBody;
-  or?: IShortcutBody;
-}
-
 export interface IShortcut {
   label: TLocalizationToken;
-  body: IShortcutBody;
+  code: string[];
 }

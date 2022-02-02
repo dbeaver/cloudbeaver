@@ -11,10 +11,10 @@ import styled, { css } from 'reshadow';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { IShortcutBody } from './IShortcut';
+import type { IShortcut } from './IShortcut';
 
 interface Props {
-  body: IShortcutBody;
+  shortcut: IShortcut;
 }
 
 const style = composes(
@@ -24,7 +24,15 @@ const style = composes(
     }
   `,
   css`
-    shortcut-body {
+    shortcut-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    shortcut-label {
+      margin-right: 8px;
+    }
+    shortcut-content {
       display: flex;
       align-items: center;
       gap: 4px;
@@ -43,27 +51,27 @@ const style = composes(
     }
 `);
 
-export const ShortcutBody: React.FC<Props> = function ShortcutBody({ body }) {
+export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
   const translate = useTranslate();
-  const styles = useStyles(style);
 
-  return styled(styles)(
-    <shortcut-body>
-      <shortcut-code>
-        {body.code}
-      </shortcut-code>
-      {body.and && (
-        <>
-          <span>+</span>
-          <ShortcutBody body={body.and} />
-        </>
-      )}
-      {body.or && (
-        <>
-          <span>{translate('ui_or')}</span>
-          <ShortcutBody body={body.or} />
-        </>
-      )}
-    </shortcut-body>
+  return styled(useStyles(style))(
+    <shortcut-container>
+      <shortcut-label>
+        {translate(shortcut.label)}
+      </shortcut-label>
+      <shortcut-content>
+        {shortcut.code.map((code, index, array) => {
+          const next = !!array[index + 1];
+          return (
+            <>
+              <shortcut-code>
+                {code}
+              </shortcut-code>
+              {next && <span>{translate('ui_or')}</span>}
+            </>
+          );
+        })}
+      </shortcut-content>
+    </shortcut-container>
   );
 };

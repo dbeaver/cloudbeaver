@@ -13,7 +13,7 @@ import { PluginBootstrap } from './PluginBootstrap';
 
 export const manifest: PluginManifest = {
   info: {
-    name: 'Info plugin',
+    name: 'Help plugin',
   },
 
   providers: [
