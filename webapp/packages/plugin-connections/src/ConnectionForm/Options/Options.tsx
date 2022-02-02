@@ -66,7 +66,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
   });
 
-  useFormValidator(submittingHandlers.for(service.formValidationTask), formRef);
+  useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
   const optionsHook = useOptions(props.state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 

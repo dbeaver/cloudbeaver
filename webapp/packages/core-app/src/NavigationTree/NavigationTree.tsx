@@ -24,6 +24,7 @@ import { navigationTreeConnectionGroupRenderer } from './navigationTreeConnectio
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './NavigationTreeSettings/createNavigationTreeUserSettings';
+import { getNavigationTreeUserSettingsId } from './NavigationTreeSettings/getNavigationTreeUserSettingsId';
 import type { INavigationTreeUserSettings } from './NavigationTreeSettings/INavigationTreeUserSettings';
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 import { useNavigationTree } from './useNavigationTree';
@@ -77,7 +78,7 @@ export const NavigationTree = observer(function NavigationTree() {
   ), [connectionInfoResource, navNodeInfoResource]);
 
   const settings = useUserData<INavigationTreeUserSettings>(
-    `navigation-tree-${root}`,
+    getNavigationTreeUserSettingsId(root),
     createNavigationTreeUserSettings,
     () => {},
     validateNavigationTreeUserSettings

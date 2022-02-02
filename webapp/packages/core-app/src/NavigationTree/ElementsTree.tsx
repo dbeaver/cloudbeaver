@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource } from '@cloudbeaver/core-blocks';
+import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFocus, useFolderExplorer, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
@@ -31,7 +31,7 @@ import { IElementsTreeCustomRenderer, IElementsTreeFilter, ITreeNodeState, useEl
 
 const styles = composes(
   css`
-    filter {
+    filter-box {
       composes: theme-background-surface from global;
     }
   `,
@@ -52,7 +52,7 @@ const styles = composes(
       padding: 0 12px 8px 12px;
     }
 
-    filter {
+    filter-box {
       padding: 8px 24px;
       flex: 0 0 auto;
       display: block;
@@ -114,6 +114,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const folderExplorer = useFolderExplorer(baseRoot);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -251,14 +252,14 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       <TreeContext.Provider value={context}>
         <box className={className}>
           {filter && (
-            <filter>
+            <filter-box ref={focusedRef} as='div'>
               <Filter
                 placeholder={translate('app_navigationTree_search')}
                 value={context.tree.filter}
                 max
                 onFilter={value => context.tree.setFilter(value as string)}
               />
-            </filter>
+            </filter-box>
           )}
           <FolderExplorer state={folderExplorer}>
             <tree>

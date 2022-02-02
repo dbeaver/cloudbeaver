@@ -35,6 +35,7 @@ export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogSer
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/MENU_NAV_TREE';
 export * from './NavigationTree/NavigationNodeComponent';
+export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/useElementsTree';

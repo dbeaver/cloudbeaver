@@ -109,7 +109,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   onClick,
 }) {
   const styles = useStyles(filterStyles, style, toggleMode && toggleModeButtonStyle);
-  const [inputRef] = useFocus<HTMLInputElement>({});
+  const [inputRef, ref] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
 
   const filter = useCallback((value: string | number, name?: string) => {
@@ -142,9 +142,9 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
 
   useEffect(() => {
     if (toggled && toggleMode) {
-      inputRef.current?.focus();
+      ref.reference?.focus();
     }
-  }, [toggled, toggleMode, inputRef]);
+  }, [toggled, toggleMode, ref.reference]);
 
   let value: any = valueControlled;
 
