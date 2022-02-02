@@ -34,8 +34,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     handleExpand,
     handleOpen,
     handleSelect,
-    handleFilter,
-    filterValue,
   } = useNavigationNode(node, path);
 
   const Control = control || NavigationNodeControl;
@@ -53,12 +51,10 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       expanded={expanded}
       externalExpanded={expandedExternal}
       leaf={leaf}
-      filterValue={filterValue}
       onExpand={handleExpand}
       onClick={handleClick}
       onOpen={handleOpen}
       onSelect={handleSelect}
-      onFilter={handleFilter}
     >
       <Control node={node} />
       {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}

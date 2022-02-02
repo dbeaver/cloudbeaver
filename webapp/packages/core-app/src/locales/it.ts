@@ -11,6 +11,8 @@ export default [
   ['app_shared_settingsMenu_lang', 'Lingua'],
   ['app_topnavbar_connection_schema_manager_not_selected', '-- non selezionato --'],
   ['app_navigationTree_openNodeTab', 'Apri'],
+  ['app_navigationTree_search', 'Search elements...'],
+  ['app_navigationTree_node_empty', 'Empty'],
   ['app_navigationTree_connection_view', 'Vista di connessione'],
   ['app_navigationTree_connection_view_option_simple', 'Semplice'],
   ['app_navigationTree_connection_view_option_advanced', 'Avanzato'],

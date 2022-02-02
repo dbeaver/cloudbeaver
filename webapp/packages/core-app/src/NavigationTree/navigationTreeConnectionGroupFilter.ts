@@ -12,7 +12,6 @@ import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
-import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 import type { IElementsTreeFilter } from './useElementsTree';
 
 export const NAVIGATION_TREE_CONNECTION_GROUPS = {
@@ -62,7 +61,7 @@ export function navigationTreeConnectionGroupFilter(
   connectionInfoResource: ConnectionInfoResource,
   resource: NavNodeInfoResource
 ): IElementsTreeFilter {
-  return (node: NavNode, children: string[]) => {
+  return (filter: string, node: NavNode, children: string[]) => {
     if (node.id !== ROOT_NODE_PATH) {
       return children;
     }

@@ -14,6 +14,8 @@ export default [
     'Нет открытых объектов для отображения. Дважды нажмите на элемент в дереве навигации, чтобы открыть его.',
   ],
   ['app_navigationTree_openNodeTab', 'Открыть'],
+  ['app_navigationTree_search', 'Искать элементы...'],
+  ['app_navigationTree_node_empty', 'Пусто'],
   ['app_navigationTree_connection_view', 'Отображение'],
   ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],
   ['app_navigationTree_connection_view_option_advanced', 'Продвинутое'],

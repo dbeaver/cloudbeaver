@@ -15,7 +15,7 @@ import type { IElementsTreeFilter } from './useElementsTree';
 export function navigationTreeDuplicateFilter(
   navNodeViewService: NavNodeViewService,
 ): IElementsTreeFilter {
-  return (node: NavNode, children: string[]) => {
+  return (filter: string, node: NavNode, children: string[]) => {
     const { nodes, duplicates } = navNodeViewService.filterDuplicates(children);
 
     untracked(() => {

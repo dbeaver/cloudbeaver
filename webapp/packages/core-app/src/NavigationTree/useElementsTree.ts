@@ -24,13 +24,13 @@ import { NavigationTreeService } from './NavigationTreeService';
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
 
 export type IElementsTreeFilter = (
+  filter: string,
   node: NavNode,
   children: string[],
   state: MetadataMap<string, ITreeNodeState>
 ) => string[];
 
 export interface ITreeNodeState {
-  filter: string;
   selected: boolean;
   expanded: boolean;
 }
@@ -55,12 +55,13 @@ interface IOptions {
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
-  onFilter?: (node: NavNode, value: string) => Promise<void> | void;
+  onFilter?: (value: string) => Promise<void> | void;
 }
 
 export interface IElementsTree {
   baseRoot: string;
   root: string;
+  filter: string;
   loading: boolean;
   disabled: boolean;
   foldersTree: boolean;
@@ -71,7 +72,7 @@ export interface IElementsTree {
   isNodeSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
   isGroup?: (node: NavNode) => boolean;
-  filter: (node: NavNode, value: string) => Promise<void>;
+  setFilter: (value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
 }
@@ -83,7 +84,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const connectionInfoResource = useService(ConnectionInfoResource);
 
   const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({
-    filter: '',
     selected: false,
     expanded: false,
   })));
@@ -170,7 +170,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
     return (options.filters || [])
       .reduce(
-        (children, filter) => filter(node, children, state),
+        (children, filter) => filter(elementsTree.filter, node, children, state),
         navTreeService.getChildren(node.id) || []
       );
   }
@@ -247,6 +247,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     state,
+    filter: '',
     loading: options.keepData || false,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
@@ -258,19 +259,19 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const children = getNodeChildren(nodeId);
 
         if (children.length > 0) {
-          return children.every(child => elementsTree.getNodeState(child).selected);
-        } else {
-          return false;
+          return children.every(child => this.isNodeSelected(child));
         }
+        
+        return false;
       }
+
       return this.getNodeState(nodeId).selected;
     },
     getNodeChildren,
-    async filter(node: NavNode, value: string) {
-      const treeNodeState = this.state.get(node.id);
-      treeNodeState.filter = value;
+    async setFilter(value: string) {
+      this.filter = value;
 
-      await options.onFilter?.(node, value);
+      await options.onFilter?.(value);
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
@@ -318,6 +319,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     isGroup: observable.ref,
     disabled: observable.ref,
     root: observable.ref,
+    filter: observable.ref,
     loading: observable.ref,
     renderers: observable.ref,
     baseRoot: observable.ref,

@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
@@ -31,6 +32,7 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
 }) {
   const styles = useStyles(TREE_NODE_STYLES);
   const treeContext = useContext(TreeContext);
+  const translate = useTranslate();
 
   const nextPath = useMemo(() => [...path, nodeId], [path, nodeId]);
   const children = getComputed(
@@ -50,6 +52,7 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
   return styled(styles)(
     <TreeNodeNested root={root}>
       {children.map(child => <NavigationNode key={child} nodeId={child} path={nextPath} />)}
+      {children.length === 0 && <TreeNodeNestedMessage>{translate('app_navigationTree_node_empty')}</TreeNodeNestedMessage>}
     </TreeNodeNested>
   );
 });

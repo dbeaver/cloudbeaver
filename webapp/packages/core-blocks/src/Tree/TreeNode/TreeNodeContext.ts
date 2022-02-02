@@ -18,11 +18,9 @@ export interface ITreeNodeContext {
   leaf: boolean;
   group: boolean;
   readonly select: (multiple?: boolean, nested?: boolean) => Promise<void>;
-  readonly filter: (value: string) => Promise<void>;
-  filterValue: string;
   readonly click?: () => Promise<void>;
   readonly expand: () => Promise<void>;
   readonly open: () => Promise<void>;
 }
 
-export const TreeNodeContext = createContext<ITreeNodeContext>(undefined as any);
+export const TreeNodeContext = createContext<ITreeNodeContext>(undefined as any); // TODO: remove cast to any

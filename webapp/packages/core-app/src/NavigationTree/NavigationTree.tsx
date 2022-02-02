@@ -30,12 +30,12 @@ const navigationTreeStyles = css`
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: auto;
   }
 
   ElementsTree {
     padding-top: 16px;
     min-width: 100%;
-    min-height: 100%;
     width: max-content;
   }
 

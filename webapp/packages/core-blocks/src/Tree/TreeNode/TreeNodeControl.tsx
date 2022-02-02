@@ -21,17 +21,18 @@ const KEY = {
 };
 
 interface Props extends ITreeNodeState {
+  title?: string;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
   big?: boolean;
 }
 
 export const TreeNodeControl = observer<Props>(function TreeNodeControl({
+  title,
   group,
   disabled,
   loading,
   selected,
-  filterValue,
   expanded,
   externalExpanded,
   leaf,
@@ -40,6 +41,10 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   children,
 }) {
   const context = useContext(TreeNodeContext);
+
+  if (!context) {
+    throw new Error('Context not provided');
+  }
 
   if (group !== undefined) {
     context.group = group;
@@ -55,10 +60,6 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
 
   if (selected !== undefined) {
     context.selected = selected;
-  }
-
-  if (filterValue !== undefined) {
-    context.filterValue = filterValue;
   }
 
   if (expanded !== undefined) {
@@ -109,6 +110,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   return (
     <div
       tabIndex={0}
+      title={title}
       aria-selected={context.selected}
       className={className}
       onClick={handleClick}

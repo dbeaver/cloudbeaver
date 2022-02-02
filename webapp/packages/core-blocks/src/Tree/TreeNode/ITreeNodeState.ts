@@ -14,5 +14,4 @@ export interface ITreeNodeState {
   externalExpanded?: boolean;
   expanded?: boolean;
   leaf?: boolean;
-  filterValue?: string;
 }
