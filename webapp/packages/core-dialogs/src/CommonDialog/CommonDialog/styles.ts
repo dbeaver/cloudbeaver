@@ -115,6 +115,7 @@ export const commonDialogBaseStyle = composes(
       justify-content: space-between;
       position: relative;
       min-height: 24px;
+      overflow: auto;
     }
     icon-container {
       display: flex;
@@ -175,6 +176,8 @@ export const commonDialogBaseStyle = composes(
     }
     h3 {
       margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     sub-title {
       composes: theme-typography--caption from global;

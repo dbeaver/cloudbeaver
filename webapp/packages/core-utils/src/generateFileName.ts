@@ -8,5 +8,5 @@
 
 export function generateFileName(fileName: string, fileFormat: string) {
   const now = new Date();
-  return `${fileName}_${now.toISOString().slice(0, 10)}_${('0' + now.getHours()).slice(-2)}-${('0' + now.getMinutes()).slice(-2)}-${('0' + now.getSeconds()).slice(-2)}${fileFormat}`;
+  return `${fileName} ${now.toISOString().slice(0, 10)} ${('0' + now.getHours()).slice(-2)}-${('0' + now.getMinutes()).slice(-2)}-${('0' + now.getSeconds()).slice(-2)}${fileFormat}`;
 }
