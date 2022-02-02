@@ -64,6 +64,7 @@ export const defaultRULocale = [
   ['ui_close_others', 'Закрыть другие'],
   ['ui_close_all_to_the_right', 'Закрыть все справа'],
   ['ui_close_all_to_the_left', 'Закрыть все слева'],
+  ['ui_or', 'Или'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

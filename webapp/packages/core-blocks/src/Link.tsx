@@ -8,12 +8,16 @@
 
 import styled, { css, use } from 'reshadow';
 
+import { IconOrImage } from './IconOrImage';
+
 interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   wrapper?: boolean;
+  indicator?: boolean;
 }
 
 const styles = css`
   a {
+    position: relative;
     cursor: pointer;
   }
   a[|wrapper] {
@@ -23,17 +27,29 @@ const styles = css`
       outline: none;
     }
   }
+  IconOrImage {
+    position: absolute;
+    width: 8px;
+    left: calc(100% + 4px);
+  }
 `;
 
 export const Link: React.FC<Props> = function Link({
   wrapper,
+  indicator,
   className,
   children,
   ...rest
 }) {
   return styled(styles)(
     <div className={className}>
-      <a {...use({ wrapper })} {...rest}>{children}</a>
+      <a
+        {...use({ wrapper })}
+        {...rest}
+      >
+        {indicator && <IconOrImage icon='external-link' />}
+        {children}
+      </a>
     </div>
   );
 };
