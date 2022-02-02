@@ -126,7 +126,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         return false;
       }
 
-      await autoOpenFolders(root, folderExplorer.path);
+      return await autoOpenFolders(root, folderExplorer.path);
     },
   });
 
