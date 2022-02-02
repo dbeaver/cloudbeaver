@@ -96,7 +96,11 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
-      isActionApplicable: (context, action) => [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN].includes(action),
+      isActionApplicable: (context, action) => (
+        [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN].includes(action)
+        && context.has(DATA_CONTEXT_SQL_EDITOR_STATE)
+        && context.has(DATA_CONTEXT_SQL_EDITOR_TAB)
+      ),
       handler: async (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
