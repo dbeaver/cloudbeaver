@@ -15,6 +15,15 @@ export default [
   ],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
+
+  ['app_navigationTree_settings_title', 'Настройки'],
+  ['app_navigationTree_settings_filter_title', 'Фильтр'],
+  ['app_navigationTree_settings_filter_description', 'Показывать фильтр'],
+  ['app_navigationTree_settings_state_title', 'Сохранять состояние'],
+  ['app_navigationTree_settings_state_description', 'Восстанавливает открытые узлы после обновления страницы'],
+  ['app_navigationTree_settings_folders_title', 'Папки'],
+  ['app_navigationTree_settings_folders_description', 'Позволяет открыть любой узел как начальный'],
+
   ['app_navigationTree_node_empty', 'Пусто'],
   ['app_navigationTree_connection_view', 'Отображение'],
   ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],

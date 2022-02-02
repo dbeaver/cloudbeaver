@@ -14,8 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import type { IActiveView } from '@cloudbeaver/core-view';
-import { View } from '@cloudbeaver/core-view';
+import { ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
@@ -44,11 +43,6 @@ export class NavigationTreeService extends View<string> {
   ) {
     super();
 
-    makeObservable<NavigationTreeService, 'unselectAll'>(this, {
-      selectNode: action,
-      unselectAll: action,
-    });
-
     this.treeState = new MetadataMap(() => ({
       filter: '',
       expanded: false,
@@ -57,6 +51,12 @@ export class NavigationTreeService extends View<string> {
 
     this.nodeSelectionTask = new SyncExecutor();
     this.getView = this.getView.bind(this);
+    this.registerAction(ACTION_FILTER);
+
+    makeObservable<NavigationTreeService, 'unselectAll'>(this, {
+      selectNode: action,
+      unselectAll: action,
+    });
   }
 
   getChildren(id: string): string[] | undefined {

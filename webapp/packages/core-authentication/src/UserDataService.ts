@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, untracked } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
@@ -15,11 +15,11 @@ import { UserInfoResource } from './UserInfoResource';
 
 @injectable()
 export class UserDataService {
-  private userData: Map<string, Record<string, any>>;
+  private readonly userData: Map<string, Record<string, any>>;
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
-    private autoSaveService: LocalStorageSaveService,
+    private readonly autoSaveService: LocalStorageSaveService,
   ) {
     this.userData = new Map();
 
@@ -36,19 +36,23 @@ export class UserDataService {
   getUserData<T>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {
     const userId = this.userInfoResource.getId();
 
-    if (!this.userData.has(userId)) {
-      this.userData.set(userId, observable({}));
-    }
+    untracked(() => {
+      if (!this.userData.has(userId)) {
+        this.userData.set(userId, observable({}));
+      }
+    });
 
     const data = this.userData.get(userId)!;
 
-    if (key in data) {
-      if (!validate || validate(data[key])) {
-        return data[key];
+    untracked(() => {
+      if (key in data) {
+        if (!validate || validate(data[key])) {
+          return data[key];
+        }
       }
-    }
 
-    data[key] = defaultValue();
+      data[key] = defaultValue();
+    });
 
     return data[key];
   }

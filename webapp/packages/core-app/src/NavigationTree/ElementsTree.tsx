@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource } from '@cloudbeaver/core-blocks';
@@ -122,6 +122,12 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   
   const root = folderExplorer.folder;
   const fullPath = folderExplorer.fullPath;
+
+  useEffect(() => {
+    if (!foldersTree && folderExplorer.folder !== baseRoot) {
+      folderExplorer.open([], baseRoot);
+    }
+  }, [foldersTree, folderExplorer, baseRoot]);
 
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
