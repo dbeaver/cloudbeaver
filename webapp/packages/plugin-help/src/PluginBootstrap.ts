@@ -9,7 +9,7 @@
 import { TopNavService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { Info } from './Info';
+import { Help } from './Help';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -22,6 +22,6 @@ export class PluginBootstrap extends Bootstrap {
   async load(): Promise<void> { }
 
   register(): void {
-    this.topNavService.placeholder.add(Info, 4);
+    this.topNavService.placeholder.add(Help, 4);
   }
 }

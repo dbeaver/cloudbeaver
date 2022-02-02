@@ -60,17 +60,14 @@ export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
         {translate(shortcut.label)}
       </shortcut-label>
       <shortcut-content>
-        {shortcut.code.map((code, index, array) => {
-          const next = !!array[index + 1];
-          return (
-            <>
-              <shortcut-code>
-                {code}
-              </shortcut-code>
-              {next && <span>{translate('ui_or')}</span>}
-            </>
-          );
-        })}
+        {shortcut.code.map((code, index) => (
+          <>
+            {index > 0 && <span>{translate('ui_or')}</span>}
+            <shortcut-code>
+              {code}
+            </shortcut-code>
+          </>
+        ))}
       </shortcut-content>
     </shortcut-container>
   );

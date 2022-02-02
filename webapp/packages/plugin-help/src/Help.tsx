@@ -36,7 +36,7 @@ const styles = composes(
   `
 );
 
-export const Info = observer(function Info() {
+export const Help = observer(function Help() {
   const style = useStyles(styles);
   const commonDialogService = useService(CommonDialogService);
 
