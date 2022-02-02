@@ -5,6 +5,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
+import io.cloudbeaver.server.servlets.CBStatusServlet;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -60,7 +61,7 @@ public class CBJettyServer {
                 String rootURI = application.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
                 servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), "/*");
-                servletContextHandler.addServlet(new ServletHolder("status", new CBStaticServlet()), "/status");
+                servletContextHandler.addServlet(new ServletHolder("status", new CBStatusServlet()), "/status");
                 servletContextHandler.addServlet(new ServletHolder("images", new CBImageServlet()), application.getServicesURI() + "images/*");
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener());
