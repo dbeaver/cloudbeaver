@@ -13,15 +13,15 @@ import { useExecutor } from './useExecutor';
 
 export function useFormValidator(
   validationTask: IExecutor<any> | IExecutorHandlersCollection<any>,
-  ref: React.RefObject<HTMLFormElement>,
+  ref: HTMLFormElement | null,
   callback?: () => void
 ): void {
   useExecutor({
     executor: validationTask,
     postHandlers: [function validate() {
-      ref.current?.focus();
-      ref.current?.checkValidity();
-      ref.current?.reportValidity();
+      ref?.focus();
+      ref?.checkValidity();
+      ref?.reportValidity();
 
       callback?.();
     }],

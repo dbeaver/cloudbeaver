@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useHotkeys } from 'react-hotkeys-hook';
 import styled, { css } from 'reshadow';
 
-import { getComputed, useFocus } from '@cloudbeaver/core-blocks';
+import { useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ActionService } from '../Action/ActionService';
@@ -39,22 +39,26 @@ export const CaptureView = observer<Props>(function CaptureView({
   const viewContext = useViewContext(view);
   const actionService = useService(ActionService);
   const [onFocus, onBlur] = useActiveView(view);
-  const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
+  const [ref, state] = useFocus<HTMLDivElement>({ onFocus, onBlur });
 
-  const actionItems = getComputed(() => (
+  const actionItems = (
     view.actions
       .map(action => actionService.getAction(viewContext, action))
       .filter(action => action?.binding && !action.isDisabled())
       .filter(Boolean) as IActionItem[]
-  ));
+  );
 
-  const keys = actionItems
+  let keys = actionItems
     .map(item => item.binding?.binding.keys)
     .flat()
-    .join(',');
+    .join(', ');
 
+  if (keys === '') {
+    keys = '*';
+  }
+  
   useHotkeys(keys, (event, handler) => {
-    if (!ref.current?.contains(document.activeElement)) {
+    if (!state.reference?.contains(document.activeElement)) {
       return;
     }
 
@@ -69,6 +73,7 @@ export const CaptureView = observer<Props>(function CaptureView({
 
     action?.activate(true);
   }, {
+    enabled: keys !== '*',
     enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
   });
 
