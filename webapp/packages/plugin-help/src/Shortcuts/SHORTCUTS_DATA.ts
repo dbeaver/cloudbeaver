@@ -64,7 +64,7 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
 
 export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
   {
-    label: 'navigation_tree_enable_filter',
+    label: 'navigation_tree_shortcut_enable_filter',
     code: ['Ctrl + F'],
   },
 ];
