@@ -14,25 +14,25 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Shortcut } from './Shortcut';
-import { DATA_VIEWER_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';
+import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';
 
 
 const style = css`
-  CommonDialogWrapper {
-    max-width: 1100px;
-  }
   Button {
     margin-left: auto;
   }
   Container {
     composes: theme-typography--body2 from global;
-    gap: 16px;
+    gap: 32px;
   }
   Group {
     gap: 16px;
   }
   GroupTitle, Group {
     padding: 0 !important;
+  }
+  GroupTitle {
+    font-weight: bold;
   }
 `;
 
@@ -54,7 +54,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
       onReject={rejectDialog}
     >
       <Container wrap overflow>
-        <Group medium overflow>
+        <Group overflow>
           <GroupTitle>
             <Link href='https://cloudbeaver.io/docs/Data-editor/' target='_blank' wrapper indicator>
               Data Viewer
@@ -62,13 +62,21 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
           </GroupTitle>
           {DATA_VIEWER_SHORTCUTS.map(shortcut => <Shortcut key={shortcut.label} shortcut={shortcut} />)}
         </Group>
-        <Group medium overflow>
+        <Group overflow>
           <GroupTitle>
             <Link href='https://cloudbeaver.io/docs/SQL-Editor/' target='_blank' wrapper indicator>
               SQL Editor
             </Link>
           </GroupTitle>
           {SQL_EDITOR_SHORTCUTS.map(shortcut => <Shortcut key={shortcut.label} shortcut={shortcut} />)}
+        </Group>
+        <Group overflow>
+          <GroupTitle>
+            <Link href='https://cloudbeaver.io/docs/Database-navigator/' target='_blank' wrapper indicator>
+              Navigation Tree
+            </Link>
+          </GroupTitle>
+          {NAVIGATION_TREE_SHORTCUTS.map(shortcut => <Shortcut key={shortcut.label} shortcut={shortcut} />)}
         </Group>
       </Container>
     </CommonDialogWrapper>
