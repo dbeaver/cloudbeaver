@@ -124,12 +124,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const root = folderExplorer.folder;
   const fullPath = folderExplorer.fullPath;
 
-  useEffect(() => {
-    if (!foldersTree && folderExplorer.folder !== baseRoot) {
-      folderExplorer.open([], baseRoot);
-    }
-  }, [foldersTree, folderExplorer, baseRoot]);
-
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
 
@@ -235,6 +229,15 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     },
     [navNodeInfoResource]
   );
+
+  useEffect(() => {
+    if (!foldersTree && folderExplorer.folder !== baseRoot) {
+      folderExplorer.open([], baseRoot);
+    }
+    if (!filter && tree.filter !== '') {
+      tree.setFilter('');
+    }
+  });
 
   const hasChildren = (children.data?.length || 0) > 0;
 
