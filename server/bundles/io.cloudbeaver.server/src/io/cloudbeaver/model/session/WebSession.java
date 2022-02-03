@@ -744,10 +744,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             throw new DBException("Can't authorize different users in the single session");
         }
 
-
         WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
         if (oldAuthInfo != null) {
             removeAuthInfo(oldAuthInfo);
+        }
+        DBASession authSession = authInfo.getAuthSession();
+        if (authSession != null) {
+            getSessionContext().addSession(authSession);
         }
 
         synchronized (authTokens) {
