@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
+public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -646,6 +646,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     ///////////////////////////////////////////////////////
     // Attributes
 
+    @Override
     public Map<String, Object> getAttributes() {
         synchronized (attributes) {
             return new HashMap<>(attributes);
@@ -653,6 +654,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T getAttribute(String name) {
         synchronized (attributes) {
             Object value = attributes.get(name);
@@ -663,6 +665,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    @Override
     public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
         synchronized (attributes) {
             Object value = attributes.get(name);
@@ -682,10 +685,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    @Override
     public void setAttribute(String name, Object value) {
         setAttribute(name, value, false);
     }
 
+    @Override
     public void setAttribute(String name, Object value, boolean persistent) {
         synchronized (attributes) {
             if (persistent) {
@@ -695,6 +700,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    @Override
     public Object removeAttribute(String name) {
         synchronized (attributes) {
             return attributes.remove(name);
