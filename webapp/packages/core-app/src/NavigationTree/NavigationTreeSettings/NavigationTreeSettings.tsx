@@ -29,6 +29,10 @@ const expandStyles = css`
       transform: rotate(180deg);
     }
   }
+  Group {
+    min-width: 350px;
+    width: min-content;
+  }
 `;
 
 interface Props {
@@ -68,6 +72,16 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           small
         >
           {translate('app_navigationTree_settings_filter_title')}
+        </Switch>
+        <Switch
+          name="filterAll"
+          state={settings}
+          disabled={!settings.filter}
+          description={translate('app_navigationTree_settings_filter_all_description')}
+          mod={['primary']}
+          small
+        >
+          {translate('app_navigationTree_settings_filter_all_title')}
         </Switch>
         <Switch
           name="saveExpanded"

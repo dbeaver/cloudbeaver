@@ -26,6 +26,8 @@ import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { NavigationTreeService } from './NavigationTreeService';
+import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
+import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
 import { ITreeContext, TreeContext } from './TreeContext';
 import { IElementsTreeCustomRenderer, IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
 
@@ -65,11 +67,13 @@ const styles = composes(
 
 interface Props {
   root?: string;
+  limit?: number;
   keepData?: boolean;
   disabled?: boolean;
   selectionTree?: boolean;
   foldersTree?: boolean;
   filter?: boolean;
+  filterAll?: boolean;
   showFolderExplorerPath?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   control?: NavTreeControlComponent;
@@ -91,6 +95,7 @@ interface Props {
 
 export const ElementsTree = observer<Props>(function ElementsTree({
   root: baseRoot = ROOT_NODE_PATH,
+  limit,
   control,
   keepData = false,
   disabled,
@@ -99,10 +104,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   showFolderExplorerPath = false,
   foldersTree = false,
   filter = false,
+  filterAll = false,
   emptyPlaceholder,
   navNodeFilterCompare,
-  filters,
-  renderers,
+  filters = [],
+  renderers = [],
   style,
   className,
   isGroup,
@@ -165,6 +171,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     },
   });
 
+  const limitFilter = useMemo(() => elementsTreeLimitFilter(
+    navTreeResource, 
+    limit
+  ), [navTreeResource, limit]);
+
   const nameFilter = useMemo(() => elementsTreeNameFilter(
     navTreeResource,
     navNodeInfoResource,
@@ -178,10 +189,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     showFolderExplorerPath,
     root,
     disabled,
+    filterAll,
     keepData,
     localState,
-    filters: [nameFilter, ...(filters || [])],
-    renderers,
+    filters: [nameFilter, ...filters, limitFilter],
+    renderers: [...renderers, elementsTreeLimitRenderer],
     isGroup,
     onFilter,
     beforeSelect,

@@ -47,7 +47,9 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
     onLoad: async resource => !(await resource.preloadNodeParents(parents, objectId)),
   });
 
-  const { nodes, duplicates } = navNodeViewService.filterDuplicates(tree.data || []);
+  const limited = navNodeViewService.limit(tree.data || []);
+
+  const { nodes, duplicates } = navNodeViewService.filterDuplicates(limited.nodes);
 
   const key = resourceKeyList(nodes);
   const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, key, {

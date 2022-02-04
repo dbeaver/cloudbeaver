@@ -60,7 +60,7 @@ export class NavigationTreeService extends View<string> {
   }
 
   getChildren(id: string): string[] | undefined {
-    return this.navTreeResource.get(id);
+    return this.navNodeManagerService.getTree(id);
   }
 
   async navToNode(id: string, parentId: string): Promise<void> {

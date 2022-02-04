@@ -15,10 +15,13 @@ export default [
   ],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
+  ['app_navigationTree_limited', 'Некоторые элементы были скрыты'],
 
   ['app_navigationTree_settings_title', 'Настройки'],
   ['app_navigationTree_settings_filter_title', 'Фильтр'],
   ['app_navigationTree_settings_filter_description', 'Показывать фильтр'],
+  ['app_navigationTree_settings_filter_all_title', 'Фильтровать скрытые элементы'],
+  ['app_navigationTree_settings_filter_all_description', 'Показывает скрытые элементы при использовании фильтра'],
   ['app_navigationTree_settings_state_title', 'Сохранять состояние'],
   ['app_navigationTree_settings_state_description', 'Восстанавливает открытые узлы после обновления страницы'],
   ['app_navigationTree_settings_folders_title', 'Папки'],

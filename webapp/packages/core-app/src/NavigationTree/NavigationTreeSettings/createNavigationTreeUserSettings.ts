@@ -13,6 +13,7 @@ import type { INavigationTreeUserSettings } from './INavigationTreeUserSettings'
 export function createNavigationTreeUserSettings(): INavigationTreeUserSettings {
   return observable<INavigationTreeUserSettings>({
     filter: false,
+    filterAll: false,
     saveExpanded: true,
     folders: false,
   });
@@ -21,6 +22,7 @@ export function createNavigationTreeUserSettings(): INavigationTreeUserSettings 
 export function validateNavigationTreeUserSettings(data: any): boolean {
   return (
     typeof data === 'object'
+    && typeof data.filterAll === 'boolean'
     && typeof data.filter === 'boolean'
     && typeof data.saveExpanded === 'boolean'
     && typeof data.folders === 'boolean'
