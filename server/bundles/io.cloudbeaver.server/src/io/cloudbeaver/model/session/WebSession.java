@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCredentialsProvider, IAdaptable {
+public class WebSession extends AbstractDBASessionPersistence implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -100,8 +100,6 @@ public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCre
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, Object> attributes = new HashMap<>();
-    private final Map<String, Function<Object,Object>> attributeDisposers = new HashMap<>();
     // Map of auth tokens. Key is authentication provdier
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
@@ -130,7 +128,6 @@ public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCre
         }
 
         initNavigatorModel();
-        this.sessionAuthContext.addSession(this);
     }
 
     @NotNull
@@ -644,70 +641,6 @@ public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCre
         }
     }
 
-    ///////////////////////////////////////////////////////
-    // Attributes
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        synchronized (attributes) {
-            return new HashMap<>(attributes);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getAttribute(String name) {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).value;
-            }
-            return (T) value;
-        }
-    }
-
-    @Override
-    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).value;
-            }
-            if (value == null) {
-                value = creator.apply(null);
-                if (value != null) {
-                    attributes.put(name, value);
-                    if (disposer != null) {
-                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
-                    }
-                }
-            }
-            return (T)value;
-        }
-    }
-
-    @Override
-    public void setAttribute(String name, Object value) {
-        setAttribute(name, value, false);
-    }
-
-    @Override
-    public void setAttribute(String name, Object value, boolean persistent) {
-        synchronized (attributes) {
-            if (persistent) {
-                value = new PersistentAttribute(value);
-            }
-            attributes.put(name, value);
-        }
-    }
-
-    @Override
-    public Object removeAttribute(String name) {
-        synchronized (attributes) {
-            return attributes.remove(name);
-        }
-    }
-
     @Property
     public Map<String, Object> getActionParameters() {
         WebActionParameters action = WebActionParameters.fromSession(this, true);
@@ -908,12 +841,4 @@ public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCre
             asyncTask.setStatus(name);
         }
     }
-
-    private class PersistentAttribute {
-        private final Object value;
-        public PersistentAttribute(Object value) {
-            this.value = value;
-        }
-    }
-
 }

@@ -19,20 +19,18 @@ package io.cloudbeaver.auth.provider.local;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
-import org.jkiss.dbeaver.model.auth.DBASession;
-import org.jkiss.dbeaver.model.auth.DBASessionContext;
-import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
+import org.jkiss.dbeaver.model.auth.*;
 
 /**
  * Local auth provider
  */
-public class LocalAuthSession implements DBASession {
+public class LocalAuthSession extends AbstractChildSession {
 
     private final DBASession webSession;
     private final String userId;
 
     LocalAuthSession(DBASession webSession, String userId) {
+        super(webSession);
         this.webSession = webSession;
         this.userId = userId;
     }

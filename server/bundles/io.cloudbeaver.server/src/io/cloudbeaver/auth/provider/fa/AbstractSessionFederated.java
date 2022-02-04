@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.auth.*;
 
 import java.util.Map;
 
-public abstract class AbstractSessionFederated implements DBASessionFederated {
+public abstract class AbstractSessionFederated extends AbstractChildSession implements DBASessionFederated {
 
     @NotNull
     protected final Map<String, Object> authParameters;
@@ -34,6 +34,7 @@ public abstract class AbstractSessionFederated implements DBASessionFederated {
     protected final DBAAuthSpace space;
 
     protected AbstractSessionFederated(@NotNull DBASession parentSession, @NotNull DBAAuthSpace space, @NotNull Map<String, Object> authParameters) {
+        super(parentSession);
         this.parentSession = parentSession;
         this.space = space;
         this.authParameters = authParameters;
