@@ -737,24 +737,35 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     }
 
     public void addAuthInfo(@NotNull WebAuthInfo authInfo) throws DBException {
-        WebUser newUser = authInfo.getUser();
+        addAuthTokens(authInfo);
+    }
+
+    public void addAuthTokens(@NotNull WebAuthInfo ... tokens) throws DBException {
+        WebUser newUser = null;
+        for (WebAuthInfo authInfo : tokens) {
+            if (newUser != null && newUser != authInfo.getUser()) {
+                throw new DBException("Different users specified in auth tokens: " + Arrays.toString(tokens));
+            }
+            newUser = authInfo.getUser();
+        }
         if (this.user == null && newUser != null) {
             forceUserRefresh(newUser);
         } else if (!CommonUtils.equalObjects(this.user, newUser)) {
             throw new DBException("Can't authorize different users in the single session");
         }
 
-        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
-        if (oldAuthInfo != null) {
-            removeAuthInfo(oldAuthInfo);
+        for (WebAuthInfo authInfo : tokens) {
+            WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
+            if (oldAuthInfo != null) {
+                removeAuthInfo(oldAuthInfo);
+            }
+            DBASession authSession = authInfo.getAuthSession();
+            if (authSession != null) {
+                getSessionContext().addSession(authSession);
+            }
         }
-        DBASession authSession = authInfo.getAuthSession();
-        if (authSession != null) {
-            getSessionContext().addSession(authSession);
-        }
-
         synchronized (authTokens) {
-            authTokens.add(authInfo);
+            Collections.addAll(authTokens, tokens);
         }
     }
 
