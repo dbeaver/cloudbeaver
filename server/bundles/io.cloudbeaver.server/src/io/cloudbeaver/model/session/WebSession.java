@@ -235,14 +235,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         refreshSessionAuth();
 
         initNavigatorModel();
-
-        for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
-            try {
-                hd.getInstance().handleSessionAuth(this);
-            } catch (Exception e) {
-                log.error("Error calling session handler '" + hd.getId() + "'", e);
-            }
-        }
     }
 
     private void initNavigatorModel() {
@@ -766,6 +758,19 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
         synchronized (authTokens) {
             Collections.addAll(authTokens, tokens);
+        }
+
+        notifySessionAuthChange();
+    }
+
+    public void notifySessionAuthChange() {
+        // Notify handlers about auth change
+        for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+            try {
+                hd.getInstance().handleSessionAuth(this);
+            } catch (Exception e) {
+                log.error("Error calling session handler '" + hd.getId() + "'", e);
+            }
         }
     }
 
