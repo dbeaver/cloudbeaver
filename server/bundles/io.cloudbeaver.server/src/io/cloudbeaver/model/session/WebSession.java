@@ -130,6 +130,7 @@ public class WebSession implements DBASession, DBASessionPersistence, DBAAuthCre
         }
 
         initNavigatorModel();
+        this.sessionAuthContext.addSession(this);
     }
 
     @NotNull
