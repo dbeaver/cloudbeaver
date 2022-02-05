@@ -15,6 +15,8 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
+import { getSqlEditorName } from '../getSqlEditorName';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
 import { ScriptImportDialog } from './ScriptImportDialog';
 
@@ -25,7 +27,7 @@ interface State {
   checkFileValidity: (file: File) => boolean;
 }
 
-export function useTools(connectionId: string | undefined): Readonly<State> {
+export function useTools(state: ISqlEditorTabState): Readonly<State> {
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
@@ -93,27 +95,23 @@ export function useTools(connectionId: string | undefined): Readonly<State> {
         type: 'application/sql',
       });
 
-      let name = 'script';
-
-      if (connectionId) {
-        const connection = this.connectionInfoResource.get(connectionId);
-        name = connection ? `${connection.name}-script` : name;
-      }
+      const connection = this.connectionInfoResource.get(this.state.executionContext?.connectionId ?? '');
+      const name = getSqlEditorName(this.state, connection);
 
       download(blob, generateFileName(name, '.sql'));
     },
   }),
-    {
-      tryReadScript: action.bound,
-      readScript: action.bound,
-      checkFileValidity: action.bound,
-      downloadScript: action.bound,
-    },
-    {
-      commonDialogService,
-      connectionInfoResource,
-      notificationService,
-      sqlEditorSettingsService,
-      connectionId,
-    });
+  {
+    tryReadScript: action.bound,
+    readScript: action.bound,
+    checkFileValidity: action.bound,
+    downloadScript: action.bound,
+  },
+  {
+    commonDialogService,
+    connectionInfoResource,
+    notificationService,
+    sqlEditorSettingsService,
+    state,
+  });
 }

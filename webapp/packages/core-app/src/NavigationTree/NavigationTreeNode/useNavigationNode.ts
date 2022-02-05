@@ -30,8 +30,6 @@ interface INavigationNode {
   handleOpen: () => Promise<void>;
   handleClick: (leaf: boolean) => Promise<void>;
   handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
-  handleFilter: (value: string) => Promise<void>;
-  filterValue: string;
 }
 
 export function useNavigationNode(node: NavNode, path: string[]): INavigationNode {
@@ -40,10 +38,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   });
   const { isLoading } = useNode(node.id);
   const children = useChildren(node.id);
-  const state = contextRef.context?.tree.getNodeState(node.id);
 
   const loading = getComputed(() => isLoading() || children.isLoading());
-  const isExpanded = getComputed(() => state?.expanded || false);
+  const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
   const leaf = getComputed(() => isLeaf(node));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
@@ -51,7 +48,6 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
-  const filterValue = getComputed(() => state?.filter || '');
 
   const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, path, leaf);
   const handleOpen = async () => await contextRef.context?.onOpen?.(node, path);
@@ -60,12 +56,11 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     multiple = false,
     nested = false
   ) => await contextRef.context?.tree.select(node, multiple, nested);
-  const handleFilter = async (value: string) => await contextRef.context?.tree.filter(node, value);
 
   useEffect(() => () => {
     if (!contextRef.context?.selectionTree) {
       if (contextRef.context?.tree.isNodeSelected(node.id)) {
-        contextRef.context?.tree.select(node, true, false);
+        contextRef.context.tree.select(node, true, false);
       }
     }
   }, [node]);
@@ -83,8 +78,6 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     handleClick,
     handleOpen,
     handleSelect,
-    handleFilter,
-    filterValue,
   };
 }
 

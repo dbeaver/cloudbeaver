@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
@@ -22,6 +23,10 @@ import { navigationTreeConnectionGroupFilter } from './navigationTreeConnectionG
 import { navigationTreeConnectionGroupRenderer } from './navigationTreeConnectionGroupRenderer';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
+import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './NavigationTreeSettings/createNavigationTreeUserSettings';
+import { getNavigationTreeUserSettingsId } from './NavigationTreeSettings/getNavigationTreeUserSettingsId';
+import type { INavigationTreeUserSettings } from './NavigationTreeSettings/INavigationTreeUserSettings';
+import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -30,12 +35,11 @@ const navigationTreeStyles = css`
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: auto;
   }
 
   ElementsTree {
-    padding-top: 16px;
     min-width: 100%;
-    min-height: 100%;
     width: max-content;
   }
 
@@ -63,6 +67,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const navNodeViewService = useService(NavNodeViewService);
 
+  const root = ROOT_NODE_PATH;
   const isEnabled = usePermission(EPermission.public);
   const { handleOpen, handleSelect } = useNavigationTree();
 
@@ -70,6 +75,13 @@ export const NavigationTree = observer(function NavigationTree() {
     connectionInfoResource,
     navNodeInfoResource
   ), [connectionInfoResource, navNodeInfoResource]);
+
+  const settings = useUserData<INavigationTreeUserSettings>(
+    getNavigationTreeUserSettingsId(root),
+    createNavigationTreeUserSettings,
+    () => {},
+    validateNavigationTreeUserSettings
+  );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
 
@@ -79,8 +91,9 @@ export const NavigationTree = observer(function NavigationTree() {
 
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>
+      <NavigationTreeSettings root={root} settings={settings} />
       <ElementsTree
-        root={ROOT_NODE_PATH}
+        root={root}
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter]}
         renderers={[navigationTreeConnectionGroupRenderer]}
@@ -93,7 +106,11 @@ export const NavigationTree = observer(function NavigationTree() {
           </center>
         )}
         customSelect={handleSelect}
-        keepData
+        foldersTree={settings.folders}
+        showFolderExplorerPath={settings.folders}
+        filter={settings.filter}
+        filterAll={settings.filterAll}
+        keepData={settings.saveExpanded}
         onOpen={handleOpen}
       />
     </CaptureView>

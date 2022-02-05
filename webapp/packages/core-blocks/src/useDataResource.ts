@@ -193,7 +193,7 @@ export function useDataResource<
   }));
 
   useEffect(() => {
-    if (!outdated && !refObj.firstRender) {
+    if ((!outdated && !refObj.firstRender) || refObj.key === null) {
       return;
     }
 

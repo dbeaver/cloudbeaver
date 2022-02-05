@@ -27,7 +27,11 @@ export type CachedDataResourceContext<TResource> = TResource extends CachedDataR
 export type CachedDataResourceGetter<
   TValue,
   TIncludes
-> = CachedResourceValueIncludes<TValue, TIncludes>;
+> = (
+  TValue extends null 
+    ? CachedResourceValueIncludes<TValue, TIncludes> | null 
+    : CachedResourceValueIncludes<TValue, TIncludes>
+);
 
 type ContextArg<TData, TContext> = TContext extends void ? void : CachedResourceIncludeArgs<TData, TContext>;
 

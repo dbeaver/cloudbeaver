@@ -58,7 +58,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   async function handleSelect() {
     await onSelect?.();
 
-    await context.select(true, group);
+    await context!.select(true, group);
   }
 
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
@@ -74,12 +74,12 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
       {loadIndicator && context.loading
         ? <Loader small />
         : (
-            <Checkbox
-              checked={selected ?? context.selected}
-              disabled={disabled}
-              onChange={handleSelect}
-            />
-          )}
+          <Checkbox
+            checked={selected ?? context.selected}
+            disabled={disabled}
+            onChange={handleSelect}
+          />
+        )}
     </div>
   );
 });

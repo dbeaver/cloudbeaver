@@ -16,10 +16,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-ui';
 import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
-import { getSqlEditorName } from './getSqlEditorName';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({
   tab, onSelect, onClose, style,

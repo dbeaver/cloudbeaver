@@ -48,7 +48,7 @@ public class CBServerAction {
     }
 
     public void saveInSession(WebSession session) {
-        session.setAttribute(PARAM_ACTION_PARAMETERS, this);
+        session.setAttribute(PARAM_ACTION_PARAMETERS, this, true);
     }
 
     public static CBServerAction fromSession(WebSession session, boolean remove) {

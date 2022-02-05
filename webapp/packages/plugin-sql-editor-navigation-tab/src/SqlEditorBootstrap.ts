@@ -20,10 +20,10 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
-import { getSqlEditorName } from './getSqlEditorName';
+import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
@@ -56,7 +56,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     );
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE),
+      isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE) && context.has(DATA_CONTEXT_SQL_EDITOR_TAB),
       getItems: (context, items) => [
         ...items,
         ACTION_RENAME,
@@ -96,7 +96,16 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
-      isActionApplicable: (context, action) => [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN].includes(action),
+      isActionApplicable: (context, action) => (
+        (
+          action === ACTION_RENAME
+          && context.has(DATA_CONTEXT_SQL_EDITOR_STATE)
+          && context.has(DATA_CONTEXT_SQL_EDITOR_TAB)
+        ) || (
+          action === ACTION_SQL_EDITOR_OPEN
+          && context.has(DATA_CONTEXT_CONNECTION)
+        )
+      ),
       handler: async (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
@@ -112,14 +121,14 @@ export class SqlEditorBootstrap extends Bootstrap {
             });
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-              state.name = result;
+              state.name = (result ?? '').trim();
             }
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
-            const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+            const connection = context.get(DATA_CONTEXT_CONNECTION);
 
-            this.sqlEditorNavigatorService.openNewEditor(undefined, connection?.id);
+            this.sqlEditorNavigatorService.openNewEditor(undefined, connection.id);
             break;
           }
         }

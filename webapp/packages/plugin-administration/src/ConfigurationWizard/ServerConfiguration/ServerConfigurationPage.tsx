@@ -43,13 +43,13 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
 }) {
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);
   const commonDialogService = useService(CommonDialogService);
   const configurationWizardService = useService(ConfigurationWizardService);
   const changed = serverConfigResource.isChanged() || serverConfigResource.isNavigatorSettingsChanged();
-  useFormValidator(service.validationTask, focusedRef);
+  useFormValidator(service.validationTask, state.reference);
 
   function handleChange() {
     service.changed();

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -38,6 +40,12 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     connectionInfoResource.onItemAdd.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
+
+    makeObservable<this, 'updateContexts' | 'updateConnectionContexts' | 'deleteConnectionContexts'>(this, {
+      updateContexts: action,
+      updateConnectionContexts: action,
+      deleteConnectionContexts: action,
+    });
   }
 
   async create(

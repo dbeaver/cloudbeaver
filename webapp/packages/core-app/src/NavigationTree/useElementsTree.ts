@@ -24,13 +24,13 @@ import { NavigationTreeService } from './NavigationTreeService';
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
 
 export type IElementsTreeFilter = (
+  filter: string,
   node: NavNode,
   children: string[],
   state: MetadataMap<string, ITreeNodeState>
 ) => string[];
 
 export interface ITreeNodeState {
-  filter: string;
   selected: boolean;
   expanded: boolean;
 }
@@ -47,6 +47,7 @@ interface IOptions {
   showFolderExplorerPath: boolean;
   disabled?: boolean;
   keepData?: boolean;
+  filterAll?: boolean;
   localState?: MetadataMap<string, ITreeNodeState>;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
@@ -55,23 +56,26 @@ interface IOptions {
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
-  onFilter?: (node: NavNode, value: string) => Promise<void> | void;
+  onFilter?: (value: string) => Promise<void> | void;
 }
 
 export interface IElementsTree {
   baseRoot: string;
   root: string;
+  filter: string;
   loading: boolean;
   disabled: boolean;
+  filterAll: boolean;
   foldersTree: boolean;
   showFolderExplorerPath: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
+  isNodeExpanded: (nodeId: string) => boolean;
   isNodeSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
   isGroup?: (node: NavNode) => boolean;
-  filter: (node: NavNode, value: string) => Promise<void>;
+  setFilter: (value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
 }
@@ -83,7 +87,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const connectionInfoResource = useService(ConnectionInfoResource);
 
   const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({
-    filter: '',
     selected: false,
     expanded: false,
   })));
@@ -131,8 +134,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await navNodeInfoResource.waitLoad();
         await navTreeResource.waitLoad();
 
-        const nodeState = state.get(child);
-        if (!nodeState.expanded && child !== options.root) {
+        const expanded = elementsTree.isNodeExpanded(child);
+        if (!expanded && child !== options.root) {
           if (navNodeInfoResource.isOutdated(child)) {
             const node = navNodeInfoResource.get(child);
 
@@ -161,28 +164,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
     }
   }
 
-  function getNodeChildren(nodeId: string): string[] {
-    const node = navNodeInfoResource.get(nodeId);
-
-    if (!node) {
-      return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
-    }
-
-    return (options.filters || [])
-      .reduce(
-        (children, filter) => filter(node, children, state),
-        navTreeService.getChildren(node.id) || []
-      );
-  }
-
   function getNestedChildren(nodeId: string): string [] {
     const nestedChildren: string[] = [];
-    const prevChildren = getNodeChildren(nodeId);
+    const prevChildren = elementsTree.getNodeChildren(nodeId);
     nestedChildren.push(...prevChildren);
 
     while (prevChildren.length) {
       const nodeKey = prevChildren.shift()!;
-      const children = getNodeChildren(nodeKey);
+      const children = elementsTree.getNodeChildren(nodeKey);
       prevChildren.push(...children);
       nestedChildren.push(...children);
     }
@@ -227,7 +216,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     }
 
     if (options.isGroup?.(node)) {
-      const children = getNodeChildren(nodeId);
+      const children = elementsTree.getNodeChildren(nodeId);
 
       for (const child of children) {
         await setSelection(child, selected);
@@ -247,30 +236,54 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     state,
+    filter: '',
     loading: options.keepData || false,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
+    },
+    isNodeExpanded(nodeId: string): boolean {
+      if (nodeId === this.root) {
+        return true;
+      }
+
+      if (this.filter !== '' && this.filterAll) {
+        return this.getNodeChildren(nodeId).length > 0;
+      }
+
+      return this.getNodeState(nodeId).expanded;
     },
     isNodeSelected(nodeId: string): boolean {
       const node = navNodeInfoResource.get(nodeId);
 
       if (node && elementsTree.isGroup?.(node)) {
-        const children = getNodeChildren(nodeId);
+        const children = this.getNodeChildren(nodeId);
 
         if (children.length > 0) {
-          return children.every(child => elementsTree.getNodeState(child).selected);
-        } else {
-          return false;
+          return children.every(child => this.isNodeSelected(child));
         }
+        
+        return false;
       }
+
       return this.getNodeState(nodeId).selected;
     },
-    getNodeChildren,
-    async filter(node: NavNode, value: string) {
-      const treeNodeState = this.state.get(node.id);
-      treeNodeState.filter = value;
+    getNodeChildren(nodeId: string): string[] {
+      const node = navNodeInfoResource.get(nodeId);
+  
+      if (!node) {
+        return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
+      }
+  
+      return (options.filters || [])
+        .reduce(
+          (children, filter) => filter(elementsTree.filter, node, children, state),
+          navTreeService.getChildren(node.id) || []
+        );
+    },
+    async setFilter(value: string) {
+      this.filter = value;
 
-      await options.onFilter?.(node, value);
+      await options.onFilter?.(value);
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
@@ -318,6 +331,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
     isGroup: observable.ref,
     disabled: observable.ref,
     root: observable.ref,
+    filter: observable.ref,
+    filterAll: observable.ref,
     loading: observable.ref,
     renderers: observable.ref,
     baseRoot: observable.ref,
@@ -326,6 +341,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     disabled: options.disabled,
     root: options.root,
     foldersTree,
+    filterAll: options.filterAll,
     showFolderExplorerPath,
     baseRoot: options.baseRoot,
     renderers,

@@ -23,11 +23,6 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   contextId,
 }) {
   const translate = useTranslate();
-  // const connectionInfoResource = useMapResource(
-  //   SqlEditorScreen,
-  //   ConnectionInfoResource,
-  //   connectionId
-  // );
   const connectionExecutionContextResource = useMapResource(
     SqlEditorScreen,
     ConnectionExecutionContextResource,
@@ -41,7 +36,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     state: null as null | ISqlEditorTabState,
     setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
       if (contextInfo) {
-        this.state = sqlEditorService.getState(0, contextInfo);
+        this.state = sqlEditorService.getState(0, undefined, undefined, contextInfo);
       } else {
         this.state = null;
       }

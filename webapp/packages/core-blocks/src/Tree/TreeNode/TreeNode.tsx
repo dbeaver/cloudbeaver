@@ -23,7 +23,6 @@ interface Props extends ITreeNodeState {
   onClick?: (leaf: boolean) => Promise<void> | void;
   onExpand?: () => Promise<void> | void;
   onSelect?: (multiple?: boolean, nested?: boolean) => Promise<void> | void;
-  onFilter?: (value: string) => Promise<void> | void;
   onOpen?: () => Promise<void> | void;
 }
 
@@ -36,7 +35,6 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   loading = false,
   selected = false,
   disabled = false,
-  filterValue = '',
   expanded = false,
   externalExpanded,
   leaf = false,
@@ -76,11 +74,6 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
         await handlersRef.onSelect?.(multiple, nested);
       });
     },
-    async filter(value: string) {
-      await processAction(async () => {
-        await handlersRef.onFilter?.(value);
-      });
-    },
     async open() {
       await processAction(async () => {
         await handlersRef.onOpen?.();
@@ -96,7 +89,6 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
     expanded: observable.ref,
     externalExpanded: observable.ref,
     leaf: observable.ref,
-    filterValue: observable.ref,
   }, {
     group,
     disabled,
@@ -105,7 +97,6 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
     expanded,
     externalExpanded: externalExpanded || false,
     leaf,
-    filterValue,
   });
 
   return styled(useStyles(TREE_NODE_STYLES))(

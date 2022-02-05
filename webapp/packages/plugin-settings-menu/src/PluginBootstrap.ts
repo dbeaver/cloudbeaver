@@ -8,6 +8,7 @@
 
 import { TopNavService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+
 import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 
 @injectable()
@@ -19,7 +20,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.topNavService.placeholder.add(SettingsMenu, 5);
+    this.topNavService.placeholder.add(SettingsMenu, 6);
   }
 
   load(): void | Promise<void> { }

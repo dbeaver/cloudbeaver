@@ -40,7 +40,8 @@ import {
   AppLocaleService,
   SessionExpiredDialogService,
   SessionExpireWarningDialogService,
-  ConnectionSchemaManagerBootstrap
+  ConnectionSchemaManagerBootstrap,
+  NavigationTreeBootstrap
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -130,6 +131,7 @@ export const coreManifests: PluginManifest[] = [
       NavNodeInfoResource,
       SqlGeneratorsBootstrap,
       SqlGeneratorsResource,
+      NavigationTreeBootstrap,
       NavTreeResource,
       DBObjectResource,
       NotificationService,

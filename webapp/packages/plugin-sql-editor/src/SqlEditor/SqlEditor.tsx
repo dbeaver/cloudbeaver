@@ -89,7 +89,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const style = useStyles(styles);
   const [editor, setEditor] = useState<SQLCodeEditorController | null>(null);
   const controller = useController(SqlEditorController, state);
-  const tools = useTools(state.executionContext?.connectionId);
+  const tools = useTools(state);
 
   useEffect(() => {
     editor?.focus();

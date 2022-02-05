@@ -17,7 +17,7 @@ import { KeyBindingService } from './KeyBinding/KeyBindingService';
 
 @injectable()
 export class ActionService {
-  private handlers: Map<string, IActionHandler>;
+  private readonly handlers: Map<string, IActionHandler>;
 
   constructor(
     private readonly keyBindingService: KeyBindingService

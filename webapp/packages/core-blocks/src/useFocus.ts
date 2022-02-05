@@ -7,7 +7,7 @@
  */
 
 import { observable } from 'mobx';
-import { useRef, useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
@@ -18,8 +18,9 @@ interface FocusOptions {
   onBlur?: () => void;
 }
 
-interface IState {
+interface IState<T extends HTMLElement> {
   focus: boolean;
+  reference: T | null;
   focusFirstChild: () => void;
 }
 
@@ -27,16 +28,15 @@ export function useFocus<T extends HTMLElement>({
   focusFirstChild,
   onFocus,
   onBlur,
-}: FocusOptions): [React.RefObject<T>, IState] {
+}: FocusOptions): [(obj: T | null) => void, IState<T>] {
   const handlersRef = useObjectRef({ onFocus, onBlur });
-  const reference = useRef<T>(null);
-  // TODO: seems can be inconsistent when element changes
-  const state = useObservableRef<IState>(
+  const [reference, setRef] = useState<T | null>(null);
+  const state = useObservableRef<IState<T>>(
     () => ({
       focus: false,
       focusFirstChild() {
-        if (reference.current !== null && focusFirstChild) {
-          const firstFocusable = reference.current
+        if (this.reference !== null && focusFirstChild) {
+          const firstFocusable = this.reference
             .querySelectorAll<T>(`
             button:not([disabled=disabled]), 
             [href], 
@@ -61,17 +61,23 @@ export function useFocus<T extends HTMLElement>({
         }
       },
     }),
-    { focus: observable.ref },
-    false,
+    { 
+      focus: observable.ref,
+      reference: observable.ref,
+    },
+    {
+      reference,
+    },
+    undefined,
     'useFocus'
   );
 
   useLayoutEffect(() => {
     state.focusFirstChild();
-  }, [focusFirstChild]);
+  }, [focusFirstChild, reference]);
 
   useEffect(() => {
-    if (!reference.current) {
+    if (!reference) {
       return;
     }
 
@@ -91,16 +97,14 @@ export function useFocus<T extends HTMLElement>({
       state.focus = false;
     };
 
-    const element = reference.current;
-
-    element.addEventListener('focusin', focusHandler);
-    element.addEventListener('focusout', blurHandler);
+    reference.addEventListener('focusin', focusHandler);
+    reference.addEventListener('focusout', blurHandler);
 
     return () => {
-      element.removeEventListener('focusin', focusHandler);
-      element.removeEventListener('focusout', blurHandler);
+      reference.removeEventListener('focusin', focusHandler);
+      reference.removeEventListener('focusout', blurHandler);
     };
-  });
+  }, [reference]);
 
-  return [reference, state];
+  return [setRef, state];
 }

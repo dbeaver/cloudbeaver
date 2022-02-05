@@ -19,6 +19,11 @@ export interface INodeDuplicateList {
   duplicates: string[];
 }
 
+export interface INodeLimitedList {
+  nodes: string[];
+  truncated: number;
+}
+
 @injectable()
 export class NavNodeViewService {
   get tabs(): NavNodeTransformView[] {
@@ -41,12 +46,12 @@ export class NavNodeViewService {
       .map(transform => transform.transformer);
   }
 
-  private transformers: INavNodeFolderTransform[];
-  private duplicationNotify: Set<string>;
+  private readonly transformers: INavNodeFolderTransform[];
+  private readonly duplicationNotify: Set<string>;
 
   constructor(
-    private navTreeResource: NavTreeResource,
-    private notificationService: NotificationService
+    private readonly navTreeResource: NavTreeResource,
+    private readonly notificationService: NotificationService
   ) {
     this.transformers = [];
     this.duplicationNotify = new Set();
@@ -72,14 +77,35 @@ export class NavNodeViewService {
   getFolders(nodeId: string): string[] | undefined {
     const children = this.navTreeResource.get(nodeId);
 
+    if (!children) {
+      return;
+    }
+
+    const limited = this.limit(children);
+
     return this.transformations.reduce(
       (children, transform) => transform(nodeId, children),
-      children
+      limited.nodes as string[] | undefined
     );
   }
 
   addTransform(transform: INavNodeFolderTransform): void {
     this.transformers.push(transform);
+  }
+
+  limit(nodes: string[]): INodeLimitedList {
+    let truncated = 0;
+
+    if (nodes.length > this.navTreeResource.childrenLimit) {
+      truncated = nodes.length - this.navTreeResource.childrenLimit;
+    }
+
+    nodes = nodes.slice(0, this.navTreeResource.childrenLimit);
+
+    return {
+      nodes,
+      truncated,
+    };
   }
 
   filterDuplicates(nodes: string[]): INodeDuplicateList {
