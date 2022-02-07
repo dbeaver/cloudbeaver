@@ -8,16 +8,16 @@
 
 import { useContext } from 'react';
 
-import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 
 export function useTab(
   tabId: string,
-  onOpen?: (tab: ITabData<any>) => void,
-  onClose?: (tab: ITabData<any>) => void,
+  onOpen?: (tab: ITabData<any>) => Promise<void> | void,
+  onClose?: (tab: ITabData<any>) => Promise<void> | void,
   onClick?: (tabId: string) => void,
 ) {
   const state = useContext(TabsContext);
@@ -27,21 +27,21 @@ export function useTab(
 
   useExecutor({
     executor: state.openExecutor,
-    handlers: [function openHandler(data) {
+    handlers: [async function openHandler(data) {
       if (tabId !== data.tabId) {
         return;
       }
-      onOpen?.(data);
+      await onOpen?.(data);
     }],
   });
 
   useExecutor({
     executor: state.closeExecutor,
-    handlers: [function closeHandler(data) {
+    handlers: [async function closeHandler(data) {
       if (tabId !== data.tabId) {
         return;
       }
-      onClose?.(data);
+      await onClose?.(data);
     }],
   });
 
