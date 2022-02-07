@@ -9,9 +9,10 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { openCenteredPopup } from '@cloudbeaver/core-utils';
@@ -23,7 +24,7 @@ export class AuthenticationService extends Bootstrap {
   configureAuthProvider: (() => void) | null;
   configureIdentityProvider: (() => void) | null;
 
-  private authPromise: Promise<void> | null;
+  private authPromise: Promise<DialogueStateResult | null> | null;
 
   constructor(
     private readonly screenService: ScreenService,
@@ -35,7 +36,8 @@ export class AuthenticationService extends Bootstrap {
     private readonly authProviderService: AuthProviderService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly sessionDataResource: SessionDataResource,
-    private readonly authInfoService: AuthInfoService
+    private readonly authInfoService: AuthInfoService,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
     this.authPromise = null;
@@ -56,10 +58,12 @@ export class AuthenticationService extends Bootstrap {
   }
 
   async logout(): Promise<void> {
-    const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
+    if (this.authInfoService.userAuthConfigurations.length > 0) {
+      const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
 
-    if (userAuthConfiguration?.signOutLink) {
-      this.logoutConfiguration(userAuthConfiguration.id, true);
+      if (userAuthConfiguration.signOutLink) {
+        this.logoutConfiguration(userAuthConfiguration.id, true);
+      }
     }
 
     try {
@@ -103,9 +107,30 @@ export class AuthenticationService extends Bootstrap {
     if (this.authPromise) {
       return this.authPromise;
     }
+
     this.authPromise = this.authDialogService.showLoginForm(persistent, provider, link);
+
+    if (this.serverConfigResource.redirectOnFederatedAuth) {
+      await this.authProvidersResource.loadAll();
+
+      const providers = this.authProvidersResource
+        .getEnabledProviders();
+
+      if (providers.length === 1) {
+        const configurableProvider = providers.find(provider => provider.configurable);
+
+        if (configurableProvider?.configurations?.length === 1) {
+          const user = await this.authInfoService.sso(configurableProvider.id, configurableProvider.configurations[0]);
+
+          if (user) {
+            this.authDialogService.closeLoginForm(this.authPromise);
+          }
+        }
+      }
+    }
+
     try {
-      await this.authPromise;
+      return this.authPromise;
     } finally {
       this.authPromise = null;
     }
@@ -140,7 +165,7 @@ export class AuthenticationService extends Bootstrap {
 
   load(): void { }
 
-  private requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
+  private readonly requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
     if (data.type === AUTH_PROVIDER_LOCAL_ID) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();

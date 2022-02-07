@@ -7,17 +7,25 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { AuthDialog } from './AuthDialog';
 
 @injectable()
 export class AuthDialogService {
   constructor(
-    private commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService
   ) { }
 
-  async showLoginForm(persistent = false, providerId: string | null = null, link?: boolean): Promise<void> {
-    await this.commonDialogService.open(AuthDialog, { providerId, link }, { persistent });
+  showLoginForm(
+    persistent = false, 
+    providerId: string | null = null, 
+    link?: boolean
+  ): Promise<DialogueStateResult | null> {
+    return this.commonDialogService.open(AuthDialog, { providerId, link }, { persistent });
+  }
+
+  closeLoginForm(promise: Promise<DialogueStateResult | null>): void {
+    this.commonDialogService.rejectDialog(promise);
   }
 }

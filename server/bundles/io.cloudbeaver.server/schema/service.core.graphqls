@@ -133,6 +133,7 @@ type ServerConfig {
 
     configurationMode: Boolean
     developmentMode: Boolean
+    redirectOnFederatedAuth: Boolean
 
     enabledFeatures: [ID!]!
     enabledAuthProviders: [ID!]!
