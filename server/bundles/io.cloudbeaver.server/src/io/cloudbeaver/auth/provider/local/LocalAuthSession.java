@@ -19,18 +19,21 @@ package io.cloudbeaver.auth.provider.local;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.*;
+import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
+import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.auth.DBASessionContext;
+import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
 
 /**
  * Local auth provider
  */
-public class LocalAuthSession extends AbstractChildSession {
-
+public class LocalAuthSession implements DBASession {
+    public static final DBAAuthSpace LOCAL_AUTH_SPACE = new DBAAuthSpace() {
+    };
     private final DBASession webSession;
     private final String userId;
 
     LocalAuthSession(DBASession webSession, String userId) {
-        super(webSession);
         this.webSession = webSession;
         this.userId = userId;
     }
@@ -42,7 +45,7 @@ public class LocalAuthSession extends AbstractChildSession {
     @NotNull
     @Override
     public DBAAuthSpace getSessionSpace() {
-        return webSession.getSingletonProject();
+        return LOCAL_AUTH_SPACE;
     }
 
     @NotNull

@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractDBASessionPersistence implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
+public class WebSession extends AbstractDBASessionPersistent implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -293,6 +293,7 @@ public class WebSession extends AbstractDBASessionPersistence implements DBASess
             addSessionError(e);
             log.error("Error getting connection list", e);
         }
+        this.sessionAuthContext.addSession(this);
     }
 
     public void refreshConnections() {
@@ -641,6 +642,42 @@ public class WebSession extends AbstractDBASessionPersistence implements DBASess
         }
     }
 
+    @Override
+    public <T> T getAttribute(String name) {
+        synchronized (attributes) {
+            Object value = attributes.get(name);
+            if (value instanceof PersistentAttribute) {
+                value = ((PersistentAttribute) value).getValue();
+            }
+            return (T) value;
+        }
+    }
+
+    public void setAttribute(String name, Object value, boolean persistent) {
+        synchronized (attributes) {
+            attributes.put(name, persistent ? new PersistentAttribute(value) : value);
+        }
+    }
+
+    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
+        synchronized (attributes) {
+            Object value = attributes.get(name);
+            if (value instanceof PersistentAttribute) {
+                value = ((PersistentAttribute) value).getValue();
+            }
+            if (value == null) {
+                value = creator.apply(null);
+                if (value != null) {
+                    attributes.put(name, value);
+                    if (disposer != null) {
+                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
+                    }
+                }
+            }
+            return (T) value;
+        }
+    }
+
     @Property
     public Map<String, Object> getActionParameters() {
         WebActionParameters action = WebActionParameters.fromSession(this, true);
@@ -839,6 +876,18 @@ public class WebSession extends AbstractDBASessionPersistence implements DBASess
         public void subTask(String name) {
             super.subTask(name);
             asyncTask.setStatus(name);
+        }
+    }
+
+    private class PersistentAttribute {
+        private final Object value;
+
+        public PersistentAttribute(Object value) {
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
         }
     }
 }
