@@ -9,3 +9,4 @@ coverage
 ts-out
 npm-debug.log
 debug.log
+tsconfig.tsbuildinfo
