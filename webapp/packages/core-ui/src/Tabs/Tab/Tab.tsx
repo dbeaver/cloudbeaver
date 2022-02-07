@@ -41,7 +41,7 @@ export const Tab = observer<TabProps>(function Tab({
   const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose, onClick);
   const menu = useMenu({
     menu: MENU_TAB,
-    context: menuContext, 
+    context: menuContext,
   });
   const info = getInfo();
 
@@ -51,7 +51,8 @@ export const Tab = observer<TabProps>(function Tab({
   menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
   const showMenu = menu.getItems().length > 0;
-  const actionsEnabled = !!onClose || showMenu;
+  const canClose = !!onClose || state.closable;
+  const actionsEnabled = canClose || showMenu;
 
   return styled(useStyles(style))(
     <TabContext.Provider value={tabContext}>
@@ -72,7 +73,7 @@ export const Tab = observer<TabProps>(function Tab({
           </BaseTab>
           {actionsEnabled && (
             <tab-actions>
-              {onClose && (
+              {canClose && (
                 <tab-action title={translate('ui_close')} onClick={handleClose}>
                   <Icon name="cross-bold" viewBox="0 0 7 8" />
                 </tab-action>
