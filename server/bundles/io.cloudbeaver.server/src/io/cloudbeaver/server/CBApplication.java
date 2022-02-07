@@ -171,6 +171,11 @@ public class CBApplication extends BaseApplicationImpl {
         return true;
     }
 
+    @Override
+    public boolean isStandalone() {
+        return false;
+    }
+
     CBDatabase getDatabase() {
         return database;
     }
