@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
-import { baseFormControlStyles } from '../baseFormControlStyles';
+import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 import { useCheckboxState } from './useCheckboxState';
@@ -122,6 +122,7 @@ export const Switch: SwitchType = observer(function Switch({
   rest = filterLayoutFakeProps(rest);
   const styles = useStyles(
     baseFormControlStyles,
+    baseValidFormControlStyles,
     switchStyles,
     ...mod.map(mod => switchMod[mod]),
     disabled && switchState.disabled,

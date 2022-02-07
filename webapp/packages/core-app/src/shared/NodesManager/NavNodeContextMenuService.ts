@@ -103,6 +103,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                 subTitle: name,
                 objectName: node.nodeType || 'Object',
                 icon: node.icon,
+                validation: name => name.trim().length > 0,
               });
 
               if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {

@@ -43,6 +43,7 @@ $mdc-theme-text-colors: (
     hint: rgba(white, 0.45),
     disabled: rgba(white, 0.45),
     icon: rgba(white, 0.45),
+    negative: $color-negative,
   ),
   dark: (
     primary: rgba(black, 0.87),
@@ -50,6 +51,7 @@ $mdc-theme-text-colors: (
     hint: rgba(black, 0.45),
     disabled: rgba(black, 0.2),
     icon: rgba(black, 0.38),
+    negative: $color-negative,
   ),
 );
 

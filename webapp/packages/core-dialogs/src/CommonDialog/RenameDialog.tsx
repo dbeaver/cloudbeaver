@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useState } from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent } from './CommonDialogService';
@@ -34,9 +36,10 @@ export interface RenameDialogPayload {
   bigIcon?: boolean;
   viewBox?: string;
   confirmActionText?: string;
+  validation?: (name: string) => Promise<boolean> | boolean;
 }
 
-export const RenameDialog: DialogComponent<RenameDialogPayload, string> = function RenameDialog({
+export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observer(function RenameDialog({
   payload,
   resolveDialog,
   rejectDialog,
@@ -48,7 +51,20 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
   const { icon, subTitle, bigIcon, viewBox, value, objectName, confirmActionText } = payload;
   const title = `${translate('ui_rename')} ${objectName}`;
 
-  const [name, setName] = useState(value);
+  const state = useObservableRef(() => ({
+    value,
+    valid: true,
+    validate: throttleAsync(async () => {
+      state.valid = (await state.payload.validation?.(state.value)) ?? true;
+    }, 300),
+  }), {
+    value: observable.ref,
+    valid: observable.ref,
+  }, {
+    payload,
+  });
+
+  const errorMessage = state.valid ? ' ' : translate('ui_rename_taken_or_invalid'); 
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper
@@ -73,7 +89,8 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
           <Button
             type="button"
             mod={['unelevated']}
-            onClick={() => resolveDialog(name)}
+            disabled={!state.valid}
+            onClick={() => resolveDialog(state.value)}
           >
             <Translate token={confirmActionText || 'ui_rename'} />
           </Button>
@@ -82,11 +99,14 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
       fixedWidth
       onReject={rejectDialog}
     >
-      <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(name)}>
+      <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
         <Container center>
           <InputField
-            value={name}
-            onChange={value => setName(String(value))}
+            name='value'
+            state={state}
+            error={!state.valid}
+            description={errorMessage}
+            onChange={() => state.validate()}
           >
             {translate('ui_name') + ':'}
           </InputField>
@@ -94,4 +114,4 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = functi
       </SubmittingForm>
     </CommonDialogWrapper>
   );
-};
+});
