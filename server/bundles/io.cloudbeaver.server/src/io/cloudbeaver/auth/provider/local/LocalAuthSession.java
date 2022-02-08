@@ -28,7 +28,8 @@ import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
  * Local auth provider
  */
 public class LocalAuthSession implements DBASession {
-
+    public static final DBAAuthSpace LOCAL_AUTH_SPACE = new DBAAuthSpace() {
+    };
     private final DBASession webSession;
     private final String userId;
 
@@ -44,7 +45,7 @@ public class LocalAuthSession implements DBASession {
     @NotNull
     @Override
     public DBAAuthSpace getSessionSpace() {
-        return webSession.getSingletonProject();
+        return LOCAL_AUTH_SPACE;
     }
 
     @NotNull

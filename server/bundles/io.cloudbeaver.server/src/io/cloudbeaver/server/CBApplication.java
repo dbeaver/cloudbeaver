@@ -171,6 +171,11 @@ public class CBApplication extends BaseApplicationImpl {
         return true;
     }
 
+    @Override
+    public boolean isMultiuser() {
+        return true;
+    }
+
     CBDatabase getDatabase() {
         return database;
     }
