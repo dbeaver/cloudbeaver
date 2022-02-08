@@ -50,6 +50,7 @@ type SQLContextInfo {
 
 input SQLDataFilterConstraint {
     attribute: String!
+    attributePosition: Int
     orderPosition: Int
     orderAsc: Boolean
 
