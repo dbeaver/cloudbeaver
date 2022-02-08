@@ -172,8 +172,8 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     @Override
-    public boolean isStandalone() {
-        return false;
+    public boolean isMultiuser() {
+        return true;
     }
 
     CBDatabase getDatabase() {

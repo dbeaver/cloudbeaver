@@ -100,6 +100,8 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
+    private final Map<String, Function<Object, Object>> attributeDisposers = new HashMap<>();
+
     // Map of auth tokens. Key is authentication provdier
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
