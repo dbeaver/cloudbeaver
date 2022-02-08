@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { baseFormControlStyles } from './baseFormControlStyles';
+import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
 const styles = css`
@@ -106,7 +106,7 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStyles, styles, style))(
+  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
     <field className={className} {...use({ tiny, small, medium, large, embedded })}>
       <field-label
         as='label'

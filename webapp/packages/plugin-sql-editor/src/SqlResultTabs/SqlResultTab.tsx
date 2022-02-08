@@ -21,7 +21,7 @@ interface Props {
   result: ISqlEditorResultTab;
   className?: string;
   style?: ComponentStyle;
-  onClose: (tab: ITabData) => Promise<void>;
+  onClose?: (tab: ITabData) => Promise<void>;
 }
 
 export const SqlResultTab = observer<Props>(function SqlResultTab({

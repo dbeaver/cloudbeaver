@@ -33,7 +33,7 @@ interface IServiceDescriptionLink extends IServiceDescriptionLinkOptions {
 export class AuthProviderService {
   readonly requestAuthProvider: IExecutor<ObjectOrigin>;
 
-  private serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
+  private readonly serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
 
   constructor(
     private readonly authProvidersResource: AuthProvidersResource

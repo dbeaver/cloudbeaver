@@ -18,7 +18,7 @@ import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
-import { baseFormControlStyles } from './baseFormControlStyles';
+import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
 const styles = composes(
@@ -321,7 +321,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const icon = selectedItem && iconSelector?.(selectedItem);
 
-  return styled(useStyles(baseFormControlStyles, styles))(
+  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles))(
     <field className={className}>
       {children && <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>}
       <input-box>
@@ -357,15 +357,15 @@ export const Combobox: ComboboxType = observer(function Combobox({
         >
           {!filteredItems.length
             ? (
-                <MenuItem id='placeholder' disabled {...menu}>
-                  {translate('combobox_no_options_placeholder')}
-                </MenuItem>
-              )
+              <MenuItem id='placeholder' disabled {...menu}>
+                {translate('combobox_no_options_placeholder')}
+              </MenuItem>
+            )
             : (filteredItems.map((item, index) => {
-                const icon = iconSelector?.(item);
-                const title = titleSelector?.(item);
+              const icon = iconSelector?.(item);
+              const title = titleSelector?.(item);
 
-                return (
+              return (
                 <MenuItem
                   key={keySelector(item, index)}
                   id={keySelector(item, index)}
@@ -381,8 +381,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   )}
                   <item-value>{valueSelector(item)}</item-value>
                 </MenuItem>
-                );
-              }))}
+              );
+            }))}
         </Menu>
       </input-box>
     </field>

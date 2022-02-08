@@ -39,7 +39,7 @@ export function elementsTreeNameFilter(
         compare,
         filter,
         child,
-        state
+        // state
       ));
 
     return nodes.map(node => node.id);
@@ -52,32 +52,32 @@ function filterNode(
   compare: NavNodeFilterCompareFn,
   filter: string,
   node: NavNode, 
-  state: MetadataMap<string, ITreeNodeState>
+  // state: MetadataMap<string, ITreeNodeState>
 ): boolean {
-  const nodeState = state.get(node.id);
+  // const nodeState = state.get(node.id);
   
   
   if (compare(node, filter)) {
     return true;
   }
 
-  if (nodeState.expanded) {
-    const children = navTreeResource.get(node.id) || [];
+  // if (nodeState.expanded) {
+  const children = navTreeResource.get(node.id) || [];
 
-    return navNodeInfoResource
-      .get(resourceKeyList(children))
-      .filter(isDefined)
-      .some(child => filterNode(
-        navTreeResource, 
-        navNodeInfoResource,
-        compare,
-        filter, 
-        child,
-        state
-      ));
-  }
+  return navNodeInfoResource
+    .get(resourceKeyList(children))
+    .filter(isDefined)
+    .some(child => filterNode(
+      navTreeResource, 
+      navNodeInfoResource,
+      compare,
+      filter, 
+      child,
+      // state
+    ));
+  // }
   
-  return false;
+  // return false;
 }
 
 function compareNodes(node: NavNode, filter: string): boolean {

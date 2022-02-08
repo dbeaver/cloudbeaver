@@ -15,7 +15,7 @@ import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
-import { baseFormControlStyles } from './baseFormControlStyles';
+import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
@@ -61,6 +61,7 @@ const INPUT_FIELD_STYLES = composes(
 `);
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> & ILayoutSizeProps & {
+  error?: boolean;
   description?: string;
   labelTooltip?: string;
   mod?: 'surface';
@@ -105,6 +106,7 @@ export const InputField: InputFieldType = observer(function InputField({
   mapValue,
   children,
   className,
+  error,
   description,
   labelTooltip,
   mod,
@@ -120,7 +122,12 @@ export const InputField: InputFieldType = observer(function InputField({
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
   const [passwordRevealed, setPasswordRevealed] = useState(false);
   const translate = useTranslate();
-  const styles = useStyles(baseFormControlStyles, INPUT_FIELD_STYLES, style);
+  const styles = useStyles(
+    baseFormControlStyles,
+    error ? baseInvalidFormControlStyles : baseValidFormControlStyles,
+    INPUT_FIELD_STYLES, 
+    style
+  );
   const context = useContext(FormContext);
 
   const revealPassword = useCallback(() => {

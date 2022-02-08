@@ -8,6 +8,7 @@
 
 export interface INavigationTreeUserSettings {
   filter: boolean;
+  filterAll: boolean;
   saveExpanded: boolean;
   folders: boolean;
 }

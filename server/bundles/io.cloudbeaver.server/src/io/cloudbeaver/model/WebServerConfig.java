@@ -131,6 +131,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isRedirectOnFederatedAuth() {
+        return application.getAppConfiguration().isRedirectOnFederatedAuth();
+    }
+
+    @Property
     public long getSessionExpireTime() {
         return application.getMaxSessionIdleTime();
     }

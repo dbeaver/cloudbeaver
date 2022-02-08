@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { baseFormControlStyles } from './baseFormControlStyles';
+import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 
 const style = css`
   field-label {
@@ -31,7 +31,7 @@ export const FormFieldDescription: React.FC<Props> = function FormFieldDescripti
   children,
   className,
 }) {
-  const styles = useStyles(baseFormControlStyles, style);
+  const styles = useStyles(baseFormControlStyles, baseValidFormControlStyles, style);
 
   return styled(styles)(
     <field title={title} className={className}>

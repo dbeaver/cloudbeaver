@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import {
   NavigationTabsService,
   TabHandler,
@@ -26,7 +28,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorTab } from './SqlEditorTab';
@@ -34,6 +36,10 @@ import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
+  get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
+    return Array.from(this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab));
+  }
+
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
   constructor(
@@ -43,7 +49,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly sqlResultTabsService: SqlResultTabsService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
-    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
 
@@ -64,6 +70,10 @@ export class SqlEditorTabService extends Bootstrap {
         objectSchemaSetter(this.setObjectSchemaId.bind(this)),
       ],
     });
+
+    makeObservable(this, {
+      sqlEditorTabs: computed,
+    });
   }
 
   register(): void {
@@ -72,6 +82,12 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   load(): void {}
+
+  getName(tabState: ISqlEditorTabState): string {
+    const connection = this.connectionInfoResource.get(tabState.executionContext?.connectionId || '');
+
+    return getSqlEditorName(tabState, connection);
+  }
 
   createNewEditor(
     name?: string,
@@ -99,7 +115,7 @@ export class SqlEditorTabService extends Bootstrap {
       const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.id);
 
       if (!executionContext?.context) {
-        if (!this.connectionInfo.has(tab.handlerState.executionContext?.connectionId || '')) {
+        if (!this.connectionInfoResource.has(tab.handlerState.executionContext?.connectionId || '')) {
           this.resetConnectionInfo(tab.handlerState);
         }
       } else {
@@ -116,7 +132,7 @@ export class SqlEditorTabService extends Bootstrap {
     for (const tab of tabs) {
       if (
         ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.id) 
-        && !this.connectionInfo.has(tab.handlerState.executionContext!.connectionId)
+        && !this.connectionInfoResource.has(tab.handlerState.executionContext!.connectionId)
       ) {
         this.resetConnectionInfo(tab.handlerState);
       }
@@ -124,8 +140,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private getFreeEditorId() {
-    const editorTabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab);
-    const ordered = Array.from(editorTabs).map(tab => tab.handlerState.order);
+    const ordered = this.sqlEditorTabs.map(tab => tab.handlerState.order);
     return findMinimalFree(ordered, 1);
   }
 
@@ -150,9 +165,9 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     if (tab.handlerState.executionContext) {
-      await this.connectionInfo.load(CachedMapAllKey);
+      await this.connectionInfoResource.load(CachedMapAllKey);
 
-      if (!this.connectionInfo.has(tab.handlerState.executionContext.connectionId)) {
+      if (!this.connectionInfoResource.has(tab.handlerState.executionContext.connectionId)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }

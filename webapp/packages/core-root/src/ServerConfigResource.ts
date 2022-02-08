@@ -15,12 +15,12 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
 
 @injectable()
-export class ServerConfigResource extends CachedDataResource<ServerConfig | null, void> {
+export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
   update: ServerConfigInput;
   navigatorSettingsUpdate: NavigatorSettingsInput;
 
   constructor(
-    private graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService
   ) {
     super(null);
 
@@ -43,6 +43,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     });
   }
 
+  get redirectOnFederatedAuth(): boolean {
+    return this.data?.redirectOnFederatedAuth ?? false;
+  }
+
   get serverVersion(): string {
     return this.data?.version || '';
   }
@@ -58,7 +62,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   get publicDisabled(): boolean {
     if (
       this.data?.configurationMode
-      || (this.data?.licenseRequired && !this.data?.licenseValid)
+      || (this.data?.licenseRequired && !this.data.licenseValid)
     ) {
       return true;
     }

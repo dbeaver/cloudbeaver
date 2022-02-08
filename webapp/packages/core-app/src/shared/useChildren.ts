@@ -12,6 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { NavigationTreeService } from '../NavigationTree/NavigationTreeService';
 import { ROOT_NODE_PATH } from './NodesManager/NavNodeInfoResource';
+import { NavNodeViewService } from './NodesManager/NavNodeView/NavNodeViewService';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
 
 interface Hook {
@@ -23,10 +24,15 @@ interface Hook {
 }
 
 export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
+  const navNodeViewService = useService(NavNodeViewService);
   const navTreeService = useService(NavigationTreeService);
   const navTreeResource = useService(NavTreeResource);
-  const children = navTreeService.getChildren(navNodeId);
+  let children = navTreeService.getChildren(navNodeId);
   const exception = navTreeResource.getException(navNodeId);
+
+  if (children) {
+    children = navNodeViewService.limit(children).nodes;
+  }
 
   const deps = [navNodeId];
 

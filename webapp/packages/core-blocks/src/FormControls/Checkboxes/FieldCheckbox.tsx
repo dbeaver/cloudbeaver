@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { baseFormControlStyles } from '../baseFormControlStyles';
+import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 
@@ -40,7 +40,7 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   className,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const styles = useStyles(baseFormControlStyles, style);
+  const styles = useStyles(baseFormControlStyles, baseValidFormControlStyles, style);
 
   if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;

@@ -24,6 +24,7 @@ export interface ITabsContext<T = Record<string, any>> {
   openExecutor: IExecutor<ITabData<T>>;
   closeExecutor: IExecutor<ITabData<T>>;
   lazy: boolean;
+  closable: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;

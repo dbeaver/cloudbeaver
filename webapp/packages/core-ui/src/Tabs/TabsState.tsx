@@ -62,6 +62,8 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }
 
+  const closable = !!onClose;
+
   const [localTabsState] = useState(() => new MetadataMap<string, any>());
   const tabsState = localState || localTabsState;
   const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
@@ -82,7 +84,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabsState,
     container,
     state,
-    tabList
+    tabList,
   });
 
   if (currentTabId !== undefined) {
@@ -197,6 +199,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     openExecutor,
     closeExecutor,
     lazy,
+    closable,
     tabList,
     enabledBaseActions,
     getTabInfo,
@@ -215,6 +218,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     closeExecutor,
     openExecutor,
     lazy,
+    closable,
     tabList,
     enabledBaseActions,
     getTabInfo,

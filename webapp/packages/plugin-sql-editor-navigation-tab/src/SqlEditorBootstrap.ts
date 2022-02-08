@@ -12,7 +12,7 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { ConnectionInfoResource, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -20,12 +20,13 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
+import { SqlEditorTabService } from './SqlEditorTabService';
 
 @injectable()
 export class SqlEditorBootstrap extends Bootstrap {
@@ -39,7 +40,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sessionActionService: SessionActionService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly connectionInfoResource: ConnectionInfoResource
+    private readonly sqlEditorTabService: SqlEditorTabService
   ) {
     super();
   }
@@ -110,14 +111,17 @@ export class SqlEditorBootstrap extends Bootstrap {
         switch (action) {
           case ACTION_RENAME: {
             const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-            const connection = this.connectionInfoResource.get(state.executionContext?.connectionId || '');
 
-            const name = getSqlEditorName(state, connection);
+            const name = this.sqlEditorTabService.getName(state);
 
             const result = await this.commonDialogService.open(RenameDialog, {
               value: name,
               objectName: name,
               icon: '/icons/sql_script_m.svg',
+              validation: name => !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
+                tab.handlerState.order !== state.order 
+                  && this.sqlEditorTabService.getName(tab.handlerState) === name.trim()
+              )),
             });
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {

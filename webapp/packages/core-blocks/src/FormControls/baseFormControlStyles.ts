@@ -12,9 +12,6 @@ import { composes } from '@cloudbeaver/core-theming';
 
 export const baseFormControlStyles = composes(
   css`
-    field-description {
-      composes: theme-text-text-hint-on-light from global;
-    }
   `,
   css`
     field {
@@ -47,4 +44,22 @@ export const baseFormControlStyles = composes(
       font-size: 12px;
     }
   `
+);
+
+export const baseValidFormControlStyles = composes(
+  css`
+    field-description {
+      composes: theme-text-text-hint-on-light from global;
+    }
+  `,
+  css``
+);
+
+export const baseInvalidFormControlStyles = composes(
+  css`
+    field-description {
+      composes: theme-text-negative from global;
+    }
+  `,
+  css``
 );

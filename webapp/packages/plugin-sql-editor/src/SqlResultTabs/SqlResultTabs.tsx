@@ -98,14 +98,19 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
 
   return styled(style)(
     <wrapper>
-      <TabsState currentTabId={currentId} tabList={tabList} enabledBaseActions onChange={handleSelect}>
+      <TabsState
+        currentTabId={currentId}
+        tabList={tabList}
+        enabledBaseActions
+        onChange={handleSelect}
+        onClose={handleClose}
+      >
         <TabList style={styles}>
           {orderedTabs.map(result => (
             <SqlResultTab
               key={result.id}
               result={result}
               style={styles}
-              onClose={handleClose}
             />
           ))}
         </TabList>

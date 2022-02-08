@@ -38,10 +38,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   });
   const { isLoading } = useNode(node.id);
   const children = useChildren(node.id);
-  const state = contextRef.context?.tree.getNodeState(node.id);
 
   const loading = getComputed(() => isLoading() || children.isLoading());
-  const isExpanded = getComputed(() => state?.expanded || false);
+  const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
   const leaf = getComputed(() => isLeaf(node));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);

@@ -9,9 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useChildren } from '@cloudbeaver/core-app';
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';

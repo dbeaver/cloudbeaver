@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { DBObjectResource, NavTreeResource } from '@cloudbeaver/core-app';
-import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useMapResource } from '@cloudbeaver/core-blocks';
-import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useMapResource, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';

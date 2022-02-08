@@ -39,7 +39,6 @@ const navigationTreeStyles = css`
   }
 
   ElementsTree {
-    padding-top: 8px;
     min-width: 100%;
     width: max-content;
   }
@@ -110,6 +109,7 @@ export const NavigationTree = observer(function NavigationTree() {
         foldersTree={settings.folders}
         showFolderExplorerPath={settings.folders}
         filter={settings.filter}
+        filterAll={settings.filterAll}
         keepData={settings.saveExpanded}
         onOpen={handleOpen}
       />
