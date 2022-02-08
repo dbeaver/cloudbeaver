@@ -121,6 +121,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionAuthContext = new SessionContextImpl(null);
+        this.sessionAuthContext.addSession(this);
 
         try {
             // Check persistent state
@@ -295,7 +296,6 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
             addSessionError(e);
             log.error("Error getting connection list", e);
         }
-        this.sessionAuthContext.addSession(this);
     }
 
     public void refreshConnections() {
