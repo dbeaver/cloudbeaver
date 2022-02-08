@@ -22,6 +22,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
@@ -148,11 +149,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     if (webAction != null) {
                         checkActionPermissions(method, webAction);
                     }
-                    beforeWebActionCall(webAction, method);
+                    beforeWebActionCall(webAction, method, args);
                     try {
                         return method.invoke(impl, args);
                     } finally {
-                        afterWebActionCall(webAction, method);
+                        afterWebActionCall(webAction, method, args);
                     }
                 } catch (InvocationTargetException e) {
                     throw e.getTargetException();
@@ -217,12 +218,39 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     // Perform any checks before action call
-    protected void beforeWebActionCall(WebAction webAction, Method method) throws DBException {
-
+    protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
+        setLogContext(method, args);
     }
 
-    protected void afterWebActionCall(WebAction webAction, Method method) throws DBException {
+    protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
+        Log.setContext(null);
+    }
 
+    protected void setLogContext(Method method, Object[] args) {
+        WebSession activeSession = null;
+        if (args != null && args.length > 0) {
+            for (Object arg : args) {
+                if (arg instanceof WebSession) {
+                    activeSession = (WebSession) arg;
+                    break;
+                } else if (arg instanceof WebSessionProvider) {
+                    activeSession = ((WebSessionProvider) arg).getWebSession();
+                    break;
+                }
+            }
+        }
+
+        if (activeSession != null) {
+            String contextName;
+            if (activeSession.getUser() != null) {
+                contextName = "@" + activeSession.getUser().getUserId();
+            } else {
+                contextName = "::" + activeSession.getSessionId();
+            }
+            Log.setContext(Log.buildContext(contextName));
+        } else {
+            Log.setContext(null);
+        }
     }
 
 

@@ -18,26 +18,20 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
-import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * WebSQLContextInfo.
  */
-public class WebSQLContextInfo {
+public class WebSQLContextInfo implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLContextInfo.class);
 
@@ -157,4 +151,8 @@ public class WebSQLContextInfo {
         resultInfoMap.clear();
     }
 
+    @Override
+    public WebSession getWebSession() {
+        return processor.getWebSession();
+    }
 }

@@ -19,6 +19,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -52,7 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Web SQL processor.
  */
-public class WebSQLProcessor {
+public class WebSQLProcessor implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLProcessor.class);
 
@@ -88,6 +89,7 @@ public class WebSQLProcessor {
         return connection;
     }
 
+    @Override
     public WebSession getWebSession() {
         return webSession;
     }
