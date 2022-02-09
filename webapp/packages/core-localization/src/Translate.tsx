@@ -14,10 +14,11 @@ import { useTranslate } from './useTranslate';
 interface Props {
   token: TLocalizationToken;
   fallback?: TLocalizationToken;
+  [key: string]: any;
 }
 
-export const Translate = observer<Props>(function Translate({ token, fallback }) {
+export const Translate = observer<Props>(function Translate({ token, fallback, children, ...args }) {
   const translate = useTranslate();
 
-  return <>{translate(token, fallback)}</>;
+  return <>{translate(token, fallback, args)}</>;
 });

@@ -14,6 +14,7 @@ import { ServerConfigResource, SessionResource } from '@cloudbeaver/core-root';
 import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
+import { createTemplate, LocalizationTemplate } from './createTemplate';
 import type { ILocaleProvider } from './ILocaleProvider';
 import { defaultENLocale } from './locales/en';
 import { defaultITLocale } from './locales/it';
@@ -33,7 +34,7 @@ export class LocalizationService extends Bootstrap {
   };
 
   // observable.shallow - don't treat locales as observables
-  private readonly localeMap: Map<string, Map<string, string>> = new Map();
+  private readonly localeMap: Map<string, Map<string, LocalizationTemplate>> = new Map();
 
   private readonly localeProviders: ILocaleProvider[] = [];
 
@@ -58,7 +59,11 @@ export class LocalizationService extends Bootstrap {
     this.localeProviders.push(provider);
   }
 
-  readonly translate = <T extends TLocalizationToken | undefined>(token: T, fallback?: T): T => {
+  readonly translate = <T extends TLocalizationToken | undefined>(
+    token: T, 
+    fallback?: T,
+    args?: Record<string | number, any>
+  ): T => {
     if (token === undefined) {
       return undefined as T;
     }
@@ -73,8 +78,8 @@ export class LocalizationService extends Bootstrap {
         ?.get(token as TLocalizationToken);
     }
 
-    if (typeof translation === 'string') {
-      return translation as T;
+    if (typeof translation === 'function') {
+      return translation(args) as T;
     }
 
     if (fallback !== undefined) {
@@ -160,7 +165,10 @@ export class LocalizationService extends Bootstrap {
           locale.set(key, value);
         }
       }
-      this.localeMap.set(localeKey, locale);
+      this.localeMap.set(
+        localeKey, 
+        new Map(Array.from(locale.entries()).map(([key, value]) => [key, createTemplate(value)]))
+      );
     } catch (error) {
       this.notificationService.logException(error, 'Locale is not found', '', true);
     }
