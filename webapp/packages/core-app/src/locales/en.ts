@@ -12,7 +12,7 @@ export default [
   ['app_topnavbar_connection_schema_manager_not_selected', '-- not selected --'],
   ['app_navigationTree_openNodeTab', 'Open'],
   ['app_navigationTree_search', 'Search elements...'],
-  ['app_navigationTree_limited', 'Elements are limited to ${args.limit} items'],
+  ['app_navigationTree_limited', 'Elements are limited to {args.limit} items'],
   ['app_navigationTree_settings_title', 'Settings'],
   ['app_navigationTree_settings_filter_title', 'Filter'],
   ['app_navigationTree_settings_filter_description', 'Show filtering field'],

@@ -15,7 +15,7 @@ export default [
   ],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
-  ['app_navigationTree_limited', 'Отображено ${args.limit} элементов'],
+  ['app_navigationTree_limited', 'Отображено {args.limit} элементов'],
 
   ['app_navigationTree_settings_title', 'Настройки'],
   ['app_navigationTree_settings_filter_title', 'Фильтр'],
