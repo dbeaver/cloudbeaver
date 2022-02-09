@@ -25,6 +25,7 @@ import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
+import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 
@@ -132,7 +133,7 @@ export class SqlEditorBootstrap extends Bootstrap {
           case ACTION_SQL_EDITOR_OPEN: {
             const connection = context.get(DATA_CONTEXT_CONNECTION);
 
-            this.sqlEditorNavigatorService.openNewEditor(undefined, connection.id);
+            this.sqlEditorNavigatorService.openNewEditor({ connectionId: connection.id });
             break;
           }
         }
@@ -178,7 +179,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
 
-    this.sqlEditorNavigatorService.openNewEditor(undefined, connectionId, catalogId, schemaId);
+    this.sqlEditorNavigatorService.openNewEditor({ connectionId, catalogId, schemaId });
   }
 
   private readonly handleAction: IExecutorHandler<ISessionAction | null, any> = (data, contexts) => {
@@ -186,7 +187,11 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     if (isSessionActionOpenSQLEditor(data)) {
       try {
-        this.sqlEditorNavigatorService.openNewEditor(data['editor-name'], data['connection-id']);
+        this.sqlEditorNavigatorService.openNewEditor({
+          name: data['editor-name'], 
+          connectionId: data['connection-id'],
+          source: SQL_EDITOR_SOURCE_ACTION,
+        });
       } finally {
         processInfo.process();
       }

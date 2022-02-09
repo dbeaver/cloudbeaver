@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -38,8 +39,17 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const translate = useTranslate();
   const sqlEditorService = useService(SqlEditorService);
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
-  const context = useMapResource(SqlEditor, ConnectionExecutionContextResource, state.executionContext?.id ?? null);
+  const connection = useMapResource(SqlEditor, ConnectionInfoResource, state.executionContext?.connectionId ?? null);
 
+  const connected = getComputed(() => connection.data?.connected ?? false);
+
+  const context = useMapResource(
+    SqlEditor, 
+    ConnectionExecutionContextResource, 
+    connected ? (state.executionContext?.id ?? null) : null
+  );
+
+  const initializingContext = getComputed(() => connection.isLoading() || context.isLoading());
   const initExecutionContext = getComputed(() => context.data === undefined && state.executionContext !== undefined);
 
   async function cancelConnection() {
@@ -49,6 +59,13 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   async function init() {
     await sqlEditorService.initEditorConnection(state);
   }
+
+  useEffect(() => {
+    if (initExecutionContext && connected) {
+      init();
+    }
+
+  }, [connected, initExecutionContext]);
 
   return styled(styles)(
     <>
@@ -75,6 +92,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
           <Button
             type="button"
             mod={['unelevated']}
+            loading={initializingContext}
             loader
             onClick={init}
           >

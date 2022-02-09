@@ -13,6 +13,7 @@ import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/cor
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { ISqlEditorTabState, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
+import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 
 enum SQLEditorNavigationAction {
@@ -25,13 +26,16 @@ export interface SQLEditorActionContext {
   type: SQLEditorNavigationAction;
 }
 
-export interface SQLCreateAction extends SQLEditorActionContext {
-  type: SQLEditorNavigationAction.create;
-
+export interface ISQLEditorOptions {
   name?: string;
   connectionId?: string;
   catalogId?: string;
   schemaId?: string;
+  source?: string;
+}
+
+export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
+  type: SQLEditorNavigationAction.create;
 }
 
 export interface SQLEditorAction extends SQLEditorActionContext {
@@ -60,13 +64,10 @@ export class SqlEditorNavigatorService {
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(name?: string, connectionId?: string, catalogId?: string, schemaId?: string): Promise<void> {
+  async openNewEditor(options: ISQLEditorOptions): Promise<void> {
     await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
-      name,
-      connectionId,
-      catalogId,
-      schemaId,
+      ...options,
     });
   }
 
@@ -96,22 +97,33 @@ export class SqlEditorNavigatorService {
       let tab: ITab<ISqlEditorTabState> | null = null;
 
       if (data.type === SQLEditorNavigationAction.create) {
-        const tabOptions = this.sqlEditorTabService.createNewEditor(
-          data.name,
-          data.connectionId
-        );
+        if (data.source === SQL_EDITOR_SOURCE_ACTION) {
+          tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => (
+            tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION
+            && tab.handlerState.executionContext?.connectionId === data.connectionId
+          )));
+        } 
+        
+        if (!tab) {
+          const tabOptions = this.sqlEditorTabService.createNewEditor(
+            data.name,
+            data.source
+          );
 
-        if (tabOptions) {
-          tab = tabInfo.openNewTab(tabOptions);
-        }
+          if (tabOptions) {
+            tab = tabInfo.openNewTab(tabOptions);
+          }
 
-        if (tab && data.connectionId) {
-          await this.sqlEditorTabService.setConnectionId(tab, data.connectionId, data.catalogId, data.schemaId);
+          if (tab && data.connectionId) {
+            await this.sqlEditorTabService.setConnectionId(tab, data.connectionId, data.catalogId, data.schemaId);
+          }
+          return;
         }
-        return;
       }
 
-      tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => tab.id === data.editorId));
+      if (!tab && 'editorId' in data) {
+        tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => tab.id === data.editorId));
+      }
 
       if (!tab) {
         return;
