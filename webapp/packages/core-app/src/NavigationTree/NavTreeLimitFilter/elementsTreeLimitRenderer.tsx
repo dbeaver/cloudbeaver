@@ -6,11 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';
 
@@ -36,6 +39,7 @@ const styles = composes(
   `
 );
 
-const ManageableGroup: NavigationNodeRendererComponent = function ManageableGroup() {
-  return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_limited' /></connection-group>);
-};
+const ManageableGroup: NavigationNodeRendererComponent = observer(function ManageableGroup() {
+  const navTreeResource = useService(NavTreeResource);
+  return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_limited' limit={navTreeResource.childrenLimit} /></connection-group>);
+});
