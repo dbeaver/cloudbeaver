@@ -37,6 +37,7 @@ export interface ITreeNodeState {
 
 interface IElementsTreeUserState {
   nodeState: Array<[string, ITreeNodeState]>;
+  filter: string;
 }
 
 interface IOptions {
@@ -71,7 +72,7 @@ export interface IElementsTree {
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
-  isNodeExpanded: (nodeId: string) => boolean;
+  isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
   isNodeSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
   isGroup?: (node: NavNode) => boolean;
@@ -94,10 +95,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const foldersTree = options.foldersTree;
   const showFolderExplorerPath = options.showFolderExplorerPath;
 
-  useUserData<IElementsTreeUserState>(
+  const userData = useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
     () => observable<IElementsTreeUserState>({
       nodeState: [],
+      filter: '',
     }),
     async data => {
       if (options.keepData) {
@@ -113,6 +115,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
     data => (
       typeof data === 'object'
+      && typeof data.filter === 'string'
       && Array.isArray(data.nodeState)
     )
   );
@@ -134,7 +137,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await navNodeInfoResource.waitLoad();
         await navTreeResource.waitLoad();
 
-        const expanded = elementsTree.isNodeExpanded(child);
+        const expanded = elementsTree.isNodeExpanded(child, true);
         if (!expanded && child !== options.root) {
           if (navNodeInfoResource.isOutdated(child)) {
             const node = navNodeInfoResource.get(child);
@@ -236,17 +239,16 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     state,
-    filter: '',
     loading: options.keepData || false,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
     },
-    isNodeExpanded(nodeId: string): boolean {
+    isNodeExpanded(nodeId: string, ignoreFilter?: boolean): boolean {
       if (nodeId === this.root) {
         return true;
       }
 
-      if (this.filter !== '' && this.filterAll) {
+      if (this.filter !== '' && this.filterAll && !ignoreFilter) {
         return this.getNodeChildren(nodeId).length > 0;
       }
 
@@ -281,7 +283,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         );
     },
     async setFilter(value: string) {
-      this.filter = value;
+      userData.filter = value;
 
       await options.onFilter?.(value);
     },
@@ -341,6 +343,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     disabled: options.disabled,
     root: options.root,
     foldersTree,
+    filter: userData.filter,
     filterAll: options.filterAll,
     showFolderExplorerPath,
     baseRoot: options.baseRoot,
