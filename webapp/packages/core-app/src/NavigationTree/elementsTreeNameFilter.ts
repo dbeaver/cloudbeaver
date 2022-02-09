@@ -12,9 +12,8 @@ import type { MetadataMap } from '@cloudbeaver/core-utils';
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import type { NavNodeInfoResource } from '../shared/NodesManager/NavNodeInfoResource';
 import type { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import { EEquality, NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import type { IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
-
-export type NavNodeFilterCompareFn = (node: NavNode, filter: string)=> boolean;
 
 function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
@@ -26,7 +25,7 @@ export function elementsTreeNameFilter(
   compare: NavNodeFilterCompareFn = compareNodes
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[], state: MetadataMap<string, ITreeNodeState>) => {
-    if (filter === '' || compare(node, filter)) {
+    if (filter === '' || compare(node, filter) === EEquality.full) {
       return children;
     }
 
@@ -57,7 +56,7 @@ function filterNode(
   // const nodeState = state.get(node.id);
   
   
-  if (compare(node, filter)) {
+  if (compare(node, filter) !== EEquality.none) {
     return true;
   }
 
@@ -80,6 +79,13 @@ function filterNode(
   // return false;
 }
 
-function compareNodes(node: NavNode, filter: string): boolean {
-  return node.name?.toLowerCase().includes(filter.toLowerCase()) ?? false;
+function compareNodes(node: NavNode, filter: string): EEquality {
+  const nodeName = node.name?.toLowerCase().trim();
+  const filterToLower = filter.toLowerCase().trim();
+
+  if (nodeName === filterToLower) {
+    return EEquality.full;
+  }
+
+  return nodeName?.includes(filterToLower) ? EEquality.partially : EEquality.none;
 }

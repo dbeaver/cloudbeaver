@@ -10,8 +10,6 @@ import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import type { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import type { IElementsTreeFilter } from '../useElementsTree';
 
-export type NavNodeFilterCompareFn = (node: NavNode, filter: string)=> boolean;
-
 export const NAVIGATION_TREE_LIMIT = {
   limit: 'nav-tree://limit',
 };

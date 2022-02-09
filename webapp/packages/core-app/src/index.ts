@@ -37,6 +37,7 @@ export * from './NavigationTree/MENU_NAV_TREE';
 export * from './NavigationTree/NavigationNodeComponent';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
+export * from './NavigationTree/NavNodeFilterCompareFn';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/useElementsTree';
 export * from './AppLocaleService';
