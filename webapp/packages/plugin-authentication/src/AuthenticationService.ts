@@ -130,7 +130,7 @@ export class AuthenticationService extends Bootstrap {
     }
 
     try {
-      return this.authPromise;
+      return await this.authPromise;
     } finally {
       this.authPromise = null;
     }
