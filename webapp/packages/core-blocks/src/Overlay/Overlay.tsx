@@ -7,52 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { use } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-
-export const style = composes(
-  css`
-    overlay {
-      composes: theme-text-on-primary from global;
-    }
-    box {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
-
-      [|active=false] {
-        display: none;
-      }
-    }
-    
-    overlay {
-      margin: auto;
-    }
-
-    overlay, box {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    box {
-      composes: theme-elevation-z6 from global;
-      border-radius: 0.25rem;
-      padding: 24px 16px;
-    }
-  `
-);
+import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
   active?: boolean;
@@ -64,7 +23,7 @@ export const Overlay = observer<Props>(function Overlay({
   className,
   children,
 }) {
-  const styles = useStyles(style);
+  const styles = useStyles(OVERLAY_BASE_STYLES);
 
   if (!active) {
     return null;

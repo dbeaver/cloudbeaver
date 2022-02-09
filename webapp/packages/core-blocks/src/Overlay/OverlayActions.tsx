@@ -7,15 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-const style = css`
-  actions {
-    padding-top: 42px;
-    gap: 16px;
-    display: flex;
-  }
-`;
+import { useStyles } from '@cloudbeaver/core-theming';
+
+import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
   className?: string;
@@ -24,8 +20,8 @@ interface Props {
 export const OverlayActions = observer<Props>(function OverlayActions({
   className,
   children,
-}){
-  return styled(style)(
+}) {
+  return styled(useStyles(OVERLAY_BASE_STYLES))(
     <actions className={className}>
       {children}
     </actions>

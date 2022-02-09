@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -17,15 +16,10 @@ interface Props {
   className?: string;
 }
 
-export const OverlayMessage = observer<Props>(function OverlayMessage({
-  className,
-  children,
-}) {
+export const OverlayHeader: React.FC<Props> = function OverlayHeader({ className, children }) {
   return styled(useStyles(OVERLAY_BASE_STYLES))(
-    <message className={className}>
-      <message-box>
-        {children}
-      </message-box>
-    </message>
+    <header className={className}>
+      {children}
+    </header>
   );
-});
+};

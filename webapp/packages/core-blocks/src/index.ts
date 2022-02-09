@@ -21,6 +21,10 @@ export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 
 export * from './Overlay/Overlay';
 export * from './Overlay/OverlayActions';
+export * from './Overlay/OverlayHeader';
+export * from './Overlay/OverlayHeaderIcon';
+export * from './Overlay/OverlayHeaderSubTitle';
+export * from './Overlay/OverlayHeaderTitle';
 export * from './Overlay/OverlayMessage';
 
 export * from './Placeholder/Placeholder';
