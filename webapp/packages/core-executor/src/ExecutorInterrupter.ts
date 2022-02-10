@@ -35,11 +35,11 @@ export const ExecutorInterrupter = {
     };
   },
 
-  interrupter(flag: () => Promise<boolean> | boolean) {
-    return async (data: any, contexts: IExecutionContextProvider<any>): Promise<void> => {
+  interrupter<T>(flag: (data: T) => Promise<boolean> | boolean) {
+    return async (data: T, contexts: IExecutionContextProvider<T>): Promise<void> => {
       const interrupt = contexts.getContext(ExecutorInterrupter.interruptContext);
 
-      if ((await flag())) {
+      if ((await flag(data))) {
         interrupt.interrupt();
       }
     };

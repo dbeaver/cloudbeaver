@@ -87,8 +87,8 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const drivers = useMapResource(ConnectionSelector, DBDriverResource, CachedMapAllKey, {
     isActive: () => isEnabled,
   });
-  
-  useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
+
+  const connectionInfo = useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
     isActive: () => isEnabled,
   });
 
@@ -96,12 +96,13 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const driver = drivers.resource.get(connection?.driverId || '');
 
   const contextsActive = getComputed(() => (
-    isEnabled 
+    isEnabled
+    && !connectionInfo.isOutdated()
     && connection?.connected === true
     && !!connectionSelectorService.activeConnectionId
   ));
 
-  useDataResource(ConnectionSelector, ContainerResource, { 
+  useDataResource(ConnectionSelector, ContainerResource, {
     connectionId: connectionSelectorService.activeConnectionId!,
     catalogId: connectionSelectorService.activeObjectCatalogId,
   }, {
@@ -152,14 +153,14 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
 
   return styled(style)(
     <connection-selector {...use({ isVisible })}>
-      <ContextMenu 
+      <ContextMenu
         menu={connectionsMenu}
         placement="bottom-end"
         style={[menuStyles, connectionMenu, topMenuStyles, removeDisableEffect]}
         disclosure
         modal
       >
-        <TopNavButton 
+        <TopNavButton
           title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
           icon={driver?.icon}
           style={[menuStyles, connectionMenu, removeDisableEffect]}
@@ -167,19 +168,19 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
           secondary
         />
       </ContextMenu>
-      <ContextMenu 
+      <ContextMenu
         menu={dataContainerMenu}
         placement="bottom-end"
         style={[menuStyles, topMenuStyles]}
         disclosure
         modal
       >
-        <TopNavButton 
+        <TopNavButton
           title={objectContainerName}
           icon={objectContainerIcon}
           style={[menuStyles, removeDisableEffect]}
           menu={
-            connectionSelectorService.isObjectCatalogChangeable 
+            connectionSelectorService.isObjectCatalogChangeable
             || connectionSelectorService.isObjectSchemaChangeable
           }
           secondary

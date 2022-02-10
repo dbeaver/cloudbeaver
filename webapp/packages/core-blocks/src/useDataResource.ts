@@ -99,14 +99,14 @@ export function useDataResource<
     async [loadFunctionName](refresh?: boolean) {
       const { key, includes, loading, resource, actions, prevData } = this;
 
-      if (loading) {
+      if (loading || actions?.active === false) {
         return;
       }
 
       try {
         const active = await actions?.isActive?.(resource);
 
-        if (active === false || actions?.active === false) {
+        if (active === false) {
           return;
         }
 

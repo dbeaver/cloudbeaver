@@ -30,15 +30,6 @@ export const NodeManagerUtils = {
     return `database://${connectionId}`;
   },
 
-  nodeIdToConnectionId(nodeId: string): string {
-    const matches = nodeId.match(/database:\/\/(.*?)(|\/.*)$/);
-    if (!matches) {
-      throw new Error('Not database object');
-    }
-
-    return matches[1];
-  },
-
   isDatabaseObject(objectId: string): boolean {
     return /^database:\/\//.test(objectId);
   },

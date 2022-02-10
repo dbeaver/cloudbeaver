@@ -151,12 +151,16 @@ export class SqlEditorController implements IInitializableController, IDestructi
 
     this.reactionDisposer = autorun(() => {
       if (this.state.executionContext) {
-        this.sqlDialectInfoService
-          .loadSqlDialectInfo(this.state.executionContext.connectionId)
-          .then(async dialect => {
-            this.parser.setDialect(dialect || null);
-            await this.updateParserScriptsThrottle();
-          });
+        const context = this.connectionExecutionContextService.get(this.state.executionContext.id);
+
+        if (context) {
+          this.sqlDialectInfoService
+            .loadSqlDialectInfo(this.state.executionContext.connectionId)
+            .then(async dialect => {
+              this.parser.setDialect(dialect || null);
+              await this.updateParserScriptsThrottle();
+            });
+        }
       }
     });
   }
@@ -297,8 +301,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
   private async updateParserScripts() {
     const connectionId = this.state.executionContext?.connectionId;
     const script = this.parser.actualScript;
-    
-    if (!connectionId) { 
+
+    if (!connectionId) {
       return;
     }
 
@@ -307,7 +311,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
         connectionId,
         script
       );
-    
+
     if (this.parser.actualScript === script) {
       this.parser.setQueries(queries);
       this.highlightActiveQuery();

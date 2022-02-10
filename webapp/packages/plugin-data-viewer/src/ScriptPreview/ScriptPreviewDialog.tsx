@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, useClipboard, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -19,7 +20,6 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 
 export const dialogStyle = css`
   footer {
@@ -46,7 +46,7 @@ const styles = css`
 
 interface Payload {
   script: string;
-  model: IDatabaseDataModel<any, IDatabaseDataResult>;
+  model: IDatabaseDataModel;
 }
 
 export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({
@@ -56,8 +56,10 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   const translate = useTranslate();
   const copy = useClipboard();
 
+  const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const sqlDialectInfoService = useService(SqlDialectInfoService);
-  const connectionId = payload.model.source.executionContext?.context?.connectionId;
+  const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
+  const connectionId = context?.context?.connectionId;
 
   const dialect = useObservableRef(() => ({
     get dialect(): SqlDialectInfo | undefined {

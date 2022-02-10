@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -19,7 +20,6 @@ import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
-import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 const styles = composes(
@@ -73,14 +73,19 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlGeneratorsResource = useService(SqlGeneratorsResource);
-  const connectionId = NodeManagerUtils.nodeIdToConnectionId(payload.pathId);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+  const connection = connectionInfoResource.getConnectionForNode(payload.pathId);
 
   const state = useObservableRef(() => ({
     query: '',
     loading: true,
     error: new GQLErrorCatcher(),
     get dialect(): SqlDialectInfo | undefined {
-      return this.sqlDialectInfoService.getDialectInfo(this.connectionId);
+      if (!this.connection?.connected) {
+        return;
+      }
+
+      return this.sqlDialectInfoService.getDialectInfo(this.connection.id);
     },
     async load() {
       this.error.clear();
@@ -96,21 +101,27 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   }), {
     query: observable.ref,
     loading: observable.ref,
-    connectionId: observable.ref,
+    connection: observable.ref,
     dialect: computed,
-  }, { connectionId, sqlDialectInfoService });
+  }, { connection, sqlDialectInfoService });
 
   const error = useErrorDetails(state.error.exception);
 
   useEffect(() => {
     state.load();
+  }, []);
 
-    sqlDialectInfoService.loadSqlDialectInfo(connectionId)
+  useEffect(() => {
+    if (!connection) {
+      return;
+    }
+
+    sqlDialectInfoService.loadSqlDialectInfo(connection.id)
       .catch(exception => {
         console.error(exception);
-        console.warn(`Can't get dialect for connection: '${connectionId}'. Default dialect will be used`);
+        console.warn(`Can't get dialect for connection: '${connection.id}'. Default dialect will be used`);
       });
-  }, []);
+  });
 
   return styled(style)(
     <CommonDialogWrapper
