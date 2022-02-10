@@ -20,8 +20,10 @@ export class UsersAdministrationNavigationService {
   static ItemName = 'users';
 
   constructor(
-    private administrationScreenService: AdministrationScreenService
-  ) {}
+    private readonly administrationScreenService: AdministrationScreenService
+  ) {
+    this.navToRoot = this.navToRoot.bind(this);
+  }
 
   navToRoot(): void {
     this.administrationScreenService.navigateToItem(UsersAdministrationNavigationService.ItemName);
