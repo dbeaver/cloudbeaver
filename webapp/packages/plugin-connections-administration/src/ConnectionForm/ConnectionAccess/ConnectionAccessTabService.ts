@@ -18,7 +18,7 @@ import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
 @injectable()
 export class ConnectionAccessTabService extends Bootstrap {
-  private key: string;
+  private readonly key: string;
 
   constructor(
     private readonly connectionFormService: ConnectionFormService,
