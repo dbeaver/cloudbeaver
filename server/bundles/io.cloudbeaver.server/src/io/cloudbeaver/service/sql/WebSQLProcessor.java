@@ -648,13 +648,14 @@ public class WebSQLProcessor implements WebSessionProvider {
         for (int i = 0; i < maxResultsCount; i++) {
             WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
             if (hasResultSet) {
-                DBCResultSet resultSet = dbStat.openResultSet();
-                if (resultSet == null) {
-                    break;
-                }
-                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
-                    readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
-                    results.setResultSet(dataReceiver.getResultSet());
+                try (DBCResultSet resultSet = dbStat.openResultSet()) {
+                    if (resultSet == null) {
+                        break;
+                    }
+                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                        readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
+                        results.setResultSet(dataReceiver.getResultSet());
+                    }
                 }
             } else {
                 long updateRowCount = dbStat.getUpdateRowCount();
