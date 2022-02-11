@@ -139,6 +139,7 @@ export * from './useObservableRef';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useAppLoadingScreen';
+export * from './useInterval';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
 export * from './Snackbars/SnackbarMarkups/SnackbarWrapper';
