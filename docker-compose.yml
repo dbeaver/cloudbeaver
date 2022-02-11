@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+
+  ####
+  #### BUILD: docker-compose build cloudbeaver-backend
+  #### VERIFY: docker run -ti dbeaver/cloudbeaver-backend find /dbeaver/cloud/backend -name "org.eclipse.equinox.launcher*.jar"
+  ####
+  cloudbeaver-backend:
+    image: dbeaver/cloudbeaver-backend
+    build:
+      context: .
+      target: backend-builder
+      cache_from:
+        - dbeaver/cloudbeaver-backend
+
+  ####
+  #### BUILD: docker-compose build cloudbeaver-frontend
+  #### VERIFY: docker run -ti dbeaver/cloudbeaver-frontend find /dbeaver/cloud/frontend -name "@cloudbeaver"
+  ####
+  cloudbeaver-frontend:
+    image: dbeaver/cloudbeaver-frontend
+    build:
+      context: .
+      target: frontend-builder
+      cache_from:
+        - dbeaver/cloudbeaver-frontend
+
+  ####
+  #### BUILD: docker-compose build cloudbeaver-frontend
+  #### VERIFY: docker run -ti dbeaver/cloudbeaver-frontend find /dbeaver/cloud/frontend -name "@cloudbeaver"
+  ####
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
+    build:
+      context: .
+      cache_from:
+        - dbeaver/cloudbeaver-backend
+        - dbeaver/cloudbeaver-frontend
+    container_name: cloudbeaver
+    ports:
+      - "8978:8978"
+    volumes:
+      - "./logs:/opt/cloudbeaver/logs"
+      - "./workspace:/opt/cloudbeaver/workspace"
