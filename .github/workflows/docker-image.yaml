@@ -22,7 +22,6 @@ on:
 
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables
 env:
-  IMAGE_NAME_SUFFIX: server
   DOCKER_CONTEXT_PATH: .
   VERSION: 1.0.0
 
@@ -47,10 +46,9 @@ jobs:
     steps:
       - name: Set default envs from the env above
         run: |
-          echo "IMAGE_NAME_SUFFIX=${{env.IMAGE_NAME_SUFFIX}}" >> $GITHUB_ENV
           echo "DOCKER_CONTEXT_PATH=${{env.DOCKER_CONTEXT_PATH}}" >> $GITHUB_ENV
           # registry has renamed: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-docker-registry
-          echo "DEFAULT_DOCKER_IMAGE_REPO=ghcr.io/${GITHUB_REPOSITORY%-docker}/${IMAGE_NAME_SUFFIX}" >> $GITHUB_ENV
+          echo "DEFAULT_DOCKER_IMAGE_REPO=ghcr.io/${GITHUB_REPOSITORY%-docker}" >> $GITHUB_ENV
           echo "DEFAULT_DOCKER_IMAGE_VERSION=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "DEFAULT_PUBLIC_IMAGE=${GITHUB_REPOSITORY%-docker}" >> $GITHUB_ENV
           # The repo name only without refs
