@@ -51,3 +51,6 @@ services:
     volumes:
       - ./data/logs:/opt/cloudbeaver/logs
       - ./data/workspace/:/opt/cloudbeaver/workspace 
+
+      # when deploying on a real server using docker-compose, just uncomment the local volume
+      #- /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace
