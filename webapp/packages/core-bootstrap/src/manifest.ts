@@ -45,17 +45,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionExecutionContextResource,
-  ConnectionExecutionContextService,
-  ConnectionsManagerService,
-  ConnectionInfoResource,
-  ContainerResource,
-  DBDriverResource,
-  NetworkHandlerResource,
-  DatabaseAuthModelsResource,
-  ConnectionsLocaleService,
-} from '@cloudbeaver/core-connections';
+import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
@@ -97,19 +87,11 @@ export const coreManifests: PluginManifest[] = [
       CommonDialogService,
       SessionExpireWarningDialogService,
       SessionExpiredDialogService,
-      ConnectionsLocaleService,
       ConnectionDialogsService,
       ConnectionSchemaManagerBootstrap,
       ConnectionSchemaManagerService,
-      ConnectionInfoResource,
       BlocksLocaleService,
       AppLocaleService,
-      ContainerResource,
-      DBDriverResource,
-      NetworkHandlerResource,
-      ConnectionExecutionContextResource,
-      ConnectionExecutionContextService,
-      ConnectionsManagerService,
       ScreenService,
       AppScreenService,
       ContextMenuService,
@@ -122,7 +104,6 @@ export const coreManifests: PluginManifest[] = [
       MainMenuService,
       TopNavService,
       NavigationTabsService,
-      DatabaseAuthModelsResource,
       NavNodeContextMenuService,
       NavigationTreeService,
       NavNodeManagerService,
@@ -147,4 +128,5 @@ export const coreManifests: PluginManifest[] = [
   coreVersionManifest,
   coreVersionUpdateManifest,
   coreRootManifest,
+  coreConnectionsManifest,
 ];

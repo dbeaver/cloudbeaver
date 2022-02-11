@@ -91,14 +91,14 @@ export class SqlEditorTabService extends Bootstrap {
 
   createNewEditor(
     name?: string,
-    connectionId?: string,
+    source?: string,
   ): ITabOptions<ISqlEditorTabState> | null {
 
     const order = this.getFreeEditorId();
 
     return {
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(order, name, connectionId),
+      handlerState: this.sqlEditorService.getState(order, name, source),
     };
   }
 
@@ -154,7 +154,7 @@ export class SqlEditorTabService extends Bootstrap {
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.connectionId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
         || !Array.isArray(tab.handlerState.tabs)
         || !Array.isArray(tab.handlerState.executionPlanTabs)
         || !Array.isArray(tab.handlerState.resultGroups)

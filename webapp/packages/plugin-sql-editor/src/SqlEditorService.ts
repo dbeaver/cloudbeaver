@@ -26,14 +26,14 @@ export class SqlEditorService {
   getState(
     order: number, 
     name?: string, 
-    connectionId?: string, 
+    source?: string, 
     contextInfo?: IConnectionExecutionContextInfo
   ): ISqlEditorTabState {
     return {
       name,
+      source,
       query: '',
       order,
-      connectionId,
       executionContext: contextInfo ? { ...contextInfo } : undefined,
       tabs: [],
       resultGroups: [],

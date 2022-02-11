@@ -134,8 +134,8 @@ export abstract class CachedMapResource<
 
   getException(key: TKey): Error | null;
   getException(key: ResourceKeyList<TKey>): Array<Error | null>;
-  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null;
-  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null {
+  getException(key: ResourceKey<TKey>): Array<Error | null> | Error | null;
+  getException(key: ResourceKey<TKey>): Array<Error | null> | Error | null {
     key = this.transformParam(key);
     return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
   }
@@ -201,11 +201,11 @@ export abstract class CachedMapResource<
       (
         (key === undefined ? this.scheduler.executing : this.scheduler.isExecuting(key))
       ) && !this.outdateWaitList.some(param => this.includes(key!, param))) {
-      this.outdateWaitList.push(key as ResourceKey<TKey>);
+      this.outdateWaitList.push(key!);
       return;
     }
 
-    this.markOutdatedSync(key as ResourceKey<TKey>);
+    this.markOutdatedSync(key!);
   }
 
   cleanError(): void
@@ -267,8 +267,8 @@ export abstract class CachedMapResource<
 
   get(key: TKey): TValue | undefined;
   get(key: ResourceKeyList<TKey>): Array<TValue | undefined>;
-  get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined;
-  get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined {
+  get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined;
+  get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined {
     key = this.transformParam(key);
     return ResourceKeyUtils.map(key, key => this.data.get(key));
   }

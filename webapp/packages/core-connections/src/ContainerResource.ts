@@ -9,6 +9,7 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
   GraphQLService,
   CachedDataResource,
@@ -70,6 +71,7 @@ string
     }));
 
     this.preloadResource(connectionInfoResource, () => CachedMapAllKey);
+    this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key.connectionId)));
 
     this.connectionInfoResource.onItemDelete.addHandler(
       key => ResourceKeyUtils.forEach(key, key => this.data.delete(key))

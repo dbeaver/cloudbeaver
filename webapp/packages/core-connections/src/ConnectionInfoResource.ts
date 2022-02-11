@@ -52,9 +52,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   readonly onConnectionClose: ISyncExecutor<Connection>;
 
   private sessionUpdate: boolean;
-  private nodeIdMap: Map<string, string>;
+  private readonly nodeIdMap: Map<string, string>;
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource,
     permissionsResource: PermissionsResource
   ) {
@@ -87,6 +87,13 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       createFromNode: action,
       add: action,
     });
+  }
+
+  isConnected(key: string): boolean;
+  isConnected(key: ResourceKeyList<string>): boolean;
+  isConnected(key: ResourceKey<string>): boolean;
+  isConnected(key: ResourceKey<string>): boolean {
+    return ResourceKeyUtils.every(key, connectionId => this.get(connectionId)?.connected ?? false);
   }
 
   getConnectionForNode(nodeId: string): Connection | undefined {

@@ -290,8 +290,6 @@ export class NavigationTabsService extends View<ITab> {
     if (!this.appAuthService.authenticated) {
       return;
     }
-    
-    this.onInit.execute(true);
 
     for (const handler of this.handlers.values()) {
       await handler.onNavInit?.();
@@ -323,6 +321,8 @@ export class NavigationTabsService extends View<ITab> {
       this.selectTab(this.userTabsState.currentId);
       this.onTabSelect.execute(tab);
     }
+    
+    this.onInit.execute(true);
   }
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {

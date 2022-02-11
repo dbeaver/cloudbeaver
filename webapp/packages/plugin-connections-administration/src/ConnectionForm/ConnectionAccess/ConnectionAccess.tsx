@@ -12,7 +12,6 @@ import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   TextPlaceholder,
   Loader,
@@ -25,12 +24,15 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
 import { ConnectionAccessList } from './ConnectionAccessList';
 import { useConnectionAccessState } from './useConnectionAccessState';
+
 
 const styles = css`
   ColoredContainer {
@@ -58,13 +60,8 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   const { selected } = useTab(tabId, state.load);
 
-  const users = useMapResource(ConnectionAccess, UsersResource, null, {
-    onLoad: resource => { resource.loadAll(); },
-  });
-
-  const roles = useMapResource(ConnectionAccess, RolesResource, null, {
-    onLoad: resource => { resource.loadAll(); },
-  });
+  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey);
+  const roles = useMapResource(ConnectionAccess, RolesResource, CachedMapAllKey);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedSubjects.includes(user.userId))

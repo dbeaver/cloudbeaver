@@ -45,6 +45,8 @@ module.exports = {
     "space-after-keywords": "off",
     "no-inner-declarations": "off",
     "no-constant-condition": "off",
+    "no-trailing-spaces": "error",
+    "space-before-blocks": "error",
 
     "@typescript-eslint/indent": ["error", 2],
     '@typescript-eslint/no-invalid-void-type': 'off',

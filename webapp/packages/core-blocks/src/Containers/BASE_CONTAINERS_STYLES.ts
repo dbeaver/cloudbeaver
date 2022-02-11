@@ -152,7 +152,6 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
 
       &[maximum], & > [maximum], &[grid][maximum] > * {
-        flex-basis: 800px;
         max-width: 100%;
       }
 

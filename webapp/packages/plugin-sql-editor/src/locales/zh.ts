@@ -1,6 +1,6 @@
 export default [
   ['sql_editor_menu', 'SQL编辑器'],
-  ['sql_editor_restore_message', 'Do you want to restore connection?'],
+  ['sql_editor_restore_message', 'Do you want to restore the connection?'],
   ['sql_editor_restore', 'Restore'],
   ['sql_editor_placeholder', '使用Ctrl + Enter执行查询以查看结果'],
   ['sql_editor_execution_plan_button_tooltip', '解释执行计划（Shift + Ctrl + E）'],
