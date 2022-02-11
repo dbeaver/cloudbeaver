@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  cloudbeaver-network:
+    external: true
+    name: cloudbeaver-network
+
+services:
+
+  # Postgres db to use with the server name "postgres-server"
+  db:
+    image: postgres
+    container_name: postgres-server
+    restart: always
+    environment:
+      POSTGRES_DB: supercash
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 10101:5432
+    networks:
+      - cloudbeaver-network
