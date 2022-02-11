@@ -42,10 +42,12 @@ services:
         - dbeaver/cloudbeaver-backend
         - dbeaver/cloudbeaver-frontend
     container_name: cloudbeaver
+    labels:
+      com.github.marcellodesales.type: runtime
     networks:
       - cloudbeaver-network
     ports:
       - "8978:8978"
     volumes:
-      - "./logs:/opt/cloudbeaver/logs"
-      - "./workspace:/opt/cloudbeaver/workspace"
+      - ./data/logs:/opt/cloudbeaver/logs
+      - ./data/workspace/:/opt/cloudbeaver/workspace 

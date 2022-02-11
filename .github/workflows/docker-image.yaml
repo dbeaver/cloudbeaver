@@ -1,0 +1,211 @@
+####
+#### Author: Marcello DeSales (@marcellodesales)
+####
+# https://www.freecodecamp.org/news/a-lightweight-tool-agnostic-ci-cd-flow-with-github-actions/
+name: main
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - devel
+      - feature/**
+      - bugfix/**
+      - hotfix/**
+    paths-ignore:
+      - '**/README.md' # https://stackoverflow.com/questions/62968897/is-it-possible-to-not-run-github-action-for-readme-updates/62972393#62972393
+
+#  pull_request:
+#    branches: [ master, develop, feature/**, bugfix/** ]
+
+# https://docs.github.com/en/actions/learn-github-actions/environment-variables
+env:
+  IMAGE_NAME_SUFFIX: base
+  DOCKER_CONTEXT_PATH: .
+  VERSION: 1.0.0
+
+# https://faun.pub/building-a-ci-cd-pipeline-with-github-actions-and-docker-part-1-a9d8709c31fb
+jobs:
+
+  setup:
+    name: 🔧 setup
+    runs-on: ubuntu-latest
+    container:
+      image: docker/compose:1.29.2
+
+    # https://github.community/t/sharing-a-variable-between-jobs/16967/14
+    outputs:
+      defaultDockerImageRepo: ${{steps.set-base-values.outputs.defaultDockerImageRepo}}
+      defaultDockerImageVersion: ${{steps.set-base-values.outputs.defaultDockerImageVersion}}
+      defaultDockerImageBranchTag: ${{steps.set-base-values.outputs.defaultDockerImageBranchTag}}
+      defaultDockerImageBranchShaTag: ${{steps.set-base-values.outputs.defaultDockerImageBranchShaTag}}
+      dockerContextPath: ${{steps.set-base-values.outputs.dockerContextPath}}
+      defaultPublicDockerImageRepo: ${{steps.set-base-values.outputs.defaultPublicDockerImageRepo}}
+
+    steps:
+      - name: Set default envs from the env above
+        run: |
+          echo "IMAGE_NAME_SUFFIX=${{env.IMAGE_NAME_SUFFIX}}" >> $GITHUB_ENV
+          echo "DOCKER_CONTEXT_PATH=${{env.DOCKER_CONTEXT_PATH}}" >> $GITHUB_ENV
+          # registry has renamed: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-docker-registry
+          echo "DEFAULT_DOCKER_IMAGE_REPO=ghcr.io/${GITHUB_REPOSITORY%-docker}/${IMAGE_NAME_SUFFIX}" >> $GITHUB_ENV
+          echo "DEFAULT_DOCKER_IMAGE_VERSION=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "DEFAULT_PUBLIC_IMAGE=${GITHUB_REPOSITORY%-docker}" >> $GITHUB_ENV
+          # The repo name only without refs
+          BRANCH_TAG=${GITHUB_REF##*/}
+          echo "BRANCH_TAG=${BRANCH_TAG}" >> $GITHUB_ENV
+          # The branch and sha together makes it easier to find
+          echo "BRANCH_SHA_TAG=${BRANCH_TAG}-$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
+
+      - id: set-base-values
+        # The below outputs a JSON array of check tasks for each subproject
+        #  and uses GitHub Actions magic (::set-output) to set an output
+        #  variable https://www.cynkra.com/blog/2020-12-23-dynamic-gha/
+        # https://github.community/t/sharing-a-variable-between-jobs/16967/14
+        run: |
+          env
+          echo "Branch tag to use: ${BRANCH_TAG} and ${BRANCH_SHA_TAG}"
+          echo "::set-output name=dockerContextPath::$DOCKER_CONTEXT_PATH"
+          echo "::set-output name=defaultDockerImageRepo::$DEFAULT_DOCKER_IMAGE_REPO"
+          echo "::set-output name=defaultDockerImageVersion::$DEFAULT_DOCKER_IMAGE_VERSION"
+          echo "::set-output name=defaultDockerImageBranchTag::$BRANCH_TAG"
+          echo "::set-output name=defaultDockerImageBranchShaTag::$BRANCH_SHA_TAG"
+          echo "::set-output name=defaultPublicDockerImageRepo::$DEFAULT_PUBLIC_IMAGE"
+
+  build:
+    name: 📦 build
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: docker/compose:1.29.2
+
+    steps:
+      - name: Fetch only the top commit
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      # This is for pushing the built image
+      # https://github.com/marcellodesales/cloner/packages?package_type=Docker
+      - name: Login to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # https://github.community/t/use-docker-layer-caching-with-docker-compose-build-not-just-docker/156049/3
+      # https://github.com/docker/build-push-action/blob/master/docs/advanced/export-docker.md
+      # https://mmeendez8.github.io/2021/07/19/new-docker-cache-is-out.html 
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+
+      # https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
+      # https://github.community/t/github-container-registry-ghcr-io-packages-not-appearing-in-webinterface/130077
+      # Manually make the image public by going to the module's settings, Danger Zone
+      - name: Associate Dockerfile to the repo
+        id: set-compose_target_service
+        run: |
+          env
+          echo "In order to associate the docker image to the repo, we need to associate the Dockerfile to the repo"
+          export LABEL_VALUE=https://github.com/${GITHUB_REPOSITORY}
+          echo "Adding 'LABEL org.opencontainers.image.source ${LABEL_VALUE}' to Dockerfile"
+          
+          # Switch to the context dir and update all dockerfiles that will be used
+          cd ${{env.DOCKER_CONTEXT_PATH}}
+          # https://stackoverflow.com/questions/845863/how-to-use-in-an-xargs-command/70230514#70230514
+          find . -name 'Dockerfile' -print0 | xargs -0 grep -iL "org.opencontainers.image.source" | xargs -0 -I{} sh -c 'echo "LABEL org.opencontainers.image.source ${LABEL_VALUE}" >> {}' -- {}
+
+          # Define the name of the "DEFAULT_TARGET_SERVICE" that has the runtime.
+          # With multiple services in docker-compose, we can define which one is the runtime by declaring
+          # the label "com.github.marcellodesales.type = runtime" in the docker-compose.yaml
+          if [[ 1 -lt $(docker-compose config | docker run --rm -i mikefarah/yq e . - -o json | docker run --rm -i imega/jq -r -c '.services | keys[]' | wc -l | awk '{ print $1}') ]]; then for DOCKER_SERVICE in $(docker-compose config | docker run --rm -i mikefarah/yq e . - -o json | docker run --rm -i imega/jq -r -c '.services | keys[]'); do HAS_LABEL=$(docker-compose config | docker run --rm -i mikefarah/yq e . - -o json | docker run --rm -i imega/jq --arg SERVICE_KEY "${DOCKER_SERVICE}" -r -c '.services[$SERVICE_KEY]["labels"]["com.github.marcellodesales.type"]'); if [ "${HAS_LABEL}" = "runtime" ]; then DEFAULT_TARGET_SERVICE=${DOCKER_SERVICE}; break; fi; done; else DEFAULT_TARGET_SERVICE=$(docker-compose config | docker run --rm -i mikefarah/yq e . - -o json | docker run --rm -i imega/jq -r -c '.services | keys[]'); fi
+
+          echo "Using docker-compose target ${DEFAULT_TARGET_SERVICE}"
+          echo "DEFAULT_TARGET_SERVICE=${DEFAULT_TARGET_SERVICE}" >> $GITHUB_ENV
+
+          echo "General build..."
+          docker buildx bake --print
+
+      # https://docs.docker.com/engine/reference/commandline/buildx_bake/
+      - name: Build and push to Github Docker Registry
+        uses: docker/bake-action@v1.6.0
+        with:
+          push: true
+          builder: ${{ steps.buildx.outputs.name }}
+          # All the properties from https://github.com/docker/buildx/blob/master/docs/reference/buildx_bake.md#set
+          # https://github.community/t/use-docker-layer-caching-with-docker-compose-build-not-just-docker/156049/3
+          # https://stackoverflow.com/questions/55756372/when-using-buildkit-with-docker-how-do-i-see-the-output-of-run-commands/55759337#55759337
+          # https://github.com/docker/buildx/blob/master/docs/reference/buildx_bake.md#set
+          # https://github.com/docker/buildx/issues/872#issuecomment-1014891886
+          set: |
+            ${{env.DEFAULT_TARGET_SERVICE}}.tags=${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}}
+            ${{env.DEFAULT_TARGET_SERVICE}}.tags=${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageBranchTag}}
+            ${{env.DEFAULT_TARGET_SERVICE}}.tags=${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageBranchShaTag}}
+            ${{env.DEFAULT_TARGET_SERVICE}}.cache-from=type=gha
+            ${{env.DEFAULT_TARGET_SERVICE}}.cache-to=type=gha,mode=max
+
+      # Just show the metadata built in case one needs to review/reuse the data
+      - name: Docker Image digest outputs
+        run: echo ${{ steps.build.outputs.digest }}
+
+  deploy:
+    name: 🚀 deploy
+    # https://stackoverflow.com/questions/63148639/create-dependencies-between-jobs-in-github-actions/63148947#63148947
+    # https://github.community/t/sharing-a-variable-between-jobs/16967/14
+    needs: [setup, build]
+    runs-on: ubuntu-latest
+    container:
+      image: docker/compose:1.29.2
+
+    steps:
+      # https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+      - name: Show all outputs
+        run: |
+          echo "Output key: needs.setup.outputs.defaultDockerImageRepo=${{needs.setup.outputs.defaultDockerImageRepo}}"
+          echo "Output key: needs.setup.outputs.defaultDockerImageVersion=${{needs.setup.outputs.defaultDockerImageVersion}}"
+          echo "Output key: needs.setup.outputs.defaultDockerImageBranchTag=${{needs.setup.outputs.defaultDockerImageBranchTag}}"
+          echo "Output key: needs.setup.outputs.defaultPublicDockerImageRepo=${{needs.setup.outputs.defaultPublicDockerImageRepo}}:latest"
+
+      # https://github.com/marcellodesales/cloner/packages?package_type=Docker
+      - name: Login to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull the built docker images locally
+        run: |
+          docker pull ${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}}
+          docker images
+
+      # https://github.blog/changelog/2021-03-24-packages-container-registry-now-supports-github_token/
+      - if: endsWith(github.ref, '/main') || endsWith(github.ref, '/master')
+        name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.REGISTRY_DOCKERHUB_TOKEN }}
+
+      - if: endsWith(github.ref, '/main') || endsWith(github.ref, '/master')
+        name: Push LATEST docker-compose image '${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}}' as '${{needs.setup.outputs.defaultDockerImageRepo}}:latest'
+        run: |
+          docker tag ${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}} ${{needs.setup.outputs.defaultDockerImageRepo}}:latest
+          docker push ${{needs.setup.outputs.defaultDockerImageRepo}}:latest
+
+          docker tag ${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}} ${{needs.setup.outputs.defaultPublicDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}}
+          docker push ${{needs.setup.outputs.defaultPublicDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}}
+
+          docker tag ${{needs.setup.outputs.defaultDockerImageRepo}}:${{needs.setup.outputs.defaultDockerImageVersion}} ${{needs.setup.outputs.defaultPublicDockerImageRepo}}:latest
+          docker push ${{needs.setup.outputs.defaultPublicDockerImageRepo}}:latest
+      
+      - if: endsWith(github.ref, '/main') || endsWith(github.ref, '/master')
+        name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{needs.setup.outputs.defaultPublicDockerImageRepo}}
