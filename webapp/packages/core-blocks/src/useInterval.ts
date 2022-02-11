@@ -6,14 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
+
+import { useObjectRef } from './useObjectRef';
 
 export function useInterval(callback: () => void, delay: number | null) {
-  const savedCallback = useRef<() => void>();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+  const state = useObjectRef({ callback });
 
   useEffect(() => {
     if (delay === null) {
@@ -21,7 +19,7 @@ export function useInterval(callback: () => void, delay: number | null) {
     }
 
     const tick = () => {
-      savedCallback.current?.();
+      state.callback();
     };
 
     const id = setInterval(tick, delay);
