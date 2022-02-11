@@ -127,17 +127,17 @@ jobs:
           echo "Using docker-compose target ${DEFAULT_TARGET_SERVICE}"
           echo "DEFAULT_TARGET_SERVICE=${DEFAULT_TARGET_SERVICE}" >> $GITHUB_ENV
 
+          # Potentially rename the docker image if we want to publish in our own repo
+          # As the docker-compose.yaml defines the service owner hard-coded, we need to just rename to the owner of the pipeline
+          # or else we will get 401 as the image is from another owner.
+          for DOCKER_IMAGE_TAG in $(docker-compose config | grep image: | awk '{ print $2 }'); do IMAGE_OWNER=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $1}'); IMAGE_REPO=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $2}'); if [ "${IMAGE_OWNER}" != "${GITHUB_REPOSITORY_OWNER}" ]; then echo "change '${DOCKER_IMAGE_TAG}' to ${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}"; docker run -v $(pwd):$(pwd) -w $(pwd) alpine find . -type f -name 'docker-compose.yaml' -exec sed -i "s@${DOCKER_IMAGE_TAG}@${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}@g" {} \;; fi; done
+
+          # Show the diff of the changes to make sure we have the ownerships
+          docker run --rm -v $(pwd):$(pwd) -w $(pwd) alpine/git --no-pager diff
+
+          # At this point we can build and push images to the pipeline's owner
           echo "General build..."
           docker buildx bake --print
-
-      # Login so we can build and push test images to our own github repo
-      # https://github.com/marcellodesales/cloner/packages?package_type=Docker
-      - name: Login to GitHub Docker Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       # https://docs.docker.com/engine/reference/commandline/buildx_bake/
       - name: Build and push to Github Docker Registry
