@@ -133,7 +133,7 @@ jobs:
           for DOCKER_IMAGE_TAG in $(docker-compose config | grep image: | awk '{ print $2 }'); do IMAGE_OWNER=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $1}'); IMAGE_REPO=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $2}'); if [ "${IMAGE_OWNER}" != "${GITHUB_REPOSITORY_OWNER}" ]; then echo "change '${DOCKER_IMAGE_TAG}' to ${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}"; docker run -v $(pwd):$(pwd) -w $(pwd) alpine find . -type f -name 'docker-compose.yaml' -exec sed -i "s@${DOCKER_IMAGE_TAG}@${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}@g" {} \;; fi; done
 
           # Show the diff of the changes to make sure we have the ownerships
-          docker run --rm -v $(pwd):$(pwd) -w $(pwd) alpine/git --no-pager diff
+          # docker run --rm -v $(pwd):$(pwd) -w $(pwd) alpine/git --no-pager diff
 
           # At this point we can build and push images to the pipeline's owner
           echo "General build..."
