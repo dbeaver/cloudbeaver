@@ -11,36 +11,37 @@ services:
   #### VERIFY: docker run -ti marcellodesales/cloudbeaver-backend find /dbeaver/cloud/backend -name "org.eclipse.equinox.launcher*.jar"
   ####
   cloudbeaver-backend:
-    image: marcellodesales/cloudbeaver-backend
+    image: ghcr.io/dbeaver/cloudbeaver/backend
     build:
       context: .
       target: backend-builder
       cache_from:
-        - marcellodesales/cloudbeaver-backend
+        - ghcr.io/dbeaver/cloudbeaver/backend
 
   ####
   #### BUILD: docker-compose build cloudbeaver-frontend
   #### VERIFY: docker run -ti marcellodesales/cloudbeaver-frontend find /dbeaver/cloud/frontend -name "@cloudbeaver"
   ####
   cloudbeaver-frontend:
-    image: marcellodesales/cloudbeaver-frontend
+    image: ghcr.io/dbeaver/cloudbeaver/frontend
     build:
       context: .
       target: frontend-builder
       cache_from:
-        - marcellodesales/cloudbeaver-frontend
+        - ghcr.io/dbeaver/cloudbeaver/frontend
 
   ####
   #### BUILD: docker-compose build cloudbeaver-frontend
   #### VERIFY: docker run -ti marcellodesales/cloudbeaver-frontend find /dbeaver/cloud/frontend -name "@cloudbeaver"
   ####
   cloudbeaver:
-    image: marcellodesales/cloudbeaver
+    image: ghcr.io/dbeaver/cloudbeaver/server
     build:
       context: .
       cache_from:
-        - marcellodesales/cloudbeaver-backend
-        - marcellodesales/cloudbeaver-frontend
+        - ghcr.io/dbeaver/cloudbeaver/backend
+        - ghcr.io/dbeaver/cloudbeaver/frontend
+        - ghcr.io/dbeaver/cloudbeaver/server
     container_name: cloudbeaver
     labels:
       com.github.marcellodesales.type: runtime

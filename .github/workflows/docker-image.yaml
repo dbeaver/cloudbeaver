@@ -130,10 +130,11 @@ jobs:
           # Potentially rename the docker image if we want to publish in our own repo
           # As the docker-compose.yaml defines the service owner hard-coded, we need to just rename to the owner of the pipeline
           # or else we will get 401 as the image is from another owner.
-          for DOCKER_IMAGE_TAG in $(docker-compose config | grep image: | awk '{ print $2 }'); do IMAGE_OWNER=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $1}'); IMAGE_REPO=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $2}'); if [ "${IMAGE_OWNER}" != "${GITHUB_REPOSITORY_OWNER}" ]; then echo "change '${DOCKER_IMAGE_TAG}' to ${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}"; docker run -v $(pwd):$(pwd) -w $(pwd) alpine find . -type f -name 'docker-compose.yaml' -exec sed -i "s@${DOCKER_IMAGE_TAG}@${GITHUB_REPOSITORY_OWNER}/${IMAGE_REPO}@g" {} \;; fi; done
+          for DOCKER_IMAGE_TAG in $(docker-compose config | grep image: | awk '{ print $2 }'); do IMAGE_OWNER=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $2}'); IMAGE_REPO=$(echo ${DOCKER_IMAGE_TAG} | awk -F"/" '{print $3}'); echo "${DOCKER_IMAGE_TAG} ... OWNER=${IMAGE_OWNER} ... REPO=${IMAGE_REPO}"; if [ "${IMAGE_OWNER}" != "${GITHUB_REPOSITORY_OWNER}" ]; then NEW_IMAGE=$(echo $DOCKER_IMAGE_TAG | awk -v from="/${IMAGE_OWNER}/" -v to="/${GITHUB_REPOSITORY_OWNER}/" '{gsub(from,to); print}'); echo "change '${DOCKER_IMAGE_TAG}' to ${NEW_IMAGE}"; find . -type f -name 'docker-compose.yaml' -exec sed -i "s@${DOCKER_IMAGE_TAG}@${NEW_IMAGE}@g" {} \;; fi; done
 
           # Show the diff of the changes to make sure we have the ownerships
-          # docker run --rm -v $(pwd):$(pwd) -w $(pwd) alpine/git --no-pager diff
+          ls -la 
+          cat docker-compose.yaml
 
           # At this point we can build and push images to the pipeline's owner
           echo "General build..."
