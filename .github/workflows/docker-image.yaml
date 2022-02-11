@@ -22,7 +22,7 @@ on:
 
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables
 env:
-  IMAGE_NAME_SUFFIX: base
+  IMAGE_NAME_SUFFIX: server
   DOCKER_CONTEXT_PATH: .
   VERSION: 1.0.0
 
@@ -129,6 +129,15 @@ jobs:
 
           echo "General build..."
           docker buildx bake --print
+
+      # Login so we can build and push test images to our own github repo
+      # https://github.com/marcellodesales/cloner/packages?package_type=Docker
+      - name: Login to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # https://docs.docker.com/engine/reference/commandline/buildx_bake/
       - name: Build and push to Github Docker Registry
