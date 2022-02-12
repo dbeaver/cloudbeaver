@@ -85,7 +85,7 @@ COPY deploy/scripts/run-server.sh /opt/cloudbeaver/run-server.sh
 # https://github.com/dbeaver/cloudbeaver/issues/349#issuecomment-903716506
 # https://stackoverflow.com/questions/49955097/how-do-i-add-a-user-when-im-using-alpine-as-a-base-image/49955098#49955098
 # Create a group and user and Tell docker that all future commands should run as the appuser user
-RUN addgroup -S -g 6000 cloudbeaver && adduser -D -u 6000 -S cloudbeaver -G cloudbeaver
-USER cloudbeaver
+#RUN addgroup -S -g 6000 cloudbeaver && adduser -D -u 6000 -S cloudbeaver -G cloudbeaver
+#USER cloudbeaver
 
 ENTRYPOINT ["/opt/cloudbeaver/run-server.sh"]
