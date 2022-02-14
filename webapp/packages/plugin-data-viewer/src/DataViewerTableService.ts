@@ -16,17 +16,19 @@ import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
+import { DataViewerService } from './DataViewerService';
 import { getDefaultRowsCount } from './getDefaultRowsCount';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
 export class DataViewerTableService {
   constructor(
-    private tableViewerStorageService: TableViewerStorageService,
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private asyncTaskInfoService: AsyncTaskInfoService,
-    private connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly tableViewerStorageService: TableViewerStorageService,
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly dataViewerService: DataViewerService
   ) { }
 
   has(tableId: string): boolean {
@@ -66,10 +68,11 @@ export class DataViewerTableService {
       })
       .setSupportedDataFormats(connection.supportedDataFormats);
 
+    const editable = this.dataViewerService.isDataEditable(connection);
     const dataModel = this.tableViewerStorageService.add(new DatabaseDataModel(source))
       .setCountGain(getDefaultRowsCount())
       .setSlice(0)
-      .setAccess(connection.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
+      .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly);
 
     return dataModel;
   }
