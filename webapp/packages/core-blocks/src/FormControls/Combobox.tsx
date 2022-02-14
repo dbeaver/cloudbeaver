@@ -358,7 +358,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {!filteredItems.length
             ? (
               <MenuItem id='placeholder' disabled {...menu}>
-                {translate('combobox_no_options_placeholder')}
+                {translate('combobox_no_results_placeholder')}
               </MenuItem>
             )
             : (filteredItems.map((item, index) => {
