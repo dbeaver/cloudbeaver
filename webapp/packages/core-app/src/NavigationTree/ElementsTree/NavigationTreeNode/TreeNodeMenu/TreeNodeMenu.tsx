@@ -16,9 +16,9 @@ import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
-import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
-import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
-import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
+import { DATA_CONTEXT_NAV_NODE } from '../../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
+import type { NavNode } from '../../../../shared/NodesManager/EntityTypes';
+import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';

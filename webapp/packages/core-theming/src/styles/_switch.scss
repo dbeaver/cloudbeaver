@@ -48,12 +48,26 @@
 }
 
 @mixin switch-core-styles-dense($query: mdc-feature-all()) {
-  $mdc-switch-track-width: 18px !global;
+  $mdc-switch-track-width: 24px !global;
   $mdc-switch-track-height: 10px !global;
   $mdc-switch-thumb-diameter: 14px !global;
   $mdc-switch-ripple-size: 36px !global;
-  $mdc-switch-thumb-offset: 8px !global;
+
+  $mdc-switch-minimum-size: 24px !global;
+  $mdc-switch-maximum-size: $mdc-switch-ripple-size !global;
+  $mdc-switch-density-scale: $mdc-density-default-scale !global;
+  $mdc-switch-density-config: (
+    size: (
+      minimum: $mdc-switch-minimum-size,
+      default: $mdc-switch-maximum-size,
+      maximum: $mdc-switch-maximum-size,
+    ),
+  ) !global;
+
+  $mdc-switch-thumb-offset: 2px !global;
+
+  $mdc-switch-thumb-active-margin:
+    $mdc-switch-track-width - $mdc-switch-thumb-diameter + $mdc-switch-thumb-offset * 2 !global;
 
   @include mdc-switch-core-styles($query);
-  @include mdc-switch-density(-3);
 }

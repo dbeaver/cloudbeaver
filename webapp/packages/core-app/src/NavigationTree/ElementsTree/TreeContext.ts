@@ -10,7 +10,7 @@ import { createContext } from 'react';
 
 import type { IFolderExplorerContext } from '@cloudbeaver/core-blocks';
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import type { IElementsTree } from './useElementsTree';
 

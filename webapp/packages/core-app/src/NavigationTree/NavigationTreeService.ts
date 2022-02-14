@@ -21,7 +21,7 @@ import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensio
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
-import type { ITreeNodeState } from './useElementsTree';
+import type { ITreeNodeState } from './ElementsTree/useElementsTree';
 
 export interface INavigationNodeSelectionData {
   id: ResourceKey<string>;
@@ -51,6 +51,8 @@ export class NavigationTreeService extends View<string> {
 
     this.nodeSelectionTask = new SyncExecutor();
     this.getView = this.getView.bind(this);
+    this.getChildren = this.getChildren.bind(this);
+    this.loadNestedNodes = this.loadNestedNodes.bind(this);
     this.registerAction(ACTION_FILTER);
 
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {

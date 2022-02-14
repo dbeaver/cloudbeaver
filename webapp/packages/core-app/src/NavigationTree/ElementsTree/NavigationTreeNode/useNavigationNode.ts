@@ -10,10 +10,10 @@ import { useContext, useEffect } from 'react';
 
 import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 
-import type { NavNode } from '../../shared/NodesManager/EntityTypes';
-import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { useNode } from '../../shared/NodesManager/useNode';
-import { useChildren } from '../../shared/useChildren';
+import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { useNode } from '../../../shared/NodesManager/useNode';
+import { useChildren } from '../../../shared/useChildren';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import { TreeContext } from '../TreeContext';
 

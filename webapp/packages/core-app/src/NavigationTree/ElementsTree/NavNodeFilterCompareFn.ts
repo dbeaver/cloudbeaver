@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 
 export enum EEquality {
   none,
   partially,
   full
-} 
+}
 
 export type NavNodeFilterCompareFn = (node: NavNode, filter: string)=> EEquality;

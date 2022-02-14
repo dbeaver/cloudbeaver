@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNode } from '../../shared/NodesManager/EntityTypes';
-import type { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
+import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import type { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import type { IElementsTreeFilter } from '../useElementsTree';
 
 export const NAVIGATION_TREE_LIMIT = {
@@ -19,8 +19,8 @@ export function elementsTreeLimitFilter(
   limit?: number
 ): IElementsTreeFilter {
   return (
-    filter: string, 
-    node: NavNode, 
+    filter: string,
+    node: NavNode,
     children: string[],
   ) => {
     limit = limit ?? navTreeResource.childrenLimit;

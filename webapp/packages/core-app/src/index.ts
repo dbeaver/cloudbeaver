@@ -32,14 +32,14 @@ export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
-export * from './NavigationTree/ElementsTree';
-export * from './NavigationTree/MENU_NAV_TREE';
-export * from './NavigationTree/NavigationNodeComponent';
+export * from './NavigationTree/ElementsTree/ElementsTree';
+export * from './NavigationTree/ElementsTree/MENU_NAV_TREE';
+export * from './NavigationTree/ElementsTree/NavigationNodeComponent';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
-export * from './NavigationTree/NavNodeFilterCompareFn';
-export * from './NavigationTree/TreeContext';
-export * from './NavigationTree/useElementsTree';
+export * from './NavigationTree/ElementsTree/NavNodeFilterCompareFn';
+export * from './NavigationTree/ElementsTree/TreeContext';
+export * from './NavigationTree/ElementsTree/useElementsTree';
 export * from './AppLocaleService';
 
 // Models

@@ -10,10 +10,11 @@ import { UserDataService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, ACTION_FILTER, IAction, IDataContextProvider, KeyBindingService } from '@cloudbeaver/core-view';
 
-import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './NavigationTreeSettings/createNavigationTreeUserSettings';
-import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
-import { getNavigationTreeUserSettingsId } from './NavigationTreeSettings/getNavigationTreeUserSettingsId';
-import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
+import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/createNavigationTreeUserSettings';
+import { DATA_CONTEXT_NAV_TREE_ROOT } from './ElementsTree/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
+import { getNavigationTreeUserSettingsId } from './ElementsTree/NavigationTreeSettings/getNavigationTreeUserSettingsId';
+import { KEY_BINDING_ENABLE_FILTER } from './ElementsTree/NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
+
 
 
 @injectable()
@@ -52,8 +53,8 @@ export class NavigationTreeBootstrap extends Bootstrap {
     }
 
     const state = this.userDataService.getUserData(
-      getNavigationTreeUserSettingsId(context), 
-      createNavigationTreeUserSettings, 
+      getNavigationTreeUserSettingsId(context),
+      createNavigationTreeUserSettings,
       validateNavigationTreeUserSettings
     );
 

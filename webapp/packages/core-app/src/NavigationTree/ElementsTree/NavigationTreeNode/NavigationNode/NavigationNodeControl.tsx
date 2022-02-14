@@ -15,10 +15,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
-import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
-import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
-import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
+import { EObjectFeature } from '../../../../shared/NodesManager/EObjectFeature';
+import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
+import { NavNodeInfoResource } from '../../../../shared/NodesManager/NavNodeInfoResource';
+import { NavTreeResource } from '../../../../shared/NodesManager/NavTreeResource';
 import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
