@@ -14,62 +14,50 @@ import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFocus, useFolder
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
-import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
+import { IElementsTreeContext, ElementsTreeContext } from './ElementsTreeContext';
 import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
+import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
-import { ITreeContext, TreeContext } from './TreeContext';
-import { IElementsTreeCustomRenderer, IElementsTreeFilter, IElementsTreeOptions, ITreeNodeState, useElementsTree } from './useElementsTree';
+import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
 
-const styles = composes(
-  css`
-    filter-box {
-      composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    box {
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-    }
+const styles = css`
+  box {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
 
-    tree {
-      position: relative;
-      box-sizing: border-box;
-      flex: 1;
-    }
+  tree {
+    position: relative;
+    box-sizing: border-box;
+    flex: 1;
+  }
+  
+  tree-box {
+    flex: 1;
+    overflow: auto;
+  }
 
-    FolderExplorerPath {
-      padding: 0 12px 8px 12px;
-    }
-
-    filter-box {
-      padding: 8px 24px;
-      flex: 0 0 auto;
-      display: block;
-      position: sticky;
-      top: 0;
-      z-index: 1; 
-    }
-  `
-);
+  FolderExplorerPath {
+    padding: 0 12px 8px 12px;
+  }
+`;
 
 interface Props extends IElementsTreeOptions {
   root?: string;
   limit?: number;
   selectionTree?: boolean;
-  filter?: boolean;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
   style?: ComponentStyle;
@@ -83,14 +71,10 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   root: baseRoot = ROOT_NODE_PATH,
   limit,
   control,
-  keepData = false,
+  settings,
   disabled,
   localState,
   selectionTree = false,
-  showFolderExplorerPath = false,
-  foldersTree = false,
-  filter = false,
-  filterAll = false,
   emptyPlaceholder,
   navNodeFilterCompare,
   filters = [],
@@ -108,12 +92,10 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
-  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const folderExplorer = useFolderExplorer(baseRoot);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const translate = useTranslate();
-  const ref = useObjectRef({ getChildren, loadChildren });
+  const ref = useObjectRef({ settings, getChildren, loadChildren });
 
   const root = folderExplorer.folder;
   const fullPath = folderExplorer.fullPath;
@@ -121,7 +103,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
 
-    if (!tree.foldersTree) {
+    if (!settings?.foldersTree) {
       return;
     }
 
@@ -173,12 +155,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const tree = useElementsTree({
     baseRoot,
     folderExplorer,
-    foldersTree,
-    showFolderExplorerPath,
+    settings,
     root,
     disabled,
-    filterAll,
-    keepData,
     localState,
     filters: [nameFilter, ...filters, limitFilter],
     renderers: [...renderers, elementsTreeLimitRenderer],
@@ -192,7 +171,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     onSelect,
   });
 
-  const context = useMemo<ITreeContext>(
+  const context = useMemo<IElementsTreeContext>(
     () => ({
       tree,
       folderExplorer,
@@ -202,7 +181,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       onClick: async (node, path, leaf) => {
         await onClick?.(node);
 
-        if (!leaf && tree.foldersTree) {
+        if (!leaf && tree.settings?.foldersTree) {
           const nodeId = node.id;
           const loaded =  await ref.loadChildren(nodeId, true);
 
@@ -233,48 +212,47 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   );
 
   useEffect(() => {
-    if (!foldersTree && folderExplorer.folder !== baseRoot) {
+    if (!settings?.foldersTree && folderExplorer.folder !== baseRoot) {
       folderExplorer.open([], baseRoot);
     }
-    if (!filter && tree.filter !== '') {
+    if (!settings?.filter && tree.filter !== '') {
       tree.setFilter('');
     }
   });
 
   const hasChildren = (children.data?.length || 0) > 0;
 
-  const loaderAvailable = !context.tree.foldersTree || context.folderExplorer.root === root;
+  const loaderAvailable = !settings?.foldersTree || context.folderExplorer.root === root;
 
   return styled(useStyles(styles, style))(
-    <ElementsTreeLoader
-      root={root}
-      context={context}
-      emptyPlaceholder={emptyPlaceholder}
-      childrenState={children}
-      hasChildren={hasChildren}
-      keepData={keepData}
-    >
-      <TreeContext.Provider value={context}>
-        <box className={className}>
-          {filter && (
-            <filter-box ref={focusedRef} as='div'>
-              <Filter
-                placeholder={translate('app_navigationTree_search')}
-                value={context.tree.filter}
-                max
-                onFilter={value => context.tree.setFilter(value as string)}
-              />
-            </filter-box>
-          )}
-          <FolderExplorer state={folderExplorer}>
-            <tree>
-              {tree.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-              <NavigationNodeNested nodeId={root} component={NavigationNodeElement} path={folderExplorer.path} root />
-              {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
-            </tree>
-          </FolderExplorer>
-        </box>
-      </TreeContext.Provider>
-    </ElementsTreeLoader>
+    <>
+      <ElementsTreeTools tree={tree} style={style} />
+      <tree-box>
+        <ElementsTreeLoader
+          root={root}
+          context={context}
+          emptyPlaceholder={emptyPlaceholder}
+          childrenState={children}
+          hasChildren={hasChildren}
+        >
+          <ElementsTreeContext.Provider value={context}>
+            <box className={className}>
+              <FolderExplorer state={folderExplorer}>
+                <tree>
+                  {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
+                  <NavigationNodeNested
+                    nodeId={root}
+                    component={NavigationNodeElement}
+                    path={folderExplorer.path}
+                    root
+                  />
+                  {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
+                </tree>
+              </FolderExplorer>
+            </box>
+          </ElementsTreeContext.Provider>
+        </ElementsTreeLoader>
+      </tree-box>
+    </>
   );
 });

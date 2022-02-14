@@ -14,7 +14,7 @@ import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import type { IElementsTree } from './useElementsTree';
 
-export interface ITreeContext {
+export interface IElementsTreeContext {
   tree: IElementsTree;
   folderExplorer: IFolderExplorerContext;
   selectionTree: boolean;
@@ -23,4 +23,4 @@ export interface ITreeContext {
   onClick?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
 }
 
-export const TreeContext = createContext<ITreeContext | null>(null);
+export const ElementsTreeContext = createContext<IElementsTreeContext | null>(null);

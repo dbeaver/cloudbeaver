@@ -9,12 +9,14 @@ export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
 export * from './TopNavBar/shared/topMenuStyles';
 export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';
+export * from './shared/NodesManager/extensions/IObjectNavNodeProvider';
 export * from './shared/NodesManager/extensions/IObjectSchemaProvider';
 export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
 export * from './shared/NodesManager/NavNodeView/IFolderTransform';
 export * from './shared/NodesManager/NavNodeView/NavNodeViewService';
 export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/DBObjectResource';
+export * from './shared/NodesManager/DATA_CONTEXT_ACTIVE_NODE';
 export * from './shared/NodesManager/DATA_CONTEXT_NAV_NODE';
 export * from './shared/NodesManager/NavNodeContextMenuService';
 export * from './shared/NodesManager/NavNodeInfoResource';
@@ -32,14 +34,15 @@ export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
+export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 export * from './NavigationTree/ElementsTree/ElementsTree';
+export * from './NavigationTree/ElementsTree/ElementsTreeContext';
 export * from './NavigationTree/ElementsTree/MENU_NAV_TREE';
 export * from './NavigationTree/ElementsTree/NavigationNodeComponent';
+export * from './NavigationTree/ElementsTree/NavNodeFilterCompareFn';
+export * from './NavigationTree/ElementsTree/useElementsTree';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
-export * from './NavigationTree/ElementsTree/NavNodeFilterCompareFn';
-export * from './NavigationTree/ElementsTree/TreeContext';
-export * from './NavigationTree/ElementsTree/useElementsTree';
 export * from './AppLocaleService';
 
 // Models

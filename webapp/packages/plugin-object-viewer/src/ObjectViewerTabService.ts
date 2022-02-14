@@ -13,7 +13,9 @@ import {
   TabHandler,
   objectCatalogProvider,
   objectSchemaProvider,
-  NavNodeManagerService
+  NavNodeManagerService,
+  objectNavNodeProvider,
+  IDataContextActiveNode
 } from '@cloudbeaver/core-app';
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -34,11 +36,11 @@ export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
 
   constructor(
-    private navNodeManagerService: NavNodeManagerService,
-    private dbObjectPageService: DBObjectPageService,
-    private notificationService: NotificationService,
-    private navigationTabsService: NavigationTabsService,
-    private connectionInfo: ConnectionInfoResource,
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly dbObjectPageService: DBObjectPageService,
+    private readonly notificationService: NotificationService,
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly connectionInfo: ConnectionInfoResource,
   ) {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -51,6 +53,7 @@ export class ObjectViewerTabService {
       canClose: this.canCloseObjectTab.bind(this),
 
       extensions: [
+        objectNavNodeProvider(this.getNavNode.bind(this)),
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
@@ -110,7 +113,7 @@ export class ObjectViewerTabService {
       if (!tabInfo.tab) {
         return;
       }
-      const pageId = (tabInfo.tab?.handlerState as IObjectViewerTabState | undefined)?.pageId;
+      const pageId = (tabInfo.tab.handlerState as IObjectViewerTabState | undefined)?.pageId;
       if (!pageId) {
         return;
       }
@@ -244,6 +247,13 @@ export class ObjectViewerTabService {
     });
   }
 
+  private getNavNode(context: ITab<IObjectViewerTabState>): IDataContextActiveNode {
+    return {
+      nodeId: context.handlerState.objectId,
+      path: context.handlerState.parents,
+    };
+  }
+
   private getConnection(context: ITab<IObjectViewerTabState>) {
     return context.handlerState.connectionId;
   }
@@ -306,7 +316,7 @@ export class ObjectViewerTabService {
 
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
-      typeof tab.handlerState?.folderId === 'string'
+      typeof tab.handlerState.folderId === 'string'
       && typeof tab.handlerState.parentId === 'string'
       && ['string', 'undefined'].includes(typeof tab.handlerState.connectionId)
       && Array.isArray(tab.handlerState.parents)

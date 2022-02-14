@@ -7,27 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Group, GroupTitle, IconOrImage, Switch } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
-import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
-import { DATA_CONTEXT_NAV_TREE_ROOT } from './DATA_CONTEXT_NAV_TREE_ROOT';
-import type { INavigationTreeUserSettings } from './INavigationTreeUserSettings';
+import type { IElementsTreeSettings } from '../../useElementsTree';
 
 const expandStyles = css`
-  Button {
-    width: 100%;
-    height: 24px !important;
-  }
-  IconOrImage {
-    width: 12px;
-    &[|opened] {
-      transform: rotate(180deg);
-    }
+  settings {
+    display: flex;
+    flex-direction: row;
   }
   Group {
     min-width: 350px;
@@ -41,36 +32,27 @@ const expandStyles = css`
 
 interface Props {
   root: string;
-  settings: INavigationTreeUserSettings;
+  settings: IElementsTreeSettings;
+  style?: ComponentStyle;
 }
 
 export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({
   root,
   settings,
+  style,
 }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles);
+  const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles, style);
   const translate = useTranslate();
-  const [opened, setOpen] = useState(false);
-
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_NAV_TREE_ROOT, root);
-  });
-
-  if (!opened) {
-    return styled(styles)(
-      <Button onClick={() => setOpen(true)}>
-        <IconOrImage icon='angle' {...use({ opened })} />
-      </Button>
-    );
-  }
 
   return styled(styles)(
-    <>
+    <settings>
       <Group keepSize form gap dense>
         <GroupTitle>{translate('app_navigationTree_settings_title')}</GroupTitle>
         <Switch
+          id={`${root}.filter`}
           name="filter"
           state={settings}
+          disabled={!settings.configurable}
           title={translate('app_navigationTree_settings_filter_description')}
           mod={['primary', 'dense']}
           small
@@ -78,9 +60,10 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           {translate('app_navigationTree_settings_filter_title')}
         </Switch>
         <Switch
+          id={`${root}.filterAll`}
           name="filterAll"
           state={settings}
-          disabled={!settings.filter}
+          disabled={!settings.filter || !settings.configurable}
           title={translate('app_navigationTree_settings_filter_all_description')}
           mod={['primary', 'dense']}
           small
@@ -88,8 +71,10 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           {translate('app_navigationTree_settings_filter_all_title')}
         </Switch>
         <Switch
+          id={`${root}.saveExpanded`}
           name="saveExpanded"
           state={settings}
+          disabled={!settings.configurable}
           title={translate('app_navigationTree_settings_state_description')}
           mod={['primary', 'dense']}
           small
@@ -97,8 +82,10 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           {translate('app_navigationTree_settings_state_title')}
         </Switch>
         <Switch
-          name="folders"
+          id={`${root}.foldersTree`}
+          name="foldersTree"
           state={settings}
+          disabled={!settings.configurable}
           title={translate('app_navigationTree_settings_folders_description')}
           mod={['primary', 'dense']}
           small
@@ -106,9 +93,6 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           {translate('app_navigationTree_settings_folders_title')}
         </Switch>
       </Group>
-      <Button onClick={() => setOpen(false)}>
-        <IconOrImage icon='angle' {...use({ opened })} />
-      </Button>
-    </>
+    </settings>
   );
 });

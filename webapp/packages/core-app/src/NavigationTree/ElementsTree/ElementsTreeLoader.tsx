@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { ILoadableState, Loader } from '@cloudbeaver/core-blocks';
 
-import type { ITreeContext } from './TreeContext';
+import type { IElementsTreeContext } from './ElementsTreeContext';
 
 const styles = css`
   center {
@@ -24,10 +24,9 @@ const styles = css`
 
 interface Props {
   root: string;
-  context: ITreeContext;
+  context: IElementsTreeContext;
   childrenState: ILoadableState;
   emptyPlaceholder?: React.FC;
-  keepData?: boolean;
   hasChildren?: boolean;
 }
 
@@ -36,17 +35,16 @@ export const ElementsTreeLoader = observer<Props>(function ElementsTreeLoader({
   context,
   childrenState,
   emptyPlaceholder: Placeholder,
-  keepData,
   hasChildren,
   children,
 }) {
   let loading = childrenState.isLoading() || context.tree.loading;
 
-  if (context.tree.foldersTree && context.folderExplorer.root !== root) {
+  if (context.tree.settings?.foldersTree && context.folderExplorer.root !== root) {
     loading = false;
   }
 
-  if (keepData && context.tree.loading) {
+  if (context.tree.settings?.saveExpanded && context.tree.loading) {
     return styled(styles)(
       <center>
         <Loader />

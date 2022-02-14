@@ -8,21 +8,25 @@
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, ACTION_FILTER, IAction, IDataContextProvider, KeyBindingService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_COLLAPSE_ALL, ACTION_FILTER, IAction, IDataContextProvider, KeyBindingService } from '@cloudbeaver/core-view';
 
-import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/createNavigationTreeUserSettings';
-import { DATA_CONTEXT_NAV_TREE_ROOT } from './ElementsTree/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
-import { getNavigationTreeUserSettingsId } from './ElementsTree/NavigationTreeSettings/getNavigationTreeUserSettingsId';
-import { KEY_BINDING_ENABLE_FILTER } from './ElementsTree/NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
-
-
+import { ConnectionSchemaManagerService } from '../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
+import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
+import { DATA_CONTEXT_ELEMENTS_TREE } from './ElementsTree/DATA_CONTEXT_ELEMENTS_TREE';
+import { createElementsTreeSettings, validateElementsTreeSettings } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
+import { DATA_CONTEXT_NAV_TREE_ROOT } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
+import { KEY_BINDING_ENABLE_FILTER } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
+import { KEY_BINDING_COLLAPSE_ALL } from './ElementsTree/KEY_BINDING_COLLAPSE_ALL';
+import { KEY_BINDING_LINK_OBJECT } from './ElementsTree/KEY_BINDING_LINK_OBJECT';
+import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 
 @injectable()
 export class NavigationTreeBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
-    private readonly userDataService: UserDataService
+    private readonly userDataService: UserDataService,
+    private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
   ) {
     super();
   }
@@ -37,11 +41,31 @@ export class NavigationTreeBootstrap extends Bootstrap {
       handler: this.switchFilter.bind(this),
     });
 
+    this.actionService.addHandler({
+      id: 'elements-tree-base',
+      isActionApplicable: (contexts, action) => contexts.has(DATA_CONTEXT_ELEMENTS_TREE),
+      handler: this.elementsTreeActionHandler.bind(this),
+    });
+
     this.keyBindingService.addKeyBindingHandler({
       id: 'nav-tree-filter',
       binding: KEY_BINDING_ENABLE_FILTER,
       isBindingApplicable: (contexts, action) => action === ACTION_FILTER,
       handler: this.switchFilter.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'elements-tree-collapse',
+      binding: KEY_BINDING_COLLAPSE_ALL,
+      isBindingApplicable: (contexts, action) => action === ACTION_COLLAPSE_ALL,
+      handler: this.elementsTreeActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'elements-tree-link',
+      binding: KEY_BINDING_LINK_OBJECT,
+      isBindingApplicable: (contexts, action) => action === ACTION_LINK_OBJECT,
+      handler: this.elementsTreeActionHandler.bind(this),
     });
   }
 
@@ -54,11 +78,36 @@ export class NavigationTreeBootstrap extends Bootstrap {
 
     const state = this.userDataService.getUserData(
       getNavigationTreeUserSettingsId(context),
-      createNavigationTreeUserSettings,
-      validateNavigationTreeUserSettings
+      createElementsTreeSettings,
+      validateElementsTreeSettings
     );
 
     state.filter = !state.filter;
+  }
+
+  private elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
+    const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
+
+    if (tree === undefined) {
+      return;
+    }
+
+    switch (action) {
+      case ACTION_COLLAPSE_ALL:
+        tree.collapse();
+        break;
+      case ACTION_LINK_OBJECT: {
+        const activeNavNode = this.connectionSchemaManagerService.activeNavNode;
+
+        if (activeNavNode && activeNavNode.path.includes(tree.baseRoot)) {
+          tree.show(
+            activeNavNode.nodeId,
+            activeNavNode.path
+          );
+        }
+      }
+        break;
+    }
   }
 
 

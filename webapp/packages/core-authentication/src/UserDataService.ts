@@ -33,7 +33,7 @@ export class UserDataService {
     );
   }
 
-  getUserData<T>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {
+  getUserData<T extends Record<any, any>>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {
     const userId = this.userInfoResource.getId();
 
     untracked(() => {
@@ -51,7 +51,7 @@ export class UserDataService {
         }
       }
 
-      data[key] = defaultValue();
+      data[key] = observable(defaultValue());
     });
 
     return data[key];

@@ -6,18 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 
-import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { useNode } from '../../../shared/NodesManager/useNode';
 import { useChildren } from '../../../shared/useChildren';
+import { ElementsTreeContext } from '../ElementsTreeContext';
+import type { IElementsTreeAction } from '../IElementsTreeAction';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
-import { TreeContext } from '../TreeContext';
 
 interface INavigationNode {
+  ref: React.RefObject<HTMLDivElement>;
   control?: NavTreeControlComponent;
   disabled: boolean;
   group: boolean;
@@ -33,8 +36,9 @@ interface INavigationNode {
 }
 
 export function useNavigationNode(node: NavNode, path: string[]): INavigationNode {
+  const elementRef = useRef<HTMLDivElement>(null);
   const contextRef = useObjectRef({
-    context: useContext(TreeContext),
+    context: useContext(ElementsTreeContext),
   });
   const { isLoading } = useNode(node.id);
   const children = useChildren(node.id);
@@ -65,7 +69,23 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     }
   }, [node]);
 
+  useEffect(() => {
+    if (contextRef.context?.tree.isNodeSelected(node.id)) {
+      elementRef.current?.scrollIntoView();
+    }
+  }, []);
+
+  useExecutor({
+    executor: contextRef.context?.tree.actions || new SyncExecutor<IElementsTreeAction>(),
+    handlers: [function refreshRoot({ type, nodeId }) {
+      if (type === 'show' && nodeId === node.id) {
+        elementRef.current?.scrollIntoView();
+      }
+    }],
+  });
+
   return {
+    ref: elementRef,
     empty,
     group,
     control,

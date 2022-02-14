@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface INavigationTreeUserSettings {
-  filter: boolean;
-  filterAll: boolean;
-  saveExpanded: boolean;
-  folders: boolean;
+export interface IElementsTreeAction {
+  type: 'show';
+  nodeId: string;
 }

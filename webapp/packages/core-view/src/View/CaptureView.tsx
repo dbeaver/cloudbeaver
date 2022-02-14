@@ -56,7 +56,7 @@ export const CaptureView = observer<Props>(function CaptureView({
   if (keys === '') {
     keys = '*';
   }
-  
+
   useHotkeys(keys, (event, handler) => {
     if (!state.reference?.contains(document.activeElement)) {
       return;
