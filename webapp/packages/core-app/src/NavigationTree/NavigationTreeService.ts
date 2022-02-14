@@ -14,13 +14,14 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
+import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
 import type { ITreeNodeState } from './ElementsTree/useElementsTree';
 
 export interface INavigationNodeSelectionData {
@@ -53,7 +54,7 @@ export class NavigationTreeService extends View<string> {
     this.getView = this.getView.bind(this);
     this.getChildren = this.getChildren.bind(this);
     this.loadNestedNodes = this.loadNestedNodes.bind(this);
-    this.registerAction(ACTION_FILTER);
+    this.registerAction(ACTION_FILTER, ACTION_COLLAPSE_ALL, ACTION_LINK_OBJECT);
 
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
       selectNode: action,

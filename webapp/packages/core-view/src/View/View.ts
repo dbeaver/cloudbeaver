@@ -19,8 +19,9 @@ export abstract class View<T> implements IView<T> {
     this.actions = observable([], { deep: false });
   }
 
-  registerAction(action: IAction): void {
-    this.actions.push(action);
+  registerAction(...actions: IAction[]): this {
+    this.actions.push(...actions);
+    return this;
   }
 
   abstract getView(): IActiveView<T> | null;

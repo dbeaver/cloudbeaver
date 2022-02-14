@@ -15,8 +15,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
+import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
-import { TreeContext } from '../TreeContext';
 import { NavigationNode } from './NavigationNode';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({
@@ -24,7 +24,7 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
   path,
   expanded,
 }) {
-  const context = useContext(TreeContext);
+  const context = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const styles = useStyles(TREE_NODE_STYLES);
 

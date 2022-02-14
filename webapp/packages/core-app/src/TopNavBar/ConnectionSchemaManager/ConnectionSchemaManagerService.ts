@@ -22,8 +22,10 @@ import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
 
 import type { ITab } from '../../shared/NavigationTabs/ITab';
 import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
+import type { IDataContextActiveNode } from '../../shared/NodesManager/DATA_CONTEXT_ACTIVE_NODE';
 import { IObjectCatalogProvider, isObjectCatalogProvider } from '../../shared/NodesManager/extensions/IObjectCatalogProvider';
 import { IObjectCatalogSetter, isObjectCatalogSetter } from '../../shared/NodesManager/extensions/IObjectCatalogSetter';
+import { IObjectNavNodeProvider, isObjectNavNodeProvider } from '../../shared/NodesManager/extensions/IObjectNavNodeProvider';
 import { IObjectSchemaProvider, isObjectSchemaProvider } from '../../shared/NodesManager/extensions/IObjectSchemaProvider';
 import { IObjectSchemaSetter, isObjectSchemaSetter } from '../../shared/NodesManager/extensions/IObjectSchemaSetter';
 
@@ -35,6 +37,7 @@ export interface IConnectionInfo {
 interface IActiveItem<T> {
   id: string;
   context: T;
+  getCurrentNavNode?: IObjectNavNodeProvider<T>;
   getCurrentConnectionId?: IConnectionProvider<T>;
   getCurrentSchemaId?: IObjectSchemaProvider<T>;
   getCurrentCatalogId?: IObjectCatalogProvider<T>;
@@ -45,8 +48,17 @@ interface IActiveItem<T> {
 
 @injectable()
 export class ConnectionSchemaManagerService {
+  get activeNavNode(): IDataContextActiveNode | null | undefined {
+
+    if (!this.activeItem?.getCurrentNavNode) {
+      return null;
+    }
+
+    return this.activeItem.getCurrentNavNode(this.activeItem.context);
+  }
+
   get activeConnectionId(): string | null | undefined {
-  
+
     if (!this.activeItem?.getCurrentConnectionId) {
       return null;
     }
@@ -179,11 +191,11 @@ export class ConnectionSchemaManagerService {
     this.pendingSchemaId = null;
 
     makeObservable<
-    ConnectionSchemaManagerService, 
-    'activeItem' 
-    | 'activeItemHistory' 
-    | 'changingConnection' 
-    | 'changingConnectionContainer' 
+    ConnectionSchemaManagerService,
+    'activeItem'
+    | 'activeItemHistory'
+    | 'changingConnection'
+    | 'changingConnectionContainer'
     | 'pendingConnectionId'
     | 'pendingCatalogId'
     | 'pendingSchemaId'
@@ -353,6 +365,7 @@ export class ConnectionSchemaManagerService {
 
   private setExtensions<T>(item: IActiveItem<T>, extensions: Array<IExtension<T>>) {
     ExtensionUtils.from(extensions)
+      .on(isObjectNavNodeProvider, extension => { item.getCurrentNavNode = extension; })
       .on(isConnectionProvider, extension => { item.getCurrentConnectionId = extension; })
       .on(isObjectCatalogProvider, extension => { item.getCurrentCatalogId = extension; })
       .on(isObjectSchemaProvider, extension => { item.getCurrentSchemaId = extension; })

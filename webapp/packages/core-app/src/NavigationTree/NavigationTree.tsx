@@ -21,9 +21,9 @@ import { NavNodeViewService } from '../shared/NodesManager/NavNodeView/NavNodeVi
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter';
 import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer';
 import { ElementsTree } from './ElementsTree/ElementsTree';
-import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/createNavigationTreeUserSettings';
-import { getNavigationTreeUserSettingsId } from './ElementsTree/NavigationTreeSettings/getNavigationTreeUserSettingsId';
-import type { INavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/INavigationTreeUserSettings';
+import { createElementsTreeSettings, validateElementsTreeSettings } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
+import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
+import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
@@ -75,11 +75,11 @@ export const NavigationTree = observer(function NavigationTree() {
     navNodeInfoResource
   ), [connectionInfoResource, navNodeInfoResource]);
 
-  const settings = useUserData<INavigationTreeUserSettings>(
+  const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
-    createNavigationTreeUserSettings,
+    createElementsTreeSettings,
     () => {},
-    validateNavigationTreeUserSettings
+    validateElementsTreeSettings
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
@@ -104,11 +104,7 @@ export const NavigationTree = observer(function NavigationTree() {
           </center>
         )}
         customSelect={handleSelect}
-        foldersTree={settings.folders}
-        showFolderExplorerPath={settings.folders}
-        filter={settings.filter}
-        filterAll={settings.filterAll}
-        keepData={settings.saveExpanded}
+        settings={settings}
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         onOpen={handleOpen}

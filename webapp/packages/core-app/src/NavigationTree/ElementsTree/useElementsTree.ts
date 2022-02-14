@@ -6,18 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { useMemo, useState } from 'react';
 
 import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
+import type { IElementsTreeAction } from './IElementsTreeAction';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
@@ -39,12 +41,18 @@ interface IElementsTreeUserState {
   filter: string;
 }
 
+export interface IElementsTreeSettings {
+  filter: boolean;
+  filterAll: boolean;
+  saveExpanded: boolean;
+  foldersTree: boolean;
+  showFolderExplorerPath: boolean;
+  configurable: boolean;
+}
+
 export interface IElementsTreeOptions {
-  foldersTree?: boolean;
-  showFolderExplorerPath?: boolean;
+  settings?: IElementsTreeSettings;
   disabled?: boolean;
-  keepData?: boolean;
-  filterAll?: boolean;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
   localState?: MetadataMap<string, ITreeNodeState>;
@@ -65,14 +73,13 @@ interface IOptions extends IElementsTreeOptions {
 }
 
 export interface IElementsTree {
+  actions: ISyncExecutor<IElementsTreeAction>;
+  settings?: IElementsTreeSettings;
   baseRoot: string;
   root: string;
   filter: string;
   loading: boolean;
   disabled: boolean;
-  filterAll: boolean;
-  foldersTree: boolean;
-  showFolderExplorerPath: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
@@ -83,6 +90,8 @@ export interface IElementsTree {
   setFilter: (value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
+  show: (nodeId: string, parents: string[]) => Promise<void>;
+  collapse: () => void;
 }
 
 export function useElementsTree(options: IOptions): IElementsTree {
@@ -97,8 +106,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   options = useObjectRef(options);
   const state = options.localState || localTreeNodesState;
-  const foldersTree = options.foldersTree;
-  const showFolderExplorerPath = options.showFolderExplorerPath;
 
   const userData = useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
@@ -107,7 +114,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       filter: '',
     }),
     async data => {
-      if (options.keepData) {
+      if (options.settings?.saveExpanded) {
         state.sync(data.nodeState);
 
         elementsTree.loading = true;
@@ -243,8 +250,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const renderers = useMemo(() => options.renderers || [], [options.renderers]);
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
+    actions: new SyncExecutor(),
     state,
-    loading: options.keepData || false,
+    loading: options.settings?.saveExpanded || false,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
     },
@@ -253,7 +261,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         return true;
       }
 
-      if (this.filter !== '' && this.filterAll && !ignoreFilter) {
+      if (this.filter !== '' && this.settings?.filterAll && !ignoreFilter) {
         return this.getNodeChildren(nodeId).length > 0;
       }
 
@@ -291,6 +299,31 @@ export function useElementsTree(options: IOptions): IElementsTree {
       userData.filter = value;
 
       await options.onFilter?.(value);
+    },
+    collapse() {
+      for (const state of this.state.values()) {
+        state.expanded = false;
+      }
+    },
+    async show(nodeId: string, path: string[]): Promise<void> {
+      const preloaded = await navTreeResource.preloadNodeParents(path);
+
+      if (preloaded) {
+        runInAction(() => {
+          for (const parent of path) {
+            const state = this.getNodeState(parent);
+            state.expanded = true;
+          }
+
+          const node = navNodeInfoResource.get(nodeId);
+
+          if (node) {
+            this.select(node, false, false);
+            this.actions.execute({ type: 'show', nodeId });
+          }
+        });
+      }
+
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
@@ -333,24 +366,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
       await setSelection(node.id, !selected);
     },
   }), {
-    foldersTree: observable.ref,
-    showFolderExplorerPath: observable.ref,
+    settings: observable.ref,
     isGroup: observable.ref,
     disabled: observable.ref,
     root: observable.ref,
     filter: observable.ref,
-    filterAll: observable.ref,
     loading: observable.ref,
     renderers: observable.ref,
     baseRoot: observable.ref,
+    collapse: action.bound,
   }, {
     isGroup: options.isGroup,
     disabled: options.disabled,
     root: options.root,
-    foldersTree,
+    settings: options.settings,
     filter: userData.filter,
-    filterAll: options.filterAll,
-    showFolderExplorerPath,
     baseRoot: options.baseRoot,
     renderers,
   });

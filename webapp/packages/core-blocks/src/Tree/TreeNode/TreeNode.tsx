@@ -20,6 +20,7 @@ import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
 interface Props extends ITreeNodeState {
   className?: string;
+  children?: React.ReactNode;
   onClick?: (leaf: boolean) => Promise<void> | void;
   onExpand?: () => Promise<void> | void;
   onSelect?: (multiple?: boolean, nested?: boolean) => Promise<void> | void;
@@ -30,7 +31,7 @@ interface IInnerTreeNodeContext extends ITreeNodeContext {
   inProgress: number;
 }
 
-export const TreeNode: React.FC<Props> = observer(function TreeNode({
+export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode({
   group = false,
   loading = false,
   selected = false,
@@ -41,7 +42,7 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   className,
   children,
   ...handlers
-}) {
+}, ref) {
   const handlersRef = useObjectRef(handlers);
 
   async function processAction(action: () => Promise<void>) {
@@ -100,10 +101,10 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   });
 
   return styled(useStyles(TREE_NODE_STYLES))(
-    <node {...use({ expanded: nodeContext.expanded || nodeContext.externalExpanded })} className={className}>
+    <node {...use({ expanded: nodeContext.expanded || nodeContext.externalExpanded })} ref={ref} className={className}>
       <TreeNodeContext.Provider value={nodeContext}>
         {children}
       </TreeNodeContext.Provider>
     </node>
   );
-});
+}, { forwardRef: true });
