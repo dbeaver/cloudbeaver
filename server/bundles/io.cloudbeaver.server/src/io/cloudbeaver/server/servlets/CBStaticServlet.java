@@ -145,7 +145,9 @@ public class CBStaticServlet extends DefaultServlet {
                 IOUtils.copyStream(fis, baos);
             }
             String indexContents = new String(baos.toByteArray(), StandardCharsets.UTF_8);
-            indexContents = indexContents.replace("{ROOT_URI}", CBApplication.getInstance().getRootURI());
+            indexContents = indexContents
+                .replace("{ROOT_URI}", CBApplication.getInstance().getRootURI())
+                .replace("{STATIC_CONTENT}", CBApplication.getInstance().getStaticContent());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
 
             putHeaders(response, content, indexBytes.length);

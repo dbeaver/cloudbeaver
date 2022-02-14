@@ -73,6 +73,8 @@ public class CBApplication extends BaseApplicationImpl {
         Log.setDefaultDebugStream(System.out);
     }
 
+    private String staticContent = "";
+
     public static CBApplication getInstance() {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
@@ -796,4 +798,10 @@ public class CBApplication extends BaseApplicationImpl {
         return false;
     }
 
+    /**
+     *
+     */
+    public String getStaticContent() {
+        return staticContent;
+    }
 }
