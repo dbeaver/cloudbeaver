@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
@@ -56,6 +57,8 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,6 +98,7 @@ public class CBApplication extends BaseApplicationImpl {
     private final Map<String, Object> productConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private final CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
+    private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
     private CBDatabase database;
@@ -481,6 +485,22 @@ public class CBApplication extends BaseApplicationImpl {
             Map<String, Object> configProps = JSONUtils.parseMap(gson, reader);
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
+
+            String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
+            if (!CommonUtils.isEmpty(externalPropertiesFile)) {
+                Properties props = new Properties();
+                try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
+                    props.load(is);
+                } catch (IOException e) {
+                    log.error("Error loading external properties from " + externalPropertiesFile, e);
+                }
+                for (String propName : props.stringPropertyNames()) {
+                    this.externalProperties.put(propName, props.getProperty(propName));
+                }
+            }
+
+            patchConfigurationWithProperties(configProps);
+
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
             serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
             if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
@@ -523,6 +543,15 @@ public class CBApplication extends BaseApplicationImpl {
                 ),
                 homeFolder
             );
+
+            String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
+            if (!CommonUtils.isEmpty(staticContentsFile)) {
+                try {
+                    staticContent = Files.readString(Path.of(staticContentsFile));
+                } catch (IOException e) {
+                    log.error("Error reading static contents from " + staticContentsFile, e);
+                }
+            }
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
         }
@@ -570,6 +599,7 @@ public class CBApplication extends BaseApplicationImpl {
                 }
             }
         }
+        patchConfigurationWithProperties(productConfiguration);
     }
 
     static String getRelativePath(String path, String curDir) {
@@ -804,4 +834,46 @@ public class CBApplication extends BaseApplicationImpl {
     public String getStaticContent() {
         return staticContent;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Configuration utils
+
+    private void patchConfigurationWithProperties(Map<String, Object> configProps) {
+        IVariableResolver varResolver = new SystemVariablesResolver() {
+            @Override
+            public String get(String name) {
+                String propValue = externalProperties.get(name);
+                if (propValue != null) {
+                    return propValue;
+                }
+                return super.get(name);
+            }
+        };
+        patchConfigurationWithProperties(configProps, varResolver);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+        for (Map.Entry<String, Object> entry : configProps.entrySet()) {
+            Object propValue = entry.getValue();
+            if (propValue instanceof String) {
+                entry.setValue(GeneralUtils.replaceVariables((String) propValue, varResolver));
+            } else if (propValue instanceof Map) {
+                patchConfigurationWithProperties((Map<String, Object>) propValue, varResolver);
+            } else if (propValue instanceof List) {
+                List value = (List) propValue;
+                for (int i = 0; i < value.size(); i++) {
+                    Object colItem = value.get(i);
+                    if (colItem instanceof String) {
+                        value.set(i, GeneralUtils.replaceVariables((String) colItem, varResolver));
+                    } else if (colItem instanceof Map) {
+                        patchConfigurationWithProperties((Map<String, Object>) colItem, varResolver);
+                    }
+                }
+            }
+        }
+    }
+
+
+
 }
