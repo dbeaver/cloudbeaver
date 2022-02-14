@@ -12,9 +12,9 @@ import { useCallback, useState } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 
-import { InlineEditor } from '../../../shared/InlineEditor/InlineEditor';
-import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
-import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
+import { InlineEditor } from '../../../../shared/InlineEditor/InlineEditor';
+import type { NavNode } from '../../../../shared/NodesManager/EntityTypes';
+import { NavTreeResource } from '../../../../shared/NodesManager/NavTreeResource';
 
 interface Props {
   node: NavNode;

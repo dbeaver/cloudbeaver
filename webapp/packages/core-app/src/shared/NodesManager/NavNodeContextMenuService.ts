@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { CoreSettingsService } from '../../CoreSettingsService';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
@@ -165,7 +165,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
-          if (items.length > 0){
+          if (items.length > 0) {
             items.push(new MenuSeparatorItem());
           }
           items.push(...actionsRefresh);

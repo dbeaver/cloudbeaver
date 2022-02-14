@@ -10,27 +10,26 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFocus, useFolderExplorer, useMapResource } from '@cloudbeaver/core-blocks';
+import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFocus, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
-import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
-import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
+import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
-import { NavigationTreeService } from './NavigationTreeService';
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
 import { ITreeContext, TreeContext } from './TreeContext';
-import { IElementsTreeCustomRenderer, IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
+import { IElementsTreeCustomRenderer, IElementsTreeFilter, IElementsTreeOptions, ITreeNodeState, useElementsTree } from './useElementsTree';
 
 const styles = composes(
   css`
@@ -66,32 +65,18 @@ const styles = composes(
   `
 );
 
-interface Props {
+interface Props extends IElementsTreeOptions {
   root?: string;
   limit?: number;
-  keepData?: boolean;
-  disabled?: boolean;
   selectionTree?: boolean;
-  foldersTree?: boolean;
   filter?: boolean;
-  filterAll?: boolean;
-  showFolderExplorerPath?: boolean;
-  localState?: MetadataMap<string, ITreeNodeState>;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
   style?: ComponentStyle;
   className?: string;
   navNodeFilterCompare?: NavNodeFilterCompareFn;
-  filters?: IElementsTreeFilter[];
-  renderers?: IElementsTreeCustomRenderer[];
-  customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
-  beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
-  isGroup?: (node: NavNode) => boolean;
-  onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onClick?: (node: NavNode) => Promise<void> | void;
   onOpen?: (node: NavNode) => Promise<void> | void;
-  onSelect?: (node: NavNode, state: boolean) => void;
-  onFilter?: (value: string) => void;
 }
 
 export const ElementsTree = observer<Props>(function ElementsTree({
@@ -112,6 +97,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   renderers = [],
   style,
   className,
+  getChildren,
+  loadChildren,
   isGroup,
   beforeSelect,
   customSelect,
@@ -125,9 +112,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const folderExplorer = useFolderExplorer(baseRoot);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const navigationTreeService = useService(NavigationTreeService);
   const translate = useTranslate();
-  
+  const ref = useObjectRef({ getChildren, loadChildren });
+
   const root = folderExplorer.folder;
   const fullPath = folderExplorer.fullPath;
 
@@ -137,13 +124,13 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     if (!tree.foldersTree) {
       return;
     }
-    
+
     while (folderExplorer.options.expandFoldersWithSingleElement) {
-      const children = navigationTreeService.getChildren(nodeId);
-            
+      const children = ref.getChildren(nodeId);
+
       if (children?.length === 1) {
         const nextNodeId = children[0];
-        const loaded = await navigationTreeService.loadNestedNodes(nextNodeId, false);
+        const loaded = await ref.loadChildren(nextNodeId, false);
 
         if (!loaded) {
           break;
@@ -151,13 +138,13 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
         path.push(nodeId);
         nodeId = nextNodeId;
-      } else { 
+      } else {
         break;
       }
     }
 
     folderExplorer.open(path, nodeId);
-    
+
   }, []);
 
   const children = useMapResource(ElementsTree, navTreeResource, root, {
@@ -173,7 +160,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   });
 
   const limitFilter = useMemo(() => elementsTreeLimitFilter(
-    navTreeResource, 
+    navTreeResource,
     limit
   ), [navTreeResource, limit]);
 
@@ -195,6 +182,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     localState,
     filters: [nameFilter, ...filters, limitFilter],
     renderers: [...renderers, elementsTreeLimitRenderer],
+    getChildren,
+    loadChildren,
     isGroup,
     onFilter,
     beforeSelect,
@@ -215,7 +204,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
         if (!leaf && tree.foldersTree) {
           const nodeId = node.id;
-          const loaded =  await navigationTreeService.loadNestedNodes(nodeId, true);
+          const loaded =  await ref.loadChildren(nodeId, true);
 
           if (loaded) {
             await autoOpenFolders(nodeId, path);
@@ -223,7 +212,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         }
       },
     }),
-    [control, selectionTree, onOpen, onClick, folderExplorer]
+    [control, folderExplorer, selectionTree, onOpen, onClick]
   );
 
   const getName = useCallback(

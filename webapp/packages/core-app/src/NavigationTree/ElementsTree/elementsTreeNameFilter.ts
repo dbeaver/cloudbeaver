@@ -9,9 +9,9 @@
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import type { NavNodeInfoResource } from '../shared/NodesManager/NavNodeInfoResource';
-import type { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
+import type { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
+import type { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import { EEquality, NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import type { IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
 
@@ -33,7 +33,7 @@ export function elementsTreeNameFilter(
       .get(resourceKeyList(children))
       .filter(isDefined)
       .filter(child => filterNode(
-        navTreeResource, 
+        navTreeResource,
         navNodeInfoResource,
         compare,
         filter,
@@ -50,12 +50,12 @@ function filterNode(
   navNodeInfoResource: NavNodeInfoResource,
   compare: NavNodeFilterCompareFn,
   filter: string,
-  node: NavNode, 
+  node: NavNode,
   // state: MetadataMap<string, ITreeNodeState>
 ): boolean {
   // const nodeState = state.get(node.id);
-  
-  
+
+
   if (compare(node, filter) !== EEquality.none) {
     return true;
   }
@@ -67,15 +67,15 @@ function filterNode(
     .get(resourceKeyList(children))
     .filter(isDefined)
     .some(child => filterNode(
-      navTreeResource, 
+      navTreeResource,
       navNodeInfoResource,
       compare,
-      filter, 
+      filter,
       child,
       // state
     ));
   // }
-  
+
   // return false;
 }
 

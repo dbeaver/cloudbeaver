@@ -14,7 +14,7 @@ import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-block
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
 import { TreeContext } from '../TreeContext';
 import { NavigationNode } from './NavigationNode';

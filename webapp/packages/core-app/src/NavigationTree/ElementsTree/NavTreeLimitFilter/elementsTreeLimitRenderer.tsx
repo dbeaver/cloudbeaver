@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
+import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';
 

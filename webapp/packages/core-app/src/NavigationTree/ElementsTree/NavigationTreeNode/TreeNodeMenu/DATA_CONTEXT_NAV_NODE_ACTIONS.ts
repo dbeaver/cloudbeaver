@@ -8,6 +8,6 @@
 
 import { createDataContext } from '@cloudbeaver/core-view';
 
-import type { INodeActions } from '../../../shared/NodesManager/INodeActions';
+import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
 
 export const DATA_CONTEXT_NAV_NODE_ACTIONS = createDataContext<INodeActions>('nav-node-actions');

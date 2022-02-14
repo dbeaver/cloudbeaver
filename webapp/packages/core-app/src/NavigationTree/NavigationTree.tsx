@@ -18,15 +18,14 @@ import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeViewService } from '../shared/NodesManager/NavNodeView/NavNodeViewService';
-import { ElementsTree } from './ElementsTree';
-import { navigationTreeConnectionGroupFilter } from './navigationTreeConnectionGroupFilter';
-import { navigationTreeConnectionGroupRenderer } from './navigationTreeConnectionGroupRenderer';
+import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter';
+import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer';
+import { ElementsTree } from './ElementsTree/ElementsTree';
+import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/createNavigationTreeUserSettings';
+import { getNavigationTreeUserSettingsId } from './ElementsTree/NavigationTreeSettings/getNavigationTreeUserSettingsId';
+import type { INavigationTreeUserSettings } from './ElementsTree/NavigationTreeSettings/INavigationTreeUserSettings';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
-import { createNavigationTreeUserSettings, validateNavigationTreeUserSettings } from './NavigationTreeSettings/createNavigationTreeUserSettings';
-import { getNavigationTreeUserSettingsId } from './NavigationTreeSettings/getNavigationTreeUserSettingsId';
-import type { INavigationTreeUserSettings } from './NavigationTreeSettings/INavigationTreeUserSettings';
-import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -91,7 +90,6 @@ export const NavigationTree = observer(function NavigationTree() {
 
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>
-      <NavigationTreeSettings root={root} settings={settings} />
       <ElementsTree
         root={root}
         localState={navTreeService.treeState}
@@ -111,6 +109,8 @@ export const NavigationTree = observer(function NavigationTree() {
         filter={settings.filter}
         filterAll={settings.filterAll}
         keepData={settings.saveExpanded}
+        getChildren={navTreeService.getChildren}
+        loadChildren={navTreeService.loadNestedNodes}
         onOpen={handleOpen}
       />
     </CaptureView>

@@ -8,7 +8,7 @@
 
 import type React from 'react';
 
-import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 
 export type NavTreeNodeComponent = React.FC<{
   nodeId: string;

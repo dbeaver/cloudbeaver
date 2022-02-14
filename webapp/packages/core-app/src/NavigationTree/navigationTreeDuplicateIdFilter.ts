@@ -10,7 +10,7 @@ import { untracked } from 'mobx';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import type { NavNodeViewService } from '../shared/NodesManager/NavNodeView/NavNodeViewService';
-import type { IElementsTreeFilter } from './useElementsTree';
+import type { IElementsTreeFilter } from './ElementsTree/useElementsTree';
 
 export function navigationTreeDuplicateFilter(
   navNodeViewService: NavNodeViewService,

@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import { Translate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
+import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
 
 export function navigationTreeConnectionGroupRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {
