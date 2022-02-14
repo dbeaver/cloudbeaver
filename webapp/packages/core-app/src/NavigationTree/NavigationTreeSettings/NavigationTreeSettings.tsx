@@ -32,6 +32,10 @@ const expandStyles = css`
   Group {
     min-width: 350px;
     width: min-content;
+
+    &[dense] {
+      padding: 12px;
+    }
   }
 `;
 
@@ -47,7 +51,7 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
   const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles);
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  
+
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, root);
   });
@@ -62,13 +66,13 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
 
   return styled(styles)(
     <>
-      <Group keepSize form gap>
+      <Group keepSize form gap dense>
         <GroupTitle>{translate('app_navigationTree_settings_title')}</GroupTitle>
         <Switch
           name="filter"
           state={settings}
-          description={translate('app_navigationTree_settings_filter_description')}
-          mod={['primary']}
+          title={translate('app_navigationTree_settings_filter_description')}
+          mod={['primary', 'dense']}
           small
         >
           {translate('app_navigationTree_settings_filter_title')}
@@ -77,8 +81,8 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
           name="filterAll"
           state={settings}
           disabled={!settings.filter}
-          description={translate('app_navigationTree_settings_filter_all_description')}
-          mod={['primary']}
+          title={translate('app_navigationTree_settings_filter_all_description')}
+          mod={['primary', 'dense']}
           small
         >
           {translate('app_navigationTree_settings_filter_all_title')}
@@ -86,8 +90,8 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
         <Switch
           name="saveExpanded"
           state={settings}
-          description={translate('app_navigationTree_settings_state_description')}
-          mod={['primary']}
+          title={translate('app_navigationTree_settings_state_description')}
+          mod={['primary', 'dense']}
           small
         >
           {translate('app_navigationTree_settings_state_title')}
@@ -95,8 +99,8 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
         <Switch
           name="folders"
           state={settings}
-          description={translate('app_navigationTree_settings_folders_description')}
-          mod={['primary']}
+          title={translate('app_navigationTree_settings_folders_description')}
+          mod={['primary', 'dense']}
           small
         >
           {translate('app_navigationTree_settings_folders_title')}

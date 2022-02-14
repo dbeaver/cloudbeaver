@@ -33,7 +33,11 @@
     composes: mdc-switch--disabled;
   }
 
-  .theme-switch_primary {
+  .theme-switch_dense {
+    @include switch-core-styles-dense($query);
+  }
+
+  .theme-switch_dense .theme-switch_primary, .theme-switch_primary {
     $mdc-switch-baseline-theme-color: primary;
 
     @include mdc-switch-toggled-on-track-color($mdc-switch-baseline-theme-color, $query);
@@ -41,4 +45,15 @@
     @include mdc-switch-toggled-off-track-color($mdc-switch-toggled-off-track-color, $query);
     @include mdc-switch-toggled-off-thumb-color($mdc-switch-toggled-off-thumb-color, $query);
   }
+}
+
+@mixin switch-core-styles-dense($query: mdc-feature-all()) {
+  $mdc-switch-track-width: 18px !global;
+  $mdc-switch-track-height: 10px !global;
+  $mdc-switch-thumb-diameter: 14px !global;
+  $mdc-switch-ripple-size: 36px !global;
+  $mdc-switch-thumb-offset: 8px !global;
+
+  @include mdc-switch-core-styles($query);
+  @include mdc-switch-density(-3);
 }

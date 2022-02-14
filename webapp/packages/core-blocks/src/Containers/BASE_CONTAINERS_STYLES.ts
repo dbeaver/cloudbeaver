@@ -62,10 +62,18 @@ export const BASE_CONTAINERS_STYLES = composes(
 
       &[parent] {
         padding: 24px;
+
+        &[dense] {
+          padding: 8px;
+        }
       }
 
       &[gap] {
         gap: 24px;
+
+        &[dense] {
+          gap: 8px;
+        }
       }
     }
 
@@ -74,6 +82,10 @@ export const BASE_CONTAINERS_STYLES = composes(
       box-sizing: border-box;
       padding: 24px;
       border-radius: 4px;
+
+      &[dense] {
+        padding: 8px;
+      }
 
       &[form] > :global(*) {
         margin-right: 25%;

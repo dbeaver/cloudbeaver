@@ -64,6 +64,19 @@ const switchMod = {
       }
     `
   ),
+  dense: composes(
+    css`
+      switch-body {
+        composes: theme-switch_dense from global;
+      }
+    `,
+    css`
+      field-label {
+        composes: theme-typography--body2 from global;
+        font-weight: initial;
+      }
+    `,
+  ),
 };
 
 const switchState = {
