@@ -1120,7 +1120,7 @@ export interface SqlDataFilter {
 }
 
 export interface SqlDataFilterConstraint {
-  attribute: Scalars['String'];
+  attributePosition: Scalars['Int'];
   criteria?: InputMaybe<Scalars['String']>;
   operator?: InputMaybe<Scalars['String']>;
   orderAsc?: InputMaybe<Scalars['Boolean']>;

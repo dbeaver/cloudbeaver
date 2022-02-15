@@ -7,8 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
-import { ComputedContextMenuModel } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult, IContextMenuItem, IMenuContext, ComputedContextMenuModel } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
 import {
@@ -31,12 +30,12 @@ import { FilterCustomValueDialog } from './FilterCustomValueDialog';
 
 @injectable()
 export class DataGridContextMenuFilterService {
-  private static menuFilterToken = 'menuFilter';
+  private static readonly menuFilterToken = 'menuFilter';
 
   constructor(
-    private dataGridContextMenuService: DataGridContextMenuService,
-    private commonDialogService: CommonDialogService,
-    private clipboardService: ClipboardService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly clipboardService: ClipboardService,
   ) {
     this.dataGridContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
   }
@@ -58,10 +57,14 @@ export class DataGridContextMenuFilterService {
 
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const columnLabel = data.getColumn(column)?.label || '';
+    const resultColumn = data.getColumn(column);
+
+    if (!resultColumn) {
+      throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
+    }
 
     await model.requestDataAction(async () => {
-      constraints.setFilter(columnLabel, operator, filterValue);
+      constraints.setFilter(resultColumn.position, operator, filterValue);
       await model.request(true);
     });
   }
@@ -384,9 +387,13 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex, key } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const columnPosition = data.getColumn(key.column)?.position;
 
-          const columnLabel = data.getColumn(key.column)?.label || '';
-          const currentConstraint = constraints.get(columnLabel);
+          if (columnPosition === undefined) {
+            return true;
+          }
+
+          const currentConstraint = constraints.get(columnPosition);
 
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         },
@@ -399,10 +406,14 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex, key } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
-          const columnLabel = data.getColumn(key.column)?.label || '';
+          const resultColumn = data.getColumn(key.column);
+
+          if (!resultColumn) {
+            throw new Error(`Failed to get result column info for the following column index: "${key.column.index}"`);
+          }
 
           await model.requestDataAction(async () => {
-            constraints.deleteFilter(columnLabel);
+            constraints.deleteFilter(resultColumn.position);
             await model.request(true);
           });
         },

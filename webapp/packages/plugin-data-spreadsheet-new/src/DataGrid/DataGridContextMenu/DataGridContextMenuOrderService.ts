@@ -13,10 +13,10 @@ import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
 export class DataGridContextMenuOrderService {
-  private static menuOrderToken = 'menuOrder';
+  private static readonly menuOrderToken = 'menuOrder';
 
   constructor(
-    private dataGridContextMenuService: DataGridContextMenuService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
   ) { }
 
   getMenuOrderToken(): string {
@@ -24,17 +24,21 @@ export class DataGridContextMenuOrderService {
   }
 
   private async changeOrder(
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     resultIndex: number,
     column: IResultSetColumnKey,
     order: Order
   ) {
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    const columnLabel = data.getColumn(column)?.label || '';
+    const resultColumn = data.getColumn(column);
+
+    if (!resultColumn) {
+      throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
+    }
 
     await model.requestDataAction(async () => {
-      constraints.setOrder(columnLabel, order, true);
+      constraints.setOrder(resultColumn.position, order, true);
       await model.request(true);
     });
   }
@@ -74,9 +78,13 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(key.column)?.label || '';
+          const columnPosition = data.getColumn(key.column)?.position;
 
-          return constraints.getOrder(columnLabel) === EOrder.asc;
+          if (columnPosition === undefined) {
+            return false;
+          }
+
+          return constraints.getOrder(columnPosition) === EOrder.asc;
         },
       }
     );
@@ -97,9 +105,13 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(key.column)?.label || '';
+          const columnPosition = data.getColumn(key.column)?.position;
 
-          return constraints.getOrder(columnLabel) === EOrder.desc;
+          if (columnPosition === undefined) {
+            return false;
+          }
+
+          return constraints.getOrder(columnPosition) === EOrder.desc;
         },
       }
     );
@@ -120,9 +132,13 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnLabel = data.getColumn(key.column)?.label || '';
+          const columnPosition = data.getColumn(key.column)?.position;
 
-          return constraints.getOrder(columnLabel) === null;
+          if (columnPosition === undefined) {
+            return false;
+          }
+
+          return constraints.getOrder(columnPosition) === null;
         },
       }
     );

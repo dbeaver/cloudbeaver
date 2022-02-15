@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { EOrder, getNextOrder, IDatabaseDataModel, IDatabaseDataResult, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
+import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
 const styles = css`
   order-button {
@@ -38,21 +38,21 @@ const styles = css`
 `;
 
 interface Props {
-  model: IDatabaseDataModel<any, IDatabaseDataResult>;
+  model: IDatabaseDataModel;
   resultIndex: number;
-  attribute: string;
+  attributePosition: number;
   className?: string;
 }
 
 export const OrderButton = observer<Props>(function OrderButton({
   model,
   resultIndex,
-  attribute,
+  attributePosition,
   className,
 }) {
   const translate = useTranslate();
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-  const currentOrder = constraints.getOrder(attribute);
+  const currentOrder = constraints.getOrder(attributePosition);
   const loading = model.isLoading();
 
   let icon = 'order-arrow-unknown';
@@ -69,7 +69,7 @@ export const OrderButton = observer<Props>(function OrderButton({
 
     const nextOrder = getNextOrder(currentOrder);
     await model.requestDataAction(async () => {
-      constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
+      constraints.setOrder(attributePosition, nextOrder, e.ctrlKey || e.metaKey);
       await model.request(true);
     });
   };

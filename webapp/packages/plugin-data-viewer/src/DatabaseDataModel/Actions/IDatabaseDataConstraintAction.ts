@@ -17,15 +17,15 @@ export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResu
   readonly filterConstraints: SqlDataFilterConstraint[];
   readonly orderConstraints: SqlDataFilterConstraint[];
   readonly supported: boolean;
-  setFilter: (attribute: string, operator: string, value?: any) => void;
-  setOrder: (attribute: string, order: Order, multiple: boolean) => void;
+  setFilter: (attributePosition: number, operator: string, value?: any) => void;
+  setOrder: (attributePosition: number, order: Order, multiple: boolean) => void;
   deleteAll: () => void;
-  deleteFilter: (attribute: string) => void;
+  deleteFilter: (attributePosition: number) => void;
   deleteFilters: () => void;
-  deleteOrder: (attribute: string) => void;
+  deleteOrder: (attributePosition: number) => void;
   deleteOrders: () => void;
   deleteDataFilters: () => void;
   deleteData: () => void;
-  get: (attribute: string) => SqlDataFilterConstraint | undefined;
-  getOrder: (attribute: string) => Order;
+  get: (attributePosition: number) => SqlDataFilterConstraint | undefined;
+  getOrder: (attributePosition: number) => Order;
 }
