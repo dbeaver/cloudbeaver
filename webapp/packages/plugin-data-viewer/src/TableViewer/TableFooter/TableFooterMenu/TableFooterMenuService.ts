@@ -20,18 +20,18 @@ import type { IDatabaseDataResult } from '../../../DatabaseDataModel/IDatabaseDa
 import { ScriptPreviewService } from '../../../ScriptPreview/ScriptPreviewService';
 
 export interface ITableFooterMenuContext {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
 }
 
 @injectable()
 export class TableFooterMenuService {
   static nodeContextType = 'NodeWithParent';
-  private tableFooterMenuToken = 'tableFooterMenu';
+  private readonly tableFooterMenuToken = 'tableFooterMenu';
 
   constructor(
-    private contextMenuService: ContextMenuService,
-    private scriptPreviewService: ScriptPreviewService,
+    private readonly contextMenuService: ContextMenuService,
+    private readonly scriptPreviewService: ScriptPreviewService,
   ) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
@@ -323,7 +323,8 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        return context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset;
+        return context.data.model.isReadonly()
+          || context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset;
       },
       isDisabled(context) {
         if (
@@ -345,7 +346,7 @@ export class TableFooterMenuService {
     });
   }
 
-  constructMenuWithContext(model: IDatabaseDataModel<any>, resultIndex: number): IMenuItem[] {
+  constructMenuWithContext(model: IDatabaseDataModel, resultIndex: number): IMenuItem[] {
     const context: IMenuContext<ITableFooterMenuContext> = {
       menuId: this.tableFooterMenuToken,
       contextId: model.id,
@@ -360,7 +361,7 @@ export class TableFooterMenuService {
   }
 }
 
-function getActiveElements(model: IDatabaseDataModel<any, IDatabaseDataResult>, resultIndex: number): unknown[] {
+function getActiveElements(model: IDatabaseDataModel, resultIndex: number): unknown[] {
   const select = model.source.getActionImplementation(
     resultIndex,
     DatabaseSelectAction

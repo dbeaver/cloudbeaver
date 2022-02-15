@@ -12,7 +12,10 @@ import { ConnectionExecutionContextService, ConnectionInfoResource } from '@clou
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
-import { DatabaseDataAccessMode, DatabaseDataModel, DatabaseEditAction, DataViewerDataChangeConfirmationService, getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, IRequestEventData, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseDataAccessMode, DatabaseDataModel, DatabaseEditAction, DataViewerDataChangeConfirmationService,
+  getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, DataViewerService, TableViewerStorageService
+} from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
@@ -33,17 +36,18 @@ export interface IQueryExecutionStatistics {
 
 @injectable()
 export class SqlQueryService {
-  private statisticsMap: Map<string, IQueryExecutionStatistics>;
+  private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
 
   constructor(
-    private tableViewerStorageService: TableViewerStorageService,
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private connectionInfoResource: ConnectionInfoResource,
-    private connectionExecutionContextService: ConnectionExecutionContextService,
-    private sqlQueryResultService: SqlQueryResultService,
-    private asyncTaskInfoService: AsyncTaskInfoService,
-    private dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService
+    private readonly tableViewerStorageService: TableViewerStorageService,
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly sqlQueryResultService: SqlQueryResultService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService,
+    private readonly dataViewerService: DataViewerService
   ) {
     this.statisticsMap = new Map();
 
@@ -90,8 +94,9 @@ export class SqlQueryService {
       tabGroup.query = query;
     }
 
+    const editable = this.dataViewerService.isDataEditable(connectionInfo);
     model
-      .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+      .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
       .setOptions({
         query: query,
         connectionId: contextInfo.connectionId,
@@ -172,8 +177,9 @@ export class SqlQueryService {
       }
       statistics.modelId = model.id;
 
+      const editable = this.dataViewerService.isDataEditable(connectionInfo);
       model
-        .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+        .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
         .setOptions({
           query: query,
           connectionId: contextInfo.connectionId,
