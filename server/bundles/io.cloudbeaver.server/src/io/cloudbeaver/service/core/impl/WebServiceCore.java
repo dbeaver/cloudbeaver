@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -453,7 +454,7 @@ public class WebServiceCore implements DBWServiceCore {
             if (handler instanceof DBWTunnel) {
                 DBWTunnel tunnel = (DBWTunnel)handler;
                 DBPConnectionConfiguration connectionConfig = new DBPConnectionConfiguration();
-                connectionConfig.setHostName("localhost");
+                connectionConfig.setHostName(DBConstants.HOST_LOCALHOST);
                 connectionConfig.setHostPort(CommonUtils.toString(nhConfig.getProperties().get(DBWHandlerConfiguration.PROP_PORT)));
                 try {
                     monitor.subTask("Initialize tunnel");

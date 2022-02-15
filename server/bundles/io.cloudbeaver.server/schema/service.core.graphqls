@@ -180,6 +180,7 @@ type DriverInfo {
     providerId: ID
     # Driver Java class name
     driverClassName: String
+    defaultHost: String
     defaultPort: String
     defaultDatabase: String
     defaultServer: String

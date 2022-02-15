@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -30,6 +31,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -85,6 +87,11 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
+    public String getDefaultHost() {
+        return CommonUtils.toString(driver.getDefaultHost(), DBConstants.HOST_LOCALHOST);
+    }
+
+    @Property
     public String getDefaultPort() {
         return driver.getDefaultPort();
     }
@@ -96,7 +103,8 @@ public class WebDatabaseDriverConfig {
 
     @Property
     public String getDefaultServer() {
-        return driver.getDefaultServer();
+        // defaultHost and defaultServer are different properties
+        return getDefaultHost();
     }
 
     @Property
@@ -169,7 +177,7 @@ public class WebDatabaseDriverConfig {
         try {
             DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
             cfg.setUrl(driver.getSampleURL());
-            cfg.setHostName("localhost");
+            cfg.setHostName(DBConstants.HOST_LOCALHOST);
             cfg.setHostPort(driver.getDefaultPort());
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
