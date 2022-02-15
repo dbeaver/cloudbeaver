@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  ItemListSearch, ItemList, SubmittingForm, TextPlaceholder
+  ItemListSearch, ItemList, SubmittingForm, TextPlaceholder, useFocus
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
@@ -48,6 +48,7 @@ interface Props {
 export const DatabaseList = observer<Props>(function DatabaseList({
   databases, hosts, disabled, className, onSelect, onChange, onSearch,
 }) {
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const [isSearched, setIsSearched] = useState(false);
 
@@ -62,7 +63,7 @@ export const DatabaseList = observer<Props>(function DatabaseList({
   const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
 
   return styled(useStyles(styles))(
-    <SubmittingForm className={className} onSubmit={onSearch}>
+    <SubmittingForm ref={focusedRef} className={className} onSubmit={onSearch}>
       <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} disabled={disabled} onChange={onChange} onSearch={searchHandler} />
       <ItemList>
         {databases.map(database => (
