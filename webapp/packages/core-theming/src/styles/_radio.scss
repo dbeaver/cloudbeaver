@@ -16,6 +16,10 @@
   }
   .theme-radio_native-control {
     composes: mdc-radio__native-control;
+
+    &:disabled {
+      opacity: 0;
+    }
   }
   .theme-radio_background {
     composes: mdc-radio__background;

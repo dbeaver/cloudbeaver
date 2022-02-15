@@ -43,7 +43,10 @@ export class NavigationTreeBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'elements-tree-base',
-      isActionApplicable: (contexts, action) => contexts.has(DATA_CONTEXT_ELEMENTS_TREE),
+      isActionApplicable: (contexts, action) => (
+        contexts.has(DATA_CONTEXT_ELEMENTS_TREE)
+        && [ACTION_COLLAPSE_ALL, ACTION_LINK_OBJECT].includes(action)
+      ),
       handler: this.elementsTreeActionHandler.bind(this),
     });
 

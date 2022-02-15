@@ -16,6 +16,10 @@
   }
   .theme-switch_native-control {
     composes: mdc-switch__native-control;
+
+    &:disabled {
+      opacity: 0;
+    }
   }
   .theme-switch__track {
     composes: mdc-switch__track;

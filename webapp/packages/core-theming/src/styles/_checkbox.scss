@@ -17,6 +17,7 @@ $mdc-checkbox-icon-size: 16px;
   }
   .theme-checkbox_native-control {
     composes: mdc-checkbox__native-control;
+
     &:disabled {
       opacity: 0;
     }
