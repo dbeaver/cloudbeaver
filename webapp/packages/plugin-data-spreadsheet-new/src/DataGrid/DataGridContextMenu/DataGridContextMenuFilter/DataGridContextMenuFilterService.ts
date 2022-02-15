@@ -387,13 +387,8 @@ export class DataGridContextMenuFilterService {
           const { model, resultIndex, key } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
-          const columnPosition = data.getColumn(key.column)?.position;
-
-          if (columnPosition === undefined) {
-            return true;
-          }
-
-          const currentConstraint = constraints.get(columnPosition);
+          const resultColumn = data.getColumn(key.column);
+          const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
 
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         },

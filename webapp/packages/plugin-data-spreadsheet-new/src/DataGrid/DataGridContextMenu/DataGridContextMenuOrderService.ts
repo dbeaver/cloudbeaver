@@ -78,13 +78,9 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnPosition = data.getColumn(key.column)?.position;
+          const resultColumn = data.getColumn(key.column);
 
-          if (columnPosition === undefined) {
-            return false;
-          }
-
-          return constraints.getOrder(columnPosition) === EOrder.asc;
+          return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.asc;
         },
       }
     );
@@ -105,13 +101,9 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnPosition = data.getColumn(key.column)?.position;
+          const resultColumn = data.getColumn(key.column);
 
-          if (columnPosition === undefined) {
-            return false;
-          }
-
-          return constraints.getOrder(columnPosition) === EOrder.desc;
+          return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.desc;
         },
       }
     );
@@ -132,13 +124,9 @@ export class DataGridContextMenuOrderService {
           const { model, resultIndex, key } = context.data;
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const columnPosition = data.getColumn(key.column)?.position;
+          const resultColumn = data.getColumn(key.column);
 
-          if (columnPosition === undefined) {
-            return false;
-          }
-
-          return constraints.getOrder(columnPosition) === null;
+          return !!resultColumn && constraints.getOrder(resultColumn.position) === null;
         },
       }
     );
