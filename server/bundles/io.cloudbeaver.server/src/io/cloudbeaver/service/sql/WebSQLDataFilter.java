@@ -19,7 +19,6 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.data.DBDAttributeBindingMeta;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
@@ -133,8 +132,9 @@ public class WebSQLDataFilter {
             result = Arrays.asList(resultInfo.getAttributes());
         }
         return result.stream()
-                .map(attribute -> new DBDAttributeConstraint(attribute, -1))
-                .collect(Collectors.toList());
+            .filter(attribute -> attribute.getOrdinalPosition() >= 0)
+            .map(attribute -> new DBDAttributeConstraint(attribute, -1))
+            .collect(Collectors.toList());
     }
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
