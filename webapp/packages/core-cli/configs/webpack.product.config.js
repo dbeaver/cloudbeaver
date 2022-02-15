@@ -7,6 +7,7 @@ const { merge } = require('webpack-merge')
 
 const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
+const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin.js');
 
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
@@ -94,6 +95,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       chunks: ['sso'],
       version: timestampVersion,
       title: package.product?.name
+    }),
+    new HtmlInjectWebpackPlugin({
+      body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: "{STATIC_CONTENT}", voidTag: false }]
     }),
   ],
 })

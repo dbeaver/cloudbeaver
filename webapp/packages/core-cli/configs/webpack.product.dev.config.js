@@ -10,7 +10,8 @@ const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
 
 const package = require(resolve('package.json'));
 
@@ -60,7 +61,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     }),
     new HtmlWebpackPlugin({ 
       template: resolve('src/index.html.ejs'), 
-      inject: 'body', 
+      inject: 'body',
       chunks: ['main'],
       version: package.version,
       title: package.product?.name
@@ -72,6 +73,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       chunks: ['sso'],
       version: package.version,
       title: package.product?.name
+    }),
+    new HtmlInjectWebpackPlugin({
+      body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: "{STATIC_CONTENT}", voidTag: false }]
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],
