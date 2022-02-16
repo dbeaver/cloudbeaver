@@ -12,6 +12,7 @@ import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { getComputed, StaticImage } from '@cloudbeaver/core-blocks';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { DataGridContext } from '../DataGridContext';
@@ -68,9 +69,11 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
+  const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
+
+  let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
   let columnName = calculatedColumn.name as string;
-  const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
   let columnReadOnly = !calculatedColumn.editable;
   let columnTooltip: string = columnName;
 
@@ -78,6 +81,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
     const column = tableDataContext.data.getColumn(calculatedColumn.columnDataIndex);
 
     if (column) {
+      resultColumn = column;
       columnName = column.label!;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: calculatedColumn.columnDataIndex });
@@ -108,8 +112,12 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {!(dataReadonly || columnReadOnly) && calculatedColumn.columnDataIndex !== null && (
-        <OrderButton model={model} resultIndex={resultIndex} attribute={columnName} />
+      {!(dataReadonly || columnReadOnly) && resultColumn && (
+        <OrderButton
+          model={model}
+          resultIndex={resultIndex}
+          attributePosition={resultColumn.position}
+        />
       )}
     </table-header>
   );
