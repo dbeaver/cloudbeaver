@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class WebSQLDataFilterConstraint {
 
-    private String attribute;
+    private Integer attributePosition;
     private Integer orderPosition;
     private Boolean orderAsc;
 
@@ -34,7 +34,7 @@ public class WebSQLDataFilterConstraint {
     private Object value;
 
     public WebSQLDataFilterConstraint(Map<String, Object> map) {
-        this.attribute = CommonUtils.toString(map.get("attribute"));
+        this.attributePosition = CommonUtils.toInt(map.get("attributePosition"));
         this.orderPosition = map.containsKey("orderPosition") ?
             CommonUtils.toInt(map.get("orderPosition")) + 1 : // Use position + 1 because 0 means no ordering (because of legacy compatibility)
             null;
@@ -45,8 +45,8 @@ public class WebSQLDataFilterConstraint {
         this.value = CommonUtils.toString(map.get("value"), null);
     }
 
-    public String getAttribute() {
-        return attribute;
+    public Integer getAttributePosition() {
+        return attributePosition;
     }
 
     public Integer getOrderPosition() {

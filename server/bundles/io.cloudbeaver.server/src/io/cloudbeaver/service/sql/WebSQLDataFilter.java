@@ -19,7 +19,6 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.data.DBDAttributeBindingMeta;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
@@ -133,43 +132,19 @@ public class WebSQLDataFilter {
             result = Arrays.asList(resultInfo.getAttributes());
         }
         return result.stream()
-                .map(attribute -> new DBDAttributeConstraint(attribute, -1))
-                .collect(Collectors.toList());
+            .filter(attribute -> attribute.getOrdinalPosition() >= 0)
+            .map(attribute -> new DBDAttributeConstraint(attribute, -1))
+            .collect(Collectors.toList());
     }
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
-        Map<String, List<DBDAttributeConstraint>> dbdConstraintByAttributeName = mapConstraintsByLabel(emptyConstraints);
         for (WebSQLDataFilterConstraint webConstr : constraints) {
-            DBDAttributeConstraint dbConstr;
-            if (dbdConstraintByAttributeName.containsKey(webConstr.getAttribute())) {
-                List<DBDAttributeConstraint> constraintsWithSameName = dbdConstraintByAttributeName.get(webConstr.getAttribute());
-                if (constraintsWithSameName.size() > 1) {
-                    throw new DBException(MessageFormat.format("Column ''{0}'' in order clause is ambiguous", webConstr.getAttribute()));
-                }
-                dbConstr = constraintsWithSameName.get(0);
-            } else {
-                dbConstr = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
-                emptyConstraints.add(dbConstr);
+            if(webConstr.getAttributePosition() >= emptyConstraints.size()) {
+                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", webConstr.getAttributePosition()));
             }
+            DBDAttributeConstraint dbConstr = emptyConstraints.get(webConstr.getAttributePosition());
             fillEmptyConstraint(dbConstr, webConstr);
         }
-    }
-
-    @NotNull
-    private Map<String, List<DBDAttributeConstraint>> mapConstraintsByLabel(@NotNull List<DBDAttributeConstraint> constraints)  {
-        Map <String, List<DBDAttributeConstraint>> dbdConstraintByLabel = new HashMap<>();
-        for (DBDAttributeConstraint constraint : constraints) {
-            String attributeName;
-            DBSAttributeBase attributeBase = constraint.getAttribute();
-            if (attributeBase instanceof DBDAttributeBindingMeta) {
-                attributeName = ((DBDAttributeBindingMeta) attributeBase).getLabel();
-            } else {
-                attributeName = constraint.getAttributeName();
-            }
-
-            dbdConstraintByLabel.computeIfAbsent(attributeName, k -> new ArrayList<>()).add(constraint);
-        }
-        return dbdConstraintByLabel;
     }
 
     private DBDAttributeConstraint fillEmptyConstraint(@NotNull DBDAttributeConstraint dbConstr,
