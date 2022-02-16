@@ -28,11 +28,14 @@ import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
@@ -65,6 +68,8 @@ import java.util.stream.Collectors;
  */
 public class WebServiceSQL implements DBWServiceSQL {
 
+    private static final Log log = Log.getLog(WebServiceSQL.class);
+
     @Override
     public WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException {
         List<WebConnectionInfo> conToRead = new ArrayList<>();
@@ -91,10 +96,31 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     @NotNull
-    public WebSQLDialectInfo getDialectInfo(@NotNull WebSQLProcessor processor) throws DBWebException {
-        DBPDataSource dataSource = processor.getConnection().getDataSourceContainer().getDataSource();
-        SQLDialect dialect = SQLUtils.getDialectFromDataSource(dataSource);
-        return new WebSQLDialectInfo(dataSource, dialect);
+    public WebSQLDialectInfo getDialectInfo(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
+        DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
+        SQLDialect dialect = getSqlDialectFromConnection(dataSourceContainer);
+        return new WebSQLDialectInfo(dataSourceContainer.getDataSource(), dialect);
+    }
+
+    @NotNull
+    public SQLDialect getSqlDialectFromConnection(DBPDataSourceContainer dataSourceContainer) {
+        DBPDataSource dataSource = dataSourceContainer.getDataSource();
+        SQLDialect dialect;
+        if (dataSource != null) {
+            dialect = SQLUtils.getDialectFromDataSource(dataSource);
+        } else {
+            try {
+                dialect = dataSourceContainer.getScriptDialect().createInstance();
+            } catch (DBException e) {
+                log.debug(e);
+                try {
+                    dialect = dataSourceContainer.getDriver().getProviderDescriptor().getScriptDialect().createInstance();
+                } catch (DBException e1) {
+                    dialect = BasicSQLDialect.INSTANCE;
+                }
+            }
+        }
+        return dialect;
     }
 
     @NotNull
@@ -403,12 +429,12 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLScriptInfo parseSqlScript(@NotNull WebSQLProcessor processor, @NotNull String sqlScript) throws DBWebException {
-        DBPDataSource dataSource = processor.getConnection().getDataSourceContainer().getDataSource();
-        if (dataSource == null) {
-            throw new DBWebException("Data source was not found");
-        }
-        List<SQLScriptElement> queries = SQLScriptParser.parseScript(dataSource, sqlScript);
+    public WebSQLScriptInfo parseSqlScript(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript) throws DBWebException {
+        SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
+        List<SQLScriptElement> queries = SQLScriptParser.parseScript(
+            dialect,
+            connectionInfo.getDataSourceContainer().getPreferenceStore(),
+            sqlScript);
         List<WebSQLQueryInfo> queriesInfo = queries.stream()
                 .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
                 .collect(Collectors.toList());

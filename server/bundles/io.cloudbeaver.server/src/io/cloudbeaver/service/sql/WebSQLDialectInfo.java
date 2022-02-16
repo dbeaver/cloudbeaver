@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
@@ -31,10 +32,11 @@ public class WebSQLDialectInfo {
 
     private static final Log log = Log.getLog(WebSQLDialectInfo.class);
 
+    @Nullable
     private final DBPDataSource dataSource;
     private final SQLDialect dialect;
 
-    public WebSQLDialectInfo(DBPDataSource dataSource, SQLDialect dialect) {
+    public WebSQLDialectInfo(@Nullable DBPDataSource dataSource, SQLDialect dialect) {
         this.dataSource = dataSource;
         this.dialect = dialect;
     }

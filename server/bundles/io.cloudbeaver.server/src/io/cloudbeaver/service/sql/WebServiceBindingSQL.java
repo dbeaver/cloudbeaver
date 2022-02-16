@@ -50,7 +50,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("sqlDialectInfo", env ->
-                getService(env).getDialectInfo(getSQLProcessor(env))
+                getService(env).getDialectInfo(getWebConnection(env))
             )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
@@ -90,7 +90,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("options"),
                     env.getArgument("nodePathList"))
             ).dataFetcher("sqlParseScript", env ->
-                getService(env).parseSqlScript(getSQLProcessor(env), env.getArgument("script"))
+                getService(env).parseSqlScript(getWebConnection(env), env.getArgument("script"))
             )
         ;
 
