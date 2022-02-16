@@ -25,8 +25,6 @@ import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
-import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -96,41 +94,30 @@ public class WebSQLDataFilter {
         return where;
     }
 
-    public DBDDataFilter makeDataFilter(
-        @NotNull DBRProgressMonitor monitor,
-        @Nullable WebSQLResultsInfo resultInfo,
-        @NotNull DBSDataContainer dataContainer) throws DBException
+    public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException
     {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         if (CommonUtils.isEmpty(constraints)) {
             return dataFilter;
         }
-        dataFilter.addConstraints(mapWebConstrainsToDbdConstrains(monitor, resultInfo, dataContainer));
+        dataFilter.addConstraints(mapWebConstrainsToDbdConstrains(resultInfo));
         return dataFilter;
     }
 
 
-    private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(@NotNull DBRProgressMonitor monitor,
-                                                                         @Nullable WebSQLResultsInfo resultInfo,
-                                                                         @NotNull DBSDataContainer dataContainer) throws DBException {
-        List<DBDAttributeConstraint> constraints = generateEmptyConstrains(monitor, resultInfo, dataContainer);
+    private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
+        List<DBDAttributeConstraint> constraints = generateEmptyConstrains(resultInfo);
         fillEmptyConstrains(constraints);
         return constraints;
     }
 
-    public List<DBDAttributeConstraint> generateEmptyConstrains(@NotNull DBRProgressMonitor monitor,
-                                                                @Nullable WebSQLResultsInfo resultInfo,
-                                                                @NotNull DBSDataContainer dataContainer) throws DBException {
-        List<? extends DBSAttributeBase> result = new ArrayList<>();
-        if (dataContainer instanceof DBSEntity) {
-            List<? extends DBSEntityAttribute> attributes = ((DBSEntity) dataContainer).getAttributes(monitor);
-            if (attributes != null) {
-                result = attributes;
-            }
-        } else if (resultInfo != null) {
-            result = Arrays.asList(resultInfo.getAttributes());
+    public List<DBDAttributeConstraint> generateEmptyConstrains(@Nullable WebSQLResultsInfo resultInfo) {
+        if (resultInfo == null) {
+            return Collections.emptyList();
         }
+
+        List<? extends DBSAttributeBase> result = Arrays.asList(resultInfo.getAttributes());
         return result.stream()
             .filter(attribute -> attribute.getOrdinalPosition() >= 0)
             .map(attribute -> new DBDAttributeConstraint(attribute, -1))

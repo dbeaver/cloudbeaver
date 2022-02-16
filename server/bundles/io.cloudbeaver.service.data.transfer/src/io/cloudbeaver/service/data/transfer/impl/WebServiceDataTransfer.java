@@ -230,7 +230,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(monitor, null, dataContainer));
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(null));
         DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
