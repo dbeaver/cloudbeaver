@@ -77,6 +77,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   register(): void {
+    this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
@@ -106,6 +107,18 @@ export class SqlEditorTabService extends Bootstrap {
     state.executionContext = undefined;
   }
 
+  private async handleConnectionDelete(key: ResourceKey<string>) {
+    const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
+      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+    );
+
+    for (const tab of tabs) {
+      if (ResourceKeyUtils.includes(key, tab.handlerState.executionContext?.connectionId)) {
+        this.resetConnectionInfo(tab.handlerState);
+      }
+    }
+  }
+
   private async handleExecutionContextUpdate(key: ResourceKey<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => !!tab.handlerState.executionContext)
@@ -131,7 +144,7 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       if (
-        ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.id) 
+        ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.id)
         && !this.connectionInfoResource.has(tab.handlerState.executionContext!.connectionId)
       ) {
         this.resetConnectionInfo(tab.handlerState);
@@ -198,8 +211,8 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   async setConnectionId(
-    tab: ITab<ISqlEditorTabState>, 
-    connectionId: string, 
+    tab: ITab<ISqlEditorTabState>,
+    connectionId: string,
     catalogId?: string,
     schemaId?: string
   ) {
