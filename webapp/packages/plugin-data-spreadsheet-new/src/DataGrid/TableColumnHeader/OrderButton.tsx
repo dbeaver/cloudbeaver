@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -24,16 +24,15 @@ const styles = css`
     width: 20px;
     box-sizing: border-box;
     cursor: pointer;
+    background: transparent;
+    outline: none;
+    color: inherit;
   }
   order-button > IconOrImage {
     width: 12px;
   }
   order-button:hover > IconOrImage {
     width: 13px;
-  }
-  order-button[|disabled] {
-    opacity: 0.7;
-    cursor: default;
   }
 `;
 
@@ -53,7 +52,7 @@ export const OrderButton = observer<Props>(function OrderButton({
   const translate = useTranslate();
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
   const currentOrder = constraints.getOrder(attributePosition);
-  const loading = model.isLoading();
+  const disabled = model.isDisabled(resultIndex) || model.isLoading();
 
   let icon = 'order-arrow-unknown';
   if (currentOrder === EOrder.asc) {
@@ -62,11 +61,7 @@ export const OrderButton = observer<Props>(function OrderButton({
     icon = 'order-arrow-down';
   }
 
-  const handleSort = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (loading) {
-      return;
-    }
-
+  const handleSort = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const nextOrder = getNextOrder(currentOrder);
     await model.requestDataAction(async () => {
       constraints.setOrder(attributePosition, nextOrder, e.ctrlKey || e.metaKey);
@@ -74,18 +69,18 @@ export const OrderButton = observer<Props>(function OrderButton({
     });
   };
 
-  function preventFocus(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
   }
 
   return styled(styles)(
     <order-button
-      as='div'
+      as='button'
       title={translate('data_grid_table_tooltip_column_header_order')}
       className={className}
+      disabled={disabled}
       onMouseDown={preventFocus}
       onClick={handleSort}
-      {...use({ disabled: loading })}
     >
       <IconOrImage
         icon={icon}

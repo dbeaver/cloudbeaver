@@ -26,13 +26,13 @@ const headerStyles = css`
     align-items: center;
     align-content: center;
     width: 100%;
-    cursor: pointer;
   }
   shrink-container {
     display: flex;
     align-items: center;
     flex: 1 1 auto;
     overflow: hidden;
+    cursor: pointer;
   }
   icon {
     display: flex;
@@ -70,6 +70,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
+  const sortingDisabled = getComputed(() => model.source.results.length > 1 || !model.source.executionContext?.context);
 
   let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
@@ -112,7 +113,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {!(dataReadonly || columnReadOnly) && resultColumn && (
+      {!(sortingDisabled || columnReadOnly) && resultColumn && (
         <OrderButton
           model={model}
           resultIndex={resultIndex}
