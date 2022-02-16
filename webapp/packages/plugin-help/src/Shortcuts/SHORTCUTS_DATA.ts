@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+
+import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/core-app';
+import { KEY_BINDING_OPEN_IN_TAB } from '@cloudbeaver/core-view';
+
 import type { IShortcut } from './IShortcut';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
@@ -58,13 +62,21 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   },
   {
     label: 'sql_editor_shortcut_open_editor_in_new_tab',
-    code: ['Alt + T'],
+    code: [KEY_BINDING_OPEN_IN_TAB.label],
   },
 ];
 
 export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
   {
     label: 'navigation_tree_shortcut_enable_filter',
-    code: ['Ctrl + F'],
+    code: [KEY_BINDING_ENABLE_FILTER.label],
+  },
+  {
+    label: 'app_navigationTree_action_collapse_all',
+    code: [KEY_BINDING_COLLAPSE_ALL.label],
+  },
+  {
+    label: 'app_navigationTree_action_link_with_editor',
+    code: [KEY_BINDING_LINK_OBJECT.label],
   },
 ];

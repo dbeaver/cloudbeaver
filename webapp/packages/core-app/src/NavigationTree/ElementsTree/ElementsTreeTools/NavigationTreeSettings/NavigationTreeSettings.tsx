@@ -34,18 +34,20 @@ interface Props {
   root: string;
   settings: IElementsTreeSettings;
   style?: ComponentStyle;
+  className?: string;
 }
 
 export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({
   root,
   settings,
   style,
+  className,
 }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles, style);
   const translate = useTranslate();
 
   return styled(styles)(
-    <settings>
+    <settings className={className}>
       <Group keepSize form gap dense>
         <GroupTitle>{translate('app_navigationTree_settings_title')}</GroupTitle>
         <Switch

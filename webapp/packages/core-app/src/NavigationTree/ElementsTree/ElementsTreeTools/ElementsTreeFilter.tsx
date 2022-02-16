@@ -32,11 +32,13 @@ const filterStyle = composes(
 interface Props {
   tree: IElementsTree;
   style?: ComponentStyle;
+  className?: string;
 }
 
 export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({
   tree,
   style,
+  className,
 }) {
   const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
@@ -47,7 +49,7 @@ export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({
   }
 
   return styled(styles)(
-    <filter-box ref={focusedRef} as='div'>
+    <filter-box ref={focusedRef} className={className} as='div'>
       <Filter
         placeholder={translate('app_navigationTree_search')}
         value={tree.filter}
