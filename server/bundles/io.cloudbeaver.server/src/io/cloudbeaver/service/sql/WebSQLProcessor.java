@@ -176,9 +176,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             final WebSQLDataFilter webDataFilter = filter;
             final String sqlQueryText = sql;
             SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
-
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
-                try (DBCSession session = context.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
+                try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                     AbstractExecutionSource source = new AbstractExecutionSource(
                         dataContainer,
                         session.getExecutionContext(),
@@ -229,7 +228,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             (resultId == null ? null : contextInfo.getResults(resultId)),
             dataContainer);
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
-            try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
+            try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
@@ -775,5 +774,9 @@ public class WebSQLProcessor implements WebSessionProvider {
             return MAX_RESULTS_COUNT;
         }
         return dataSource.getInfo().supportsMultipleResults() ? MAX_RESULTS_COUNT : 1;
+    }
+
+    private static DBCExecutionPurpose resolveQueryPurpose(DBDDataFilter filter) {
+        return filter.hasFilters() ? DBCExecutionPurpose.USER_FILTERED : DBCExecutionPurpose.USER;
     }
 }
