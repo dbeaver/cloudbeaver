@@ -14,6 +14,7 @@ import { useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
+import { composes } from '@cloudbeaver/core-theming';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
@@ -60,6 +61,20 @@ const navigationTreeStyles = css`
   }
 `;
 
+const elementsTreeStyles = composes(
+  css`
+    tools {
+      composes: theme-border-color-background from global;
+    }
+  `,
+  css`
+    tools > *:last-child:not(:first-child) {
+      border-bottom: solid 1px;
+      border-color: inherit;
+    }
+  `
+);
+
 export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -105,6 +120,7 @@ export const NavigationTree = observer(function NavigationTree() {
         )}
         customSelect={handleSelect}
         settings={settings}
+        style={elementsTreeStyles}
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         onOpen={handleOpen}

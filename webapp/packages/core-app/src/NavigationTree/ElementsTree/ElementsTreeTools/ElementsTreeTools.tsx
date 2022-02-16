@@ -34,7 +34,7 @@ const toolsStyles = composes(
       composes: theme-text-primary from global;
     }
     tools {
-      composes: theme-background-surface theme-border-color-background from global;
+      composes: theme-background-surface from global;
     }
   `,
   css`
@@ -43,11 +43,6 @@ const toolsStyles = composes(
       position: sticky;
       top: 0;
       z-index: 1;
-
-      &> *:last-child:not(:first-child) {
-        border-bottom: solid 1px;
-        border-color: inherit;
-      }
     }
     actions {
       display: flex;
