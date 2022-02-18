@@ -113,7 +113,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {!(sortingDisabled || columnReadOnly) && resultColumn && (
+      {!sortingDisabled && resultColumn && (
         <OrderButton
           model={model}
           resultIndex={resultIndex}
