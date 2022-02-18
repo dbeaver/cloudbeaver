@@ -1,6 +1,6 @@
 export const defaultZHLocale = [
   ['name', 'zh'],
-  ['ui_rename_taken_or_invalid', 'Name taken or invalid'],
+  ['ui_rename_taken_or_invalid', 'Name has taken or invalid'],
   ['ui_tag_new', '新建'],
   ['ui_light_theme', '明亮'],
   ['ui_dark_theme', '黑暗'],

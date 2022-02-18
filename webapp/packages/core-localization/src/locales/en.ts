@@ -1,6 +1,6 @@
 export const defaultENLocale = [
   ['name', 'en'],
-  ['ui_rename_taken_or_invalid', 'Name taken or invalid'],
+  ['ui_rename_taken_or_invalid', 'Name has taken or invalid'],
   ['ui_tag_new', 'New'],
   ['ui_light_theme', 'Light'],
   ['ui_dark_theme', 'Dark'],
