@@ -59,7 +59,11 @@ const toolsStyles = composes(
       border-radius: 3px;
       overflow: hidden;
 
-      &[|opened] {
+      & Icon, & StaticImage {
+        transition: transform .3s ease-in-out;
+      }
+
+      &[|opened] Icon, &[|opened] StaticImage {
         transform: rotate(180deg);
       }
     }
@@ -104,23 +108,27 @@ export const ElementsTreeTools = observer<Props>(function ElementsTreeTools({
         <fill />
         {activeNavNode && nodeInTree && (
           <IconButton
-            name='dots'
-            viewBox="0 0 32 32"
+            name='/icons/link_editor_sm.svg'
             title={translate('app_navigationTree_action_link_with_editor') + ` (${KEY_BINDING_LINK_OBJECT.label})`}
+            style={toolsStyles}
+            img
             onMouseDown={showObject}
           />
         )}
         <IconButton
-          name='password-hide'
-          viewBox="0 0 16 16"
+          name='/icons/collapse_sm.svg'
           title={translate('app_navigationTree_action_collapse_all') + ` (${KEY_BINDING_COLLAPSE_ALL.label})`}
+          style={toolsStyles}
+          img
           onClick={tree.collapse}
           {...use({ primary: true })}
         />
         {tree.settings?.configurable && (
           <IconButton
-            name='angle'
+            name='/icons/settings_cog_sm.svg'
             title={translate('app_navigationTree_settings_title')}
+            style={toolsStyles}
+            img
             onClick={() => setOpen(!opened)}
             {...use({ opened, primary: true })}
           />

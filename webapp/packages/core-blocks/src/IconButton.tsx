@@ -9,7 +9,10 @@
 import { Button, ButtonProps } from 'reakit/Button';
 import styled, { css } from 'reshadow';
 
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
 import { Icon } from './Icon';
+import { StaticImage } from './StaticImage';
 
 const styles = css`
   Button {
@@ -23,7 +26,7 @@ const styles = css`
     height: 16px;
     width: 16px;
 
-    & Icon {
+    & Icon, & StaticImage {
       width: 100%;
       height: 100%;
     }
@@ -32,13 +35,16 @@ const styles = css`
 
 interface Props {
   name: string;
+  img?: boolean;
   viewBox?: string;
+  style?: ComponentStyle;
 }
 
-export function IconButton({ name, viewBox, ...rest }: Props & ButtonProps) {
-  return styled(styles)(
+export function IconButton({ name, img, viewBox, style, ...rest }: Props & ButtonProps) {
+  return styled(useStyles(styles, style))(
     <Button {...rest}>
-      <Icon name={name} viewBox={viewBox} />
+      {img && <StaticImage icon={name} />}
+      {!img && <Icon name={name} viewBox={viewBox} />}
     </Button>
   );
 }
