@@ -16,6 +16,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { ConnectionSchemaManagerService } from '../../../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL';
@@ -81,6 +82,7 @@ export const ElementsTreeTools = observer<Props>(function ElementsTreeTools({
   children,
 }) {
   const translate = useTranslate();
+  const navNodeInfoResource  = useService(NavNodeInfoResource);
   const connectionSchemaManagerService = useService(ConnectionSchemaManagerService);
   const [opened, setOpen] = useState(false);
   const styles = useStyles(toolsStyles, style);
@@ -91,7 +93,7 @@ export const ElementsTreeTools = observer<Props>(function ElementsTreeTools({
   });
 
   const activeNavNode = connectionSchemaManagerService.activeNavNode;
-  const nodeInTree = activeNavNode?.path.includes(tree.baseRoot);
+  const nodeInTree = activeNavNode?.path.includes(tree.baseRoot) && navNodeInfoResource.has(activeNavNode.nodeId);
 
   function showObject() {
     if (activeNavNode && nodeInTree) {
