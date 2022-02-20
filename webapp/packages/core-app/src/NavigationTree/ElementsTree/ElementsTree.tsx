@@ -211,18 +211,21 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     [navNodeInfoResource]
   );
 
+  const foldersTree = settings?.foldersTree; // mobx subscription
+  const filter = settings?.filter;
+
   useEffect(() => {
-    if (!settings?.foldersTree && folderExplorer.folder !== baseRoot) {
+    if (!foldersTree && folderExplorer.folder !== baseRoot) {
       folderExplorer.open([], baseRoot);
     }
-    if (!settings?.filter && tree.filter !== '') {
+    if (!filter && tree.filter !== '') {
       tree.setFilter('');
     }
   });
 
   const hasChildren = (children.data?.length || 0) > 0;
 
-  const loaderAvailable = !settings?.foldersTree || context.folderExplorer.root === root;
+  const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
 
   return styled(useStyles(styles, style))(
     <>
