@@ -20,7 +20,7 @@ export default [
   ['app_navigationTree_settings_filter_description', 'Show filtering field'],
   ['app_navigationTree_settings_filter_all_title', 'Show collapsed'],
   ['app_navigationTree_settings_filter_all_description', 'Shows filtered elements in collapsed folders'],
-  ['app_navigationTree_settings_state_title', 'Save state'],
+  ['app_navigationTree_settings_state_title', 'Save tree state'],
   ['app_navigationTree_settings_state_description', 'Reopen expanded nodes after page refresh'],
   ['app_navigationTree_settings_folders_title', 'Folders'],
   ['app_navigationTree_settings_folders_description', 'Open any node as tree root node'],
