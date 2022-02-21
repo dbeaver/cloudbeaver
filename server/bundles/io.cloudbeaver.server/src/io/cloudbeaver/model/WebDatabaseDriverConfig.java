@@ -19,6 +19,7 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.ConfigurationUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -44,13 +45,11 @@ public class WebDatabaseDriverConfig {
     private final WebSession webSession;
     private final DBPDriver driver;
     private String id;
-    private final boolean enabled;
 
-    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver, boolean enabled) {
+    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
         this.driver = driver;
         this.id = driver.getFullId();
-        this.enabled = enabled;
     }
 
     @Property
@@ -237,6 +236,6 @@ public class WebDatabaseDriverConfig {
 
     @Property
     public boolean isEnabled() {
-        return enabled;
+        return ConfigurationUtils.isDriverEnabled(driver);
     }
 }
