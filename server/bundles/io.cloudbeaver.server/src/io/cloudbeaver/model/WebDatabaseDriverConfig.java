@@ -19,6 +19,7 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.ConfigurationUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -233,4 +234,8 @@ public class WebDatabaseDriverConfig {
             .toArray(WebPropertyInfo[]::new);
     }
 
+    @Property
+    public boolean isEnabled() {
+        return ConfigurationUtils.isDriverEnabled(driver);
+    }
 }
