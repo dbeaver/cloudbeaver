@@ -71,7 +71,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public Map<String, Object> getConfiguration() {
-        return origin.getConfiguration();
+        return origin.getDataSourceConfiguration();
     }
 
     @Property
