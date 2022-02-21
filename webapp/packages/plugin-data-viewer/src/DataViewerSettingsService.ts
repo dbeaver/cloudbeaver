@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  disableEdit: true,
+  disableEdit: false,
 };
 
 export type DataViewerSettings = typeof defaultSettings;
