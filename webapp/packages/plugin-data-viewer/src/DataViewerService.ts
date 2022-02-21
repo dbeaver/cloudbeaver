@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
 
 import { DataViewerSettingsService } from './DataViewerSettingsService';
 
@@ -17,12 +15,10 @@ import { DataViewerSettingsService } from './DataViewerSettingsService';
 export class DataViewerService {
   constructor(
     private readonly dataViewerSettingsService: DataViewerSettingsService,
-    private readonly permissionsService: PermissionsService,
   ) { }
 
   isDataEditable(connection: Connection) {
-    const isAdmin = this.permissionsService.has(EAdminPermission.admin);
-    const editable = this.dataViewerSettingsService.settings.getValue(isAdmin ? 'edit.admin' : 'edit.users');
-    return editable && !connection.readOnly;
+    const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
+    return !disabled && !connection.readOnly;
   }
 }

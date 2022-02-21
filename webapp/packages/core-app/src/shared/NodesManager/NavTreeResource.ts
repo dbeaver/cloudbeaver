@@ -92,7 +92,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
-    this.userInfoResource.userChange.addHandler(() => this.clear());
+    this.userInfoResource.userChange.addHandler(action(() => {
+      this.clear();
+      this.navNodeInfoResource.clear(); // TODO: need more convenient way
+    }));
   }
 
   async preloadNodeParents(
