@@ -54,6 +54,7 @@ export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResu
   result: TResult;
   resultIndex: number;
   updateResult: (result: TResult) => void;
+  updateResults: (results: TResult[]) => void;
   afterResultUpdate: () => void;
   tryGetAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionClass<TOptions, TResult, T>

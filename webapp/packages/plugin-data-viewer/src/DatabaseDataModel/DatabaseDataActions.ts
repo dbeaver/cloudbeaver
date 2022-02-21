@@ -18,9 +18,9 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
 
 export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataActions<TOptions, TResult> {
-  private actions: Map<string, ActionsList<TOptions, TResult>>;
-  private source: IDatabaseDataSource<TOptions, TResult>;
+  implements IDatabaseDataActions<TOptions, TResult> {
+  private readonly actions: Map<string, ActionsList<TOptions, TResult>>;
+  private readonly source: IDatabaseDataSource<TOptions, TResult>;
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.actions = new Map();
@@ -33,7 +33,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     });
   }
 
-  tryGet <T extends IDatabaseDataAction<TOptions, TResult>>(
+  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     Action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T | undefined {
@@ -44,7 +44,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     return this.get(result, Action);
   }
 
-  get <T extends IDatabaseDataAction<TOptions, TResult>>(
+  get<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     Action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
@@ -76,7 +76,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     });
   }
 
-  getImplementation <T extends IDatabaseDataAction<TOptions, TResult>>(
+  getImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     Action: IDatabaseDataActionInterface<TOptions, TResult, T>
   ): T | undefined {
@@ -92,15 +92,18 @@ implements IDatabaseDataActions<TOptions, TResult> {
     for (const [key, actions] of actionsMap) {
       const result = results.find(result => result.uniqueResultId === key);
 
-      if (!result) {
-        for (const action of actions) {
+      for (const action of actions) {
+        action.updateResults(results);
+
+        if (!result) {
           action.dispose();
-        }
-        this.actions.delete(key);
-      } else {
-        for (const action of actions) {
+        } else {
           action.updateResult(result);
         }
+      }
+
+      if (!result) {
+        this.actions.delete(key);
       }
     }
 

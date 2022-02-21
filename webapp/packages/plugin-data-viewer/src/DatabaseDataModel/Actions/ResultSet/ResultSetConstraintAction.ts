@@ -240,6 +240,35 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
 
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
+
+  updateResults(results: IDatabaseResultSet[]): void {
+    if (!this.source.options || results.length !== this.source.results.length) {
+      return;
+    }
+
+    const nextResult = results[this.resultIndex];
+
+    for (const constraint of this.source.options.constraints) {
+      const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);
+
+      if (!prevColumn) {
+        return;
+      }
+
+      const column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
+
+      if (column && prevColumn.position !== column.position) {
+        const prevConstraint = this.source.prevOptions?.constraints
+          .find(prevConstraint => prevConstraint.attributePosition === constraint.attributePosition);
+
+        constraint.attributePosition = column.position;
+
+        if (prevConstraint) {
+          prevConstraint.attributePosition = constraint.attributePosition;
+        }
+      }
+    }
+  }
 }
 
 export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {
