@@ -242,8 +242,8 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   }
 
   updateResults(results: IDatabaseResultSet[]): void {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
+    if (!this.source.options || results.length !== this.source.results.length) {
+      return;
     }
 
     const nextResult = results[this.resultIndex];
