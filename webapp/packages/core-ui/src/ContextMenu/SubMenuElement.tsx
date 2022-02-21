@@ -65,7 +65,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   if (hidden) {
     return null;
   }
-  
+
   const loading = handler?.isLoading?.(subMenuData.context);
   const disabled = handler?.isDisabled?.(subMenuData.context);
   const MenuPanel = menuPanel;
@@ -89,10 +89,10 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         menuData={subMenuData}
         menu={menu}
         style={style}
-        panelAvailable={subMenuData.isAvailable()}
+        panelAvailable={subMenuData.available}
       >
         {item => (
-          <MenuItemRenderer 
+          <MenuItemRenderer
             key={item.id}
             item={item}
             menuData={menuData}

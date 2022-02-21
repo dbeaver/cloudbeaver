@@ -160,13 +160,16 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
         disclosure
         modal
       >
-        <TopNavButton
-          title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
-          icon={driver?.icon}
-          style={[menuStyles, connectionMenu, removeDisableEffect]}
-          menu={connectionSelectorService.isConnectionChangeable}
-          secondary
-        />
+        {({ loading }) => (
+          <TopNavButton
+            title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
+            icon={driver?.icon}
+            style={[menuStyles, connectionMenu, removeDisableEffect]}
+            menu={connectionSelectorService.isConnectionChangeable}
+            loading={loading}
+            secondary
+          />
+        )}
       </ContextMenu>
       <ContextMenu
         menu={dataContainerMenu}
@@ -175,16 +178,19 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
         disclosure
         modal
       >
-        <TopNavButton
-          title={objectContainerName}
-          icon={objectContainerIcon}
-          style={[menuStyles, removeDisableEffect]}
-          menu={
-            connectionSelectorService.isObjectCatalogChangeable
+        {({ loading }) => (
+          <TopNavButton
+            title={objectContainerName}
+            icon={objectContainerIcon}
+            style={[menuStyles, removeDisableEffect]}
+            menu={
+              connectionSelectorService.isObjectCatalogChangeable
             || connectionSelectorService.isObjectSchemaChangeable
-          }
-          secondary
-        />
+            }
+            loading={loading}
+            secondary
+          />
+        )}
       </ContextMenu>
     </connection-selector>
   );

@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -50,7 +50,7 @@ export const Tab = observer<TabProps>(function Tab({
   menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
   menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
-  const showMenu = menu.getItems().length > 0;
+  const showMenu = getComputed(() => menu.items.length > 0);
   const canClose = !!onClose || state.closable;
   const actionsEnabled = canClose || showMenu;
 

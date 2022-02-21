@@ -42,7 +42,7 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
     return null;
   }
 
-  const items = menuData.getItems();
+  const items = menuData.items;
 
   const hasBindings = getComputed(() => items.some(
     item => item instanceof MenuActionItem && item.action.binding !== null

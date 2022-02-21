@@ -13,7 +13,7 @@ import {
 } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuService } from '@cloudbeaver/core-view';
@@ -21,6 +21,13 @@ import { IMenuData, MenuService } from '@cloudbeaver/core-view';
 import { MenuItemRenderer } from './MenuItemRenderer';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
+
+interface IMenuProps {
+  loading: boolean;
+  disabled: boolean;
+}
+
+type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode;
 
 interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   menu: IMenuData;
@@ -30,6 +37,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   modal?: boolean;
   visible?: boolean;
   rtl?: boolean;
+  children?: React.ReactNode | ContextMenuRenderingChildren;
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
@@ -48,13 +56,14 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
   const menuService = useService(MenuService);
 
   const handler = menuService.getHandler(menuData.context);
-  const hidden = handler?.isHidden?.(menuData.context);
-  const loading = handler?.isLoading?.(menuData.context);
-  const disabled = loading || handler?.isDisabled?.(menuData.context);
+  const hidden = handler?.isHidden?.(menuData.context) || false;
+  const loading = handler?.isLoading?.(menuData.context) || false;
+  const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
 
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
+  const lazy = getComputed(() => !menuData.available || hidden);
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -68,24 +77,26 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
     }
   }, [menu.visible]);
 
-  if (!menuData.isAvailable() || hidden) {
+  if (lazy) {
     return null;
   }
 
-  if (React.isValidElement(children) && disclosure) {
+  const renderingChildren: React.ReactNode  = typeof children === 'function' ? children({ loading, disabled }) : children;
+
+  if (React.isValidElement(renderingChildren) && disclosure) {
     return styled(styles)(
       <>
-        <MenuButton ref={ref} {...menu} {...props} {...children.props} disabled={disabled}>
-          {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props, loading })}
+        <MenuButton ref={ref} {...menu} {...props} {...renderingChildren.props} disabled={disabled}>
+          {disclosureProps => React.cloneElement(renderingChildren, { ...disclosureProps, ...renderingChildren.props })}
         </MenuButton>
-        <MenuPanel 
+        <MenuPanel
           menuData={menuData}
           menu={menu}
           style={style}
           rtl={rtl}
         >
           {item => (
-            <MenuItemRenderer 
+            <MenuItemRenderer
               key={item.id}
               item={item}
               menuData={menuData}
@@ -102,16 +113,16 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
   return styled(styles)(
     <>
       <MenuButton {...menu} {...props} disabled={disabled}>
-        <box>{children}</box>
+        <box>{renderingChildren}</box>
       </MenuButton>
-      <MenuPanel 
+      <MenuPanel
         menuData={menuData}
         menu={menu}
         style={style}
         rtl={rtl}
       >
         {item => (
-          <MenuItemRenderer 
+          <MenuItemRenderer
             key={item.id}
             item={item}
             menuData={menuData}

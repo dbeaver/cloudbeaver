@@ -50,13 +50,13 @@ export function useStyles(
     return dispose;
   }, [currentThemeId, themeService]);
 
-  let changed = lastThemeRef.current !== currentThemeId || componentStyles.length !== stylesRef.current.length;
-  for (let i = 0; !changed && i < componentStyles.length; i++) {
-    changed = stylesRef.current[i] !== componentStyles[i];
+  let changed = lastThemeRef.current !== currentThemeId || filteredStyles.length !== stylesRef.current.length;
+  for (let i = 0; !changed && i < filteredStyles.length; i++) {
+    changed = stylesRef.current[i] !== filteredStyles[i];
   }
 
   if (changed) {
-    stylesRef.current = componentStyles;
+    stylesRef.current = filteredStyles;
     lastThemeRef.current = currentThemeId;
     const staticStyles: BaseStyles[] = [];
     const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
@@ -85,10 +85,10 @@ export function useStyles(
 
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
-    return applyComposes([...themeStyles, ...loadedStyles.current]);
+    return create(applyComposes([...themeStyles, ...loadedStyles.current]));
   }, [currentThemeId, patch, loadedStyles.current]);
 
-  return create(styles); // todo this method is called in each rerender
+  return styles; // todo this method is called in each rerender
 }
 
 export function joinStyles(...styles: ComponentStyle[]): ComponentStyle {

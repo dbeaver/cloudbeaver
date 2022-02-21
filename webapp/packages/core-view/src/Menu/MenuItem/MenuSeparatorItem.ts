@@ -12,8 +12,8 @@ import { MenuItem } from './MenuItem';
 export class MenuSeparatorItem extends MenuItem implements IMenuSeparatorItem {
   readonly hidden: boolean;
 
-  constructor() {
-    super();
+  constructor(id?: string) {
+    super(id);
     this.hidden = false;
   }
 }

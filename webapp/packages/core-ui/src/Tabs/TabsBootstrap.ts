@@ -108,7 +108,7 @@ export class TabsBootstrap extends Bootstrap {
         ]);
 
         if (actions.length > 0) {
-          if (items.length > 0){
+          if (items.length > 0) {
             items.push(new MenuSeparatorItem());
           }
           items.push(...actions);

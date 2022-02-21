@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { computed, observable } from 'mobx';
+
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { IDataContext } from '../DataContext/IDataContext';
@@ -19,8 +21,8 @@ import { useMenuContext } from './useMenuContext';
 export interface IMenuData {
   menu: IMenu;
   context: IDataContext;
-  isAvailable: () => boolean;
-  getItems: () => IMenuItem[];
+  available: boolean;
+  items: IMenuItem[];
 }
 
 interface IMenuOptions {
@@ -35,15 +37,21 @@ export function useMenu(options: IMenuOptions): IMenuData {
 
   context.set(DATA_CONTEXT_MENU_LOCAL, options.local);
 
-  return useObjectRef(() => ({
-    isAvailable() {
+  return useObservableRef<IMenuData>(() => ({
+    context,
+    get available() {
       return menuService.isMenuAvailable(this.context);
     },
-    getItems() {
+    get items() {
       return menuService.getMenu(this.context);
     },
   }), {
+    available: computed,
+    items: computed,
+    menu: observable.ref,
+    context: observable.ref,
+  }, {
     menu: options.menu,
     context,
-  }, ['isAvailable', 'getItems']);
+  });
 }

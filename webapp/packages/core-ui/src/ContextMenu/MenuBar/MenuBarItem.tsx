@@ -35,7 +35,7 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(function MenuBarIt
 
   const title = translate(rest.title);
   return styled(useStyles(style))(
-    <menu-bar-item as='button' ref={ref} {...rest} title={title} aria-label={title}>
+    <menu-bar-item ref={ref} as='button' {...rest} title={title} aria-label={title}>
       {loading && <Loader small fullSize />}
       {!loading && icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {label && <item-label><Translate token={label} /></item-label>}

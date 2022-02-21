@@ -35,7 +35,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar(
   ...props
 }, ref) {
   const styles = useStyles(style);
-  const items = menu.getItems();
+  const items = menu.items;
 
   if (!items.length) {
     return null;
@@ -168,12 +168,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   style,
 }) {
   const styles = useStyles(style);
-  const menuService = useService(MenuService);
   const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
-
-  const handler = menuService.getHandler(menuData.context);
-  const loading = handler?.isLoading?.(menuData.context);
-  const disabled = handler?.isDisabled?.(menuData.context);
 
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
 
@@ -184,17 +179,19 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
       disclosure
       {...nestedMenuSettings}
     >
-      <MenuBarItem
-        id={item.id}
-        aria-label={item.menu.label}
-        label={item.menu.label}
-        icon={item.menu.icon}
-        title={item.menu.tooltip || item.menu.label}
-        loading={loading}
-        disabled={disabled}
-        style={style}
-        {...use({ hidden: item.hidden })}
-      />
+      {({ loading, disabled }) => (
+        <MenuBarItem
+          id={item.id}
+          aria-label={item.menu.label}
+          label={item.menu.label}
+          icon={item.menu.icon}
+          title={item.menu.tooltip || item.menu.label}
+          loading={loading}
+          disabled={disabled}
+          style={style}
+          {...use({ hidden: item.hidden })}
+        />
+      )}
     </ContextMenu>
   );
 });

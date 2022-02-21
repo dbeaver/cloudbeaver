@@ -176,7 +176,7 @@ const ItemName = observer<IItemNameProps>(function ItemName({
       return true;
     }
 
-    return !menu.isAvailable();
+    return !menu.available;
   });
 
   return styled(styles)(
