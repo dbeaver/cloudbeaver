@@ -42,6 +42,7 @@ public class AdminServerConfig {
     private final List<String> enabledFeatures;
     private final List<String> enabledAuthProviders;
     private final String[] enabledDrivers;
+    private final String[] disabledDrivers;
 
     private long sessionExpireTime;
 
@@ -75,6 +76,12 @@ public class AdminServerConfig {
             this.enabledDrivers = JSONUtils.getStringList(params, "enabledDrivers").toArray(new String[0]);
         } else {
             this.enabledDrivers = appConfig.getEnabledDrivers();
+        }
+
+        if (params.containsKey("disabledDrivers")) {
+            this.disabledDrivers = JSONUtils.getStringList(params, "disabledDrivers").toArray(new String[0]);
+        } else {
+            this.disabledDrivers = appConfig.getDisabledDrivers();
         }
     }
 
@@ -144,5 +151,9 @@ public class AdminServerConfig {
 
     public String[] getEnabledDrivers() {
         return enabledDrivers;
+    }
+
+    public String[] getDisabledDrivers() {
+        return disabledDrivers;
     }
 }

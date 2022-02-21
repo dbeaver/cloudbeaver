@@ -18,7 +18,6 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.registry.WebDriverRegistry;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -302,9 +301,6 @@ public class CBPlatform extends BasePlatformImpl {
 
         for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
             for (DBPDriver driver : dspd.getEnabledDrivers()) {
-                if (!WebDriverRegistry.getInstance().isDriverEnabled(driver)) {
-                    continue;
-                }
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
                 {
                     boolean hasAllFiles = true;

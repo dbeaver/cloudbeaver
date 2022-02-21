@@ -801,6 +801,9 @@ public class CBApplication extends BaseApplicationImpl {
                     if (appConfig.getEnabledDrivers() != null) {
                         JSONUtils.serializeStringList(json, "enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()), true);
                     }
+                    if (appConfig.getDisabledDrivers() != null) {
+                        JSONUtils.serializeStringList(json, "disabledDrivers", Arrays.asList(appConfig.getDisabledDrivers()), true);
+                    }
 
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());

@@ -142,6 +142,7 @@ type ServerConfig {
     productConfiguration: Object!
     productInfo: ProductInfo!
     defaultNavigatorSettings: NavigatorSettings!
+    disabledDrivers: [ID!]!
 }
 
 type SessionInfo {
@@ -189,6 +190,7 @@ type DriverInfo {
     driverInfoURL: String
     driverPropertiesURL: String
     embedded: Boolean
+    enabled: Boolean!
 
     # this fields must be removed and be replaced by DriverAuthModel
     allowsEmptyPassword: Boolean @deprecated

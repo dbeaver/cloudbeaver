@@ -189,4 +189,9 @@ public class WebServerConfig {
         return new WebProductInfo();
     }
 
+    @Property
+    public String[] getDisabledDrivers() {
+        return application.getAppConfiguration().getDisabledDrivers();
+    }
+
 }

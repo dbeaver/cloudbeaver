@@ -166,6 +166,10 @@ public class CBAppConfig {
         return disabledDrivers;
     }
 
+    public void setDisabledDrivers(String[] disabledDrivers) {
+        this.disabledDrivers = disabledDrivers;
+    }
+
     public boolean isFeatureEnabled(String id) {
         return ArrayUtils.contains(getEnabledFeatures(), id);
     }

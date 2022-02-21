@@ -91,7 +91,7 @@ input ServerConfigInput {
 
     enabledFeatures: [ID!]
     enabledAuthProviders: [ID!]
-    enabledDrivers: [ID!]
+    disabledDrivers: [ID!]
 
     sessionExpireTime: Int
 }

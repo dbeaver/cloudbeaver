@@ -26,6 +26,7 @@ import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.ConfigurationUtils;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -79,7 +80,7 @@ public class WebServiceCore implements DBWServiceCore {
         List<WebDatabaseDriverConfig> result = new ArrayList<>();
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(driver.getFullId())) {
-                result.add(new WebDatabaseDriverConfig(webSession, driver));
+                result.add(new WebDatabaseDriverConfig(webSession, driver, ConfigurationUtils.isDriverEnabled(driver)));
             }
         }
         return result;

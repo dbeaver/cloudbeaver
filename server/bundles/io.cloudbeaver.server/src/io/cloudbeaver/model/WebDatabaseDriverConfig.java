@@ -44,11 +44,13 @@ public class WebDatabaseDriverConfig {
     private final WebSession webSession;
     private final DBPDriver driver;
     private String id;
+    private final boolean enabled;
 
-    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver) {
+    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver, boolean enabled) {
         this.webSession = webSession;
         this.driver = driver;
         this.id = driver.getFullId();
+        this.enabled = enabled;
     }
 
     @Property
@@ -233,4 +235,8 @@ public class WebDatabaseDriverConfig {
             .toArray(WebPropertyInfo[]::new);
     }
 
+    @Property
+    public boolean isEnabled() {
+        return enabled;
+    }
 }
