@@ -81,7 +81,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <div>
-            <ObjectChildrenPropertyTable objects={objects} />
+            <ObjectChildrenPropertyTable objects={objects} truncated={limited.truncated > 0} />
           </div>
         )}
       </>

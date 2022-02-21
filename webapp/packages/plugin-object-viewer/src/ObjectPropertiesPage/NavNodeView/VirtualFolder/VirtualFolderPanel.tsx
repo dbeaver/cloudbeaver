@@ -39,7 +39,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
     onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 
-  const { nodes } = navNodeViewService.limit(tree.data || []);
+  const { nodes, truncated } = navNodeViewService.limit(tree.data || []);
   const key = resourceKeyList(nodes);
   const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, key, {
     async onLoad(resource: DBObjectResource) {
@@ -65,7 +65,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <tab-wrapper>
-            <ObjectChildrenPropertyTable objects={objects} />
+            <ObjectChildrenPropertyTable objects={objects} truncated={truncated > 0} />
           </tab-wrapper>
         )}
       </>

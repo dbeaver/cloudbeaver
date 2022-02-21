@@ -18,6 +18,7 @@ import { NavTreeResource } from './NodesManager/NavTreeResource';
 interface Hook {
   children: string[] | undefined;
   exception: Error | null;
+  limited: boolean;
   isLoaded: () => boolean;
   isLoading: () => boolean;
   isOutdated: () => boolean;
@@ -28,10 +29,13 @@ export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
   const navTreeService = useService(NavigationTreeService);
   const navTreeResource = useService(NavTreeResource);
   let children = navTreeService.getChildren(navNodeId);
+  let limited = false;
   const exception = navTreeResource.getException(navNodeId);
 
   if (children) {
-    children = navNodeViewService.limit(children).nodes;
+    const data = navNodeViewService.limit(children);
+    children = data.nodes;
+    limited = data.truncated > 0;
   }
 
   const deps = [navNodeId];
@@ -43,6 +47,7 @@ export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
   return {
     children,
     exception,
+    limited,
     isLoaded,
     isLoading,
     isOutdated,

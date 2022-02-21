@@ -10,10 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { DBObject } from '@cloudbeaver/core-app';
-import { useTabLocalState } from '@cloudbeaver/core-ui';
-import { TableHeader, TableBody, Table, useTable, useControlledScroll, IScrollState } from '@cloudbeaver/core-blocks';
+import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
+import { TableHeader, TableBody, Table, useTable, useControlledScroll, IScrollState, TableItem, TableColumnValue } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { Header } from './Header';
 import { Item } from './Item';
@@ -26,6 +28,9 @@ const style = composes(
     }
     ObjectPropertyTableFooter {
       composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
+    }
+    TableColumnValue {
+      composes: theme-text-text-hint-on-light from global;
     }
   `,
   css`
@@ -48,16 +53,22 @@ const style = composes(
     ObjectPropertyTableFooter {
       border-top: 1px solid;
     }
+    TableColumnValue {
+      composes: theme-typography--caption from global;
+    }
   `,
 );
 
 interface Props {
   objects: DBObject[];
+  truncated?: boolean;
 }
 
 export const ObjectChildrenPropertyTable = observer<Props>(function ObjectPropertyTable({
   objects,
+  truncated,
 }) {
+  const navTreeResource = useService(NavTreeResource);
   const [scrollBox, setScrollBox] = useState<HTMLDivElement | null>(null);
   const styles = useStyles(style);
   const table = useTable();
@@ -90,6 +101,13 @@ export const ObjectChildrenPropertyTable = observer<Props>(function ObjectProper
                 columns={properties.length}
               />
             ))}
+            {truncated && (
+              <TableItem item="limited">
+                <TableColumnValue colSpan={properties.length + 2}>
+                  <Translate token='app_navigationTree_limited' limit={navTreeResource.childrenLimit} />
+                </TableColumnValue>
+              </TableItem>
+            )}
           </TableBody>
         </Table>
       </table-container>
