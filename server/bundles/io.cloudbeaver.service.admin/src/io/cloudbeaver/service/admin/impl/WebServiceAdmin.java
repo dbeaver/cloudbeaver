@@ -473,6 +473,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
             appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
             appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
+            appConfig.setEnabledDrivers(config.getEnabledDrivers());
 
             if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
                 // All of them
@@ -532,6 +533,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 // Just reload session state
                 webSession.forceUserRefresh(webSession.getUser());
             }
+            CBPlatform.getInstance().refreshApplicableDrivers();
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
         }

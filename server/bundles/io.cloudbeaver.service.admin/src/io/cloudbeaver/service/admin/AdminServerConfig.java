@@ -41,6 +41,7 @@ public class AdminServerConfig {
     private final boolean adminCredentialsSaveEnabled;
     private final List<String> enabledFeatures;
     private final List<String> enabledAuthProviders;
+    private final String[] enabledDrivers;
 
     private long sessionExpireTime;
 
@@ -69,6 +70,12 @@ public class AdminServerConfig {
         }
 
         this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
+
+        if (params.containsKey("enabledDrivers")) {
+            this.enabledDrivers = JSONUtils.getStringList(params, "enabledDrivers").toArray(new String[0]);
+        } else {
+            this.enabledDrivers = appConfig.getEnabledDrivers();
+        }
     }
 
     public String getServerName() {
@@ -133,5 +140,9 @@ public class AdminServerConfig {
 
     public List<String> getEnabledAuthProviders() {
         return enabledAuthProviders;
+    }
+
+    public String[] getEnabledDrivers() {
+        return enabledDrivers;
     }
 }

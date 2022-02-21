@@ -158,6 +158,10 @@ public class CBAppConfig {
         return enabledDrivers;
     }
 
+    public void setEnabledDrivers(String[] enabledDrivers) {
+        this.enabledDrivers = enabledDrivers;
+    }
+
     public String[] getDisabledDrivers() {
         return disabledDrivers;
     }
