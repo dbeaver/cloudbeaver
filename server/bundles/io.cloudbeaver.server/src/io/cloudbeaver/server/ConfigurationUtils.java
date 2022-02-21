@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.server;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.LinkedHashMap;
@@ -78,5 +81,18 @@ public class ConfigurationUtils {
             );
         }
         return res;
+    }
+
+    public static boolean isDriverEnabled(@NotNull DBPDriver driver) {
+        var driverId = driver.getFullId();
+        String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
+        if (enabledDrivers.length > 0 && !ArrayUtils.contains(enabledDrivers, driverId)) {
+            return false;
+        }
+        String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
+        if (disabledDrivers.length > 0 && ArrayUtils.contains(disabledDrivers, driverId)) {
+            return false;
+        }
+        return true;
     }
 }

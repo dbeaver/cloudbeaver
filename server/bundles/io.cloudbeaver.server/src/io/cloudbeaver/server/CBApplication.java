@@ -798,6 +798,9 @@ public class CBApplication extends BaseApplicationImpl {
                     if (appConfig.getEnabledAuthProviders() != null) {
                         JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
                     }
+                    if (appConfig.getEnabledDrivers() != null) {
+                        JSONUtils.serializeStringList(json, "enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()), true);
+                    }
 
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
@@ -806,6 +809,7 @@ public class CBApplication extends BaseApplicationImpl {
                         json.name("authConfiguration");
                         gson.toJson(appConfig.getAuthProviderConfigurations(), Map.class, json);
                     }
+
 
                     json.endObject();
                 }

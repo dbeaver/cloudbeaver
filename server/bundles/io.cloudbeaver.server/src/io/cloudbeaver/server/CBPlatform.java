@@ -151,30 +151,7 @@ public class CBPlatform extends BasePlatformImpl {
 
         super.initialize();
 
-        for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
-            for (DBPDriver driver : dspd.getEnabledDrivers()) {
-                if (!WebDriverRegistry.getInstance().isDriverEnabled(driver)) {
-                    continue;
-                }
-                List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
-                {
-                    boolean hasAllFiles = true;
-                    for (DBPDriverLibrary lib : libraries) {
-                        if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !lib.getLocalFile().exists()))
-                        {
-                            hasAllFiles = false;
-                            log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
-                            break;
-                        }
-                    }
-                    if (hasAllFiles) {
-                        applicableDrivers.add(driver);
-                    }
-                }
-            }
-        }
-        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+        refreshApplicableDrivers();
 
         sessionManager = WebSessionManager.getInstance();
 
@@ -318,6 +295,34 @@ public class CBPlatform extends BasePlatformImpl {
 
     public WebSessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    public void refreshApplicableDrivers() {
+        this.applicableDrivers.clear();
+
+        for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
+            for (DBPDriver driver : dspd.getEnabledDrivers()) {
+                if (!WebDriverRegistry.getInstance().isDriverEnabled(driver)) {
+                    continue;
+                }
+                List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
+                {
+                    boolean hasAllFiles = true;
+                    for (DBPDriverLibrary lib : libraries) {
+                        if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
+                            (lib.getLocalFile() == null || !lib.getLocalFile().exists())) {
+                            hasAllFiles = false;
+                            log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
+                            break;
+                        }
+                    }
+                    if (hasAllFiles) {
+                        applicableDrivers.add(driver);
+                    }
+                }
+            }
+        }
+        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
     }
 
 }

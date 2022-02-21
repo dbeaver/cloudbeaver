@@ -16,13 +16,12 @@
  */
 package io.cloudbeaver.registry;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.ConfigurationUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.utils.ArrayUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,15 +63,7 @@ public class WebDriverRegistry {
     public boolean isDriverEnabled(DBPDriver driver) {
         String driverId = driver.getFullId();
         if (webDrivers.contains(driverId)) {
-            String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
-            if (enabledDrivers.length > 0 && !ArrayUtils.contains(enabledDrivers, driverId)) {
-                return false;
-            }
-            String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
-            if (disabledDrivers.length > 0 && ArrayUtils.contains(disabledDrivers, driverId)) {
-                return false;
-            }
-            return true;
+            return ConfigurationUtils.isDriverEnabled(driver);
         }
         return false;
     }
