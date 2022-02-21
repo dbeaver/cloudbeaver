@@ -13,7 +13,7 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataAction<TOptions, TResult> {
+  implements IDatabaseDataAction<TOptions, TResult> {
   result: TResult;
 
   get resultIndex(): number {
@@ -35,6 +35,8 @@ implements IDatabaseDataAction<TOptions, TResult> {
     this.result = result;
   }
 
+  updateResults(results: TResult[]): void { }
+
   afterResultUpdate(): void { }
 
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
@@ -49,13 +51,13 @@ implements IDatabaseDataAction<TOptions, TResult> {
     return this.source.actions.get(this.result, action);
   }
 
-  getActionImplementation <T extends IDatabaseDataAction<TOptions, TResult>>(
+  getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionInterface<TOptions, TResult, T>
   ): T | undefined {
     return this.source.actions.getImplementation(this.result, action);
   }
 
-  dispose(): void {}
+  dispose(): void { }
 }
 
 export function isDatabaseDataAction(action: any): action is IDatabaseDataActionClass<any, any, any> {

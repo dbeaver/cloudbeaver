@@ -18,7 +18,7 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataSource<TOptions, TResult> {
+  implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -166,8 +166,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
   }
 
   setResults(results: TResult[]): this {
-    this.results = results;
     this.actions.updateResults(results);
+    this.results = results;
     return this;
   }
 
