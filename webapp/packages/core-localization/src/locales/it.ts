@@ -1,6 +1,6 @@
 export const defaultITLocale = [
   ['name', 'it'],
-  ['ui_rename_taken_or_invalid', 'Name has taken or invalid'],
+  ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
   ['ui_tag_new', 'Nuovo'],
   ['ui_light_theme', 'Light'],
   ['ui_dark_theme', 'Dark'],

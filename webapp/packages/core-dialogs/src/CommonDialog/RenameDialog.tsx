@@ -64,7 +64,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     payload,
   });
 
-  const errorMessage = state.valid ? ' ' : translate('ui_rename_taken_or_invalid'); 
+  const errorMessage = state.valid ? ' ' : translate('ui_rename_taken_or_invalid');
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper
