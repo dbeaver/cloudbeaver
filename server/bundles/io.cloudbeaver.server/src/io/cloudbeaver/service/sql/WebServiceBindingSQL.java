@@ -109,9 +109,15 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             })
 
             .dataFetcher("sqlResultClose", env ->
-                getService(env).closeResult(
-                    getSQLContext(env),
-                    env.getArgument("resultId")))
+                {
+                    WebSQLContextInfo sqlContext = getSQLContext(env, false);
+                    if (sqlContext == null) {
+                        throw new DBWebException("SQL context not found");
+                    }
+                    return getService(env).closeResult(
+                        getSQLContext(env),
+                        env.getArgument("resultId"));
+                })
 
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
@@ -178,6 +184,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         return getSQLProcessor(connectionInfo);
     }
 
+    @Nullable
+    public static WebSQLProcessor getSQLProcessor(DataFetchingEnvironment env, boolean connect) throws DBWebException {
+        WebConnectionInfo connectionInfo = getWebConnection(env);
+        return getSQLProcessor(connectionInfo, connect);
+    }
+
     @NotNull
     public static WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo) throws DBWebException {
         return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo);
@@ -190,7 +202,19 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
 
     @NotNull
     public static WebSQLContextInfo getSQLContext(DataFetchingEnvironment env) throws DBWebException {
-        WebSQLProcessor processor = getSQLProcessor(env);
+        WebSQLContextInfo context = getSQLContext(env, true);
+        if (context == null) {
+            throw new DBWebException("Error getting SQL context");
+        }
+        return context;
+    }
+
+    @Nullable
+    public static WebSQLContextInfo getSQLContext(DataFetchingEnvironment env, boolean connect) throws DBWebException {
+        WebSQLProcessor processor = getSQLProcessor(env, connect);
+        if (processor == null) {
+            return null;
+        }
         String contextId = env.getArgument("contextId");
         return getSQLContext(processor, contextId);
     }
