@@ -9,6 +9,7 @@ fragment DatabaseDriver on DriverInfo {
   defaultUser
   sampleURL
   embedded
+  enabled
   anonymousAccess
   promotedScore
 

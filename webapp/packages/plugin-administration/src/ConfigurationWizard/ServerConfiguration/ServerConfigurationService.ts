@@ -151,7 +151,7 @@ export class ServerConfigurationService {
     return validation.getState();
   }
 
-  private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
+  private readonly loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
     if (!data.reset) {
       return;
     }
@@ -175,6 +175,8 @@ export class ServerConfigurationService {
       data.state.serverConfig.adminCredentialsSaveEnabled = config.adminCredentialsSaveEnabled;
       data.state.serverConfig.publicCredentialsSaveEnabled = config.publicCredentialsSaveEnabled;
       data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
+      data.state.serverConfig.disabledDrivers = config.disabledDrivers;
+
 
       Object.assign(data.state.navigatorConfig, config.defaultNavigatorSettings);
     } catch (exception) {
@@ -191,7 +193,7 @@ export class ServerConfigurationService {
     };
   }
 
-  private save: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
+  private readonly save: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
     if (!validation.getState()) {
@@ -212,7 +214,7 @@ export class ServerConfigurationService {
     }
   };
 
-  private ensureValidation: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
+  private readonly ensureValidation: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
     if (!validation.getState()) {
@@ -223,7 +225,7 @@ export class ServerConfigurationService {
     }
   };
 
-  private validateForm: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
+  private readonly validateForm: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
     if (!this.isFormFilled(data.state)) {

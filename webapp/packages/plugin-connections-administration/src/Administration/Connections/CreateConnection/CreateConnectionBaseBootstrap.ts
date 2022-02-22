@@ -30,7 +30,6 @@ export class CreateConnectionBaseBootstrap extends Bootstrap {
       name: 'connections_connection_create_custom',
       order: 1,
       panel: () => CustomConnection,
-      onOpen: () => this.connectionManualService.load(),
     });
     this.createConnectionService.tabsContainer.add({
       key: 'search',

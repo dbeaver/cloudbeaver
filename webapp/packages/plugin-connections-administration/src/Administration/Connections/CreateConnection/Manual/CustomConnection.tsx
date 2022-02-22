@@ -10,22 +10,22 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionManualService } from './ConnectionManualService';
 import { DriverList } from './DriverList';
 
 export const CustomConnection = observer(function CustomConnection() {
   const service = useService(ConnectionManualService);
-  const dbDriverResource = useService(DBDriverResource);
+  const dbDriverResource = useMapResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
   const loading = dbDriverResource.isLoading();
   const drivers = useMemo(() => computed(() => (
-    Array.from(dbDriverResource.data.values())
-      .sort((a, b) => dbDriverResource.compare(a, b))
-  )), [dbDriverResource.data]);
+    dbDriverResource.resource.enabledDrivers.sort(dbDriverResource.resource.compare)
+  )), [dbDriverResource]);
 
   if (loading) {
     return <Loader />;

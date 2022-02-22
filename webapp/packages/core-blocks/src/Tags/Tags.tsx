@@ -1,0 +1,46 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
+
+import { Tag } from './Tag';
+
+export interface ITag {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
+interface Props {
+  tags: ITag[];
+  onRemove: (id: string) => void;
+  className?: string;
+}
+
+const style = css`
+  tags {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+`;
+
+export const Tags = observer<Props>(function Tags({ tags, onRemove, className }) {
+  return styled(style)(
+    <tags as='ul' className={className}>
+      {tags.map(tag => (
+        <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={onRemove} />
+      ))}
+    </tags>
+  );
+});
