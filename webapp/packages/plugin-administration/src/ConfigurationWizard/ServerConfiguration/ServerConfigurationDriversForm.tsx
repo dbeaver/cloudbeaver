@@ -69,7 +69,6 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     <Group maximum gap>
       <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
       <Combobox
-        id='ss'
         keySelector={item => item.id}
         valueSelector={value => value.name || value.id}
         iconSelector={value => value.icon}
