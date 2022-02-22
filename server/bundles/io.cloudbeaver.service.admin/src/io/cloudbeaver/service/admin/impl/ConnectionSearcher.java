@@ -18,6 +18,7 @@ package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.ConfigurationUtils;
 import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -128,6 +129,9 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
     }
 
     private void updatePortInfo(Map<Integer, AdminConnectionSearchInfo> portCache, String hostName, String displayName, DBPDriver driver, int timeout) {
+        if (!ConfigurationUtils.isDriverEnabled(driver)) {
+            return;
+        }
         int driverPort = CommonUtils.toInt(driver.getDefaultPort());
         if (driverPort <= 0) {
             return;
