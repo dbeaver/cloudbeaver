@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.registry;
 
-import io.cloudbeaver.server.ConfigurationUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -61,11 +60,7 @@ public class WebDriverRegistry {
     }
 
     public boolean isDriverEnabled(DBPDriver driver) {
-        String driverId = driver.getFullId();
-        if (webDrivers.contains(driverId)) {
-            return ConfigurationUtils.isDriverEnabled(driver);
-        }
-        return false;
+        return webDrivers.contains(driver.getFullId());
     }
 
 }
