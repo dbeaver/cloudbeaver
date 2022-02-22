@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, makeObservable } from 'mobx';
+import { computed, observable, makeObservable, action, runInAction } from 'mobx';
 
 import {
   ConnectionInfoResource,
@@ -169,13 +169,32 @@ export class ConnectionSchemaManagerService {
     return this.changingConnectionContainer;
   }
 
+  get activeItem(): IActiveItem<any> | null {
+    const tab = this.navigationTabsService.currentTab;
+
+    if (!tab) {
+      return null;
+    }
+
+    const item: IActiveItem<ITab> = {
+      id: tab.id,
+      context: tab,
+    };
+
+    const handler = this.navigationTabsService.getTabHandler(tab.handlerId);
+
+    if (handler?.extensions) {
+      this.setExtensions(item, handler.extensions);
+    }
+
+    return item;
+  }
+
   private pendingConnectionId: string | null;
   private pendingCatalogId: string | null | undefined;
   private pendingSchemaId: string | null | undefined;
   private changingConnection: boolean;
   private changingConnectionContainer: boolean;
-  private activeItem: IActiveItem<any> | null = null;
-  private activeItemHistory: Array<IActiveItem<any>> = [];
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
@@ -193,12 +212,12 @@ export class ConnectionSchemaManagerService {
     makeObservable<
     ConnectionSchemaManagerService,
     'activeItem'
-    | 'activeItemHistory'
     | 'changingConnection'
     | 'changingConnectionContainer'
     | 'pendingConnectionId'
     | 'pendingCatalogId'
     | 'pendingSchemaId'
+    | 'setExtensions'
     >(this, {
       currentObjectCatalog: computed,
       currentObjectSchema: computed,
@@ -211,13 +230,13 @@ export class ConnectionSchemaManagerService {
       isConnectionChangeable: computed,
       isObjectCatalogChangeable: computed,
       isObjectSchemaChangeable: computed,
+      activeItem: computed,
       changingConnection: observable,
       changingConnectionContainer: observable,
-      activeItem: observable,
-      activeItemHistory: observable,
       pendingConnectionId: observable,
       pendingCatalogId: observable,
       pendingSchemaId: observable,
+      setExtensions: action,
     });
   }
 
@@ -229,17 +248,21 @@ export class ConnectionSchemaManagerService {
       return;
     }
     try {
-      this.changingConnection = true;
-      this.pendingConnectionId = connectionId;
-      this.pendingSchemaId = undefined;
-      this.pendingCatalogId = undefined;
+      runInAction(() => {
+        this.changingConnection = true;
+        this.pendingConnectionId = connectionId;
+        this.pendingSchemaId = undefined;
+        this.pendingCatalogId = undefined;
+      });
       await this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
       await this.updateContainer(connectionId);
     } finally {
-      this.changingConnection = false;
-      this.pendingConnectionId = null;
-      this.pendingSchemaId = null;
-      this.pendingCatalogId = null;
+      runInAction(() => {
+        this.changingConnection = false;
+        this.pendingConnectionId = null;
+        this.pendingSchemaId = null;
+        this.pendingCatalogId = null;
+      });
     }
   }
 
@@ -256,21 +279,26 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-      this.changingConnectionContainer = true;
-      this.pendingCatalogId = catalogId;
 
-      if (resetSchemaId) {
-        this.pendingSchemaId = undefined;
-      }
+      runInAction(() => {
+        this.changingConnectionContainer = true;
+        this.pendingCatalogId = catalogId;
+
+        if (resetSchemaId) {
+          this.pendingSchemaId = undefined;
+        }
+      });
 
       await this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
       await this.updateContainer(this.currentConnectionId, catalogId);
     } finally {
-      if (resetSchemaId) {
-        this.pendingSchemaId = null;
-      }
-      this.pendingCatalogId = null;
-      this.changingConnectionContainer = false;
+      runInAction(() => {
+        if (resetSchemaId) {
+          this.pendingSchemaId = null;
+        }
+        this.pendingCatalogId = null;
+        this.changingConnectionContainer = false;
+      });
     }
   }
 
@@ -283,8 +311,10 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-      this.changingConnectionContainer = true;
-      this.pendingSchemaId = schemaId;
+      runInAction(() => {
+        this.changingConnectionContainer = true;
+        this.pendingSchemaId = schemaId;
+      });
 
       if (catalogId) {
         await this.selectCatalog(catalogId, false);
@@ -292,38 +322,14 @@ export class ConnectionSchemaManagerService {
 
       await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
     } finally {
-      this.pendingSchemaId = null;
-      this.changingConnectionContainer = false;
+      runInAction(() => {
+        this.pendingSchemaId = null;
+        this.changingConnectionContainer = false;
+      });
     }
   }
 
-  reset() {
-    this.activeItem = null;
-    this.activeItemHistory = [];
-  }
-
-  onTabSelect(tab: ITab) {
-    const item: IActiveItem<ITab> = {
-      id: tab.id,
-      context: tab,
-    };
-    const handler = this.navigationTabsService.getTabHandler(tab.handlerId);
-
-    if (handler?.extensions) {
-      this.setExtensions(item, handler.extensions);
-    }
-
-    this.setActiveItem(item);
-  }
-
-  onTabClose(tab: ITab | undefined) {
-    if (!tab) {
-      return;
-    }
-    this.removeActiveItem(tab.id);
-  }
-
-  private async updateContainer(connectionId?: string | null, catalogId?: string): Promise<void> {
+  async updateContainer(connectionId?: string | null, catalogId?: string): Promise<void> {
     if (!connectionId) {
       connectionId = this.currentConnectionId;
     }
@@ -373,28 +379,5 @@ export class ConnectionSchemaManagerService {
       .on(isConnectionSetter, extension => { item.changeConnectionId = extension; })
       .on(isObjectCatalogSetter, extension => { item.changeCatalogId = extension; })
       .on(isObjectSchemaSetter, extension => { item.changeSchemaId = extension; });
-  }
-
-  private removeActiveItem(id: string) {
-    this.clearHistory(id);
-    if (id === this.activeItem?.id) {
-      this.setActiveItem(this.activeItemHistory.shift() ?? null);
-    }
-  }
-
-  private setActiveItem(item: IActiveItem<any> | null) {
-    if (!item) {
-      this.activeItem = item;
-      return;
-    }
-    this.clearHistory(item.id);
-    this.activeItem = item;
-    this.activeItemHistory.push(item);
-
-    this.updateContainer();
-  }
-
-  private clearHistory(id: string) {
-    this.activeItemHistory = this.activeItemHistory.filter(item => item.id !== id);
   }
 }

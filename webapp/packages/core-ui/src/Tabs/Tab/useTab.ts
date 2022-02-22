@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
 import { useContext } from 'react';
 
-import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -21,6 +22,8 @@ export function useTab(
   onClick?: (tabId: string) => void,
 ) {
   const state = useContext(TabsContext);
+  const refObject = useObjectRef({ onClick });
+
   if (!state) {
     throw new Error('TabsContext not provided');
   }
@@ -45,20 +48,30 @@ export function useTab(
     }],
   });
 
-  return useObjectRef({
-    state,
-    getInfo: () => state.getTabInfo(tabId),
-    selected: state.state.selectedId === tabId,
-    handleOpen: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  return useObservableRef(() => ({
+    get selected() {
+      return this.state.state.selectedId === this.tabId;
+    },
+    getInfo() {
+      return this.state.getTabInfo(this.tabId);
+    },
+    handleOpen(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
       if (EventContext.has(e, EventStopPropagationFlag)) {
         return;
       }
-      onClick?.(tabId);
-      state.open(tabId);
+      refObject.onClick?.(this.tabId);
+      this.state.open(this.tabId);
     },
-    handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    handleClose(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
-      state.close(tabId);
+      this.state.close(tabId);
     },
-  });
+  }), {
+    selected: computed,
+    state: observable.ref,
+    tabId: observable.ref,
+  }, {
+    state,
+    tabId,
+  }, ['getInfo', 'handleOpen', 'handleClose']);
 }

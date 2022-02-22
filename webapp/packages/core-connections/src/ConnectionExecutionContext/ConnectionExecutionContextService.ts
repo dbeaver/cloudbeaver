@@ -40,6 +40,10 @@ export class ConnectionExecutionContextService {
     return this.contexts.get(contextId);
   }
 
+  async load(): Promise<void> {
+    await this.connectionExecutionContextResource.loadAll();
+  }
+
   async create(
     connectionId: string,
     defaultCatalog?: string,

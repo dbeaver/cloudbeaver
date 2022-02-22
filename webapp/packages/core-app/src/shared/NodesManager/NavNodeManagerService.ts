@@ -15,7 +15,7 @@ import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/cor
 import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { ENodeFeature } from './ENodeFeature';
@@ -240,6 +240,9 @@ export class NavNodeManagerService extends Bootstrap {
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
+
+    await this.connectionInfo.load(CachedMapAllKey);
+
     const connection = this.connectionInfo.getConnectionForNode(nodeId);
 
     if (NodeManagerUtils.isDatabaseObject(nodeId) && connection?.connected) {

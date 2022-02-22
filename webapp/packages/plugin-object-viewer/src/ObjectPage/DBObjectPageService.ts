@@ -23,6 +23,7 @@ export class DBObjectPageService {
       pages: observable,
       orderedPages: computed,
       register: action,
+      selectPage: action.bound,
     });
   }
 
@@ -41,14 +42,14 @@ export class DBObjectPageService {
     return this.pages.get(pageId);
   }
 
-  getPageState<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>| string): T | undefined {
+  getPageState<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T> | string): T | undefined {
     const pageKey = typeof page === 'string' ? page : page.key;
 
     return tab.handlerState.pagesState[pageKey];
   }
 
   canSwitchPage(currentPage: ObjectPage<any>, page: ObjectPage<any>): boolean {
-    if ((currentPage?.priority || 0) < page.priority) {
+    if ((currentPage.priority || 0) < page.priority) {
       return true;
     }
     return false;
@@ -66,13 +67,15 @@ export class DBObjectPageService {
     return false;
   }
 
-  selectPage = async <T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T) => {
+  selectPage<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T): void {
     tab.handlerState.pageId = page.key;
+
     if (state !== undefined) {
       tab.handlerState.pagesState[page.key] = state;
     }
-    await this.callHandlerCallback(tab, page => page.onSelect);
-  };
+
+    this.callHandlerCallback(tab, page => page.onSelect);
+  }
 
   async restorePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
     for (const page of this.pages.values()) {
@@ -106,7 +109,7 @@ export class DBObjectPageService {
     for (const page of this.pages.values()) {
       const callback = selector(page);
       if (callback) {
-        await callback.call(page, tab, this.getPageState(tab, page));
+        callback.call(page, tab, this.getPageState(tab, page));
       }
     }
   }

@@ -7,13 +7,12 @@
  */
 
 import {
-  NavNodeManagerService, ITab, INodeNavigationData
+  NavNodeManagerService, INodeNavigationData
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import type { ObjectPage } from '../ObjectPage/ObjectPage';
 import { ObjectViewerTabService } from '../ObjectViewerTabService';
@@ -25,10 +24,10 @@ export class ObjectPropertiesPageService {
   page?: ObjectPage;
 
   constructor(
-    private navNodeManagerService: NavNodeManagerService,
-    private notificationService: NotificationService,
-    private objectViewerTabService: ObjectViewerTabService,
-    private dbObjectPageService: DBObjectPageService
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly notificationService: NotificationService,
+    private readonly objectViewerTabService: ObjectViewerTabService,
+    private readonly dbObjectPageService: DBObjectPageService
   ) {
   }
 
@@ -39,15 +38,8 @@ export class ObjectPropertiesPageService {
       order: 1,
       getTabComponent: () => ObjectPropertiesPageTab,
       getPanelComponent: () => ObjectPropertiesPagePanel,
-      onSelect: this.handlePageSelect.bind(this),
     });
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
-  }
-
-  private async handlePageSelect(tab: ITab<IObjectViewerTabState>) {
-    // TODO: must be loaded by info folder?
-    // await this.nodesManagerService.loadDatabaseObjectInfo(tab.handlerState.objectId);
-    // await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {

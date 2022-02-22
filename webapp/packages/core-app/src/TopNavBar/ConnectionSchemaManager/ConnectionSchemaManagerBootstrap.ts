@@ -10,7 +10,6 @@ import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerServi
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
-import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
 import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
 import { ConnectionIcon } from './ConnectionSelector/ConnectionIcon';
@@ -28,7 +27,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   }
 
   constructor(
-    private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly connectionsManagerService: ConnectionsManagerService,
@@ -41,19 +39,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.connectionInfoResource.onDataUpdate
       .addHandler(this.connectionSchemaManagerService.onConnectionUpdate.bind(this.connectionSchemaManagerService));
-
-    this.navigationTabsService.onTabSelect
-      .addHandler(this.connectionSchemaManagerService.onTabSelect.bind(this.connectionSchemaManagerService));
-
-    this.navigationTabsService.onTabClose
-      .addHandler(this.connectionSchemaManagerService.onTabClose.bind(this.connectionSchemaManagerService));
-
-    this.navigationTabsService.onInit
-      .addHandler(state => {
-        if (!state) {
-          this.connectionSchemaManagerService.reset.bind(this.connectionSchemaManagerService);
-        }
-      });
 
     this.menuService.setHandler({
       id: 'connection-selector-base',

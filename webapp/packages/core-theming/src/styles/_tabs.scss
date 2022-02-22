@@ -121,6 +121,10 @@
     position: absolute;
     top: 0;
     right: 0;
+
+    &:empty {
+      display: none;
+    }
   }
 
   tab-action:before {

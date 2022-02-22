@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable, runInAction } from 'mobx';
+
 import {
   NavigationTabsService,
   INodeNavigationData,
@@ -21,7 +23,7 @@ import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbe
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -59,6 +61,11 @@ export class ObjectViewerTabService {
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
       ],
     });
+
+    makeObservable<this, 'updateConnectionTabs' | 'selectObjectTab'>(this, {
+      updateConnectionTabs: action,
+      selectObjectTab: action,
+    });
   }
 
   registerTabHandler(): void {
@@ -67,7 +74,6 @@ export class ObjectViewerTabService {
     this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
-    this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
 
@@ -173,20 +179,19 @@ export class ObjectViewerTabService {
     };
   };
 
-  private async closeConnectionTabs(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const tabs = this.navigationTabsService.findTabs(
-        isObjectViewerTab(tab => tab.handlerState.connectionId === key)
-      );
+  private closeConnectionTabs(key: ResourceKey<string>) {
+    const tabs = Array.from(
+      this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => ResourceKeyUtils.includes(key, tab.handlerState.connectionId))
+      )
+    )
+      .map(tab => tab.id);
 
-      for (const tab of tabs) {
-        await this.navigationTabsService.closeTab(tab.id, true);
-      }
-    });
+    this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private async updateConnectionTabs(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+  private updateConnectionTabs(key: ResourceKey<string>) {
+    ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
         isObjectViewerTab(tab =>
           tab.id === this.navigationTabsService.currentTabId
@@ -195,56 +200,45 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
-        await this.navigationTabsService.selectTab(tab.id);
+        this.navigationTabsService.selectTab(tab.id);
       }
     });
   }
 
-  private async closeConnectionInfoTabs(connection: Connection) {
+  private closeConnectionInfoTabs(connection: Connection) {
     if (!connection.connected) {
-      const tabs = this.navigationTabsService.findTabs(
+      const tabs = Array.from(this.navigationTabsService.findTabs(
         isObjectViewerTab(tab => tab.handlerState.connectionId === connection.id)
-      );
+      )).map(tab => tab.id);
 
-      for (const tab of tabs) {
-        await this.navigationTabsService.closeTab(tab.id, true);
-      }
+      this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
     }
   }
 
-  private async updateTabs(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab => tab.handlerState.objectId === key)
-      );
-
-      if (tab) {
-        tab.handlerState.error = false;
-
-        if (tab.id === this.navigationTabsService.currentTabId) {
-          await this.navigationTabsService.selectTab(tab.id);
-        }
-      }
-    });
-  }
-
   private async removeTabs(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+    const tabs: string[] = [];
+
+    await this.connectionInfo.load(CachedMapAllKey);
+
+    ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
         isObjectViewerTab(tab => tab.handlerState.objectId === key)
       );
 
       if (tab) {
-        if (tab.handlerState.connectionId && this.connectionInfo.has(tab.handlerState.connectionId)) {
-          const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
+        if (tab.handlerState.connectionId) {
+          const connection = this.connectionInfo.get(tab.handlerState.connectionId);
 
-          if (!connection.connected) {
+          if (connection && !connection.connected) {
             return;
           }
         }
-        await this.navigationTabsService.closeTab(tab.id, true);
+
+        tabs.push(tab.id);
       }
     });
+
+    this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
   private getNavNode(context: ITab<IObjectViewerTabState>): IDataContextActiveNode {
@@ -278,31 +272,16 @@ export class ObjectViewerTabService {
     return nodeInfo.schemaId;
   }
 
-  private async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
+  private selectObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (tab.handlerState.error) {
       return;
     }
 
     try {
-      if (tab.handlerState.connectionId) {
-        // here we wait when connections info will be updated and then check is connections is steel available
-        await this.connectionInfo.waitLoad();
-
-        if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
-          return;
-        }
-
-        const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
-
-        if (!connection.connected) {
-          return;
-        }
-      }
-
       const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
 
       if (currentPage) {
-        await this.dbObjectPageService.selectPage(tab, currentPage);
+        this.dbObjectPageService.selectPage(tab, currentPage);
       }
 
       if (tab.handlerState.childrenError) {
@@ -333,8 +312,11 @@ export class ObjectViewerTabService {
           return false;
         }
       }
-      tab.handlerState.error = false;
-      tab.handlerState.childrenError = false;
+
+      runInAction(() => {
+        tab.handlerState.error = false;
+        tab.handlerState.childrenError = false;
+      });
 
       return this.dbObjectPageService.restorePages(tab);
     }
@@ -354,15 +336,17 @@ export class ObjectViewerTabService {
       const { tab, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
 
       if (tab) {
-        if (
-          !tab.handlerState.folderId
-          || (data.folderId && tab.handlerState.folderId !== data.folderId)
-          || (tab.handlerState.folderId !== nodeInfo.folderId)
-        ) {
-          tab.handlerState.childrenError = false;
-          tab.handlerState.folderId = data.folderId || nodeInfo.folderId;
-        }
-        this.navigationTabsService.selectTab(tab.id);
+        runInAction(() => {
+          if (
+            !tab.handlerState.folderId
+            || (data.folderId && tab.handlerState.folderId !== data.folderId)
+            || (tab.handlerState.folderId !== nodeInfo.folderId)
+          ) {
+            tab.handlerState.childrenError = false;
+            tab.handlerState.folderId = data.folderId || nodeInfo.folderId;
+          }
+          this.navigationTabsService.selectTab(tab.id);
+        });
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');

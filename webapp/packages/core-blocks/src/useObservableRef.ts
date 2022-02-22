@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AnnotationsMap, getDebugName, makeObservable } from 'mobx';
+import { AnnotationsMap, makeObservable, untracked } from 'mobx';
 import { useState } from 'react';
 
 export function useObservableRef<T extends Record<any, any>>(
@@ -60,11 +60,11 @@ export function useObservableRef<T extends Record<any, any>>(
   }
 
   if (update === undefined) {
-    update = typeof init === 'function' ? init() : init;
+    update = typeof init === 'function' ? untracked(init) : init;
   }
 
   const [state] = useState(() => {
-    let state = typeof init === 'function' ? init() : init;
+    let state = typeof init === 'function' ? untracked(init) : init;
 
     if (update) {
       Object.assign(state, update);

@@ -12,8 +12,8 @@ import { LocalizationService } from './LocalizationService';
 import type { TLocalizationToken } from './TLocalizationToken';
 
 export function useTranslate(): (<T extends TLocalizationToken | undefined>(
-  token: T, 
-  fallback?: T, 
+  token: T,
+  fallback?: T,
   args?: Record<string | number, any>
 ) => T) {
   const localizationService = useService(LocalizationService);

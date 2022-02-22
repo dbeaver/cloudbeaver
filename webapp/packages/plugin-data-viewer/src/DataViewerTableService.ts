@@ -8,7 +8,6 @@
 
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
@@ -25,7 +24,6 @@ export class DataViewerTableService {
   constructor(
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService
@@ -54,7 +52,6 @@ export class DataViewerTableService {
   ): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
     const source = new ContainerDataSource(
       this.graphQLService,
-      this.notificationService,
       this.asyncTaskInfoService,
       this.connectionExecutionContextService
     );

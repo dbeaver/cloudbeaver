@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
@@ -134,64 +135,86 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }, []);
 
-  const handleOpen = useCallback((tabId: string) => openExecutor.execute({
-    tabId,
-    props: dynamic.props,
-  }), []);
-
-  const handleClose = useCallback((tabId: string) => closeExecutor.execute({
-    tabId,
-    props: dynamic.props,
-  }), []);
-
-  const closeAll = useCallback(async () => {
-    if (dynamic.tabList) {
-      for (const tab of dynamic.tabList.slice()) {
-        await handleClose(tab);
+  const value = useObservableRef<ITabsContext<T>>(() => ({
+    getTabInfo(tabId: string) {
+      return  dynamic.container?.getTabInfo(tabId);
+    },
+    getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
+      return dynamic.container?.getTabState(
+        dynamic.tabsState,
+        tabId,
+        dynamic.props,
+        valueGetter
+      );
+    },
+    getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
+      return dynamic.tabsState.get(
+        tabId,
+        valueGetter
+      );
+    },
+    async open(tabId: string) {
+      await openExecutor.execute({
+        tabId,
+        props: dynamic.props,
+      });
+    },
+    async close(tabId: string) {
+      await closeExecutor.execute({
+        tabId,
+        props: dynamic.props,
+      });
+    },
+    async closeAll() {
+      if (dynamic.tabList) {
+        for (const tab of dynamic.tabList.slice()) {
+          await this.close(tab);
+        }
       }
-    }
-  }, [handleClose]);
+    },
+    async closeAllToTheDirection(tabId: string, direction: TabDirection) {
+      if (dynamic.tabList) {
+        const index = dynamic.tabList.indexOf(tabId);
 
-  const closeAllToTheDirection = useCallback(async (tabId: string, direction: TabDirection) => {
-    if (dynamic.tabList) {
-      const index = dynamic.tabList.indexOf(tabId);
+        if (index === -1) {
+          return;
+        }
 
-      if (index === -1) {
-        return;
+        const tabs = direction === 'left' ? dynamic.tabList.slice(0, index) : dynamic.tabList.slice(index + 1);
+
+        for (const tab of tabs) {
+          await this.close(tab);
+        }
       }
-
-      const tabs = direction === 'left' ? dynamic.tabList.slice(0, index) : dynamic.tabList.slice(index + 1);
-
-      for (const tab of tabs) {
-        await handleClose(tab);
+    },
+    async closeOthers(tabId: string) {
+      if (dynamic.tabList) {
+        const tabs = dynamic.tabList.filter(tab => tab !== tabId);
+        for (const tab of tabs) {
+          await this.close(tab);
+        }
       }
-    }
-  }, [handleClose]);
-
-  const closeOthers = useCallback(async (tabId: string) => {
-    if (dynamic.tabList) {
-      const tabs = dynamic.tabList.filter(tab => tab !== tabId);
-      for (const tab of tabs) {
-        await handleClose(tab);
-      }
-    }
-  }, [handleClose]);
-
-  const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
-  const getTabState = useCallback(
-    (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => dynamic.container?.getTabState(
-      dynamic.tabsState,
-      tabId,
-      dynamic.props,
-      valueGetter
-    ), []);
-  const getLocalState = useCallback(
-    (tabId: string, valueGetter?: MetadataValueGetter<string, any>) => tabsState.get(
-      tabId,
-      valueGetter
-    ), [tabsState]);
-
-  const value = useMemo<ITabsContext<T>>(() => ({
+    },
+  }), {
+    state: observable.ref,
+    tabsState: observable.ref,
+    props: observable.ref,
+    container: observable.ref,
+    openExecutor: observable.ref,
+    closeExecutor: observable.ref,
+    lazy: observable.ref,
+    closable: observable.ref,
+    tabList: observable.ref,
+    enabledBaseActions: observable.ref,
+    getTabInfo: action.bound,
+    getTabState: action.bound,
+    getLocalState: action.bound,
+    open: action.bound,
+    close: action.bound,
+    closeAll: action.bound,
+    closeAllToTheDirection: action.bound,
+    closeOthers: action.bound,
+  }, {
     state,
     tabsState,
     props,
@@ -202,33 +225,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     closable,
     tabList,
     enabledBaseActions,
-    getTabInfo,
-    getTabState,
-    getLocalState,
-    open: handleOpen,
-    close: handleClose,
-    closeAll,
-    closeAllToTheDirection,
-    closeOthers,
-  }), [
-    ...Object.values(state),
-    tabsState,
-    ...Object.values(rest),
-    container,
-    closeExecutor,
-    openExecutor,
-    lazy,
-    closable,
-    tabList,
-    enabledBaseActions,
-    getTabInfo,
-    getTabState,
-    handleClose,
-    handleOpen,
-    closeAll,
-    closeAllToTheDirection,
-    closeOthers,
-  ]);
+  });
 
   return (
     <TabsContext.Provider value={value}>

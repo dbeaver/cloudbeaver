@@ -54,17 +54,23 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
 
+  function unloadTabs() {
+    navigation.unloadTabs();
+  }
+
   async function restoreTabs() {
-    await navigation.unloadTabs();
     await navigation.restoreTabs();
   }
 
   useExecutor({
     executor: userInfoResource.onDataUpdate,
-    postHandlers: [restoreTabs],
+    postHandlers: [unloadTabs, restoreTabs],
   });
 
-  useEffect(() => { restoreTabs(); }, []);
+  useEffect(() => {
+    unloadTabs();
+    restoreTabs();
+  }, []);
 
   if (navigation.tabIdList.length === 0) {
     return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
