@@ -16,6 +16,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
 import type { IDataTableActionsPrivate } from './IDataTableActions';
 import { TableError } from './TableError';
@@ -121,6 +122,15 @@ export const TableViewer = observer<Props>(function TableViewer({
   const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
   const dataTableActions = useObservableRef<IDataTableActionsPrivate>(() => ({
+    handlePresentationChange(id: string) {
+      const constraints = this.dataModel?.source.tryGetAction(this.resultIndex, ResultSetConstraintAction);
+
+      if (constraints) {
+        constraints.deleteAll();
+      }
+
+      this.onPresentationChange(id);
+    },
     setPresentation(id: string) {
       const presentation = dataPresentationService.get(id);
 
@@ -131,7 +141,7 @@ export const TableViewer = observer<Props>(function TableViewer({
         ) {
           this.dataModel?.setDataFormat(presentation.dataFormat).reload();
         }
-        this.onPresentationChange(id);
+        this.handlePresentationChange(id);
       }
     },
 
@@ -196,7 +206,7 @@ export const TableViewer = observer<Props>(function TableViewer({
     const presentation = dataPresentationService.get(presentationId);
 
     if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
-      onPresentationChange(dataFormat);
+      dataTableActions.handlePresentationChange(dataFormat);
     }
   }, [dataFormat]);
 
