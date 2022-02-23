@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage, Link } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILogEntry } from './ILogEntry';
@@ -64,6 +65,10 @@ export const LogEntry = observer<Props>(function LogEntry({
   selected = false,
   className,
 }) {
+  const translate = useTranslate();
+
+  const isError = !!item.stackTrace;
+  const message = isError ? item.message || translate('ui_error') : item.message;
   let icon: string | null = null;
 
   switch (item.type) {
@@ -81,12 +86,12 @@ export const LogEntry = observer<Props>(function LogEntry({
       <td>{item.time}</td>
       <td>
         <message-cell>
-          <message title={item.message}>
-            {item.stackTrace ? (
+          <message title={message}>
+            {isError ? (
               <Link onClick={() => onSelect(item)}>
-                {item.message}
+                {message}
               </Link>
-            ) : item.message}
+            ) : message}
           </message>
         </message-cell>
       </td>
