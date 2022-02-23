@@ -7,12 +7,14 @@
  */
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
-import { TabsBootstrap } from './Tabs/TabsBootstrap';
+
 
 import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap';
 import { ClipboardService } from './Clipboard/ClipboardService';
+import { LocaleService } from './LocaleService';
 import { NavigationService } from './Screens/AppScreen/NavigationService';
 import { OptionsPanelService } from './Screens/AppScreen/OptionsPanelService';
+import { TabsBootstrap } from './Tabs/TabsBootstrap';
 
 export const manifest: PluginManifest = {
   info: {
@@ -24,6 +26,7 @@ export const manifest: PluginManifest = {
     OptionsPanelService,
     ClipboardBootstrap,
     ClipboardService,
-    TabsBootstrap
+    TabsBootstrap,
+    LocaleService,
   ],
 };
