@@ -25,4 +25,7 @@ export default [
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],
   ['administration_configuration_wizard_configuration_security_admin_credentials_description', 'Позволяет сохранять приватные данные, такие как пароли и SSH ключи'],
   ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Пользователи будут иметь возможность сохранять приватные данные, такие как пароли и SSH ключи'],
+
+  ['administration_disabled_drivers_title', 'Отключенные драйвера'],
+  ['administration_disabled_drivers_search_placeholder', 'Поиск по драйверу...'],
 ];

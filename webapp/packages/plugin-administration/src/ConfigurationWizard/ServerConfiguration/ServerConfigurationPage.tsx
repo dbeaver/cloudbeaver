@@ -22,6 +22,7 @@ import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeatu
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
+import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = css`
@@ -133,6 +134,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                 state={service.state}
               />
               <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
+              <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
             </Container>
           )}
         </Loader>

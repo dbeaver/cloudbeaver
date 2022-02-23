@@ -19,13 +19,12 @@ export class CustomConnectionController implements IInitializableController {
   onClose!: () => void;
 
   get drivers(): DBDriver[] {
-    return this.dbDriverResource.values
-      .sort(this.dbDriverResource.compare);
+    return this.dbDriverResource.enabledDrivers.slice().sort(this.dbDriverResource.compare);
   }
 
   constructor(
-    private dbDriverResource: DBDriverResource,
-    private notificationService: NotificationService,
+    private readonly dbDriverResource: DBDriverResource,
+    private readonly notificationService: NotificationService,
     private readonly publicConnectionFormService: PublicConnectionFormService
   ) {
     makeObservable(this, {
@@ -42,7 +41,7 @@ export class CustomConnectionController implements IInitializableController {
   onDriverSelect = async (driverId: string) => {
     const state = await this.publicConnectionFormService.open(
       { driverId },
-      this.dbDriverResource.keys
+      this.drivers.map(driver => driver.id)
     );
 
     if (state) {

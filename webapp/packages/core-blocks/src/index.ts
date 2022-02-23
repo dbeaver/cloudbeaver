@@ -103,6 +103,9 @@ export * from './FolderExplorer/FolderExplorerPath';
 export * from './FolderExplorer/FolderName';
 export * from './FolderExplorer/useFolderExplorer';
 
+export * from './Tags/Tag';
+export * from './Tags/Tags';
+
 export * from './FormControls/FormBoxElement';
 export * from './FormControls/Combobox';
 export * from './FormControls/FormContext';

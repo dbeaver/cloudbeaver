@@ -78,6 +78,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.update.enabledAuthProviders || this.data?.enabledAuthProviders || [];
   }
 
+  get disabledDrivers(): string[] {
+    return this.update.disabledDrivers || this.data?.disabledDrivers || [];
+  }
+
   get credentialsSaveEnabled(): boolean {
     return this.update.adminCredentialsSaveEnabled ?? this.data?.adminCredentialsSaveEnabled ?? false;
   }
@@ -115,6 +119,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
       || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
       || !isArraysEqual(this.update.enabledFeatures || [], this.data.enabledFeatures)
+      || !isArraysEqual(this.update.disabledDrivers || [], this.data.disabledDrivers)
     );
   }
 
@@ -213,5 +218,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     this.update.customConnectionsEnabled = serverConfig.supportsCustomConnections;
     this.update.enabledAuthProviders = [...serverConfig.enabledAuthProviders];
     this.update.enabledFeatures = [...serverConfig.enabledFeatures];
+    this.update.disabledDrivers = [...serverConfig.disabledDrivers];
   }
 }
