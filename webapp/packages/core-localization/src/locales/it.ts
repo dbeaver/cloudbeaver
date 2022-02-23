@@ -17,7 +17,7 @@ export const defaultITLocale = [
   ['ui_processing_saved', 'Saved'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Applica'],
-  ['ui_error', 'Error'],
+  ['ui_error', 'Errore'],
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
   ['ui_close', 'Chiudi'],
