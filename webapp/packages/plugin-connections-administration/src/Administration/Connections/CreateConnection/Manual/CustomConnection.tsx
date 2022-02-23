@@ -24,7 +24,7 @@ export const CustomConnection = observer(function CustomConnection() {
 
   const loading = dbDriverResource.isLoading();
   const drivers = useMemo(() => computed(() => (
-    dbDriverResource.resource.enabledDrivers.sort(dbDriverResource.resource.compare)
+    dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
   if (loading) {

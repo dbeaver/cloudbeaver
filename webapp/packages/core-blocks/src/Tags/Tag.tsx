@@ -13,6 +13,12 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../IconOrImage';
 
+export interface ITag {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
 const style = composes(
   css`
     tag-container {
@@ -65,10 +71,7 @@ const style = composes(
   `
 );
 
-interface Props {
-  id: string;
-  label: string;
-  icon?: string;
+interface Props extends ITag {
   onRemove: (id: string) => void;
   className?: string;
 }

@@ -9,17 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Tag } from './Tag';
-
-export interface ITag {
-  id: string;
-  label: string;
-  icon?: string;
-}
-
 interface Props {
-  tags: ITag[];
-  onRemove: (id: string) => void;
   className?: string;
 }
 
@@ -35,12 +25,10 @@ const style = css`
   }
 `;
 
-export const Tags = observer<Props>(function Tags({ tags, onRemove, className }) {
+export const Tags = observer<Props>(function Tags({ children, className }) {
   return styled(style)(
     <tags as='ul' className={className}>
-      {tags.map(tag => (
-        <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={onRemove} />
-      ))}
+      {children}
     </tags>
   );
 });

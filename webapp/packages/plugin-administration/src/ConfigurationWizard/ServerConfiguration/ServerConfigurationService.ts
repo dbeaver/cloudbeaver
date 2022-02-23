@@ -175,8 +175,7 @@ export class ServerConfigurationService {
       data.state.serverConfig.adminCredentialsSaveEnabled = config.adminCredentialsSaveEnabled;
       data.state.serverConfig.publicCredentialsSaveEnabled = config.publicCredentialsSaveEnabled;
       data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
-      data.state.serverConfig.disabledDrivers = config.disabledDrivers;
-
+      data.state.serverConfig.disabledDrivers = [...config.disabledDrivers];
 
       Object.assign(data.state.navigatorConfig, config.defaultNavigatorSettings);
     } catch (exception) {
