@@ -43,7 +43,7 @@ export const GrantedConnectionsTableItem = observer<Props>(function GrantedConne
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue>{icon && <StaticImage icon={icon} title={iconTooltip} />}</TableColumnValue>
+      <TableColumnValue flex centerContent>{icon && <StaticImage icon={icon} title={iconTooltip} />}</TableColumnValue>
       <TableColumnValue title={name} ellipsis>{name}</TableColumnValue>
       <TableColumnValue>{host && host}</TableColumnValue>
     </TableItem>

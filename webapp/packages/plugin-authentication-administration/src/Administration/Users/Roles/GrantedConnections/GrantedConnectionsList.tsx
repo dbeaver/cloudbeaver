@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import {
   Table,
@@ -20,9 +20,9 @@ import {
   Group,
   Button,
   useObjectRef,
-  getSelectedItems
+  getSelectedItems,
+  getComputed
 } from '@cloudbeaver/core-blocks';
-import { getComputed } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
@@ -57,6 +57,9 @@ const styles = composes(
     }
     table-container {
       overflow: auto;
+    }
+    Table {
+      width: 100%;
     }
   `
 );
@@ -110,7 +113,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects}>
+          <Table keys={keys} selectedItems={selectedSubjects} {...use({ size: 'big' })}>
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               <TableItem item='tableInfo' selectDisabled>
