@@ -25,6 +25,8 @@ const styles = composes(
 `,
   css`
     Icon {
+      width: 100%;
+      height: 100%;
       cursor: pointer;
       opacity: 0.5;
       transform: rotate(-90deg);

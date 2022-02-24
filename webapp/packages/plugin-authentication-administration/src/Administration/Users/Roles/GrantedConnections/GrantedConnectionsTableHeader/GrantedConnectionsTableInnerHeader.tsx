@@ -37,7 +37,7 @@ export const GrantedConnectionsTableInnerHeader = observer<Props>(function Grant
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <TableHeader className={className}>
-      <TableColumnHeader min>
+      <TableColumnHeader min flex centerContent>
         <TableSelect id='selectConnections' disabled={disabled} />
       </TableColumnHeader>
       <TableColumnHeader min />

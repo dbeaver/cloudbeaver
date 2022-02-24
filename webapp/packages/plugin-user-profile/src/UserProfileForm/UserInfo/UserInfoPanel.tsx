@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { TabPanel } from '@cloudbeaver/core-ui';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { TabPanel } from '@cloudbeaver/core-ui';
 
 import { AuthTokenList } from '../AuthTokens/AuthTokenList';
 
