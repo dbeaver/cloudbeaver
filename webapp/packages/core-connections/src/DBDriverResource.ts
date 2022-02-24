@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
+import { EPermission, PermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -23,12 +25,23 @@ export type DBDriver = DatabaseDriverFragment;
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
+  get enabledDrivers() {
+    return this.values.filter(driver => driver.enabled);
+  }
+
   constructor(
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly graphQLService: GraphQLService,
     permissionsResource: PermissionsResource,
   ) {
     super();
     permissionsResource.require(this, EPermission.public);
+
+    this.serverConfigResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+
+    makeObservable(this, {
+      enabledDrivers: computed,
+    });
   }
 
   async loadAll(): Promise<Map<string, DBDriver>> {

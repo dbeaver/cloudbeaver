@@ -51,4 +51,7 @@ export default [
   ['administration_configuration_wizard_finish_step_description', 'Confirmation'],
   ['administration_configuration_wizard_finish_title', 'That is almost it.'],
   ['administration_configuration_wizard_finish_message', 'Press the Finish button to complete the server configuration. You can return to the previous pages if you want to change or add something.\nWhen the configuration is completed all entered settings will be applied for your CloudBeaver server. You will be redirected to the main page to start working.\nYou can always login to the system as administrator to change the server settings.'],
+
+  ['administration_disabled_drivers_title', 'Disabled drivers'],
+  ['administration_disabled_drivers_search_placeholder', 'Search for the driver...'],
 ];

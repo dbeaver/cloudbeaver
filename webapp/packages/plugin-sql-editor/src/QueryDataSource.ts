@@ -9,7 +9,6 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
@@ -31,9 +30,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   constructor(
-    private graphQLService: GraphQLService,
-    private asyncTaskInfoService: AsyncTaskInfoService,
-    private notificationService: NotificationService
+    private readonly graphQLService: GraphQLService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super();
 
@@ -217,6 +215,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   private async closeResults(results: IDatabaseResultSet[]) {
+    if (!this.executionContext?.context) {
+      return;
+    }
+
     for (const result of results) {
       if (result.id === null) {
         continue;

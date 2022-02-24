@@ -11,6 +11,7 @@ import { useCallback, useEffect } from 'react';
 import { MenuButton, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
+import { getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, IMenuData, IMenuSubMenuItem, MenuService, useMenu } from '@cloudbeaver/core-view';
@@ -48,7 +49,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
 
   const handler = menuService.getHandler(subMenuData.context);
-  const hidden = handler?.isHidden?.(subMenuData.context);
+  const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -66,8 +67,8 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     return null;
   }
 
-  const loading = handler?.isLoading?.(subMenuData.context);
-  const disabled = handler?.isDisabled?.(subMenuData.context);
+  const loading = getComputed(() => handler?.isLoading?.(subMenuData.context));
+  const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
   const MenuPanel = menuPanel;
   const MenuItemRenderer = itemRenderer;
 
@@ -89,7 +90,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         menuData={subMenuData}
         menu={menu}
         style={style}
-        panelAvailable={subMenuData.available}
+        panelAvailable={subMenuData.available && !loading}
       >
         {item => (
           <MenuItemRenderer

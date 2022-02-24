@@ -22,7 +22,8 @@ import {
   resourceKeyList,
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata
+  ICachedMapResourceMetadata,
+  CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -107,7 +108,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     const first = parents[0];
-    await this.connectionInfo.waitLoad();
+    await this.connectionInfo.load(CachedMapAllKey);
     await this.load(first);
 
     for (const nodeId of parents) {

@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionsResource } from '../../../ConnectionsResource';
@@ -23,12 +22,10 @@ export class ConnectionManualService {
   }
 
   constructor(
-    private dbDriverResource: DBDriverResource,
-    private connectionsResource: ConnectionsResource,
+    private readonly connectionsResource: ConnectionsResource,
     private createConnectionService: CreateConnectionService
   ) {
     this.select = this.select.bind(this);
-    this.load = this.load.bind(this);
   }
 
   select(driverId: string): void {
@@ -39,9 +36,5 @@ export class ConnectionManualService {
       },
       [driverId]
     );
-  }
-
-  async load(): Promise<void> {
-    await this.dbDriverResource.loadAll();
   }
 }

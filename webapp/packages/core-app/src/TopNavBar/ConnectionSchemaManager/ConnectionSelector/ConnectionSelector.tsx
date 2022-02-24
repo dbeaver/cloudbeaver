@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { getComputed, useDataResource, useMapResource } from '@cloudbeaver/core-blocks';
@@ -146,6 +147,12 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
       || connectionSelectorService.currentConnectionId !== null
     )
   ));
+
+  useEffect(() => {
+    if (isEnabled && connectionSelectorService.activeItem) {
+      connectionSelectorService.updateContainer();
+    }
+  }, [connectionSelectorService.activeItem, isEnabled]);
 
   if (!isEnabled) {
     return null;

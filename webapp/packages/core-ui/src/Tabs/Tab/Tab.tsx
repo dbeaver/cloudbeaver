@@ -13,11 +13,12 @@ import styled, { use } from 'reshadow';
 
 import { getComputed, Icon } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
-import { useMenu } from '@cloudbeaver/core-view';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
+import type { ITabsContext } from '../TabsContext';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';
@@ -38,57 +39,76 @@ export const Tab = observer<TabProps>(function Tab({
 }) {
   const translate = useTranslate();
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
-  const { state, getInfo, handleClose, handleOpen } = useTab(tabId, onOpen, onClose, onClick);
-  const menu = useMenu({
-    menu: MENU_TAB,
-    context: menuContext,
-  });
-  const info = getInfo();
+  const tab = useTab(tabId, onOpen, onClose, onClick);
+  const info = tab.getInfo();
 
-  const [menuOpened, switchState] = useState(false);
-
-  menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
-  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
-
-  const showMenu = getComputed(() => menu.items.length > 0);
-  const canClose = !!onClose || state.closable;
-  const actionsEnabled = canClose || showMenu;
+  const canClose = getComputed(() => !!onClose || tab.state.closable);
 
   return styled(useStyles(style))(
     <TabContext.Provider value={tabContext}>
       <tab-outer>
         <tab-inner>
           <BaseTab
-            {...state.state}
+            {...tab.state.state}
             type="button"
             title={translate(title ?? info?.title)}
             id={tabId}
             className={className}
             disabled={disabled}
-            onClick={handleOpen}
+            onClick={tab.handleOpen}
           >
             <tab-container>
               {children}
             </tab-container>
           </BaseTab>
-          {actionsEnabled && (
-            <tab-actions>
-              {canClose && (
-                <tab-action title={translate('ui_close')} onClick={handleClose}>
-                  <Icon name="cross-bold" viewBox="0 0 7 8" />
-                </tab-action>
-              )}
-              <portal {...use({ menuOpened })}>
-                <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
-                  <tab-action>
-                    <Icon name="dots" viewBox="0 0 32 32" />
-                  </tab-action>
-                </ContextMenu>
-              </portal>
-            </tab-actions>
-          )}
+          <tab-actions>
+            {canClose && (
+              <tab-action title={translate('ui_close')} onClick={tab.handleClose}>
+                <Icon name="cross-bold" viewBox="0 0 7 8" />
+              </tab-action>
+            )}
+            <TabMenu
+              tabId={tabId}
+              state={tab.state}
+              menuContext={menuContext}
+              style={style}
+            />
+          </tab-actions>
         </tab-inner>
       </tab-outer>
     </TabContext.Provider>
+  );
+});
+
+interface TabMenuProps {
+  tabId: string;
+  state: ITabsContext<any>;
+  menuContext?: IDataContext;
+  style?: ComponentStyle;
+}
+
+const TabMenu = observer<TabMenuProps>(function TabMenu({
+  tabId,
+  state,
+  menuContext,
+  style,
+}) {
+  const [menuOpened, switchState] = useState(false);
+  const menu = useMenu({
+    menu: MENU_TAB,
+    context: menuContext,
+  });
+
+  menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
+  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
+
+  return styled(useStyles(style))(
+    <portal {...use({ menuOpened })}>
+      <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
+        <tab-action>
+          <Icon name="dots" viewBox="0 0 32 32" />
+        </tab-action>
+      </ContextMenu>
+    </portal>
   );
 });

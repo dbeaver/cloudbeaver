@@ -78,10 +78,10 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
           ...items,
           ...actions.map(action => new MenuBaseItem(
             {
-              id: action.id, 
-              label: action.label, 
+              id: action.id,
+              label: action.label,
               tooltip: action.description,
-            }, 
+            },
             {
               onSelect: () => {
                 this.commonDialogService.open(GeneratedSqlDialog, {

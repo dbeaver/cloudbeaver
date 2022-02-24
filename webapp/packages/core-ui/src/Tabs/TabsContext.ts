@@ -30,11 +30,11 @@ export interface ITabsContext<T = Record<string, any>> {
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
   getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;
   getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;
-  open: (tabId: string) => void;
-  close: (tabId: string) => void;
-  closeAll: () => void;
-  closeAllToTheDirection: (tabId: string, direction: TabDirection) => void;
-  closeOthers: (tabId: string) => void;
+  open: (tabId: string) => Promise<void>;
+  close: (tabId: string) => Promise<void>;
+  closeAll: () => Promise<void>;
+  closeAllToTheDirection: (tabId: string, direction: TabDirection) => Promise<void>;
+  closeOthers: (tabId: string) => Promise<void>;
 }
 
 export const TabsContext = createContext<ITabsContext<any> | undefined>(

@@ -36,20 +36,24 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
   style,
 }) {
   const styles = useStyles(menuPanelStyles, style);
-  const visible = panelAvailable && menu.visible;
+  const visible = menu.visible;
 
   if (!visible) {
     return null;
   }
 
-  const items = menuData.items;
+  let items: IMenuItem[] = [];
+
+  if (panelAvailable) {
+    items = menuData.items;
+  }
 
   const hasBindings = getComputed(() => items.some(
     item => item instanceof MenuActionItem && item.action.binding !== null
   ));
 
   return styled(styles)(
-    <Menu {...menu} aria-label={menuData.menu.label} visible={visible}>
+    <Menu {...menu} aria-label={menuData.menu.label} visible={panelAvailable}>
       <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
         {items.length === 0 && (
           <MenuEmptyItem menu={menu} style={style} />

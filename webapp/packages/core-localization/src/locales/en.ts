@@ -17,6 +17,7 @@ export const defaultENLocale = [
   ['ui_processing_saved', 'Saved'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
+  ['ui_error', 'Error'],
   ['ui_error_message', 'Error:'],
   ['ui_error_close', 'Close'],
   ['ui_close', 'Close'],

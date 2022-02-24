@@ -17,6 +17,7 @@ export const defaultZHLocale = [
   ['ui_processing_saved', 'Saved'],
   ['ui_configure', '配置'],
   ['ui_apply', '应用'],
+  ['ui_error', '错误'],
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
   ['ui_close', '关闭'],

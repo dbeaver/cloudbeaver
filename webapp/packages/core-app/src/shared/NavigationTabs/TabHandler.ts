@@ -28,7 +28,7 @@ export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandl
 
 export type TabHandlerNavInitEvent = () => Promise<void> | void;
 export type TabHandlerCloseEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;
-export type TabHandlerEvent<T = any> = (tab: ITab<T>) => Promise<void> | void;
+export type TabHandlerEvent<T = any> = (tab: ITab<T>) => void;
 export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;
 
 export interface TabHandlerOptions<TState = any> {

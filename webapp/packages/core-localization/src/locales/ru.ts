@@ -15,6 +15,7 @@ export const defaultRULocale = [
   ['ui_processing_saved', 'Сохранено'],
   ['ui_configure', 'Настроить'],
   ['ui_apply', 'Применить'],
+  ['ui_error', 'Ошибка'],
   ['ui_error_message', 'Ошибка:'],
   ['ui_error_close', 'Закрыть'],
   ['ui_close', 'Закрыть'],

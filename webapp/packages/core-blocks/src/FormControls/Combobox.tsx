@@ -280,6 +280,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
+      event.preventDefault();
       matchItems(true);
     }
   }, [matchItems]);

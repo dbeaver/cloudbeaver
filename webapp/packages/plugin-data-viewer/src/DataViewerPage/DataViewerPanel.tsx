@@ -9,16 +9,18 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewer } from '../TableViewer/TableViewer';
+import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel';
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({
   tab,
   page,
 }) {
+  const dataViewerDatabaseDataModel = useDataViewerDatabaseDataModel(tab);
   const pageState = page.getState(tab);
 
   const handlePresentationChange = useCallback((presentationId: string) => {
@@ -54,13 +56,19 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
   }
 
   return (
-    <TableViewer
-      tableId={tab.handlerState.tableId}
-      resultIndex={pageState?.resultIndex}
-      presentationId={pageState?.presentationId}
-      valuePresentationId={pageState?.valuePresentationId}
-      onPresentationChange={handlePresentationChange}
-      onValuePresentationChange={handleValuePresentationChange}
-    />
+    <Loader state={dataViewerDatabaseDataModel}>
+      {tab.handlerState.tableId ? (
+        <TableViewer
+          tableId={tab.handlerState.tableId}
+          resultIndex={pageState?.resultIndex}
+          presentationId={pageState?.presentationId}
+          valuePresentationId={pageState?.valuePresentationId}
+          onPresentationChange={handlePresentationChange}
+          onValuePresentationChange={handleValuePresentationChange}
+        />
+      ) : (
+        <TextPlaceholder>Table model not loaded</TextPlaceholder>
+      )}
+    </Loader>
   );
 });

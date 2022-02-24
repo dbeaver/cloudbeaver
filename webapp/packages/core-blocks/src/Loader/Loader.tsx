@@ -189,7 +189,7 @@ export const Loader = observer<Props>(function Loader({
   refLoaderDisplayed.state = true;
 
   let spinnerURL: string;
-  
+
   if (secondary || overlay) {
     spinnerURL = small ? spinnerType.secondarySmall : spinnerType.secondary;
   } else {
@@ -218,3 +218,11 @@ export const Loader = observer<Props>(function Loader({
     </LoaderContext.Provider>
   );
 });
+
+export function isContainsException(exception?: Error[] | Error | null): boolean {
+  if (Array.isArray(exception)) {
+    return exception.some(Boolean);
+  }
+
+  return !!exception;
+}

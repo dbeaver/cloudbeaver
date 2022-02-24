@@ -12,12 +12,12 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabHandlerPanelComponent, NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-app';
-import { TabsBox, TabPanel, useTabLocalState } from '@cloudbeaver/core-ui';
-import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getComputed } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { TabsBox, TabPanel, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -71,13 +71,19 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     isActive: resource => !connectionId || !resource.has(connectionId),
   });
 
+  const connected = getComputed(() => connection.data?.connected || false);
+
   const children = useMapResource(ObjectViewerPanel, NavTreeResource, parentId, {
     onLoad: async resource => {
+      if (!connected) {
+        return true;
+      }
+
       const preload = await resource.preloadNodeParents(parents);
       state.notFound = !preload;
       return state.notFound;
     },
-    isActive: () => connection.data?.connected || false,
+    active: connected,
     onData: data => {
       state.notFound = !data.includes(objectId);
     },
@@ -90,7 +96,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       tab.handlerState.tabIcon = data.icon;
       tab.handlerState.tabTitle = data.name;
     },
-    isActive: () => !state.notFound,
+    active: !state.notFound,
     preload: [children],
   });
 

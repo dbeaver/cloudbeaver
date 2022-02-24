@@ -35,6 +35,7 @@ query serverConfig {
     defaultNavigatorSettings {
       ...AllNavigatorSettings
     }
+    disabledDrivers
     productInfo {
       id
       version
