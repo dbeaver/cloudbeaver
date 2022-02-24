@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import {
   Table,
@@ -55,11 +55,11 @@ const styles = composes(
     table-container {
       overflow: auto;
     }
-    Table {
-      width: 100%;
-    }
     GrantedConnectionsTableHeader {
       flex: 0 0 auto;
+    }
+    Table {
+      width: 100%;
     }
   `
 );
@@ -107,6 +107,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({
             keys={keys}
             selectedItems={selectedSubjects}
             isItemSelectable={item => !grantedSubjects.includes(item)}
+            {...use({ size: 'big' })}
           >
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
