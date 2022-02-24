@@ -6,16 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
-import { ErrorBoundary } from '@cloudbeaver/core-blocks';
+import { ErrorBoundary, getComputed } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 
-export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
+export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
   tabId,
   children,
   className,
@@ -28,8 +29,9 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
   }
 
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
+  const enabled = getComputed(() => (lazy || state.lazy) && state.state.selectedId !== tabId);
 
-  if ((lazy || state.lazy) && state.state.selectedId !== tabId) {
+  if (enabled) {
     return null;
   }
 
@@ -54,4 +56,4 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
       </TabContext.Provider>
     </ErrorBoundary>
   );
-};
+});
