@@ -24,7 +24,6 @@ export interface IDataTableActions {
 export interface IDataTableActionsPrivate extends IDataTableActions {
   resultIndex: number;
   dataFormat: ResultDataFormat;
-  handlePresentationChange: (id: string) => void;
   onPresentationChange: (id: string) => void;
   onValuePresentationChange: (id: string | null) => void;
 }

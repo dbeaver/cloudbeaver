@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -121,16 +121,17 @@ export const TableViewer = observer<Props>(function TableViewer({
   const loading = dataModel?.isLoading() ?? true;
   const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
-  const dataTableActions = useObservableRef<IDataTableActionsPrivate>(() => ({
-    handlePresentationChange(id: string) {
-      const constraints = this.dataModel?.source.tryGetAction(this.resultIndex, ResultSetConstraintAction);
+  const localActions = useObjectRef({
+    clearConstraints() {
+      const constraints = dataModel?.source.tryGetAction(resultIndex, ResultSetConstraintAction);
 
       if (constraints) {
         constraints.deleteAll();
       }
-
-      this.onPresentationChange(id);
     },
+  });
+
+  const dataTableActions = useObservableRef<IDataTableActionsPrivate>(() => ({
     setPresentation(id: string) {
       const presentation = dataPresentationService.get(id);
 
@@ -141,7 +142,9 @@ export const TableViewer = observer<Props>(function TableViewer({
         ) {
           this.dataModel?.setDataFormat(presentation.dataFormat).reload();
         }
-        this.handlePresentationChange(id);
+
+        localActions.clearConstraints();
+        this.onPresentationChange(id);
       }
     },
 
@@ -206,7 +209,8 @@ export const TableViewer = observer<Props>(function TableViewer({
     const presentation = dataPresentationService.get(presentationId);
 
     if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
-      dataTableActions.handlePresentationChange(dataFormat);
+      localActions.clearConstraints();
+      onPresentationChange(dataFormat);
     }
   }, [dataFormat]);
 
