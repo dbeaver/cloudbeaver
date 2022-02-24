@@ -45,7 +45,7 @@
         <driver id="jaybird:jaybird"/>
         <driver id="clickhouse:yandex_clickhouse"/>
         <driver id="generic:derby_server"/>
-        <driver id="generic:h2_embedded"/>
+        <driver id="h2:h2_embedded"/>
         <driver id="sqlite:sqlite_jdbc"/>
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
