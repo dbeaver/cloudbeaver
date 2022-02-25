@@ -59,6 +59,9 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Permission;
+import java.security.Policy;
+import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,6 +111,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     private boolean develMode = false;
     private boolean configurationMode = false;
+    private boolean enableSecurityManager = false;
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
@@ -303,6 +307,16 @@ public class CBApplication extends BaseApplicationImpl {
         if (configurationMode) {
             // Try to configure automatically
             performAutoConfiguration(new File(configPath).getParentFile());
+        }
+
+        if (enableSecurityManager) {
+            Policy.setPolicy(new Policy() {
+                @Override
+                public boolean implies(ProtectionDomain domain, Permission permission) {
+                    return true;
+                }
+            });
+            System.setSecurityManager(new SecurityManager());
         }
 
         try {
@@ -526,6 +540,7 @@ public class CBApplication extends BaseApplicationImpl {
             maxSessionIdleTime = JSONUtils.getLong(serverConfig, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, maxSessionIdleTime);
 
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
+            enableSecurityManager = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_SECURITY_MANAGER, enableSecurityManager);
 
             // App config
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
