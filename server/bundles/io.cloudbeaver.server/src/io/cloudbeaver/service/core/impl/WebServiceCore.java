@@ -423,8 +423,12 @@ public class WebServiceCore implements DBWServiceCore {
         }
         webSession.provideAuthParameters(webSession.getProgressMonitor(), testDataSource, testDataSource.getConnectionConfiguration());
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
+        if (DataSourceDescriptor.class.isAssignableFrom(testDataSource.getClass())) {
+            ((DataSourceDescriptor) testDataSource).setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
+        }
         try {
-            ConnectionTestJob ct = new ConnectionTestJob(testDataSource, param -> {});
+            ConnectionTestJob ct = new ConnectionTestJob(testDataSource, param -> {
+            });
             ct.run(webSession.getProgressMonitor());
             if (ct.getConnectError() != null) {
                 throw new DBWebException("Connection failed", ct.getConnectError());
