@@ -27,8 +27,8 @@ echo Copy server packages
 xcopy /E /Q ..\server\product\web-server\target\products\io.cloudbeaver.product\all\all\all\* cloudbeaver\server >NUL
 copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\samples
-mkdir cloudbeaver\samples\db
-xcopy /E /Q ..\samples\sample-databases\db cloudbeaver\samples\db >NUL
+rem mkdir cloudbeaver\samples\db
+rem xcopy /E /Q ..\samples\sample-databases\db cloudbeaver\samples\db >NUL
 copy ..\samples\sample-databases\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
 copy ..\samples\sample-databases\*.conf cloudbeaver\conf >NUL
 move drivers cloudbeaver >NUL
