@@ -48,11 +48,13 @@ public class WebSQLUtils {
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (type instanceof DBDAttributeBinding &&
-            (cellValue instanceof Date || cellValue instanceof Number))
-        {
+            (cellValue instanceof Date || cellValue instanceof Number)) {
             return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
         }
 
+        if (cellValue instanceof Boolean) {
+            return cellValue;
+        }
         if (cellValue instanceof Date) {
             return CBConstants.ISO_DATE_FORMAT.format(cellValue);
         } else if (cellValue instanceof Number) {
@@ -80,7 +82,7 @@ public class WebSQLUtils {
                 return serializeContentValue(session, (DBDContent)dbValue);
             }
         }
-        return cellValue;
+        return cellValue == null ? null : cellValue.toString();
     }
 
     private static Object serializeComplexValue(WebSession session, DBSTypedObject type, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
