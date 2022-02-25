@@ -67,9 +67,15 @@ export class SQLCodeEditorController {
       keywords[key.toLowerCase()] = true;
     }
 
-    if (this.dialect.quoteStrings.flat().includes('"')) {
+    const quoteStrings = this.dialect.quoteStrings.flat();
+
+    if (quoteStrings.includes('"')) {
       hooks['"'] = hookIdentifierDoublequote;
       // support['doubleQuote'] = true;
+    }
+
+    if (quoteStrings.includes('`')) {
+      hooks['`'] =   hookIdentifier;
     }
 
     if (this.dialect.singleLineComments.includes('#')) {
@@ -164,6 +170,18 @@ function hookIdentifierDoublequote(stream: StringStream) {
   let ch;
   while ((ch = stream.next()) != null) {
     if (ch == '"' && !stream.eat('"')) {return 'variable-2';}
+  }
+  stream.backUp(stream.current().length - 1);
+  return stream.eatWhile(/\w/) ? 'variable-2' : null;
+}
+
+// `identifier`
+function hookIdentifier(stream: StringStream) {
+  // MySQL/MariaDB identifiers
+  // ref: http://dev.mysql.com/doc/refman/5.6/en/identifier-qualifiers.html
+  let ch;
+  while ((ch = stream.next()) != null) {
+    if (ch == '`' && !stream.eat('`')) {return 'variable-2';}
   }
   stream.backUp(stream.current().length - 1);
   return stream.eatWhile(/\w/) ? 'variable-2' : null;
