@@ -355,11 +355,11 @@ public class WebServiceUtils {
         }
     }
 
-    public static void addResponseCookie(HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
-        addResponseCookie(response, cookieName, cookieValue, maxSessionIdleTime, null);
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
+        addResponseCookie(request, response, cookieName, cookieValue, maxSessionIdleTime, null);
     }
 
-    public static void addResponseCookie(HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
         Cookie sessionCookie = new Cookie(cookieName, cookieValue);
         if (maxSessionIdleTime > 0) {
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
@@ -368,8 +368,12 @@ public class WebServiceUtils {
         String path = CBApplication.getInstance().getRootURI();
 
         if(sameSite != null) {
-            sessionCookie.setSecure(true);
-            path = path.concat("; SameSite=" + sameSite);
+            if(sameSite.toLowerCase() == "none" && request.isSecure() == false) {
+                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
+            }else {
+                sessionCookie.setSecure(true);
+                path = path.concat("; SameSite=" + sameSite);
+            }
         }
 
         sessionCookie.setPath(path);
