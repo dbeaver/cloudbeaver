@@ -270,7 +270,7 @@ public class GraphQLEndpoint extends HttpServlet {
         String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
 
         WebServiceUtils.addResponseCookie(
-            response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
+                request, response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     private static class WebInstrumentation extends SimpleInstrumentation {
