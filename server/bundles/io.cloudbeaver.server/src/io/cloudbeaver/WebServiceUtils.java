@@ -356,11 +356,23 @@ public class WebServiceUtils {
     }
 
     public static void addResponseCookie(HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
+        addResponseCookie(response, cookieName, cookieValue, maxSessionIdleTime, null);
+    }
+
+    public static void addResponseCookie(HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
         Cookie sessionCookie = new Cookie(cookieName, cookieValue);
         if (maxSessionIdleTime > 0) {
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
         }
-        sessionCookie.setPath(CBApplication.getInstance().getRootURI());
+
+        String path = CBApplication.getInstance().getRootURI();
+
+        if(sameSite != null) {
+            sessionCookie.setSecure(true);
+            path = path.concat("; SameSite=" + sameSite);
+        }
+
+        sessionCookie.setPath(path);
         response.addCookie(sessionCookie);
     }
 
