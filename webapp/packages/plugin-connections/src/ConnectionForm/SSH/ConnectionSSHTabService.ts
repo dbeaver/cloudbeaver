@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable } from 'mobx';
+
 import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -27,6 +29,11 @@ export class ConnectionSSHTabService extends Bootstrap {
     private readonly dbDriverResource: DBDriverResource
   ) {
     super();
+
+    makeObservable<this, 'fillConfig' | 'prepareConfig'>(this, {
+      fillConfig: action,
+      prepareConfig: action,
+    });
   }
 
   register(): void {
@@ -38,7 +45,7 @@ export class ConnectionSSHTabService extends Bootstrap {
       panel: () => SSH,
       isHidden: (tabId, props) => {
         if (props?.state.config.driverId) {
-          const driver = this.dbDriverResource.get(props?.state.config.driverId);
+          const driver = this.dbDriverResource.get(props.state.config.driverId);
 
           return !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
         }
@@ -149,7 +156,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
   }
 
-  private async prepareConfig(
+  private prepareConfig(
     {
       state,
     }: IConnectionFormSubmitData,

@@ -32,6 +32,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
     <Loader loading={service.formState === null}>
       {() => service.formState && (
         <ConnectionForm
+          // key={service.formState.id}
           state={service.formState}
           onSave={save}
           onCancel={close}

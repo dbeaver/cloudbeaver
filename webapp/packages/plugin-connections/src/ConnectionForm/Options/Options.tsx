@@ -46,10 +46,9 @@ const styles = css`
   }
 `;
 
-export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options(props) {
-  const {
-    state,
-  } = props;
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
+  state,
+}) {
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
@@ -63,11 +62,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   } = state;
 
   const authentication = useAuthenticationAction({
-    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+    origin: info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
   });
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
-  const optionsHook = useOptions(props.state);
+  const optionsHook = useOptions(state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const handleDriverSelect = useCallback(async (value?: string, name?: string, prev?: string) => {
@@ -87,8 +86,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     { key: config.driverId || null, includes: ['includeProviderProperties'] },
     {
       onData: (data, resource, prevData) => {
-        if (!prevData) {
-          handleDriverSelect(data.id);
+        if (data.id !== prevData?.id) {
+          optionsHook.setDefaults(data);
         }
       },
     }

@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, toJS } from 'mobx';
+import { observable, runInAction, toJS } from 'mobx';
 
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
 import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
@@ -101,7 +101,7 @@ export class ConnectionFormService {
     },
   });
 
-  private showSubmittingStatusMessage: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
+  private readonly showSubmittingStatusMessage: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
     const status = contexts.getContext(this.connectionStatusContext);
 
     if (!status.saved) {
@@ -124,7 +124,7 @@ export class ConnectionFormService {
     }
   };
 
-  private askCredentials: IExecutorHandler<IConnectionFormSubmitData> = async (data, contexts) => {
+  private readonly askCredentials: IExecutorHandler<IConnectionFormSubmitData> = async (data, contexts) => {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
     if (data.submitType !== 'test' || (!credentialsState.authModelId && !credentialsState.networkHandlers.length)) {
@@ -133,21 +133,23 @@ export class ConnectionFormService {
 
     const config = contexts.getContext(connectionConfigContext);
 
-    if (credentialsState.authModelId) {
-      if (!config.credentials) {
-        config.credentials = { ...data.state.config.credentials };
+    runInAction(() => {
+      if (credentialsState.authModelId) {
+        if (!config.credentials) {
+          config.credentials = { ...data.state.config.credentials };
+        }
+
+        config.credentials = observable(config.credentials);
       }
 
-      config.credentials = observable(config.credentials);
-    }
+      if (credentialsState.networkHandlers.length > 0) {
+        if (!config.networkHandlersConfig) {
+          config.networkHandlersConfig = toJS(data.state.config.networkHandlersConfig) || [];
+        }
 
-    if (credentialsState.networkHandlers.length > 0) {
-      if (!config.networkHandlersConfig) {
-        config.networkHandlersConfig = toJS(data.state.config.networkHandlersConfig) || [];
+        config.networkHandlersConfig = observable(config.networkHandlersConfig);
       }
-
-      config.networkHandlersConfig = observable(config.networkHandlersConfig);
-    }
+    });
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
       config,
@@ -161,7 +163,7 @@ export class ConnectionFormService {
     }
   };
 
-  private ensureValidation: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
+  private readonly ensureValidation: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
     const validation = contexts.getContext(this.connectionValidationContext);
 
     if (!validation.valid) {

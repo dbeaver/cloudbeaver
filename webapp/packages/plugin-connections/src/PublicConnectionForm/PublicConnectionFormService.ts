@@ -38,12 +38,6 @@ export class PublicConnectionFormService {
     private readonly connectionAuthService: ConnectionAuthService,
     private readonly sessionDataResource: SessionDataResource
   ) {
-    makeObservable(this, {
-      formState: observable.shallow,
-      change: action,
-      open: action,
-      close: action,
-    });
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
@@ -51,9 +45,20 @@ export class PublicConnectionFormService {
     this.sessionDataResource.onDataOutdated.addHandler(() => {
       this.close(true);
     });
+
+    makeObservable(this, {
+      formState: observable.shallow,
+      change: action,
+      open: action,
+      close: action,
+    });
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {
+    // if (this.formState) {
+    //   this.formState.dispose();
+    // }
+
     if (!this.formState) {
       this.formState = new ConnectionFormState(
         this.connectionFormService,
@@ -80,6 +85,10 @@ export class PublicConnectionFormService {
   }
 
   async close(saved?: boolean): Promise<void> {
+    if (!this.formState) {
+      return;
+    }
+
     if (saved) {
       this.clearFormState();
     }
@@ -101,7 +110,7 @@ export class PublicConnectionFormService {
     }
   }
 
-  private closeRemoved: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+  private readonly closeRemoved: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
     if (!this.formState || !this.formState.config.connectionId) {
       return;
     }
@@ -111,7 +120,7 @@ export class PublicConnectionFormService {
     }
   };
 
-  private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+  private readonly closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
     if (!this.formState || !this.formState.config.connectionId) {
       return;
     }
@@ -121,7 +130,7 @@ export class PublicConnectionFormService {
     }
   };
 
-  private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
+  private readonly closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (
       !this.formState
       || !this.optionsPanelService.isOpen(formGetter)

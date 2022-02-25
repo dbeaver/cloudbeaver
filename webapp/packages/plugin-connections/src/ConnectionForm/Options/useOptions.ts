@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { DBDriver, isJDBCConnection } from '@cloudbeaver/core-connections';
 import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
@@ -23,84 +25,87 @@ export function useOptions(state: IConnectionFormState) {
 
   return useObjectRef({
     updateNameTemplate(driver: DBDriver | undefined) {
-      const {
-        prevName,
-        state: {
-          config,
-          info,
-          mode,
-        },
-      } = refObject;
+      runInAction(() => {
+        const {
+          prevName,
+          state: {
+            config,
+            info,
+            mode,
+          },
+        } = refObject;
 
-      const isAutoFill = config.name === prevName || prevName === null;
+        const isAutoFill = config.name === prevName || prevName === null;
 
-      if (mode === 'edit' || !isAutoFill) {
-        return;
-      }
-
-      if (isJDBCConnection(driver, info)) {
-        refObject.prevName = config.url || '';
-        config.name = config.url || '';
-        return;
-      }
-
-      if (!driver) {
-        config.name = 'New connection';
-        return;
-      }
-
-      let name = driver.name || '';
-      if (config.host) {
-        name += '@' + config.host.slice(0, MAX_HOST_LENGTH);
-        if (config.port && config.port !== driver.defaultPort) {
-          name += ':' + config.port;
+        if (mode === 'edit' || !isAutoFill) {
+          return;
         }
-      }
-      refObject.prevName = name;
-      config.name = name;
+
+        if (isJDBCConnection(driver, info)) {
+          refObject.prevName = config.url || '';
+          config.name = config.url || '';
+          return;
+        }
+
+        if (!driver) {
+          config.name = 'New connection';
+          return;
+        }
+
+        let name = driver.name || '';
+        if (config.host) {
+          name += '@' + config.host.slice(0, MAX_HOST_LENGTH);
+          if (config.port && config.port !== driver.defaultPort) {
+            name += ':' + config.port;
+          }
+        }
+        refObject.prevName = name;
+        config.name = name;
+      });
     },
-    setDefaults(driver: DBDriver | undefined, prevDriver: DBDriver | undefined) {
-      const {
-        state: {
-          config,
-          info,
-        },
-      } = refObject;
+    setDefaults(driver: DBDriver | undefined, prevDriver?: DBDriver) {
+      runInAction(() => {
+        const {
+          state: {
+            config,
+            info,
+          },
+        } = refObject;
 
-      if (info) {
-        return;
-      }
-      
-      if (!prevDriver || config.host === prevDriver.defaultServer) {
-        config.host = driver?.defaultServer || 'localhost';
-      }
-
-      if (!prevDriver || config.port === prevDriver.defaultPort) {
-        config.port = driver?.defaultPort;
-      }
-
-      if (!prevDriver || config.databaseName === prevDriver.defaultDatabase) {
-        config.databaseName = driver?.defaultDatabase;
-      }
-
-      if (!prevDriver || config.url === prevDriver.sampleURL) {
-        config.url = driver?.sampleURL;
-      }
-
-      this.updateNameTemplate(driver);
-
-      if (driver?.id !== prevDriver?.id) {
-        for (const property of Object.keys(config.credentials)) {
-          delete config.credentials[property];
+        if (info || driver?.id !== config.driverId) {
+          return;
         }
 
-        for (const property of Object.keys(config.providerProperties)) {
-          delete config.providerProperties[property];
+        if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {
+          config.host = driver?.defaultServer || 'localhost';
         }
 
-        config.authModelId = driver?.defaultAuthModel;
-      }
-      
+        if ((!prevDriver && config.port === undefined) || config.port === prevDriver?.defaultPort) {
+          config.port = driver?.defaultPort;
+        }
+
+        if ((!prevDriver && config.databaseName === undefined) || config.databaseName === prevDriver?.defaultDatabase) {
+          config.databaseName = driver?.defaultDatabase;
+        }
+
+        if ((!prevDriver && config.url === undefined) || config.url === prevDriver?.sampleURL) {
+          config.url = driver?.sampleURL;
+        }
+
+        this.updateNameTemplate(driver);
+
+        if (driver?.id !== prevDriver?.id) {
+          for (const property of Object.keys(config.credentials)) {
+            delete config.credentials[property];
+          }
+
+          for (const property of Object.keys(config.providerProperties)) {
+            delete config.providerProperties[property];
+          }
+
+          config.authModelId = driver?.defaultAuthModel;
+        }
+      });
     },
     setAuthModel(model: DatabaseAuthModel) {
       // const {
