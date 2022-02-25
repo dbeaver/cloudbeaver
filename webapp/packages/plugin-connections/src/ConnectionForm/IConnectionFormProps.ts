@@ -23,6 +23,7 @@ export interface IConnectionFormState {
 
   partsState: MetadataMap<string, any>;
 
+  readonly id: string;
   readonly initError: Error | null;
   readonly statusMessage: string | null;
   readonly disabled: boolean;

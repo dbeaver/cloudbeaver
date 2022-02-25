@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable, runInAction, toJS } from 'mobx';
+
 import { DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -28,6 +30,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
   ) {
     super();
+
+    makeObservable<this, 'fillConfig'>(this, {
+      fillConfig: action,
+    });
   }
 
   register(): void {
@@ -179,45 +185,46 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+    const tempConfig = toJS(config);
 
     if (state.mode === 'edit') {
-      config.connectionId = state.config.connectionId;
+      tempConfig.connectionId = state.config.connectionId;
     }
 
-    config.name = state.config.name?.trim();
+    tempConfig.name = state.config.name?.trim();
 
-    if (config.name && state.mode === 'create') {
+    if (tempConfig.name && state.mode === 'create') {
       const connections = await state.resource.load(CachedMapAllKey);
       const connectionNames = connections.map(connection => connection.name);
-      config.name = getUniqueName(config.name, connectionNames);
+      tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
-    config.description = state.config.description;
-    config.template = state.config.template;
-    config.driverId = state.config.driverId;
+    tempConfig.description = state.config.description;
+    tempConfig.template = state.config.template;
+    tempConfig.driverId = state.config.driverId;
 
     if (isJDBCConnection(driver, state.info)) {
-      config.url = state.config.url;
+      tempConfig.url = state.config.url;
     } else {
       if (!driver.embedded) {
-        config.host = state.config.host;
-        config.port = state.config.port;
+        tempConfig.host = state.config.host;
+        tempConfig.port = state.config.port;
       }
-      config.databaseName = state.config.databaseName;
+      tempConfig.databaseName = state.config.databaseName;
     }
 
     if (state.config.authModelId || driver.defaultAuthModel) {
-      config.authModelId = state.config.authModelId || driver.defaultAuthModel;
-      config.saveCredentials = state.config.saveCredentials;
+      tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
+      tempConfig.saveCredentials = state.config.saveCredentials;
 
-      const properties = await this.getConnectionAuthModelProperties(config.authModelId, state.info);
+      const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        config.credentials = { ...state.config.credentials };
+        tempConfig.credentials = { ...state.config.credentials };
       }
 
-      if (!config.saveCredentials) {
-        credentialsState.requireAuthModel(config.authModelId);
+      if (!tempConfig.saveCredentials) {
+        credentialsState.requireAuthModel(tempConfig.authModelId);
       }
     }
 
@@ -235,8 +242,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
         providerProperties[providerProperty.id] = providerProperty.defaultValue;
       }
 
-      config.providerProperties = providerProperties;
+      tempConfig.providerProperties = providerProperties;
     }
+
+    runInAction(() => {
+      Object.assign(config, tempConfig);
+    });
   }
 
   private async formState(

@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, action } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionsResource } from '../ConnectionsResource';
@@ -40,16 +40,23 @@ export class CreateConnectionService {
     this.data = null;
     this.tabsContainer = new TabsContainer();
 
-    makeObservable(this, {
-      data: observable,
-      disabled: observable,
-    });
-
     this.setConnectionTemplate = this.setConnectionTemplate.bind(this);
     this.clearConnectionTemplate = this.clearConnectionTemplate.bind(this);
     this.setCreateMethod = this.setCreateMethod.bind(this);
     this.cancelCreate = this.cancelCreate.bind(this);
     this.create = this.create.bind(this);
+
+    makeObservable<this, 'activateMethod'>(this, {
+      data: observable,
+      disabled: observable,
+      setCreateMethod: action,
+      cancelCreate: action,
+      create: action,
+      setConnectionTemplate: action,
+      clearConnectionTemplate: action,
+      close: action,
+      activateMethod: action,
+    });
   }
 
   getDefault(): string | null {

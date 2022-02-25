@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable } from 'mobx';
+
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -24,6 +26,10 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     private readonly dbDriverResource: DBDriverResource,
   ) {
     super();
+
+    makeObservable<this, 'fillConfig'>(this, {
+      fillConfig: action,
+    });
   }
 
   register(): void {
@@ -35,7 +41,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       panel: () => DriverProperties,
       isDisabled: (tabId, props) => {
         if (props?.state.config.driverId) {
-          return !props?.state.config.driverId;
+          return !props.state.config.driverId;
         }
         return true;
       },

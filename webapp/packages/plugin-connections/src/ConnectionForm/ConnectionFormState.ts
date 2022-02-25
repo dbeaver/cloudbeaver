@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, EConnectionFeature, IConnectionsResource } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
 import type { ConnectionFormService } from './ConnectionFormService';
@@ -71,10 +71,19 @@ export class ConnectionFormState implements IConnectionFormState {
     return false;
   }
 
+  get id(): string {
+    if (this.mode === 'create') {
+      return 'create';
+    }
+
+    return this.config.connectionId || this._id;
+  }
+
   readonly resource: IConnectionsResource;
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
 
+  private readonly _id: string;
   private stateInfo: IFormStateInfo | null;
   private readonly loadConnectionTask: IExecutor<IConnectionFormState>;
   private readonly formStateTask: IExecutor<IConnectionFormState>;
@@ -84,21 +93,8 @@ export class ConnectionFormState implements IConnectionFormState {
     service: ConnectionFormService,
     resource: IConnectionsResource
   ) {
+    this._id = uuid();
     this.initError = null;
-
-    makeObservable<IConnectionFormState, '_availableDrivers' | 'stateInfo'>(this, {
-      mode: observable,
-      type: observable,
-      config: observable,
-      availableDrivers: computed,
-      _availableDrivers: observable,
-      info: computed,
-      statusMessage: observable,
-      configured: observable,
-      readonly: computed,
-      stateInfo: observable,
-      initError: observable.ref,
-    });
 
     this.resource = resource;
     this.config = {};
@@ -142,6 +138,26 @@ export class ConnectionFormState implements IConnectionFormState {
         };
       })
       .next(this.formStateTask);
+
+    makeObservable<IConnectionFormState, '_availableDrivers' | 'stateInfo' | 'updateFormState'>(this, {
+      mode: observable,
+      type: observable,
+      config: observable,
+      availableDrivers: computed,
+      _availableDrivers: observable,
+      info: computed,
+      statusMessage: observable,
+      configured: observable,
+      readonly: computed,
+      stateInfo: observable,
+      initError: observable.ref,
+      id: computed,
+      reset: action,
+      setOptions: action,
+      setConfig: action,
+      setAvailableDrivers: action,
+      updateFormState: action,
+    });
   }
 
   async loadConnectionInfo(): Promise<DatabaseConnection | undefined> {
