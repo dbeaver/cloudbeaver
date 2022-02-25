@@ -367,10 +367,10 @@ public class WebServiceUtils {
 
         String path = CBApplication.getInstance().getRootURI();
 
-        if(sameSite != null) {
-            if(sameSite.toLowerCase() == "none" && request.isSecure() == false) {
+        if (sameSite != null) {
+            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
                 log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
-            }else {
+            } else {
                 sessionCookie.setSecure(true);
                 path = path.concat("; SameSite=" + sameSite);
             }
