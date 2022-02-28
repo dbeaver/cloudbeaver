@@ -38,16 +38,14 @@ import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
-import org.jkiss.dbeaver.model.sql.SQLQuery;
-import org.jkiss.dbeaver.model.sql.SQLScriptElement;
-import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.sql.format.SQLFormatUtils;
 import org.jkiss.dbeaver.model.sql.generator.SQLGenerator;
 import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
+import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
@@ -439,5 +437,23 @@ public class WebServiceSQL implements DBWServiceSQL {
                 .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
                 .collect(Collectors.toList());
         return new WebSQLScriptInfo(queriesInfo);
+    }
+    @Override
+    public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException {
+        SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
+        SQLSyntaxManager syntaxManager = new SQLSyntaxManager();
+        syntaxManager.init(dialect, connectionInfo.getDataSourceContainer().getPreferenceStore());
+        SQLRuleManager ruleManager = new SQLRuleManager(syntaxManager);
+        ruleManager.loadRules();
+
+        Document sqlDocument = new Document(sqlScript);
+
+        SQLParserContext parserContext = new SQLParserContext(null, syntaxManager, ruleManager, sqlDocument);
+
+        SQLScriptElement query = SQLScriptParser.extractQueryAtPos(parserContext, cursorPosition);
+        if (query == null) {
+            return new WebSQLQueryInfo(0, 0);
+        }
+        return new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length());
     }
 }

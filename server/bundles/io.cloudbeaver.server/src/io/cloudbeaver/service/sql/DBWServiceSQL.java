@@ -130,4 +130,7 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLScriptInfo parseSqlScript(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript) throws DBWebException;
+
+    @WebAction
+    WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int currentPosition) throws DBWebException;
 }

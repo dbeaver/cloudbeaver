@@ -1,0 +1,4 @@
+fragment SQLQueryInfo on SQLScriptQuery {
+    start
+    end
+}

@@ -240,6 +240,12 @@ extend type Query {
         connectionId: ID!,
         script: String!
     ): SQLScriptInfo!
+
+    sqlParseQuery(
+        connectionId: ID!,
+        script: String!
+        position: Int!
+    ): SQLScriptQuery!
 }
 
 extend type Mutation {
