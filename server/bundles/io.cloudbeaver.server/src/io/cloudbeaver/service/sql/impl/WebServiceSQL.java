@@ -441,19 +441,11 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Override
     public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
-        SQLSyntaxManager syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(dialect, connectionInfo.getDataSourceContainer().getPreferenceStore());
-        SQLRuleManager ruleManager = new SQLRuleManager(syntaxManager);
-        ruleManager.loadRules();
-
-        Document sqlDocument = new Document(sqlScript);
-
-        SQLParserContext parserContext = new SQLParserContext(null, syntaxManager, ruleManager, sqlDocument);
-
-        SQLScriptElement query = SQLScriptParser.extractQueryAtPos(parserContext, cursorPosition);
-        if (query == null) {
-            return new WebSQLQueryInfo(0, 0);
-        }
-        return new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length());
+        SQLScriptElement query = SQLScriptParser.parseQuery(
+            dialect,
+            connectionInfo.getDataSourceContainer().getPreferenceStore(),
+            sqlScript,
+            cursorPosition);
+        return query == null ? new WebSQLQueryInfo(0, 0) : new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length());
     }
 }
