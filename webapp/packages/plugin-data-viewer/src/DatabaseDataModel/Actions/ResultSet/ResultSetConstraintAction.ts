@@ -255,7 +255,11 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
         return;
       }
 
-      const column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
+      let column = nextResult.data?.columns?.find(column => column.position === prevColumn.position);
+
+      if (!column || column.label !== prevColumn.label) {
+        column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
+      }
 
       if (column && prevColumn.position !== column.position) {
         const prevConstraint = this.source.prevOptions?.constraints
