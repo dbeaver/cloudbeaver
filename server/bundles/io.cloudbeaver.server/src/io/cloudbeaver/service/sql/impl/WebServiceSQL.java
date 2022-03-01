@@ -438,6 +438,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 .collect(Collectors.toList());
         return new WebSQLScriptInfo(queriesInfo);
     }
+
     @Override
     public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
