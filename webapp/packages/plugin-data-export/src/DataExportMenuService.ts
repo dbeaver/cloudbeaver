@@ -104,6 +104,10 @@ export class DataExportMenuService {
       containerNodePath: source.options.containerNodePath,
       resultId: result.id,
       sourceName: source.options.query,
+      filter: {
+        constraints: source.options.constraints,
+        where: source.options.whereFilter,
+      },
     });
   }
 }
