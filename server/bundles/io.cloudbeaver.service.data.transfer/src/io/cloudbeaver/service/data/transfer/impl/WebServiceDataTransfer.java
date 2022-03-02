@@ -27,6 +27,7 @@ import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -103,7 +104,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             throw new DBWebException("Invalid node path: " + containerNodePath, e);
         }
 
-        return asyncExportFromDataContainer(sqlProcessor, parameters, dataContainer);
+        return asyncExportFromDataContainer(sqlProcessor, parameters, dataContainer, null);
     }
 
     @NotNull
@@ -119,7 +120,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         WebSQLResultsInfo results = sqlContext.getResults(resultsId);
 
-        return asyncExportFromDataContainer(sqlContext.getProcessor(), parameters, results.getDataContainer());
+        return asyncExportFromDataContainer(sqlContext.getProcessor(), parameters, results.getDataContainer(), results);
     }
 
     @Override
@@ -140,7 +141,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return true;
     }
 
-    private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer) {
+    private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer,
+                                                          @Nullable WebSQLResultsInfo resultsInfo) {
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
@@ -150,7 +152,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     monitor.subTask("Export data using " + processor.getName());
                     File exportFile = new File(dataExportFolder, makeUniqueFileName(sqlProcessor, processor));
                     try {
-                        exportData(monitor, processor, dataContainer, parameters, exportFile);
+                        exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
                     } catch (Exception e) {
                         if (exportFile.exists()) {
                             if (!exportFile.delete()) {
@@ -183,6 +185,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DataTransferProcessorDescriptor processor,
         DBSDataContainer dataContainer,
         WebDataTransferParameters parameters,
+        WebSQLResultsInfo resultsInfo,
         File exportFile) throws DBException, IOException
     {
         IDataTransferProcessor processorInstance = processor.getInstance();
@@ -230,7 +233,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(null));
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
         DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
