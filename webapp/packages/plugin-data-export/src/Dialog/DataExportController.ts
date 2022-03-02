@@ -51,9 +51,9 @@ export class DataExportController implements IInitializableController, IDestruct
   private isDistructed = false;
 
   constructor(
-    private dataExportService: DataExportService,
-    private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService
+    private readonly dataExportService: DataExportService,
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService
   ) {
     makeObservable(this, {
       step: observable,
@@ -87,6 +87,7 @@ export class DataExportController implements IInitializableController, IDestruct
         {
           processorId: this.processor.id,
           processorProperties: this.processorProperties,
+          filter: this.context.filter,
         }
       );
       this.close();

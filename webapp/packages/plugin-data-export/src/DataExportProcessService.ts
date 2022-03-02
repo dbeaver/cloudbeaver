@@ -32,8 +32,8 @@ export class DataExportProcessService {
   readonly exportProcesses = new OrderedMap<string, ExportProcess>(value => value.taskId);
 
   constructor(
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService
   ) { }
 
   async cancel(exportId: string): Promise<void> {
@@ -89,11 +89,16 @@ export class DataExportProcessService {
     context: IExportContext,
     parameters: DataTransferParameters
   ): Promise<string> {
-    let process: Process;
-    if (context.containerNodePath) {
+    let process: Process | undefined;
+
+    if (context.contextId && context.resultId) {
+      process = await this.exportFromResults(context.connectionId, context.contextId, context.resultId, parameters);
+    } else if (context.containerNodePath) {
       process = await this.exportFromContainer(context.connectionId, context.containerNodePath, parameters);
-    } else {
-      process = await this.exportFromResults(context.connectionId, context.contextId!, context.resultId!, parameters);
+    }
+
+    if (!process) {
+      throw new Error('Context data must be provided');
     }
 
     this.exportProcesses.addValue({
