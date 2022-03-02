@@ -6,10 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { SqlDataFilter } from '@cloudbeaver/core-sdk';
+
 export interface IExportContext {
   connectionId: string;
   contextId?: string;
   containerNodePath?: string;
   resultId?: string | null;
   sourceName?: string;
+  filter?: SqlDataFilter;
 }
