@@ -1,0 +1,39 @@
+{
+	"folders": {},
+	"connections": {
+		"sqlite_xerial-sample-database": {
+			"provider": "generic",
+			"driver": "sqlite_jdbc",
+			"name": "SQLite - Chinook (Sample)",
+			"save-password": true,
+			"navigator-show-only-entities": false,
+			"navigator-hide-folders": false,
+			"read-only": false,
+			"template": false,
+			"configuration": {
+				"database": "${application.path}/../samples/db/Chinook.sqlitedb",
+				"type": "dev",
+				"auth-model": "native"
+			}
+		},
+		"postgresql-template-1": {
+			"provider": "postgresql",
+			"driver": "postgres-jdbc",
+			"name": "PostgreSQL (Template)",
+			"save-password": false,
+			"show-system-objects": false,
+			"read-only": true,
+			"template": true,
+			"configuration": {
+				"host": "localhost",
+				"port": "5432",
+				"database": "postgres",
+				"url": "jdbc:postgresql://localhost:5432/postgres",
+				"type": "dev",
+				"provider-properties": {
+					"@dbeaver-show-non-default-db@": "false"
+				}
+			}
+		}
+	}
+}
