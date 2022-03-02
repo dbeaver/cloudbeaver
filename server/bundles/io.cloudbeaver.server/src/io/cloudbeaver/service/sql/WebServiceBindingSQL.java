@@ -91,6 +91,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("nodePathList"))
             ).dataFetcher("sqlParseScript", env ->
                 getService(env).parseSqlScript(getWebConnection(env), env.getArgument("script"))
+            ).dataFetcher("sqlParseQuery", env ->
+                getService(env).parseSqlQuery(
+                    getWebConnection(env),
+                    env.getArgument("script"),
+                    env.getArgument("position"))
             )
         ;
 
