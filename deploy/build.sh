@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+#command line arguments
+CONFIGURATION_PATH=$1
+SAMPLE_DATABASE_PATH=$2
+
+if [[ -z "${CONFIGURATION_PATH}"  ]]; then
+  CONFIGURATION_PATH="../samples/sample-databases/DefaultConfiguration"
+fi
+
 echo "Clone and build Cloudbeaver"
 
 rm -rf ./drivers
@@ -31,9 +39,14 @@ echo "Copy server packages"
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
 cp -p ./scripts/* ./cloudbeaver
 mkdir cloudbeaver/samples
-#mkdir cloudbeaver/samples/db
-#cp -rp ../samples/sample-databases/db cloudbeaver/samples/
-cp -rp ../samples/sample-databases/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
+
+if [[ -n "${SAMPLE_DATABASE_PATH}"  ]]; then
+  mkdir cloudbeaver/samples/db
+  cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
+fi
+
+cp -rp "${CONFIGURATION_PATH}"/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
+cp -p "${CONFIGURATION_PATH}"/*.conf cloudbeaver/conf/
 cp -p ../samples/sample-databases/*.conf cloudbeaver/conf/
 mv drivers cloudbeaver
 
