@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { useMemo, useState } from 'react';
 
 import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
@@ -77,11 +77,12 @@ export interface IElementsTree {
   settings?: IElementsTreeSettings;
   baseRoot: string;
   root: string;
-  filter: string;
+  readonly filter: string;
   loading: boolean;
   disabled: boolean;
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
+  userData: IElementsTreeUserState;
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
   isNodeSelected: (nodeId: string) => boolean;
@@ -253,6 +254,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
     actions: new SyncExecutor(),
     state,
     loading: options.settings?.saveExpanded || false,
+    get filter(): string {
+      return this.userData.filter;
+    },
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
     },
@@ -296,7 +300,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         );
     },
     async setFilter(value: string) {
-      userData.filter = value;
+      this.userData.filter = value;
 
       await options.onFilter?.(value);
     },
@@ -370,19 +374,20 @@ export function useElementsTree(options: IOptions): IElementsTree {
     isGroup: observable.ref,
     disabled: observable.ref,
     root: observable.ref,
-    filter: observable.ref,
+    filter: computed,
     loading: observable.ref,
     renderers: observable.ref,
     baseRoot: observable.ref,
     collapse: action.bound,
+    userData: observable.ref,
   }, {
     isGroup: options.isGroup,
     disabled: options.disabled,
     root: options.root,
     settings: options.settings,
-    filter: userData.filter,
     baseRoot: options.baseRoot,
     renderers,
+    userData,
   });
 
   function exitNodeFolder(nodeId: string) {
