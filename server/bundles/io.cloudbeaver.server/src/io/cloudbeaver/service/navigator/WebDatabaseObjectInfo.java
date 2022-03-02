@@ -32,6 +32,8 @@ import org.jkiss.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.jkiss.dbeaver.model.struct.DBSDataContainer.FEATURE_DATA_FILTER;
+
 /**
  * Web connection info
  */
@@ -155,7 +157,12 @@ public class WebDatabaseObjectInfo {
     private static void getObjectFeatures(DBSObject object, List<String> features) {
         if (object instanceof DBPScriptObject) features.add("script");
         if (object instanceof DBPScriptObjectExt) features.add("scriptExtended");
-        if (object instanceof DBSDataContainer) features.add("dataContainer");
+        if (object instanceof DBSDataContainer) {
+            features.add("dataContainer");
+            if (((DBSDataContainer) object).isFeatureSupported(FEATURE_DATA_FILTER)) {
+                features.add(FEATURE_DATA_FILTER);
+            }
+        }
         if (object instanceof DBSDataManipulator) features.add("dataManipulator");
         if (object instanceof DBSEntity) features.add("entity");
         if (object instanceof DBSSchema) features.add("schema");
