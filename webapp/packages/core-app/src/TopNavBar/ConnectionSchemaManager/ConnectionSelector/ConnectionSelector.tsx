@@ -86,11 +86,11 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const isEnabled = usePermission(EPermission.public);
 
   const drivers = useMapResource(ConnectionSelector, DBDriverResource, CachedMapAllKey, {
-    isActive: () => isEnabled,
+    active: isEnabled,
   });
 
   const connectionInfo = useMapResource(ConnectionSelector, ConnectionInfoResource, CachedMapAllKey, {
-    isActive: () => isEnabled,
+    active: isEnabled,
   });
 
   const connection = connectionSelectorService.currentConnection;
