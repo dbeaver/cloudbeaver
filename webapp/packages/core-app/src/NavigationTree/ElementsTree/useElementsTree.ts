@@ -46,6 +46,7 @@ export interface IElementsTreeSettings {
   filterAll: boolean;
   saveExpanded: boolean;
   foldersTree: boolean;
+  saveFilter: boolean;
   showFolderExplorerPath: boolean;
   configurable: boolean;
 }
@@ -115,6 +116,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       filter: '',
     }),
     async data => {
+      if (!options.settings?.saveFilter) {
+        data.filter = '';
+      }
+
       if (options.settings?.saveExpanded) {
         state.sync(data.nodeState);
 
