@@ -42,7 +42,7 @@ public class WebDatabaseObjectInfo {
 
     public static final String OBJECT_FEATURE_CATALOG = "catalog";
     public static final String OBJECT_FEATURE_DATA_CONTAINER = "dataContainer";
-    public static final String OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS = "dataContainerSupportsFilters";
+    public static final String OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS = "supportsDataFilter";
     public static final String OBJECT_FEATURE_DATA_MANIPULATOR = "dataManipulator";
     public static final String OBJECT_FEATURE_DATA_SOURCE = "dataSource";
     public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
