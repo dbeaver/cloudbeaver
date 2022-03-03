@@ -32,12 +32,27 @@ import org.jkiss.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Web connection info
  */
 public class WebDatabaseObjectInfo {
 
     private static final Log log = Log.getLog(WebDatabaseObjectInfo.class);
+
+    public static final String OBJECT_FEATURE_CATALOG = "catalog";
+    public static final String OBJECT_FEATURE_DATA_CONTAINER = "dataContainer";
+    public static final String OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS = "supportsDataFilter";
+    public static final String OBJECT_FEATURE_DATA_MANIPULATOR = "dataManipulator";
+    public static final String OBJECT_FEATURE_DATA_SOURCE = "dataSource";
+    public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
+    public static final String OBJECT_FEATURE_DATA_SOURCE_TEMPORARY = "dataSourceTemporary";
+    public static final String OBJECT_FEATURE_ENTITY = "entity";
+    public static final String OBJECT_FEATURE_ENTITY_CONTAINER = "entityContainer";
+    public static final String OBJECT_FEATURE_OBJECT_CONTAINER = "objectContainer";
+    public static final String OBJECT_FEATURE_SCHEMA = "schema";
+    public static final String OBJECT_FEATURE_SCRIPT = "script";
+    public static final String OBJECT_FEATURE_SCRIPT_EXTENDED = "scriptExtended";
 
     private final WebSession session;
     private final DBSObject object;
@@ -134,13 +149,13 @@ public class WebDatabaseObjectInfo {
         List<String> features = new ArrayList<>();
         getObjectFeatures(object, features);
         if (object instanceof DBPDataSourceContainer) {
-            features.add("dataSource");
+            features.add(OBJECT_FEATURE_DATA_SOURCE);
             DBPDataSourceContainer dbpDataSourceContainer = (DBPDataSourceContainer) this.object;
             if (dbpDataSourceContainer.isConnected()) {
-                features.add("dataSourceConnected");
+                features.add(OBJECT_FEATURE_DATA_SOURCE_CONNECTED);
             }
             if (dbpDataSourceContainer.isTemporary()) {
-                features.add("dataSourceTemporary");
+                features.add(OBJECT_FEATURE_DATA_SOURCE_TEMPORARY);
             }
             if (dbpDataSourceContainer.isConnected()) {
                 DBPDataSource dataSource = dbpDataSourceContainer.getDataSource();
@@ -153,19 +168,24 @@ public class WebDatabaseObjectInfo {
     }
 
     private static void getObjectFeatures(DBSObject object, List<String> features) {
-        if (object instanceof DBPScriptObject) features.add("script");
-        if (object instanceof DBPScriptObjectExt) features.add("scriptExtended");
-        if (object instanceof DBSDataContainer) features.add("dataContainer");
-        if (object instanceof DBSDataManipulator) features.add("dataManipulator");
-        if (object instanceof DBSEntity) features.add("entity");
-        if (object instanceof DBSSchema) features.add("schema");
-        if (object instanceof DBSCatalog) features.add("catalog");
+        if (object instanceof DBPScriptObject) features.add(OBJECT_FEATURE_SCRIPT);
+        if (object instanceof DBPScriptObjectExt) features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+        if (object instanceof DBSDataContainer) {
+            features.add(OBJECT_FEATURE_DATA_CONTAINER);
+            if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
+                features.add(OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS);
+            }
+        }
+        if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
+        if (object instanceof DBSEntity) features.add(OBJECT_FEATURE_ENTITY);
+        if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
+        if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
         if (object instanceof DBSObjectContainer) {
-            features.add("objectContainer");
+            features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
                 if (DBSEntity.class.isAssignableFrom(childType)) {
-                    features.add("entityContainer");
+                    features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
             } catch (Exception e) {
                 log.error(e);
