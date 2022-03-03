@@ -103,7 +103,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
 
-    if (!settings?.foldersTree) {
+    if (!ref.settings?.foldersTree) {
       return;
     }
 
@@ -127,7 +127,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
     folderExplorer.open(path, nodeId);
 
-  }, []);
+  }, [folderExplorer]);
 
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
@@ -191,7 +191,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         }
       },
     }),
-    [control, folderExplorer, selectionTree, onOpen, onClick]
+    [control, folderExplorer, selectionTree, onOpen, onClick, folderExplorer]
   );
 
   const getName = useCallback(

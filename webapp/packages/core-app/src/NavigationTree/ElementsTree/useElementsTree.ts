@@ -109,6 +109,123 @@ export function useElementsTree(options: IOptions): IElementsTree {
   options = useObjectRef(options);
   const state = options.localState || localTreeNodesState;
 
+  const functionsRef = useObjectRef({
+    async loadTree(nodeId: string) {
+      const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);
+
+      if (!preloaded) {
+        return;
+      }
+
+      let children = [nodeId];
+
+      while (children.length > 0) {
+        const nextChildren: string[] = [];
+
+        for (const child of children) {
+          await connectionInfoResource.load(CachedMapAllKey);
+          await navNodeInfoResource.waitLoad();
+          await navTreeResource.waitLoad();
+
+          const expanded = elementsTree.isNodeExpanded(child, true);
+          if (!expanded && child !== options.root) {
+            if (navNodeInfoResource.isOutdated(child)) {
+              const node = navNodeInfoResource.get(child);
+
+              if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+                await navNodeInfoResource.load(child);
+              }
+            }
+            continue;
+          }
+
+          const loaded = await options.loadChildren(child, false);
+
+          if (!loaded) {
+            const node = navNodeInfoResource.get(child);
+
+            if (node) {
+              await elementsTree.expand(node, false);
+            }
+            continue;
+          }
+
+          nextChildren.push(...(navTreeResource.get(child) || []));
+        }
+
+        children = nextChildren;
+      }
+    },
+
+    getNestedChildren(nodeId: string): string [] {
+      const nestedChildren: string[] = [];
+      const prevChildren = elementsTree.getNodeChildren(nodeId);
+      nestedChildren.push(...prevChildren);
+
+      while (prevChildren.length) {
+        const nodeKey = prevChildren.shift()!;
+        const children = elementsTree.getNodeChildren(nodeKey);
+        prevChildren.push(...children);
+        nestedChildren.push(...children);
+      }
+
+      return nestedChildren;
+    },
+
+    async clearSelection(nodeId: string) {
+      const node = navNodeInfoResource.get(nodeId);
+
+      const ignore = node && options.isGroup?.(node)
+        ? this.getNestedChildren(nodeId)
+        : [];
+
+      for (const [id, nodeState] of state) {
+        if (nodeState.selected && id !== nodeId && !ignore.includes(id)) {
+          nodeState.selected = false;
+
+          if (options.onSelect) {
+            const node = navNodeInfoResource.get(id);
+
+            if (node) {
+              await options.onSelect(node, false);
+            }
+          }
+        }
+      }
+    },
+
+    async setSelection(nodeId: string, selected: boolean): Promise<void> {
+      const node = navNodeInfoResource.get(nodeId);
+
+      if (!node) {
+        return;
+      }
+
+      const treeNodeState = state.get(nodeId);
+      const selectionState = elementsTree.isNodeSelected(nodeId);
+
+      if (selectionState === selected) {
+        return;
+      }
+
+      if (options.isGroup?.(node)) {
+        const children = elementsTree.getNodeChildren(nodeId);
+
+        for (const child of children) {
+          await this.setSelection(child, selected);
+        }
+
+        if (children.length === 0) {
+          return;
+        }
+      } else {
+        treeNodeState.selected = selected;
+      }
+
+      await options.onSelect?.(node, selected);
+    },
+  });
+
   const userData = useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
     () => observable<IElementsTreeUserState>({
@@ -125,7 +242,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         elementsTree.loading = true;
         try {
-          await loadTree(options.root);
+          await functionsRef.loadTree(options.root);
         } finally {
           elementsTree.loading = false;
         }
@@ -137,121 +254,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       && Array.isArray(data.nodeState)
     )
   );
-
-  async function loadTree(nodeId: string) {
-    const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);
-
-    if (!preloaded) {
-      return;
-    }
-
-    let children = [nodeId];
-
-    while (children.length > 0) {
-      const nextChildren: string[] = [];
-
-      for (const child of children) {
-        await connectionInfoResource.load(CachedMapAllKey);
-        await navNodeInfoResource.waitLoad();
-        await navTreeResource.waitLoad();
-
-        const expanded = elementsTree.isNodeExpanded(child, true);
-        if (!expanded && child !== options.root) {
-          if (navNodeInfoResource.isOutdated(child)) {
-            const node = navNodeInfoResource.get(child);
-
-            if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
-              await navNodeInfoResource.load(child);
-            }
-          }
-          continue;
-        }
-
-        const loaded = await options.loadChildren(child, false);
-
-        if (!loaded) {
-          const node = navNodeInfoResource.get(child);
-
-          if (node) {
-            await elementsTree.expand(node, false);
-          }
-          continue;
-        }
-
-        nextChildren.push(...(navTreeResource.get(child) || []));
-      }
-
-      children = nextChildren;
-    }
-  }
-
-  function getNestedChildren(nodeId: string): string [] {
-    const nestedChildren: string[] = [];
-    const prevChildren = elementsTree.getNodeChildren(nodeId);
-    nestedChildren.push(...prevChildren);
-
-    while (prevChildren.length) {
-      const nodeKey = prevChildren.shift()!;
-      const children = elementsTree.getNodeChildren(nodeKey);
-      prevChildren.push(...children);
-      nestedChildren.push(...children);
-    }
-
-    return nestedChildren;
-  }
-
-  async function clearSelection(nodeId: string) {
-    const node = navNodeInfoResource.get(nodeId);
-
-    const ignore = node && options.isGroup?.(node)
-      ? getNestedChildren(nodeId)
-      : [];
-
-    for (const [id, nodeState] of state) {
-      if (nodeState.selected && id !== nodeId && !ignore.includes(id)) {
-        nodeState.selected = false;
-
-        if (options.onSelect) {
-          const node = navNodeInfoResource.get(id);
-
-          if (node) {
-            await options.onSelect(node, false);
-          }
-        }
-      }
-    }
-  }
-
-  async function setSelection(nodeId: string, selected: boolean): Promise<void> {
-    const node = navNodeInfoResource.get(nodeId);
-
-    if (!node) {
-      return;
-    }
-
-    const treeNodeState = state.get(nodeId);
-    const selectionState = elementsTree.isNodeSelected(nodeId);
-
-    if (selectionState === selected) {
-      return;
-    }
-
-    if (options.isGroup?.(node)) {
-      const children = elementsTree.getNodeChildren(nodeId);
-
-      for (const child of children) {
-        await setSelection(child, selected);
-      }
-
-      if (children.length === 0) {
-        return;
-      }
-    } else {
-      treeNodeState.selected = selected;
-    }
-
-    await options.onSelect?.(node, selected);
-  }
 
   const renderers = useMemo(() => options.renderers || [], [options.renderers]);
 
@@ -346,7 +348,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         treeNodeState.expanded = state;
 
         if (state) {
-          await loadTree(node.id);
+          await functionsRef.loadTree(node.id);
         }
       } catch {
         treeNodeState.expanded = false;
@@ -365,14 +367,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const selected = this.isNodeSelected(node.id);
 
       if (!multiple) {
-        await clearSelection(node.id);
+        await functionsRef.clearSelection(node.id);
 
         if (selected) {
           return;
         }
       }
 
-      await setSelection(node.id, !selected);
+      await functionsRef.setSelection(node.id, !selected);
     },
   }), {
     settings: observable.ref,
@@ -416,7 +418,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
     postHandlers: [function refreshRoot() {
-      loadTree(options.root);
+      functionsRef.loadTree(options.root);
     }],
   });
 
