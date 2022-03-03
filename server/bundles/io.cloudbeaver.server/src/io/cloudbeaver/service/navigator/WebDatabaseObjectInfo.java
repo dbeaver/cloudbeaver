@@ -41,8 +41,8 @@ public class WebDatabaseObjectInfo {
     private static final Log log = Log.getLog(WebDatabaseObjectInfo.class);
 
     public static final String OBJECT_FEATURE_CATALOG = "catalog";
-    public static final String OBJECT_FEATURE_CONTAINS_DATA_FILTER = "containsDataFilter";
     public static final String OBJECT_FEATURE_DATA_CONTAINER = "dataContainer";
+    public static final String OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS = "dataContainerSupportsFilters";
     public static final String OBJECT_FEATURE_DATA_MANIPULATOR = "dataManipulator";
     public static final String OBJECT_FEATURE_DATA_SOURCE = "dataSource";
     public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
@@ -173,7 +173,7 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSDataContainer) {
             features.add(OBJECT_FEATURE_DATA_CONTAINER);
             if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
-                features.add(OBJECT_FEATURE_CONTAINS_DATA_FILTER);
+                features.add(OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS);
             }
         }
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
