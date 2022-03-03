@@ -40,6 +40,20 @@ public class WebDatabaseObjectInfo {
 
     private static final Log log = Log.getLog(WebDatabaseObjectInfo.class);
 
+    public static final String CATALOG = "catalog";
+    public static final String CONTAINS_DATA_FILTER = "containsDataFilter";
+    public static final String DATA_CONTAINER = "dataContainer";
+    public static final String DATA_MANIPULATOR = "dataManipulator";
+    public static final String DATA_SOURCE = "dataSource";
+    public static final String DATA_SOURCE_CONNECTED = "dataSourceConnected";
+    public static final String DATA_SOURCE_TEMPORARY = "dataSourceTemporary";
+    public static final String ENTITY = "entity";
+    public static final String ENTITY_CONTAINER = "entityContainer";
+    public static final String OBJECT_CONTAINER = "objectContainer";
+    public static final String SCHEMA = "schema";
+    public static final String SCRIPT = "script";
+    public static final String SCRIPT_EXTENDED = "scriptExtended";
+
     private final WebSession session;
     private final DBSObject object;
 
@@ -135,13 +149,13 @@ public class WebDatabaseObjectInfo {
         List<String> features = new ArrayList<>();
         getObjectFeatures(object, features);
         if (object instanceof DBPDataSourceContainer) {
-            features.add("dataSource");
+            features.add(DATA_SOURCE);
             DBPDataSourceContainer dbpDataSourceContainer = (DBPDataSourceContainer) this.object;
             if (dbpDataSourceContainer.isConnected()) {
-                features.add("dataSourceConnected");
+                features.add(DATA_SOURCE_CONNECTED);
             }
             if (dbpDataSourceContainer.isTemporary()) {
-                features.add("dataSourceTemporary");
+                features.add(DATA_SOURCE_TEMPORARY);
             }
             if (dbpDataSourceContainer.isConnected()) {
                 DBPDataSource dataSource = dbpDataSourceContainer.getDataSource();
@@ -154,24 +168,24 @@ public class WebDatabaseObjectInfo {
     }
 
     private static void getObjectFeatures(DBSObject object, List<String> features) {
-        if (object instanceof DBPScriptObject) features.add("script");
-        if (object instanceof DBPScriptObjectExt) features.add("scriptExtended");
+        if (object instanceof DBPScriptObject) features.add(SCRIPT);
+        if (object instanceof DBPScriptObjectExt) features.add(SCRIPT_EXTENDED);
         if (object instanceof DBSDataContainer) {
-            features.add("dataContainer");
-            if (((DBSDataContainer) object).isFeatureSupported("data.filter")) {
-                features.add("dataWithFilter");
+            features.add(DATA_CONTAINER);
+            if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
+                features.add(CONTAINS_DATA_FILTER);
             }
         }
-        if (object instanceof DBSDataManipulator) features.add("dataManipulator");
-        if (object instanceof DBSEntity) features.add("entity");
-        if (object instanceof DBSSchema) features.add("schema");
-        if (object instanceof DBSCatalog) features.add("catalog");
+        if (object instanceof DBSDataManipulator) features.add(DATA_MANIPULATOR);
+        if (object instanceof DBSEntity) features.add(ENTITY);
+        if (object instanceof DBSSchema) features.add(SCHEMA);
+        if (object instanceof DBSCatalog) features.add(CATALOG);
         if (object instanceof DBSObjectContainer) {
-            features.add("objectContainer");
+            features.add(OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
                 if (DBSEntity.class.isAssignableFrom(childType)) {
-                    features.add("entityContainer");
+                    features.add(ENTITY_CONTAINER);
                 }
             } catch (Exception e) {
                 log.error(e);
