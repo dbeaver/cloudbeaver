@@ -177,7 +177,7 @@ public class WebDatabaseObjectInfo {
             }
         }
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
-        if (object instanceof DBSEntity && object instanceof DBSDataType == false) features.add(OBJECT_FEATURE_ENTITY);
+        if (object instanceof DBSEntity && !(object instanceof DBSDataType)) features.add(OBJECT_FEATURE_ENTITY);
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
         if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
         if (object instanceof DBSObjectContainer) {
