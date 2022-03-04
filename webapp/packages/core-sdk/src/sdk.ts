@@ -744,6 +744,7 @@ export interface Query {
   sqlFormatQuery: Scalars['String'];
   sqlGenerateEntityQuery: Scalars['String'];
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
+  sqlParseQuery: SqlScriptQuery;
   sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
@@ -1048,6 +1049,13 @@ export interface QuerySqlGenerateEntityQueryArgs {
 export interface QuerySqlListContextsArgs {
   connectionId?: InputMaybe<Scalars['ID']>;
   contextId?: InputMaybe<Scalars['ID']>;
+}
+
+
+export interface QuerySqlParseQueryArgs {
+  connectionId: Scalars['ID'];
+  position: Scalars['Int'];
+  script: Scalars['String'];
 }
 
 
@@ -2136,6 +2144,15 @@ export type FormatSqlQueryQueryVariables = Exact<{
 
 
 export type FormatSqlQueryQuery = { query: string };
+
+export type ParseSqlQueryQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  script: Scalars['String'];
+  position: Scalars['Int'];
+}>;
+
+
+export type ParseSqlQueryQuery = { queryInfo: { start: number; end: number } };
 
 export type ParseSqlScriptQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -3396,6 +3413,18 @@ export const FormatSqlQueryDocument = `
   )
 }
     `;
+export const ParseSqlQueryDocument = `
+    query parseSQLQuery($connectionId: ID!, $script: String!, $position: Int!) {
+  queryInfo: sqlParseQuery(
+    connectionId: $connectionId
+    script: $script
+    position: $position
+  ) {
+    start
+    end
+  }
+}
+    `;
 export const ParseSqlScriptDocument = `
     query parseSQLScript($connectionId: ID!, $script: String!) {
   scriptInfo: sqlParseScript(connectionId: $connectionId, script: $script) {
@@ -3748,6 +3777,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     formatSqlQuery(variables: FormatSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<FormatSqlQueryQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'formatSqlQuery');
+    },
+    parseSQLQuery(variables: ParseSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ParseSqlQueryQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<ParseSqlQueryQuery>(ParseSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'parseSQLQuery');
     },
     parseSQLScript(variables: ParseSqlScriptQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ParseSqlScriptQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<ParseSqlScriptQuery>(ParseSqlScriptDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'parseSQLScript');
