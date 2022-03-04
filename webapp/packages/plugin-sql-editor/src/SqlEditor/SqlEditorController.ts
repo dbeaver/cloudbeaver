@@ -197,8 +197,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   executeQuery = async (): Promise<void> => {
+    const query = this.getSubQuery();
+
     await this.executeQueryAction(
-      this.getSubQuery(),
+      await this.executeQueryAction(query, () => this.getResolvedSegment()),
       query => this.sqlQueryService.executeEditorQuery(
         this.state,
         query.query,
@@ -208,8 +210,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
   };
 
   executeQueryNewTab = async (): Promise<void> => {
+    const query = this.getSubQuery();
+
     await this.executeQueryAction(
-      this.getSubQuery(),
+      await this.executeQueryAction(query, () => this.getResolvedSegment()),
       query => this.sqlQueryService.executeEditorQuery(
         this.state,
         query.query,
@@ -223,8 +227,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
       return;
     }
 
+    const query = this.getSubQuery();
+
     await this.executeQueryAction(
-      this.getSubQuery(),
+      await this.executeQueryAction(query, () => this.getResolvedSegment()),
       query => this.sqlExecutionPlanService.executeExecutionPlan(
         this.state,
         query.query,
@@ -318,10 +324,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
     }
   }
 
-  private async executeQueryAction(
+  private async executeQueryAction<T>(
     query: ISQLScriptSegment | undefined,
-    action: (query: ISQLScriptSegment) => Promise<void>
-  ): Promise<void> {
+    action: (query: ISQLScriptSegment) => Promise<T>
+  ): Promise<T | undefined> {
     if (!query || this.isDisabled || this.isLineScriptEmpty) {
       return;
     }
@@ -329,9 +335,11 @@ export class SqlEditorController implements IInitializableController, IDestructi
     this.beforeExecute();
 
     try {
-      this.highlightExecutingLine(query.from, true);
-      await action(query);
+      const id = setTimeout(() => this.highlightExecutingLine(query.from, true), 250);
+      const result = await action(query);
+      clearTimeout(id);
       this.highlightExecutingLine(query.from, false);
+      return result;
     } catch (exception) {
       this.highlightExecutingLine(query.from, false);
       this.highlightExecutingErrorLine(query.from, true);
@@ -576,6 +584,41 @@ export class SqlEditorController implements IInitializableController, IDestructi
     } else {
       this.editor?.removeLineClass(line, 'background', 'running-query-error');
     }
+  }
+
+  private async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
+    const connectionId = this.state.executionContext?.connectionId;
+
+    if (!connectionId || !this.editor || this.editor.somethingSelected()) {
+      return this.getSubQuery();
+    }
+
+    const cursor = this.editor.getCursor();
+    const position = getAbsolutePosition(this.editor, cursor);
+
+    const result = await this.sqlEditorService.parseSQLQuery(
+      connectionId,
+      this.value,
+      position
+    );
+
+    const query = this.value.substring(result.start, result.end);
+    const from = this.parser.getScriptLineAtPos(result.start);
+    const to = this.parser.getScriptLineAtPos(result.end);
+
+    if (!from || !to) {
+      throw new Error('Failed to get position');
+    }
+
+    return {
+      query,
+      begin: result.start,
+      end: result.end,
+      from: from.index,
+      to: to.index,
+      fromPosition: from.begin,
+      toPosition: from.end,
+    };
   }
 
   private getSubQuery(): ISQLScriptSegment | undefined {

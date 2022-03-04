@@ -24,9 +24,9 @@ export class SqlEditorService {
   }
 
   getState(
-    order: number, 
-    name?: string, 
-    source?: string, 
+    order: number,
+    name?: string,
+    source?: string,
     contextInfo?: IConnectionExecutionContextInfo
   ): ISqlEditorTabState {
     return {
@@ -53,6 +53,20 @@ export class SqlEditorService {
     });
 
     return result.scriptInfo;
+  }
+
+  async parseSQLQuery(
+    connectionId: string,
+    script: string,
+    position: number,
+  ) {
+    const result = await this.gql.sdk.parseSQLQuery({
+      connectionId,
+      script,
+      position,
+    });
+
+    return result.queryInfo;
   }
 
   async getAutocomplete(
