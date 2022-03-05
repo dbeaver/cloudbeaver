@@ -16,13 +16,12 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWConnectionGrant;
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWSecurityController;
-import io.cloudbeaver.DBWSecuritySubjectType;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.dbeaver.model.security.DBSecurityAdminController;
+import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
+import org.jkiss.dbeaver.model.security.DBSecuritySubjectType;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -33,6 +32,7 @@ import org.jkiss.dbeaver.model.auth.DBAAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import io.cloudbeaver.model.user.WebRole;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-class CBSecurityController implements DBWSecurityController {
+class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole, WebSession> {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
@@ -151,7 +151,7 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
-                "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
+                    "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
                 dbStat.setString(1, userId);
                 List<WebRole> roles = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -826,9 +826,9 @@ class CBSecurityController implements DBWSecurityController {
 
     @NotNull
     @Override
-    public DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+    public DBSecurityConnectionGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
         if (subjectIds.length == 0) {
-            return new DBWConnectionGrant[0];
+            return new DBSecurityConnectionGrant[0];
         }
         List<String> allSubjects = new ArrayList<>();
         Collections.addAll(allSubjects, subjectIds);
@@ -854,19 +854,19 @@ class CBSecurityController implements DBWSecurityController {
                 sql.append(")");
 
                 if (allSubjects.isEmpty()) {
-                    return new DBWConnectionGrant[0];
+                    return new DBSecurityConnectionGrant[0];
                 }
                 try (Statement dbStat = dbCon.createStatement()) {
-                    List<DBWConnectionGrant> result = new ArrayList<>();
+                    List<DBSecurityConnectionGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
                         while (dbResult.next()) {
-                            result.add(new DBWConnectionGrant(
+                            result.add(new DBSecurityConnectionGrant(
                                 dbResult.getString(1),
                                 dbResult.getString(2),
-                                DBWSecuritySubjectType.fromCode(dbResult.getString(3))));
+                                DBSecuritySubjectType.fromCode(dbResult.getString(3))));
                         }
                     }
-                    return result.toArray(new DBWConnectionGrant[0]);
+                    return result.toArray(new DBSecurityConnectionGrant[0]);
                 }
             }
         } catch (SQLException e) {
@@ -901,7 +901,7 @@ class CBSecurityController implements DBWSecurityController {
 
     @NotNull
     @Override
-    public DBWConnectionGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
+    public DBSecurityConnectionGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -909,16 +909,16 @@ class CBSecurityController implements DBWSecurityController {
                         "FROM CB_DATASOURCE_ACCESS DA,CB_AUTH_SUBJECT S\n" +
                         "WHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.DATASOURCE_ID=?")) {
                     dbStat.setString(1, connectionId);
-                    List<DBWConnectionGrant> result = new ArrayList<>();
+                    List<DBSecurityConnectionGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
-                            result.add(new DBWConnectionGrant(
+                            result.add(new DBSecurityConnectionGrant(
                                 connectionId,
                                 dbResult.getString(1),
-                                DBWSecuritySubjectType.fromCode(dbResult.getString(2))));
+                                DBSecuritySubjectType.fromCode(dbResult.getString(2))));
                         }
                     }
-                    return result.toArray(new DBWConnectionGrant[0]);
+                    return result.toArray(new DBSecurityConnectionGrant[0]);
                 }
             }
         } catch (SQLException e) {

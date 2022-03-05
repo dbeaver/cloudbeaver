@@ -50,6 +50,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -125,7 +126,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
 
         try {
             // Check persistent state
-            this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
+            this.persisted = CBApplication.getInstance().getSecurityController().isSessionPersisted(this.id);
         } catch (Exception e) {
             log.error("Error checking session state,", e);
         }
@@ -338,7 +339,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
         try {
             return Arrays.stream(application.getSecurityController()
                 .getSubjectConnectionAccess(new String[]{subjectId}))
-                .map(DBWConnectionGrant::getConnectionId).collect(Collectors.toSet());
+                .map(DBSecurityConnectionGrant::getConnectionId).collect(Collectors.toSet());
         } catch (DBCException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);
@@ -438,12 +439,12 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    DBWSecurityController.getInstance().createSession(this);
+                    CBApplication.getInstance().getSecurityController().createSession(this);
                     this.persisted = true;
                 } else {
                     if (!CBApplication.getInstance().isConfigurationMode()) {
                         // Update record
-                        DBWSecurityController.getInstance().updateSession(this);
+                        CBApplication.getInstance().getSecurityController().updateSession(this);
                     }
                 }
             } catch (Exception e) {

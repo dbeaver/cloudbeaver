@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.auth;
 
-import io.cloudbeaver.DBWSecurityController;
+import org.jkiss.dbeaver.model.security.DBSecurityController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -54,7 +54,7 @@ public interface DBAAuthProviderExternal<AUTH_SESSION extends DBASession> extend
     @NotNull
     String validateLocalAuth(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBWSecurityController securityController,
+        @NotNull DBSecurityController securityController,
         @NotNull Map<String, Object> providerConfig,
         @NotNull Map<String, Object> userCredentials,
         @Nullable WebUser activeUser) throws DBException;

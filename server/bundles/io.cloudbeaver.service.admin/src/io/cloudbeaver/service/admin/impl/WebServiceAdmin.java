@@ -16,7 +16,8 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
-import io.cloudbeaver.DBWConnectionGrant;
+import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
@@ -28,8 +29,6 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
@@ -51,6 +50,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import io.cloudbeaver.model.user.WebRole;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -74,7 +74,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, String userName) throws DBWebException {
         try {
             List<AdminUserInfo> webUsers = new ArrayList<>();
-            for (WebUser user : CBPlatform.getInstance().getApplication().getSecurityController().findUsers(userName)) {
+            for (WebUser user : CBPlatform.getInstance().getApplication().getAdminSecurityController().findUsers(userName)) {
                 webUsers.add(new AdminUserInfo(webSession, user));
             }
             return webUsers;
@@ -89,11 +89,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             List<AdminRoleInfo> roles = new ArrayList<>();
             if (CommonUtils.isEmpty(roleId)) {
-                for (WebRole role : CBPlatform.getInstance().getApplication().getSecurityController().readAllRoles()) {
+                for (WebRole role : CBPlatform.getInstance().getApplication().getAdminSecurityController().readAllRoles()) {
                     roles.add(new AdminRoleInfo(role));
                 }
             } else {
-                WebRole role = CBPlatform.getInstance().getApplication().getSecurityController().findRole(roleId);
+                WebRole role = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
                 if (role != null) {
                     roles.add(new AdminRoleInfo(role));
                 }
@@ -127,8 +127,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty user name");
         }
         try {
-            WebUser newUser = new WebUser(userName);
-            CBPlatform.getInstance().getApplication().getSecurityController().createUser(newUser);
+            WebUser newUser = new io.cloudbeaver.model.user.WebUser(userName);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().createUser(newUser);
             return new AdminUserInfo(webSession, newUser);
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
@@ -141,7 +141,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("You cannot delete yourself");
         }
         try {
-            CBPlatform.getInstance().getApplication().getSecurityController().deleteUser(userName);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().deleteUser(userName);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
@@ -158,7 +158,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             WebRole newRole = new WebRole(roleId);
             newRole.setName(roleName);
             newRole.setDescription(description);
-            CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole, webSession.getUser().getUserId());
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().createRole(newRole, webSession.getUser().getUserId());
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
@@ -175,7 +175,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             WebRole newRole = new WebRole(roleId);
             newRole.setName(roleName);
             newRole.setDescription(description);
-            CBPlatform.getInstance().getApplication().getSecurityController().updateRole(newRole);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().updateRole(newRole);
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error updating role " + roleId, e);
@@ -186,10 +186,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
             WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(webSession.getUser().getUserId());
-            if (Arrays.stream(userRoles).anyMatch(webRole -> webRole.getRoleId().equals(roleId))) {
+            if (Arrays.stream(userRoles).anyMatch(DBRole -> DBRole.getRoleId().equals(roleId))) {
                 throw new DBWebException("You can not delete your own role");
             }
-            CBPlatform.getInstance().getApplication().getSecurityController().deleteRole(roleId);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().deleteRole(roleId);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting role", e);
@@ -210,7 +210,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
             if (!roleIds.contains(role)) {
                 roleIds.add(role);
-                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+                CBPlatform.getInstance().getApplication().getAdminSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' already has role '" + role + "'");
             }
@@ -234,7 +234,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
             if (roleIds.contains(role)) {
                 roleIds.remove(role);
-                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+                CBPlatform.getInstance().getApplication().getAdminSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have role '" + role + "'");
             }
@@ -556,7 +556,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Access management
 
     @Override
-    public DBWConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
+    public DBSecurityConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
             return CBApplication.getInstance().getSecurityController().getConnectionSubjectAccess(connectionId);
         } catch (DBCException e) {
@@ -583,7 +583,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
+    public DBSecurityConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
             return CBApplication.getInstance().getSecurityController().getSubjectConnectionAccess(new String[] { subjectId } );
         } catch (DBCException e) {
@@ -623,7 +623,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
         try {
-            CBApplication.getInstance().getSecurityController().setUserMeta(userId, parameters);
+            CBApplication.getInstance().getAdminSecurityController().setUserMeta(userId, parameters);
             return true;
         } catch (DBCException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);

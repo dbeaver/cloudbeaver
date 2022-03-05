@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWSecurityController;
+import org.jkiss.dbeaver.model.security.DBSecurityController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.DBAAuthProviderExternal;
@@ -62,7 +62,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @NotNull Map<String, Object> authParameters,
         boolean linkWithActiveUser) throws DBWebException {
-        DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        DBSecurityController<WebUser, ?, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -152,11 +152,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                             curUser = securityController.getUserById(userId);
                             if (curUser == null) {
                                 curUser = new WebUser(userId);
-                                securityController.createUser(curUser);
+                                var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController();
+                                adminSecurityController.createUser(curUser);
 
                                 String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
                                 if (!CommonUtils.isEmpty(defaultRoleName)) {
-                                    securityController.setUserRoles(
+                                    adminSecurityController.setUserRoles(
                                         userId,
                                         new String[]{defaultRoleName},
                                         userId);
@@ -230,7 +231,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     private boolean isAdminAuthTry(@NotNull AuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
-        DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        DBSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
         boolean isAdmin = false;
 
         try {

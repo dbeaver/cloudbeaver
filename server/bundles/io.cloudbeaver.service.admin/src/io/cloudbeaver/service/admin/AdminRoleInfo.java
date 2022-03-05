@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.DBWConnectionGrant;
-import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
+import io.cloudbeaver.model.user.WebRole;
 
 import java.util.List;
 
@@ -57,13 +57,13 @@ public class AdminRoleInfo {
     }
 
     @Property
-    public DBWConnectionGrant[] getGrantedConnections() throws DBCException {
+    public DBSecurityConnectionGrant[] getGrantedConnections() throws DBCException {
         return CBPlatform.getInstance().getApplication().getSecurityController().getSubjectConnectionAccess(new String[] { getRoleId()} );
     }
 
     @Property
     public String[] getGrantedUsers() throws DBCException {
-        return CBPlatform.getInstance().getApplication().getSecurityController().getRoleSubjects(getRoleId());
+        return CBPlatform.getInstance().getApplication().getAdminSecurityController().getRoleSubjects(getRoleId());
     }
 
 }
