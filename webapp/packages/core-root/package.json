@@ -15,10 +15,10 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "^0.1.0",
-    "@cloudbeaver/core-sdk": "^0.1.0",
-    "@cloudbeaver/core-settings": "^0.1.0",
-    "@cloudbeaver/core-utils": "^0.1.0",
-    "mobx": "^6.x.x"
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-sdk": "~0.1.0",
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "mobx": "~6.x.x"
   }
 }

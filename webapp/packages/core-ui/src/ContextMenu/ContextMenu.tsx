@@ -81,7 +81,8 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
     return null;
   }
 
-  const renderingChildren: React.ReactNode  = typeof children === 'function' ? children({ loading, disabled }) : children;
+  // TODO: fix type error
+  const renderingChildren: React.ReactNode  = typeof children === 'function' ? (children as any)({ loading, disabled }) : children;
 
   if (React.isValidElement(renderingChildren) && disclosure) {
     return styled(styles)(

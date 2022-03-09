@@ -198,7 +198,7 @@ export function useMapResource<
         await actions?.onData?.(
           newData,
           resource,
-          prevData
+          prevData as any  // TODO: fix type error
         );
         setException(null);
       } catch (exception) {

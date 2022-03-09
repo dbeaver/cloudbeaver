@@ -19,10 +19,10 @@ export class GraphQLService {
 
   readonly client: CustomGraphQLClient;
 
-  constructor(private environmentService: EnvironmentService) {
+  constructor(private readonly environmentService: EnvironmentService) {
     const gqlEndpoint = this.environmentService.gqlEndpoint;
     this.client = new CustomGraphQLClient(gqlEndpoint);
-    this.sdk = getSdk(this.client);
+    this.sdk = getSdk(this.client as any);
   }
 
   registerInterceptor(interceptor: IResponseInterceptor): void {

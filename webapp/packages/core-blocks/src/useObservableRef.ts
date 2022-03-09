@@ -60,11 +60,11 @@ export function useObservableRef<T extends Record<any, any>>(
   }
 
   if (update === undefined) {
-    update = typeof init === 'function' ? untracked(init) : init;
+    update = typeof init === 'function' ? untracked(init as any) : init;
   }
 
   const [state] = useState(() => {
-    let state = typeof init === 'function' ? untracked(init) : init;
+    let state: T = typeof init === 'function' ? untracked(init as any) : init;
 
     if (update) {
       Object.assign(state, update);

@@ -28,8 +28,8 @@ export type CachedDataResourceGetter<
   TValue,
   TIncludes
 > = (
-  TValue extends null 
-    ? CachedResourceValueIncludes<TValue, TIncludes> | null 
+  TValue extends null
+    ? CachedResourceValueIncludes<TValue, TIncludes> | null
     : CachedResourceValueIncludes<TValue, TIncludes>
 );
 
@@ -70,7 +70,7 @@ export abstract class CachedDataResource<
     if (includes) {
       const metadata = this.getMetadata(param);
 
-      if (includes.some(include => !metadata.includes.includes(include))) {
+      if ((includes as string[]).some(include => !metadata.includes.includes(include))) {
         return false;
       }
     }

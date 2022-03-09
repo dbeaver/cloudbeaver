@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem, GroupTitle } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';

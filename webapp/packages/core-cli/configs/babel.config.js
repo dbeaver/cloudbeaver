@@ -54,7 +54,7 @@ module.exports = {
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties'],
     ["@babel/plugin-proposal-object-rest-spread", { useBuiltIns: true }],
-    'reshadow/babel',
+    require('@reshadow/babel'),
     /*devMode &&*/[
       "babel-plugin-module-resolver",
       {

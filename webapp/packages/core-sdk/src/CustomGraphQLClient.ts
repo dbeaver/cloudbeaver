@@ -7,7 +7,7 @@
  */
 
 import { GraphQLClient, ClientError } from 'graphql-request';
-import type { Variables } from 'graphql-request/dist/types';
+import type { RequestDocument, Variables } from 'graphql-request/dist/types';
 import type * as Dom from 'graphql-request/dist/types.dom';
 
 import { GQLError } from './GQLError';
@@ -27,14 +27,15 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  request<T, V = Variables>(
-    query: string,
+  // @ts-expect-error should be fixed somehow
+  request<T = any, V = Variables>(
+    document: RequestDocument,
     variables?: V,
     requestHeaders?: Dom.RequestInit['headers']
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T>(query, variables, requestHeaders)
+      this.overrideRequest<T>(document as string, variables, requestHeaders)
     );
   }
 

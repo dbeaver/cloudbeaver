@@ -189,7 +189,7 @@ export abstract class CachedResource<
     return this;
   }
 
-  before(handler: IExecutorHandler<TParam, any>): this {
+  before(handler: IExecutorHandler<TParam>): this {
     this.beforeLoad.addHandler(async (param, contexts) => {
       try {
         if (this.logActivity) {
@@ -230,7 +230,7 @@ export abstract class CachedResource<
     const metadata = this.getMetadata(key);
 
     if (includes) {
-      return includes.every(include => metadata.includes.includes(include));
+      return (includes as string[]).every(include => metadata.includes.includes(include));
     }
     return true;
   }
@@ -270,7 +270,7 @@ export abstract class CachedResource<
     param = this.transformParam(param);
 
     if (includes) {
-      this.commitIncludes(param, includes);
+      this.commitIncludes(param, includes as string[]);
     }
 
     const metadata = this.getMetadata(param);
@@ -428,7 +428,7 @@ export abstract class CachedResource<
     param: TParam,
     context: TContext,
     update: (param: TParam, context: TContext) => Promise<T>,
-  ): Promise<T>
+  ): Promise<T>;
   protected async performUpdate<T>(
     param: TParam,
     context: TContext,
@@ -571,7 +571,7 @@ export abstract class CachedResource<
     console.log(this.getActionPrefixedName(action));
   };
 
-  private logName = (action: string): IExecutorHandler<any> => () => {
+  private readonly logName = (action: string): IExecutorHandler<any> => () => {
     console.log(this.getActionPrefixedName(action));
   };
 
@@ -579,7 +579,7 @@ export abstract class CachedResource<
     return this.constructor.name + ': ' + action;
   }
 
-  private logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
+  private readonly logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       console.log(this.getActionPrefixedName(action) + 'interrupted');
     }

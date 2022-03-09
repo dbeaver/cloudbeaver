@@ -167,7 +167,8 @@ export const Loader = observer<Props>(function Loader({
   if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
       if (typeof children === 'function') {
-        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
+        // TODO: fix type error
+        return <LoaderContext.Provider value={contextState}>{(children as any)()}</LoaderContext.Provider>;
       } else {
         return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
       }

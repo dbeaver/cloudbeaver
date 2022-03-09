@@ -15,24 +15,24 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@material/button": "^4.0.0",
-    "@material/elevation": "^4.0.0",
-    "@material/layout-grid": "^4.0.0",
-    "@material/radio": "^4.0.0",
-    "@material/ripple": "^4.0.0",
-    "@material/theme": "^4.0.0",
-    "@material/typography": "^4.0.0",
-    "@material/switch": "^4.0.0",
-    "@material/checkbox": "^4.0.0"
+    "@material/button": "~4.0.0",
+    "@material/elevation": "~4.0.0",
+    "@material/layout-grid": "~4.0.0",
+    "@material/radio": "~4.0.0",
+    "@material/ripple": "~4.0.0",
+    "@material/theme": "~4.0.0",
+    "@material/typography": "~4.0.0",
+    "@material/switch": "~4.0.0",
+    "@material/checkbox": "~4.0.0"
   },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "^0.1.0",
-    "@cloudbeaver/core-events": "^0.1.0",
-    "@cloudbeaver/core-settings": "^0.1.0",
-    "@cloudbeaver/core-utils": "^0.1.0",
-    "mobx": "^6.x.x",
-    "mobx-react-lite": "^3.x.x",
-    "react": "^17.x.x",
-    "reshadow": "^0.x.x"
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-events": "~0.1.0",
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "mobx": "~6.x.x",
+    "mobx-react-lite": "~3.x.x",
+    "react": "~17.x.x",
+    "reshadow": "~0.x.x"
   }
 }
