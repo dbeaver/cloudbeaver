@@ -9,6 +9,7 @@
 import { action, computed, observable, makeObservable } from 'mobx';
 
 import './styles/main/normalize.css';
+import './styles/main/fonts.css';
 import './styles/main/app-loading-screen.css';
 import './styles/main/elevation.scss';
 import './styles/main/typography.scss';
@@ -109,7 +110,7 @@ export class ThemeService extends Bootstrap {
       this.notificationService.logError({ title: `Theme ${themeId} not found.` });
       return COMMON_STYLES;
     }
-    return [...COMMON_STYLES, theme.styles as ClassCollection];
+    return [...COMMON_STYLES, theme.styles!];
   }
 
   async changeTheme(themeId: string): Promise<void> {
