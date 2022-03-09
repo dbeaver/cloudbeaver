@@ -58,6 +58,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     }),
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(package.version),
+      _DEV_: true,
     }),
     new HtmlWebpackPlugin({ 
       template: resolve('src/index.html.ejs'), 

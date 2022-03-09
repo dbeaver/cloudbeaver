@@ -80,6 +80,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     }),
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(timestampVersion),
+      _DEV_: false
     }),
     new HtmlWebpackPlugin({
       template: resolve('src/index.html.ejs'),

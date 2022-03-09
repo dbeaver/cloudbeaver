@@ -9,9 +9,14 @@
 import path from 'path';
 
 declare const _VERSION_: string | undefined;
+declare const _DEV_: boolean | undefined;
 declare const _ROOT_URI_: string | undefined;
 
 export const GlobalConstants = {
+  get dev(): boolean {
+    return _DEV_ || false;
+  },
+
   get version(): string | undefined {
     return _VERSION_;
   },
