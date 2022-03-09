@@ -131,25 +131,27 @@ public class CBDatabase {
 
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
-        if (CommonUtils.isEmpty(dbUser) && databaseConfiguration.getUrl().startsWith("jdbc:h2")) {
-            // No database credentials specified
-            dbUser = DEFAULT_DB_USER_NAME;
-
-            // Load or generate random password
+        if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
             File pwdFile = new File(application.getDataDirectory(true), DEFAULT_DB_PWD_FILE);
-            if (pwdFile.exists()) {
-                try (FileReader fr = new FileReader(pwdFile)) {
-                    dbPassword = IOUtils.readToString(fr);
-                } catch (Exception e) {
-                    log.error(e);
+            if (!driver.isAnonymousAccess()) {
+                // No database credentials specified
+                dbUser = DEFAULT_DB_USER_NAME;
+
+                // Load or generate random password
+                if (pwdFile.exists()) {
+                    try (FileReader fr = new FileReader(pwdFile)) {
+                        dbPassword = IOUtils.readToString(fr);
+                    } catch (Exception e) {
+                        log.error(e);
+                    }
                 }
-            }
-            if (CommonUtils.isEmpty(dbPassword)) {
-                dbPassword = SecurityUtils.generatePassword(8);
-                try {
-                    IOUtils.writeFileFromString(pwdFile, dbPassword);
-                } catch (IOException e) {
-                    log.error(e);
+                if (CommonUtils.isEmpty(dbPassword)) {
+                    dbPassword = SecurityUtils.generatePassword(8);
+                    try {
+                        IOUtils.writeFileFromString(pwdFile, dbPassword);
+                    } catch (IOException e) {
+                        log.error(e);
+                    }
                 }
             }
         }
