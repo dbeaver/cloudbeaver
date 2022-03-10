@@ -17,9 +17,11 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.DBSecurityAdminController;
-import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
-import org.jkiss.dbeaver.model.security.DBSecuritySubjectType;
+import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.auth.SMAuthProviderDescriptor;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMSubjectType;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
@@ -27,8 +29,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
-import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProfile;
-import org.jkiss.dbeaver.model.auth.DBAAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole, WebSession> {
+class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSession> {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
@@ -327,10 +327,10 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
     ///////////////////////////////////////////
     // Credentials
 
-    private static DBAAuthCredentialsProfile getCredentialProfileByParameters(DBAAuthProviderDescriptor authProvider, Set<String> keySet) {
-        List<DBAAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
+    private static SMAuthCredentialsProfile getCredentialProfileByParameters(SMAuthProviderDescriptor authProvider, Set<String> keySet) {
+        List<SMAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
         if (credentialProfiles.size() > 1) {
-            for (DBAAuthCredentialsProfile profile : credentialProfiles) {
+            for (SMAuthCredentialsProfile profile : credentialProfiles) {
                 if (profile.getCredentialParameters().size() == keySet.size()) {
                     boolean matches = true;
                     for (String paramName : keySet) {
@@ -349,10 +349,10 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
     }
 
     @Override
-    public void setUserCredentials(String userId, DBAAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, SMAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
         try {
-            DBAAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
+            SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
@@ -392,7 +392,7 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
 
     @Nullable
     @Override
-    public String getUserByCredentials(DBAAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    public String getUserByCredentials(SMAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
@@ -459,7 +459,7 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
     }
 
     @Override
-    public Map<String, Object> getUserCredentials(String userId, DBAAuthProviderDescriptor authProvider) throws DBCException {
+    public Map<String, Object> getUserCredentials(String userId, SMAuthProviderDescriptor authProvider) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
@@ -826,9 +826,9 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
 
     @NotNull
     @Override
-    public DBSecurityConnectionGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
         if (subjectIds.length == 0) {
-            return new DBSecurityConnectionGrant[0];
+            return new SMDataSourceGrant[0];
         }
         List<String> allSubjects = new ArrayList<>();
         Collections.addAll(allSubjects, subjectIds);
@@ -854,19 +854,19 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
                 sql.append(")");
 
                 if (allSubjects.isEmpty()) {
-                    return new DBSecurityConnectionGrant[0];
+                    return new SMDataSourceGrant[0];
                 }
                 try (Statement dbStat = dbCon.createStatement()) {
-                    List<DBSecurityConnectionGrant> result = new ArrayList<>();
+                    List<SMDataSourceGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
                         while (dbResult.next()) {
-                            result.add(new DBSecurityConnectionGrant(
+                            result.add(new SMDataSourceGrant(
                                 dbResult.getString(1),
                                 dbResult.getString(2),
-                                DBSecuritySubjectType.fromCode(dbResult.getString(3))));
+                                SMSubjectType.fromCode(dbResult.getString(3))));
                         }
                     }
-                    return result.toArray(new DBSecurityConnectionGrant[0]);
+                    return result.toArray(new SMDataSourceGrant[0]);
                 }
             }
         } catch (SQLException e) {
@@ -901,7 +901,7 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
 
     @NotNull
     @Override
-    public DBSecurityConnectionGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -909,16 +909,16 @@ class CBSecurityController implements DBSecurityAdminController<WebUser, WebRole
                         "FROM CB_DATASOURCE_ACCESS DA,CB_AUTH_SUBJECT S\n" +
                         "WHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.DATASOURCE_ID=?")) {
                     dbStat.setString(1, connectionId);
-                    List<DBSecurityConnectionGrant> result = new ArrayList<>();
+                    List<SMDataSourceGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
-                            result.add(new DBSecurityConnectionGrant(
+                            result.add(new SMDataSourceGrant(
                                 connectionId,
                                 dbResult.getString(1),
-                                DBSecuritySubjectType.fromCode(dbResult.getString(2))));
+                                SMSubjectType.fromCode(dbResult.getString(2))));
                         }
                     }
-                    return result.toArray(new DBSecurityConnectionGrant[0]);
+                    return result.toArray(new SMDataSourceGrant[0]);
                 }
             }
         } catch (SQLException e) {

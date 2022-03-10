@@ -17,7 +17,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -98,7 +98,7 @@ public class CBStaticServlet extends DefaultServlet {
                 try {
                     // We have the only provider
                     // Forward to signon URL
-                    DBAAuthProvider<?> authProviderInstance = authProvider.getInstance();
+                    SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
                     if (authProviderInstance instanceof DBWAuthProviderFederated) {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {

@@ -23,9 +23,9 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.DBSecurityAdminController;
-import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
-import org.jkiss.dbeaver.model.security.DBSecurityController;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -176,11 +176,11 @@ public class CBApplication extends BaseApplicationImpl {
         return productConfiguration;
     }
 
-    public DBSecurityController<WebUser, WebRole, WebSession> getSecurityController() {
+    public SMController<WebUser, WebRole, WebSession> getSecurityController() {
         return securityController;
     }
 
-    public DBSecurityAdminController<WebUser, WebRole, WebSession> getAdminSecurityController() {
+    public SMAdminController<WebUser, WebRole, WebSession> getAdminSecurityController() {
         return securityController;
     }
 
@@ -734,9 +734,9 @@ public class CBApplication extends BaseApplicationImpl {
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
-            DBSecurityController securityController = getSecurityController();
+            SMController securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                DBSecurityConnectionGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
+                SMDataSourceGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(
                         ds.getId(),

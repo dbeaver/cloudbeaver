@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
-import org.jkiss.dbeaver.model.security.user.DBSecurityRole;
+import org.jkiss.dbeaver.model.security.user.SMRole;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Web role.
  */
-public class WebRole implements DBSecurityRole {
+public class WebRole implements SMRole {
     private final String roleId;
     private String name;
     private String description;

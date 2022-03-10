@@ -19,7 +19,7 @@ package io.cloudbeaver.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.DBSecurityAdminController;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import org.apache.commons.dbcp2.*;
@@ -253,7 +253,7 @@ public class CBDatabase {
 
     @NotNull
     private WebUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
-        DBSecurityAdminController<WebUser, ?, ?> serverController = application.getAdminSecurityController();
+        SMAdminController<WebUser, ?, ?> serverController = application.getAdminSecurityController();
         WebUser adminUser = serverController.getUserById(adminName);
         if (adminUser == null) {
             adminUser = new io.cloudbeaver.model.user.WebUser(adminName);
@@ -281,7 +281,7 @@ public class CBDatabase {
 
     private void grantAdminPermissionsToUser(String userId) throws DBCException {
         // Grant all roles
-        DBSecurityAdminController<?, WebRole, ?> securityController = application.getAdminSecurityController();
+        SMAdminController<?, WebRole, ?> securityController = application.getAdminSecurityController();
         WebRole[] allRoles = securityController.readAllRoles();
         securityController.setUserRoles(
             userId,
@@ -348,7 +348,7 @@ public class CBDatabase {
 
             try {
                 // Fill initial data
-                DBSecurityAdminController<?, WebRole, ?> serverController = application.getAdminSecurityController();
+                SMAdminController<?, WebRole, ?> serverController = application.getAdminSecurityController();
 
                 CBDatabaseInitialData initialData = getInitialData();
                 if (initialData == null) {

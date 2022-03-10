@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
@@ -76,7 +76,7 @@ public class AdminUserInfo {
     }
 
     @Property
-    public DBSecurityConnectionGrant[] getGrantedConnections() throws DBCException {
+    public SMDataSourceGrant[] getGrantedConnections() throws DBCException {
         return CBPlatform.getInstance().getApplication().getSecurityController().getSubjectConnectionAccess(new String[] { getUserId()} );
     }
 

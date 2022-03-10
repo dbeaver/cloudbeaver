@@ -21,8 +21,8 @@ import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
-import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -34,14 +34,14 @@ import java.util.Map;
 /**
  * Local auth provider
  */
-public class LocalAuthProvider implements DBAAuthProvider<LocalAuthSession> {
+public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
 
     public static final String PROVIDER_ID = "local";
     public static final String CRED_USER = "user";
     public static final String CRED_PASSWORD = "password";
 
     @Override
-    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull DBASession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
@@ -66,12 +66,12 @@ public class LocalAuthProvider implements DBAAuthProvider<LocalAuthSession> {
     }
 
     @Override
-    public void closeSession(@NotNull DBASession mainSession, LocalAuthSession localAuthSession) throws DBException {
+    public void closeSession(@NotNull SMSession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 
     @Override
-    public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull DBASession mainSession, LocalAuthSession localAuthSession) throws DBException {
+    public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
     }
 

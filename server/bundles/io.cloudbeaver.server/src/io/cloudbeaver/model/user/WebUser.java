@@ -17,14 +17,14 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.security.user.DBSecurityUser;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 
 import java.util.*;
 
 /**
  * Web user.
  */
-public class WebUser implements DBSecurityUser {
+public class WebUser implements SMUser {
     @NotNull
     private final String userId;
     private String displayName;

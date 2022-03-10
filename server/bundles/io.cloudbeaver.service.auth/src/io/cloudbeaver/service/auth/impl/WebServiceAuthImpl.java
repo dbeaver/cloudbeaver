@@ -17,7 +17,9 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWConstants;
-import org.jkiss.dbeaver.model.security.DBSecurityController;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.security.SMController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.DBAAuthProviderExternal;
@@ -37,8 +39,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
-import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -62,7 +62,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @NotNull Map<String, Object> authParameters,
         boolean linkWithActiveUser) throws DBWebException {
-        DBSecurityController<WebUser, ?, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController<WebUser, ?, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -92,7 +92,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
-            DBAAuthProvider<?> authProviderInstance = authProvider.getInstance();
+            SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
             DBAAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBAAuthProviderExternal<?> ?
                 (DBAAuthProviderExternal<?>) authProviderInstance : null;
             Map<String, Object> userCredentials;
@@ -118,7 +118,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
             WebUser user = null;
             String userId;
-            DBASession authSession;
+            SMSession authSession;
             if (configMode) {
                 if (webSession.getUser() != null) {
                     // Already logged in - remove auth token
@@ -231,7 +231,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     private boolean isAdminAuthTry(@NotNull AuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
-        DBSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
         boolean isAdmin = false;
 
         try {

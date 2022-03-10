@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.DBSecurityConnectionGrant;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
@@ -556,7 +556,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Access management
 
     @Override
-    public DBSecurityConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
             return CBApplication.getInstance().getSecurityController().getConnectionSubjectAccess(connectionId);
         } catch (DBCException e) {
@@ -583,7 +583,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public DBSecurityConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
+    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
             return CBApplication.getInstance().getSecurityController().getSubjectConnectionAccess(new String[] { subjectId } );
         } catch (DBCException e) {

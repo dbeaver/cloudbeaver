@@ -19,21 +19,21 @@ package io.cloudbeaver.auth.provider.local;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
-import org.jkiss.dbeaver.model.auth.DBASession;
-import org.jkiss.dbeaver.model.auth.DBASessionContext;
-import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
+import org.jkiss.dbeaver.model.auth.SMAuthSpace;
+import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 
 /**
  * Local auth provider
  */
-public class LocalAuthSession implements DBASession {
-    public static final DBAAuthSpace LOCAL_AUTH_SPACE = new DBAAuthSpace() {
+public class LocalAuthSession implements SMSession {
+    public static final SMAuthSpace LOCAL_AUTH_SPACE = new SMAuthSpace() {
     };
-    private final DBASession webSession;
+    private final SMSession webSession;
     private final String userId;
 
-    LocalAuthSession(DBASession webSession, String userId) {
+    LocalAuthSession(SMSession webSession, String userId) {
         this.webSession = webSession;
         this.userId = userId;
     }
@@ -44,18 +44,18 @@ public class LocalAuthSession implements DBASession {
 
     @NotNull
     @Override
-    public DBAAuthSpace getSessionSpace() {
+    public SMAuthSpace getSessionSpace() {
         return LOCAL_AUTH_SPACE;
     }
 
     @NotNull
     @Override
-    public DBASessionContext getSessionContext() {
+    public SMSessionContext getSessionContext() {
         return webSession.getSessionContext();
     }
 
     @Override
-    public DBASessionPrincipal getSessionPrincipal() {
+    public SMSessionPrincipal getSessionPrincipal() {
         return webSession.getSessionPrincipal();
     }
 

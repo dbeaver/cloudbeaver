@@ -21,7 +21,7 @@ import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class WebAuthProviderInfo {
         return result;
     }
 
-    public List<DBAAuthCredentialsProfile> getCredentialProfiles() {
+    public List<SMAuthCredentialsProfile> getCredentialProfiles() {
         return descriptor.getCredentialProfiles();
     }
 
