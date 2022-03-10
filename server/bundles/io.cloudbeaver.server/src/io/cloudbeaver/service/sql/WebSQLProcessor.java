@@ -654,11 +654,12 @@ public class WebSQLProcessor implements WebSessionProvider {
             } else {
                 if (updateRowCount >= 0) {
                     results.setUpdateRowCount(updateRowCount);
+                } else if (dataContainer.getDataSource().getInfo().supportsMultipleResults()) {
+                    break;
                 }
-
             }
             resultList.add(results);
-            if (!hasResultSet && updateRowCount < 0){
+            if (!hasResultSet && updateRowCount < 0) {
                 break;
             }
             hasResultSet = dbStat.nextResults();
