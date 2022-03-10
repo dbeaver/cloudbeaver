@@ -18,11 +18,10 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -37,6 +36,7 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
+import io.cloudbeaver.model.user.WebRole;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
@@ -216,7 +216,7 @@ public class CBDatabase {
         CBDatabaseInitialData initialData = getInitialData();
         if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName()) && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)) {
             // Delete old admin user
-            application.getSecurityController().deleteUser(initialData.getAdminName());
+            application.getAdminSecurityController().deleteUser(initialData.getAdminName());
         }
         // Create new admin user
         createAdminUser(adminName, adminPassword);
@@ -253,10 +253,10 @@ public class CBDatabase {
 
     @NotNull
     private WebUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
-        DBWSecurityController serverController = application.getSecurityController();
+        SMAdminController<WebUser, ?, ?> serverController = application.getAdminSecurityController();
         WebUser adminUser = serverController.getUserById(adminName);
         if (adminUser == null) {
-            adminUser = new WebUser(adminName);
+            adminUser = new io.cloudbeaver.model.user.WebUser(adminName);
             serverController.createUser(adminUser);
         }
 
@@ -281,7 +281,7 @@ public class CBDatabase {
 
     private void grantAdminPermissionsToUser(String userId) throws DBCException {
         // Grant all roles
-        DBWSecurityController securityController = application.getSecurityController();
+        SMAdminController<?, WebRole, ?> securityController = application.getAdminSecurityController();
         WebRole[] allRoles = securityController.readAllRoles();
         securityController.setUserRoles(
             userId,
@@ -348,7 +348,7 @@ public class CBDatabase {
 
             try {
                 // Fill initial data
-                DBWSecurityController serverController = application.getSecurityController();
+                SMAdminController<?, WebRole, ?> serverController = application.getAdminSecurityController();
 
                 CBDatabaseInitialData initialData = getInitialData();
                 if (initialData == null) {

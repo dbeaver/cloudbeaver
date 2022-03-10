@@ -18,7 +18,7 @@ package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.DBAAuthProviderExternal;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -29,8 +29,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
-import org.jkiss.dbeaver.model.auth.DBASession;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
@@ -100,13 +100,13 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             if (authInfo == null) {
                 throw new DBException("Session not authorized in auth provider '" + authProvider.getId() + "'");
             }
-            DBASession authSession = authInfo.getAuthSession();
-            DBAAuthProvider<?> authProvider = this.authProvider.getInstance();
-            if (authSession != null && authProvider instanceof DBAAuthProviderExternal) {
+            SMSession authSession = authInfo.getAuthSession();
+            SMAuthProvider<?> authProvider = this.authProvider.getInstance();
+            if (authSession != null && authProvider instanceof SMAuthProviderExternal) {
                 if (!isValidSessionType(authSession, authProvider)) {
                     return new WebPropertyInfo[0];
                 }
-                DBPObject userDetails = ((DBAAuthProviderExternal) authProvider).getUserDetails(
+                DBPObject userDetails = ((SMAuthProviderExternal) authProvider).getUserDetails(
                     session.getProgressMonitor(),
                     session,
                     authSession,
@@ -122,7 +122,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
         return new WebPropertyInfo[0];
     }
 
-    private static boolean isValidSessionType(DBASession authSession, DBAAuthProvider<?> authProvider) {
+    private static boolean isValidSessionType(SMSession authSession, SMAuthProvider<?> authProvider) {
         Type providerSuperClass = authProvider.getClass().getGenericSuperclass();
         if (providerSuperClass instanceof ParameterizedType) {
             Type[] typeArguments = ((ParameterizedType) providerSuperClass).getActualTypeArguments();

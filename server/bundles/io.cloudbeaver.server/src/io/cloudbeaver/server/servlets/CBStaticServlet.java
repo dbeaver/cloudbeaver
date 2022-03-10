@@ -1,7 +1,7 @@
 package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.auth.DBWAuthProviderFederated;
+import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -17,7 +17,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -98,11 +98,11 @@ public class CBStaticServlet extends DefaultServlet {
                 try {
                     // We have the only provider
                     // Forward to signon URL
-                    DBAAuthProvider<?> authProviderInstance = authProvider.getInstance();
-                    if (authProviderInstance instanceof DBWAuthProviderFederated) {
+                    SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
+                    if (authProviderInstance instanceof SMWAuthProviderFederated) {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {
-                            String signInLink = ((DBWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
+                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);

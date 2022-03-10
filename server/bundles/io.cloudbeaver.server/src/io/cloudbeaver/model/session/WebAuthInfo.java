@@ -22,9 +22,9 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
-import org.jkiss.dbeaver.model.auth.DBASession;
-import org.jkiss.dbeaver.model.auth.DBASessionPrincipal;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * WebAuthInfo
  */
-public class WebAuthInfo implements DBASessionPrincipal {
+public class WebAuthInfo implements SMSessionPrincipal {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);
 
@@ -42,7 +42,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
     private final WebUser user;
     private final AuthProviderDescriptor authProvider;
     private WebAuthProviderConfiguration authProviderConfiguration;
-    private DBASession authSession;
+    private SMSession authSession;
     private final OffsetDateTime loginTime;
     private final DBWUserIdentity userIdentity;
     private String message;
@@ -54,7 +54,7 @@ public class WebAuthInfo implements DBASessionPrincipal {
         @NotNull WebUser user,
         @NotNull AuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
-        @NotNull DBASession authSession,
+        @NotNull SMSession authSession,
         @NotNull OffsetDateTime loginTime)
     {
         this.session = session;
@@ -125,14 +125,14 @@ public class WebAuthInfo implements DBASessionPrincipal {
         this.authProviderConfiguration = authProviderConfiguration;
     }
 
-    public DBASession getAuthSession() {
+    public SMSession getAuthSession() {
         return authSession;
     }
 
     void closeAuth() {
         if (authProvider != null && authSession != null) {
             try {
-                DBAAuthProvider authProviderInstance = this.authProvider.getInstance();
+                SMAuthProvider authProviderInstance = this.authProvider.getInstance();
                 authProviderInstance.closeSession(session, authSession);
             } catch (Exception e) {
                 log.error(e);

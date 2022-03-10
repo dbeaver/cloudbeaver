@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
+import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
@@ -50,6 +51,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -71,7 +73,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractDBASessionPersistent implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent implements SMSession, SMAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -125,7 +127,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
 
         try {
             // Check persistent state
-            this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
+            this.persisted = CBApplication.getInstance().getSecurityController().isSessionPersisted(this.id);
         } catch (Exception e) {
             log.error("Error checking session state,", e);
         }
@@ -135,12 +137,12 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
 
     @NotNull
     @Override
-    public DBAAuthSpace getSessionSpace() {
+    public SMAuthSpace getSessionSpace() {
         return sessionProject;
     }
 
     @Override
-    public DBASessionPrincipal getSessionPrincipal() {
+    public SMSessionPrincipal getSessionPrincipal() {
         synchronized (authTokens) {
             if (authTokens.isEmpty()) {
                 return null;
@@ -167,7 +169,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
     }
 
     @NotNull
-    public DBASessionContext getSessionContext() {
+    public SMSessionContext getSessionContext() {
         return sessionProject.getSessionContext();
     }
 
@@ -338,7 +340,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
         try {
             return Arrays.stream(application.getSecurityController()
                 .getSubjectConnectionAccess(new String[]{subjectId}))
-                .map(DBWConnectionGrant::getConnectionId).collect(Collectors.toSet());
+                .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
         } catch (DBCException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);
@@ -438,12 +440,12 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    DBWSecurityController.getInstance().createSession(this);
+                    CBApplication.getInstance().getSecurityController().createSession(this);
                     this.persisted = true;
                 } else {
                     if (!CBApplication.getInstance().isConfigurationMode()) {
                         // Update record
-                        DBWSecurityController.getInstance().updateSession(this);
+                        CBApplication.getInstance().getSecurityController().updateSession(this);
                     }
                 }
             } catch (Exception e) {
@@ -730,7 +732,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
             if (oldAuthInfo != null) {
                 removeAuthInfo(oldAuthInfo);
             }
-            DBASession authSession = authInfo.getAuthSession();
+            SMSession authSession = authInfo.getAuthSession();
             if (authSession != null) {
                 getSessionContext().addSession(authSession);
             }
@@ -772,7 +774,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
     }
 
     public boolean hasContextCredentials() {
-        return getAdapter(DBAAuthCredentialsProvider.class) != null;
+        return getAdapter(SMAuthCredentialsProvider.class) != null;
     }
 
     // Auth credentials provider
@@ -782,7 +784,7 @@ public class WebSession extends AbstractDBASessionPersistent implements DBASessi
         try {
             // Properties from nested auth sessions
             // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
-            DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
+            SMAuthCredentialsProvider nestedProvider = getAdapter(SMAuthCredentialsProvider.class);
             if (nestedProvider != null) {
                 if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
                     return false;

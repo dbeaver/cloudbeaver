@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
-import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.security.user.SMRole;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,11 +24,8 @@ import java.util.Set;
 /**
  * Web role.
  */
-public class WebRole implements WebAuthSubject {
-
-    private static final Log log = Log.getLog(WebRole.class);
-
-    private String roleId;
+public class WebRole implements SMRole {
+    private final String roleId;
     private String name;
     private String description;
 
@@ -73,10 +70,5 @@ public class WebRole implements WebAuthSubject {
     @Override
     public String toString() {
         return roleId;
-    }
-
-    @Override
-    public String getSubjectId() {
-        return getRoleId();
     }
 }

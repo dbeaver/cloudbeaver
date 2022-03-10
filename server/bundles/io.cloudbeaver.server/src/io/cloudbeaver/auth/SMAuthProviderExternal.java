@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.auth;
 
-import io.cloudbeaver.DBWSecurityController;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.security.SMController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -24,8 +26,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.auth.DBAAuthProvider;
-import org.jkiss.dbeaver.model.auth.DBASession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Map;
  * External auth provider.
  * Authenticates user using external user identity
  */
-public interface DBAAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBAAuthProvider<AUTH_SESSION> {
+public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends SMAuthProvider<AUTH_SESSION> {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
@@ -54,7 +54,7 @@ public interface DBAAuthProviderExternal<AUTH_SESSION extends DBASession> extend
     @NotNull
     String validateLocalAuth(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBWSecurityController securityController,
+        @NotNull SMController securityController,
         @NotNull Map<String, Object> providerConfig,
         @NotNull Map<String, Object> userCredentials,
         @Nullable WebUser activeUser) throws DBException;

@@ -17,17 +17,14 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 
 import java.util.*;
 
 /**
  * Web user.
  */
-public class WebUser implements WebAuthSubject {
-
-    private static final Log log = Log.getLog(WebUser.class);
-
+public class WebUser implements SMUser {
     @NotNull
     private final String userId;
     private String displayName;
@@ -109,10 +106,5 @@ public class WebUser implements WebAuthSubject {
     @Override
     public String toString() {
         return userId;
-    }
-
-    @Override
-    public String getSubjectId() {
-        return getUserId();
     }
 }

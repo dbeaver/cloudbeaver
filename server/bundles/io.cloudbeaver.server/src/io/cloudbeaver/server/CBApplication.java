@@ -20,8 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
-import io.cloudbeaver.DBWConnectionGrant;
-import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -172,7 +176,11 @@ public class CBApplication extends BaseApplicationImpl {
         return productConfiguration;
     }
 
-    public DBWSecurityController getSecurityController() {
+    public SMController<WebUser, WebRole, WebSession> getSecurityController() {
+        return securityController;
+    }
+
+    public SMAdminController<WebUser, WebRole, WebSession> getAdminSecurityController() {
         return securityController;
     }
 
@@ -726,9 +734,9 @@ public class CBApplication extends BaseApplicationImpl {
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
-            DBWSecurityController securityController = getSecurityController();
+            SMController securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                DBWConnectionGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
+                SMDataSourceGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(
                         ds.getId(),
@@ -895,7 +903,6 @@ public class CBApplication extends BaseApplicationImpl {
             }
         }
     }
-
 
 
 }
