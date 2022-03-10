@@ -22,7 +22,7 @@ import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.security.SMController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.auth.DBAAuthProviderExternal;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -93,8 +93,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
             SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
-            DBAAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBAAuthProviderExternal<?> ?
-                (DBAAuthProviderExternal<?>) authProviderInstance : null;
+            SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
+                (SMAuthProviderExternal<?>) authProviderInstance : null;
             Map<String, Object> userCredentials;
 
             if (authProviderExternal != null) {

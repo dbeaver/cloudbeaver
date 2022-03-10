@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.auth.provider;
 
-import io.cloudbeaver.auth.DBAAuthProviderExternal;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.utils.CommonUtils;
@@ -24,7 +24,7 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Abstract external auth provider
  */
-public abstract class AbstractExternalAuthProvider<SESSION extends SMSession> implements DBAAuthProviderExternal<SESSION> {
+public abstract class AbstractExternalAuthProvider<SESSION extends SMSession> implements SMAuthProviderExternal<SESSION> {
 
     public static final String META_AUTH_PROVIDER = "$provider";
     public static final String META_AUTH_SPACE_ID = "$space";

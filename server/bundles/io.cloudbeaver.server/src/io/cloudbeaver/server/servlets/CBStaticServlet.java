@@ -1,7 +1,7 @@
 package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.auth.DBWAuthProviderFederated;
+import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -99,10 +99,10 @@ public class CBStaticServlet extends DefaultServlet {
                     // We have the only provider
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
-                    if (authProviderInstance instanceof DBWAuthProviderFederated) {
+                    if (authProviderInstance instanceof SMWAuthProviderFederated) {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {
-                            String signInLink = ((DBWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
+                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);

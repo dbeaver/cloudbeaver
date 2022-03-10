@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
-import io.cloudbeaver.auth.DBWAuthProviderFederated;
+import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -74,19 +74,19 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof DBWAuthProviderFederated ? ((DBWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
     }
 
     @Override

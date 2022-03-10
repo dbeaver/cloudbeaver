@@ -34,7 +34,7 @@ import java.util.Map;
  * External auth provider.
  * Authenticates user using external user identity
  */
-public interface DBAAuthProviderExternal<AUTH_SESSION extends SMSession> extends SMAuthProvider<AUTH_SESSION> {
+public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends SMAuthProvider<AUTH_SESSION> {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
