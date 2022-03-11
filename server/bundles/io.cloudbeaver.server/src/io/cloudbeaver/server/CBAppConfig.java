@@ -16,17 +16,21 @@
  */
 package io.cloudbeaver.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -260,6 +264,19 @@ public class CBAppConfig {
 
     public <T> T getPluginOption(@NotNull String pluginId, @NotNull String option) {
         return (T)getPluginConfig(pluginId).get(option);
+    }
+
+    public <T> T getPluginOptions(@NotNull String pluginId, @NotNull String option, Class<T> theClass) throws DBException {
+        Map<String, Object> iamSettingsMap = CBPlatform.getInstance().getApplication().getAppConfiguration().getPluginOption(
+            pluginId, option);
+        if (CommonUtils.isEmpty(iamSettingsMap)) {
+            throw new DBException("Settings '" + option + "' not specified in plugin '" + pluginId + "' configuration");
+        }
+
+        Gson gson = new GsonBuilder().create();
+        return gson.fromJson(
+            gson.toJsonTree(iamSettingsMap),
+            theClass);
     }
 
     ////////////////////////////////////////////
