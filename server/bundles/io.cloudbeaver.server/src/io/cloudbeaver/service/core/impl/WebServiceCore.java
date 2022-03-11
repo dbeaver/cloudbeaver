@@ -27,6 +27,7 @@ import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -276,7 +277,7 @@ public class WebServiceCore implements DBWServiceCore {
                 authProperties,
                 true);
 
-            WebServiceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
+            WebDataSourceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
             dataSourceContainer.persistConfiguration();
         }
 
@@ -410,7 +411,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        DBPDataSourceContainer dataSource = WebServiceUtils.getLocalOrGlobalDataSource(webSession, connectionId);
+        DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(CBApplication.getInstance(), webSession, connectionId);
 
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer testDataSource;

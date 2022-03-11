@@ -17,13 +17,12 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -48,10 +47,11 @@ public class WebUserOriginInfo implements WebObjectOrigin {
 
     private final WebSession session;
     private final WebUser user;
+    @NotNull
     private final AuthProviderDescriptor authProvider;
     private boolean selfIdentity;
 
-    public WebUserOriginInfo(WebSession session, WebUser user, AuthProviderDescriptor authProvider, boolean selfIdentity) {
+    public WebUserOriginInfo(WebSession session, WebUser user, @NotNull AuthProviderDescriptor authProvider, boolean selfIdentity) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
@@ -61,7 +61,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getType() {
-        return authProvider == null ? LocalAuthProvider.PROVIDER_ID : authProvider.getId();
+        return authProvider.getId();
     }
 
     @Nullable
@@ -73,13 +73,13 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getDisplayName() {
-        return authProvider == null ? "N/A" : authProvider.getLabel();
+        return authProvider.getLabel();
     }
 
     @Nullable
     @Override
     public String getIcon() {
-        return authProvider == null ? null : WebServiceUtils.makeIconId(authProvider.getIcon());
+        return WebCommonUtils.makeIconId(authProvider.getIcon());
     }
 
     @NotNull
@@ -91,12 +91,11 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @Property
     @Override
     public WebPropertyInfo[] getDetails() throws DBWebException {
-        if (user == null || authProvider == null) {
+        if (user == null) {
             return new WebPropertyInfo[0];
         }
         try {
-            WebAuthInfo authInfo = session.getAuthInfo(
-                LocalAuthProvider.PROVIDER_ID.equals(authProvider.getId()) ? null : authProvider.getId());
+            WebAuthInfo authInfo = session.getAuthInfo(authProvider.getId());
             if (authInfo == null) {
                 throw new DBException("Session not authorized in auth provider '" + authProvider.getId() + "'");
             }
@@ -113,7 +112,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
                     user,
                     selfIdentity);
                 if (userDetails != null) {
-                    return WebServiceUtils.getObjectProperties(session, userDetails);
+                    return WebCommonUtils.getObjectProperties(session, userDetails);
                 }
             }
         } catch (Exception e) {

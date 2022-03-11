@@ -17,7 +17,7 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.model.CBConstants;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

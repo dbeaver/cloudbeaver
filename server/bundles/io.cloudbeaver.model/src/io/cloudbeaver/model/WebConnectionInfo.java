@@ -16,10 +16,9 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.sql.WebDataFormat;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -282,7 +281,7 @@ public class WebConnectionInfo {
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, hasContextCredentials))
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 

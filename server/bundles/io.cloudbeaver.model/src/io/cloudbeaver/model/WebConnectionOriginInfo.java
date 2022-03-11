@@ -17,8 +17,8 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -65,7 +65,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
     @Nullable
     @Override
     public String getIcon() {
-        return WebServiceUtils.makeIconId(origin.getIcon());
+        return WebCommonUtils.makeIconId(origin.getIcon());
     }
 
     @NotNull
@@ -82,7 +82,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
             if (details == null) {
                 return new WebPropertyInfo[0];
             }
-            return WebServiceUtils.getObjectProperties(session, details);
+            return WebCommonUtils.getObjectProperties(session, details);
         } catch (DBException e) {
             throw new DBWebException("Error reading origin details", e);
         }

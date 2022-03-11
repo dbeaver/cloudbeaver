@@ -19,6 +19,8 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.CBConstants;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * Application configuration
  */
-public class CBAppConfig {
+public class CBAppConfig implements WebAppConfiguration {
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
     private boolean anonymousAccessEnabled;

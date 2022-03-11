@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.server.CBConstants;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 

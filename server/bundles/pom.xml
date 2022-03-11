@@ -13,7 +13,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>io.cloudbeaver.model</module>
         <module>io.cloudbeaver.server</module>
+
         <module>io.cloudbeaver.service.admin</module>
         <module>io.cloudbeaver.service.auth</module>
         <module>io.cloudbeaver.service.metadata</module>

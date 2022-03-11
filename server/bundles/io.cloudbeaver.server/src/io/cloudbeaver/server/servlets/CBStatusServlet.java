@@ -1,7 +1,7 @@
 package io.cloudbeaver.server.servlets;
 
 import com.google.gson.stream.JsonWriter;
-import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.model.CBConstants;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
