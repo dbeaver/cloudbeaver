@@ -661,7 +661,9 @@ public class WebSQLProcessor implements WebSessionProvider {
             resultList.add(results);
             hasResultSet = dbStat.nextResults();
         }
-
+        if (resultList.isEmpty()) {
+            resultList.add(new WebSQLQueryResults(webSession, dataFormat));
+        }
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
         setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, dataFilter);
