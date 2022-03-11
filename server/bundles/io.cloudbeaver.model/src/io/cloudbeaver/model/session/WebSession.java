@@ -195,7 +195,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    synchronized long getLastAccessTimeMillis() {
+    public synchronized long getLastAccessTimeMillis() {
         return lastAccessTime;
     }
 
@@ -439,7 +439,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
+    public synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -511,7 +511,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    void close() {
+    public void close() {
         try {
             resetNavigationModel();
             resetSessionCache();
