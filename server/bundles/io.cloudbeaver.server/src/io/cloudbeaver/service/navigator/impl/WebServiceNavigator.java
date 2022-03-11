@@ -104,10 +104,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
             }
-            if (offset == null || limit == null) {
+            // Checks the range of the expected result
+            if (offset == null || limit == null || (offset == 0 && limit >= result.size())) {
                 return result;
-            } else {
-                return result.subList(offset, offset + limit <= result.size() ? offset + limit : result.size());
+            } else if (offset + limit <= result.size()) {
+                return result.subList(offset, offset + limit);
+            } else  {
+                return result.subList(offset, result.size());
             }
         } catch (DBException e) {
             throw new DBWebException(e, null);
