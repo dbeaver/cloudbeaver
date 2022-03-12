@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  org.jkiss.dbeaver.net.ssh,
- io.cloudbeaver.model;visibility:=reexport
+ io.cloudbeaver.model;visibility:=reexport,
+ io.cloudbeaver.service.security
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth.provider,
  io.cloudbeaver.auth.provider.fa,

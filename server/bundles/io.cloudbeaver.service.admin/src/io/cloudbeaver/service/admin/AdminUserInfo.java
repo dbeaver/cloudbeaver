@@ -16,8 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
@@ -26,7 +25,6 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
-import io.cloudbeaver.model.user.WebRole;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 

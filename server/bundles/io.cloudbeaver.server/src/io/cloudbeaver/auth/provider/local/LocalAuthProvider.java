@@ -36,9 +36,9 @@ import java.util.Map;
  */
 public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
 
-    public static final String PROVIDER_ID = "local";
-    public static final String CRED_USER = "user";
-    public static final String CRED_PASSWORD = "password";
+    public static final String PROVIDER_ID = LocalAuthProviderConstants.PROVIDER_ID;
+    public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;
+    public static final String CRED_PASSWORD = LocalAuthProviderConstants.CRED_PASSWORD;
 
     @Override
     public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
@@ -73,10 +73,6 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     @Override
     public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, LocalAuthSession localAuthSession) throws DBException {
 
-    }
-
-    public static String makeClientPasswordHash(String userName, String password) {
-        return SecurityUtils.makeDigest(password);
     }
 
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {

@@ -50,6 +50,7 @@ public class CBConstants {
     public static final String PARAM_STATIC_CONTENT = "staticContent";
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
     public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
+    public static final String PARAM_DB_CONFIGURATION = "database";
 
     public static final String PARAM_SESSION_EXPIRE_PERIOD = "expireSessionAfterPeriod";
 

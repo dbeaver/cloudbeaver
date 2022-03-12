@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.service.security;
 
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.server.CBDatabase;
 import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.auth.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.SMAdminController;

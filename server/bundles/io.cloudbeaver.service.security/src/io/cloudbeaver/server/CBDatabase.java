@@ -18,9 +18,12 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
+import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.model.security.SMAdminController;
-import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -72,34 +75,21 @@ public class CBDatabase {
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
 
-    static final String PARAM_DB_CONFIGURATION = "database";
-    static final String PARAM_DB_DRIVER_CONFIGURATION = "driver";
-    static final String PARAM_DB_URL_CONFIGURATION = "url";
-    static final String PARAM_DB_USER_CONFIGURATION = "user";
-    static final String PARAM_DB_PW_CONFIGURATION = "password";
-    static final String PARAM_DB_CREATE_DATABASE_CONFIGURATION = "createDatabase";
-    static final String PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION = "allowPublicAccess";
-    static final String PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION = "initialDataConfiguration";
-    static final String PARAM_DB_POOL_CONFIGURATION = "pool";
-    static final String PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION = "minIdleConnections";
-    static final String PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION = "maxIdleConnections";
-    static final String PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION = "maxConnections";
-    static final String PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION = "validationQuery";
-
-    private final CBApplication application;
+    private final WebApplication application;
     private final CBDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
+    private SMAdminController<WebUser, WebRole, WebSession> adminSecurityController;
 
-    CBDatabase(CBApplication application, CBDatabaseConfig databaseConfiguration) {
+    public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
 
-    public static CBDatabase getInstance() {
-        return CBPlatform.getInstance().getApplication().getDatabase();
+    public void setAdminSecurityController(SMAdminController<WebUser, WebRole, WebSession> adminSecurityController) {
+        this.adminSecurityController = adminSecurityController;
     }
 
     public String getInstanceId() {
@@ -117,7 +107,7 @@ public class CBDatabase {
         return cbDataSource;
     }
 
-    void initialize() throws DBException {
+    public void initialize() throws DBException {
         log.debug("Initiate management database");
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
@@ -207,7 +197,8 @@ public class CBDatabase {
         log.debug("\tManagement database connection established");
     }
 
-    void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+    //TODO move out
+    public void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
         }
@@ -216,18 +207,18 @@ public class CBDatabase {
         CBDatabaseInitialData initialData = getInitialData();
         if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName()) && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)) {
             // Delete old admin user
-            application.getAdminSecurityController().deleteUser(initialData.getAdminName());
+            adminSecurityController.deleteUser(initialData.getAdminName());
         }
         // Create new admin user
         createAdminUser(adminName, adminPassword);
 
         // Associate all auth credentials with admin user
         for (WebAuthInfo ai : authInfoList) {
-            if (!ai.getAuthProvider().equals(LocalAuthProvider.PROVIDER_ID)) {
+            if (!ai.getAuthProvider().equals(LocalAuthProviderConstants.PROVIDER_ID)) {
                 AuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
-                    application.getSecurityController().setUserCredentials(adminName, authProvider, userCredentials);
+                    adminSecurityController.setUserCredentials(adminName, authProvider, userCredentials);
                 }
             }
         }
@@ -240,7 +231,7 @@ public class CBDatabase {
             return null;
         }
 
-        initialDataPath = CBApplication.getRelativePath(
+        initialDataPath = WebAppUtils.getRelativePath(
             databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setLenient().create();
@@ -253,24 +244,23 @@ public class CBDatabase {
 
     @NotNull
     private WebUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
-        SMAdminController<WebUser, ?, ?> serverController = application.getAdminSecurityController();
-        WebUser adminUser = serverController.getUserById(adminName);
+        WebUser adminUser = adminSecurityController.getUserById(adminName);
         if (adminUser == null) {
-            adminUser = new io.cloudbeaver.model.user.WebUser(adminName);
-            serverController.createUser(adminUser);
+            adminUser = new WebUser(adminName);
+            adminSecurityController.createUser(adminUser);
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
             // This is how client password will be transmitted from client
-            String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), adminPassword);
+            String clientPassword = SecurityUtils.makeDigest(adminPassword);
 
             Map<String, Object> credentials = new LinkedHashMap<>();
-            credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
-            credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
+            credentials.put(LocalAuthProviderConstants.CRED_USER, adminUser.getUserId());
+            credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, clientPassword);
 
-            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
             if (authProvider != null) {
-                serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
+                adminSecurityController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
             }
         }
 
@@ -281,15 +271,14 @@ public class CBDatabase {
 
     private void grantAdminPermissionsToUser(String userId) throws DBCException {
         // Grant all roles
-        SMAdminController<?, WebRole, ?> securityController = application.getAdminSecurityController();
-        WebRole[] allRoles = securityController.readAllRoles();
-        securityController.setUserRoles(
+        WebRole[] allRoles = adminSecurityController.readAllRoles();
+        adminSecurityController.setUserRoles(
             userId,
             Arrays.stream(allRoles).map(WebRole::getRoleId).toArray(String[]::new),
             userId);
     }
 
-    void shutdown() {
+    public void shutdown() {
         log.debug("Shutdown database");
         if (cbDataSource != null) {
             try {
@@ -327,8 +316,7 @@ public class CBDatabase {
             if (JDBCUtils.executeUpdate(
                 connection,
                 "UPDATE CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
-                CURRENT_SCHEMA_VERSION) <= 0)
-            {
+                CURRENT_SCHEMA_VERSION) <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
                     "INSERT INTO CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)",
@@ -337,6 +325,7 @@ public class CBDatabase {
         }
 
         @Override
+        //TODO move out
         public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
             // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
             exclusiveConnection = new DelegatingConnection<Connection>(connection) {
@@ -348,7 +337,6 @@ public class CBDatabase {
 
             try {
                 // Fill initial data
-                SMAdminController<?, WebRole, ?> serverController = application.getAdminSecurityController();
 
                 CBDatabaseInitialData initialData = getInitialData();
                 if (initialData == null) {
@@ -361,9 +349,9 @@ public class CBDatabase {
                 if (!CommonUtils.isEmpty(initialData.getRoles())) {
                     // Create roles
                     for (WebRole role : initialData.getRoles()) {
-                        serverController.createRole(role, adminName);
+                        adminSecurityController.createRole(role, adminName);
                         if (adminName != null) {
-                            serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                            adminSecurityController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
                         }
                     }
                 }
