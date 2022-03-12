@@ -256,7 +256,7 @@ public class CBDatabase {
         SMAdminController<WebUser, ?, ?> serverController = application.getAdminSecurityController();
         WebUser adminUser = serverController.getUserById(adminName);
         if (adminUser == null) {
-            adminUser = new WebUser(adminName);
+            adminUser = new io.cloudbeaver.model.user.WebUser(adminName);
             serverController.createUser(adminUser);
         }
 
