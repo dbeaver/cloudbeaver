@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -33,7 +33,7 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   const keys = configurations.map(configuration => configuration.id);
 
   return styled(useStyles(styles))(
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
       <TableHeader>
         <TableColumnHeader min flex centerContent>
           <TableSelect />

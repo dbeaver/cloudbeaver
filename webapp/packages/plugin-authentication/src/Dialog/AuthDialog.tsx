@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import { AuthDialogFooter } from './AuthDialogFooter';
@@ -24,13 +24,7 @@ import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { useAuthDialogState } from './useAuthDialogState';
 
-const styles = composes(
-  css`
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-`,
-  css`
+const styles = css`
     CommonDialogWrapper {
       min-height: 520px !important;
       max-height: max(100vh - 48px, 520px) !important;
@@ -63,9 +57,10 @@ const styles = composes(
       margin-top: 12px;
     }
     ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       flex: 1;
     }
-`);
+`;
 
 interface IAuthPayload {
   providerId: string | null;
@@ -147,7 +142,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
     );
   }
 
-  return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
+  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES))(
     <TabsState currentTabId={state.tabId} onChange={tabData => { state.setTabId(tabData.tabId); }}>
       <CommonDialogWrapper
         size='large'

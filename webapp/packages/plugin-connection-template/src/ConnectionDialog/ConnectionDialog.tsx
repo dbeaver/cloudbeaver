@@ -19,20 +19,14 @@ import {
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { ConnectionAuthenticationForm } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
 import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
 
-const styles = composes(
-  css`
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     SubmittingForm, center {
       display: flex;
       flex: 1;
@@ -44,7 +38,10 @@ const styles = composes(
       align-items: center;
       justify-content: center;
     }
-`);
+    ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+`;
 
 export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({
   rejectDialog,

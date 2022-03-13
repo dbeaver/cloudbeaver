@@ -11,14 +11,14 @@ import { useContext, useCallback } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Icon } from '../Icon';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
-import { useTranslate } from '@cloudbeaver/core-localization';
 
 interface Props {
   onExpand?: (item: any, state: boolean) => void;
@@ -34,11 +34,10 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({
   const translate = useTranslate();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
-  const styles = useStyles();
   if (!context) {
     throw new Error('TableContext must be provided');
   }
-  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement>) => {
     if (disabled) {
       return;
     }
@@ -54,7 +53,7 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({
     }
   }, [tableContext, context, onExpand, disabled]);
 
-  return styled(styles)(
+  return styled(BASE_TABLE_STYLES)(
     <table-item-expand-box className={className} title={translate('ui_expand')} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
     </table-item-expand-box>

@@ -9,12 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, TabPanelList, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { Loader, SubmittingForm, Button, useFocus, StatusMessage } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsState, TabList, TabPanelList, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { UserFormController } from './UserFormController';
 import { UserFormService } from './UserFormService';
@@ -32,16 +32,10 @@ const tabsStyles = css`
   }
 `;
 
-const formStyles = composes(
-  css`
+const formStyles = css`
     FormBox {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-    content-box {
-      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-    }
-`,
-  css`
     box {
       display: flex;
       flex-direction: column;
@@ -50,6 +44,7 @@ const formStyles = composes(
       overflow: auto;
     }
     content-box {
+      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
       display: flex;
       flex: 1;
       flex-direction: column;
@@ -61,16 +56,11 @@ const formStyles = composes(
       display: flex;
       flex-direction: column;
     }
-`);
+`;
 
-const topBarStyles = composes(
-  css`
+const topBarStyles = css`
     connection-top-bar {
       composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    connection-top-bar {
       position: relative;
       display: flex;
       padding-top: 16px;
@@ -97,8 +87,7 @@ const topBarStyles = composes(
       padding: 0 24px;
       gap: 16px;
     }
-  `
-);
+  `;
 
 interface Props {
   user: AdminUserInfo;
@@ -111,7 +100,7 @@ export const UserForm = observer<Props>(function UserForm({
   editing = false,
   onCancel,
 }) {
-  const style = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const translate = useTranslate();
   const service = useService(UserFormService);

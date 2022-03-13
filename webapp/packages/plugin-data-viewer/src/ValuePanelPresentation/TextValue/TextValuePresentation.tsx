@@ -10,10 +10,10 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { BASE_CONTAINERS_STYLES, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -26,16 +26,10 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { TextValuePresentationService } from './TextValuePresentationService';
 
-const styles = composes(
-  css`
-    TabList {
-      composes: theme-border-color-background theme-background-background from global;
-    }
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
     }
-  `,
-  css`
     container {
       display: flex;
       flex-direction: column;
@@ -57,6 +51,7 @@ const styles = composes(
       overflow: auto;
     }
     TabList {
+      composes: theme-border-color-background theme-background-background from global;
       overflow: auto;
       border-radius: 16px;
 
@@ -68,8 +63,7 @@ const styles = composes(
         }
       }
     }
-  `
-);
+  `;
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function TextValuePresentation({
   model,
@@ -153,7 +147,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           lazy
           onChange={tab => state.setContentType(tab.tabId)}
         >
-          <TabList style={[styles, UNDERLINE_TAB_STYLES]} />
+          <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
         </TabsState>
       </actions>
       {useCodeEditor ? (

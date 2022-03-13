@@ -8,12 +8,11 @@
 
 import styled, { css } from 'reshadow';
 
-import { ComponentStyle, Composes, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
 
-const checkboxStyles = composes(
-  css`
+const checkboxStyles = css`
   checkbox {
     composes: theme-checkbox from global;
   }
@@ -35,8 +34,6 @@ const checkboxStyles = composes(
   checkbox-ripple {
     composes: theme-checkbox__ripple from global;
   }
-  `,
-  css`
     checkbox-container {
       display: flex;
       align-items: center;
@@ -45,31 +42,23 @@ const checkboxStyles = composes(
       composes: theme-typography--body2 from global;
       cursor: pointer;
     }
-  `
-);
+  `;
 
-const checkboxMod: Record<CheckboxMod, Composes> = {
-  primary: composes(
-    css`
+const checkboxMod: Record<CheckboxMod, any> = {
+  primary: css`
       checkbox {
         composes: theme-checkbox_primary from global;
       }
-    `
-  ),
-  surface: composes(
-    css`
+    `,
+  surface: css`
       checkbox {
         composes: theme-checkbox_surface from global;
       }
-    `
-  ),
-  small: composes(
-    css`
+    `,
+  small: css`
       checkbox {
         composes: theme-checkbox_small from global;
       }
-    `,
-    css`
       checkbox-container {
         & checkbox {
           width: 14px;
@@ -81,24 +70,19 @@ const checkboxMod: Record<CheckboxMod, Composes> = {
         }
       }
     `,
-  ),
 };
 
 const checkboxState = {
-  disabled: composes(
-    css`
+  disabled: css`
       checkbox {
         composes: theme-checkbox--disabled from global;
       }
-    `
-  ),
-  checked: composes(
-    css`
+    `,
+  checked: css`
       checkbox {
         composes: theme-checkbox--checked from global;
       }
-    `
-  ),
+    `,
 };
 
 interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style'> {

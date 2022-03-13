@@ -10,41 +10,29 @@ import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsState, TabList, verticalTabStyles, BASE_TAB_STYLES, OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 
-const tabsStyles = composes(
-  css`
+const tabsStyles = css`
     TabList {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     }
     Tab {
       composes: theme-ripple theme-background-background theme-ripple-selectable from global;
-    }
-  `,
-  css`
-    Tab {
       color: inherit;
     }
-  `
-);
+  `;
 
-const administrationStyles = composes(
-  css`
+const administrationStyles = css`
     container {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    container {
       display: flex;
       flex-direction: row;
       flex: 1;
@@ -70,8 +58,7 @@ const administrationStyles = composes(
       flex-direction: column;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   configurationWizard: boolean;
@@ -94,7 +81,7 @@ export const Administration = observer<Props>(function Administration({
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
-  return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
+  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
     <container>
       <TabsState currentTabId={activeScreen?.item} orientation='vertical'>
         <TabList aria-label="Administration items">
@@ -103,7 +90,7 @@ export const Administration = observer<Props>(function Administration({
               key={item.name}
               item={item}
               configurationWizard={configurationWizard}
-              style={[verticalTabStyles, tabsStyles]}
+              style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
               disabled={hasOnlyActive}
               onSelect={onItemSelect}
             />

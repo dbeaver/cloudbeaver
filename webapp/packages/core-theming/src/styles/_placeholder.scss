@@ -7,12 +7,12 @@
  */
 
 @mixin placeholder {
-  placeholder {
+  .placeholder {
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
     background: #f0f0f0;
-    border-radius: 3px;
+    border-radius: $theme-form-element-radius;
     margin: 2px;
     animation: wave 1.5s linear infinite;
   }

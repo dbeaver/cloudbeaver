@@ -15,25 +15,19 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Database } from './Database';
 
-const styles = composes(
-  css`
+const styles = css`
     SubmittingForm {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    SubmittingForm {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   databases: AdminConnectionSearchInfo[];

@@ -9,7 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IShortcut } from './IShortcut';
 
@@ -17,13 +17,7 @@ interface Props {
   shortcut: IShortcut;
 }
 
-const style = composes(
-  css`
-    shortcut-code {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const style = css`
     shortcut-container {
       display: flex;
       align-items: center;
@@ -38,10 +32,10 @@ const style = composes(
       gap: 4px;
     }
     shortcut-code {
+      composes: theme-form-element-radius theme-background-secondary theme-text-on-secondary from global;
       flex-shrink: 0;
       font-family: monospace;
       font-weight: bold;
-      border-radius: 4px;
       width: max-content;
       padding: 4px 8px;
     }
@@ -49,7 +43,7 @@ const style = composes(
       white-space: nowrap;
       text-transform: lowercase;
     }
-`);
+`;
 
 export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
   const translate = useTranslate();

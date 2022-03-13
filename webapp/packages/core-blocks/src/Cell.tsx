@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   description?: React.ReactElement | string;
@@ -18,13 +18,10 @@ interface Props {
   className?: string;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     cell {
       composes: theme-ripple from global;
-    }  
-`,
-  css`
+    } 
     main {
       position: relative;
       display: flex;
@@ -53,7 +50,7 @@ const styles = composes(
       composes: theme-typography--caption from global;
       line-height: 1.2;
     }
-`);
+`;
 
 export const Cell: React.FC<Props> = function Cell({ before, after, description, style, className, children }) {
   return styled(useStyles(styles, style))(

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
 import { useFocus } from '../useFocus';
@@ -49,17 +49,12 @@ const filterStyles = css`
   }
 `;
 
-const toggleModeButtonStyle = composes(
-  css`
+const toggleModeButtonStyle = css`
     IconButton {
       composes: theme-background-primary theme-text-on-primary from global;
-    }
-  `,
-  css`
-    IconButton {
       cursor: pointer;
     }
-`);
+`;
 
 const innerInputStyle = css`
   input {

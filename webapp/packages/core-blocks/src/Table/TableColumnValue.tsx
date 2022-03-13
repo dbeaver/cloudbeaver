@@ -11,9 +11,9 @@ import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useObjectRef } from '../useObjectRef';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
@@ -42,12 +42,11 @@ export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(functi
   onDoubleClick,
   ...rest
 }, ref) {
-  const styles = useStyles();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const props = useObjectRef({ onClick, onDoubleClick });
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement>) => {
     if (!context) {
       return;
     }
@@ -70,7 +69,7 @@ export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(functi
     return null;
   }
 
-  return styled(styles)(
+  return styled(BASE_TABLE_STYLES)(
     <td
       align={align}
       className={className}

@@ -8,18 +8,13 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const TREE_NODE_STYLES = composes(
-  css`
+export const TREE_NODE_STYLES = css`
     TreeNodeControl {
       composes: theme-ripple theme-ripple-selectable from global;
     }
     TreeNodeNestedMessage {
       composes: theme-text-text-hint-on-light from global;
     }
-  `,
-  css`
     node {
       box-sizing: border-box;
       width: fit-content;
@@ -161,4 +156,4 @@ export const TREE_NODE_STYLES = composes(
     node TreeNodeControl[big] + TreeNodeNested {
       padding-left: 46px;
     }
-`);
+`;

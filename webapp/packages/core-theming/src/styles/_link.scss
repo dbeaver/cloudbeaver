@@ -7,7 +7,7 @@
  */
 
 @mixin link() {
-  :global(a) {
+  a {
     color: $link-color;
     text-decoration: none;
 

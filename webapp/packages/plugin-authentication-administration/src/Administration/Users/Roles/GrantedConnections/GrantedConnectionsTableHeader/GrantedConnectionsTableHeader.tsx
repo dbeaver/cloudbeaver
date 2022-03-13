@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { Filter } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 export interface IFilterState {
   filterValue: string;
@@ -23,18 +23,13 @@ interface Props {
   className?: string;
 }
 
-const styles = composes(
-  css`
-    header {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
+const styles = css`
     buttons {
       display: flex;
       gap: 16px;
     }
     header {
+      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
       overflow: hidden;
       position: sticky;
       top: 0;
@@ -46,8 +41,7 @@ const styles = composes(
       gap: 16px;
       border-bottom: 1px solid;
     }
-  `
-);
+  `;
 
 export const GrantedConnectionsTableHeader = observer<Props>(function GrantedConnectionsTableHeader({ filterState, disabled, className, children }) {
   const translate = useTranslate();

@@ -8,15 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const UNDERLINE_TAB_STYLES = composes(
-  css`
-    Tab {
-      composes: theme-border-color-primary from global;
-    }
-  `,
-  css`
+export const UNDERLINE_TAB_STYLES = css`
     TabList {
       display: flex;
     }
@@ -25,7 +17,7 @@ export const UNDERLINE_TAB_STYLES = composes(
       background: none;
       color: inherit;
       border: none;
-      border-bottom: 2px solid;
+      border-bottom: 2px solid var(--theme-primary);
       outline: none;
       opacity: 1;
       height: 30px !important;
@@ -47,4 +39,4 @@ export const UNDERLINE_TAB_STYLES = composes(
         opacity: 1;
       }
     }
-`);
+`;

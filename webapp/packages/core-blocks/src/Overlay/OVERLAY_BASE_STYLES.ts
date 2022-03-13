@@ -8,19 +8,9 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const OVERLAY_BASE_STYLES = composes(
-  css`
+export const OVERLAY_BASE_STYLES = css`
     overlay {
       composes: theme-text-on-primary from global;
-    }
-    box {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -46,7 +36,7 @@ export const OVERLAY_BASE_STYLES = composes(
     }
 
     box {
-      composes: theme-elevation-z6 from global;
+      composes: theme-background-surface theme-text-on-surface theme-elevation-z6 from global;
       border-radius: 0.25rem;
       align-items: normal;
       max-width: calc(100% - 48px);
@@ -120,5 +110,4 @@ export const OVERLAY_BASE_STYLES = composes(
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-  `
-);
+  `;

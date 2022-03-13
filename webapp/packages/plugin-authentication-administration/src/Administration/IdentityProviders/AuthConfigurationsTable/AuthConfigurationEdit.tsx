@@ -13,27 +13,21 @@ import styled, { css } from 'reshadow';
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
 import { TableContext } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationForm } from '../AuthConfigurationForm';
 import { useAuthConfigurationFormState } from '../useAuthConfigurationFormState';
 
-const styles = composes(
-  css`
+const styles = css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    box {
       box-sizing: border-box;
       padding-bottom: 24px;
       display: flex;
       flex-direction: column;
       height: 664px;
     }
-  `
-);
+  `;
 
 interface Props {
   item: string;

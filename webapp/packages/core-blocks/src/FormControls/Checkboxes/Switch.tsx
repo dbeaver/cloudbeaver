@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
 import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
@@ -17,34 +17,33 @@ import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 import { useCheckboxState } from './useCheckboxState';
 
-const switchStyles = composes(
-  css`
-    switch-control {
-      composes: theme-switch from global;
-    }
-    switch-control-track {
-      composes: theme-switch__track from global;
-    }
-    switch-input {
-      composes: theme-switch_native-control from global;
-    }
-    switch-control-underlay {
-      composes: theme-switch__thumb-underlay from global;
-    }
-    switch-control-thumb {
-      composes: theme-switch__thumb from global;
-    }
-    radio-ripple {
-      composes: theme-radio_ripple from global;
-    }
-  `,
-  css`
+const switchStyles = css`
+switch-control {
+  composes: theme-switch from global;
+}
+switch-control-track {
+  composes: theme-switch__track from global;
+}
+switch-input {
+  composes: theme-switch_native-control from global;
+}
+switch-control-underlay {
+  composes: theme-switch__thumb-underlay from global;
+}
+switch-control-thumb {
+  composes: theme-switch__thumb from global;
+}
+radio-ripple {
+  composes: theme-radio_ripple from global;
+}
     switch-body {
       display: flex;
       align-items: center;
     }
-    field-label {
+    switch-body {
       composes: theme-typography--body1 from global;
+    }
+    switch-body field-label {
       cursor: pointer;
       user-select: none;
       display: block;
@@ -53,47 +52,38 @@ const switchStyles = composes(
       white-space: pre-wrap;
       font-weight: 500;
     }
-  `
-);
+  `;
 
 const switchMod = {
-  primary: composes(
-    css`
+  primary: css`
       switch-control {
         composes: theme-switch_primary from global;
       }
-    `
-  ),
-  dense: composes(
-    css`
+    `,
+  dense: css`
       switch-body {
         composes: theme-switch_dense from global;
       }
-    `,
-    css`
       field-label {
         composes: theme-typography--body2 from global;
+      }
+      switch-body field-label {
         font-weight: initial;
       }
     `,
-  ),
 };
 
 const switchState = {
-  disabled: composes(
-    css`
+  disabled: css`
       switch-control {
-        composes: theme-switch--disabled from global;
+        composes: theme-switch--disabled mdc-switch--disabled from global;
       }
-    `
-  ),
-  checked: composes(
-    css`
+    `,
+  checked: css`
       switch-control {
-        composes: theme-switch--checked from global;
+        composes: theme-switch--checked mdc-switch--checked from global;
       }
-    `
-  ),
+    `,
 };
 
 interface IBaseProps {

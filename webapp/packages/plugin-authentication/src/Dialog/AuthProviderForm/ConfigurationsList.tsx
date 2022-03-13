@@ -15,17 +15,11 @@ import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder } from '@
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthenticationService } from '../../AuthenticationService';
 
-const styles = composes(
-  css`
-    Cell {
-      composes: theme-border-color-secondary from global;
-    }
-`,
-  css`
+const styles = css`
     container {
       display: flex;
       flex-direction: column;
@@ -38,6 +32,7 @@ const styles = composes(
       overflow: auto;
     }
     Cell {
+      composes: theme-border-color-secondary from global;
       border-bottom: 1px solid;
       padding: 0 16px;
     }
@@ -45,7 +40,7 @@ const styles = composes(
       width: 100%;
       height: 100%;
     }
-`);
+`;
 
 interface IProviderConfiguration {
   provider: AuthProvider;

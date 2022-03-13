@@ -8,24 +8,18 @@
 
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   className?: string;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     code-container {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    code-container {
       padding: 16px;
     }
-  `
-);
+  `;
 
 export const Code: React.FC<Props> = function Code({ children, className }) {
   return styled(useStyles(styles))(

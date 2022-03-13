@@ -11,19 +11,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { getDefaultRowsCount } from '../../getDefaultRowsCount';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
-const tableFooterStyles = composes(
-  css`
-    reload {
-      composes: theme-text-primary theme-ripple from global;
-    }
-  `,
-  css`
+const tableFooterStyles = css`
     ToolsPanel {
       align-items: center;
       flex: 0 0 auto;
@@ -38,6 +32,7 @@ const tableFooterStyles = composes(
       line-height: 24px;
     }
     reload {
+      composes: theme-text-primary theme-ripple from global;
       height: 100%;
       display: flex;
       cursor: pointer;
@@ -64,8 +59,7 @@ const tableFooterStyles = composes(
       margin-left: auto;
       margin-right: 16px;
     }
-  `
-);
+  `;
 
 interface Props {
   resultIndex: number;

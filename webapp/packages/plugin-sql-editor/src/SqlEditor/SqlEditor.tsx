@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ISqlEditorProps } from './ISqlEditorProps';
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
@@ -21,13 +21,10 @@ import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlEditorController } from './SqlEditorController';
 import { useTools } from './useTools';
 
-const styles = composes(
-  css`
+const styles = css`
     button, upload {
       composes: theme-ripple from global;
     }
-  `,
-  css`
     sql-editor {
       position: relative;
       z-index: 0;
@@ -81,8 +78,7 @@ const styles = composes(
       flex: 1;
       overflow: auto;
     }
-  `
-);
+  `;
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();

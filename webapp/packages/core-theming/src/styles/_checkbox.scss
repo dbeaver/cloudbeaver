@@ -13,35 +13,35 @@ $mdc-checkbox-icon-size: 16px;
   @include mdc-checkbox-core-styles($query);
 
   .theme-checkbox {
-    composes: mdc-checkbox;
+    @extend .mdc-checkbox;
   }
   .theme-checkbox_native-control {
-    composes: mdc-checkbox__native-control;
+    @extend .mdc-checkbox__native-control;
 
     &:disabled {
       opacity: 0;
     }
   }
   .theme-checkbox__background {
-    composes: mdc-checkbox__background;
+    @extend .mdc-checkbox__background;
   }
   .theme-checkbox__checkmark {
-    composes: mdc-checkbox__checkmark;
+    @extend .mdc-checkbox__checkmark;
   }
   .theme-checkbox__checkmark-path {
-    composes: mdc-checkbox__checkmark-path;
+    @extend .mdc-checkbox__checkmark-path;
   }
   .theme-checkbox__mixedmark {
-    composes: mdc-checkbox__mixedmark;
+    @extend .mdc-checkbox__mixedmark;
   }
   .theme-checkbox__ripple {
-    composes: mdc-checkbox__ripple;
+    @extend .mdc-checkbox__ripple;
   }
   .theme-checkbox--checked {
-    composes: mdc-checkbox--selected;
+    @extend .mdc-checkbox--selected;
   }
   .theme-checkbox--disabled {
-    composes: mdc-checkbox--disabled;
+    @extend .mdc-checkbox--disabled;
   }
 
   .theme-checkbox_primary {

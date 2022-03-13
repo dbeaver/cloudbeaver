@@ -8,10 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const BASE_CONTAINERS_STYLES = composes(
-  css`
+export const BASE_CONTAINERS_STYLES = css`
     Group {
       composes: theme-background-surface theme-text-on-surface from global;
     }
@@ -21,8 +18,6 @@ export const BASE_CONTAINERS_STYLES = composes(
     GroupSubTitle {
       composes: theme-text-text-hint-on-light from global;
     }
-  `,
-  css`
     Container, ColoredContainer, Group {
       display: flex;
       flex-direction: row;
@@ -203,4 +198,4 @@ export const BASE_CONTAINERS_STYLES = composes(
       right: 24px;
       margin-right: 0 !important;
     }
-  `);
+  `;

@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { TableContext } from './TableContext';
 
 interface Props {
@@ -37,7 +38,7 @@ export const TableSelect = observer<Props>(function TableSelect({ id, disabled, 
     throw new Error('Context must be provided');
   }
 
-  return styled(styles)(
+  return styled(BASE_TABLE_STYLES, styles)(
     <Checkbox
       id={id}
       className={className}

@@ -10,31 +10,26 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Split, Pane, ResizerControls, splitStyles } from '@cloudbeaver/core-blocks';
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Split, Pane, ResizerControls, splitStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService';
 
-const styles = composes(
-  css`
+const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
     }
-  `,
-  css`
     Pane:first-child {
       overflow: hidden;
     }
     Pane:last-child {
       flex: 0 1 450px;
     }
- `
-);
+ `;
 
 interface Props {
   executionPlanTab: IExecutionPlanTab;

@@ -9,34 +9,11 @@
 import { createContext } from 'react';
 import { css } from 'reshadow';
 
-import { ComponentStyle, composes } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-export const ITEM_LIST_STYLES = composes(
-  css`
+export const ITEM_LIST_STYLES = css`
     item-list {
       composes: theme-background-surface from global;
-    }
-    list-item {
-      composes: theme-ripple theme-background-surface theme-border-color-secondary from global;
-    }
-    list-search {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-    list-item-name {
-      composes: theme-border-color-secondary from global;
-    }
-    ListSearchButton {
-      composes: theme-ripple theme-background-primary theme-text-on-primary from global;
-    }
-    item-list-overflow {
-      composes: branding-overflow from global;
-    }
-    item-list-overflow-top {
-      composes: branding-overflow-inverse from global;
-    }
-  `,
-  css`
-    item-list {
       box-sizing: border-box;
       border-collapse: collapse;
       z-index: 0;
@@ -50,14 +27,16 @@ export const ITEM_LIST_STYLES = composes(
       pointer-events: none;
     }
     item-list-overflow {
+      composes: branding-overflow from global;
       bottom: 0;
     }
     item-list-overflow-top {
+      composes: branding-overflow-inverse from global;
       top: 0;
       z-index: 1;
     }
     list-search {
-      composes: theme-typography--body1 from global;
+      composes: theme-background-surface theme-text-on-surface theme-typography--body1 from global;
       position: sticky;
       top: 0;
       padding: 16px 24px;
@@ -91,10 +70,14 @@ export const ITEM_LIST_STYLES = composes(
         }
       }
     }
+    ListSearchButton {
+      composes: theme-ripple theme-background-primary theme-text-on-primary from global;
+    }
     list-item:not(:nth-last-child(2)) {
       border-bottom: 1px solid;
     }
     list-item {
+      composes: theme-ripple theme-background-surface theme-border-color-secondary from global;
       position: relative;
       cursor: pointer;
       display: flex;
@@ -114,7 +97,7 @@ export const ITEM_LIST_STYLES = composes(
       }
     }
     list-item-name {
-      composes: theme-typography--body1 from global;
+      composes: theme-border-color-secondary theme-typography--body1 from global;
       box-sizing: border-box;
       font-weight: 500;
       min-width: 250px;
@@ -135,7 +118,6 @@ export const ITEM_LIST_STYLES = composes(
       overflow: hidden;
       text-overflow: ellipsis;
     }
-  `
-);
+  `;
 
 export const Styles = createContext<ComponentStyle>(ITEM_LIST_STYLES);

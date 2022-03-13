@@ -8,8 +8,10 @@
 
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
 import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { useStyles } from '@cloudbeaver/core-theming';
+
+import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 
 interface IProps {
   icon?: string;
@@ -18,7 +20,7 @@ interface IProps {
 }
 
 export const TabIcon: React.FC<IProps> = function TabIcon({ icon, viewBox, className }) {
-  return styled(useStyles())(
+  return styled(useStyles(BASE_TAB_STYLES))(
     <tab-icon className={className}>
       {icon ? <IconOrImage icon={icon} viewBox={viewBox} /> : <placeholder />}
     </tab-icon>

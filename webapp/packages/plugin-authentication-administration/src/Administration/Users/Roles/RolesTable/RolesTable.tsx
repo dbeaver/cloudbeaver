@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import type { RoleInfo } from '@cloudbeaver/core-authentication';
 import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, ILoadableState } from '@cloudbeaver/core-blocks';
@@ -41,7 +41,7 @@ export const RolesTable = observer<Props>(function RolesTable({ roles, state, se
 
   return styled(useStyles(styles))(
     <Loader state={state} style={loaderStyle} overlay>
-      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
         <TableHeader>
           <TableColumnHeader min flex centerContent>
             <TableSelect />

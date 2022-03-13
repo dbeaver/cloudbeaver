@@ -7,30 +7,20 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
 import { useConfigurationsTable } from './AuthConfigurationsTable/useConfigurationsTable';
 import { CreateAuthConfiguration } from './CreateAuthConfiguration';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 
-const styles = composes(
-  css`
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-    layout-grid-cell {
-      composes: theme-border-color-background from global;
-    }
-   
-`,
-  css` 
+const styles = css` 
     layout-grid {
       width: 100%;
       overflow: auto;
@@ -39,16 +29,17 @@ const styles = composes(
       min-height: 100%;
     }
     layout-grid-cell {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
       position: relative;
       border: solid 1px;
     }
-`);
+`;
 
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({
   sub,
 }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
+  const style = useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const service = useService(CreateAuthConfigurationService);
 
   const table = useConfigurationsTable();
@@ -87,11 +78,11 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
       <layout-grid>
         <layout-grid-inner>
           {sub && (
-            <layout-grid-cell {...use({ span: 12 })}>
+            <layout-grid-cell data-span='12'>
               <CreateAuthConfiguration />
             </layout-grid-cell>
           )}
-          <layout-grid-cell {...use({ span: 12 })}>
+          <layout-grid-cell data-span='12'>
             <AuthConfigurationsTable
               configurations={table.configurations}
               selectedItems={table.tableState.selected}

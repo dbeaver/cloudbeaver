@@ -7,25 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { Button, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_LAYOUT_GRID_STYLES, Button, useFocus } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-
-    layout-grid-cell {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
+const styles = css`
     layout-grid {
       width: 100%;
       flex: 1;
@@ -36,6 +26,7 @@ const styles = composes(
     }
 
     layout-grid-cell {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
       position: relative;
       border: solid 1px;
       padding: 16px 24px
@@ -45,8 +36,7 @@ const styles = composes(
       line-height: 2;
       white-space: pre;
     }
-  `
-);
+  `;
 
 export const FinishPage = observer(function FinishPage() {
   const translate = useTranslate();
@@ -55,10 +45,10 @@ export const FinishPage = observer(function FinishPage() {
     focusFirstChild: true,
   });
 
-  return styled(useStyles(styles))(
-    <layout-grid as="div">
-      <layout-grid-inner as="div">
-        <layout-grid-cell ref={focus} as='div' {...use({ span: 12 })}>
+  return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles))(
+    <layout-grid>
+      <layout-grid-inner>
+        <layout-grid-cell ref={focus} as='div' data-span='12'>
           <h3>{translate('administration_configuration_wizard_finish_title')}</h3>
           <p>{translate('administration_configuration_wizard_finish_message')}</p>
 

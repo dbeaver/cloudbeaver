@@ -8,24 +8,14 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const PROPERTIES_TABLE_STYLES = composes(
-  css`
-    properties-header {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-secondary from global;
-    }
-    properties-list-overflow {
-      composes: branding-overflow from global;
-    }
-  `,
-  css`
+export const PROPERTIES_TABLE_STYLES = css`
     properties {
       display: flex;
       flex: 1 0 auto;
       flex-direction: column;
     }
     properties-header {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-secondary from global;
       box-sizing: border-box;
       display: inline-flex;
       border-bottom: solid 1px;
@@ -56,6 +46,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
     }
 
     properties-list-overflow {
+      composes: branding-overflow from global;
       position: sticky;
       flex-shrink: 0;
       bottom: -4px;
@@ -63,8 +54,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
       height: 24px;
       pointer-events: none;
     }
-  `
-);
+  `;
 
 export const PROPERTIES_TABLE_ADD_STYLES = css`
   button-icon {

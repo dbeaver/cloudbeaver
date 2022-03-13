@@ -8,11 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const slideBoxStyles = composes(
-  css``,
-  css`
+export const slideBoxStyles = css`
     SlideBox {
       overflow: hidden;
       white-space: nowrap;
@@ -59,5 +55,4 @@ export const slideBoxStyles = composes(
         }
       }
     }
-  `
-);
+  `;

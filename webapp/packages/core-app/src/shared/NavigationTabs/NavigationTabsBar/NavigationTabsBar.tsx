@@ -14,24 +14,21 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { TabsBox, TabPanel } from '@cloudbeaver/core-ui';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsBox, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
 
-const styles = composes(
-  css`
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
     }
     tabs {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-  `,
-  css`
     TabsBox {
       outline: none;
     }
@@ -40,15 +37,14 @@ const styles = composes(
       display: flex;
       overflow: auto;
     }
-  `
-);
+  `;
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
-  const style = useStyles(styles);
+  const style = useStyles(BASE_TAB_STYLES, styles);
   const translate = useTranslate();
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);

@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Icon } from '../Icon';
 
@@ -17,14 +17,9 @@ interface Props {
   onClick?: () => void;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     icon-btn {
       composes: theme-background-surface theme-text-on-surface theme-ripple from global;
-    }
-  `,
-  css`
-    icon-btn {
       box-sizing: border-box;
       margin-left: 36px;
       width: 48px;
@@ -39,8 +34,7 @@ const styles = composes(
     Icon {
       width: 100%;
     }
-  `
-);
+  `;
 
 export const SlideOverlay: React.FC<Props> = function SlideOverlay({
   className,

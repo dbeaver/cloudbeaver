@@ -8,15 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const splitStyles = composes(
-  css`
-    ResizerControls {
-      composes: theme-background-background theme-text-on-secondary from global;
-    }
-  `,
-  css`
+export const splitStyles = css`
     space {
       display: flex;
       flex-direction: row;
@@ -37,6 +29,7 @@ export const splitStyles = composes(
     }
 
     ResizerControls {
+      composes: theme-background-background theme-text-on-secondary from global;
       position: relative;
       flex: 0 1 auto;
       width: 2px;
@@ -55,8 +48,7 @@ export const splitStyles = composes(
       cursor: col-resize;
       box-sizing: border-box;
     }
-  `
-);
+  `;
 
 export const splitHorizontalStyles = css`
   space {

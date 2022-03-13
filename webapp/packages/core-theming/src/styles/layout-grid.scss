@@ -18,8 +18,7 @@
     }
   }
 
-  .layout-grid,
-  layout-grid {
+  .layout-grid {
     @each $size in map-keys($mdc-layout-grid-columns) {
       @include mdc-layout-grid-media-query_($size) {
         $margin: map-get($mdc-layout-grid-default-margin, $size);
@@ -29,8 +28,7 @@
     }
   }
 
-  .layout-grid__inner,
-  layout-grid-inner {
+  .layout-grid__inner {
     @each $size in map-keys($mdc-layout-grid-columns) {
       @include mdc-layout-grid-media-query_($size) {
         $margin: map-get($mdc-layout-grid-default-margin, $size);
@@ -41,8 +39,7 @@
     }
   }
 
-  .layout-grid__cell,
-  layout-grid-cell {
+  .layout-grid__cell {
     // select the upper breakpoint
     $upper-breakpoint: nth(map-keys($mdc-layout-grid-columns), 1);
 
@@ -56,8 +53,8 @@
           // Span classes.
           @at-root .layout-grid__cell--span-#{$span},
             .layout-grid__cell--span-#{$span}-#{$size},
-            [use|span="#{$span}"],
-            [use|span-#{$size}="#{$span}"] {
+            .layout-grid__cell[data-span="#{$span}"],
+            .layout-grid__cell[data-span-#{$size}="#{$span}"] {
             @include mdc-layout-grid-cell-span_($size, $span, $gutter);
           }
         }
@@ -86,8 +83,7 @@
   }
 
   .layout-grid--fixed-column-width,
-  layout-grid[use|fixed-width],
-  .layout-grid[use|fixed-width] {
+  .layout-grid[data-grid-fixed-width=true] {
     @each $size in map-keys($mdc-layout-grid-columns) {
       @include mdc-layout-grid-media-query_($size) {
         $margin: map-get($mdc-layout-grid-default-margin, $size);
@@ -100,13 +96,13 @@
   }
 
   .layout-grid--align-left,
-  [use|align="left"] {
+  [data--grid-align="left"] {
     margin-right: auto;
     margin-left: 0;
   }
 
   .layout-grid--align-right,
-  [use|align="right"] {
+  [data-grid-align="right"] {
     margin-right: 0;
     margin-left: auto;
   }

@@ -8,18 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const buttonStyles = composes(
-  css`
-    button {
-      composes: theme-button theme-button_unelevated theme-button_background from global;
-    }
-    ripple {
-      composes: theme-button_ripple from global;
-    }
-  `,
-  css`
+export const buttonStyles = css`
     container {
       position: absolute;
       display: flex;
@@ -35,8 +24,13 @@ export const buttonStyles = composes(
     }
 
     button {
+      composes: theme-button theme-button_unelevated theme-button_background from global;
       opacity: 0;
       transition-property: opacity, box-shadow !important;
+    }
+
+    ripple {
+      composes: theme-button_ripple from global;
     }
 
     container:hover button {
@@ -133,5 +127,4 @@ export const buttonStyles = composes(
         margin: -3px -2px;
       }
     }
-  `
-);
+  `;

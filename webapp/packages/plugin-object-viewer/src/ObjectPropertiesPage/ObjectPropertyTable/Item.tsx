@@ -36,6 +36,7 @@ const itemStyles = css`
       }
     }
     placeholder {
+      composes: placeholder from global;
       height: 16px;
       width: 180px;
     }

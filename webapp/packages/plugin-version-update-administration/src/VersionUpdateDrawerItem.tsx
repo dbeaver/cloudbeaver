@@ -14,18 +14,12 @@ import { useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-const styles = composes(
-  css`
-    icon {
-      composes: theme-background-primary from global;
-    }
-`,
-  css`
+const styles = css`
     tab-container {
       justify-content: space-between;
     }
@@ -33,6 +27,7 @@ const styles = composes(
       flex: 1;
     }
     icon {
+      composes: theme-background-primary from global;
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -42,7 +37,7 @@ const styles = composes(
     IconOrImage {
       width: 16px;
     }
-`);
+`;
 
 export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(function VersionUpdateDrawerItem({
   item, onSelect, style, disabled,

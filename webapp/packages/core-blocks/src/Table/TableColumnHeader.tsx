@@ -8,7 +8,7 @@
 
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 
 interface Props {
   title?: string;
@@ -21,7 +21,7 @@ interface Props {
 export const TableColumnHeader: React.FC<Props> = function TableColumnHeader({
   title, min, flex, centerContent, className, children,
 }) {
-  return styled(useStyles())(
+  return styled(BASE_TABLE_STYLES)(
     <th
       title={title}
       className={className}

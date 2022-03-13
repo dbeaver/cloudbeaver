@@ -12,22 +12,12 @@ import styled, { css } from 'reshadow';
 import { IconButton } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationForm } from './AuthConfigurationForm';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 
-const styles = composes(
-  css`
-    title-bar {
-      composes: theme-border-color-background from global;
-    }
-
-     configuration-create-content {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     configuration-create {
       display: flex;
       flex-direction: column;
@@ -36,7 +26,7 @@ const styles = composes(
     }
 
     title-bar {
-      composes: theme-typography--headline6 from global;
+      composes: theme-border-color-background theme-typography--headline6 from global;
       box-sizing: border-box;
       padding: 16px 24px;
       align-items: center;
@@ -46,6 +36,7 @@ const styles = composes(
     }
 
     configuration-create-content {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -56,8 +47,7 @@ const styles = composes(
     fill {
       flex: 1;
     }
-  `
-);
+  `;
 
 export const CreateAuthConfiguration: React.FC = observer(function CreateAuthConfiguration() {
   const style = useStyles(styles);

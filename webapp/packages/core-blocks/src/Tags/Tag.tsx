@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../IconOrImage';
 
@@ -19,28 +19,23 @@ export interface ITag {
   icon?: string;
 }
 
-const style = composes(
-  css`
+const style = css`
     tag-container {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    tag-container {
       display: flex;
       align-items: center;
       padding: 4px 4px 4px 8px;
-      border-radius: 4px;
+      border-radius: var(--theme-form-element-radius);
       max-width: 150px;
       &::before {
-        border-radius: 4px;
+        border-radius: var(--theme-form-element-radius);
       }
     }
     tag-icon {
       display: flex;
       flex-shrink: 0;
       width: 16px;
-      margin-right: 4px;
+      margin-right: var(--theme-form-element-radius);
     }
     tag-content {
       composes: theme-typography--caption from global;
@@ -68,8 +63,7 @@ const style = composes(
       width: 100%;
       height: 100%;
     }
-  `
-);
+  `;
 
 interface Props extends ITag {
   onRemove: (id: string) => void;

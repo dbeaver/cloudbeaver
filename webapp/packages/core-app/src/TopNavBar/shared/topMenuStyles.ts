@@ -8,14 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const topMenuStyles = composes(
-  css`
-    menu-box {
-      composes: theme-text-on-primary from global;
-    }
-    
+export const topMenuStyles = css`
     checkbox {
       composes: theme-checkbox_surface from global;
     }
@@ -23,9 +16,8 @@ export const topMenuStyles = composes(
     Button {
       composes: theme-ripple from global;
     }
-  `,
-  css`
     menu-box {
+      composes: theme-text-on-primary from global;
       background-color: #338ecc!important;
     }
     menu-box menu-panel-item {
@@ -73,5 +65,4 @@ export const topMenuStyles = composes(
         display: none;
       }
     }
-  `
-);
+  `;

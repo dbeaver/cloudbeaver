@@ -14,25 +14,17 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavigationTree } from '../NavigationTree';
 import { RightArea } from './RightArea';
 
-const mainStyles = composes(
-  css`
+const mainStyles = css`
     space {
-      composes: theme-background-primary from global;
+      composes: theme-typography--body2 theme-background-primary from global;
     }
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    space {
-      composes: theme-typography--body2 from global;
-    }
-    Pane {
       display: flex;
     }
     Pane:first-child {
@@ -42,8 +34,7 @@ const mainStyles = composes(
     Pane:last-child {
       overflow: hidden;
     }
-  `
-);
+  `;
 
 export const Main = observer(function Main() {
   const styles = useStyles(mainStyles, splitStyles);
