@@ -13,18 +13,13 @@ import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UserProfileService } from './UserProfileService';
 
-const styles = composes(
-  css`
+const styles = css`
     user {
       composes: theme-ripple from global;
-    }
-  `,
-  css`
-    user {
       height: 100%;
       display: flex;
       align-items: center;
@@ -40,7 +35,7 @@ const styles = composes(
       line-height: initial;
       margin-left: 8px;
     }
-`);
+`;
 
 interface Props {
   info: IUserInfo;

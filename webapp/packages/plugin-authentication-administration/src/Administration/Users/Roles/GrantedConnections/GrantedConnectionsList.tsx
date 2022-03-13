@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import {
   Table,
@@ -27,20 +27,14 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
-const styles = composes(
-  css`
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
+const styles = css`
     Group {
       position: relative;
     }
@@ -59,10 +53,10 @@ const styles = composes(
       overflow: auto;
     }
     Table {
+      composes: theme-background-surface theme-text-on-surface from global;
       width: 100%;
     }
-  `
-);
+  `;
 
 interface Props {
   grantedConnections: DatabaseConnectionFragment[];
@@ -113,7 +107,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} {...use({ size: 'big' })}>
+          <Table keys={keys} selectedItems={selectedSubjects} size='big'>
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               <TableItem item='tableInfo' selectDisabled>

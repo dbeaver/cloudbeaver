@@ -11,10 +11,10 @@ import { useContext, useCallback, useMemo, Children } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { getComputed } from '../getComputed';
 import { useObjectRef } from '../useObjectRef';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext, ITableItemContext } from './TableItemContext';
@@ -47,7 +47,6 @@ export const TableItem = observer<Props>(function TableItem({
   onClick,
   onDoubleClick,
 }) {
-  const styles = useStyles();
   const context = useContext(TableContext);
   const props = useObjectRef({ selectOnItem });
 
@@ -94,7 +93,7 @@ export const TableItem = observer<Props>(function TableItem({
 
   const ExpandElement = expandElement;
 
-  return styled(styles)(
+  return styled(BASE_TABLE_STYLES)(
     <TableItemContext.Provider value={itemContext}>
       <tr
         title={title}

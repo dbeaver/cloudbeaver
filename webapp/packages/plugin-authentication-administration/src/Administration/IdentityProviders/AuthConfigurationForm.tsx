@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList } from '@cloudbeaver/core-ui';
 import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { authConfigurationContext } from './Contexts/authConfigurationContext';
@@ -34,14 +34,9 @@ const tabsStyles = css`
   }
 `;
 
-const topBarStyles = composes(
-  css`
+const topBarStyles = css`
     configuration-top-bar {
       composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    configuration-top-bar {
       position: relative;
       display: flex;
       padding-top: 16px;
@@ -79,21 +74,11 @@ const topBarStyles = composes(
         width: 24px;
       }
     }
-  `
-);
+  `;
 
-const formStyles = composes(
-  css`
+const formStyles = css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-
-    content-box {
-      composes: theme-background-secondary theme-border-color-background from global;
-    }
-  `,
-  css`
-    box {
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -101,14 +86,14 @@ const formStyles = composes(
       overflow: auto;
     }
     content-box {
+      composes: theme-background-secondary theme-border-color-background from global;
       position: relative;
       display: flex;
       flex: 1;
       flex-direction: column;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   state: IAuthConfigurationFormState;
@@ -125,7 +110,7 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
 }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(AuthConfigurationFormService);
 

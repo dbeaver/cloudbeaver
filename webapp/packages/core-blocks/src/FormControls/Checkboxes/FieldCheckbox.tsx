@@ -20,15 +20,18 @@ const style = css`
   }
   field {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     white-space: pre-wrap;
+
+    & field-label {
+      cursor: pointer;
+      user-select: none;
+      padding-left: 10px;
+      line-height: 16px;
+    }
   }
   field-label {
-    composes: theme-typography--body2 from global;
-    cursor: pointer;
-    user-select: none;
-    padding-left: 10px;
-    line-height: 16px;
+      composes: theme-typography--body2 from global;
   }
   Checkbox[disabled] + field-label {
     cursor: auto;

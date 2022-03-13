@@ -34,6 +34,7 @@ const styles = css`
   InlineEditor {
     font-size: 12px;
     left: -1px;
+    top: 0;
   }
 `;
 

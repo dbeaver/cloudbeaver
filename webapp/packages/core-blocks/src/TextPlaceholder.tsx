@@ -8,15 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const TextPlaceholderStyles = composes(
-  css`
-    span {
-      composes: theme-typography--headline5 from global;
-    }
-  `,
-  css`
+const TextPlaceholderStyles = css`
     div {
       flex: 1;
       display: flex;
@@ -29,8 +23,7 @@ const TextPlaceholderStyles = composes(
       margin: auto;
       text-align: center;
     }
-  `
-);
+  `;
 
 export const TextPlaceholder: React.FC = function TextPlaceholder(props) {
   return styled(useStyles(TextPlaceholderStyles))(

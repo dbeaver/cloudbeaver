@@ -11,27 +11,21 @@ import styled, { css } from 'reshadow';
 
 import { TableColumnHeader, TableHeader, TableSelect } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   disabled?: boolean;
   className?: string;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     TableHeader {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    TableHeader {
       position: sticky;
       top: 0;
       z-index: 1;
     }
-  `
-);
+  `;
 
 export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUsersTableInnerHeader({ disabled, className }) {
   const translate = useTranslate();

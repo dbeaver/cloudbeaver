@@ -12,26 +12,21 @@ import {
 } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
+import { useFocus } from '../useFocus';
 import type { IProperty } from './IProperty';
 import { PropertyValueSelector } from './PropertyValueSelector';
 
-const styles = composes(
-  css`
-    property-item, button {
-      composes: theme-ripple from global;
-    }
-    ShadowInput {
-      composes: theme-background-surface theme-border-color-positive from global;
-    }
+const styles = css`
     [|error] {
       composes: theme-text-error from global;
     }
-  `,
-  css`
+    property-item, button {
+      composes: theme-ripple from global;
+    }
     property-item {
       box-sizing: border-box;
       display: inline-flex;
@@ -41,11 +36,13 @@ const styles = composes(
       composes: theme-typography--caption from global;
       position: relative;
       display: flex;
+      align-items: center;
       box-sizing: border-box;
       flex: 1;
       padding: 4px 0;
 
       & ShadowInput {
+        height: 24px;
         padding: 0 36px;
       }
     }
@@ -72,6 +69,9 @@ const styles = composes(
       opacity: 1;
     }
     ShadowInput {
+      composes: theme-background-surface theme-border-color-positive from global;
+    }
+    property-name ShadowInput, property-value ShadowInput {
       box-sizing: border-box;
       font: inherit;
       color: inherit;
@@ -83,7 +83,7 @@ const styles = composes(
         font-weight: 600;
       }
       &:global([readonly]), &:not(:focus):not([|focus]) {
-        background: transparent;
+        background: transparent !important;
         border: solid 1px transparent !important;
       }
     }
@@ -102,8 +102,12 @@ const styles = composes(
       padding: 4px;
       cursor: pointer;
     }
-  `
-);
+    button, PropertyValueSelector {
+      composes: theme-form-element-radius from global;
+      margin: 2px;
+      overflow: hidden;
+    }
+  `;
 
 interface Props {
   property: IProperty;
@@ -127,7 +131,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const propertyValue = value !== undefined ? value : property.defaultValue;
-  const [focus, setFocus] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
   const [valueRef, setValueRef] = useState<HTMLDivElement | null>(null);
 
@@ -143,6 +147,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({
       keyInputRef.current.focus();
     }
   }, [property]);
+
+  const focus = menuOpen;
 
   return styled(useStyles(styles))(
     <property-item>
@@ -166,6 +172,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           placeholder={property.valuePlaceholder}
           autoComplete='none'
           readOnly={readOnly}
+          data-focus={focus}
           onChange={handleValueChange}
           {...use({ focus, edited })}
         >
@@ -178,7 +185,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
               values={property.validValues}
               container={valueRef}
               onSelect={handleValueChange}
-              onSwitch={setFocus}
+              onSwitch={setMenuOpen}
             >
               <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
             </PropertyValueSelector>

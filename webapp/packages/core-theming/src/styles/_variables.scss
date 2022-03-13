@@ -23,3 +23,14 @@ $mdc-theme-extra-property-values: (
 );
 
 $mdc-theme-property-values: map-merge($mdc-theme-property-values, $mdc-theme-extra-property-values);
+
+$theme-class: "theme-#{$theme-name}";
+$theme-form-element-radius: 3px !default;
+
+@mixin css-variables {
+  .theme-form-element-radius {
+    border-radius: $theme-form-element-radius;
+  }
+
+  --theme-form-element-radius: #{$theme-form-element-radius};
+}

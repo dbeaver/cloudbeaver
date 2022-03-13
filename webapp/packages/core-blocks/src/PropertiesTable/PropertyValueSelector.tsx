@@ -16,51 +16,27 @@ import {
 } from 'reakit/Menu';
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
-    Menu {
-      composes: theme-text-on-surface theme-background-surface from global;
-    }
-    MenuItem, MenuButton {
-      composes: theme-ripple from global;
-    }
-  `,
-  css`
-    MenuButton {
-      background: transparent;
-      outline: none;
-      padding: 4px;
-      cursor: pointer;
-    }
+import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
 
-    Menu {
-      composes: theme-typography--caption theme-elevation-z3 from global;
-      display: flex;
-      flex-direction: column;
-      width: max-content;
-      outline: none;
-      padding: 4px 0;
-      z-index: 999;
-
-      & MenuItem {
-        background: transparent;
-        display: block;
-        padding: 4px 36px;
-        text-align: left;
-        outline: none;
-        color: inherit;
-        cursor: pointer;
-      }
-    }
-  `
-);
+const styles = css`
+  MenuItem, MenuButton {
+    composes: theme-ripple from global;
+  }
+  MenuButton {
+    background: transparent;
+    outline: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+`;
 
 interface Props {
   propertyName?: string;
   values: string[];
   container: HTMLDivElement | null;
+  className?: string;
   onSelect: (value: string) => void;
   onSwitch: (state: boolean) => void;
 }
@@ -70,12 +46,14 @@ export const PropertyValueSelector = observer<Props>(function PropertyValueSelec
   values,
   container,
   children,
+  className,
   onSelect,
   onSwitch,
 }) {
   const menuRef = useRef<HTMLDivElement>(null);
   const menu = useMenuState({
     placement: 'bottom-end',
+    gutter: 4,
   });
   const handleMenuSelect = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -105,11 +83,13 @@ export const PropertyValueSelector = observer<Props>(function PropertyValueSelec
     };
   }, [container]);
 
-  return styled(useStyles(styles))(
+  const visible = menu.visible;
+
+  return styled(useStyles(BASE_DROPDOWN_STYLES, styles))(
     <>
-      <MenuButton {...menu}>{children}</MenuButton>
-      <Menu {...menu} ref={menuRef} aria-label={propertyName} modal>
-        {menu.visible && values.map(value => (
+      <MenuButton {...menu} className={className} visible={visible}>{children}</MenuButton>
+      <Menu {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>
+        {visible && values.map(value => (
           <MenuItem key={value} id={value} type='button' {...menu} onClick={handleMenuSelect}>
             {value}
           </MenuItem>

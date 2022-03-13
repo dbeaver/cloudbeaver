@@ -13,20 +13,14 @@ import { IProperty, PropertiesTable, ErrorMessage } from '@cloudbeaver/core-bloc
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
 
-const styles = composes(
-  css`
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
     PropertiesTable {
       flex: 1;
       overflow: hidden;
@@ -35,12 +29,12 @@ const styles = composes(
       margin: auto;
     }
     ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       position: sticky;
       bottom: 0;
       padding: 8px 24px;
     }
-  `
-);
+  `;
 
 interface Props {
   processor: DataTransferProcessorInfo;

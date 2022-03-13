@@ -14,7 +14,7 @@ import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle,
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
-import { TabPanel } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
 
 import { AuthTokenList } from '../AuthTokens/AuthTokenList';
 
@@ -30,7 +30,7 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
   style,
 }) {
   const userMetaParameters = useDataResource(UserInfoPanel, UserMetaParametersResource, undefined);
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
   return styled(styles)(

@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
@@ -25,19 +25,12 @@ export function elementsTreeLimitRenderer(nodeId: string): NavigationNodeRendere
   return;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     connection-group {
-      composes: theme-text-text-hint-on-light from global;
-    }
-  `,
-  css`
-    connection-group {
-      composes: theme-typography--caption from global;
+      composes: theme-text-text-hint-on-light theme-typography--caption from global;
       padding: 4px 32px;
     }
-  `
-);
+  `;
 
 const ManageableGroup: NavigationNodeRendererComponent = observer(function ManageableGroup() {
   const navTreeResource = useService(NavTreeResource);

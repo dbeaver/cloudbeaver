@@ -14,16 +14,10 @@ import { IconOrImage, Link, Cell, useMapResource, Loader, Button } from '@cloudb
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, UserInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-const styles = composes(
-  css`
-    Cell {
-      composes: theme-border-color-secondary from global;
-    }
-`,
-  css`
+const styles = css`
     container {
       display: flex;
       flex-direction: column;
@@ -33,6 +27,7 @@ const styles = composes(
       overflow: auto;
     }
     Cell {
+      composes: theme-border-color-secondary from global;
       border-bottom: 1px solid;
       padding: 0 16px;
     }
@@ -47,7 +42,7 @@ const styles = composes(
     time {
       composes: theme-typography--caption from global;
     }
-`);
+`;
 
 interface Props {
   user: UserInfo;

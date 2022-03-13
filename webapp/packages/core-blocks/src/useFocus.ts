@@ -61,7 +61,7 @@ export function useFocus<T extends HTMLElement>({
         }
       },
     }),
-    { 
+    {
       focus: observable.ref,
       reference: observable.ref,
     },

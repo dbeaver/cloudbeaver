@@ -14,7 +14,7 @@ import styled, { css } from 'reshadow';
 import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
@@ -27,17 +27,12 @@ import { TablePresentationBar } from './TablePresentationBar/TablePresentationBa
 import { TableToolsPanel } from './TableToolsPanel';
 import { TableViewerStorageService } from './TableViewerStorageService';
 
-const viewerStyles = composes(
-  css`
+const viewerStyles = css`
     pane-content {
       composes: theme-background-surface theme-text-on-surface from global;
     }
     table-viewer {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    table-viewer {
       position: relative;
       flex: 1;
       display: flex;
@@ -91,8 +86,7 @@ const viewerStyles = composes(
       width: 100%;
       height: 100%;
     }
-  `
-);
+  `;
 
 interface Props {
   tableId: string;
@@ -244,7 +238,7 @@ export const TableViewer = observer<Props>(function TableViewer({
   const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
   const valuePanelDisplayed = valuePresentation
   && (valuePresentation.dataFormat === undefined
-    || valuePresentation?.dataFormat === dataFormat)
+    || valuePresentation.dataFormat === dataFormat)
   && overlay
   && resultExist;
 

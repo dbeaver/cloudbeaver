@@ -19,6 +19,7 @@ import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
 import type { ITabsContext } from '../TabsContext';
+import { BASE_TAB_ACTION_STYLES, BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';
@@ -44,7 +45,7 @@ export const Tab = observer<TabProps>(function Tab({
 
   const canClose = getComputed(() => !!onClose || tab.state.closable);
 
-  return styled(useStyles(style))(
+  return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
     <TabContext.Provider value={tabContext}>
       <tab-outer>
         <tab-inner>
@@ -102,7 +103,7 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({
   menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
   menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
-  return styled(useStyles(style))(
+  return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
     <portal {...use({ menuOpened })}>
       <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
         <tab-action>

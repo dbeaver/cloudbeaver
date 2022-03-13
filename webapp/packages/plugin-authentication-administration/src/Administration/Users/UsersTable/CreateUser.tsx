@@ -10,21 +10,15 @@ import styled, { css } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UserForm } from '../UserForm/UserForm';
 
-const styles = composes(
-  css`
-    title-bar {
-      composes: theme-border-color-background from global;
-    }
+const styles = css`
 
     user-create-footer, user-create-content {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-  `,
-  css`
     user-create {
       display: flex;
       flex-direction: column;
@@ -33,7 +27,7 @@ const styles = composes(
     }
 
     title-bar {
-      composes: theme-typography--headline6 from global;
+      composes: theme-border-color-background theme-typography--headline6 from global;
       box-sizing: border-box;
       padding: 16px 24px;
       align-items: center;
@@ -49,8 +43,7 @@ const styles = composes(
       flex: 1;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   user: AdminUserInfo;

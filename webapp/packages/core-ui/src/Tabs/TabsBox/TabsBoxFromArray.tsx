@@ -11,6 +11,7 @@ import styled from 'reshadow';
 
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { BASE_TAB_STYLES } from '../Tab/BASE_TAB_STYLES';
 import { Tab } from '../Tab/Tab';
 import { TabPanel } from '../TabPanel';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -43,7 +44,7 @@ export const TabsBoxFromArray = observer<IProps>(function TabsBoxFromArray({
   className,
   style,
 }) {
-  return styled(useStyles(style))(
+  return styled(useStyles(BASE_TAB_STYLES, style))(
     <TabsBox
       currentTabId={currentTabId}
       tabs={!hideTabs && tabIdList.map(tabId => (
@@ -54,7 +55,7 @@ export const TabsBoxFromArray = observer<IProps>(function TabsBoxFromArray({
       className={className}
       style={style}
     >
-      {tabIdList?.map(tabId => (
+      {tabIdList.map(tabId => (
         <TabPanel key={tabId} tabId={tabId}>
           <PanelData tabId={tabId} />
         </TabPanel>

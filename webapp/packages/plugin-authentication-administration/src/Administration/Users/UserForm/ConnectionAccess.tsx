@@ -16,31 +16,25 @@ import {
   TableItem, TableColumnValue, TableItemSelect, StaticImage,
   TextPlaceholder, ColoredContainer, BASE_CONTAINERS_STYLES, Group
 } from '@cloudbeaver/core-blocks';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
 
-const styles = composes(
-  css`
+const styles = css`
     Table {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    Table {
       width: 100%;
     }
     StaticImage {
       display: flex;
       width: 24px;
     }
-  `
-);
+  `;
 
 export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = observer(function ConnectionAccess({
   controller,

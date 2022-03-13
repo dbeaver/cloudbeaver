@@ -12,7 +12,7 @@ import { useMenuState, Menu, MenuItem, MenuButton } from 'reakit/Menu';
 import styled, { css, use } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -21,16 +21,7 @@ import { IconOrImage } from '../IconOrImage';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
-const styles = composes(
-  css`
-    Menu {
-      composes: theme-text-on-surface theme-background-surface from global;
-    }
-    MenuItem {
-      composes: theme-ripple from global;
-    }
-  `,
-  css`
+const styles = css`
     field input {
       margin: 0;
     }
@@ -57,16 +48,19 @@ const styles = composes(
         opacity: 0.7;
       }
     }
+    MenuItem {
+      composes: theme-ripple from global;
+    }
 
     Menu {
-      composes: theme-typography--caption theme-elevation-z3 from global;
+      composes: theme-text-on-surface theme-background-surface theme-typography--caption theme-elevation-z3 from global;
       display: flex;
       flex-direction: column;
       max-height: 300px;
       overflow: auto;
       outline: none;
       z-index: 999;
-      border-radius: 3px;
+      border-radius: var(--theme-form-element-radius);
 
       & MenuItem {
         background: transparent;
@@ -127,8 +121,7 @@ const styles = composes(
           }
       }
     }
-  `
-);
+  `;
 
 type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
   propertyName?: string;
@@ -321,10 +314,12 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }, [inputRef]);
 
   const icon = selectedItem && iconSelector?.(selectedItem);
+  const focus = menu.visible;
+  const select = !searchable;
 
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles))(
     <field className={className}>
-      {children && <field-label title={title} as='label'>{children}{rest.required && ' *'}</field-label>}
+      {children && <field-label title={title}>{children}{rest.required && ' *'}</field-label>}
       <input-box>
         {icon && (
           <input-icon>
@@ -338,15 +333,17 @@ export const Combobox: ComboboxType = observer(function Combobox({
           title={title}
           value={inputValue}
           disabled={disabled}
-          readOnly={readOnly || !searchable}
+          readOnly={readOnly || select}
+          data-focus={focus}
+          data-select={select}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onClick={handleClick}
           {...rest}
-          {...use({ select: !searchable, focus: menu.visible })}
+          {...use({ select, focus })}
         />
         <MenuButton {...menu} disabled={readOnly || disabled}>
-          <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus: menu.visible })} />
+          <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
         </MenuButton>
         <Menu
           {...menu}

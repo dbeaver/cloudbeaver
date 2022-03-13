@@ -17,18 +17,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
-const styles = composes(
-  css`
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }  
-`,
-  css`
+const styles = css`
     footer-container {
       display: flex;
       width: min-content;
@@ -43,6 +37,7 @@ const styles = composes(
       gap: 24px;
     }
     ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       flex: 1;
     }
     wrapper {
@@ -56,7 +51,7 @@ const styles = composes(
       height: 100%;
       width: 100%;
     }
-`);
+`;
 
 interface Payload {
   generatorId: string;

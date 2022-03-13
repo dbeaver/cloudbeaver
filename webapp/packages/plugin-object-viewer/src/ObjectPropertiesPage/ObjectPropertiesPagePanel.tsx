@@ -9,26 +9,20 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
 
-const viewerStyles = composes(
-  css`
+const viewerStyles = css`
     wrapper {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    wrapper {
       display: flex;
       width: 100%;
       flex: 1 1 auto;
       padding-top: 16px; /* TODO: must be refactored */
     }
-  `
-);
+  `;
 
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({
   tab,

@@ -14,7 +14,7 @@
   @include mdc-button-theme-baseline;
 
   .theme-button {
-    composes: mdc-button;
+    @extend .mdc-button;
     height: 32px;
 
     &[disabled] {
@@ -22,22 +22,22 @@
     }
   }
   .theme-button__label {
-    composes: mdc-button__label;
+    @extend .mdc-button__label;
   }
   .theme-button__icon {
-    composes: mdc-button__icon;
+    @extend .mdc-button__icon;
   }
   .theme-button_ripple {
-    composes: mdc-button__ripple;
+    @extend .mdc-button__ripple;
   }
   .theme-button_raised {
-    composes: mdc-button--raised;
+    @extend .mdc-button--raised;
   }
   .theme-button_unelevated {
-    composes: mdc-button--unelevated;
+    @extend .mdc-button--unelevated;
   }
   .theme-button_outlined {
-    composes: mdc-button--outlined;
+    @extend .mdc-button--outlined;
   }
   .theme-button_secondary {
     @include mdc-button-ink-color(secondary, $query);

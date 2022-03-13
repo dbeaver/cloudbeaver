@@ -7,32 +7,26 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import {
   Table, TableHeader, TableColumnHeader, TableBody, TableSelect
 } from '@cloudbeaver/core-blocks';
 import type { DatabaseConnection } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Connection } from './Connection';
 
-const styles = composes(
-  css`
-    TableItemSeparator {
-      composes: theme-background-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     Table {
       width: 100%;
     }
     TableItemSeparator {
+      composes: theme-background-secondary from global;
       text-align: center;
     }
-  `
-);
+  `;
 
 interface Props {
   connections: DatabaseConnection[];
@@ -49,7 +43,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   const keys = connections.map(connection => connection.id);
 
   return styled(useStyles(styles))(
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
       <TableHeader>
         <TableColumnHeader min flex centerContent>
           <TableSelect />

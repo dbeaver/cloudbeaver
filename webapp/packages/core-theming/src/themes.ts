@@ -8,21 +8,23 @@
 
 import type { ITheme } from './ThemeService';
 
+const emptyTheme = {};
+
 export const themes: ITheme[] = [
   {
     name: 'ui_light_theme',
     id: 'light',
     loader: async () => {
-      const styles = await import('./styles/theme-light.module.scss');
-      return styles.default;
+      const styles = await import('./styles/main/light.theme.scss');
+      return styles.default || emptyTheme;
     },
   },
   {
     name: 'ui_dark_theme',
     id: 'dark',
     loader: async () => {
-      const styles = await import('./styles/theme-dark.module.scss');
-      return styles.default;
+      const styles = await import('./styles/main/dark.theme.scss');
+      return styles.default || emptyTheme;
     },
   },
 ];

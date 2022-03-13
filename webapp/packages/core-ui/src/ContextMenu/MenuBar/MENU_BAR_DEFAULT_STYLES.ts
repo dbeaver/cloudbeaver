@@ -8,30 +8,15 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const MENU_BAR_DEFAULT_STYLES = composes(
-  css`
+export const MENU_BAR_DEFAULT_STYLES = css`
     menu-bar {
-      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-    }
-
-    menu-bar-item {
-      composes: theme-ripple from global;
-    }
-
-    MenuSeparator {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
-    menu-bar {
-      composes: theme-typography--body2 from global;
+      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background theme-typography--body2 from global;
       height: 48px;
       display: flex;
     }
     
     menu-bar-item {
+      composes: theme-ripple from global;
       padding: 0 16px;
       display: flex;
       align-items: center;
@@ -65,9 +50,9 @@ export const MENU_BAR_DEFAULT_STYLES = composes(
     }
 
     MenuSeparator {
+      composes: theme-border-color-background from global;
       height: 100%;
       margin: 0;
-      border: 1px solid;
+      border: 1px solid !important;
     }
-  `
-);
+  `;

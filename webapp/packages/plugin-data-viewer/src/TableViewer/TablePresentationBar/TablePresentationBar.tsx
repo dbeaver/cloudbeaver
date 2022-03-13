@@ -7,33 +7,23 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
-import { use } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
-import { TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
 
-const styles = composes(
-  css`
-    Tab {
-      composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
-    }
-    TabList {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     table-left-bar {
       display: flex;
     }
     Tab {
-      composes: theme-typography--body2 from global;
+      composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
       text-transform: uppercase;
       font-weight: normal;
 
@@ -41,18 +31,20 @@ const styles = composes(
         font-weight: normal !important;
       }
     }
+    TabList {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
     TabList[|flexible] tab-outer:only-child {
       display: none;
     }
-  `
-);
+  `;
 
 interface Props {
   type: DataPresentationType;
   presentationId: string | null | undefined;
   dataFormat: ResultDataFormat;
   supportedDataFormat: ResultDataFormat[];
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
   className?: string;
   onPresentationChange: (id: string) => void;
@@ -70,7 +62,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   onPresentationChange,
   onClose,
 }) {
-  const style = useStyles(styles, verticalRotatedTabStyles);
+  const style = useStyles(styles, BASE_TAB_STYLES, verticalRotatedTabStyles);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(
     type,

@@ -11,29 +11,17 @@ import styled, { css, use } from 'reshadow';
 
 import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader
-} from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { CreateMetaParameter } from './CreateMetaParameter';
 import { CreateMetaParameterService } from './CreateMetaParameterService';
 import { MetadataParam } from './MetadataParam';
 import { MetaParametersController } from './MetaParametersController';
 
-const layoutStyles = composes(
-  css`
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-
-    layout-grid-cell {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
+const layoutStyles = css`
     layout-grid {
       width: 100%;
       overflow: auto;
@@ -44,11 +32,11 @@ const layoutStyles = composes(
     }
 
     layout-grid-cell {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
       position: relative;
       border: solid 1px;
     }
-  `
-);
+  `;
 
 const styles = css`
   Table {
@@ -69,10 +57,10 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
   const keys = userMetaParametersResource.data.map(metadata => metadata.id);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
 
-  return styled(useStyles(styles, layoutStyles))(
+  return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, layoutStyles))(
     <layout-grid>
       <layout-grid-inner>
-        <layout-grid-cell {...use({ span: 12 })}>
+        <layout-grid-cell data-span='12'>
           <ToolsPanel>
             {isLocalProviderAvailable && (
               <ToolsAction
@@ -108,19 +96,19 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
         </layout-grid-cell>
 
         {param === 'create' && createMetaParameterService.user && (
-          <layout-grid-cell {...use({ span: 12 })}>
+          <layout-grid-cell data-span='12'>
             <CreateMetaParameter
               user={createMetaParameterService.user}
               onCancel={createMetaParameterService.cancelCreate}
             />
           </layout-grid-cell>
         )}
-        <layout-grid-cell {...use({ span: 12 })}>
+        <layout-grid-cell data-span='12'>
           <Table
             keys={keys}
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
-            {...use({ size: 'big' })}
+            size='big'
           >
             <TableHeader>
               {isLocalProviderAvailable && (

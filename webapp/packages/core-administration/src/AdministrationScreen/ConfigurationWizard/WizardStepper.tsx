@@ -12,21 +12,13 @@ import styled, { css } from 'reshadow';
 import { Button } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConfigurationWizardService } from './ConfigurationWizardService';
 
-const styles = composes(
-  css`
+const styles = css`
     wizard-stepper {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    }
-    actions {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
-    wizard-stepper {
       position: sticky;
       top: 0;
       height: 48px;
@@ -39,10 +31,9 @@ const styles = composes(
     }
 
     actions {
+      composes: theme-border-color-background from global;
       border-right: solid 1px;
-    }
 
-    actions {
       & Button {
         margin-right: 16px;
       }
@@ -57,8 +48,7 @@ const styles = composes(
     wizard-text {
       padding: 0 16px;
     }
-  `
-);
+  `;
 
 export const WizardStepper = observer(function WizardStepper() {
   const service = useService(ConfigurationWizardService);

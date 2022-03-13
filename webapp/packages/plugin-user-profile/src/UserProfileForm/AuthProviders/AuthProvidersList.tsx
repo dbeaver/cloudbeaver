@@ -13,15 +13,9 @@ import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { IconOrImage, Link, Cell, useMapResource, Loader, getComputed } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList, UserInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
-    Cell {
-      composes: theme-border-color-secondary from global;
-    }
-`,
-  css`
+const styles = css`
     container {
       display: flex;
       flex-direction: column;
@@ -31,6 +25,7 @@ const styles = composes(
       overflow: auto;
     }
     Cell {
+      composes: theme-border-color-secondary from global;
       border-bottom: 1px solid;
       padding: 0 16px;
     }
@@ -42,7 +37,7 @@ const styles = composes(
       width: 24px;
       height: 24px;
     }
-`);
+`;
 
 interface Props {
   user: UserInfo;

@@ -27,20 +27,17 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';
 
-const styles = composes(
-  css`
+const styles = css`
     Table {
       composes: theme-background-surface theme-text-on-surface from global;
     }
-  `,
-  css`
     Group {
       position: relative;
     }
@@ -58,8 +55,7 @@ const styles = composes(
     GrantedUsersTableHeader {
       flex: 0 0 auto;
     }
-  `
-);
+  `;
 
 interface Props {
   userList: AdminUserInfoFragment[];

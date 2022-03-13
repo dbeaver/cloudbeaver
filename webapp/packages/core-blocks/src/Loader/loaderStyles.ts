@@ -8,8 +8,6 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
 export const loaderStyles = css`
   loader {
     margin: auto;
@@ -84,14 +82,9 @@ export const loaderStyles = css`
     }
   }
 `;
-export const overlayStyles = composes(
-  css`
+export const overlayStyles = css`
     loader {
       composes: theme-text-on-primary from global;
-    }
-  `,
-  css`
-    loader {
       position: absolute;
       top: 0;
       left: 0;
@@ -99,5 +92,4 @@ export const overlayStyles = composes(
       height: 100%;
       background-color: rgba(0, 0, 0, 0.4);
     }
-  `
-);
+  `;

@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { css } from 'reshadow';
 
 import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
-import { composes } from '@cloudbeaver/core-theming';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -19,21 +18,9 @@ import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX } from './DAT
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
-const TABLE_HEADER_MENU_BAR_STYLES = composes(
-  css`
+const TABLE_HEADER_MENU_BAR_STYLES = css`
     menu-bar {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-    }
-    menu-bar-item {
-      composes: theme-ripple from global;
-    }
-    MenuSeparator {
-      composes: theme-border-color-background from global;
-    }
-`,
-  css`
-    menu-bar {
-      composes: theme-typography--body2 from global;
+      composes: theme-border-color-background theme-background-surface theme-text-on-surface theme-typography--body2 from global;
       display: flex;
       margin-left: 8px;
       box-sizing: border-box;
@@ -42,6 +29,7 @@ const TABLE_HEADER_MENU_BAR_STYLES = composes(
     }
 
     menu-bar-item {
+      composes: theme-ripple from global;
       padding: 4px;
       display: flex;
       align-items: center;
@@ -75,13 +63,13 @@ const TABLE_HEADER_MENU_BAR_STYLES = composes(
     }
     
     MenuSeparator {
+      composes: theme-border-color-background from global;
       height: 100%;
       margin: 0;
-      border: 0;
-      border-right: 1px solid;
+      border: 0 !important;
+      border-right: 1px solid !important;
     }
-  `
-);
+  `;
 
 export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({
   model,

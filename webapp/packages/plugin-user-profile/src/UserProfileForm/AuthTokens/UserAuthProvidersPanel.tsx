@@ -9,12 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { TabPanel } from '@cloudbeaver/core-ui';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
 
-import { AuthProvidersList } from './ConfigurationsList';
+import { AuthProvidersList } from '../AuthProviders/AuthProvidersList';
 
 interface Props {
   user: UserInfo;
@@ -27,7 +27,7 @@ export const UserAuthProviderPanel = observer<Props>(function UserAuthProviderPa
   className,
   style,
 }) {
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
 
   return styled(styles)(
     <TabPanel tabId='auth-providers' className={className}>

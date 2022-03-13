@@ -15,27 +15,21 @@ import {
   TableContext
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UserForm } from '../UserForm/UserForm';
 import { UserEditController } from './UserEditController';
 
-const styles = composes(
-  css`
+const styles = css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    box {
       box-sizing: border-box;
       padding-bottom: 24px;
       height: 520px;
       display: flex;
       flex-direction: column;
     }
-  `
-);
+  `;
 
 interface Props {
   item: string;

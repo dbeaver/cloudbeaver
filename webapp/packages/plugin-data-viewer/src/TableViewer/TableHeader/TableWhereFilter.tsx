@@ -12,24 +12,18 @@ import styled, { css } from 'reshadow';
 import { InlineEditor } from '@cloudbeaver/core-app';
 import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 import { useWhereFilter } from './useWhereFilter';
 
-const styles = composes(
-  css`
+const styles = css`
     InlineEditor {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    InlineEditor {
       flex: 1;
       height: 24px;
     }
-  `
-);
+  `;
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({
   model,

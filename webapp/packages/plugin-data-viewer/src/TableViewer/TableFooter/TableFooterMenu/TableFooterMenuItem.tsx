@@ -13,23 +13,18 @@ import styled, { css, use } from 'reshadow';
 import { IconOrImage, ToolsAction } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;
 };
 
-export const tableFooterMenuStyles = composes(
-  css`
+export const tableFooterMenuStyles = css`
     Menu {
       composes: theme-text-on-surface from global;
     }
     MenuTrigger {
       composes: theme-ripple from global;
-    }
-  `,
-  css`
-    MenuTrigger {
       height: 100%;
       padding: 0 16px;
       display: flex;
@@ -52,8 +47,7 @@ export const tableFooterMenuStyles = composes(
     menu-trigger-icon + menu-trigger-title {
       padding-left: 8px;
     }
-  `
-);
+  `;
 
 export const TableFooterMenuItem = observer<Props>(function TableFooterMenuItem({
   menuItem,

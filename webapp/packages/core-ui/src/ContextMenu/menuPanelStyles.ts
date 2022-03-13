@@ -8,10 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const menuPanelStyles = composes(
-  css`
+export const menuPanelStyles = css`
     menu-box {
       composes: theme-background-surface theme-text-on-surface from global;
     }
@@ -25,8 +22,6 @@ export const menuPanelStyles = composes(
     menu-panel-item, MenuSeparator {
       composes: theme-border-color-background from global;
     }
-  `,
-  css`
     MenuButton {
       background: none;
       border: none;
@@ -91,8 +86,8 @@ export const menuPanelStyles = composes(
       width: 100%;
       display: flex;
       margin: 4px 0;
-      border: none;
-      border-bottom: 1px solid;
+      border: none !important;
+      border-bottom: 1px solid !important;
     }
 
     menu-item-binding {
@@ -141,5 +136,4 @@ export const menuPanelStyles = composes(
         width: 16px;
       }
     }
-  `
-);
+  `;

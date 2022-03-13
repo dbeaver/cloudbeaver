@@ -13,27 +13,21 @@ import styled, { css } from 'reshadow';
 import { RolesResource } from '@cloudbeaver/core-authentication';
 import { TableContext } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { RoleForm } from '../RoleForm';
 import { useRoleFormState } from '../useRoleFormState';
 
-const styles = composes(
-  css`
+const styles = css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    box {
       box-sizing: border-box;
       padding-bottom: 24px;
       display: flex;
       flex-direction: column;
       height: 664px;
     }
-  `
-);
+  `;
 
 interface Props {
   item: string;

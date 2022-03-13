@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, Link } from '@cloudbeaver/core-blocks';
+import { BASE_TABLE_STYLES, IconOrImage, Link } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -80,7 +80,7 @@ export const LogEntry = observer<Props>(function LogEntry({
       break;
   }
 
-  return styled(useStyles(style))(
+  return styled(useStyles(BASE_TABLE_STYLES, style))(
     <tr className={className} {...use({ selected })}>
       <td title={item.type}><icon-box>{icon && <IconOrImage icon={icon} />}</icon-box></td>
       <td>{item.time}</td>

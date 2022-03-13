@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 
 interface Props {
   colSpan?: number;
@@ -25,7 +25,7 @@ export const TableItemSeparator = observer<Props>(function TableItemSeparator({
   onClick,
   onDoubleClick,
 }) {
-  return styled(useStyles())(
+  return styled(BASE_TABLE_STYLES)(
     <tr {...use({ noHover: true })} className={className} onClick={onClick} onDoubleClick={onDoubleClick}>
       <td colSpan={colSpan} {...use({ expandArea: true })}>
         {children}

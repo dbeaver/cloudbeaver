@@ -47,16 +47,19 @@ module.exports = (env, argv) => {
     return loaders
   }
 
-  function generateStyleLoaders (options = { hasModule: false }) {
+  function generateStyleLoaders (options = { hasModule: false, disable: false }) {
     const moduleScope = options.hasModule ? 'local' : 'global'
-    const modules = {
+    let modules = {
       mode: moduleScope,
       localIdentName: '[local]___[hash:base64:5]',
     }
 
+    if(options.disable) {
+      modules = false;
+    }
+
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
-      // require('postcss-discard-comments'),
       require('@reshadow/postcss')({ scopeBehaviour: moduleScope }),
     ]
 
@@ -153,7 +156,11 @@ module.exports = (env, argv) => {
               ],
             },
             {
-              use: generateStyleLoaders({ hasModule: false }),
+              test: /\.(theme|pure)\.(css|s[ac]ss)$/,
+              use: generateStyleLoaders({ disable: true }),
+            },
+            {
+              use: generateStyleLoaders(),
             },
           ],
         },
@@ -185,6 +192,15 @@ module.exports = (env, argv) => {
         filename: devMode ? '[name].css' : '[name].[contenthash].css',
         chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
         ignoreOrder: false, // Enable to remove warnings about conflicting order
+        insert: linkTag => {
+          let reshadowObj = document.getElementById('__reshadow__');
+
+          if(reshadowObj) {
+            document.head.insertBefore(linkTag, reshadowObj);
+          } else { 
+            document.head.appendChild(linkTag)
+          }
+        }
       }),
     ],
   }

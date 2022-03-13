@@ -109,7 +109,6 @@ export const Textarea: TextareaType = observer(function Textarea({
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
     <field className={className} {...use({ tiny, small, medium, large, embedded })}>
       <field-label
-        as='label'
         title={labelTooltip || rest.title}
       >
         {children}{required && ' *'}

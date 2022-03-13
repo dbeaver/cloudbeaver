@@ -15,22 +15,17 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NestedNode } from './NestedNode';
 import { useExecutionPlanTreeState } from './useExecutionPlanTreeState';
 
-const styles = composes(
-  css`
+const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
     }
     TableHeader {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    TableHeader {
       position: sticky;
       top: 0;
       z-index: 1;
@@ -49,8 +44,7 @@ const styles = composes(
     Textarea > :global(textarea) {
       border: none !important;
     }
-  `
-);
+  `;
 
 interface Props {
   nodeList: SqlExecutionPlanNode[];

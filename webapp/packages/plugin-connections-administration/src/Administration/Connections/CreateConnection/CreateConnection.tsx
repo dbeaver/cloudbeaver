@@ -9,35 +9,21 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList } from '@cloudbeaver/core-ui';
 import { IconButton, Loader, StaticImage, Icon, useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { ConnectionForm } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
 
-const styles = composes(
-  css`
+const styles = css`
     title-bar {
       composes: theme-border-color-background from global;
     }
 
-    Tab {
-      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
-
-    TabList {
-      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    }
-
-    connection-create-content {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
     connection-create {
       display: flex;
       flex-direction: column;
@@ -46,6 +32,7 @@ const styles = composes(
     }
 
     connection-create-content {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -54,12 +41,14 @@ const styles = composes(
     }
 
     Tab {
+      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
       height: 46px!important;
       text-transform: uppercase;
       font-weight: 500 !important;
     }
 
     TabList {
+      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
       border-top: solid 1px;
       position: relative;
       flex-shrink: 0;
@@ -118,10 +107,9 @@ const styles = composes(
         width: 16px;
       }
     }
-  `
-);
+  `;
 
-const componentStyle = [styles, UNDERLINE_TAB_STYLES];
+const componentStyle = [BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES];
 
 interface Props {
   method: string | null | undefined;

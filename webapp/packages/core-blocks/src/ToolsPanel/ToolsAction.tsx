@@ -9,18 +9,13 @@
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../IconOrImage';
 
-const styles = composes(
-  css`
+const styles = css`
     button {
       composes: theme-ripple from global;
-    }
-  `,
-  css`
-    button {
       padding: 0 16px;
       display: flex;
       align-items: center;
@@ -41,8 +36,7 @@ const styles = composes(
     IconOrImage + button-label {
       padding-left: 8px
     }
-  `
-);
+  `;
 
 interface Props extends ButtonHTMLAttributes<any> {
   icon?: string;

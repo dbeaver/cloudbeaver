@@ -9,18 +9,13 @@
 import { useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../../IconButton';
 
-const SNACKBAR_WRAPPER_STYLES = composes(
-  css`
+const SNACKBAR_WRAPPER_STYLES = css` 
   notification {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }`,
-  css` 
-  notification {
-    composes: theme-elevation-z5 from global;
+    composes: theme-background-surface theme-text-on-surface theme-elevation-z5 from global;
     position: relative;
     display: flex;
     box-sizing: border-box;
@@ -52,8 +47,7 @@ const SNACKBAR_WRAPPER_STYLES = composes(
     &:hover {
       opacity: 0.7;
     }
-  }`
-);
+  }`;
 
 interface ISnackbarWrapperProps {
   closing?: boolean;

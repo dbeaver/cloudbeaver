@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { IconButton } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
@@ -26,20 +26,12 @@ import { ElementsTreeFilter } from './ElementsTreeFilter';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 
-const toolsStyles = composes(
-  css`
-    IconButton {
-      composes: /*theme-text-primary*/ theme-ripple from global;
-    }
+const toolsStyles = css`
     [|primary] {
       composes: theme-text-primary from global;
     }
     tools {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    tools {
       display: block;
       position: sticky;
       top: 0;
@@ -53,11 +45,11 @@ const toolsStyles = composes(
       flex: 1;
     }
     IconButton {
+      composes: theme-form-element-radius theme-ripple from global;
       padding: 4px;
       margin: 2px;
       width: 24px;
       height: 24px;
-      border-radius: 3px;
       overflow: hidden;
 
       & Icon, & StaticImage {
@@ -68,8 +60,7 @@ const toolsStyles = composes(
         transform: rotate(180deg);
       }
     }
-  `
-);
+  `;
 
 interface Props {
   tree: IElementsTree;

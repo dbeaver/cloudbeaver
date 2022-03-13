@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { MetaParameters } from './MetaParameters/MetaParameters';
 import { RolesPage } from './Roles/RolesPage';
@@ -45,7 +45,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
 
-  const tabStyle = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES, tabStyle);
 
   function openSub({ tabId }: ITabData) {

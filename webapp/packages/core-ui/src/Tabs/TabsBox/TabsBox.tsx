@@ -7,12 +7,39 @@
  */
 
 import { PropsWithChildren, ReactNode, forwardRef } from 'react';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { TabsState } from '../TabsState';
+
+const styles = css`
+  tabs-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  tabs {
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 auto;
+    overflow: auto;
+  }
+  tab-panels {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  tab-panel {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    outline: none;
+    position: relative;
+  }
+`;
 
 type TabsBoxProps = PropsWithChildren<{
   currentTabId: string;
@@ -36,8 +63,13 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
   className,
   style,
 }, ref) {
-  return styled(useStyles(style))(
-    <TabsState currentTabId={currentTabId} localState={localState} tabList={tabList} enabledBaseActions={enabledBaseActions}>
+  return styled(styles, useStyles(style))(
+    <TabsState
+      currentTabId={currentTabId}
+      localState={localState}
+      tabList={tabList}
+      enabledBaseActions={enabledBaseActions}
+    >
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && <tabs>{tabs}</tabs>}
         <tab-panels>

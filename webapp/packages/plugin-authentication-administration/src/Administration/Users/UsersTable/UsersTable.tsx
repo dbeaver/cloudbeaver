@@ -11,11 +11,11 @@ import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel, Loader } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { filterUndefined } from '@cloudbeaver/core-utils';
 
 import { CreateUser } from './CreateUser';
@@ -23,17 +23,7 @@ import { CreateUserService } from './CreateUserService';
 import { User } from './User';
 import { UsersTableController } from './UsersTableController';
 
-const layoutStyles = composes(
-  css`
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-
-    layout-grid-cell {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
+const layoutStyles = css`
     layout-grid {
       width: 100%;
       overflow: auto;
@@ -44,11 +34,11 @@ const layoutStyles = composes(
     }
 
     layout-grid-cell {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
       position: relative;
       border: solid 1px;
     }
-  `
-);
+  `;
 
 const loaderStyle = css`
   ExceptionMessage {
@@ -77,7 +67,7 @@ interface Props {
 
 export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, layoutStyles);
+  const style = useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES, layoutStyles);
   const createUserService = useService(CreateUserService);
   const controller = useController(UsersTableController);
   const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
@@ -100,7 +90,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   return styled(style)(
     <layout-grid>
       <layout-grid-inner>
-        <layout-grid-cell {...use({ span: 12 })}>
+        <layout-grid-cell data-span='12'>
           <ToolsPanel>
             {isLocalProviderAvailable && (
               <ToolsAction
@@ -136,17 +126,17 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
         </layout-grid-cell>
 
         {create && createUserService.user && (
-          <layout-grid-cell {...use({ span: 12 })}>
+          <layout-grid-cell data-span='12'>
             <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
           </layout-grid-cell>
         )}
-        <layout-grid-cell {...use({ span: 12, table: true })}>
+        <layout-grid-cell data-span='12' {...use({ table: true })}>
           <Loader style={loaderStyle} state={usersResource} overlay>
             <Table
-            keys={keys}
-            selectedItems={controller.selectedItems}
-            expandedItems={controller.expandedItems}
-            {...use({ size: 'big' })}
+              keys={keys}
+              selectedItems={controller.selectedItems}
+              expandedItems={controller.expandedItems}
+              size='big'
             >
               <TableHeader>
                 {isLocalProviderAvailable && (

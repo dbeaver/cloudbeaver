@@ -10,32 +10,20 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 
-const styles = composes(
-  css`
-    Tab {
-      composes: theme-ripple from global;
-    }
-    TabList {
-      composes: theme-border-color-background from global;
-    }
-    TabList, TabPanel {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     table-left-bar {
       display: flex;
     }
     Tab {
-      composes: theme-typography--body2 from global;
+      composes: theme-ripple from theme-typography--body2 from global;
       text-transform: uppercase;
       font-weight: normal;
 
@@ -44,6 +32,7 @@ const styles = composes(
       }
     }
     TabList {
+      composes: theme-border-color-background from global;
       position: relative;
       
       &:before {
@@ -61,8 +50,10 @@ const styles = composes(
     TabPanel {
       padding: 16px;
     }
-  `
-);
+    TabList, TabPanel {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+  `;
 
 export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({
   dataFormat,
@@ -83,7 +74,7 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
     }
   }
 
-  return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
+  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES))(
     <TabsState
       currentTabId={currentTabId}
       container={service.tabs}
@@ -93,8 +84,8 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
       lazy
       onChange={tab => setCurrentTabId(tab.tabId)}
     >
-      <TabList style={[styles, UNDERLINE_TAB_STYLES]} />
-      <TabPanelList style={[styles, UNDERLINE_TAB_STYLES]} />
+      <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
+      <TabPanelList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
     </TabsState>
   );
 });

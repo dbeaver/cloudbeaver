@@ -19,6 +19,9 @@ export class Composes {
   }
 }
 
+/**
+ * @deprecated Not needed anymore
+ */
 export function composes(composes: ClassCollection, styles?: ClassCollection) {
   return new Composes(composes, styles);
 }
@@ -46,7 +49,7 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
         const classnames: string[] = [];
 
         while (classes.length > 0) {
-          const classname = classes.shift() as string;
+          const classname = classes.shift()!;
 
           for (let i = styles.length - 1; i >= 0; i--) {
             const test = styles[i][classname];
