@@ -10,7 +10,7 @@ import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBDatabase;
 import io.cloudbeaver.server.CBDatabaseConfig;
-import org.jkiss.code.NotNull;
+import io.cloudbeaver.service.security.internal.CBSecurityController;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAdminController;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security;
+package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBDatabase;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSession> {
+public class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSession> {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
@@ -58,7 +58,7 @@ class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSes
 
     private final CBDatabase database;
 
-    CBSecurityController(CBDatabase database) {
+    public CBSecurityController(CBDatabase database) {
         this.database = database;
     }
 
@@ -964,7 +964,7 @@ class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSes
     ///////////////////////////////////////////
     // Utils
 
-    void initializeMetaInformation() throws DBCException {
+    public void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 Set<String> registeredProviders = new HashSet<>();

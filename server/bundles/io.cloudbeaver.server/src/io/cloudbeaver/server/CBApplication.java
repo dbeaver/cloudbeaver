@@ -113,7 +113,6 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
-    private CBDatabase database;
     private SMAdminController<WebUser, WebRole, WebSession> securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
