@@ -27,7 +27,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
-    return this.source.results.length < 2;
+    return this.source.constraintsAvailable && this.source.results.length < 2;
   }
 
   get orderConstraints(): SqlDataFilterConstraint[] {

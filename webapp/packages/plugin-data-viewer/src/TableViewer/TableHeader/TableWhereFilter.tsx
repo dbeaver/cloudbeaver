@@ -36,7 +36,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
     <InlineEditor
       name="data_where"
       value={state.filter}
-      placeholder={translate('table_header_sql_expression')}
+      placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
       controlsPosition='inside'
       edited={!!state.filter}
       disableSave={!state.applicableFilter}

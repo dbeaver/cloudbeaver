@@ -108,7 +108,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
 
           model = dataViewerTableService.create(
             connectionInfo,
-            this.tab.handlerState.objectId
+            node
           );
           this.tab.handlerState.tableId = model.id;
           dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);

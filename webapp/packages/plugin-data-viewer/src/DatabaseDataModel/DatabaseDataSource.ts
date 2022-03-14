@@ -22,6 +22,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
+  constraintsAvailable: boolean;
   actions: IDatabaseDataActions<TOptions, TResult>;
   results: TResult[];
   offset: number;
@@ -49,6 +50,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.prevOptions = null;
     this.options = null;
     this.disabled = false;
+    this.constraintsAvailable = true;
     this.activeRequest = null;
     this.activeSave = null;
     this.activeTask = null;
@@ -77,6 +79,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       error: observable.ref,
       executionContext: observable,
       disabled: observable,
+      constraintsAvailable: observable.ref,
       activeRequest: observable.ref,
       activeSave: observable.ref,
       activeTask: observable.ref,
@@ -213,6 +216,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     if (!this.supportedDataFormats.includes(this.dataFormat)) {
       this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
     }
+    return this;
+  }
+
+  setConstraintsAvailable(value: boolean) {
+    this.constraintsAvailable = value;
     return this;
   }
 

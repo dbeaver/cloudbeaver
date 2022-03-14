@@ -1,5 +1,6 @@
 export default [
   ['table_header_sql_expression', 'Enter a SQL expression to filter results'],
+  ['table_header_sql_expression_not_supported', 'Data filter is not supported'],
   ['data_viewer_tab_title', 'Data'],
   ['data_viewer_value_edit', 'Edit'],
   ['data_viewer_value_apply', 'Apply'],

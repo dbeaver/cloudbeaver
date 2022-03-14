@@ -29,6 +29,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
+  readonly constraintsAvailable: boolean;
   readonly actions: IDatabaseDataActions<TOptions, TResult>;
   readonly results: TResult[];
   readonly offset: number;
