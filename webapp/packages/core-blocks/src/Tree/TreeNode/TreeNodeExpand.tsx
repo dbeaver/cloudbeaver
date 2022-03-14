@@ -44,31 +44,27 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     throw new Error('Context not provided');
   }
 
-  if (context.externalExpanded || context.disabled) {
-    disabled = true;
-  }
+  disabled = getComputed(() => context.externalExpanded || context.disabled || disabled);
+  leaf = getComputed(() => context.leaf || leaf);
+  const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
+  const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
-  leaf = context.leaf || leaf;
-
-  const handleExpand = async (event: React.MouseEvent<HTMLDivElement>) => {
+  async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
     if (!leaf && !disabled) {
       await context.expand();
     }
-  };
-
-  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  }
+  function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
-  };
-
-  const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
+  }
 
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
-      {!loading && (!leaf || context.externalExpanded) && (
-        big 
+      {expandable && (
+        big
           ? <Icon name="angle" viewBox="0 0 15 8" />
           : <Icon name="arrow" viewBox="0 0 16 16" />
       )}

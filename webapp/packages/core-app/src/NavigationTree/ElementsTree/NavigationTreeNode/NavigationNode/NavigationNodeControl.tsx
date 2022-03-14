@@ -7,13 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { EObjectFeature } from '../../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
@@ -66,6 +65,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
     || !!navTreeResource.getException(node.id)
   ));
   const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
+  const selected = getComputed(() => treeNodeContext.selected);
 
   const [editing, setEditing] = useState(false);
 
@@ -86,11 +86,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
     treeNodeContext.select();
   }
 
-  const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
     treeNodeContext.select(event.ctrlKey || event.metaKey);
-  }, [treeNodeContext]);
+  }
 
-  return styled(useStyles(TREE_NODE_STYLES, styles))(
+  return styled(TREE_NODE_STYLES, styles)(
     <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={icon}>
@@ -101,7 +101,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
       </TreeNodeName>
       {!editing && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={treeNodeContext.selected} />
+          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

@@ -59,7 +59,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   readonly translate = <T extends TLocalizationToken | undefined>(
-    token: T, 
+    token: T,
     fallback?: T,
     args: Record<string | number, any> = {}
   ): T => {
@@ -79,7 +79,7 @@ export class LocalizationService extends Bootstrap {
 
     if (typeof translation === 'string') {
       return Object.entries(args).reduce<string>(
-        (translation, [key, value]) => translation.replace(`{args.${key}}`, value), 
+        (translation, [key, value]) => translation.replace(`{args.${key}}`, value),
         translation
       ) as T;
     }
@@ -168,7 +168,7 @@ export class LocalizationService extends Bootstrap {
         }
       }
       this.localeMap.set(
-        localeKey, 
+        localeKey,
         locale
       );
     } catch (error) {

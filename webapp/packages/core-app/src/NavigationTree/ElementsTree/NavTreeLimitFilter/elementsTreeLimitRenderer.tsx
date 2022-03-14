@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
@@ -34,5 +33,5 @@ const styles = css`
 
 const ManageableGroup: NavigationNodeRendererComponent = observer(function ManageableGroup() {
   const navTreeResource = useService(NavTreeResource);
-  return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_limited' limit={navTreeResource.childrenLimit} /></connection-group>);
+  return styled(styles)(<connection-group><Translate token='app_navigationTree_limited' limit={navTreeResource.childrenLimit} /></connection-group>);
 });

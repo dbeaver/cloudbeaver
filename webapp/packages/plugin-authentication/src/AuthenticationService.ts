@@ -149,7 +149,7 @@ export class AuthenticationService extends Bootstrap {
     // this.sessionDataResource.beforeLoad.addHandler(
     //   ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
     // );
-    this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
+    this.sessionDataResource.onDataUpdate.addPostHandler(() => { this.requireAuthentication(); });
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
     this.administrationScreenService.ensurePermissions.addHandler(async () => {

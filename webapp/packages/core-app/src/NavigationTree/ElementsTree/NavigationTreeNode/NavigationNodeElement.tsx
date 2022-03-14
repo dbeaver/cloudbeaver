@@ -12,7 +12,6 @@ import styled from 'reshadow';
 
 import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { ElementsTreeContext } from '../ElementsTreeContext';
@@ -26,7 +25,6 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
 }) {
   const context = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const styles = useStyles(TREE_NODE_STYLES);
 
   if (context?.tree.renderers) {
     for (const renderer of context.tree.renderers) {
@@ -41,7 +39,7 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
-    return styled(styles)(<TreeNodeNestedMessage>Node not found</TreeNodeNestedMessage>);
+    return styled(TREE_NODE_STYLES)(<TreeNodeNestedMessage>Node not found</TreeNodeNestedMessage>);
   }
 
   // TODO: after node update reference can be lost and NavigationNode skip update

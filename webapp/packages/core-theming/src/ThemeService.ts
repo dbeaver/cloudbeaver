@@ -18,6 +18,7 @@ import './styles/main/color.pure.scss';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
@@ -63,6 +64,8 @@ export class ThemeService extends Bootstrap {
     return theme;
   }
 
+  readonly onThemeChange: ISyncExecutor<ITheme>;
+
   private readonly themeMap: Map<string, ITheme> = new Map();
   private readonly settings: ISettings = {
     currentThemeId: defaultThemeSettings.defaultTheme,
@@ -76,6 +79,7 @@ export class ThemeService extends Bootstrap {
   ) {
     super();
 
+    this.onThemeChange = new SyncExecutor();
     this.userInfoResource.onDataUpdate.addHandler(() => {
       const theme = this.userInfoResource.getConfigurationParameter(THEME_KEY);
       if (theme && theme !== this.currentThemeId) {
@@ -136,6 +140,7 @@ export class ThemeService extends Bootstrap {
 
   private setCurrentThemeId(themeId: string) {
     this.settings.currentThemeId = themeId;
+    this.onThemeChange.execute(this.currentTheme);
   }
 
   private loadAllThemes(): void {

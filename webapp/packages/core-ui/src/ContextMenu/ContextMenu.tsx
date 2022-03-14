@@ -8,9 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { ButtonHTMLAttributes, useCallback, useEffect } from 'react';
-import {
-  MenuButton, MenuInitialState, useMenuState
-} from 'reakit/Menu';
+import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
 import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -55,15 +53,15 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
 }, ref) {
   const menuService = useService(MenuService);
 
-  const handler = menuService.getHandler(menuData.context);
-  const hidden = handler?.isHidden?.(menuData.context) || false;
-  const loading = handler?.isLoading?.(menuData.context) || false;
+  const handler = getComputed(() => menuService.getHandler(menuData.context));
+  const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
+  const loading = getComputed(() => handler?.isLoading?.(menuData.context) || false);
   const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
+  const lazy = getComputed(() => !menuData.available || hidden);
 
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
-  const lazy = getComputed(() => !menuData.available || hidden);
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -82,7 +80,9 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
   }
 
   // TODO: fix type error
-  const renderingChildren: React.ReactNode  = typeof children === 'function' ? (children as any)({ loading, disabled }) : children;
+  const renderingChildren: React.ReactNode  = typeof children === 'function'
+    ? (children as any)({ loading, disabled })
+    : children;
 
   if (React.isValidElement(renderingChildren) && disclosure) {
     return styled(styles)(

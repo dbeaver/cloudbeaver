@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { action, observable } from 'mobx';
+import { useEffect } from 'react';
 
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
@@ -21,6 +21,7 @@ interface FocusOptions {
 interface IState<T extends HTMLElement> {
   focus: boolean;
   reference: T | null;
+  updateFocus: (ref: T | null) => void;
   focusFirstChild: () => void;
 }
 
@@ -30,10 +31,16 @@ export function useFocus<T extends HTMLElement>({
   onBlur,
 }: FocusOptions): [(obj: T | null) => void, IState<T>] {
   const handlersRef = useObjectRef({ onFocus, onBlur });
-  const [reference, setRef] = useState<T | null>(null);
   const state = useObservableRef<IState<T>>(
     () => ({
+      reference: null,
       focus: false,
+      updateFocus(ref: T | null) {
+        if (this.reference !== ref) {
+          this.reference = ref;
+          this.focusFirstChild();
+        }
+      },
       focusFirstChild() {
         if (this.reference !== null && focusFirstChild) {
           const firstFocusable = this.reference
@@ -64,19 +71,16 @@ export function useFocus<T extends HTMLElement>({
     {
       focus: observable.ref,
       reference: observable.ref,
+      updateFocus: action.bound,
     },
-    {
-      reference,
-    },
+    false,
     undefined,
     'useFocus'
   );
 
-  useLayoutEffect(() => {
-    state.focusFirstChild();
-  }, [focusFirstChild, reference]);
-
   useEffect(() => {
+    const reference = state.reference;
+
     if (!reference) {
       return;
     }
@@ -104,7 +108,7 @@ export function useFocus<T extends HTMLElement>({
       reference.removeEventListener('focusin', focusHandler);
       reference.removeEventListener('focusout', blurHandler);
     };
-  }, [reference]);
+  }, [state.reference]);
 
-  return [setRef, state];
+  return [state.updateFocus, state];
 }

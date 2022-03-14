@@ -15,6 +15,7 @@ console.warn = (...args) => {
 
 module.exports = {
   compact: !devMode,
+  retainLines: devMode,
   assumptions: {
     setPublicClassFields: true, // defines properties in extending classes via Object.defineProperty
     setSpreadProperties: true

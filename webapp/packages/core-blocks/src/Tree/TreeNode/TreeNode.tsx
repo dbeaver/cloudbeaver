@@ -10,8 +10,7 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
+import { getComputed } from '../../getComputed';
 import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
 import type { ITreeNodeState } from './ITreeNodeState';
@@ -100,8 +99,10 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
     leaf,
   });
 
-  return styled(useStyles(TREE_NODE_STYLES))(
-    <node {...use({ expanded: nodeContext.expanded || nodeContext.externalExpanded })} ref={ref} className={className}>
+  const elementExpanded = getComputed(() => nodeContext.expanded || nodeContext.externalExpanded);
+
+  return styled(TREE_NODE_STYLES)(
+    <node {...use({ expanded: elementExpanded })} ref={ref} className={className}>
       <TreeNodeContext.Provider value={nodeContext}>
         {children}
       </TreeNodeContext.Provider>

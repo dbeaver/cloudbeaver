@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { autorun } from 'mobx';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
+import { useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ThemeService } from './ThemeService';
-import { applyComposes, ClassCollection, Composes } from './themeUtils';
+import type { ClassCollection } from './themeUtils';
 
-export type BaseStyles = ClassCollection | Composes;
+export type BaseStyles = ClassCollection;
 export type ThemeSelector = (theme: string) => Promise<undefined | BaseStyles | BaseStyles[]>;
 export type Style = BaseStyles | ThemeSelector;
 export type DynamicStyle = Style | boolean | undefined;
@@ -36,19 +36,19 @@ export function useStyles(
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
-  const [currentThemeId, setCurrentThemeId] = useState(themeService.currentThemeId);
+  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
   const lastThemeRef = useRef<string>(currentThemeId);
   const filteredStyles = flat(componentStyles).filter(Boolean) as Style[];
+  const trackTheme = filteredStyles.some(style => typeof style === 'function');
 
-  useEffect(() => {
-    const dispose = autorun(() => {
-      if (currentThemeId !== themeService.currentThemeId) {
-        setCurrentThemeId(themeService.currentThemeId);
+  useExecutor({
+    executor: themeService.onThemeChange,
+    handlers: [function updateThemeId(theme) {
+      if (currentThemeId !== themeService.currentThemeId && trackTheme) {
+        setCurrentThemeId(theme.id);
       }
-    });
-
-    return dispose;
-  }, [currentThemeId, themeService]);
+    }],
+  });
 
   let changed = lastThemeRef.current !== currentThemeId || filteredStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < filteredStyles.length; i++) {
@@ -62,7 +62,7 @@ export function useStyles(
     const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
 
     for (const style of filteredStyles) {
-      const data = (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId);
+      const data = typeof style === 'object' ? style : style(currentThemeId);
 
       if (data instanceof Promise) {
         themedStyles.push(data);
@@ -83,10 +83,7 @@ export function useStyles(
     }
   }
 
-  const styles = useMemo(() => {
-    const themeStyles = themeService.getThemeStyles(currentThemeId);
-    return create(applyComposes([...themeStyles, ...loadedStyles.current]));
-  }, [currentThemeId, patch, loadedStyles.current]);
+  const styles = useMemo(() => create(loadedStyles.current), [patch, loadedStyles.current]);
 
   return styles; // todo this method is called in each rerender
 }

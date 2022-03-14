@@ -28,7 +28,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(node.name || '');
 
-  const save = useCallback(async () => {
+  async function save() {
     if (loading) {
       return;
     }
@@ -44,11 +44,11 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       setLoading(false);
       onClose();
     }
-  }, [name, onClose, node, loading, navTreeResource, notificationService]);
+  }
 
-  const stopPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
+  function stopPropagation(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventStopPropagationFlag);
-  };
+  }
 
   return (
     <InlineEditor

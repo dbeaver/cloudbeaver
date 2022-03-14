@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
+import { getComputed } from '../../getComputed';
 import { Loader } from '../../Loader/Loader';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
@@ -47,35 +48,31 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     throw new Error('Context not provided');
   }
 
-  if (context.disabled) {
-    disabled = context.disabled;
-  }
-
-  if (group === undefined) {
-    group = context.group;
-  }
+  disabled = getComputed(() => context.disabled || disabled);
+  group = getComputed(() => group ?? context.group);
+  const loading = getComputed(() => loadIndicator && context.loading);
+  selected = getComputed(() => selected ?? context.selected);
 
   async function handleSelect() {
     await onSelect?.();
-
     await context!.select(true, group);
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
+  function handleClick(event: React.MouseEvent<HTMLInputElement>) {
     EventContext.set(event, EventTreeNodeSelectFlag);
-  };
+  }
 
-  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeSelectFlag);
-  };
+  }
 
   return styled(styles)(
     <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
-      {loadIndicator && context.loading
+      {loading
         ? <Loader small />
         : (
           <Checkbox
-            checked={selected ?? context.selected}
+            checked={selected}
             disabled={disabled}
             onChange={handleSelect}
           />

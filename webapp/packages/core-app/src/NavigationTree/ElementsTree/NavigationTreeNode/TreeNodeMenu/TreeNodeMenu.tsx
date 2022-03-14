@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -39,7 +39,7 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   menu.context.set(DATA_CONTEXT_NAV_NODE, node);
   menu.context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions);
 
-  const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const connection = getComputed(() => connectionsInfoResource.getConnectionForNode(node.id));
 
   if (connection) {
     menu.context.set(DATA_CONTEXT_CONNECTION, connection);

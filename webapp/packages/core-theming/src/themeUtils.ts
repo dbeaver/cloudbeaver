@@ -26,6 +26,9 @@ export function composes(composes: ClassCollection, styles?: ClassCollection) {
   return new Composes(composes, styles);
 }
 
+/**
+ * @deprecated Not needed anymore
+ */
 export function applyComposes(mixed: Array<Composes | ClassCollection>) {
   const composes: Composes[] = [];
   const styles: ClassCollection[] = [];

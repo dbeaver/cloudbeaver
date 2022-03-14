@@ -7,14 +7,14 @@
  */
 
 import { action, computed, observable, runInAction } from 'mobx';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
@@ -111,6 +111,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
+      await connectionInfoResource.load(CachedMapAllKey);
       const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);
 
       if (!preloaded) {
@@ -123,7 +124,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const nextChildren: string[] = [];
 
         for (const child of children) {
-          await connectionInfoResource.load(CachedMapAllKey);
           await navNodeInfoResource.waitLoad();
           await navTreeResource.waitLoad();
 
@@ -415,11 +415,13 @@ export function useElementsTree(options: IOptions): IElementsTree {
     });
   }
 
+  const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
+    functionsRef.loadTree(options.root);
+  }, 100), []);
+
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
-    postHandlers: [function refreshRoot() {
-      functionsRef.loadTree(options.root);
-    }],
+    postHandlers: [loadTreeThreshold],
   });
 
   useExecutor({
