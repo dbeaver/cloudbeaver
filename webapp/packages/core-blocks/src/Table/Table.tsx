@@ -11,10 +11,9 @@ import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useMemo } from 'react';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { useObjectRef } from '../useObjectRef';
 import { useObservableRef } from '../useObservableRef';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { TableContext, ITableContext, ITableState } from './TableContext';
 
 interface Props {
@@ -87,7 +86,7 @@ export const Table = observer<Props>(function Table({
     collapse,
   }));
 
-  return styled(useStyles())(
+  return styled(BASE_TABLE_STYLES)(
     <TableContext.Provider value={context}>
       <table className={className} {...use({ expanded: isExpanded.get(), size })}>
         {children}

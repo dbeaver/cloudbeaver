@@ -11,23 +11,17 @@ import styled, { css } from 'reshadow';
 
 import { Filter, useFocus } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IElementsTree } from '../useElementsTree';
 
-const filterStyle = composes(
-  css`
+const filterStyle = css`
     filter-box {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    filter-box {
       padding: 8px 12px;
       flex: 0 0 auto;
     }
-  `
-);
+  `;
 
 interface Props {
   tree: IElementsTree;

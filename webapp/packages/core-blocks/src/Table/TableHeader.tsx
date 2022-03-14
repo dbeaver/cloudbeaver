@@ -8,14 +8,14 @@
 
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 
 interface Props {
   className?: string;
 }
 
 export const TableHeader: React.FC<Props> = function TableHeader({ children, className }) {
-  return styled(useStyles())(
+  return styled(BASE_TABLE_STYLES)(
     <thead className={className}>
       <tr>
         {children}

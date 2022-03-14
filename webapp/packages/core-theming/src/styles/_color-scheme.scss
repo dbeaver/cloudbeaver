@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-$theme-class: "theme-#{$theme-name}";
-
-@mixin theme-matcher() {
-  theme {
-    composes: #{$theme-class} theme-typography from global;
-  }
+@mixin color-scheme {
+  color-scheme: $color-scheme;
 }

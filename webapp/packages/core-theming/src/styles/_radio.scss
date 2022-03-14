@@ -12,29 +12,29 @@
   @include mdc-radio-core-styles;
 
   .theme-radio {
-    composes: mdc-radio;
+    @extend .mdc-radio;
   }
   .theme-radio_native-control {
-    composes: mdc-radio__native-control;
+    @extend .mdc-radio__native-control;
 
     &:disabled {
       opacity: 0;
     }
   }
   .theme-radio_background {
-    composes: mdc-radio__background;
+    @extend .mdc-radio__background;
   }
   .theme-radio_outer-circle {
-    composes: mdc-radio__outer-circle;
+    @extend .mdc-radio__outer-circle;
   }
   .theme-radio_inner-circle {
-    composes: mdc-radio__inner-circle;
+    @extend .mdc-radio__inner-circle;
   }
   .theme-radio_ripple {
-    composes: mdc-radio__ripple;
+    @extend .mdc-radio__ripple;
   }
   .theme-radio--disabled {
-    composes: mdc-radio--disabled;
+    @extend .mdc-radio--disabled;
   }
 
   .theme-radio_primary {

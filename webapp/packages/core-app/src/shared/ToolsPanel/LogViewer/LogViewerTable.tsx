@@ -9,20 +9,17 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
+import { BASE_TABLE_STYLES, Button } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
 
-const styles = composes(
-  css`
+const styles = css`
     icon, timestamp, message {
       composes: theme-border-color-background from global;
     }
-  `,
-  css`
     wrapper {
       overflow: hidden;
       display: flex;
@@ -60,8 +57,7 @@ const styles = composes(
     timestamp {
       width: 180px;
     }
-  `
-);
+  `;
 
 interface Props {
   items: ILogEntry[];
@@ -72,7 +68,7 @@ interface Props {
 }
 export const LogViewerTable = observer<Props>(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
-  const style = useStyles(styles);
+  const style = useStyles(BASE_TABLE_STYLES, styles);
 
   return styled(style)(
     <wrapper className={className}>

@@ -52,7 +52,7 @@ const connectionMenu = css`
   MenuItem IconOrImage {
     background-color: #fff;
     padding: 2px;
-    border-radius: 2px;
+    border-radius: var(--theme-form-element-radius);
   }
   menu-trigger-icon:not([|loading]) {
     background-color: #fff;

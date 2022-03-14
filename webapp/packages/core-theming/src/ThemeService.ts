@@ -8,12 +8,13 @@
 
 import { action, computed, observable, makeObservable } from 'mobx';
 
-import './styles/main/normalize.css';
-import './styles/main/fonts.css';
-import './styles/main/app-loading-screen.css';
-import './styles/main/elevation.scss';
-import './styles/main/typography.scss';
-import './styles/main/color.scss';
+import './styles/main/normalize.pure.css';
+import './styles/main/base.pure.css';
+import './styles/main/fonts.pure.css';
+import './styles/main/app-loading-screen.pure.css';
+import './styles/main/elevation.pure.scss';
+import './styles/main/typography.pure.scss';
+import './styles/main/color.pure.scss';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';

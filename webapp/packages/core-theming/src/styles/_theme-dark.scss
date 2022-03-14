@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-theme {
-  color-scheme: dark;
-}
-
 $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
 $mdc-theme-secondary: hsl(240deg, 10%, 15%);
@@ -19,6 +15,7 @@ $mdc-theme-on-surface: #ffffff;
 $mdc-theme-background: hsl(240deg, 10%, 26%);
 $mdc-theme-error: #e94948;
 
+$color-scheme: dark;
 $color-positive: #52c41a;
 $color-on-positive: #fff;
 $color-negative: #e73e52;

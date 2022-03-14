@@ -8,20 +8,15 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
-import { use } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
-import { useStyles, composes, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
 import { Loader } from './Loader/Loader';
 import { useObservableRef } from './useObservableRef';
 
-const buttonStyles = composes(
-  css`
-    Button {
-      composes: theme-button from global;
-    }
+const buttonStyles = css`
     button-label {
       composes: theme-button__label from global;
     }
@@ -31,9 +26,8 @@ const buttonStyles = composes(
     ripple {
       composes: theme-button_ripple from global;
     }
-  `,
-  css`
     Button {
+      composes: theme-button from global;
       display: flex;
 
       & Loader, & button-label {
@@ -64,38 +58,29 @@ const buttonStyles = composes(
       }
     }
     
-  `
-);
+  `;
 
 const buttonMod = {
-  raised: composes(
-    css`
+  raised: css`
     Button {
       composes: theme-button_raised from global;
     }
-    `
-  ),
-  unelevated: composes(
-    css`
+    `,
+  unelevated: css`
     Button {
       composes: theme-button_unelevated from global;
     }
-    `
-  ),
-  outlined: composes(
-    css`
+    `,
+  outlined: css`
     Button {
       composes: theme-button_outlined from global;
     }
-    `
-  ),
-  secondary: composes(
-    css`
+    `,
+  secondary: css`
     Button {
       composes: theme-button_secondary from global;
     }
-    `
-  ),
+    `,
 };
 
 type ButtonProps = (
@@ -113,7 +98,7 @@ type ButtonProps = (
   target?: '_blank' | '_self' | '_parent' | '_top';
   loader?: boolean;
   onClick?: React.MouseEventHandler<
-    HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement
+  HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement
   > | (() => Promise<any>);
   download?: boolean;
 };

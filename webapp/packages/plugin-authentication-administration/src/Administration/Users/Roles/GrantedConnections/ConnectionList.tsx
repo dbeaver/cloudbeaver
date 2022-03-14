@@ -27,20 +27,14 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
-const styles = composes(
-  css`
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
+const styles = css`
     Group {
       position: relative;
     }
@@ -59,10 +53,10 @@ const styles = composes(
       flex: 0 0 auto;
     }
     Table {
+      composes: theme-background-surface theme-text-on-surface from global;
       width: 100%;
     }
-  `
-);
+  `;
 
 interface Props {
   connectionList: DatabaseConnectionFragment[];
@@ -107,7 +101,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({
             keys={keys}
             selectedItems={selectedSubjects}
             isItemSelectable={item => !grantedSubjects.includes(item)}
-            {...use({ size: 'big' })}
+            size='big'
           >
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>

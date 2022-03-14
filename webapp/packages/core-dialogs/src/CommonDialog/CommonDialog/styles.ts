@@ -8,7 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes, ThemeSelector } from '@cloudbeaver/core-theming';
+import type { ThemeSelector } from '@cloudbeaver/core-theming';
 
 export const commonDialogThemeStyle: ThemeSelector = async theme => {
   let styles: any;
@@ -25,18 +25,9 @@ export const commonDialogThemeStyle: ThemeSelector = async theme => {
   return [styles.default];
 };
 
-export const commonDialogBaseStyle = composes(
-  css`
+export const commonDialogBaseStyle = css`
     dialog {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-    dialog-body-overflow {
-      composes: branding-overflow from global;
-    }
-  `,
-  css`
-    dialog {
-      composes: theme-elevation-z10 from global;
+      composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -166,6 +157,7 @@ export const commonDialogBaseStyle = composes(
       overflow: auto;
     }
     dialog-body-overflow {
+      composes: branding-overflow from global;
       position: sticky;
       bottom: 0;
       left: 0;
@@ -201,5 +193,4 @@ export const commonDialogBaseStyle = composes(
         display: none;
       }
     }
-  `
-);
+  `;

@@ -12,19 +12,16 @@ import styled, { css } from 'reshadow';
 
 import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { LogViewerInfoPanel } from './LogViewerInfoPanel';
 import { LogViewerTable } from './LogViewerTable';
 import { useLogViewer } from './useLogViewer';
 
-const styles = composes(
-  css`
+const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
     }
-  `,
-  css`
     log-view-wrapper, Pane {
       position: relative;
       display: flex;
@@ -32,7 +29,7 @@ const styles = composes(
       flex-direction: column;
       overflow: hidden;
     }
-`);
+`;
 
 export const LogViewer = observer(function LogViewer() {
   const style = useStyles(styles, splitStyles);

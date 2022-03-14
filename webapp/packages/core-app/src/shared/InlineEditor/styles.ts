@@ -8,28 +8,13 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const InlineEditorStyles = composes(
-  css`
-  editor {
-    composes: theme-border-color-background from global;
-  }
-
-  editor-actions {
-    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-  }
-
-  editor-action {
-    composes: theme-ripple from global;
-  }
-
+export const InlineEditorStyles = css`
   input {
     composes: theme-text-text-primary-on-light from global;
   }
-  `,
-  css`
+
   editor {
+    composes: theme-border-color-background from global;
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -59,6 +44,7 @@ export const InlineEditorStyles = composes(
   }
   
   editor-actions {
+    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     position: absolute;
     top: -1px;
     left: 100%;
@@ -107,6 +93,7 @@ export const InlineEditorStyles = composes(
   }
 
   editor-action {
+    composes: theme-ripple from global;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -133,5 +120,4 @@ export const InlineEditorStyles = composes(
       display: none;
     }
   }
-`
-);
+`;

@@ -13,18 +13,13 @@ import styled, { css, use } from 'reshadow';
 import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerErrorType } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
-const style = composes(
-  css`
+const style = css`
     error {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    error {
       position: absolute;
       box-sizing: border-box;
       width: 100%;
@@ -81,11 +76,10 @@ const style = composes(
         flex-shrink: 0;
       }
     }
-  `
-);
+  `;
 
 interface Props {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   loading: boolean;
   className?: string;
 }

@@ -9,7 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
@@ -27,23 +27,16 @@ export function navigationTreeConnectionGroupRenderer(nodeId: string): Navigatio
   return UnManageableGroup;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     connection-group {
-      composes: theme-text-text-hint-on-light from global;
-    }
-  `,
-  css`
-    connection-group {
-      composes: theme-typography--caption from global;
+      composes: theme-text-text-hint-on-light theme-typography--caption from global;
       padding: 4px 12px;
 
       &:not(:first-child) {
         margin-top: 8px;
       }
     }
-  `
-);
+  `;
 
 const ManageableGroup: NavigationNodeRendererComponent = function ManageableGroup() {
   return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_connection_group_user' /></connection-group>);

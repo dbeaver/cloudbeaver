@@ -12,29 +12,29 @@
   @include mdc-switch-core-styles($query);
   
   .theme-switch {
-    composes: mdc-switch;
+    @extend .mdc-switch;
   }
   .theme-switch_native-control {
-    composes: mdc-switch__native-control;
+    @extend .mdc-switch__native-control;
 
     &:disabled {
       opacity: 0;
     }
   }
   .theme-switch__track {
-    composes: mdc-switch__track;
+    @extend .mdc-switch__track;
   }
   .theme-switch__thumb-underlay {
-    composes: mdc-switch__thumb-underlay;
+    @extend .mdc-switch__thumb-underlay;
   }
   .theme-switch__thumb {
-    composes: mdc-switch__thumb;
+    @extend .mdc-switch__thumb;
   }
   .theme-switch--checked {
-    composes: mdc-switch--checked;
+    @extend .mdc-switch--checked;
   }
   .theme-switch--disabled {
-    composes: mdc-switch--disabled;
+    @extend .mdc-switch--disabled;
   }
 
   .theme-switch_dense {

@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { BASE_CONTAINERS_STYLES, Button, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationPanel } from './Authentication/AuthenticationPanel';
 import { AuthenticationTab } from './Authentication/AuthenticationTab';
@@ -35,14 +35,9 @@ const tabsStyles = css`
   }
 `;
 
-const topBarStyles = composes(
-  css`
+const topBarStyles = css`
     top-bar {
       composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    top-bar {
       position: relative;
       display: flex;
       padding-top: 16px;
@@ -84,20 +79,12 @@ const topBarStyles = composes(
         width: 24px;
       }
     }
-  `
-);
+  `;
 
-const formStyles = composes(
-  css`
+const formStyles = css`
     box {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-
-    content-box {
-      composes: theme-background-secondary theme-border-color-background from global;
-    }
-  `,
-  css`
     flex-box {
       display: flex;
       flex-direction: column;
@@ -106,14 +93,14 @@ const formStyles = composes(
       overflow: auto;
     }
     content-box {
+      composes: theme-background-secondary theme-border-color-background from global;
       position: relative;
       display: flex;
       flex: 1;
       flex-direction: column;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   user: UserInfo;
@@ -127,7 +114,7 @@ export const UserForm = observer<Props>(function UserForm({
   onClose,
 }) {
   const translate = useTranslate();
-  const style = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
 
   const localProvider = user.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);

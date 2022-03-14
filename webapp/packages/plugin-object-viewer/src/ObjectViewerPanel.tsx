@@ -16,8 +16,8 @@ import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getC
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { TabsBox, TabPanel, useTabLocalState } from '@cloudbeaver/core-ui';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { TabsBox, TabPanel, useTabLocalState, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -25,30 +25,26 @@ import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
 
-const styles = composes(
-  css`
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
     }
     tabs {
       composes: theme-background-background theme-text-text-primary-on-light from global;
     }
-  `,
-  css`
     tab-outer:only-child {
       display: none;
     }
     ExceptionMessage {
       padding: 24px;
     }
-  `
-);
+  `;
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({
   tab,
 }) {
   const translate = useTranslate();
-  const style = useStyles(styles);
+  const style = useStyles(BASE_TAB_STYLES, styles);
   const dbObjectPagesService = useService(DBObjectPageService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);

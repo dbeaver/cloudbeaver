@@ -10,13 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FormContext } from './FormContext';
 import { RadioGroupContext } from './RadioGroupContext';
 
-const radioStyles = composes(
-  css`
+const radioStyles = css`
     radio {
       composes: theme-radio from global;
     }
@@ -35,8 +34,6 @@ const radioStyles = composes(
     radio-ripple {
       composes: theme-radio_ripple from global;
     }
-  `,
-  css`
     field {
       display: inline-flex;
       align-items: center;
@@ -50,24 +47,18 @@ const radioStyles = composes(
         cursor: auto;
       }
     }
-  `
-);
+  `;
 
 const radioMod = {
-  primary: composes(
-    css`
+  primary: css`
       radio {
         composes: theme-radio_primary from global;
       }
-    `
-  ),
-  small: composes(
-    css`
+    `,
+  small: css`
       radio {
         composes: theme-radio_small from global;
       }
-    `,
-    css`
       field {
         & radio {
           width: 14px;
@@ -81,31 +72,24 @@ const radioMod = {
           border-width: 7px;
         }
       }
-   `
-  ),
+   `,
 };
 
-const noRippleStyles = composes(
-  css`
+const noRippleStyles = css`
     radio {
       composes: theme-radio_no-ripple from global;
     }
-  `
-);
+  `;
 
 const radioState = {
-  disabled: composes(
-    css`
+  disabled: css`
       radio {
         composes: theme-radio--disabled from global;
       }
-    `,
-    css`
       input {
         opacity: 0 !important;
       }
-    `
-  ),
+    `,
 };
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {

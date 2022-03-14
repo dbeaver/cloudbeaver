@@ -7,19 +7,14 @@
  */
 
 @mixin form-controls() {
-  :global(fieldset) {
+  fieldset {
     padding: 0;
     border: none;
     margin: 0;
 
-    &:global([disabled]) {
+    &[disabled] {
       opacity: 1;
     }
-  }
-
-  input:global([type="checkbox"]) {
-    height: 16px;
-    width: 16px;
   }
 
   textarea {
@@ -30,7 +25,7 @@
   input {
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 25px;
+    min-height: 24px;
   }
 
   input,
@@ -40,14 +35,14 @@
     width: 100%;
     border: 2px solid;
     outline: none;
-    border-radius: 3px;
+    border-radius: $theme-form-element-radius;
 
     @include mdc-theme-prop(color, input-color, false);
     @include mdc-theme-prop(border-color, input-border, false);
     @include mdc-theme-prop(background-color, input-background, false);
 
     &:focus,
-    &[|focus] {
+    &[data-focus=true] {
       @include mdc-theme-prop(border-color, primary, false);
     }
     // we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug
@@ -57,17 +52,7 @@
       box-shadow: 0 0 0 50px $input-background inset;
     }
 
-    &:global([type="checkbox"]) {
-      height: 16px;
-      width: 16px;
-    }
-
-    &[|select] {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    &:not([|select]):global([readonly]) {
+    &:not([data-select=true])[readonly] {
       @include mdc-theme-prop(color, input-color-readonly, false);
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
@@ -77,7 +62,7 @@
         box-shadow: 0 0 0 50px $input-background-readonly inset;
       }
     }
-    &:global([disabled]) {
+    &[disabled] {
       @include mdc-theme-prop(color, input-color-disabled, false);
       @include mdc-theme-prop(border-color, input-border-disabled, false);
       @include mdc-theme-prop(background-color, input-background-disabled, false);
@@ -87,27 +72,12 @@
         box-shadow: 0 0 0 50px $input-background-disabled inset;
       }
     }
-    &:global([data-embedded]) {
-      &:global([disabled]),
-      &:not([|select]):global([readonly]) {
+    &[data-embedded=true] {
+      &[disabled],
+      &:not([data-select=true])[readonly] {
         @include mdc-theme-prop(border-color, background, false);
         @include mdc-theme-prop(background-color, input-background, false);
       }
-    }
-  }
-
-  label {
-    display: block;
-    line-height: 15px;
-    box-sizing: border-box;
-    padding: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 100%;
-
-    &:global([title]) {
-      text-decoration: none;
     }
   }
 }

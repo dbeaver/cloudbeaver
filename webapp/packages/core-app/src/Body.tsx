@@ -16,29 +16,24 @@ import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 
 import { useAppVersion } from './useAppVersion';
 
-const bodyStyles = composes(
-  css`
+const bodyStyles = css`
     theme {
-      composes: theme-background-surface theme-text-on-surface from global
-    }
-  `,
-  css`
-    theme {
+      composes: theme-background-surface theme-text-on-surface theme-typography from global;
       height: 100vh;
       display: flex;
       padding: 0 !important; /* fix additional padding with modal reakit menu */
       flex-direction: column;
       overflow: hidden;
     }
-  `
-);
+  `;
 
 export const Body = observer(function Body() {
   useAppLoadingScreen();
+  const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
   const permissionsService = useDataResource(Body, PermissionsResource, undefined);
@@ -55,7 +50,7 @@ export const Body = observer(function Body() {
   });
 
   return styled(style)(
-    <theme ref={ref}>
+    <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
       <Loader state={permissionsService}>{() => styled(style)(
         <>
           {Screen && <Screen {...screenService.routerService.params} />}

@@ -9,18 +9,10 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const ADMINISTRATION_TOOLS_PANEL_STYLES = composes(
-  css`
+export const ADMINISTRATION_TOOLS_PANEL_STYLES = css`
     ToolsPanel {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    }
-  `,
-  css`
-    ToolsPanel {
       border-bottom: solid 1px;
       flex: 0 0 auto;
     }
-  `
-);
+  `;

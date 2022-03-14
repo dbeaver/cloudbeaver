@@ -14,25 +14,19 @@ import styled, { css } from 'reshadow';
 import { Table, TableHeader, TableColumnHeader, TableBody, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { isVisibleProperty } from '../useExecutionPlanTreeState';
 import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup';
 
-const styles = composes(
-  css`
+const styles = css`
     TableColumnHeader {
       composes: theme-background-surface from global;
-    }
-  `,
-  css`
-    TableColumnHeader {
       position: sticky;
       top: 0;
       z-index: 1;
     }
-  `
-);
+  `;
 
 interface Props {
   selectedNode: string;

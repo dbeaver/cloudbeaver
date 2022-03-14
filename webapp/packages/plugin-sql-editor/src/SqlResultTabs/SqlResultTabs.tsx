@@ -12,27 +12,21 @@ import styled, { css } from 'reshadow';
 import { TextPlaceholder, getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { ITabData, TabsState, TabList, TabPanel } from '@cloudbeaver/core-ui';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { ITabData, TabsState, TabList, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlResultPanel } from './SqlResultPanel';
 import { SqlResultTab } from './SqlResultTab';
 import { SqlResultTabsService } from './SqlResultTabsService';
 
-const styles = composes(
-  css`
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
     }
     TabIcon {
       composes: theme-text-surface from global;
     }
-    TabList {
-      composes: theme-background-background theme-text-text-primary-on-light from global;
-    }
-  `,
-  css`
     wrapper {
       overflow: auto;
       display: flex;
@@ -45,11 +39,11 @@ const styles = composes(
       height: 100%;
     }
     TabList {
+      composes: theme-background-background theme-text-text-primary-on-light from global;
       display: flex;
       overflow: auto;
     }
-  `
-);
+  `;
 
 interface Props {
   state: ISqlEditorTabState;
@@ -58,7 +52,7 @@ interface Props {
 }
 
 export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
-  const style = useStyles(styles);
+  const style = useStyles(BASE_TAB_STYLES, styles);
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);
 

@@ -13,18 +13,13 @@ import styled, { css, use } from 'reshadow';
 
 import { Icon, IconOrImage, Loader } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle, composes } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { topMenuStyles } from './topMenuStyles';
 
-const elementStyle = composes(
-  css`
+const elementStyle = css`
     Button {
       composes: theme-ripple from global;
-    }
-  `,
-  css`
-    Button {
       background: none;
       border: none;
       outline: none !important;
@@ -51,7 +46,7 @@ const elementStyle = composes(
       object-fit: contain;
     }
   `
-);
+;
 
 interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   title?: string;

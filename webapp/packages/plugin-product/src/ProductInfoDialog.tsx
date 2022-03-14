@@ -35,7 +35,6 @@ const productInfoDialogStyles = css`
     IconOrImage {
       max-width: 154px;
       height: 32px;
-      border-radius: 2px;
     }
 `;
 

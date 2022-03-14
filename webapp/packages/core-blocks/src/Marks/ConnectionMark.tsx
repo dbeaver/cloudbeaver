@@ -8,16 +8,11 @@
 
 import styled, { css, use } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
+const styles = css`
     status {
       composes: theme-background-positive theme-border-color-surface from global;
-    }
-  `,
-  css`
-    status {
       position: absolute;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -33,7 +28,7 @@ const styles = composes(
         opacity: 1;
       }
     }
-`);
+`;
 
 interface Props {
   connected: boolean;

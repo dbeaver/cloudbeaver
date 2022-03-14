@@ -13,6 +13,7 @@ import styled from 'reshadow';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { generateTabElement } from './generateTabElement';
+import { BASE_TAB_STYLES } from './Tab/BASE_TAB_STYLES';
 import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
@@ -26,7 +27,7 @@ export const TabPanelList = observer<Props>(function TabPanelList({
   children,
 }) {
   const state = useContext(TabsContext);
-  const styles = useStyles(style);
+  const styles = useStyles(BASE_TAB_STYLES, style);
 
   if (!state) {
     throw new Error('Tabs context was not provided');

@@ -9,7 +9,7 @@
 import styled, { css, use } from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   expanded: boolean;
@@ -17,14 +17,9 @@ interface Props {
   className?: string;
 }
 
-const styles = composes(
-  css`
+const styles = css`
     Icon {
       composes: theme-text-on-surface from global;
-    }
-`,
-  css`
-    Icon {
       width: 100%;
       height: 100%;
       cursor: pointer;
@@ -35,7 +30,7 @@ const styles = composes(
         transform: rotate(0deg);
       }
     }
-  `);
+  `;
 
 export const Expand: React.FC<Props> = function Expand({ expanded, onClick, className }) {
   return styled(useStyles(styles))(

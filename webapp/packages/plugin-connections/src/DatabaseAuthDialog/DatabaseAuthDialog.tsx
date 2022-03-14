@@ -19,19 +19,13 @@ import {
 import { useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 
-const styles = composes(
-  css`
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
+const styles = css`
     SubmittingForm {
       overflow: auto;
       margin: auto;
@@ -43,9 +37,10 @@ const styles = composes(
       align-content: center;
     }
     ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
       flex: 1;
     }
-`);
+`;
 
 interface Payload {
   connectionId: string;

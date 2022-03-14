@@ -11,22 +11,16 @@ import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 
 import { Version } from './Version';
 
-const layoutStyles = composes(
-  css`
-    layout-grid-cell {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
+const layoutStyles = css`
     layout-grid {
       width: 100%;
       overflow: auto;
@@ -37,11 +31,11 @@ const layoutStyles = composes(
     }
 
     layout-grid-cell {
+      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
       position: relative;
       border: solid 1px;
     }
-  `
-);
+  `;
 
 const loaderStyle = css`
   ExceptionMessage {
@@ -79,10 +73,10 @@ export const VersionsTable = observer<Props>(function VersionsTable({ versions }
     }
   }, [versionResource, notificationService]);
 
-  return styled(style)(
+  return styled(BASE_LAYOUT_GRID_STYLES, style)(
     <layout-grid>
       <layout-grid-inner>
-        <layout-grid-cell {...use({ span: 12 })}>
+        <layout-grid-cell data-span='12'>
           <ToolsPanel>
             <ToolsAction
               title={translate('ui_refresh')}
@@ -94,12 +88,12 @@ export const VersionsTable = observer<Props>(function VersionsTable({ versions }
             </ToolsAction>
           </ToolsPanel>
         </layout-grid-cell>
-        <layout-grid-cell {...use({ span: 12, table: true })}>
+        <layout-grid-cell data-span='12' {...use({ table: true })}>
           <Loader style={loaderStyle} loading={versionResource.isLoading()} overlay>
             <Table
               selectedItems={table.selected}
               expandedItems={table.expanded}
-              {...use({ size: 'big' })}
+              size='big'
             >
               <TableHeader>
                 <TableColumnHeader min />

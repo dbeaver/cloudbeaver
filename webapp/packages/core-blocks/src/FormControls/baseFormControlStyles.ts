@@ -8,12 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const baseFormControlStyles = composes(
-  css`
-  `,
-  css`
+export const baseFormControlStyles = css`
     field {
       box-sizing: border-box;
       max-width: 100%;
@@ -29,6 +24,7 @@ export const baseFormControlStyles = composes(
     }
 
     field-label {
+      composes: theme-typography--body1 from global;
       box-sizing: border-box;
       overflow: hidden;
       white-space: nowrap;
@@ -42,24 +38,22 @@ export const baseFormControlStyles = composes(
 
     input, textarea {
       font-size: 12px;
-    }
-  `
-);
 
-export const baseValidFormControlStyles = composes(
-  css`
+      &[|select] {
+        cursor: pointer;
+        user-select: none;
+      }
+    }
+  `;
+
+export const baseValidFormControlStyles = css`
     field-description {
       composes: theme-text-text-hint-on-light from global;
     }
-  `,
-  css``
-);
+  `;
 
-export const baseInvalidFormControlStyles = composes(
-  css`
+export const baseInvalidFormControlStyles = css`
     field-description {
       composes: theme-text-negative from global;
     }
-  `,
-  css``
-);
+  `;

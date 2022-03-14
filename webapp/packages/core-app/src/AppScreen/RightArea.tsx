@@ -22,21 +22,16 @@ import {
   ErrorBoundary
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
 import { LogViewer } from '../shared/ToolsPanel/LogViewer/LogViewer';
 import { LogViewerService } from '../shared/ToolsPanel/LogViewer/LogViewerService';
 
-const styles = composes(
-  css`
+const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    Pane {
       flex: 1;
       display: flex;
       overflow: auto;
@@ -47,8 +42,7 @@ const styles = composes(
     SlideBox {
       flex: 1;
     }
-  `
-);
+  `;
 
 export const RightArea = observer(function RightArea() {
   const logViewerService = useService(LogViewerService);

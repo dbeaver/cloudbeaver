@@ -8,15 +8,10 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '@cloudbeaver/core-theming';
-
-export const cellMenuStyles = composes(
-  css`
+export const cellMenuStyles = css`
     IconOrImage {
       composes: theme-text-primary from global;
     }
-`,
-  css`
     :global(.rdg-cell):not(:global(.rdg-cell-selected)):not(:hover) cell-menu {
       display: none;
     }
@@ -38,4 +33,4 @@ export const cellMenuStyles = composes(
         height: 10px; 
       }
     }
-`);
+`;

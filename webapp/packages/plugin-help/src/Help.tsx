@@ -12,18 +12,13 @@ import styled, { css } from 'reshadow';
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
 
-const styles = composes(
-  css`
+const styles = css`
     container {
       composes: theme-ripple from global;
-    }
-  `,
-  css`
-    container {
       height: 100%;
       display: flex;
       align-items: center;
@@ -33,8 +28,7 @@ const styles = composes(
         width: 24px;
       }
     }
-  `
-);
+  `;
 
 export const Help = observer(function Help() {
   const style = useStyles(styles);

@@ -11,7 +11,7 @@ import { useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
@@ -19,13 +19,10 @@ import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormContr
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-const INPUT_FIELD_STYLES = composes(
-  css`
+const INPUT_FIELD_STYLES = css`
     Icon {
       composes: theme-text-on-secondary from global;
     }
-`,
-  css`
     field-label {
       display: block;
       composes: theme-typography--body1 from global;
@@ -58,7 +55,7 @@ const INPUT_FIELD_STYLES = composes(
     input:not(:only-child) {
       padding-right: 32px !important;
     }
-`);
+`;
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> & ILayoutSizeProps & {
   error?: boolean;
@@ -125,7 +122,7 @@ export const InputField: InputFieldType = observer(function InputField({
   const styles = useStyles(
     baseFormControlStyles,
     error ? baseInvalidFormControlStyles : baseValidFormControlStyles,
-    INPUT_FIELD_STYLES, 
+    INPUT_FIELD_STYLES,
     style
   );
   const context = useContext(FormContext);

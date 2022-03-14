@@ -14,31 +14,21 @@ import { ITab, NavNodeManagerService, NavNodeViewService, NavTreeResource } from
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
 
-const styles = composes(
-  css`
-    TabList {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    }
-    vertical-tabs {
-      composes: theme-border-color-background from global;
-    }
+const styles = css`
     Tab {
       composes: theme-ripple theme-background-background theme-ripple-selectable from global;
-    }
-  `,
-  css`
-    Tab {
       color: inherit;
     }
     vertical-tabs {
+      composes: theme-border-color-background from global;
       border-top: 1px solid;
       flex: 1;
     }
@@ -46,6 +36,7 @@ const styles = composes(
       overflow: auto !important;
     }
     TabList {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
       border-right: 1px solid;
     }
     TabTitle {
@@ -61,10 +52,9 @@ const styles = composes(
     ExceptionMessage {
       padding: 24px;
     }
-  `
-);
+  `;
 
-const tabStyles = [verticalTabStyles, styles];
+const tabStyles = [BASE_TAB_STYLES, verticalTabStyles, styles];
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
@@ -74,7 +64,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
-  const style = useStyles(verticalTabStyles, styles);
+  const style = useStyles(BASE_TAB_STYLES, verticalTabStyles, styles);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const nodeId = tab.handlerState.objectId;

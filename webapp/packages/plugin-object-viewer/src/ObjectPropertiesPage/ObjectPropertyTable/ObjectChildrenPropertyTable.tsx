@@ -14,26 +14,14 @@ import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
 import { TableHeader, TableBody, Table, useTable, useControlledScroll, IScrollState, TableItem, TableColumnValue } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { Header } from './Header';
 import { Item } from './Item';
 import { ObjectPropertyTableFooter } from './ObjectPropertyTableFooter';
 
-const style = composes(
-  css`
-    TableHeader {
-      composes: theme-background-surface from global;
-    }
-    ObjectPropertyTableFooter {
-      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-    }
-    TableColumnValue {
-      composes: theme-text-text-hint-on-light from global;
-    }
-  `,
-  css`
+const style = css`
     wrapper {
       overflow: auto;
       height: 100%;
@@ -46,18 +34,19 @@ const style = composes(
       overflow: auto;
     }
     TableHeader {
+      composes: theme-background-surface from global;
       position: sticky;
       top: 0;
       z-index: 1;
     }
     ObjectPropertyTableFooter {
+      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
       border-top: 1px solid;
     }
     TableColumnValue {
-      composes: theme-typography--caption from global;
+      composes: theme-text-text-hint-on-light theme-typography--caption from global;
     }
-  `,
-);
+  `;
 
 interface Props {
   objects: DBObject[];

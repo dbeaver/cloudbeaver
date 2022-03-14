@@ -16,15 +16,9 @@ import {
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
-    StaticImage {
-      composes: theme-background-surface theme-border-color-surface from global;
-    }
-  `,
-  css`
+const styles = css`
     ListItemIcon {
       position: relative;
       min-width: 80px;
@@ -32,6 +26,7 @@ const styles = composes(
     }
 
     StaticImage {
+      composes: theme-background-surface theme-border-color-surface from global;
       box-sizing: border-box;
       width: 32px;
       border-radius: 50%;
@@ -44,8 +39,7 @@ const styles = composes(
         margin-left: -20px;
       }
     }
-  `
-);
+  `;
 
 interface Props {
   database: AdminConnectionSearchInfo;
