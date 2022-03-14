@@ -16,18 +16,11 @@
  */
 package io.cloudbeaver.utils;
 
-import java.nio.file.Path;
+import org.jkiss.dbeaver.model.DBConstants;
 
-public class WebAppUtils {
-    public static String getRelativePath(String path, String curDir) {
-        return getRelativePath(path, Path.of(curDir));
-    }
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
-    public static String getRelativePath(String path, Path curDir) {
-        if (path.startsWith("/") || path.length() > 2 && path.charAt(1) == ':') {
-            return path;
-        }
-        return curDir.resolve(path).toAbsolutePath().toString();
-    }
-
+public class CBModelConstants {
+    public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
 }

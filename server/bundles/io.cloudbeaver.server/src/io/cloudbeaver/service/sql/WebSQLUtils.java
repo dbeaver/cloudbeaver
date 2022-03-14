@@ -18,8 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.model.CBConstants;
-import io.cloudbeaver.utils.WebConstants;
+import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
@@ -57,7 +56,7 @@ public class WebSQLUtils {
             return cellValue;
         }
         if (cellValue instanceof Date) {
-            return WebConstants.ISO_DATE_FORMAT.format(cellValue);
+            return CBModelConstants.ISO_DATE_FORMAT.format(cellValue);
         } else if (cellValue instanceof Number) {
             if (cellValue instanceof Double) {
                 return CommonUtils.niceFormatDouble((Double) cellValue);
