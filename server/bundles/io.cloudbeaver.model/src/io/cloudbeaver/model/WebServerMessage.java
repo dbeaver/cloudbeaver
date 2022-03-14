@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.utils.WebConstants;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -58,7 +60,7 @@ public class WebServerMessage {
     }
 
     public String getTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(time);
+        return WebConstants.ISO_DATE_FORMAT.format(time);
     }
 
     public String getMessage() {

@@ -18,7 +18,6 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.CBConstants;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -26,6 +25,7 @@ import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
+import io.cloudbeaver.utils.WebConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -187,12 +187,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @Property
     public String getCreateTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(createTime);
+        return WebConstants.ISO_DATE_FORMAT.format(createTime);
     }
 
     @Property
     public synchronized String getLastAccessTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+        return WebConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
     public synchronized long getLastAccessTimeMillis() {

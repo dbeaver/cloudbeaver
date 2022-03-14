@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.server.CBDatabase;
+import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.auth.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
