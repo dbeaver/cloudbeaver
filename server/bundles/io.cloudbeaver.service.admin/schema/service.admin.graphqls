@@ -4,8 +4,8 @@ enum AdminSubjectType {
     role
 }
 
-type AdminConnectionGrantInfo {
-    connectionId: ID!
+type AdminDataSourceGrantInfo {
+    dataSourceId: ID!
     subjectId: ID!
     subjectType: AdminSubjectType!
 }
@@ -24,7 +24,7 @@ type AdminUserInfo {
     metaParameters: Object!
     configurationParameters: Object!
     grantedRoles: [ID!]!
-    grantedConnections: [AdminConnectionGrantInfo!]!
+    grantedConnections: [AdminDataSourceGrantInfo!]!
 
     origins: [ObjectOrigin!]!
 
@@ -37,7 +37,7 @@ type AdminRoleInfo {
     description: String
 
     grantedUsers: [ID!]!
-    grantedConnections: [AdminConnectionGrantInfo!]!
+    grantedConnections: [AdminDataSourceGrantInfo!]!
 
     rolePermissions: [ID]!
 }
@@ -132,10 +132,10 @@ extend type Query {
 
     # Permissions
 
-    getConnectionSubjectAccess(connectionId: ID): [AdminConnectionGrantInfo!]!
+    getConnectionSubjectAccess(connectionId: ID): [AdminDataSourceGrantInfo!]!
     setConnectionSubjectAccess(connectionId: ID!, subjects: [ID!]!): Boolean
 
-    getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
+    getSubjectConnectionAccess(subjectId: ID): [AdminDataSourceGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
 
     #### Feature sets
