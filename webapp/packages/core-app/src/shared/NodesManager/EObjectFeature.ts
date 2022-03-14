@@ -19,4 +19,5 @@ export enum EObjectFeature {
   'dataSourceTemporary' = 'dataSourceTemporary',
   'dataSourceConnected' = 'dataSourceConnected',
   'entityContainer' = 'entityContainer',
+  'supportsDataFilter' = 'supportsDataFilter'
 }

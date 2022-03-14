@@ -1,5 +1,6 @@
 export default [
   ['table_header_sql_expression', '输入SQL表达式以过滤结果'],
+  ['table_header_sql_expression_not_supported', 'Data filter is not supported'],
   ['data_viewer_tab_title', '数据'],
   ['data_viewer_value_edit', '编辑'],
   ['data_viewer_value_apply', '应用'],

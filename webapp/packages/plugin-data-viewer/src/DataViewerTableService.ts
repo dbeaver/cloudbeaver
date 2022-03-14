@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { EObjectFeature, NavNode } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -48,7 +49,7 @@ export class DataViewerTableService {
 
   create(
     connection: Connection,
-    containerNodePath = ''
+    node: NavNode | undefined
   ): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
     const source = new ContainerDataSource(
       this.graphQLService,
@@ -59,11 +60,12 @@ export class DataViewerTableService {
     source
       .setOptions({
         connectionId: connection.id,
-        containerNodePath,
+        containerNodePath: node?.id ?? '',
         constraints: [],
         whereFilter: '',
       })
-      .setSupportedDataFormats(connection.supportedDataFormats);
+      .setSupportedDataFormats(connection.supportedDataFormats)
+      .setConstraintsAvailable(node?.objectFeatures.includes(EObjectFeature.supportsDataFilter) ?? true);
 
     const editable = this.dataViewerService.isDataEditable(connection);
     const dataModel = this.tableViewerStorageService.add(new DatabaseDataModel(source))

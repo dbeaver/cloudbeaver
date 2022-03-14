@@ -69,8 +69,11 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
+
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
-  const sortingDisabled = getComputed(() => model.source.results.length > 1 || !model.source.executionContext?.context);
+  const sortingDisabled = getComputed(
+    () => !tableDataContext.constraints.supported || !model.source.executionContext?.context
+  );
 
   let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
@@ -99,7 +102,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
     }
   }
 
-  function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     gridSelectionContext.selectColumn(calculatedColumn.idx, event.ctrlKey || event.metaKey);
     dataGridContext.focus();
   }

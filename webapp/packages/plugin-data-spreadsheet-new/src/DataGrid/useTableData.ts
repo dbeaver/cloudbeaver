@@ -11,7 +11,11 @@ import type { Column } from 'react-data-grid';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools, uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, ResultSetDataAction, ResultSetDataKeysUtils, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey,
+  ResultSetConstraintAction, ResultSetDataAction, ResultSetDataKeysUtils,
+  ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
@@ -40,6 +44,7 @@ export function useTableData(
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
   return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(() => ({
     get gridDiv(): HTMLDivElement | null {
@@ -176,12 +181,14 @@ export function useTableData(
     data: observable.ref,
     editor: observable.ref,
     view: observable.ref,
+    constraints: observable.ref,
     gridDIVElement: observable.ref,
   }, {
     format,
     data,
     editor,
     view,
+    constraints,
     gridDIVElement,
   });
 }
