@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.model.CBConstants;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;

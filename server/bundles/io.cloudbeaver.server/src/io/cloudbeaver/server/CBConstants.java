@@ -14,20 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model;
-
-import org.jkiss.dbeaver.model.DBConstants;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+package io.cloudbeaver.server;
 
 /**
  * Various constants
  */
 public class CBConstants {
-
-    public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
-
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String RUNTIME_DATA_DIR_NAME = ".data";
     public static final String RUNTIME_APP_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
