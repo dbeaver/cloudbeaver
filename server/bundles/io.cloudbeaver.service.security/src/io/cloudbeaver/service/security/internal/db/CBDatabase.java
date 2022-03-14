@@ -57,6 +57,8 @@ import org.jkiss.utils.SecurityUtils;
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
 
@@ -122,7 +124,7 @@ public class CBDatabase {
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
         if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
-            File pwdFile = new File(application.getDataDirectory(true), DEFAULT_DB_PWD_FILE);
+            File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
             if (!driver.isAnonymousAccess()) {
                 // No database credentials specified
                 dbUser = DEFAULT_DB_USER_NAME;

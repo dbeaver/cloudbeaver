@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
-import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.CBConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
@@ -160,8 +159,8 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         return driversLocation;
     }
 
-    public File getHomeDirectory() {
-        return homeDirectory;
+    public Path getHomeDirectory() {
+        return homeDirectory.toPath();
     }
 
     public long getMaxSessionIdleTime() {
@@ -417,23 +416,23 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
     @NotNull
     private File getRuntimeAppConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_APP_CONFIG_FILE_NAME);
+       return getDataDirectory(false).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
     }
 
     @NotNull
-    private File getRuntimeProductConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
+    private Path getRuntimeProductConfigFilePath() {
+        return getDataDirectory(false).resolve(CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
     }
 
     @NotNull
-    public File getDataDirectory(boolean create) {
+    public Path getDataDirectory(boolean create) {
         File dataDir = new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME);
         if (create && !dataDir.exists()) {
             if (!dataDir.mkdirs()) {
                 log.error("Can't create data directory '" + dataDir.getAbsolutePath() + "'");
             }
         }
-        return dataDir;
+        return dataDir.toPath();
     }
 
     private void initializeSecurityController() throws DBException {
@@ -582,7 +581,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
         // Add product config from runtime
         {
-            File rtConfig = getRuntimeProductConfigFile();
+            File rtConfig = getRuntimeProductConfigFilePath().toFile();
             if (rtConfig.exists()) {
                 log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
                 try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {

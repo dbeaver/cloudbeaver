@@ -18,7 +18,7 @@ package io.cloudbeaver.model.app;
 
 import org.jkiss.dbeaver.model.app.DBPApplication;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Base interface for web application
@@ -28,7 +28,7 @@ public interface WebApplication extends DBPApplication {
 
     WebAppConfiguration getAppConfiguration();
 
-    File getDataDirectory(boolean create);
+    Path getDataDirectory(boolean create);
 
-    File getHomeDirectory();
+    Path getHomeDirectory();
 }

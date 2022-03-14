@@ -1,17 +1,17 @@
 package io.cloudbeaver.utils;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class WebAppUtils {
     public static String getRelativePath(String path, String curDir) {
-        return getRelativePath(path, new File(curDir));
+        return getRelativePath(path, Path.of(curDir));
     }
 
-    public static String getRelativePath(String path, File curDir) {
+    public static String getRelativePath(String path, Path curDir) {
         if (path.startsWith("/") || path.length() > 2 && path.charAt(1) == ':') {
             return path;
         }
-        return new File(curDir, path).getAbsolutePath();
+        return curDir.resolve(path).toAbsolutePath().toString();
     }
 
 }
