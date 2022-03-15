@@ -1,8 +1,10 @@
 query getChildrenDBObjectInfo(
   $navNodeId: ID!
+  $offset: Int
+  $limit: Int
   $filter: ObjectPropertyFilter
 ) {
-  dbObjects: navNodeChildren(parentPath: $navNodeId) {
+  dbObjects: navNodeChildren(parentPath: $navNodeId, offset: $offset, limit: $limit) {
     ...NavNodeDBObjectInfo
   }
 }

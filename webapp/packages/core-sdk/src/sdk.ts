@@ -2023,6 +2023,8 @@ export type MetadataGetNodeDdlQuery = { metadataGetNodeDDL?: string };
 
 export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
   filter?: InputMaybe<ObjectPropertyFilter>;
 }>;
 
@@ -2046,6 +2048,8 @@ export type NavDeleteNodesMutation = { navDeleteNodes?: number };
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
   withDetails: Scalars['Boolean'];
 }>;
 
@@ -3252,8 +3256,12 @@ export const MetadataGetNodeDdlDocument = `
 }
     `;
 export const GetChildrenDbObjectInfoDocument = `
-    query getChildrenDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
-  dbObjects: navNodeChildren(parentPath: $navNodeId) {
+    query getChildrenDBObjectInfo($navNodeId: ID!, $offset: Int, $limit: Int, $filter: ObjectPropertyFilter) {
+  dbObjects: navNodeChildren(
+    parentPath: $navNodeId
+    offset: $offset
+    limit: $limit
+  ) {
     ...NavNodeDBObjectInfo
   }
 }
@@ -3271,8 +3279,8 @@ export const NavDeleteNodesDocument = `
 }
     `;
 export const NavNodeChildrenDocument = `
-    query navNodeChildren($parentPath: ID!, $withDetails: Boolean!) {
-  navNodeChildren(parentPath: $parentPath) {
+    query navNodeChildren($parentPath: ID!, $offset: Int, $limit: Int, $withDetails: Boolean!) {
+  navNodeChildren(parentPath: $parentPath, offset: $offset, limit: $limit) {
     ...NavNodeInfo
   }
   navNodeInfo(nodePath: $parentPath) {

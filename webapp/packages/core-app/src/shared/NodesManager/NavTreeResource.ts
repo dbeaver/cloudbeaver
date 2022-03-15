@@ -468,10 +468,16 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
   }
 
-  private async loadNodeChildren(parentPath: string): Promise<NavNodeChildrenQuery> {
+  private async loadNodeChildren(
+    parentPath: string,
+    offset = 0,
+    limit = this.childrenLimit + 1
+  ): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
+      offset,
+      limit,
       withDetails: metadata.withDetails,
     });
 
