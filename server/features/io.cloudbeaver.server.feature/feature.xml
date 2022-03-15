@@ -31,11 +31,13 @@
     <includes id="org.jkiss.dbeaver.runtime.feature" version="0.0.0"/>
     <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
 
+    <plugin id="io.cloudbeaver.model" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.admin" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.data.transfer" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.metadata" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.security" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
     <!-- Extra plugins -->
     <plugin id="org.jkiss.dbeaver.data.office" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
