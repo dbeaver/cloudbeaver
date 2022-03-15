@@ -31,6 +31,10 @@ public class WebSQLQueryResultSet {
     private Object[][] rows;
     private boolean hasMoreData;
     private WebSQLResultsInfo resultsInfo;
+    private boolean singleEntity = true;
+
+    public WebSQLQueryResultSet() {
+    }
 
     @Property
     public String getId() {
@@ -72,11 +76,21 @@ public class WebSQLQueryResultSet {
         this.hasMoreData = hasMoreData;
     }
 
-    public void setResultsInfo(WebSQLResultsInfo resultsInfo) {
-        this.resultsInfo = resultsInfo;
+    @Property
+    public boolean isSingleEntity() {
+        return singleEntity;
+    }
+
+    public void setSingleEntity(boolean singleEntity) {
+        this.singleEntity = singleEntity;
     }
 
     public WebSQLResultsInfo getResultsInfo() {
         return resultsInfo;
     }
+
+    public void setResultsInfo(WebSQLResultsInfo resultsInfo) {
+        this.resultsInfo = resultsInfo;
+    }
+
 }

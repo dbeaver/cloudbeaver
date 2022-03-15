@@ -136,6 +136,10 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
         webResultSet.setResultsInfo(resultsInfo);
+
+        boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;
+
+        webResultSet.setSingleEntity(isSingleEntity);
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {
