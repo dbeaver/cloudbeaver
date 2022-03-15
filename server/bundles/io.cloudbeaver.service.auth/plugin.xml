@@ -19,6 +19,9 @@
             </propertyGroup>
         </userProfileProperties>
     </extension>
+    <extension point="io.cloudbeaver.handler">
+        <sessionHandler id="RPSessionHandler" class="io.cloudbeaver.service.auth.RPSessionHandler"/>
+    </extension>
 
 
 </plugin>

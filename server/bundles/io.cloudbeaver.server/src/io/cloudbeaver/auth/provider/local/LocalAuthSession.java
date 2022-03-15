@@ -33,7 +33,7 @@ public class LocalAuthSession implements SMSession {
     private final SMSession webSession;
     private final String userId;
 
-    LocalAuthSession(SMSession webSession, String userId) {
+    public LocalAuthSession(SMSession webSession, String userId) {
         this.webSession = webSession;
         this.userId = userId;
     }
