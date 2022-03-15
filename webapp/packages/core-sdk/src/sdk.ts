@@ -31,7 +31,9 @@ export interface AdminAuthProviderConfiguration {
 }
 
 export interface AdminConnectionGrantInfo {
+  /** @deprecated use dataSourceId instead */
   connectionId: Scalars['ID'];
+  dataSourceId: Scalars['ID'];
   subjectId: Scalars['ID'];
   subjectType: AdminSubjectType;
 }
@@ -267,7 +269,7 @@ export interface DriverInfo {
   /** @deprecated Field no longer supported */
   allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
   anonymousAccess?: Maybe<Scalars['Boolean']>;
-  applicableAuthModel: Array<Scalars['ID']>;
+  applicableAuthModels: Array<Scalars['ID']>;
   applicableNetworkHandlers: Array<Maybe<Scalars['ID']>>;
   custom?: Maybe<Scalars['Boolean']>;
   defaultAuthModel: Scalars['ID'];
@@ -1216,9 +1218,10 @@ export interface SqlResultRow {
 
 export interface SqlResultSet {
   columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
-  hasMoreData?: Maybe<Scalars['Boolean']>;
+  hasMoreData: Scalars['Boolean'];
   id: Scalars['ID'];
   rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
+  singleEntity: Scalars['Boolean'];
 }
 
 export interface SqlScriptInfo {
@@ -1727,7 +1730,7 @@ export type DriverListQueryVariables = Exact<{
 }>;
 
 
-export type DriverListQuery = { drivers: Array<{ id: string; name?: string; icon?: string; description?: string; defaultPort?: string; defaultDatabase?: string; defaultServer?: string; defaultUser?: string; sampleURL?: string; embedded?: boolean; enabled: boolean; anonymousAccess?: boolean; promotedScore?: number; defaultAuthModel: string; applicableNetworkHandlers: Array<string>; driverParameters?: any; providerProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; length: ObjectPropertyLength; features: Array<string>; order: number }>; driverProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any> }> }> };
+export type DriverListQuery = { drivers: Array<{ id: string; name?: string; icon?: string; description?: string; defaultPort?: string; defaultDatabase?: string; defaultServer?: string; defaultUser?: string; sampleURL?: string; embedded?: boolean; enabled: boolean; anonymousAccess?: boolean; promotedScore?: number; defaultAuthModel: string; applicableAuthModels: Array<string>; applicableNetworkHandlers: Array<string>; driverParameters?: any; providerProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; length: ObjectPropertyLength; features: Array<string>; order: number }>; driverProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any> }> }> };
 
 export type ExecutionContextCreateMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1900,7 +1903,7 @@ export type AuthTokenFragment = { authProvider: string; authConfiguration?: stri
 
 export type DatabaseConnectionFragment = { id: string; name: string; description?: string; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; folder?: string; nodePath?: string; host?: string; port?: string; databaseName?: string; url?: string; properties?: any; providerProperties: any; features: Array<string>; supportedDataFormats: Array<ResultDataFormat>; authNeeded: boolean; authModel?: string; origin?: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }; authProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }>; networkHandlersConfig: Array<{ id: string; enabled: boolean; authType: NetworkHandlerAuthType; userName?: string; password?: string; key?: string; savePassword: boolean; properties?: any }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } };
 
-export type DatabaseDriverFragment = { id: string; name?: string; icon?: string; description?: string; defaultPort?: string; defaultDatabase?: string; defaultServer?: string; defaultUser?: string; sampleURL?: string; embedded?: boolean; enabled: boolean; anonymousAccess?: boolean; promotedScore?: number; defaultAuthModel: string; applicableNetworkHandlers: Array<string>; driverParameters?: any; providerProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; length: ObjectPropertyLength; features: Array<string>; order: number }>; driverProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any> }> };
+export type DatabaseDriverFragment = { id: string; name?: string; icon?: string; description?: string; defaultPort?: string; defaultDatabase?: string; defaultServer?: string; defaultUser?: string; sampleURL?: string; embedded?: boolean; enabled: boolean; anonymousAccess?: boolean; promotedScore?: number; defaultAuthModel: string; applicableAuthModels: Array<string>; applicableNetworkHandlers: Array<string>; driverParameters?: any; providerProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; length: ObjectPropertyLength; features: Array<string>; order: number }>; driverProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any> }> };
 
 export type ExecutionContextInfoFragment = { id: string; connectionId: string; defaultCatalog?: string; defaultSchema?: string };
 
@@ -1981,7 +1984,7 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 }>;
 
 
-export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; hasMoreData?: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
+export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; hasMoreData: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -2366,6 +2369,7 @@ export const DatabaseDriverFragmentDoc = `
   anonymousAccess
   promotedScore
   defaultAuthModel
+  applicableAuthModels
   applicableNetworkHandlers
   providerProperties @include(if: $includeProviderProperties) {
     id

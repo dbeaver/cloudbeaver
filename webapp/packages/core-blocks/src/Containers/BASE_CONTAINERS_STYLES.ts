@@ -24,6 +24,10 @@ export const BASE_CONTAINERS_STYLES = css`
       align-content: baseline;
       position: relative;
 
+      &[hideEmpty]:empty {
+        display: none;
+      }
+
       &[vertical] {
         flex-direction: column;
         align-content: stretch;

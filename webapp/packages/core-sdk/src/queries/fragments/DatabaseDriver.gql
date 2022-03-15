@@ -14,7 +14,7 @@ fragment DatabaseDriver on DriverInfo {
   promotedScore
 
   defaultAuthModel
-  # applicableAuthModel
+  applicableAuthModels
   applicableNetworkHandlers
 
   providerProperties @include(if: $includeProviderProperties) {

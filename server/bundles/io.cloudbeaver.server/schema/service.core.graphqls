@@ -222,7 +222,7 @@ type DriverInfo {
     anonymousAccess: Boolean
 
     defaultAuthModel: ID!
-    applicableAuthModel: [ID!]!
+    applicableAuthModels: [ID!]!
 
     applicableNetworkHandlers: [ID]!
 }

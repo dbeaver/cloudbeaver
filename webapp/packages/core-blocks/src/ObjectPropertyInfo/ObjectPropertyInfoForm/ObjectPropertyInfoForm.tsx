@@ -26,6 +26,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   readOnly?: boolean;
   autoHide?: boolean;
   showRememberTip?: boolean;
+  hideEmptyPlaceholder?: boolean;
   onFocus?: (name: string) => void;
 }
 
@@ -40,6 +41,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   readOnly,
   autoHide,
   showRememberTip,
+  hideEmptyPlaceholder,
   onFocus,
 }) {
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
@@ -48,7 +50,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
     }
   }, [onFocus]);
 
-  if (properties.length === 0) {
+  if (properties.length === 0 && !hideEmptyPlaceholder) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 

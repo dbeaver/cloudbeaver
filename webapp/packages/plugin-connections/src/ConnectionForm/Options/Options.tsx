@@ -30,6 +30,7 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -74,13 +75,23 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       return;
     }
 
-    const prevDriver = prev ? await driver.resource.load(prev) : undefined;
-    const newDriver = await driver.resource.load(value);
+    const prevDriver = prev ? await driverMap.resource.load(prev) : undefined;
+    const newDriver = await driverMap.resource.load(value);
 
     optionsHook.setDefaults(newDriver, prevDriver);
   }, []);
 
-  const driver = useMapResource(
+  const handleAuthModelSelect = useCallback(async (value?: string, name?: string, prev?: string) => {
+    const model = applicableAuthModels.find(model => model?.id === value);
+
+    if (!model) {
+      return;
+    }
+
+    optionsHook.setAuthModel(model);
+  }, []);
+
+  const driverMap = useMapResource(
     Options,
     DBDriverResource,
     { key: config.driverId || null, includes: ['includeProviderProperties'] },
@@ -93,39 +104,52 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   );
 
+  const driver = driverMap.data;
+
   const handleFormChange = useCallback((value?: unknown, name?: string) => {
     if (name !== 'name') {
-      optionsHook.updateNameTemplate(driver.data);
+      optionsHook.updateNameTemplate(driver);
     }
   }, []);
+
+  const { data: applicableAuthModels } = useMapResource(
+    Options,
+    DatabaseAuthModelsResource,
+    resourceKeyList(driver?.applicableAuthModels || [])
+  );
+
 
   const { data: authModel } = useMapResource(
     Options,
     DatabaseAuthModelsResource,
-    info?.authModel || driver.data?.defaultAuthModel || null,
+    config.authModelId || info?.authModel || driver?.defaultAuthModel || null,
     {
       onData: data => optionsHook.setAuthModel(data),
     }
   );
 
-  const JDBC = isJDBCConnection(driver.data, info);
+  const JDBC = isJDBCConnection(driver, info);
   const admin = state.type === 'admin';
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
-  const drivers = driver.resource.values
+  const drivers = driverMap.resource.values
     .filter(({ id }) => availableDrivers.includes(id))
-    .sort(driver.resource.compare);
+    .sort(driverMap.resource.compare);
 
   let properties = authModel?.properties;
 
-  if (info?.authProperties && info.authProperties.length > 0) {
+  if (
+    info?.authProperties
+    && info.authProperties.length > 0
+    && config.authModelId === info.authModel
+  ) {
     properties = info.authProperties;
   }
 
   // TODO we need to get these values other way
-  const providerPropertiesWithoutBoolean = driver.data?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
-  const booleanProviderProperties = driver.data?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
+  const providerPropertiesWithoutBoolean = driver?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
+  const booleanProviderProperties = driver?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange}>
@@ -180,7 +204,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             ) : (
               <ParametersForm
                 config={config}
-                embedded={driver.data?.embedded}
+                embedded={driver?.embedded}
                 disabled={disabled}
                 readOnly={readonly}
                 originLocal={originLocal}
@@ -210,32 +234,53 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(authModel && !driver.data?.anonymousAccess && properties && authentication.authorized) && (
+          {(!driver?.anonymousAccess && authentication.authorized) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              <Container wrap gap>
-                <ObjectPropertyInfoForm
-                  autofillToken='new-password'
-                  properties={properties}
-                  state={config.credentials}
-                  disabled={disabled}
-                  readOnly={readonly}
-                  showRememberTip
-                  tiny
-                />
-              </Container>
-              {credentialsSavingEnabled && (
-                <FieldCheckbox
-                  id={config.connectionId + 'authNeeded'}
-                  name="saveCredentials"
+              {applicableAuthModels.length > 1 && (
+                <Combobox
+                  name='authModelId'
                   state={config}
-                  disabled={disabled || readonly}
-                >{translate('connections_connection_edit_save_credentials')}
-                </FieldCheckbox>
+                  items={applicableAuthModels}
+                  keySelector={model => model!.id}
+                  valueSelector={model => model!.displayName}
+                  titleSelector={model => model?.description}
+                  searchable={applicableAuthModels.length > 10}
+                  readOnly={readonly}
+                  disabled={disabled}
+                  tiny
+                  fill
+                  onSelect={handleAuthModelSelect}
+                />
+              )}
+              {authModel && properties && (
+                <>
+                  <Container wrap gap hideEmpty>
+                    <ObjectPropertyInfoForm
+                      autofillToken='new-password'
+                      properties={properties}
+                      state={config.credentials}
+                      disabled={disabled}
+                      readOnly={readonly}
+                      showRememberTip
+                      hideEmptyPlaceholder
+                      tiny
+                    />
+                  </Container>
+                  {credentialsSavingEnabled && (
+                    <FieldCheckbox
+                      id={config.connectionId + 'authNeeded'}
+                      name="saveCredentials"
+                      state={config}
+                      disabled={disabled || readonly}
+                    >{translate('connections_connection_edit_save_credentials')}
+                    </FieldCheckbox>
+                  )}
+                </>
               )}
             </Group>
           )}
-          {driver.isLoaded() && driver.data?.providerProperties && driver.data.providerProperties.length > 0 && (
+          {driverMap.isLoaded() && driver?.providerProperties && driver.providerProperties.length > 0 && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
               {booleanProviderProperties && booleanProviderProperties.length > 0 && (

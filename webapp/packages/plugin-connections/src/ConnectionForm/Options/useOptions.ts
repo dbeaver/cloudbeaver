@@ -95,26 +95,31 @@ export function useOptions(state: IConnectionFormState) {
         this.updateNameTemplate(driver);
 
         if (driver?.id !== prevDriver?.id) {
-          for (const property of Object.keys(config.credentials)) {
-            delete config.credentials[property];
-          }
-
-          for (const property of Object.keys(config.providerProperties)) {
-            delete config.providerProperties[property];
-          }
-
+          config.credentials = {};
+          config.providerProperties = {};
           config.authModelId = driver?.defaultAuthModel;
         }
       });
     },
     setAuthModel(model: DatabaseAuthModel) {
-      // const {
-      //   props: {
-      //     data: { info, config },
-      //   },
-      // } = refObject.current;
+      const {
+        state: {
+          config,
+          info,
+        },
+      } = refObject;
 
-      // config.credentials = {};
+      config.credentials = {};
+
+      if (model.id === info?.authModel) {
+        if (info.authProperties) {
+          for (const property of info.authProperties) {
+            if (!property.features.includes('password')) {
+              config.credentials[property.id!] = property.value;
+            }
+          }
+        }
+      }
     },
   });
 }
