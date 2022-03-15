@@ -1,8 +1,10 @@
 query navNodeChildren(
   $parentPath: ID!
+  $offset: Int
+  $limit: Int
   $withDetails: Boolean!
 ) {
-  navNodeChildren(parentPath: $parentPath) {
+  navNodeChildren(parentPath: $parentPath, offset: $offset, limit: $limit) {
     ...NavNodeInfo
   }
 

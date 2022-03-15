@@ -18,9 +18,9 @@ import { NavTreeResource } from './NavTreeResource';
 @injectable()
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
-    private graphQLService: GraphQLService,
-    private navNodeInfoResource: NavNodeInfoResource,
-    private navTreeResource: NavTreeResource
+    private readonly graphQLService: GraphQLService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly navTreeResource: NavTreeResource
   ) {
     super();
 
@@ -34,7 +34,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     await this.performUpdate(
       key,
       [],
-      () => this.loadFromChildren(parentId),
+      () => this.loadFromChildren(parentId, 0, this.navTreeResource.childrenLimit + 1),
       () => this.isLoaded(key) && !this.isOutdated(key)
     );
 
@@ -55,9 +55,11 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return this.data;
   }
 
-  private async loadFromChildren(parentId: string) {
+  private async loadFromChildren(parentId: string, offset: number, limit: number) {
     const { dbObjects } = await this.graphQLService.sdk.getChildrenDBObjectInfo({
       navNodeId: parentId,
+      offset,
+      limit,
     });
 
     this.set(resourceKeyList(dbObjects.map(dbObject => dbObject.id)), dbObjects);
