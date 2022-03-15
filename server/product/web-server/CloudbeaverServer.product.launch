@@ -107,6 +107,7 @@
         <setEntry value="io.cloudbeaver.connect.provider.sample@default:default"/>
         <setEntry value="io.cloudbeaver.product.ce@default:default"/>
         <setEntry value="io.cloudbeaver.resources.drivers.base@default:default"/>
+        <setEntry value="io.cloudbeaver.model@default:default"/>
         <setEntry value="io.cloudbeaver.server@default:default"/>
         <setEntry value="io.cloudbeaver.service.admin@default:default"/>
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>

@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.session;
+package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebHandlerRegistry;
+import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -29,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Various constants
@@ -91,7 +96,11 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             webSession = sessionMap.get(sessionId);
             if (webSession == null) {
-                webSession = new WebSession(httpSession);
+                CBApplication application = CBApplication.getInstance();
+                Map<String, DBWSessionHandler> sessionHandlers = WebHandlerRegistry.getInstance().getSessionHandlers()
+                    .stream()
+                    .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
+                webSession = new WebSession(httpSession, CBApplication.getInstance().getSecurityController(), application, sessionHandlers);
                 sessionMap.put(sessionId, webSession);
 
                 if (!CBApplication.getInstance().isConfigurationMode()) {

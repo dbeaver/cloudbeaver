@@ -13,11 +13,14 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>io.cloudbeaver.model</module>
         <module>io.cloudbeaver.server</module>
+
         <module>io.cloudbeaver.service.admin</module>
         <module>io.cloudbeaver.service.auth</module>
         <module>io.cloudbeaver.service.metadata</module>
         <module>io.cloudbeaver.service.data.transfer</module>
+        <module>io.cloudbeaver.service.security</module>
 
         <module>io.cloudbeaver.resources.drivers.base</module>
         <module>io.cloudbeaver.connect.provider.sample</module>

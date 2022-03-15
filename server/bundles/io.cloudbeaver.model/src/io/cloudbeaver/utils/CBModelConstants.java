@@ -14,30 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.utils;
 
-import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.dbeaver.model.DBConstants;
 
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
-class CBDatabaseInitialData {
-    private String adminName = "cbadmin";
-    private String adminPassword = "cbadmin20";
-    private List<WebRole> roles;
-
-    public String getAdminName() {
-        return adminName;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public List<WebRole> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<WebRole> roles) {
-        this.roles = roles;
-    }
+public class CBModelConstants {
+    public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
 }

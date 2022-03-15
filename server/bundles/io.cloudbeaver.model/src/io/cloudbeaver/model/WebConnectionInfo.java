@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.sql.WebDataFormat;
+import io.cloudbeaver.utils.WebCommonUtils;
+import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -166,7 +166,7 @@ public class WebConnectionInfo {
     @Property
     public String getConnectTime() {
         return dataSourceContainer.getConnectTime() == null ? null :
-            CBConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
+            CBModelConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
     }
 
     @Property
@@ -282,7 +282,7 @@ public class WebConnectionInfo {
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, hasContextCredentials))
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 

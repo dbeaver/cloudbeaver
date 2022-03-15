@@ -17,70 +17,11 @@
 package io.cloudbeaver.server;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.utils.ArrayUtils;
-import org.jkiss.utils.CommonUtils;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ConfigurationUtils {
     private ConfigurationUtils() {
-    }
-
-    public static Map<String, Object> databaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
-        Map<String, Object> res = new LinkedHashMap<>();
-        if (databaseConfiguration == null) {
-            return res;
-        }
-        res.computeIfAbsent(
-            CBDatabase.PARAM_DB_DRIVER_CONFIGURATION,
-            v -> databaseConfiguration.getDriver()
-        );
-        res.computeIfAbsent(
-            CBDatabase.PARAM_DB_URL_CONFIGURATION,
-            v -> databaseConfiguration.getUrl()
-        );
-        res.computeIfAbsent(
-            CBDatabase.PARAM_DB_USER_CONFIGURATION,
-            v -> databaseConfiguration.getUser()
-        );
-        res.computeIfAbsent(
-            CBDatabase.PARAM_DB_PW_CONFIGURATION,
-            v -> databaseConfiguration.getPassword()
-        );
-        res.put(CBDatabase.PARAM_DB_CREATE_DATABASE_CONFIGURATION, databaseConfiguration.isCreateDatabase());
-        res.put(CBDatabase.PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION, databaseConfiguration.isAllowPublicAccess());
-        res.computeIfAbsent(
-            CBDatabase.PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
-            v -> databaseConfiguration.getInitialDataConfiguration()
-        );
-        Map<String, Object> poolMap = ConfigurationUtils.poolDatabaseConfigToMap(databaseConfiguration);
-        if (!CommonUtils.isEmpty(poolMap)) {
-            res.put(CBDatabase.PARAM_DB_POOL_CONFIGURATION, poolMap);
-        }
-        return res;
-    }
-
-    public static Map<String, Object> poolDatabaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
-        Map<String, Object> res = new LinkedHashMap<>();
-        if (databaseConfiguration == null) {
-            return res;
-        }
-        CBDatabaseConfig.Pool pool = databaseConfiguration.getPool();
-        if (pool == null) {
-            return res;
-        } else {
-            res.put(CBDatabase.PARAM_DB_POOL_MIN_IDLE_CONNECTIONS_CONFIGURATION, pool.getMinIdleConnections());
-            res.put(CBDatabase.PARAM_DB_POOL_MAX_IDLE_CONNECTIONS_CONFIGURATION, pool.getMaxIdleConnections());
-            res.put(CBDatabase.PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION, pool.getMaxConnections());
-            res.computeIfAbsent(
-                CBDatabase.PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION,
-                v -> pool.getValidationQuery()
-            );
-        }
-        return res;
     }
 
     public static boolean isDriverEnabled(@NotNull DBPDriver driver) {

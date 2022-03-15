@@ -26,6 +26,7 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -63,15 +64,11 @@ import java.util.*;
 /**
  * Various constants
  */
-public class WebServiceUtils {
+public class WebServiceUtils extends WebCommonUtils {
 
     private static final Log log = Log.getLog(WebServiceUtils.class);
 
     private static final Gson gson = new GsonBuilder().create();
-
-    public static String makeIconId(@Nullable DBPImage icon) {
-        return icon == null ? null : icon.getLocation();
-    }
 
     @NotNull
     public static DBPDriver getDriverById(String id) throws DBWebException {
@@ -298,60 +295,6 @@ public class WebServiceUtils {
     public static void checkServerConfigured() throws DBWebException {
         if (CBApplication.getInstance().isConfigurationMode()) {
             throw new DBWebException("Server is in configuration mode");
-        }
-    }
-
-    @NotNull
-    public static WebPropertyInfo[] getObjectProperties(WebSession session, DBPObject details) {
-        PropertyCollector propertyCollector = new PropertyCollector(details, false);
-        propertyCollector.collectProperties();
-        return Arrays.stream(propertyCollector.getProperties())
-            .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
-            .map(p -> new WebPropertyInfo(session, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
-    }
-
-    public static boolean isAuthPropertyApplicable(DBPPropertyDescriptor prop, boolean hasContextCredentials) {
-        if (hasContextCredentials && prop instanceof ObjectPropertyDescriptor) {
-            if (((ObjectPropertyDescriptor) prop).isHidden()) {
-                return false;
-            }
-            AuthProperty authProperty = ((ObjectPropertyDescriptor) prop).getAnnotation(AuthProperty.class);
-            if (authProperty != null) return !authProperty.contextProvided();
-        }
-        return true;
-    }
-
-    @Nullable
-    public static DBPDataSourceContainer getLocalOrGlobalDataSource(WebSession webSession, String connectionId) throws DBWebException {
-        DBPDataSourceContainer dataSource = null;
-        if (!CommonUtils.isEmpty(connectionId)) {
-            dataSource = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(connectionId);
-            if (dataSource == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || CBApplication.getInstance().isConfigurationMode())) {
-                // If called for new connection in admin mode then this connection may absent in session registry yet
-                dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);
-            }
-        }
-        return dataSource;
-    }
-
-    public static void saveCredentialsInDataSource(WebConnectionInfo webConnectionInfo, DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
-        // Properties passed from web
-        // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
-        Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
-        if (authProperties != null) {
-            authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
-        }
-        List<WebNetworkHandlerConfigInput> networkCredentials = webConnectionInfo.getSavedNetworkCredentials();
-        if (networkCredentials != null) {
-            networkCredentials.forEach(c -> {
-                if (c != null) {
-                    DBWHandlerConfiguration handlerCfg = configuration.getHandler(c.getId());
-                    if (handlerCfg != null) {
-                        handlerCfg.setUserName(c.getUserName());
-                        handlerCfg.setPassword(c.getPassword());
-                    }
-                }
-            });
         }
     }
 

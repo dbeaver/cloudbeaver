@@ -20,9 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.service.security.SecurityPluginService;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -73,7 +76,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseApplicationImpl {
+public class CBApplication extends BaseApplicationImpl implements WebApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -103,13 +106,12 @@ public class CBApplication extends BaseApplicationImpl {
 
     // Configurations
     private final Map<String, Object> productConfiguration = new HashMap<>();
+    private final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
-    private final CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
-    private CBDatabase database;
-    private CBSecurityController securityController;
+    private SMAdminController<WebUser, WebRole, WebSession> securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -156,16 +158,12 @@ public class CBApplication extends BaseApplicationImpl {
         return driversLocation;
     }
 
-    public File getHomeDirectory() {
-        return homeDirectory;
+    public Path getHomeDirectory() {
+        return homeDirectory.toPath();
     }
 
     public long getMaxSessionIdleTime() {
         return maxSessionIdleTime;
-    }
-
-    public CBDatabaseConfig getDatabaseConfiguration() {
-        return databaseConfiguration;
     }
 
     public CBAppConfig getAppConfiguration() {
@@ -194,10 +192,6 @@ public class CBApplication extends BaseApplicationImpl {
         return true;
     }
 
-    CBDatabase getDatabase() {
-        return database;
-    }
-
     @Override
     public Object start(IApplicationContext context) {
         String configPath = CBConstants.DEFAULT_CONFIG_FILE_PATH;
@@ -223,7 +217,6 @@ public class CBApplication extends BaseApplicationImpl {
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
-        //|| CommonUtils.isEmpty(databaseConfiguration.getUser()) || CommonUtils.isEmpty(databaseConfiguration.getPassword());
 
         // Determine address for local host
         localHostAddress = System.getenv(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
@@ -296,21 +289,12 @@ public class CBApplication extends BaseApplicationImpl {
 
         {
             try {
-                initializeDatabase();
+                initializeSecurityController();
             } catch (Exception e) {
                 log.error("Error initializing database", e);
                 return null;
             }
         }
-
-        Thread shutdownThread = new Thread(() -> {
-            try {
-                database.shutdown();
-            } catch (Exception e) {
-                log.error(e);
-            }
-        });
-        Runtime.getRuntime().addShutdownHook(shutdownThread);
 
         if (configurationMode) {
             // Try to configure automatically
@@ -431,36 +415,27 @@ public class CBApplication extends BaseApplicationImpl {
 
     @NotNull
     private File getRuntimeAppConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_APP_CONFIG_FILE_NAME);
+       return getDataDirectory(false).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
     }
 
     @NotNull
-    private File getRuntimeProductConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
+    private Path getRuntimeProductConfigFilePath() {
+        return getDataDirectory(false).resolve(CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
     }
 
     @NotNull
-    File getDataDirectory(boolean create) {
+    public Path getDataDirectory(boolean create) {
         File dataDir = new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME);
         if (create && !dataDir.exists()) {
             if (!dataDir.mkdirs()) {
                 log.error("Can't create data directory '" + dataDir.getAbsolutePath() + "'");
             }
         }
-        return dataDir;
+        return dataDir.toPath();
     }
 
-    private void initializeDatabase() throws DBException {
-        if (databaseConfiguration == null) {
-            throw new DBException("Database configuration missing");
-        }
-        database = new CBDatabase(this, databaseConfiguration);
-
-        securityController = new CBSecurityController(database);
-
-        database.initialize();
-
-        securityController.initializeMetaInformation();
+    private void initializeSecurityController() throws DBException {
+        securityController = SecurityPluginService.getSecurityService(this, databaseConfiguration);
     }
 
     private void loadConfiguration(String configPath) {
@@ -491,15 +466,11 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
-        InstanceCreator<CBDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
-        InstanceCreator<CBDatabaseConfig.Pool> dbPoolConfigCreator = type -> databaseConfiguration.getPool();
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
 
         Gson gson = new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
-            .registerTypeAdapter(CBDatabaseConfig.class, dbConfigCreator)
-            .registerTypeAdapter(CBDatabaseConfig.Pool.class, dbPoolConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
             .create();
 
@@ -536,13 +507,13 @@ public class CBApplication extends BaseApplicationImpl {
             }
 
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
-            contentRoot = getRelativePath(
+            contentRoot = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
             rootURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, rootURI);
             servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, servicesURI);
-            driversLocation = getRelativePath(
+            driversLocation = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, driversLocation), homeFolder);
-            workspaceLocation = getRelativePath(
+            workspaceLocation = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, workspaceLocation), homeFolder);
 
             maxSessionIdleTime = JSONUtils.getLong(serverConfig, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, maxSessionIdleTime);
@@ -553,12 +524,9 @@ public class CBApplication extends BaseApplicationImpl {
             // App config
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+            databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
-            // Database config
-            Map<String, Object> databaseConfig = JSONUtils.getObject(serverConfig, CBDatabase.PARAM_DB_CONFIGURATION);
-            gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
-
-            productConfigPath = getRelativePath(
+            productConfigPath = WebAppUtils.getRelativePath(
                 JSONUtils.getString(
                     serverConfig,
                     CBConstants.PARAM_PRODUCT_CONFIGURATION,
@@ -612,7 +580,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Add product config from runtime
         {
-            File rtConfig = getRuntimeProductConfigFile();
+            File rtConfig = getRuntimeProductConfigFilePath().toFile();
             if (rtConfig.exists()) {
                 log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
                 try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
@@ -623,17 +591,6 @@ public class CBApplication extends BaseApplicationImpl {
             }
         }
         patchConfigurationWithProperties(productConfiguration);
-    }
-
-    static String getRelativePath(String path, String curDir) {
-        return getRelativePath(path, new File(curDir));
-    }
-
-    static String getRelativePath(String path, File curDir) {
-        if (path.startsWith("/") || path.length() > 2 && path.charAt(1) == ':') {
-            return path;
-        }
-        return new File(curDir, path).getAbsolutePath();
     }
 
     private void runWebServer() {
@@ -699,7 +656,7 @@ public class CBApplication extends BaseApplicationImpl {
         }
 
         if (isConfigurationMode()) {
-            database.finishConfiguration(adminName, adminPassword, authInfoList);
+            SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
         }
 
         // Save runtime configuration
@@ -773,9 +730,8 @@ public class CBApplication extends BaseApplicationImpl {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
                     }
 
-                    Map<String, Object> dbMap = ConfigurationUtils.databaseConfigToMap(databaseConfiguration);
-                    if (!CommonUtils.isEmpty(dbMap)) {
-                        JSONUtils.serializeProperties(json, CBDatabase.PARAM_DB_CONFIGURATION, dbMap);
+                    if (!CommonUtils.isEmpty(databaseConfiguration)) {
+                        JSONUtils.serializeProperties(json, CBConstants.PARAM_DB_CONFIGURATION, databaseConfiguration);
                     }
                     json.endObject();
                 }

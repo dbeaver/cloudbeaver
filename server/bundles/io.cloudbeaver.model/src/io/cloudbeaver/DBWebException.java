@@ -20,8 +20,6 @@ import graphql.ErrorClassification;
 import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
-import io.cloudbeaver.server.graphql.GraphQLEndpoint;
-import io.cloudbeaver.service.WebServiceBindingBase;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -109,19 +107,20 @@ public class DBWebException extends DBException implements GraphQLError {
 
         Map<String, Object> extensions = new LinkedHashMap<>();
         String stString = buf.toString();
-        int divPos = stString.indexOf(WebServiceBindingBase.class.getName());
-        if (divPos == -1) {
-            divPos = stString.indexOf(GraphQLEndpoint.class.getName());
-        }
-        if (divPos != -1) {
-            stString = stString.substring(0, divPos);
-        }
-        divPos = stString.indexOf(':');
-        if (divPos != -1) {
-            String exceptionClass = stString.substring(0, divPos);
-            extensions.put("exceptionClass", exceptionClass);
-            //stString = stString.substring(divPos + 1).trim();
-        }
+        //TODO looks unused and can be removed
+//        int divPos = stString.indexOf(WebServiceBindingBase.class.getName());
+//        if (divPos == -1) {
+//            divPos = stString.indexOf(GraphQLEndpoint.class.getName());
+//        }
+//        if (divPos != -1) {
+//            stString = stString.substring(0, divPos);
+//        }
+//        divPos = stString.indexOf(':');
+//        if (divPos != -1) {
+//            String exceptionClass = stString.substring(0, divPos);
+//            extensions.put("exceptionClass", exceptionClass);
+//            //stString = stString.substring(divPos + 1).trim();
+//        }
         extensions.put("stackTrace", stString);
         int errorCode = getErrorCode();
         if (errorCode != ERROR_CODE_NONE) {

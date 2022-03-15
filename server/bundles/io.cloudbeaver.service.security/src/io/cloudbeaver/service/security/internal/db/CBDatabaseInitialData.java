@@ -14,13 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.user;
+package io.cloudbeaver.service.security.internal.db;
 
-/**
- * Web auth subject.
- */
-public interface WebAuthSubject {
+import io.cloudbeaver.model.user.WebRole;
 
-    String getSubjectId();
+import java.util.List;
 
+class CBDatabaseInitialData {
+    private String adminName = "cbadmin";
+    private String adminPassword = "cbadmin20";
+    private List<WebRole> roles;
+
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    public List<WebRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<WebRole> roles) {
+        this.roles = roles;
+    }
 }

@@ -59,8 +59,7 @@ public class CBStaticServlet extends DefaultServlet {
 
         if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth() &&
             (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html")) &&
-            request.getParameterMap().isEmpty())
-        {
+            request.getParameterMap().isEmpty()) {
             if (processSessionStart(request, response)) {
                 return;
             }

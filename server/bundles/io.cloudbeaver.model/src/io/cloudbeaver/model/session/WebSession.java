@@ -16,17 +16,17 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebHandlerRegistry;
-import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
+import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
@@ -51,11 +52,13 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.ProjectMetadata;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
@@ -111,23 +114,32 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
+    private final SMController<?, ?, WebSession> securityController;
+    private final WebApplication application;
+    private final Map<String, DBWSessionHandler> sessionHandlers;
 
     @NotNull
     public static Path getUserProjectsFolder() {
-        return CBPlatform.getInstance().getWorkspace().getAbsolutePath().resolve(USER_PROJECTS_FOLDER);
+        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(USER_PROJECTS_FOLDER);
     }
 
-    public WebSession(HttpSession httpSession) {
+    public WebSession(HttpSession httpSession,
+                      SMController<?, ?, WebSession> securityController,
+                      WebApplication application,
+                      Map<String, DBWSessionHandler> sessionHandlers) {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionAuthContext = new SessionContextImpl(null);
         this.sessionAuthContext.addSession(this);
+        this.securityController = securityController;
+        this.application = application;
+        this.sessionHandlers = sessionHandlers;
 
         try {
             // Check persistent state
-            this.persisted = CBApplication.getInstance().getSecurityController().isSessionPersisted(this.id);
+            this.persisted = securityController.isSessionPersisted(this.id);
         } catch (Exception e) {
             log.error("Error checking session state,", e);
         }
@@ -175,15 +187,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @Property
     public String getCreateTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(createTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(createTime);
     }
 
     @Property
     public synchronized String getLastAccessTime() {
-        return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    synchronized long getLastAccessTimeMillis() {
+    public synchronized long getLastAccessTimeMillis() {
         return lastAccessTime;
     }
 
@@ -241,7 +253,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     private void initNavigatorModel() {
-        CBPlatform platform = CBPlatform.getInstance();
+        DBPPlatform platform = DBWorkbench.getPlatform();
         DBPProject globalProject = platform.getWorkspace().getActiveProject();
 
         String projectName;
@@ -333,12 +345,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @NotNull
     private Set<String> readAccessibleConnectionIds() {
-        CBApplication application = CBApplication.getInstance();
         String subjectId = user == null ?
             application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
 
         try {
-            return Arrays.stream(application.getSecurityController()
+            return Arrays.stream(securityController
                 .getSubjectConnectionAccess(new String[]{subjectId}))
                 .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
         } catch (DBCException e) {
@@ -383,17 +394,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private void refreshSessionAuth() {
         try {
-            CBApplication application = CBPlatform.getInstance().getApplication();
 
             if (this.user == null) {
                 if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
-                    sessionPermissions = application.getSecurityController().getSubjectPermissions(
+                    sessionPermissions = securityController.getSubjectPermissions(
                         application.getAppConfiguration().getAnonymousUserRole());
                 } else {
                     sessionPermissions = Collections.emptySet();
                 }
             } else {
-                sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
+                sessionPermissions = securityController.getUserPermissions(this.user.getUserId());
             }
 
             accessibleConnectionIds = readAccessibleConnectionIds();
@@ -429,7 +439,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
+    public synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -440,12 +450,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    CBApplication.getInstance().getSecurityController().createSession(this);
+                    securityController.createSession(this);
                     this.persisted = true;
                 } else {
-                    if (!CBApplication.getInstance().isConfigurationMode()) {
+                    if (!application.isConfigurationMode()) {
                         // Update record
-                        CBApplication.getInstance().getSecurityController().updateSession(this);
+                        securityController.updateSession(this);
                     }
                 }
             } catch (Exception e) {
@@ -469,7 +479,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = WebServiceUtils.getLocalOrGlobalDataSource(this, connectionID);
+            DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(application,this, connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -501,7 +511,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    void close() {
+    public void close() {
         try {
             resetNavigationModel();
             resetSessionCache();
@@ -586,7 +596,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
                 TaskProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, asyncTask);
                 try {
-                    Number queryLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
+                    Number queryLimit = application.getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
                     if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
                         throw new DBQuotaException(
                             "Maximum simultaneous queries quota exceeded", WebSQLConstants.QUOTA_PROP_QUERY_LIMIT, queryLimit.intValue(), curTaskCount);
@@ -746,13 +756,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public void notifySessionAuthChange() {
         // Notify handlers about auth change
-        for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+        sessionHandlers.forEach((id, handler) -> {
             try {
-                hd.getInstance().handleSessionAuth(this);
+                handler.handleSessionAuth(this);
             } catch (Exception e) {
-                log.error("Error calling session handler '" + hd.getId() + "'", e);
+                log.error("Error calling session handler '" + id + "'", e);
             }
-        }
+        });
     }
 
     private void removeAuthInfo(WebAuthInfo oldAuthInfo) {
@@ -792,7 +802,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             }
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
-                WebServiceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
+                WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }
 
             // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)

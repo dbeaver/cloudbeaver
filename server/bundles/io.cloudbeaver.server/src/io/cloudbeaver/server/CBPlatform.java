@@ -17,7 +17,7 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.model.session.WebSessionManager;
+import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
