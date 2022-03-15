@@ -21,10 +21,8 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
 
 const styles = css`
-  MenuItem, MenuButton {
-    composes: theme-ripple from global;
-  }
   MenuButton {
+    composes: theme-ripple from global;
     background: transparent;
     outline: none;
     padding: 4px;
@@ -72,7 +70,8 @@ export const PropertyValueSelector = observer<Props>(function PropertyValueSelec
     const resizeObserver = new ResizeObserver(() => {
       const containerSize = container.getBoundingClientRect();
       if (menuRef.current && containerSize !== undefined) {
-        menuRef.current.style.width = containerSize.width + 'px';
+        // 1px offset of MenuButton
+        menuRef.current.style.width = (containerSize.width - 1) + 'px';
       }
     });
 

@@ -7,16 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import {
-  useCallback, useRef, useState, useLayoutEffect
-} from 'react';
+import { useCallback, useRef, useState, useLayoutEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
-import { useFocus } from '../useFocus';
 import type { IProperty } from './IProperty';
 import { PropertyValueSelector } from './PropertyValueSelector';
 
@@ -43,15 +40,15 @@ const styles = css`
 
       & ShadowInput {
         height: 24px;
-        padding: 0 36px;
+        padding: 0 36px 0 12px;
       }
     }
-    property-value {
-      margin-left: 2px;
+    property-value, property-name {
+      margin-left: 24px;
     }
     property-name {
       flex: 0 0 auto;
-      width: 300px;
+      width: 276px;
     }
     property-remove {
       position: relative;
@@ -69,7 +66,7 @@ const styles = css`
       opacity: 1;
     }
     ShadowInput {
-      composes: theme-background-surface theme-border-color-positive from global;
+      composes: theme-background-surface from global;
     }
     property-name ShadowInput, property-value ShadowInput {
       box-sizing: border-box;
@@ -77,14 +74,13 @@ const styles = css`
       color: inherit;
       width: 100%;
       outline: none;
-      border: solid 1px;
 
       &[|edited] {
         font-weight: 600;
       }
       &:global([readonly]), &:not(:focus):not([|focus]) {
         background: transparent !important;
-        border: solid 1px transparent !important;
+        border: solid 2px transparent !important;
       }
     }
     Icon {
