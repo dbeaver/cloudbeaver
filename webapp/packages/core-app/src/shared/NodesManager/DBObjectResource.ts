@@ -34,7 +34,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     await this.performUpdate(
       key,
       [],
-      () => this.loadFromChildren(parentId),
+      () => this.loadFromChildren(parentId, 0, this.navTreeResource.childrenLimit + 1),
       () => this.isLoaded(key) && !this.isOutdated(key)
     );
 
@@ -55,7 +55,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return this.data;
   }
 
-  private async loadFromChildren(parentId: string, offset = 0, limit = this.navTreeResource.childrenLimit + 1) {
+  private async loadFromChildren(parentId: string, offset: number, limit: number) {
     const { dbObjects } = await this.graphQLService.sdk.getChildrenDBObjectInfo({
       navNodeId: parentId,
       offset,

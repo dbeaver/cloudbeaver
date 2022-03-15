@@ -292,14 +292,15 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
+    const limit = this.childrenLimit + 1;
     if (isResourceKeyList(key)) {
       const values: NavNodeChildrenQuery[] = [];
       for (const nodePath of key.list) {
-        values.push(await this.loadNodeChildren(nodePath));
+        values.push(await this.loadNodeChildren(nodePath, 0, limit));
       }
       this.setNavObject(values);
     } else {
-      this.setNavObject(await this.loadNodeChildren(key));
+      this.setNavObject(await this.loadNodeChildren(key, 0, limit));
     }
 
     return this.data;
@@ -470,8 +471,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   private async loadNodeChildren(
     parentPath: string,
-    offset = 0,
-    limit = this.childrenLimit + 1
+    offset: number,
+    limit: number
   ): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
