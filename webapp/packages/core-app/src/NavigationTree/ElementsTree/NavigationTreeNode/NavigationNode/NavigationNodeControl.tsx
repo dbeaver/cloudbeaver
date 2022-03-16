@@ -65,7 +65,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
     || !!navTreeResource.getException(node.id)
   ));
   const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
-  const selected = getComputed(() => treeNodeContext.selected);
+  const selected = treeNodeContext.selected;
 
   const [editing, setEditing] = useState(false);
 

@@ -54,7 +54,7 @@ export const TableItem = observer<Props>(function TableItem({
     throw new Error('TableContext must be provided');
   }
 
-  const selectionDisabled = getComputed(() => selectDisabled || (!!context.state.isItemSelectable && ((
+  const selectionDisabled = selectDisabled || getComputed(() => (!!context.state.isItemSelectable && ((
     context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)
   ) || !context.state.isItemSelectable(item))));
 

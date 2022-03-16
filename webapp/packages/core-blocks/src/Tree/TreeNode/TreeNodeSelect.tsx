@@ -48,10 +48,10 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     throw new Error('Context not provided');
   }
 
-  disabled = getComputed(() => context.disabled || disabled);
-  group = getComputed(() => group ?? context.group);
-  const loading = getComputed(() => loadIndicator && context.loading);
-  selected = getComputed(() => selected ?? context.selected);
+  disabled = disabled || context.disabled;
+  group = group ?? context.group;
+  const loading = loadIndicator && context.loading;
+  selected = selected ?? context.selected;
 
   async function handleSelect() {
     await onSelect?.();

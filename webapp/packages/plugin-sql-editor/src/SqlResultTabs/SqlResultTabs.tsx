@@ -56,7 +56,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);
 
-  const orderedTabs = getComputed(() => state.tabs
+  const orderedTabs = state.tabs
     .slice()
     .sort((tabA, tabB) => {
       const resultTabA = state.resultTabs.find(tab => tab.tabId === tabA.id);
@@ -67,7 +67,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
       }
 
       return tabA.order - tabB.order;
-    }));
+    });
 
   function handleSelect(tab: ITabData) {
     sqlResultTabsService.selectResultTab(state, tab.tabId);

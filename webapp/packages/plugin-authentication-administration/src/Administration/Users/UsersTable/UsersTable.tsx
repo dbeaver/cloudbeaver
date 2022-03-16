@@ -72,7 +72,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const controller = useController(UsersTableController);
   const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
-  const users = getComputed(() => usersResource.data
+  const users = usersResource.data
     .filter<AdminUser>(filterUndefined)
     .sort((a, b) => {
       if (usersResource.resource.isNew(a.userId) === usersResource.resource.isNew(b.userId)) {
@@ -82,7 +82,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
         return -1;
       }
       return 1;
-    }));
+    });
 
   const create = param === 'create';
   const keys = users.map(user => user.userId);

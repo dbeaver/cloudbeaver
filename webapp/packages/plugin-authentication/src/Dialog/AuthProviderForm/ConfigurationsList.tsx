@@ -68,19 +68,19 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
     )).flat()
   );
 
-  const filteredConfigurations = getComputed(() => {
-    const sortedConfigurations = configurations
-      .slice()
-      .sort((a, b) => comparePublicAuthConfigurations(a.configuration, b.configuration)) || [];
+  const sortedConfigurations = configurations
+    .slice()
+    .sort((a, b) => comparePublicAuthConfigurations(a.configuration, b.configuration));
 
-    if (!search) {
-      return sortedConfigurations;
-    }
+  let filteredConfigurations: IProviderConfiguration[];
 
-    return sortedConfigurations.filter(({ configuration }) => {
-      const target = `${configuration.displayName}${configuration.description || ''}`;
-      return target.toUpperCase().includes(search.toUpperCase());
-    });
+  if (!search) {
+    filteredConfigurations =  sortedConfigurations;
+  }
+
+  filteredConfigurations =  sortedConfigurations.filter(({ configuration }) => {
+    const target = `${configuration.displayName}${configuration.description || ''}`;
+    return target.toUpperCase().includes(search.toUpperCase());
   });
 
   async function auth({ provider, configuration }: IProviderConfiguration) {

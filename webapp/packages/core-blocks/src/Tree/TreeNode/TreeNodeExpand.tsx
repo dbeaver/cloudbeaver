@@ -44,8 +44,8 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     throw new Error('Context not provided');
   }
 
-  disabled = getComputed(() => context.externalExpanded || context.disabled || disabled);
-  leaf = getComputed(() => context.leaf || leaf);
+  disabled = getComputed(() => context.externalExpanded || context.disabled) || disabled;
+  leaf = context.leaf || leaf;
   const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
