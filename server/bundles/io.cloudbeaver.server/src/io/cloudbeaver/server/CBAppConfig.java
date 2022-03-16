@@ -49,7 +49,7 @@ public class CBAppConfig implements WebAppConfiguration {
     private boolean supportsCustomConnections;
     private boolean supportsConnectionBrowser;
     private boolean supportsUserWorkspaces;
-    private boolean supportsReverseProxyAuth;
+    private boolean enableReverseProxyAuth;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
 
@@ -85,7 +85,7 @@ public class CBAppConfig implements WebAppConfiguration {
         this.plugins = new LinkedHashMap<>();
         this.authConfiguration = new LinkedHashMap<>();
         this.resourceQuotas = new LinkedHashMap<>();
-        this.supportsReverseProxyAuth = false;
+        this.enableReverseProxyAuth = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -107,7 +107,7 @@ public class CBAppConfig implements WebAppConfiguration {
         this.plugins = new LinkedHashMap<>(src.plugins);
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
         this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
-        this.supportsReverseProxyAuth = src.supportsReverseProxyAuth;
+        this.enableReverseProxyAuth = src.enableReverseProxyAuth;
     }
 
     public boolean isAnonymousAccessEnabled() {
@@ -334,8 +334,8 @@ public class CBAppConfig implements WebAppConfiguration {
     ////////////////////////////////////////////
     // Reverse proxy auth
 
-    public boolean isSupportsReverseProxyAuth() {
-        return supportsReverseProxyAuth;
+    public boolean isEnabledReverseProxyAuth() {
+        return enableReverseProxyAuth;
     }
 
 }
