@@ -36,6 +36,7 @@ mutation getSqlExecuteTaskResults(
                     }
                 }
                 rows
+                singleEntity
                 hasMoreData
             }
         }
