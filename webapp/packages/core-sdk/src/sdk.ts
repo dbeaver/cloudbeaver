@@ -1984,7 +1984,7 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 }>;
 
 
-export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; hasMoreData: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
+export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -2003,7 +2003,7 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
 }>;
 
 
-export type UpdateResultsDataBatchMutation = { result: { duration: number; filterText?: string; results: Array<{ updateRowCount?: number; resultSet?: { id: string; rows?: Array<Array<any>> } }> } };
+export type UpdateResultsDataBatchMutation = { result: { duration: number; filterText?: string; results: Array<{ updateRowCount?: number; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean } }> } };
 
 export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -3190,6 +3190,7 @@ export const GetSqlExecuteTaskResultsDocument = `
           }
         }
         rows
+        singleEntity
         hasMoreData
       }
     }
@@ -3240,6 +3241,8 @@ export const UpdateResultsDataBatchDocument = `
       resultSet {
         id
         rows
+        singleEntity
+        hasMoreData
       }
     }
   }

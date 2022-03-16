@@ -22,6 +22,8 @@ mutation updateResultsDataBatch(
             resultSet {
                 id
                 rows
+                singleEntity
+                hasMoreData
             }
         }
     }
