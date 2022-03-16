@@ -38,8 +38,8 @@ export class ResultSetEditAction
   static dataFormat = [ResultDataFormat.Resultset];
 
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
-  private editorData: Map<string, IResultSetUpdate>;
-  private data: ResultSetDataAction;
+  private readonly editorData: Map<string, IResultSetUpdate>;
+  private readonly data: ResultSetDataAction;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
@@ -50,7 +50,11 @@ export class ResultSetEditAction
     this.applyAction = new SyncExecutor();
     this.editorData = new Map();
     this.data = data;
-    this.features = ['add', 'delete'];
+    this.features = [];
+
+    if (result.data?.singleEntity) {
+      this.features = ['add', 'delete'];
+    }
 
     makeObservable<this, 'editorData'>(this, {
       editorData: observable,
