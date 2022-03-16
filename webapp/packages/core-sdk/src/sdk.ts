@@ -1509,7 +1509,7 @@ export type GetUserGrantedConnectionsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserGrantedConnectionsQuery = { grantedConnections: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> };
+export type GetUserGrantedConnectionsQuery = { grantedConnections: Array<{ connectionId: string; dataSourceId: string; subjectId: string; subjectType: AdminSubjectType }> };
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['ID']>;
@@ -1614,7 +1614,7 @@ export type GetConnectionAccessQueryVariables = Exact<{
 }>;
 
 
-export type GetConnectionAccessQuery = { subjects: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> };
+export type GetConnectionAccessQuery = { subjects: Array<{ connectionId: string; dataSourceId: string; subjectId: string; subjectType: AdminSubjectType }> };
 
 export type GetConnectionsQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']>;
@@ -1632,7 +1632,7 @@ export type GetSubjectConnectionAccessQueryVariables = Exact<{
 }>;
 
 
-export type GetSubjectConnectionAccessQuery = { grantInfo: Array<{ connectionId: string; subjectId: string; subjectType: AdminSubjectType }> };
+export type GetSubjectConnectionAccessQuery = { grantInfo: Array<{ connectionId: string; dataSourceId: string; subjectId: string; subjectType: AdminSubjectType }> };
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']> | Scalars['String'];
@@ -2697,6 +2697,7 @@ export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
     connectionId
+    dataSourceId
     subjectId
     subjectType
   }
@@ -2781,6 +2782,7 @@ export const GetConnectionAccessDocument = `
     query getConnectionAccess($connectionId: ID) {
   subjects: getConnectionSubjectAccess(connectionId: $connectionId) {
     connectionId
+    dataSourceId
     subjectId
     subjectType
   }
@@ -2797,6 +2799,7 @@ export const GetSubjectConnectionAccessDocument = `
     query getSubjectConnectionAccess($subjectId: ID) {
   grantInfo: getSubjectConnectionAccess(subjectId: $subjectId) {
     connectionId
+    dataSourceId
     subjectId
     subjectType
   }
