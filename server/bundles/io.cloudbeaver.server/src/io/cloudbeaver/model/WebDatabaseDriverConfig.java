@@ -205,6 +205,7 @@ public class WebDatabaseDriverConfig {
     @Property
     public String[] getApplicableAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
+            .filter(s -> !s.isDesktopModel())
             .map(DBPAuthModelDescriptor::getId).toArray(String[]::new);
     }
 
