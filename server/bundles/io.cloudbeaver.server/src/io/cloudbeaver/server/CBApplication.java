@@ -742,6 +742,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
                     JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+                    JSONUtils.field(json, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
 
                     Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
                     if (!CommonUtils.isEmpty(resourceQuotas)) {
