@@ -100,14 +100,15 @@
         <setEntry value="org.jkiss.bundle.jedis@default:default"/>
         <setEntry value="org.jkiss.bundle.lightcouch@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
-        <setEntry value="org.objectweb.asm@default:default"/>
+        <setEntry value="org.objectweb.asm*8.0.1.v20200420-1007@default:default"/>
+        <setEntry value="org.objectweb.asm*9.1.0.v20210209-1849@default:default"/>
         <setEntry value="org.slf4j.api@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
         <setEntry value="io.cloudbeaver.connect.provider.sample@default:default"/>
+        <setEntry value="io.cloudbeaver.model@default:default"/>
         <setEntry value="io.cloudbeaver.product.ce@default:default"/>
         <setEntry value="io.cloudbeaver.resources.drivers.base@default:default"/>
-        <setEntry value="io.cloudbeaver.model@default:default"/>
         <setEntry value="io.cloudbeaver.server@default:default"/>
         <setEntry value="io.cloudbeaver.service.admin@default:default"/>
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
