@@ -39,5 +39,7 @@ public class WebSQLConstants {
     public static final String ATTR_TEXT = "text";
     public static final String ATTR_BINARY = "binary";
     public static final String ATTR_DATA = "data";
+    public static final String ATTR_SRID = "srid";
+    public static final String ATTR_PROPERTIES = "properties";
 
 }
