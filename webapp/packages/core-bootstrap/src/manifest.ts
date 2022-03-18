@@ -41,7 +41,8 @@ import {
   SessionExpiredDialogService,
   SessionExpireWarningDialogService,
   ConnectionSchemaManagerBootstrap,
-  NavigationTreeBootstrap
+  NavigationTreeBootstrap,
+  ToolsPanelService
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -119,6 +120,7 @@ export const coreManifests: PluginManifest[] = [
       SettingsService,
       ThemeSettingsService,
       ThemeService,
+      ToolsPanelService,
     ],
   },
   coreSDKManifest,

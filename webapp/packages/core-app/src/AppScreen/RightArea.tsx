@@ -26,8 +26,8 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
-import { LogViewer } from '../shared/ToolsPanel/LogViewer/LogViewer';
-import { LogViewerService } from '../shared/ToolsPanel/LogViewer/LogViewerService';
+import { ToolsPanel } from '../shared/ToolsPanel/ToolsPanel';
+import { ToolsPanelService } from '../shared/ToolsPanel/ToolsPanelService';
 
 const styles = css`
     Pane {
@@ -45,9 +45,11 @@ const styles = css`
   `;
 
 export const RightArea = observer(function RightArea() {
-  const logViewerService = useService(LogViewerService);
+  const toolsPanelService = useService(ToolsPanelService);
   const optionsPanelService = useService(OptionsPanelService);
   const OptionsPanel = optionsPanelService.getPanelComponent();
+
+  const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active}>
@@ -55,16 +57,16 @@ export const RightArea = observer(function RightArea() {
         <ErrorBoundary remount><OptionsPanel /></ErrorBoundary>
       </SlideElement>
       <SlideElement>
-        <Split sticky={30} split="horizontal" mode={logViewerService.isActive ? undefined : 'minimize'} keepRatio>
+        <Split sticky={30} split="horizontal" mode={activeTools.length ? undefined : 'minimize'} keepRatio>
           <Pane>
             <ErrorBoundary remount>
               <NavigationTabsBar />
             </ErrorBoundary>
           </Pane>
-          {logViewerService.isActive && <ResizerControls />}
+          {!!activeTools.length && <ResizerControls />}
           <Pane main>
             <ErrorBoundary remount>
-              <LogViewer />
+              <ToolsPanel container={toolsPanelService.tabsContainer} />
             </ErrorBoundary>
           </Pane>
         </Split>
