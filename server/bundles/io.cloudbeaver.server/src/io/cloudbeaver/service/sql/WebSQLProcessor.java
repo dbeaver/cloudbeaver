@@ -377,6 +377,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBSEntity dataContainer = rowIdentifier.getEntity();
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
+        //only script generation (without execution)
+        boolean withoutExecution = keyReceiver == null;
 
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
@@ -410,7 +412,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < updateAttributes.length; i++) {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
                         Object realCellValue = convertInputCellValue(session, updateAttribute,
-                            updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition())));
+                            updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition())), withoutExecution);
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
@@ -425,7 +427,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 session,
                                 keyAttribute,
                                 convertInputCellValue(session, keyAttribute,
-                                    row.getData().get(keyAttribute.getOrdinalPosition())),
+                                    row.getData().get(keyAttribute.getOrdinalPosition()), withoutExecution),
                                 false,
                                 true);
                         }
@@ -457,7 +459,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (addedValues.get(i) != null) {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                addedValues.get(i));
+                                addedValues.get(i), withoutExecution);
                             insertAttributes.put(allAttributes[i], realCellValue);
                             finalRow[i] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                         }
@@ -487,7 +489,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                keyData.get(i));
+                                keyData.get(i), withoutExecution);
                             delKeyAttributes.put(allAttributes[i], realCellValue);
                         }
                     }
@@ -537,17 +539,26 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     @Nullable
-    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue) throws DBCException {
+    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBCException {
         cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
         Object realCellValue = cellRawValue;
         // In some cases we already have final value here
         if (!(realCellValue instanceof DBDValue)) {
-            realCellValue = updateAttribute.getValueHandler().getValueFromObject(
-                session,
-                updateAttribute,
-                cellRawValue,
-                false,
-                true);
+            try {
+                realCellValue = updateAttribute.getValueHandler().getValueFromObject(
+                        session,
+                        updateAttribute,
+                        cellRawValue,
+                        false,
+                        true);
+            } catch (DBCException e) {
+                //checks if this function is used only for script generation
+                if (justGenerateScript) {
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
         }
         return realCellValue;
     }
