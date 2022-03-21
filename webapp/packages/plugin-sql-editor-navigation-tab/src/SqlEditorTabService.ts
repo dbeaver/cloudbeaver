@@ -93,13 +93,14 @@ export class SqlEditorTabService extends Bootstrap {
   createNewEditor(
     name?: string,
     source?: string,
+    query?: string,
   ): ITabOptions<ISqlEditorTabState> | null {
 
     const order = this.getFreeEditorId();
 
     return {
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(order, name, source),
+      handlerState: this.sqlEditorService.getState(order, name, source, query),
     };
   }
 
