@@ -9,13 +9,16 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { EMainMenu, MainMenuService } from '../../../TopNavBar/MainMenu/MainMenuService';
+import { ToolsPanelService } from '../ToolsPanelService';
+import { LogViewer } from './LogViewer';
 import { LogViewerService } from './LogViewerService';
 
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {
   constructor(
-    private mainMenuService: MainMenuService,
-    private logViewerService: LogViewerService
+    private readonly mainMenuService: MainMenuService,
+    private readonly toolsPanelService: ToolsPanelService,
+    private readonly logViewerService: LogViewerService
   ) {
     super();
   }
@@ -32,6 +35,14 @@ export class LogViewerBootstrap extends Bootstrap {
         onClick: () => this.logViewerService.toggle(),
       }
     );
+
+    this.toolsPanelService.tabsContainer.add({
+      key: 'log-viewer-tab',
+      order: 0,
+      name: 'app_shared_toolsMenu_logViewer',
+      isHidden: () => !this.logViewerService.isActive,
+      panel: () => LogViewer,
+    });
   }
 
   load(): void { }
