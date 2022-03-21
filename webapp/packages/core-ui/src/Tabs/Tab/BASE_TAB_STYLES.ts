@@ -37,10 +37,6 @@ BaseTab {
   &:not(:global([aria-selected="true"])) {
     background-color: transparent !important;
   }
-
-  &:not(:only-child) {
-    padding-right: 14px;
-  }
 }
 
 tab-inner {
@@ -49,7 +45,7 @@ tab-inner {
   position: relative;
 }
 
-BaseTab:global([aria-selected="true"]) + tab-actions portal,
+tab-inner[|selected] portal,
 tab-inner portal[|menuOpened],
 tab-inner:hover portal,
 tab-inner:focus-within portal {
@@ -114,6 +110,11 @@ export const BASE_TAB_ACTION_STYLES = css`
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 1;
+
+    &:not(:empty) + BaseTab {
+      padding-right: 14px;
+    }
 
     &:empty {
       display: none;
