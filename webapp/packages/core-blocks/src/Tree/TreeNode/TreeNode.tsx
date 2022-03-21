@@ -23,7 +23,7 @@ interface Props extends ITreeNodeState {
   onClick?: (leaf: boolean) => Promise<void> | void;
   onExpand?: () => Promise<void> | void;
   onSelect?: (multiple?: boolean, nested?: boolean) => Promise<void> | void;
-  onOpen?: () => Promise<void> | void;
+  onOpen?: (leaf: boolean) => Promise<void> | void;
 }
 
 interface IInnerTreeNodeContext extends ITreeNodeContext {
@@ -76,7 +76,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
     },
     async open() {
       await processAction(async () => {
-        await handlersRef.onOpen?.();
+        await handlersRef.onOpen?.(this.leaf);
       });
     },
   }), {

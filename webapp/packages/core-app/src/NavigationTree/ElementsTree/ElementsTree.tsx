@@ -64,7 +64,7 @@ interface Props extends IElementsTreeOptions {
   className?: string;
   navNodeFilterCompare?: NavNodeFilterCompareFn;
   onClick?: (node: NavNode) => Promise<void> | void;
-  onOpen?: (node: NavNode) => Promise<void> | void;
+  onOpen?: (node: NavNode, folder: boolean) => Promise<void> | void;
 }
 
 export const ElementsTree = observer<Props>(function ElementsTree({
@@ -177,9 +177,10 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       folderExplorer,
       selectionTree,
       control,
-      onOpen,
-      onClick: async (node, path, leaf) => {
-        await onClick?.(node);
+      onOpen: async (node, path, leaf) => {
+        const folder = !leaf && tree.settings?.foldersTree || false;
+
+        await onOpen?.(node, folder);
 
         if (!leaf && tree.settings?.foldersTree) {
           const nodeId = node.id;
@@ -187,9 +188,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
           if (loaded) {
             await autoOpenFolders(nodeId, path);
+            tree.setFilter('');
           }
         }
       },
+      onClick,
     }),
     [control, folderExplorer, selectionTree, onOpen, onClick, folderExplorer]
   );

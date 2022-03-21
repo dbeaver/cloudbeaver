@@ -14,7 +14,7 @@ import { NavigationTreeService } from './NavigationTreeService';
 
 interface INavigationTree {
   navigationTreeService: NavigationTreeService;
-  handleOpen: (node: NavNode) => Promise<void>;
+  handleOpen: (node: NavNode, folder: boolean) => Promise<void>;
   handleSelect: (node: NavNode, state: boolean) => void;
 }
 
@@ -25,8 +25,10 @@ export function useNavigationTree(): INavigationTree {
 
   return useObjectRef<INavigationTree>(() => ({
     navigationTreeService,
-    handleOpen(node: NavNode) {
-      return this.navigationTreeService.navToNode(node.id, node.parentId);
+    async handleOpen(node: NavNode, folder: boolean) {
+      if (!folder) {
+        await  this.navigationTreeService.navToNode(node.id, node.parentId);
+      }
     },
     handleSelect(node: NavNode, state: boolean) {
       return this.navigationTreeService.selectNode(node.id, state);

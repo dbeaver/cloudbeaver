@@ -30,7 +30,7 @@ interface INavigationNode {
   leaf: boolean;
   empty: boolean;
   handleExpand: () => Promise<void>;
-  handleOpen: () => Promise<void>;
+  handleOpen: (leaf: boolean) => Promise<void>;
   handleClick: (leaf: boolean) => Promise<void>;
   handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
 }
@@ -54,7 +54,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
 
   const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, path, leaf);
-  const handleOpen = async () => await contextRef.context?.onOpen?.(node, path);
+  const handleOpen = async (leaf: boolean) => await contextRef.context?.onOpen?.(node, path, leaf);
   const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
   const handleSelect = async (
     multiple = false,

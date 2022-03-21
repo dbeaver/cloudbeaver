@@ -19,7 +19,7 @@ export interface IElementsTreeContext {
   folderExplorer: IFolderExplorerContext;
   selectionTree: boolean;
   control?: NavTreeControlComponent;
-  onOpen?: (node: NavNode, path: string[]) => Promise<void> | void;
+  onOpen?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
   onClick?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
 }
 

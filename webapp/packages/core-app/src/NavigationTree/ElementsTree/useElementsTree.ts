@@ -237,15 +237,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
         data.filter = '';
       }
 
-      if (options.settings?.saveExpanded) {
-        state.sync(data.nodeState);
+      if (!options.settings?.saveExpanded) {
+        data.nodeState = [];
+      }
 
-        elementsTree.loading = true;
-        try {
-          await functionsRef.loadTree(options.root);
-        } finally {
-          elementsTree.loading = false;
-        }
+      state.sync(data.nodeState);
+
+      elementsTree.loading = true;
+      try {
+        await functionsRef.loadTree(options.root);
+      } finally {
+        elementsTree.loading = false;
       }
     },
     data => (

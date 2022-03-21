@@ -38,11 +38,11 @@ const styles = css`
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow: auto;
     }
   
     actions {
       width: 32px;
-      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -66,6 +66,7 @@ const styles = css`
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-shrink: 0;
     }
   
     StaticImage {
@@ -91,7 +92,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     editor?.focus();
   }, [editor]);
 
-  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function preventFocus(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
   }
 
