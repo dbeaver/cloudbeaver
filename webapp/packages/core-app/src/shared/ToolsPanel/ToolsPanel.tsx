@@ -41,7 +41,7 @@ const formStyles = css`
     overflow: auto;
   }
   content-box {
-    composes: theme-background-secondary theme-border-color-background from global;
+    composes: theme-border-color-background from global;
     position: relative;
     display: flex;
     flex: 1;
@@ -60,11 +60,7 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
   return styled(useStyles(tabStyle, formStyles))(
     <TabsState container={container} lazy>
       <box>
-        <connection-top-bar>
-          <connection-top-bar-tabs>
-            <TabList style={tabStyle} />
-          </connection-top-bar-tabs>
-        </connection-top-bar>
+        <TabList style={tabStyle} />
         <content-box>
           <TabPanelList style={tabStyle} />
         </content-box>
