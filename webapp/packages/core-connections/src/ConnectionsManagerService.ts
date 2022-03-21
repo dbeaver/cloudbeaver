@@ -124,7 +124,7 @@ export class ConnectionsManagerService {
         await this._closeConnectionAsync(connection);
       }
       notification.close();
-    } catch (e) {
+    } catch (e: any) {
       controller.reject(e);
     } finally {
       this.disconnecting = false;
@@ -141,7 +141,7 @@ export class ConnectionsManagerService {
     try {
       await this._closeConnectionAsync(connection);
       notification.close();
-    } catch (exception) {
+    } catch (exception: any) {
       controller.reject(exception);
     }
   }

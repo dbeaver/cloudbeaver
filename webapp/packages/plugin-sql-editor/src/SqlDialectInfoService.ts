@@ -21,7 +21,7 @@ export class SqlDialectInfoService {
   async formatScript(context: IConnectionExecutionContextInfo, query: string): Promise<string> {
     try {
       return await this.connectionDialectResource.formatScript(context, query);
-    } catch (error) {
+    } catch (error: any) {
       this.notificationService.logException(error, 'Failed to format script');
     }
     return query;
@@ -35,7 +35,7 @@ export class SqlDialectInfoService {
     if (!this.connectionDialectResource.has(connectionId)) {
       try {
         return this.connectionDialectResource.load(connectionId);
-      } catch (error) {
+      } catch (error: any) {
         this.notificationService.logException(error, 'Failed to load SqlDialectInfo');
       }
     }

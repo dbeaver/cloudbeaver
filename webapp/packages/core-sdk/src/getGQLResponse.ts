@@ -18,7 +18,7 @@ export async function getGQLResponse<T>(query: Promise<T>): Promise<IGraphQLResp
     const data = await query;
 
     return { data };
-  } catch (exception) {
+  } catch (exception: any) {
     const data = exception instanceof GQLError ? exception.response.data : null;
     return {
       data,

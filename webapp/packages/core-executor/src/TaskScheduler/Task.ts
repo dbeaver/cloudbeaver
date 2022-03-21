@@ -70,7 +70,7 @@ export class Task<TValue> implements ITask<TValue> {
       try {
         const value = await this.innerPromise;
         return await onfulfilled?.(value) as TResult1;
-      } catch (e) {
+      } catch (e: any) {
         if (onrejected) {
           return await onrejected(e);
         }
@@ -85,7 +85,7 @@ export class Task<TValue> implements ITask<TValue> {
     return new Task(async () => {
       try {
         return await this.innerPromise;
-      } catch (exception) {
+      } catch (exception: any) {
         if (onrejected) {
           return await onrejected(exception);
         }

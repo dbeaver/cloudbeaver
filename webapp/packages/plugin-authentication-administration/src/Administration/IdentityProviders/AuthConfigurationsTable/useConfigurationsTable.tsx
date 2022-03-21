@@ -46,7 +46,7 @@ export function useConfigurationsTable(): Readonly<State> {
         this.processing = true;
         await resource.refreshAll();
         notificationService.logSuccess({ title: 'administration_identity_providers_configuration_list_update_success' });
-      } catch (exception) {
+      } catch (exception: any) {
         notificationService.logException(exception, 'administration_identity_providers_configuration_list_update_fail');
       } finally {
         this.processing = false;
@@ -83,7 +83,7 @@ export function useConfigurationsTable(): Readonly<State> {
 
         this.tableState.unselect();
         this.tableState.unexpand(deletionList);
-      } catch (exception) {
+      } catch (exception: any) {
         notificationService.logException(exception, 'Configurations delete failed');
       } finally {
         this.processing = false;

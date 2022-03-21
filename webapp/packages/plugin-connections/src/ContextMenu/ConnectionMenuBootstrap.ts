@@ -176,7 +176,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           case ACTION_DELETE: {
             try {
               await this.connectionsManagerService.deleteConnection(connection.id);
-            } catch (exception) {
+            } catch (exception: any) {
               this.notificationService.logException(exception, 'Failed to delete connection');
             }
             break;
@@ -199,7 +199,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       if (connection.nodePath) {
         await this.navNodeManagerService.refreshTree(connection.nodePath);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception);
     }
   }

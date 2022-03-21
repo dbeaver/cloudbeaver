@@ -33,7 +33,7 @@ export class ScriptPreviewService {
         script,
         model,
       });
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'data_viewer_script_preview_error_title');
     }
   }

@@ -173,7 +173,7 @@ export class PublicConnectionFormService {
     try {
       await this.connectionInfoResource.close(id);
       await this.connectionAuthService.auth(id);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
     }
   }

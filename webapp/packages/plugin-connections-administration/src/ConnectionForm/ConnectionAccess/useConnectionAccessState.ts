@@ -60,7 +60,7 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
         }
 
         this.state.loaded = true;
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
       } finally {
         this.state.loading = false;

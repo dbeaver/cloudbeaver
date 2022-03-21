@@ -43,6 +43,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "incremental": true,
+    "noEmit": false,
     "strictNullChecks": true,
     "isolatedModules": true,
     "types": [
@@ -51,6 +52,8 @@
     ],
   },
   "references": [
-      { "path": "./packages/*" }
+    {
+      "path": "./packages/*"
+    }
   ]
 }

@@ -77,7 +77,7 @@ export class ObjectPropertyTableFooterService {
             await this.navTreeResource.deleteNode(node.id);
             deleted.push(node.id);
           }
-        } catch (exception) {
+        } catch (exception: any) {
           this.notificationService.logException(exception, 'Failed to delete item');
         }
 

@@ -113,7 +113,7 @@ export class AsyncTask {
     this._cancelled = true;
     try {
       await this.cancelTask();
-    } catch (exception) {
+    } catch (exception: any) {
       this._cancelled = false;
       throw exception;
     }

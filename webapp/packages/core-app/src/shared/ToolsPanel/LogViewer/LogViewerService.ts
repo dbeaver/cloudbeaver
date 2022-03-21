@@ -123,7 +123,7 @@ export class LogViewerService {
     try {
       const newEntries = await this.loadLog();
       this.addNewEntries(newEntries);
-    } catch (e) {
+    } catch (e: any) {
       if (this.failedRequestsCount === 0 && !this.sessionExpireService.sessionExpired) {
         this.notificationService.logException(e, 'Failed to load log');
       }

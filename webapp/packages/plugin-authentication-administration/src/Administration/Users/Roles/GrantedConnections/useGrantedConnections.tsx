@@ -60,7 +60,7 @@ export function useGrantedConnections(role: RoleInfo, mode: RoleFormMode): Reado
         }
 
         this.state.loaded = true;
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception, `Error getting granted connections for "${this.role.roleId}"`);
       } finally {
         this.state.loading = false;

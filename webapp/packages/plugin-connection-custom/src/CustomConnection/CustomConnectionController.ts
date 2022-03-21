@@ -52,7 +52,7 @@ export class CustomConnectionController implements IInitializableController {
   private async loadDBDrivers() {
     try {
       await this.dbDriverResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers');
     } finally {
       this.isLoading = false;

@@ -78,7 +78,7 @@ export function useDataResource<
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
-  let includes: TIncludes = [] as TIncludes;
+  let includes: TIncludes = [] as unknown as TIncludes;
   const [loadFunctionName] = useState(`${component.name}.useDataResource(${resource.getName()}).load`);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
@@ -135,7 +135,7 @@ export function useDataResource<
         } finally {
           this.prevData = newData;
         }
-      } catch (exception) {
+      } catch (exception: any) {
         if (resource.getException(key) === null) {
           setException(exception);
         }

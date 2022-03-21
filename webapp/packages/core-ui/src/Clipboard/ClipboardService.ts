@@ -28,7 +28,7 @@ export class ClipboardService {
   }
 
   constructor(
-    private notificationService: NotificationService
+    private readonly notificationService: NotificationService
   ) {
     makeObservable<ClipboardService, 'permissionUpdate'>(this, {
       clipboardValue: observable,
@@ -48,10 +48,10 @@ export class ClipboardService {
     try {
       const value = await navigator.clipboard.readText();
       this.clipboardValue = value;
-    } catch (exeption) {
+    } catch (exception: any) {
       this.clipboardAvailable = false;
       this.clipboardValue = null;
-      this.notificationService.logException(exeption, 'Failed to read from clipboard', '', true);
+      this.notificationService.logException(exception, 'Failed to read from clipboard', '', true);
       this.notificationService.logInfo({ title: 'ui_clipboard_access_denied_title', message: 'ui_clipboard_access_denied_message' });
     }
 
@@ -64,7 +64,7 @@ export class ClipboardService {
       if (notify) {
         this.notificationService.notify({ title: 'ui_copy_to_clipboard_copied' }, ENotificationType.Info);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'ui_copy_to_clipboard_failed_to_copy');
     }
   }
@@ -86,9 +86,9 @@ export class ClipboardService {
 
   async updatePermissionStatus(): Promise<void> {
     try {
-      this.readPermission = await navigator.permissions.query({ name: 'clipboard-read' });
-    } catch (exeption) {
-      this.notificationService.logException(exeption, 'Failed to get permission status', '', true);
+      this.readPermission = await navigator.permissions.query({ name: 'clipboard-read' as any });
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'Failed to get permission status', '', true);
       this.readPermission = null;
     }
   }

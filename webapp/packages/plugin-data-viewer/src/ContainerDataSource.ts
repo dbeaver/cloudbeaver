@@ -123,7 +123,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       await this.closeResults(prevResults);
 
       return this.transformResults(executionContext.context!, response.results, limit);
-    } catch (exception) {
+    } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
@@ -174,7 +174,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         }
       }
       this.clearError();
-    } catch (exception) {
+    } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
@@ -204,7 +204,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           contextId: result.contextId,
           resultId: result.id,
         });
-      } catch (exception) {
+      } catch (exception: any) {
         console.log(`Error closing result (${result.id}):`, exception);
       }
     }

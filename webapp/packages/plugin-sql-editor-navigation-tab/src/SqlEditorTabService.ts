@@ -231,7 +231,7 @@ export class SqlEditorTabService extends Bootstrap {
       }
 
       return true;
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
       return false;
     }
@@ -255,7 +255,7 @@ export class SqlEditorTabService extends Bootstrap {
       );
       tab.handlerState.executionContext.defaultCatalog = containerId;
       return true;
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
       return false;
     }
@@ -279,7 +279,7 @@ export class SqlEditorTabService extends Bootstrap {
       );
       tab.handlerState.executionContext.defaultSchema = containerId;
       return true;
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
       return false;
     }

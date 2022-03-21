@@ -57,7 +57,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       data.state.serverConfig.anonymousAccessEnabled = config.anonymousAccessEnabled;
       data.state.serverConfig.enabledAuthProviders = [...config.enabledAuthProviders];
       data.state.serverConfig.enabledFeatures = [...config.enabledFeatures];
-    } catch (exception) {
+    } catch (exception: any) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, 'Can\'t load server configuration');
     }

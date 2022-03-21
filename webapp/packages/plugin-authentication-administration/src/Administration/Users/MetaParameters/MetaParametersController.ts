@@ -75,7 +75,7 @@ implements IInitializableController {
     try {
       await this.usersResource.refreshAll();
       this.notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
-    } catch (exception) {
+    } catch (exception: any) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Users update failed');
       }
@@ -117,7 +117,7 @@ implements IInitializableController {
       for (const id of deletionList) {
         this.expandedItems.delete(id);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'User delete failed');
       }

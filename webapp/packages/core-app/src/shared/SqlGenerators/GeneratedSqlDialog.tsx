@@ -87,7 +87,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
       try {
         this.query = await sqlGeneratorsResource.generateEntityQuery(payload.generatorId, payload.pathId);
-      } catch (exception) {
+      } catch (exception: any) {
         this.error.catch(exception);
       } finally {
         this.loading = false;

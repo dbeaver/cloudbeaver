@@ -51,7 +51,7 @@ export class ConnectionsAdministrationController {
     try {
       await this.connectionsResource.refreshAll();
       this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'connections_administration_tools_refresh_fail');
     } finally {
       this.isProcessing = false;
@@ -95,7 +95,7 @@ export class ConnectionsAdministrationController {
       for (const id of deletionList) {
         this.expandedItems.delete(id);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Connections delete failed');
     } finally {
       this.isProcessing = false;

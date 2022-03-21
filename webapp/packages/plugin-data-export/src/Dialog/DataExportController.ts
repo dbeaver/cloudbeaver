@@ -91,7 +91,7 @@ export class DataExportController implements IInitializableController, IDestruct
         }
       );
       this.close();
-    } catch (exception) {
+    } catch (exception: any) {
       if (!this.error.catch(exception) || this.isDistructed) {
         this.notificationService.logException(exception, 'Can\'t export');
       }
@@ -136,7 +136,7 @@ export class DataExportController implements IInitializableController, IDestruct
   private async loadProcessors() {
     try {
       await this.dataExportService.processors.load();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load data export processors');
     }
   }

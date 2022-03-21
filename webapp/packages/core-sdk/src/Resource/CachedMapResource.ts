@@ -69,6 +69,7 @@ export abstract class CachedMapResource<
   }
 
   constructor(defaultIncludes?: CachedResourceIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
+    //@ts-expect-error fix
     super(defaultValue || new Map(), defaultIncludes);
     this.onItemAdd = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKey<TKey>>(null);
@@ -123,11 +124,13 @@ export abstract class CachedMapResource<
     return this;
   }
 
+  //@ts-expect-error fix
   isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
       const metadata = this.metadata.get(key);
 
+      //@ts-expect-error fix
       return includes.every(include => metadata.includes.includes(include));
     });
   }
@@ -194,8 +197,8 @@ export abstract class CachedMapResource<
     this.onDataError.execute({ param: key, exception });
   }
 
-  markOutdated(): void
-  markOutdated(key: ResourceKey<TKey>): void
+  markOutdated(): void;
+  markOutdated(key: ResourceKey<TKey>): void;
   markOutdated(key?: ResourceKey<TKey>): void {
     if (
       (
@@ -208,8 +211,8 @@ export abstract class CachedMapResource<
     this.markOutdatedSync(key!);
   }
 
-  cleanError(): void
-  cleanError(key: ResourceKey<TKey>): void
+  cleanError(): void;
+  cleanError(key: ResourceKey<TKey>): void;
   cleanError(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
       key = resourceKeyList(this.keys);
@@ -223,8 +226,8 @@ export abstract class CachedMapResource<
     });
   }
 
-  markUpdated(): void
-  markUpdated(key: ResourceKey<TKey>): void
+  markUpdated(): void;
+  markUpdated(key: ResourceKey<TKey>): void;
   markUpdated(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
       // TODO: maybe should add all aliases to loadedKeys
@@ -243,6 +246,7 @@ export abstract class CachedMapResource<
     });
   }
 
+  //@ts-expect-error fix
   isLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return false;
@@ -257,6 +261,7 @@ export abstract class CachedMapResource<
       if (includes) {
         const metadata = this.metadata.get(key);
 
+        //@ts-expect-error fix
         if (includes.some(include => !metadata.includes.includes(include))) {
           return false;
         }
@@ -324,6 +329,7 @@ export abstract class CachedMapResource<
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
+    //@ts-expect-error fix
     await this.loadData(key, true, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
@@ -344,6 +350,7 @@ export abstract class CachedMapResource<
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
+    //@ts-expect-error fix
     await this.loadData(key, false, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
@@ -414,8 +421,8 @@ export abstract class CachedMapResource<
     });
   }
 
-  protected markOutdatedSync(): void
-  protected markOutdatedSync(key: ResourceKey<TKey>): void
+  protected markOutdatedSync(): void;
+  protected markOutdatedSync(key: ResourceKey<TKey>): void;
   protected markOutdatedSync(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
       key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));

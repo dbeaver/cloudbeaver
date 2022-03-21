@@ -38,7 +38,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
         setLoading(true);
         await navTreeResource.changeName(node, name);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       notificationService.logException(exception, 'app_navigationTree_node_change_name_error');
     } finally {
       setLoading(false);

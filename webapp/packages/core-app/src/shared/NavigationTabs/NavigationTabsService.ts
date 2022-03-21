@@ -373,7 +373,7 @@ export class NavigationTabsService extends View<ITab> {
       if (!handler || (handler.onRestore && !(await handler.onRestore(tab)))) {
         restoreFail = true;
       }
-    } catch (exception) {
+    } catch (exception: any) {
       restoreFail = true;
     }
 

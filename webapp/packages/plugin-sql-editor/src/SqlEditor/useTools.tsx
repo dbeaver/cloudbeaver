@@ -61,7 +61,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       try {
         const process = getTextFileReadingProcess(file);
         script = await process.promise;
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception, 'Uploading script error');
       }
 

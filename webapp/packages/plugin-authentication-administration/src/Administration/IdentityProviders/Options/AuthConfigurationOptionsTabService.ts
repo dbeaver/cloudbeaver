@@ -126,7 +126,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
         status.info('Configuration updated');
         status.info(configuration.displayName);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       status.error('connections_connection_create_fail', exception);
     }
   }

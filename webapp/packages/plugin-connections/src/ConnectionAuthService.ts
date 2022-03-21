@@ -44,7 +44,7 @@ export class ConnectionAuthService {
         return;
       }
       connection.connection = tempConnection;
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception);
       throw exception;
     }

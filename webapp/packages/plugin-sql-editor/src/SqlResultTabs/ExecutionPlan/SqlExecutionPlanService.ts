@@ -27,10 +27,10 @@ export class SqlExecutionPlanService {
   data: Map<string, IExecutionPlanData>;
 
   constructor(
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private asyncTaskInfoService: AsyncTaskInfoService,
-    private connectionExecutionContextService: ConnectionExecutionContextService
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService
   ) {
     this.data = new Map();
 
@@ -95,7 +95,7 @@ export class SqlExecutionPlanService {
         task,
         executionPlan,
       });
-    } catch (exception) {
+    } catch (exception: any) {
       const cancelled = task.cancelled;
       const message = cancelled ? 'Execution plan process has been canceled' : undefined;
       this.notificationService.logException(exception, 'Execution plan Error', message);

@@ -112,7 +112,7 @@ export class RoleOptionsTabService extends Bootstrap {
         status.info('Role updated');
         status.info(role.roleId);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       if (create) {
         status.error('administration_roles_role_create_error', exception);
       } else {

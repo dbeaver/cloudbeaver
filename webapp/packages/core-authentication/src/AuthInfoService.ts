@@ -86,7 +86,7 @@ export class AuthInfoService {
       return active.promise;
     }
 
-    const popup = openCenteredPopup(configuration.signInLink, configuration.id, 600, 700, undefined, true);
+    const popup = openCenteredPopup(configuration.signInLink, configuration.id, 600, 700, undefined);
 
     if (popup) {
       popup.focus();

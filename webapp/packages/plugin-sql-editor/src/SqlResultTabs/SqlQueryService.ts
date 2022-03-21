@@ -121,7 +121,7 @@ export class SqlQueryService {
         model.getResults().length
       ));
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
-    } catch (exception) {
+    } catch (exception: any) {
       // remove group if execution was cancelled
       if (source.currentTask?.cancelled && isNewTabCreated) {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
@@ -225,7 +225,7 @@ export class SqlQueryService {
           model = source = undefined;
         }
         options?.onQueryExecuted?.(query, i, true);
-      } catch (exception) {
+      } catch (exception: any) {
         if (model) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
           this.sqlQueryResultService.updateGroupTabs(

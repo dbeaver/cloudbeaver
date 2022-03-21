@@ -129,7 +129,7 @@ export function useMapResource<
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
-  let includes: TIncludes = [] as TIncludes;
+  let includes: TIncludes = [] as unknown as TIncludes;
   const [loadFunctionName] = useState(`${component.name}.useMapResource(${resource.getName()}).load`);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
@@ -201,7 +201,7 @@ export function useMapResource<
           prevData as any  // TODO: fix type error
         );
         setException(null);
-      } catch (exception) {
+      } catch (exception: any) {
         const resourceException = resource.getException(key);
 
         if (

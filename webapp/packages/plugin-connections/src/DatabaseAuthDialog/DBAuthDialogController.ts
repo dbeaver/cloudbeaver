@@ -71,7 +71,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     try {
       await this.connectionInfoResource.init(this.getConfig());
       this.close();
-    } catch (exception) {
+    } catch (exception: any) {
       if (!this.error.catch(exception) || this.isDistructed) {
         this.notificationService.logException(exception, 'Authentication failed');
       }
@@ -129,7 +129,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
           });
         }
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load auth model');
     }
   }
@@ -137,7 +137,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
   private async loadDrivers() {
     try {
       this.dbDriverResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
   }

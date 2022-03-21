@@ -125,14 +125,14 @@ export class SqlEditorService {
     schemaId?: string
   ): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
-    
+
     if (!connection) {
       return null;
     }
 
     try {
       return await this.connectionExecutionContextService.create(connection.id, catalogId, schemaId);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(
         exception,
         `Failed to create context for ${connection.name} connection`,
@@ -149,7 +149,7 @@ export class SqlEditorService {
     if (executionContext) {
       try {
         await executionContext.destroy();
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.id}`, '', true);
       }
     }

@@ -54,7 +54,7 @@ export class DataExportProcessService {
       if (dataFileId) {
         await this.graphQLService.sdk.removeDataTransferFile({ dataFileId });
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Error occurred while deleting file');
     } finally {
       this.exportProcesses.remove(exportId);

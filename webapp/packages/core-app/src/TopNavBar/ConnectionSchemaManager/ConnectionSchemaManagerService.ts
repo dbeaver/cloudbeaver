@@ -349,7 +349,7 @@ export class ConnectionSchemaManagerService {
 
     try {
       await this.dbDriverResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
 
@@ -359,7 +359,7 @@ export class ConnectionSchemaManagerService {
 
     try {
       await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(
         exception,
         `Can't load objectContainers for ${connectionId}@${catalogId}`,

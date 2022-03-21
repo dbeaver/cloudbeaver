@@ -8,7 +8,7 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf lib/*",
+    "prebuild": "rimraf lib/* && rimraf tsconfig.tsbuildinfo",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
     "dev": "core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100",
     "analyse": "core-cli-build --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",

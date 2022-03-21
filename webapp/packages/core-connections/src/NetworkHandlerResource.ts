@@ -46,7 +46,7 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
         title: 'connections_network_handler_test_success',
         message: 'Client version: ' + info.clientVersion + '\nServer version: ' + info.serverVersion,
       });
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'connections_network_handler_test_fail');
     }
   }

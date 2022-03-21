@@ -71,7 +71,7 @@ export class ConnectionSearchService {
         .split(/[\s,|+-]/);
 
       this.databases = await this.connectionsResource.searchDatabases(hosts);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Databases search failed');
     } finally {
       this.disabled = false;

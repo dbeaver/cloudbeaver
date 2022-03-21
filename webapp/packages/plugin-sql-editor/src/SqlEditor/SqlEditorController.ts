@@ -340,7 +340,7 @@ export class SqlEditorController implements IInitializableController, IDestructi
       clearTimeout(id);
       this.highlightExecutingLine(query.from, false);
       return result;
-    } catch (exception) {
+    } catch (exception: any) {
       this.highlightExecutingLine(query.from, false);
       this.highlightExecutingErrorLine(query.from, true);
       throw exception;

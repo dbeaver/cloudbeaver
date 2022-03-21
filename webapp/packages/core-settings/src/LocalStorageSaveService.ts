@@ -31,7 +31,7 @@ export class LocalStorageSaveService {
           try {
             const parsed = this.parseData(store, state, remap);
             set(store, parsed);
-          } catch (e) {
+          } catch (e: any) {
             console.log('Error when parsing local storage value', e);
           }
         }

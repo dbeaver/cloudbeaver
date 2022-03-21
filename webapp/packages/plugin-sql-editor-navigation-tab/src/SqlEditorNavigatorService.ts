@@ -102,8 +102,8 @@ export class SqlEditorNavigatorService {
             tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION
             && tab.handlerState.executionContext?.connectionId === data.connectionId
           )));
-        } 
-        
+        }
+
         if (!tab) {
           const tabOptions = this.sqlEditorTabService.createNewEditor(
             data.name,
@@ -139,7 +139,7 @@ export class SqlEditorNavigatorService {
         }
       }
       this.navigationTabsService.selectTab(tab.id);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing action with editor');
     }
   }

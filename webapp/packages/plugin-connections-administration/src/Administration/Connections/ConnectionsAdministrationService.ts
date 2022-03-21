@@ -120,7 +120,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
       await this.connectionsResource.loadAll();
       await this.dbDriverResource.loadAll();
       await this.networkHandlerResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Error occurred while loading connections');
     }
   }

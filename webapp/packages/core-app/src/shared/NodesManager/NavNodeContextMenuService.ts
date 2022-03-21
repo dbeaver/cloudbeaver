@@ -86,7 +86,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           case ACTION_REFRESH: {
             try {
               await this.navNodeManagerService.refreshTree(node.id);
-            } catch (exception) {
+            } catch (exception: any) {
               this.notificationService.logException(exception, 'Failed to refresh node');
             }
             break;
@@ -110,7 +110,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                 if (name !== result && result.trim().length) {
                   try {
                     await this.navTreeResource.changeName(node, result);
-                  } catch (exception) {
+                  } catch (exception: any) {
                     this.notificationService.logException(exception, 'Error occurred while renaming');
                   }
                 }
@@ -133,7 +133,7 @@ export class NavNodeContextMenuService extends Bootstrap {
 
             try {
               await this.navTreeResource.deleteNode(node.id);
-            } catch (exception) {
+            } catch (exception: any) {
               this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
             }
             break;

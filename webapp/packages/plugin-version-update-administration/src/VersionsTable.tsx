@@ -68,7 +68,7 @@ export const VersionsTable = observer<Props>(function VersionsTable({ versions }
     try {
       await versionResource.refreshAll();
       notificationService.logSuccess({ title: 'version_update_versions_refresh_successful' });
-    } catch (exception) {
+    } catch (exception: any) {
       notificationService.logException(exception, 'version_update_versions_refresh_fail');
     }
   }, [versionResource, notificationService]);

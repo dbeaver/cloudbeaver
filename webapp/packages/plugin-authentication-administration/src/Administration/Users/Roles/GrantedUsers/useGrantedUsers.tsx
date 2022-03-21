@@ -60,7 +60,7 @@ export function useGrantedUsers(role: RoleInfo, mode: RoleFormMode): Readonly<St
         }
 
         this.state.loaded = true;
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception, "Can't load users info");
       } finally {
         this.state.loading = false;

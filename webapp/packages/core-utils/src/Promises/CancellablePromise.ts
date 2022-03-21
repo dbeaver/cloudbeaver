@@ -34,7 +34,7 @@ export class CancellablePromise<T> extends Promise<T> {
     this._reject = _reject;
     try {
       this._cancel = executor(this._resolve, this._reject);
-    } catch (e) {
+    } catch (e: any) {
       this._reject(e);
     }
   }

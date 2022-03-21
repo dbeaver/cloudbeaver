@@ -56,7 +56,7 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
         }
 
         result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
-      } catch (exception) {
+      } catch (exception: any) {
         console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
         console.error(exception);
       }

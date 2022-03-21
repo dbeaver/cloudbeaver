@@ -133,11 +133,11 @@ export class ConnectionController
 
         this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();
-      } catch (exception) {
+      } catch (exception: any) {
         this.showError(exception, 'Failed to establish connection');
         await this.connectionInfoResource.deleteConnection(connection.id);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.showError(exception, 'Failed to establish connection');
     } finally {
       this.isConnecting = false;
@@ -226,7 +226,7 @@ export class ConnectionController
     try {
       await this.templateConnectionsResource.load();
       await this.dbDriverResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database sources');
     } finally {
       this.isLoading = false;
@@ -241,7 +241,7 @@ export class ConnectionController
     try {
       this.isLoading = true;
       this.authModel = await this.dbAuthModelsResource.load(this.dbDriver.defaultAuthModel);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load driver auth model');
     } finally {
       this.isLoading = false;

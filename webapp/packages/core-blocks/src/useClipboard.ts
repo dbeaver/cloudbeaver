@@ -21,7 +21,7 @@ export function useClipboard() {
       if (notify) {
         notificationService.notify({ title: 'ui_copy_to_clipboard_copied' }, ENotificationType.Success);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       notificationService.logException(exception, 'ui_copy_to_clipboard_failed_to_copy');
     }
   }, [notificationService]);

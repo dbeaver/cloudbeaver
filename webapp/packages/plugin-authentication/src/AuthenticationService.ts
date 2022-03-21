@@ -72,7 +72,7 @@ export class AuthenticationService extends Bootstrap {
       if (!this.administrationScreenService.isConfigurationMode) {
         this.screenService.navigateToRoot();
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t logout');
     }
   }
@@ -82,7 +82,7 @@ export class AuthenticationService extends Bootstrap {
       .find(configuration => configuration.id === configurationId);
 
     if (userAuthConfiguration?.signOutLink) {
-      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, `${userAuthConfiguration.id}-sign-out`, 600, 700, undefined, true);
+      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, `${userAuthConfiguration.id}-sign-out`, 600, 700, undefined);
 
       if (popup) {
         popup.blur();

@@ -76,7 +76,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
       state.properties = origin.details!;
       state.state = propertiesState;
       state.loaded = true;
-    } catch (error) {
+    } catch (error: any) {
       state.exception = error;
     } finally {
       state.loading = false;

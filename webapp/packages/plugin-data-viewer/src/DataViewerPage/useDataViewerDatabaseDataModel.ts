@@ -132,7 +132,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
           model.request();
         }
         this._exception = null;
-      } catch (exception) {
+      } catch (exception: any) {
         this._exception = exception;
       } finally {
         this._loading = false;

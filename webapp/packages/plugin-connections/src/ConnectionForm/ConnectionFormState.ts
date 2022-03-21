@@ -166,7 +166,7 @@ export class ConnectionFormState implements IConnectionFormState {
       this.initError = null;
 
       return this.info;
-    } catch (exception) {
+    } catch (exception: any) {
       this.initError = exception;
       throw exception;
     }

@@ -55,7 +55,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
   private async loadTemplateConnections() {
     try {
       await this.templateConnectionsResource.load();
-    } catch (error) {
+    } catch (error: any) {
       this.notificationService.logException(error, 'Template Connections loading failed');
     }
   }

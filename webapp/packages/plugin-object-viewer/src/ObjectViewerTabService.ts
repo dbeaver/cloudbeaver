@@ -287,7 +287,7 @@ export class ObjectViewerTabService {
       if (tab.handlerState.childrenError) {
         return;
       }
-    } catch (exception) {
+    } catch (exception: any) {
       tab.handlerState.error = true;
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while tab selecting');
     }
@@ -348,7 +348,7 @@ export class ObjectViewerTabService {
           this.navigationTabsService.selectTab(tab.id);
         });
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
     }
   }
@@ -364,7 +364,7 @@ export class ObjectViewerTabService {
       const { switchPage } = await contexts.getContext(this.objectViewerTabContext);
 
       switchPage();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
     }
   }

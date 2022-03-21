@@ -105,7 +105,7 @@ export class GrantedUsersTabService extends Bootstrap {
       }
 
       state.loaded = false;
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception);
     }
 

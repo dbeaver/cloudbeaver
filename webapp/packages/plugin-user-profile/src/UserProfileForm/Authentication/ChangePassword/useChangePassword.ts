@@ -53,7 +53,7 @@ export function useChangePassword(): IState {
         await usersResource.updateLocalPassword(this.config.oldPassword, this.config.password);
         notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
         this.resetConfig();
-      } catch (exception) {
+      } catch (exception: any) {
         notificationService.logException(exception);
       } finally {
         this.submitting = false;
@@ -65,12 +65,12 @@ export function useChangePassword(): IState {
       this.config.repeatedPassword = '';
     },
   }),
-    {
-      config: observable,
-      submitting: observable.ref,
-      formFilled: computed,
-      changePassword: action.bound,
-      resetConfig: action,
-    },
-    { usersResource, notificationService });
+  {
+    config: observable,
+    submitting: observable.ref,
+    formFilled: computed,
+    changePassword: action.bound,
+    resetConfig: action,
+  },
+  { usersResource, notificationService });
 }

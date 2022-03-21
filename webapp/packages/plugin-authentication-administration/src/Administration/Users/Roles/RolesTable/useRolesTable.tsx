@@ -48,7 +48,7 @@ export function useRolesTable(): Readonly<State> {
         this.processing = true;
         await resource.resource.refreshAll();
         notificationService.logSuccess({ title: 'administration_roles_role_list_update_success' });
-      } catch (exception) {
+      } catch (exception: any) {
         notificationService.logException(exception, 'administration_roles_role_list_update_fail');
       } finally {
         this.processing = false;
@@ -83,7 +83,7 @@ export function useRolesTable(): Readonly<State> {
 
         this.tableState.unselect();
         this.tableState.unexpand(deletionList);
-      } catch (exception) {
+      } catch (exception: any) {
         notificationService.logException(exception, 'Roles delete Error');
       } finally {
         this.processing = false;

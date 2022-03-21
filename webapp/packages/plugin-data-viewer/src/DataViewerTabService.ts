@@ -61,7 +61,7 @@ export class DataViewerTabService {
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Data Viewer Error', 'Error in Data Viewer while processing action with database node');
     }
   }

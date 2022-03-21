@@ -44,7 +44,7 @@ export class SessionExpireService extends Bootstrap {
   private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
     try {
       return await request;
-    } catch (exception) {
+    } catch (exception: any) {
       if (exception instanceof GQLError && exception.errorCode === EServerErrorCode.sessionExpired) {
         this.sessionExpired();
       }

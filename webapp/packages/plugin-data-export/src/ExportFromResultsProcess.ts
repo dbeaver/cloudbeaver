@@ -50,7 +50,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
       this.statusUpdateProcess();
 
       return this.taskId;
-    } catch (e) {
+    } catch (e: any) {
       this.onError(e);
       throw e;
     }
@@ -89,7 +89,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
         if (this.isFinished) {
           return;
         }
-      } catch (e) {
+      } catch (e: any) {
         this.notificationService.logException(e, 'Failed to check async task status');
       }
 
@@ -107,7 +107,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
     try {
       await this.graphQLService.sdk.asyncTaskCancel({ taskId });
       this.isCancelConfirmed = true;
-    } catch (e) {
+    } catch (e: any) {
       if (this.getState() === EDeferredState.CANCELLING) {
         this.toPending();
         this.notificationService.logException(e, 'Failed to cancel async task');

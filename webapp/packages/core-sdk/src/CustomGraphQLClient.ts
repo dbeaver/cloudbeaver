@@ -66,7 +66,7 @@ export class CustomGraphQLClient extends GraphQLClient {
 
       // TODO: seems here can be undefined
       return response.data as T;
-    } catch (error) {
+    } catch (error: any) {
       if (isClientError(error)) {
         if (isObjectError(error)) {
           throw new GQLError(error);

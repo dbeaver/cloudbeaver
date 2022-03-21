@@ -3,6 +3,7 @@ const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
+const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
@@ -104,7 +105,14 @@ module.exports = (env, argv) => {
 
   return {
     // target: !devMode ? "web" : "browserslist",
-    cache: true,
+    // optimization: {
+    //   removeAvailableModules: false,
+    //   removeEmptyChunks: false,
+    //   splitChunks: false
+    // },
+    // output: {
+    //   pathinfo: false
+    // },
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
@@ -178,13 +186,11 @@ module.exports = (env, argv) => {
             semantic: true,
             syntactic: true,
           },
-          // build: true,
-          // mode: "write-references",
         },
-        // eslint: {
-        //   files: './src/**/*.{ts,tsx,js,jsx}'
-        // }
       }),
+      // new ExtraWatchWebpackPlugin({
+      //   files: ['packages/*/src/**.ts', 'packages/*/src/**.tsx']
+      // }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output

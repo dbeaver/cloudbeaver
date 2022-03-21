@@ -72,7 +72,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
   private async loadConfigurations() {
     try {
       await this.authConfigurationsResource.load(CachedMapAllKey);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Error occurred while loading configurations');
     }
   }

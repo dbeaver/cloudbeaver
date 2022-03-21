@@ -157,7 +157,7 @@ export class UserFormController implements IInitializableController, IDestructib
       }
       this.error.clear();
       this.statusMessage = null;
-    } catch (exception) {
+    } catch (exception: any) {
       this.error.catch(exception);
       const title = this.editing ? 'authentication_administration_user_update_failed' : 'authentication_administration_user_create_failed';
 
@@ -198,7 +198,7 @@ export class UserFormController implements IInitializableController, IDestructib
         }
       }
       this.connectionAccessLoaded = true;
-    } catch (exception) {
+    } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_load_fail', ENotificationType.Error);
     }
     await this.loadConnections();
@@ -297,7 +297,7 @@ export class UserFormController implements IInitializableController, IDestructib
     try {
       await this.rolesResource.loadAll();
       await this.loadUser();
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load roles');
     } finally {
       this.isLoading = false;
@@ -309,7 +309,7 @@ export class UserFormController implements IInitializableController, IDestructib
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load user');
     }
   }
@@ -318,7 +318,7 @@ export class UserFormController implements IInitializableController, IDestructib
     try {
       await this.dbDriverResource.loadAll();
       await this.connectionsResource.loadAll();
-    } catch (exception) {
+    } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }
   }

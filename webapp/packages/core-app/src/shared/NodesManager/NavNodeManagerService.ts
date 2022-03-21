@@ -318,7 +318,7 @@ export class NavNodeManagerService extends Bootstrap {
       let connection: Connection | null;
       try {
         connection = await this.connectionsManagerService.requireConnection(nodeInfo.connection.id);
-      } catch (exception) {
+      } catch (exception: any) {
         this.notificationService.logException(exception);
         throw exception;
       }

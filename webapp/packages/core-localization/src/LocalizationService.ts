@@ -171,7 +171,7 @@ export class LocalizationService extends Bootstrap {
         localeKey,
         locale
       );
-    } catch (error) {
+    } catch (error: any) {
       this.notificationService.logException(error, 'Locale is not found', '', true);
     }
   }

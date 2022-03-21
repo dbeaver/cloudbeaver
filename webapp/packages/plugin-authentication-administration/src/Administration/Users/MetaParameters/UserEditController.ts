@@ -58,7 +58,7 @@ implements IInitializableController, IDestructibleController {
       // we create a copy to protect the current value from mutation
       await this.usersResource.load(this.userId);
       await this.updateUser(this.userId);
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, `Can't load user ${this.userId}`);
     }
   }

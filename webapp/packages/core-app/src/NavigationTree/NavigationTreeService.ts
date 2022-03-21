@@ -100,7 +100,7 @@ export class NavigationTreeService extends View<string> {
 
       await this.navTreeResource.load(id);
       return true;
-    } catch (exception) {
+    } catch (exception: any) {
       if (notify) {
         this.notificationService.logException(exception);
       }

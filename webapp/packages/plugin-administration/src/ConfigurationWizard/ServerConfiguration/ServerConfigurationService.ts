@@ -134,7 +134,7 @@ export class ServerConfigurationService {
         state: this.state,
         reset,
       });
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load server configuration');
     }
   }
@@ -178,7 +178,7 @@ export class ServerConfigurationService {
       data.state.serverConfig.disabledDrivers = [...config.disabledDrivers];
 
       Object.assign(data.state.navigatorConfig, config.defaultNavigatorSettings);
-    } catch (exception) {
+    } catch (exception: any) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, 'Can\'t load server configuration');
     }
@@ -206,7 +206,7 @@ export class ServerConfigurationService {
         await this.serverConfigResource.finishConfiguration();
         await this.sessionDataResource.refresh();
       }
-    } catch (exception) {
+    } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 
       throw exception;

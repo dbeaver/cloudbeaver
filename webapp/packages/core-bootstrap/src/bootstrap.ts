@@ -25,7 +25,7 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<void> {
     await app.loadServices();
 
     renderLayout(app.getServiceInjector());
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
     showErrorPage();
     throw e;

@@ -85,7 +85,7 @@ export function createComplexLoader<T>(loader: () => Promise<T>): IComplexLoader
       try {
         this.data = await this.promise;
         return this.data;
-      } catch (exception) {
+      } catch (exception: any) {
         this.error = exception;
 
         throw exception;

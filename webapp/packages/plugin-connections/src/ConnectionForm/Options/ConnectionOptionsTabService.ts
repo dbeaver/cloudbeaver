@@ -94,7 +94,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
         status.info('Server version: ' + info.serverVersion);
         status.info('Connection time: ' + info.connectTime);
       }
-    } catch (exception) {
+    } catch (exception: any) {
       if (submitType === 'submit') {
         status.error('connections_connection_create_fail', exception);
       } else {

@@ -95,7 +95,7 @@ export class AsyncTaskInfoService {
           return taskInfo;
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log('Failed to check async task status', e);
     }
   }

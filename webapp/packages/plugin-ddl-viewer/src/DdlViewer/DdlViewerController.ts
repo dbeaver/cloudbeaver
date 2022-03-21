@@ -53,7 +53,7 @@ export class DdlViewerController implements IInitializableController, IDestructi
     try {
       this.metadata = await this.ddlViewerService.loadDdlMetadata(nodeId)!;
       await this.loadDialect(nodeId);
-    } catch (error) {
+    } catch (error: any) {
       this.notificationService.logException(error, 'Failed to load DDL');
     } finally {
       this.isLoading = false;

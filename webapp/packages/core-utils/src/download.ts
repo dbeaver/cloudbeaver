@@ -18,7 +18,7 @@ export function download(blob: Blob, fileName: string): void {
     const url = URL.createObjectURL(blob);
     saveLink.href = url;
     saveLink.onclick = () => requestAnimationFrame(() => URL.revokeObjectURL(url));
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
     console.warn('Error while getting object URL.');
   }

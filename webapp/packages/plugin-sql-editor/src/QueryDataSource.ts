@@ -110,7 +110,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
         }
       }
       this.clearError();
-    } catch (exception) {
+    } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
@@ -208,7 +208,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       this.closeResults(prevResults);
 
       return results;
-    } catch (exception) {
+    } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
@@ -229,7 +229,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
           contextId: result.contextId,
           resultId: result.id,
         });
-      } catch (exception) {
+      } catch (exception: any) {
         console.log(`Error closing result (${result.id}):`, exception);
       }
     }
