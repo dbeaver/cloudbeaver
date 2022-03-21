@@ -48,20 +48,7 @@ export const Tab = observer<TabProps>(function Tab({
   return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
     <TabContext.Provider value={tabContext}>
       <tab-outer>
-        <tab-inner>
-          <BaseTab
-            {...tab.state.state}
-            type="button"
-            title={translate(title ?? info?.title)}
-            id={tabId}
-            className={className}
-            disabled={disabled}
-            onClick={tab.handleOpen}
-          >
-            <tab-container>
-              {children}
-            </tab-container>
-          </BaseTab>
+        <tab-inner {...use({ selected: tab.selected })}>
           <tab-actions>
             {canClose && (
               <tab-action title={translate('ui_close')} onClick={tab.handleClose}>
@@ -75,6 +62,19 @@ export const Tab = observer<TabProps>(function Tab({
               style={style}
             />
           </tab-actions>
+          <BaseTab
+            {...tab.state.state}
+            type="button"
+            title={translate(title ?? info?.title)}
+            id={tabId}
+            className={className}
+            disabled={disabled}
+            onClick={tab.handleOpen}
+          >
+            <tab-container>
+              {children}
+            </tab-container>
+          </BaseTab>
         </tab-inner>
       </tab-outer>
     </TabContext.Provider>
@@ -94,6 +94,8 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({
   menuContext,
   style,
 }) {
+  const styles = useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style);
+
   const [menuOpened, switchState] = useState(false);
   const menu = useMenu({
     menu: MENU_TAB,
@@ -103,7 +105,13 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({
   menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
   menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
-  return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
+  const hidden = getComputed(() => !menu.items.length || menu.items.every(item => item.hidden));
+
+  if (hidden) {
+    return null;
+  }
+
+  return styled(styles)(
     <portal {...use({ menuOpened })}>
       <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
         <tab-action>
