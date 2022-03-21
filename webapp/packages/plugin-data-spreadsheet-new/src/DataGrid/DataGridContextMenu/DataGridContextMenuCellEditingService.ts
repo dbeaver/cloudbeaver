@@ -13,10 +13,10 @@ import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
 export class DataGridContextMenuCellEditingService {
-  private static menuEditingToken = 'menuEditing';
+  private static readonly menuEditingToken = 'menuEditing';
 
   constructor(
-    private dataGridContextMenuService: DataGridContextMenuService
+    private readonly dataGridContextMenuService: DataGridContextMenuService
   ) { }
 
   getMenuEditingToken(): string {
@@ -106,6 +106,10 @@ export class DataGridContextMenuCellEditingService {
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
+        isHidden(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          return !editor.hasFeature('add');
+        },
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           editor.addRow(context.data.key.row);
@@ -121,6 +125,10 @@ export class DataGridContextMenuCellEditingService {
         title: 'data_grid_table_editing_row_add_copy',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          return !editor.hasFeature('add');
         },
         onClick(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
@@ -139,11 +147,12 @@ export class DataGridContextMenuCellEditingService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
-          if (context.data.model.isReadonly()) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+
+          if (context.data.model.isReadonly() || !editor.hasFeature('delete')) {
             return true;
           }
 
-          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
           return (
             format.isReadOnly(context.data.key)
@@ -167,11 +176,12 @@ export class DataGridContextMenuCellEditingService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
-          if (context.data.model.isReadonly()) {
+          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+
+          if (context.data.model.isReadonly() || !editor.hasFeature('delete')) {
             return true;
           }
 
-          const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           const select = context.data.model.source.getActionImplementation(
             context.data.resultIndex,
             ResultSetSelectAction
@@ -190,7 +200,7 @@ export class DataGridContextMenuCellEditingService {
 
           const selectedElements = select?.getSelectedElements() || [];
 
-          editor?.delete(...selectedElements);
+          editor.delete(...selectedElements);
         },
       }
     );
