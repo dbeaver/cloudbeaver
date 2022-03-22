@@ -67,7 +67,17 @@ export class DDLViewerFooterService {
 
             const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
             const container = this.navNodeManagerService.getNodeContainerInfo(nodeId);
-            const name = `${container.catalogId ? '<' + container.catalogId + '> ' : ''}DDL${container.schemaId ? ' of <' + container.schemaId + '>' : ''}`;
+            const node = this.navNodeManagerService.getNode(nodeId);
+            const path = [];
+
+            if (container.schemaId) {
+              path.push(container.schemaId);
+            }
+            if (node?.name && node.name !== container.schemaId) {
+              path.push(node.name);
+            }
+
+            const name = `${container.catalogId ? '<' + container.catalogId + '> ' : ''}DDL${path.length ? ' of <' + path.join('.') + '>' : ''}`;
 
             await this.sqlEditorNavigatorService.openNewEditor({
               name,
