@@ -77,7 +77,8 @@ export class DDLViewerFooterService {
               path.push(node.name);
             }
 
-            const name = `${container.catalogId ? '<' + container.catalogId + '> ' : ''}DDL${path.length ? ' of <' + path.join('.') + '>' : ''}`;
+            const catalog = container.catalogId ? '<' + container.catalogId + '> ' : '';
+            const name = `${catalog}DDL${path.length ? ' of <' + path.join('.') + '>' : ''}`;
 
             await this.sqlEditorNavigatorService.openNewEditor({
               name,
