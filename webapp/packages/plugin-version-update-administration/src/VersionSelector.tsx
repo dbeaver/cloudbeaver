@@ -24,9 +24,6 @@ interface Props {
 }
 
 const style = css`
-  Container {
-    composes: theme-typography--body2 from global;
-  }
   Group {
     list-style-position: inside;
   }
@@ -48,10 +45,6 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
       setSelected(versionResource.latest.number);
     }
   }, [versionResource.latest?.number]);
-
-  if (!versions.length) {
-    return null;
-  }
 
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.instructionGetter?.();

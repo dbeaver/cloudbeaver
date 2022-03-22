@@ -21,7 +21,6 @@ interface Props {
 
 const style = css`
   Group {
-    composes: theme-typography--body2 from global;
     list-style-position: inside;
     height: 100%;
     max-height: 300px;
@@ -40,8 +39,8 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const version = versionResource.data;
 
   return styled(styles)(
-    <Container wrap gap overflow medium fill>
-      <Group form gap overflow>
+    <Container wrap gap overflow large>
+      <Group gap overflow>
         <GroupTitle>{version ? `Release notes ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
         {version && (
           <GroupItem>
