@@ -9,9 +9,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
-    org.jkiss.dbeaver.model.sql,
-    org.jkiss.dbeaver.registry;visibility:=reexport,
-    org.jkiss.bundle.apache.dbcp,
-    io.cloudbeaver.model
-Export-Package: io.cloudbeaver.service.security
+ org.jkiss.dbeaver.model.sql,
+ org.jkiss.dbeaver.registry;visibility:=reexport,
+ org.jkiss.bundle.apache.dbcp,
+ io.cloudbeaver.model
+Export-Package: io.cloudbeaver.service.security,
+ io.cloudbeaver.service.security.external.remote.model.role,
+ io.cloudbeaver.service.security.external.remote.model.session
 Automatic-Module-Name: io.cloudbeaver.service.security
