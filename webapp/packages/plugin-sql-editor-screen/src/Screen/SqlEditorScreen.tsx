@@ -36,7 +36,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     state: null as null | ISqlEditorTabState,
     setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
       if (contextInfo) {
-        this.state = sqlEditorService.getState(0, undefined, undefined, contextInfo);
+        this.state = sqlEditorService.getState(0, undefined, undefined, undefined, contextInfo);
       } else {
         this.state = null;
       }
