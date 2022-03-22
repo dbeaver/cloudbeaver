@@ -14,9 +14,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const style = css`
-  Group {
-    composes: theme-typography--body2 from global;
-  }
   GroupItem {
     white-space: pre-line;
   }
@@ -34,11 +31,10 @@ export const Instructions = observer(function Instructions() {
   const styles = useStyles(BASE_CONTAINERS_STYLES, style);
 
   return styled(styles)(
-    <Group form gap>
+    <Group gap large>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem>
         <h4>
-          We highly recommend avoiding product downgrade. We cannot guarantee the proper work of the application after this procedure.<br />
           The following instructions apply only when you run CloudBeaver in a Docker container.
         </h4>
         <ol>

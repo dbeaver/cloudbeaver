@@ -18,11 +18,13 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 import { Instructions } from './Instructions';
+import { Recommendations } from './Recommendations';
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
 
 const styles = css`
   ColoredContainer {
+    composes: theme-typography--body2 from global;
     list-style-position: inside;
   }
 `;
@@ -37,8 +39,13 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
   return styled(style)(
     <ColoredContainer wrap gap overflow parent>
       <VersionChecker />
-      <Instructions />
-      <VersionSelector versions={versions} />
+      {versions.length > 0 && (
+        <>
+          <Instructions />
+          <VersionSelector versions={versions} />
+        </>
+      )}
+      <Recommendations />
     </ColoredContainer>
   );
 });
