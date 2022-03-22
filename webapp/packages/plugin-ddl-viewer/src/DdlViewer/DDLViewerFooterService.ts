@@ -7,9 +7,11 @@
  */
 
 import { NavNodeManagerService } from '@cloudbeaver/core-app';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { download, generateFileName } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
@@ -21,6 +23,8 @@ export class DDLViewerFooterService {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly actionsService: ActionService,
     private readonly menuService: MenuService,
+    private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) { }
 
   register(): void {
@@ -34,14 +38,14 @@ export class DDLViewerFooterService {
           return false;
         }
 
-        if (action === ACTION_SAVE) {
+        if (action === ACTION_SAVE || action === ACTION_SQL_EDITOR_OPEN) {
           const ddl = context.tryGet(DATA_CONTEXT_DDL_VIEWER_VALUE);
           return !!ddl;
         }
 
         return false;
       },
-      handler: (context, action) => {
+      handler: async (context, action) => {
         switch (action) {
           case ACTION_SAVE: {
             const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE);
@@ -57,7 +61,40 @@ export class DDLViewerFooterService {
             download(blob, generateFileName(name, '.sql'));
             break;
           }
+          case ACTION_SQL_EDITOR_OPEN: {
+            const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE);
+            const nodeId = context.get(DATA_CONTEXT_DDL_VIEWER_NODE);
+
+            const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
+            const container = this.navNodeManagerService.getNodeContainerInfo(nodeId);
+            const node = this.navNodeManagerService.getNode(nodeId);
+            const path = [];
+
+            if (container.schemaId) {
+              path.push(container.schemaId);
+            }
+            if (node?.name && node.name !== container.schemaId) {
+              path.push(node.name);
+            }
+
+            const name = `${container.catalogId ? '<' + container.catalogId + '> ' : ''}DDL${path.length ? ' of <' + path.join('.') + '>' : ''}`;
+
+            await this.sqlEditorNavigatorService.openNewEditor({
+              name,
+              connectionId: connection?.id,
+              catalogId: container.catalogId,
+              schemaId: container.schemaId,
+              query: ddl,
+            });
+            break;
+          }
         }
+      },
+      getActionInfo: (context, action) => {
+        if (action === ACTION_SQL_EDITOR_OPEN) {
+          return { ...action.info, icon: '/icons/sql_script_m.svg' };
+        }
+        return action.info;
       },
     });
 
@@ -66,6 +103,7 @@ export class DDLViewerFooterService {
       getItems: (context, items) => [
         ...items,
         ACTION_SAVE,
+        ACTION_SQL_EDITOR_OPEN,
       ],
     });
   }

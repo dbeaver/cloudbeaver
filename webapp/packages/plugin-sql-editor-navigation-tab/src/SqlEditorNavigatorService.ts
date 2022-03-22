@@ -32,6 +32,7 @@ export interface ISQLEditorOptions {
   catalogId?: string;
   schemaId?: string;
   source?: string;
+  query?: string;
 }
 
 export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
@@ -107,7 +108,8 @@ export class SqlEditorNavigatorService {
         if (!tab) {
           const tabOptions = this.sqlEditorTabService.createNewEditor(
             data.name,
-            data.source
+            data.source,
+            data.query
           );
 
           if (tabOptions) {

@@ -27,12 +27,13 @@ export class SqlEditorService {
     order: number,
     name?: string,
     source?: string,
+    query?: string,
     contextInfo?: IConnectionExecutionContextInfo
   ): ISqlEditorTabState {
     return {
       name,
       source,
-      query: '',
+      query: query ?? '',
       order,
       executionContext: contextInfo ? { ...contextInfo } : undefined,
       tabs: [],
