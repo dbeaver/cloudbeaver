@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -18,7 +18,7 @@ import { EObjectFeature } from '../../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../../../shared/NodesManager/NavTreeResource';
-import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
+import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
@@ -53,9 +53,10 @@ const styles = css`
   }
 `;
 
-export const NavigationNodeControl: NavTreeControlComponent = observer(function NavigationNodeControl({
+export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(function NavigationNodeControl({
   node,
-}) {
+  dragging,
+}, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
@@ -91,7 +92,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
   }
 
   return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl onClick={onClickHandler} {...use({ outdated, editing })}>
+    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={icon}>
         <ConnectionMark connected={connected} />
@@ -106,4 +107,4 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(function 
       )}
     </TreeNodeControl>
   );
-});
+}, { forwardRef: true });

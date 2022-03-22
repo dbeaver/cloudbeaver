@@ -57,8 +57,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   return (
     <TreeNode
-      ref={setRef}
-      dragging={dndData.state.isDragging}
       group={group}
       loading={loading}
       disabled={disabled}
@@ -71,7 +69,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       onOpen={handleOpen}
       onSelect={handleSelect}
     >
-      <Control node={node} />
+      <Control ref={setRef} dragging={dndData.state.isDragging} node={node} />
       {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
     </TreeNode>
   );

@@ -16,10 +16,14 @@ export type NavTreeNodeComponent = React.FC<{
   expanded?: boolean;
 }>;
 
-export type NavTreeControlComponent = React.FC<{
+export type NavTreeControlProps = {
   node: NavNode;
+  dragging?: boolean;
   expanded?: boolean;
-}>;
+  ref?: React.Ref<HTMLDivElement> | undefined;
+};
+
+export type NavTreeControlComponent = React.FC<NavTreeControlProps>;
 
 export type NavigationNodeComponent = React.FC<{
   node: NavNode;

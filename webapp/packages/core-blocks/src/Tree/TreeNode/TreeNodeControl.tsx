@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -25,9 +25,10 @@ interface Props extends ITreeNodeState {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
   big?: boolean;
+  children?: React.ReactNode;
 }
 
-export const TreeNodeControl = observer<Props>(function TreeNodeControl({
+export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNodeControl({
   title,
   group,
   disabled,
@@ -39,7 +40,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
   onClick,
   className,
   children,
-}) {
+}, ref) {
   const context = useContext(TreeNodeContext);
 
   if (!context) {
@@ -107,6 +108,7 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
 
   return (
     <div
+      ref={ref}
       tabIndex={0}
       title={title}
       aria-selected={context.selected}
@@ -118,4 +120,4 @@ export const TreeNodeControl = observer<Props>(function TreeNodeControl({
       {children}
     </div>
   );
-});
+}, { forwardRef: true });

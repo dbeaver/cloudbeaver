@@ -30,10 +30,6 @@ export const TREE_NODE_STYLES = css`
         }
       }
 
-      &[|dragging] {
-        opacity: 0.6;
-      }
-
       & TreeNodeControl {
         box-sizing: border-box;
         height: 20px;
@@ -50,6 +46,10 @@ export const TREE_NODE_STYLES = css`
           top: auto;
           height: inherit;
           width: 100%;
+        }
+
+        &[|dragging] {
+          opacity: 0.6;
         }
 
         &[|editing]::before {
