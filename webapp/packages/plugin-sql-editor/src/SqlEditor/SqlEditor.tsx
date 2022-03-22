@@ -10,10 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
+import { DATA_CONTEXT_NAV_NODE, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { useDNDBox } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorProps } from './ISqlEditorProps';
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
@@ -83,6 +85,27 @@ const styles = css`
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const dndBox = useDNDBox({
+    canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
+    onDrop: (context, mouse) => {
+      const node = context.get(DATA_CONTEXT_NAV_NODE);
+      const editor = controller.getEditor();
+
+      if (editor && mouse) {
+        const alias = navNodeManagerService.getNodeDatabaseAlias(node.id);
+
+        if (alias) {
+          const pos = editor.coordsChar({ left: mouse.x, top: mouse.y });
+          const doc = editor.getDoc();
+          doc.replaceRange(alias, pos);
+          editor.setCursor({ ...pos, ch: pos.ch + alias.length });
+        }
+
+        editor.focus();
+      }
+    },
+  });
   const style = useStyles(styles);
   const [editor, setEditor] = useState<SQLCodeEditorController | null>(null);
   const controller = useController(SqlEditorController, state);
@@ -112,7 +135,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   }
 
   return styled(style)(
-    <sql-editor className={className}>
+    <sql-editor ref={dndBox.setRef} className={className}>
       <container>
         <actions onMouseDown={preventFocus}>
           <button

@@ -129,9 +129,9 @@ export class NavNodeManagerService extends Bootstrap {
     await this.navTree.refreshTree(navNodeId);
   }
 
-  getTree(navNodeId: string): string[] | undefined
-  getTree(navNodeKey: NavNodeKey): string[] | undefined
-  getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>
+  getTree(navNodeId: string): string[] | undefined;
+  getTree(navNodeKey: NavNodeKey): string[] | undefined;
+  getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>;
   getTree(navNodeId: string | NavNodeKey | NavNodeKey[]): string[] | undefined | Array<string[] | undefined> {
     if (typeof navNodeId === 'string') {
       return this.navTree.get(navNodeId);
@@ -152,9 +152,9 @@ export class NavNodeManagerService extends Bootstrap {
     this.navTree.delete(path);
   }
 
-  getNode(navNodeId: string): NavNode | undefined
-  getNode(navNodeKey: NavNodeKey): NavNode | undefined
-  getNode(navNodeKey: NavNodeKey[]): Array<NavNode | undefined>
+  getNode(navNodeId: string): NavNode | undefined;
+  getNode(navNodeKey: NavNodeKey): NavNode | undefined;
+  getNode(navNodeKey: NavNodeKey[]): Array<NavNode | undefined>;
   getNode(navNodeId: string | NavNodeKey | NavNodeKey[]): NavNode | undefined | Array<NavNode | undefined> {
     if (typeof navNodeId === 'string') {
       return this.navNodeInfoResource.get(navNodeId);
@@ -167,8 +167,8 @@ export class NavNodeManagerService extends Bootstrap {
     return this.navNodeInfoResource.get(navNodeId.nodeId);
   }
 
-  async loadNode(node: NavNodeKey): Promise<NavNode>
-  async loadNode(...nodes: NavNodeKey[]): Promise<NavNode>
+  async loadNode(node: NavNodeKey): Promise<NavNode>;
+  async loadNode(...nodes: NavNodeKey[]): Promise<NavNode>;
   async loadNode(...nodes: NavNodeKey[]): Promise<NavNode | NavNode[]> {
     const items = await this.navNodeInfoResource.load(resourceKeyList(nodes.map(n => n.nodeId)));
 
@@ -202,6 +202,31 @@ export class NavNodeManagerService extends Bootstrap {
 
     return node.objectFeatures.includes(ENodeFeature.dataContainer)
       || node.objectFeatures.includes(ENodeFeature.container);
+  }
+
+  getNodeDatabaseAlias(nodeId: string): string | null {
+    const node = this.getNode(nodeId);
+    const containerInfo = this.getNodeContainerInfo(nodeId);
+
+    if (node?.name && containerInfo) {
+      if (node.folder) {
+        return `"${node.name}"`;
+      }
+
+      const aliasParts: string[] = [];
+
+      if (containerInfo.schemaId) {
+        aliasParts.push(containerInfo.schemaId);
+      }
+
+      if (containerInfo.schemaId !== node.name) {
+        aliasParts.push(node.name);
+      }
+
+      return aliasParts.join('.');
+    }
+
+    return null;
   }
 
   getNodeContainerInfo(nodeId: string): INodeContainerInfo {

@@ -18,6 +18,7 @@ import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
 import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
 interface Props extends ITreeNodeState {
+  dragging?: boolean;
   className?: string;
   children?: React.ReactNode;
   onClick?: (leaf: boolean) => Promise<void> | void;
@@ -31,6 +32,7 @@ interface IInnerTreeNodeContext extends ITreeNodeContext {
 }
 
 export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode({
+  dragging,
   group = false,
   loading = false,
   selected = false,
@@ -102,7 +104,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
   const elementExpanded = getComputed(() => nodeContext.expanded || nodeContext.externalExpanded);
 
   return styled(TREE_NODE_STYLES)(
-    <node {...use({ expanded: elementExpanded })} ref={ref} className={className}>
+    <node {...use({ expanded: elementExpanded, dragging })} ref={ref} className={className}>
       <TreeNodeContext.Provider value={nodeContext}>
         {children}
       </TreeNodeContext.Provider>

@@ -9,7 +9,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
+import { useDNDData } from '@cloudbeaver/core-ui';
+import { useDataContext } from '@cloudbeaver/core-view';
 
+import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
@@ -36,6 +39,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     handleOpen,
     handleSelect,
   } = useNavigationNode(node, path);
+  const context = useDataContext();
+  const dndData = useDNDData(context);
+  context.set(DATA_CONTEXT_NAV_NODE, node);
 
   const Control = control || NavigationNodeControl;
 
@@ -43,9 +49,16 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     expandedExternal = false;
   }
 
+  function setRef(refObj: HTMLDivElement  | null) {
+    //@ts-expect-error ignore
+    ref.current = refObj;
+    dndData.setTargetRef(refObj);
+  }
+
   return (
     <TreeNode
-      ref={ref}
+      ref={setRef}
+      dragging={dndData.state.isDragging}
       group={group}
       loading={loading}
       disabled={disabled}

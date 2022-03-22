@@ -17,6 +17,7 @@ import { Notifications } from '@cloudbeaver/core-notifications';
 import { PermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
+import { DNDProvider } from '@cloudbeaver/core-ui';
 
 import { useAppVersion } from './useAppVersion';
 
@@ -50,15 +51,17 @@ export const Body = observer(function Body() {
   });
 
   return styled(style)(
-    <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-      <Loader state={permissionsService}>{() => styled(style)(
-        <>
-          {Screen && <Screen {...screenService.routerService.params} />}
-        </>
-      )}
-      </Loader>
-      <DialogsPortal />
-      <Notifications />
-    </theme>
+    <DNDProvider>
+      <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
+        <Loader state={permissionsService}>{() => styled(style)(
+          <>
+            {Screen && <Screen {...screenService.routerService.params} />}
+          </>
+        )}
+        </Loader>
+        <DialogsPortal />
+        <Notifications />
+      </theme>
+    </DNDProvider>
   );
 });

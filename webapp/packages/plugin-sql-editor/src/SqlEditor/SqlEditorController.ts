@@ -169,6 +169,10 @@ export class SqlEditorController implements IInitializableController, IDestructi
     this.reactionDisposer?.();
   }
 
+  getEditor(): Editor | null {
+    return this.editor || null;
+  }
+
   formatScript = async (): Promise<void> => {
     if (this.isDisabled || this.isScriptEmpty || !this.state.executionContext) {
       return;
@@ -545,8 +549,8 @@ export class SqlEditorController implements IInitializableController, IDestructi
     });
   }
 
-  private highlightSegment(clear: true): void
-  private highlightSegment(segment: ISQLScriptSegment): void
+  private highlightSegment(clear: true): void;
+  private highlightSegment(segment: ISQLScriptSegment): void;
   private highlightSegment(segment: ISQLScriptSegment | true): void {
     if (segment === true) {
       const marks = this.editor?.getAllMarks();
