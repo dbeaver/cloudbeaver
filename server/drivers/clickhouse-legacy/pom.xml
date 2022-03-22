@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>drivers.clickhouse</artifactId>
+    <artifactId>drivers.clickhouse-legacy</artifactId>
     <version>1.0.0</version>
     <parent>
         <groupId>io.cloudbeaver</groupId>
@@ -11,14 +11,21 @@
     </parent>
 
     <properties>
-        <deps.output.dir>clickhouse</deps.output.dir>
+        <deps.output.dir>clickhouse-legacy</deps.output.dir>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.clickhouse</groupId>
+            <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.3.2-patch7</version>
+            <classifier>shaded</classifier>
+            <version>0.3.1-patch</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
