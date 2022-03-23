@@ -58,6 +58,8 @@ type NavigatorNodeInfo {
     id: ID!
     # Node human readable name
     name: String
+    #Node full name
+    fullName: String
     # Node icon path
     icon: String
     # Node description
