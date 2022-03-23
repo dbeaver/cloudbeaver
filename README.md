@@ -21,7 +21,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
-### CloudBeaver 22.0.0 - 2021-03-09
+### CloudBeaver 22.0.1 - 2022-03-22
+-   The Navigator tree and the Metadata Editor open folders faster.
+-   The application supports authentication with Nginx.
+-   User access information can be stored in an SQLite database.
+-   Different bug fixes and enhancements have been made.
+
+### CloudBeaver 22.0.0 - 2022-03-09
 
 Changes since 21.3.0
 - Administration:
