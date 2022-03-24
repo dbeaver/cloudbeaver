@@ -35,7 +35,7 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
 @injectable()
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   protected metadata: MetadataMap<string, INodeMetadata>;
-  constructor(private graphQLService: GraphQLService) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
 
     makeObservable(this, {
@@ -122,6 +122,17 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       objectFeatures: node.object?.features || [],
       parentId: parentId || this.get(node.id)?.parentId || ROOT_NODE_PATH,
     };
+  }
+
+  async loadNodeFullName(nodePath: string): Promise<NavNode> {
+    const node = await this.load(nodePath);
+    const { navNodeInfo } = await this.graphQLService.sdk.getNavNodeFullName({
+      nodePath,
+    });
+
+    node.fullName = navNodeInfo.fullName;
+
+    return node;
   }
 
   private async loadNodeInfo(nodePath: string): Promise<NavNode> {

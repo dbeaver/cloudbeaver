@@ -12,6 +12,7 @@ export type NavNodeInfo = NavigatorNodeInfo;
 
 export type NavNode = Omit<NavNodeInfo, 'object'> & {
   parentId: string;
+  fullName?: string;
   objectFeatures: string[];
 };
 

@@ -121,6 +121,10 @@ export class SQLParser {
       return this.getQueryAtPos(begin);
     }
 
+    if (end === -1) {
+      end = begin;
+    }
+
     this.update();
     const from = this.getScriptLineAtPos(begin);
     const to = this.getScriptLineAtPos(end);

@@ -204,29 +204,16 @@ export class NavNodeManagerService extends Bootstrap {
       || node.objectFeatures.includes(ENodeFeature.container);
   }
 
-  getNodeDatabaseAlias(nodeId: string): string | null {
+  async getNodeDatabaseAlias(nodeId: string): Promise<string> {
     const node = this.getNode(nodeId);
-    const containerInfo = this.getNodeContainerInfo(nodeId);
 
-    if (node?.name && containerInfo) {
-      if (node.folder) {
-        return `"${node.name}"`;
-      }
-
-      const aliasParts: string[] = [];
-
-      if (containerInfo.schemaId) {
-        aliasParts.push(containerInfo.schemaId);
-      }
-
-      if (containerInfo.schemaId !== node.name) {
-        aliasParts.push(node.name);
-      }
-
-      return aliasParts.join('.');
+    if (node?.fullName) {
+      return node.fullName;
     }
 
-    return null;
+    const nodeInfo = await this.navNodeInfoResource.loadNodeFullName(nodeId);
+
+    return nodeInfo.fullName!;
   }
 
   getNodeContainerInfo(nodeId: string): INodeContainerInfo {

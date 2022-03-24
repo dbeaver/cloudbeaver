@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { DATA_CONTEXT_NAV_NODE, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorModeProps } from '../../SqlEditorModeService';
@@ -35,26 +36,36 @@ const styles = css`
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({
   data,
 }) {
+  const notificationService = useService(NotificationService);
   const [sqlCodeEditorController, setEditor] = useState<SQLCodeEditorController | null>(null);
   const navNodeManagerService = useService(NavNodeManagerService);
   const panelData = useSQLCodeEditorPanel(data, sqlCodeEditorController);
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
-    onDrop: (context, mouse) => {
+    onDrop: async (context, mouse) => {
       const node = context.get(DATA_CONTEXT_NAV_NODE);
       const editor = sqlCodeEditorController?.getEditor();
 
       if (editor && mouse) {
-        const alias = navNodeManagerService.getNodeDatabaseAlias(node.id);
-
-        if (alias) {
+        try {
           const pos = editor.coordsChar({ left: mouse.x, top: mouse.y });
-          const doc = editor.getDoc();
-          doc.replaceRange(alias, pos);
-          editor.setCursor({ ...pos, ch: pos.ch + alias.length });
-        }
+          editor.setCursor(pos);
 
-        editor.focus();
+          await data.executeQueryAction(data.cursorSegment, async () => {
+            const alias = await navNodeManagerService.getNodeDatabaseAlias(node.id);
+
+            if (alias) {
+              const doc = editor.getDoc();
+
+              doc.replaceRange(alias, pos);
+              editor.setCursor({ ...pos, ch: pos.ch + alias.length });
+            }
+
+            editor.focus();
+          }, true);
+        } catch (exception: any) {
+          notificationService.logException(exception, 'sql_editor_alias_loading_error');
+        }
       }
     },
   });

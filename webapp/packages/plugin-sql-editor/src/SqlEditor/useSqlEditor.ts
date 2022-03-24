@@ -38,6 +38,7 @@ interface ISegmentExecutionData {
 export interface ISQLEditorData {
   readonly dialect: SqlDialectInfo | undefined;
   readonly activeSegment: ISQLScriptSegment | undefined;
+  readonly cursorSegment: ISQLScriptSegment | undefined;
   readonly readonly: boolean;
   readonly isLineScriptEmpty: boolean;
   readonly isScriptEmpty: boolean;
@@ -56,6 +57,11 @@ export interface ISQLEditorData {
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
+  executeQueryAction<T>(
+    segment: ISQLScriptSegment | undefined,
+    action: (query: ISQLScriptSegment) => Promise<T>,
+    passEmpty?: boolean
+  ): Promise<T | undefined>;
 }
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
@@ -75,10 +81,6 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   reactionDisposer: IReactionDisposer | null;
   updateParserScriptsThrottle(): Promise<void>;
   updateParserScripts(): Promise<void>;
-  executeQueryAction<T>(
-    segment: ISQLScriptSegment | undefined,
-    action: (query: ISQLScriptSegment) => Promise<T>
-  ): Promise<T | undefined>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
@@ -104,6 +106,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
     get activeSegment(): ISQLScriptSegment | undefined {
       return this.parser.getSegment(this.cursor.begin, this.cursor.end);
+    },
+
+    get cursorSegment(): ISQLScriptSegment | undefined {
+      return this.parser.getSegment(this.cursor.begin, -1);
     },
 
     get readonly(): boolean {
@@ -352,9 +358,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
     async executeQueryAction<T>(
       segment: ISQLScriptSegment | undefined,
-      action: (query: ISQLScriptSegment) => Promise<T>
+      action: (query: ISQLScriptSegment) => Promise<T>,
+      passEmpty?: boolean
     ): Promise<T | undefined> {
-      if (!segment || this.isDisabled || this.isLineScriptEmpty) {
+      if (!segment || this.isDisabled || (!passEmpty && this.isLineScriptEmpty)) {
         return;
       }
 

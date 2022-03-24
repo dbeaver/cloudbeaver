@@ -537,6 +537,7 @@ export interface NavigatorNodeInfo {
   description?: Maybe<Scalars['String']>;
   features?: Maybe<Array<Scalars['String']>>;
   folder?: Maybe<Scalars['Boolean']>;
+  fullName?: Maybe<Scalars['String']>;
   hasChildren?: Maybe<Scalars['Boolean']>;
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
@@ -2042,6 +2043,13 @@ export type GetDbObjectInfoQueryVariables = Exact<{
 
 export type GetDbObjectInfoQuery = { objectInfo: { id: string; object?: { type?: string; features?: Array<string>; properties?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> } } };
 
+export type GetNavNodeFullNameQueryVariables = Exact<{
+  nodePath: Scalars['ID'];
+}>;
+
+
+export type GetNavNodeFullNameQuery = { navNodeInfo: { fullName?: string } };
+
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
 }>;
@@ -3283,6 +3291,13 @@ export const GetDbObjectInfoDocument = `
   }
 }
     ${NavNodeDbObjectInfoFragmentDoc}`;
+export const GetNavNodeFullNameDocument = `
+    query getNavNodeFullName($nodePath: ID!) {
+  navNodeInfo(nodePath: $nodePath) {
+    fullName
+  }
+}
+    `;
 export const NavDeleteNodesDocument = `
     mutation navDeleteNodes($nodePaths: [ID!]!) {
   navDeleteNodes(nodePaths: $nodePaths)
@@ -3747,6 +3762,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getDBObjectInfo(variables: GetDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetDbObjectInfoQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDBObjectInfo', 'query');
+    },
+    getNavNodeFullName(variables: GetNavNodeFullNameQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetNavNodeFullNameQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetNavNodeFullNameQuery>(GetNavNodeFullNameDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getNavNodeFullName', 'query');
     },
     navDeleteNodes(variables: NavDeleteNodesMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavDeleteNodesMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navDeleteNodes', 'mutation');

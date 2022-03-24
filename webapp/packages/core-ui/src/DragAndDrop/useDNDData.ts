@@ -29,17 +29,28 @@ interface IDNDDataPrivate extends IDNDData {
   setPreview: (element: React.ReactElement | Element | null) => void;
 }
 
-export function useDNDData(context: IDataContextProvider): IDNDData {
+interface IOptions {
+  onDragStart: () => void;
+}
+
+export function useDNDData(context: IDataContextProvider, options: IOptions): IDNDData {
   const state = useObservableRef<IState>(() => ({
     isDragging: false,
   }), {
     isDragging: observable.ref,
   }, false);
+  options = useObjectRef(options);
 
   const [, setTarget, setPreview] = useDrag<IDataContextProvider, void, void>(() => ({
     type:DND_ELEMENT_TYPE,
     item: context,
     collect: monitor => {
+      const dragging = monitor.isDragging();
+
+      if (dragging !== state.isDragging && dragging) {
+        options.onDragStart();
+      }
+
       state.isDragging = monitor.isDragging();
     },
   }));

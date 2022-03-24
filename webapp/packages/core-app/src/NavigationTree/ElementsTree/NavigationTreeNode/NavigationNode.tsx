@@ -9,10 +9,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useDNDData } from '@cloudbeaver/core-ui';
 import { useDataContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
+import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
@@ -24,6 +26,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   path,
   expanded: expandedExternal,
 }) {
+  const navNodeManagerService = useService(NavNodeManagerService);
   const {
     ref,
     empty,
@@ -40,7 +43,11 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     handleSelect,
   } = useNavigationNode(node, path);
   const context = useDataContext();
-  const dndData = useDNDData(context);
+  const dndData = useDNDData(context, {
+    onDragStart: async () => {
+      await navNodeManagerService.getNodeDatabaseAlias(node.id);
+    },
+  });
   context.set(DATA_CONTEXT_NAV_NODE, node);
 
   const Control = control || NavigationNodeControl;
