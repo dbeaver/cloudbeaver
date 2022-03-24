@@ -8,7 +8,7 @@
 
 import { css } from 'reshadow';
 
-export const verticalRotatedTabStyles = css`
+export const VERTICAL_ROTATED_TAB_STYLES = css`
   tab-outer {
     display: table;
   }

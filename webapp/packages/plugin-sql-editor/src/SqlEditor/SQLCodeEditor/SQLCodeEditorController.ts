@@ -8,7 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable, StringStream } from 'codemirror';
+import { Position, Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable, StringStream } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
@@ -139,12 +139,68 @@ export class SQLCodeEditorController {
     this.dialect = dialect;
   }
 
+  getEditor(): Editor | undefined {
+    return this.editor;
+  }
+
   setReadonly(readonly: boolean): void {
     this.readonlyState = readonly;
   }
 
   focus(): void {
     this.editor?.focus();
+  }
+
+  resetLineStateHighlight(): void {
+    this.editor?.eachLine(line => {
+      const lineNumber = this.editor?.getLineNumber(line);
+
+      if (lineNumber !== null && lineNumber !== undefined) {
+        this.highlightExecutingLine(lineNumber, false);
+        this.highlightExecutingErrorLine(lineNumber, false);
+      }
+    });
+  }
+
+  highlightSegment(clear: true): void;
+  highlightSegment(from: Position, to: Position): void;
+  highlightSegment(from: Position | true, to?: Position): void {
+    if (from === true) {
+      const marks = this.editor?.getAllMarks();
+
+      if (marks) {
+        for (const mark of marks) {
+          if (mark.className === 'active-query') {
+            mark.clear();
+          }
+        }
+      }
+      return;
+    }
+
+    this.editor?.markText(
+      from,
+      to!,
+      {
+        className: 'active-query',
+      }
+    );
+  }
+
+  highlightExecutingLine(line: number, state: boolean): void {
+    if (state) {
+      this.editor?.addLineClass(line, 'background', 'running-query');
+    } else {
+      this.editor?.removeLineClass(line, 'background', 'running-query');
+    }
+  }
+
+  highlightExecutingErrorLine(line: number, state: boolean): void {
+    if (state) {
+      this.editor?.addLineClass(line, 'background', 'running-query-error');
+    } else {
+      this.editor?.removeLineClass(line, 'background', 'running-query-error');
+    }
   }
 
   private handleConfigure(editor: Editor) {

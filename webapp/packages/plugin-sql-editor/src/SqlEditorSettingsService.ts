@@ -17,7 +17,7 @@ const defaultSettings = {
 export class SqlEditorSettingsService {
   readonly settings: PluginSettings<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) { 
+  constructor(private readonly pluginManagerService: PluginManagerService) {
     this.settings = this.pluginManagerService.getPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

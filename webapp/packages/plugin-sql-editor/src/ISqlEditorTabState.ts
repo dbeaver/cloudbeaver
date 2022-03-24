@@ -50,6 +50,7 @@ export interface ISqlEditorTabState {
   query: string;
   executionContext?: IConnectionExecutionContextInfo;
   currentTabId?: string;
+  currentEditorId?: string;
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];
   resultTabs: IResultTab[];

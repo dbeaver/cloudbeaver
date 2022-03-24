@@ -193,7 +193,7 @@
       color: white !important;
     }
 
-    .cm-s-material .active-query {
+    .cm-s-material :not(.CodeMirror-selectedtext).active-query {
       @include mdc-theme-prop(background, secondary, false);
     }
 

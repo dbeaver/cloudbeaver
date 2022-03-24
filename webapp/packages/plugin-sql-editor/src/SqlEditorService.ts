@@ -9,8 +9,10 @@
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, QuerySqlCompletionProposalsQuery, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
+
+export type SQLProposal = SqlCompletionProposal;
 
 @injectable()
 export class SqlEditorService {
@@ -77,8 +79,8 @@ export class SqlEditorService {
     cursor: number,
     maxResults?: number,
     simple?: boolean,
-  ): Promise<QuerySqlCompletionProposalsQuery> {
-    const result = await this.gql.sdk.querySqlCompletionProposals({
+  ): Promise<SQLProposal[]> {
+    const { proposals } = await this.gql.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
       query,
@@ -87,7 +89,7 @@ export class SqlEditorService {
       simple,
     });
 
-    return result;
+    return proposals as SQLProposal[];
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {

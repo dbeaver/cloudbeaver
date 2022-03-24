@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { BASE_TAB_STYLES, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
@@ -62,7 +62,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   onPresentationChange,
   onClose,
 }) {
-  const style = useStyles(styles, BASE_TAB_STYLES, verticalRotatedTabStyles);
+  const style = useStyles(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(
     type,

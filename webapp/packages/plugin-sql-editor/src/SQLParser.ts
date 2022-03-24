@@ -102,7 +102,25 @@ export class SQLParser {
     this.customQuotes = [["'", "'"]];
   }
 
+  getScriptSegment(): ISQLScriptSegment {
+    const to = this.getScriptLineAtPos(this.parsedScript.length);
+
+    return {
+      query: this.parsedScript,
+      begin: 0,
+      end: this.parsedScript.length,
+      from: 0,
+      to: this.lineCount,
+      fromPosition: 0,
+      toPosition: to?.end || 0,
+    };
+  }
+
   getSegment(begin: number, end: number): ISQLScriptSegment | undefined {
+    if (begin === end) {
+      return this.getQueryAtPos(begin);
+    }
+
     this.update();
     const from = this.getScriptLineAtPos(begin);
     const to = this.getScriptLineAtPos(end);

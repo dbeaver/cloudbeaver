@@ -41,7 +41,7 @@ export * from './Tabs/Tab/TabIcon';
 export * from './Tabs/Tab/TabProps';
 export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
-export * from './Tabs/Tab/verticalRotatedTabStyles';
+export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
 export * from './Tabs/Tab/UnderlineTabStyles';
 export * from './Tabs/Tab/verticalTabStyles';
 export * from './Tabs/TabsBootstrap';

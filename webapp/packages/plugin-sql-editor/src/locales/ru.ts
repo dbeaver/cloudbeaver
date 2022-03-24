@@ -1,5 +1,6 @@
 export default [
   ['sql_editor_menu', 'SQL Редактор'],
+  ['sql_editor_script_editor', 'Редактор Скрипта'],
   ['sql_editor_restore_message', 'Вы хотите восстановить подключение?'],
   ['sql_editor_restore', 'Восстановить'],
   ['sql_editor_placeholder', 'Нажмите Ctrl+Enter, чтобы выполнить запрос и увидеть результат'],

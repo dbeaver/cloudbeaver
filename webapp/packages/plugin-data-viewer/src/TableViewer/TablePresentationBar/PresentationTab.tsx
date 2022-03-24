@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import {
-  verticalRotatedTabStyles, Tab, TabIcon, TabTitle, BASE_TAB_STYLES
+  VERTICAL_ROTATED_TAB_STYLES, Tab, TabIcon, TabTitle, BASE_TAB_STYLES
 } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -35,7 +35,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
   onClick,
 }) {
   const translate = useTranslate();
-  const styles = useStyles(BASE_TAB_STYLES, verticalRotatedTabStyles, style);
+  const styles = useStyles(BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style);
 
   if (presentation.getTabComponent) {
     const Tab = presentation.getTabComponent();
@@ -44,7 +44,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
       <Tab
         tabId={presentation.id}
         className={className}
-        style={[BASE_TAB_STYLES, verticalRotatedTabStyles]}
+        style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES]}
         model={model}
         presentation={presentation}
         disabled={model.isLoading()}
@@ -56,7 +56,7 @@ export const PresentationTab = observer<Props>(function PresentationTab({
   return styled(styles)(
     <Tab
       tabId={presentation.id}
-      style={[BASE_TAB_STYLES, verticalRotatedTabStyles, style]}
+      style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style]}
       disabled={model.isLoading()}
       onClick={onClick}
     >
