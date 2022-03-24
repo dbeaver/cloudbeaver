@@ -67,6 +67,11 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    public String getFullName() {
+        return node.getNodeFullName();
+    }
+
+    @Property
     public String getIcon() {
         return node.getNodeIconDefault().getLocation();
     }
