@@ -21,8 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.DBPObjectWithDetails;
+import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
@@ -68,7 +67,17 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getFullName() {
-        return node.getNodeFullName();
+        String nodeName;
+        if (node instanceof DBNDatabaseNode && !(node instanceof DBNDataSource)) {
+            DBSObject object = ((DBNDatabaseNode) node).getObject();
+            nodeName = DBUtils.getObjectFullName(object, DBPEvaluationContext.UI);
+        } else if (node instanceof DBNDataSource) {
+            DBPDataSourceContainer object = ((DBNDataSource) node).getDataSourceContainer();
+            nodeName = object.getName();
+        } else {
+            nodeName = node.getNodeTargetName();
+        }
+        return nodeName;
     }
 
     @Property
