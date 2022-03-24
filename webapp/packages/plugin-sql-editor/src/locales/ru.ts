@@ -1,6 +1,6 @@
 export default [
   ['sql_editor_menu', 'SQL Редактор'],
-  ['sql_editor_script_editor', 'Редактор Скрипта'],
+  ['sql_editor_script_editor', 'Редактор SQL'],
   ['sql_editor_alias_loading_error', 'Возникла ошибка при загрузке псевдонима'],
   ['sql_editor_restore_message', 'Вы хотите восстановить подключение?'],
   ['sql_editor_restore', 'Восстановить'],

@@ -1,6 +1,6 @@
 export default [
   ['sql_editor_menu', 'SQL编辑器'],
-  ['sql_editor_script_editor', 'Script Editor'],
+  ['sql_editor_script_editor', 'SQL Editor'],
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],
   ['sql_editor_restore_message', 'Do you want to restore the connection?'],
   ['sql_editor_restore', 'Restore'],

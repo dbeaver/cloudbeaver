@@ -8,6 +8,7 @@ export * from './QueryDataSource';
 export * from './SqlDialectInfoService';
 export * from './ISqlEditorTabState';
 export * from './SqlEditor';
+export * from './SqlEditorModeService';
 export * from './SqlEditorService';
 
 export default sqlEditorPluginManifest;

@@ -33,10 +33,12 @@ const styles = css`
     }
 
     container {
+      composes: theme-border-color-background from global;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overflow: auto;
+      border-right: solid 1px;
     }
   
     actions {
@@ -76,6 +78,7 @@ const styles = css`
 
 const tabStyles = css`
   tabs {
+    composes: theme-background-secondary theme-text-on-secondary from global;
     overflow-x: hidden;
   }
   Tab {
