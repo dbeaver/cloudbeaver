@@ -22,12 +22,18 @@ export interface IQueryInfo {
 export interface ISQLScriptSegment {
   query: string;
 
+  /** query begin index in script */
   begin: number;
+  /** query end index in script */
   end: number;
 
-  from: number; // query begin line
-  to: number; // query end line
+  /** query begin line */
+  from: number;
+  /** query end line */
+  to: number;
+  /** query begin index in line */
   fromPosition: number;
+  /** query end index in line */
   toPosition: number;
 }
 
@@ -94,6 +100,26 @@ export class SQLParser {
     this.lines = [];
     this.customScriptDelimiters = [];
     this.customQuotes = [["'", "'"]];
+  }
+
+  getSegment(begin: number, end: number): ISQLScriptSegment | undefined {
+    this.update();
+    const from = this.getScriptLineAtPos(begin);
+    const to = this.getScriptLineAtPos(end);
+
+    if (!from || !to) {
+      return undefined;
+    }
+
+    return {
+      query: this.parsedScript.substring(begin, end),
+      begin,
+      end,
+      from: from.index,
+      to: to.index,
+      fromPosition: begin - from.begin,
+      toPosition: end - to.begin,
+    };
   }
 
   getQueryAtPos(position: number): ISQLScriptSegment | undefined {
@@ -182,7 +208,7 @@ export class SQLParser {
         let query = currentSegment;
 
         if (scriptDelimiter) {
-          query = query.substr(0, query.length - scriptDelimiter.length);
+          query = query.substring(0, query.length - scriptDelimiter.length);
         }
 
         query = query.trim();
@@ -250,7 +276,7 @@ export class SQLParser {
     for (const query of queries) {
       const from = this.getScriptLineAtPos(query.start);
       const to = this.getScriptLineAtPos(query.end);
-      
+
       if (from && to) {
         this._scripts.push({
           query: this.script.substring(query.start, query.end),
