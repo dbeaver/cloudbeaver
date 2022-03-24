@@ -1,36 +1,40 @@
 package io.cloudbeaver.service.security.internal.remote;
 
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.external.remote.model.role.DCRole;
 import io.cloudbeaver.service.security.external.remote.model.role.DCRoleCreateRequest;
 import io.cloudbeaver.service.security.external.remote.model.role.DCRoleUpdateRequest;
-import io.cloudbeaver.service.security.external.remote.model.user.DCUserCreateRequest;
-import io.cloudbeaver.service.security.external.remote.model.user.DCUserRolesUpdateRequest;
+import io.cloudbeaver.service.security.external.remote.model.session.DCSessionCreateRequest;
+import io.cloudbeaver.service.security.external.remote.model.session.DCSessionUpdateRequest;
+import io.cloudbeaver.service.security.external.remote.model.subjects.DCDataSourceSubjectAccessUpdateRequest;
+import io.cloudbeaver.service.security.external.remote.model.subjects.DCSubjectUpdateDataSourceAccessRequest;
+import io.cloudbeaver.service.security.external.remote.model.subjects.DCSubjectUpdatePermissionsRequest;
+import io.cloudbeaver.service.security.external.remote.model.user.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.auth.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CBRemoteSecurityController implements SMAdminController<WebUser, WebRole, WebSession> {
-    private final DCServerClient dcClient = new DCServerClient("http://localhost:8080");
+
+public class CBRemoteSecurityController implements SMAdminController<WebUser, WebRole> {
+    private final DCServerClient dcClient = new DCServerClient("http://localhost:8081");
 
     @Nullable
     @Override
-    public String getUserByCredentials(SMAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
-        return null;
+    public String getUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
+        return dcClient.getUserByCredentials(new DCUserByCredentialsSearchRequest(authProviderId, authParameters));
     }
 
     @Override
-    public Map<String, Object> getUserCredentials(String userId, SMAuthProviderDescriptor authProvider) throws DBCException {
-        return null;
+    public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
+        return dcClient.getUserCredentials(userId, authProviderId);
     }
 
     @Override
@@ -45,7 +49,7 @@ public class CBRemoteSecurityController implements SMAdminController<WebUser, We
 
     @Override
     public void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException {
-        dcClient.updateUserRoles(userId, new DCUserRolesUpdateRequest(Arrays.asList(roleIds), grantorId));
+        dcClient.updateUserRoles(userId, new DCUserRolesUpdateRequest(Arrays.asList(roleIds)));
     }
 
     @NotNull
@@ -61,76 +65,77 @@ public class CBRemoteSecurityController implements SMAdminController<WebUser, We
 
     @Override
     public Map<String, Object> getUserParameters(String userId) throws DBCException {
-        return null;
+        return dcClient.getUserParameters(userId);
     }
 
     @Override
     public void setUserParameter(String userId, String name, Object value) throws DBCException {
-
+        dcClient.setUserParameter(userId, new DCUserUpdateParameterRequest(name, value));
     }
 
     @Override
-    public void setUserCredentials(String userId, SMAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
-
+    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException {
+        dcClient.setUserCredentials(userId, new DCUserUpdateCredentialsRequest(authProviderId, credentials));
     }
 
     @Override
     public String[] getUserLinkedProviders(String userId) throws DBCException {
-        return new String[0];
-    }
-
-    @Override
-    public void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException {
-
-    }
-
-    @NotNull
-    @Override
-    public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
-        return null;
+        return dcClient.getUserLinkedProviders(userId);
     }
 
     @NotNull
     @Override
     public Set<String> getUserPermissions(String userId) throws DBCException {
-        return null;
+        return dcClient.getUserPermissions(userId);
     }
 
     @Override
     public boolean isSessionPersisted(String id) throws DBCException {
-        return false;
+        return dcClient.isSessionPersisted(id);
     }
 
     @Override
-    public void createSession(WebSession session) throws DBCException {
-
+    public void createSession(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters) throws DBCException {
+        dcClient.createSession(new DCSessionCreateRequest(appSessionId, userId, parameters));
     }
 
     @Override
-    public void updateSession(WebSession session) throws DBCException {
+    public void updateSession(@NotNull String sessionId, @Nullable String userId, Map<String, Object> parameters) throws DBCException {
+        dcClient.updateSession(sessionId, new DCSessionUpdateRequest(userId, parameters));
+    }
 
+
+    @Override
+    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBCException {
+        dcClient.setSubjectPermissions(subjectId, new DCSubjectUpdatePermissionsRequest(permissionIds));
+    }
+
+    @Override
+    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull List<String> connectionIds, String grantor) throws DBCException {
+        dcClient.setSubjectDataSourceAccess(subjectId, new DCSubjectUpdateDataSourceAccessRequest(connectionIds));
+    }
+
+    @NotNull
+    @Override
+    public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
+        return dcClient.getSubjectPermissions(subjectId);
     }
 
     @NotNull
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectId) throws DBCException {
-        return new SMDataSourceGrant[0];
-    }
-
-    @Override
-    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull String[] connectionIds, String grantor) throws DBCException {
-
+        return dcClient.getSubjectDataSourceAccess(subjectId);
     }
 
     @NotNull
     @Override
     public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
-        return new SMDataSourceGrant[0];
+        return dcClient.getDataSourceSubjectAccess(connectionId);
     }
 
     @Override
     public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
-
+        dcClient.setDataSourceSubjectAccess(connectionId, new DCDataSourceSubjectAccessUpdateRequest(Arrays.asList(subjects)));
     }
 
     @NotNull
@@ -147,12 +152,12 @@ public class CBRemoteSecurityController implements SMAdminController<WebUser, We
     @NotNull
     @Override
     public WebRole[] readAllRoles() throws DBCException {
-        return dcClient.findAllRoles();
+        return dcClient.getAllRoles().stream().map(DCRole::toWebRole).toArray(WebRole[]::new);
     }
 
     @Override
     public WebRole findRole(String roleId) throws DBCException {
-        return dcClient.findRole(roleId);
+        return DCRole.toWebRole(dcClient.findRole(roleId));
     }
 
     @NotNull

@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -57,8 +56,6 @@ import org.jkiss.utils.SecurityUtils;
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
 
@@ -83,14 +80,14 @@ public class CBDatabase {
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
-    private SMAdminController<WebUser, WebRole, WebSession> adminSecurityController;
+    private SMAdminController<WebUser, WebRole> adminSecurityController;
 
     public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
 
-    public void setAdminSecurityController(SMAdminController<WebUser, WebRole, WebSession> adminSecurityController) {
+    public void setAdminSecurityController(SMAdminController<WebUser, WebRole> adminSecurityController) {
         this.adminSecurityController = adminSecurityController;
     }
 
@@ -220,7 +217,7 @@ public class CBDatabase {
                 AuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
-                    adminSecurityController.setUserCredentials(adminName, authProvider, userCredentials);
+                    adminSecurityController.setUserCredentials(adminName, authProvider.getId(), userCredentials);
                 }
             }
         }
@@ -262,7 +259,7 @@ public class CBDatabase {
 
             AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
             if (authProvider != null) {
-                adminSecurityController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
+                adminSecurityController.setUserCredentials(adminUser.getUserId(), authProvider.getId(), credentials);
             }
         }
 
@@ -353,7 +350,7 @@ public class CBDatabase {
                     for (WebRole role : initialData.getRoles()) {
                         adminSecurityController.createRole(role, adminName);
                         if (adminName != null) {
-                            adminSecurityController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                            adminSecurityController.setSubjectPermissions(role.getRoleId(), new ArrayList<>(role.getPermissions()), adminName);
                         }
                     }
                 }

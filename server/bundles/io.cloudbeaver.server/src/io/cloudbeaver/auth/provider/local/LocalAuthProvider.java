@@ -45,7 +45,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider);
+        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
         }
@@ -79,7 +79,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         String userName = webSession.getUser().getUserId();
 
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider);
+        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
         }
@@ -98,7 +98,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
-        CBApplication.getInstance().getSecurityController().setUserCredentials(userName, authProvider, storedCredentials);
+        CBApplication.getInstance().getSecurityController().setUserCredentials(userName, authProvider.getId(), storedCredentials);
         return true;
     }
 

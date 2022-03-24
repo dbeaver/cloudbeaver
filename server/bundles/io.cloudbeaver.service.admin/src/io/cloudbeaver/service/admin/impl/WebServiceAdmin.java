@@ -251,7 +251,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
         try {
-            CBPlatform.getInstance().getApplication().getSecurityController().setSubjectPermissions(roleID, permissions.toArray(new String[0]), grantor.getUserId());
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting role permissions", e);
@@ -270,7 +270,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             credentials.put(LocalAuthProvider.CRED_USER, userID);
         }
         try {
-            CBPlatform.getInstance().getApplication().getSecurityController().setUserCredentials(userID, authProvider, credentials);
+            CBPlatform.getInstance().getApplication().getSecurityController().setUserCredentials(userID, authProvider.getId(), credentials);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting user credentials", e);
@@ -603,7 +603,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getSecurityController().setSubjectConnectionAccess(subjectId, connections.toArray(new String[0]), grantor.getUserId());
+            CBApplication.getInstance().getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }

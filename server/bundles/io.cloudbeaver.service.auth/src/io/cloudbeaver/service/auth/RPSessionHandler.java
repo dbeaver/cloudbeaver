@@ -56,7 +56,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         return false;
     }
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
-        SMController<WebUser, ?, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController<WebUser, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(AUTH_PROVIDER);
 
         String userName = request.getHeader(X_USER);
@@ -81,7 +81,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                         userRoles = new String[]{defaultRoleName};
                     }
                     // We need to associate new credentials with active user
-                    securityController.setUserCredentials(userName, authProvider, credentials);
+                    securityController.setUserCredentials(userName, authProvider.getId(), credentials);
                 }
                 adminSecurityController.setUserRoles(userName, userRoles, userName);
                 user = curUser;

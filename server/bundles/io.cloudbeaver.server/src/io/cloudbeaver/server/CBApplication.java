@@ -111,7 +111,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
-    private SMAdminController<WebUser, WebRole, WebSession> securityController;
+    private SMAdminController<WebUser, WebRole> securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -174,11 +174,11 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         return productConfiguration;
     }
 
-    public SMController<WebUser, WebRole, WebSession> getSecurityController() {
+    public SMController<WebUser, WebRole> getSecurityController() {
         return securityController;
     }
 
-    public SMAdminController<WebUser, WebRole, WebSession> getAdminSecurityController() {
+    public SMAdminController<WebUser, WebRole> getAdminSecurityController() {
         return securityController;
     }
 

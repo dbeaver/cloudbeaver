@@ -2,6 +2,7 @@ package io.cloudbeaver.service.security.external.remote.model.role;
 
 public class DCRoleCreateRequest {
     private final DCRole role;
+    //TODO remove
     private final String grantor;
 
     public DCRoleCreateRequest(DCRole role, String grantor) {

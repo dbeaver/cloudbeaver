@@ -1,6 +1,7 @@
 package io.cloudbeaver.service.security.external.remote.model.role;
 
 import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.code.Nullable;
 
 import java.util.Set;
 
@@ -47,7 +48,11 @@ public class DCRole {
         );
     }
 
-    public static WebRole toWebRole(DCRole dcRole) {
+    @Nullable
+    public static WebRole toWebRole(@Nullable DCRole dcRole) {
+        if (dcRole == null) {
+            return null;
+        }
         WebRole webRole = new WebRole(dcRole.getRoleId());
         webRole.setDescription(dcRole.getDescription());
         webRole.setName(dcRole.getName());

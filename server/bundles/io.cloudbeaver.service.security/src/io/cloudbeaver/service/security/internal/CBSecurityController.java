@@ -18,18 +18,15 @@ package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
-import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
-import org.jkiss.dbeaver.model.auth.SMAuthProviderDescriptor;
+import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
-import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -46,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBSecurityController implements SMAdminController<WebUser, WebRole, WebSession> {
+public class CBSecurityController implements SMAdminController<WebUser, WebRole> {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
@@ -350,8 +347,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     }
 
     @Override
-    public void setUserCredentials(String userId, SMAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException {
         List<String[]> transformedCredentials;
+        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
             SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
@@ -393,7 +391,8 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
 
     @Nullable
     @Override
-    public String getUserByCredentials(SMAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    public String getUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
+        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
             if (prop.isIdentifying()) {
@@ -460,7 +459,8 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     }
 
     @Override
-    public Map<String, Object> getUserCredentials(String userId, SMAuthProviderDescriptor authProvider) throws DBCException {
+    public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
+        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
@@ -658,11 +658,11 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     // Permissions
 
     @Override
-    public void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException {
+    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
-                insertPermissions(dbCon, subjectId, permissionIds, grantorId);
+                insertPermissions(dbCon, subjectId, permissionIds.toArray(String[]::new), grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -755,28 +755,27 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     }
 
     @Override
-    public void createSession(WebSession session) throws DBCException {
+    public void createSession(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID) " +
                     "VALUES(?,?,?,?,?,?,?)")) {
-                dbStat.setString(1, session.getSessionId());
-                WebUser user = session.getUser();
-                if (user == null) {
+                dbStat.setString(1, appSessionId);
+                if (userId == null) {
                     dbStat.setNull(2, Types.VARCHAR);
                 } else {
-                    dbStat.setString(2, user.getUserId());
+                    dbStat.setString(2, userId);
                 }
                 Timestamp currentTS = new Timestamp(System.currentTimeMillis());
                 dbStat.setTimestamp(3, currentTS);
                 dbStat.setTimestamp(4, currentTS);
-                if (session.getLastRemoteAddr() != null) {
-                    dbStat.setString(5, session.getLastRemoteAddr());
+                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
+                    dbStat.setString(5, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
                 } else {
                     dbStat.setNull(5, Types.VARCHAR);
                 }
-                if (session.getLastRemoteUserAgent() != null) {
-                    dbStat.setString(6, session.getLastRemoteUserAgent());
+                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
+                    dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
                 } else {
                     dbStat.setNull(6, Types.VARCHAR);
                 }
@@ -789,30 +788,29 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     }
 
     @Override
-    public void updateSession(WebSession session) throws DBCException {
+    public void updateSession(@NotNull String sessionId, @Nullable String userId, @NotNull Map<String, Object> parameters) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? WHERE SESSION_ID=?")) {
-                WebUser user = session.getUser();
-                if (user == null) {
+                if (userId == null) {
                     dbStat.setNull(1, Types.VARCHAR);
                 } else {
-                    dbStat.setString(1, user.getUserId());
+                    dbStat.setString(1, userId);
                 }
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                if (session.getLastRemoteAddr() != null) {
-                    dbStat.setString(3, CommonUtils.truncateString(session.getLastRemoteAddr(), 128));
+                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
+                    dbStat.setString(3, CommonUtils.truncateString(parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString(), 128));
                 } else {
                     dbStat.setNull(3, Types.VARCHAR);
                 }
-                if (session.getLastRemoteUserAgent() != null) {
-                    dbStat.setString(4, CommonUtils.truncateString(session.getLastRemoteUserAgent(), 255));
+                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
+                    dbStat.setString(4, CommonUtils.truncateString(parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString(), 255));
                 } else {
                     dbStat.setNull(4, Types.VARCHAR);
                 }
                 dbStat.setString(5, database.getInstanceId());
 
-                dbStat.setString(6, session.getSessionId());
+                dbStat.setString(6, sessionId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Session not exists in database");
                 }
@@ -876,12 +874,12 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
     }
 
     @Override
-    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull String[] connectionIds, String grantorId) throws DBCException {
+    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull List<String> connectionIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon,
                     "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
-                if (!ArrayUtils.isEmpty(connectionIds)) {
+                if (!CommonUtils.isEmpty(connectionIds)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
                         "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
                         dbStat.setString(1, subjectId);
@@ -1006,6 +1004,14 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole,
             dbStat.setString(1, subjectId);
             dbStat.execute();
         }
+    }
+
+    private AuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
+        if (authProvider == null) {
+            throw new DBCException("Auth provider not found: " + authProviderId);
+        }
+        return authProvider;
     }
 
 }
