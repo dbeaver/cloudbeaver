@@ -13,7 +13,5 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  io.cloudbeaver.model
-Export-Package: io.cloudbeaver.service.security,
- io.cloudbeaver.service.security.external.remote.model.role,
- io.cloudbeaver.service.security.external.remote.model.session
+Export-Package: io.cloudbeaver.service.security
 Automatic-Module-Name: io.cloudbeaver.service.security
