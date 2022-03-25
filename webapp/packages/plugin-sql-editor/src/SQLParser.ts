@@ -87,7 +87,7 @@ export class SQLParser {
   private dialect: SqlDialectInfo | null;
   private _scripts: ISQLScriptSegment[];
   private script: string;
-  private parsedScript: string;
+  private parsedScript: string | null;
   private lines: ISQLScriptLine[];
   private customScriptDelimiters: string[];
   private readonly customQuotes: string[][];
@@ -96,19 +96,20 @@ export class SQLParser {
     this.dialect = null;
     this._scripts = [];
     this.script = '';
-    this.parsedScript = '';
+    this.parsedScript = null;
     this.lines = [];
     this.customScriptDelimiters = [];
     this.customQuotes = [["'", "'"]];
   }
 
   getScriptSegment(): ISQLScriptSegment {
-    const to = this.getScriptLineAtPos(this.parsedScript.length);
+    const script = this.parsedScript || '';
+    const to = this.getScriptLineAtPos(script.length);
 
     return {
-      query: this.parsedScript,
+      query: script,
       begin: 0,
-      end: this.parsedScript.length,
+      end: script.length,
       from: 0,
       to: this.lineCount,
       fromPosition: 0,
@@ -134,7 +135,7 @@ export class SQLParser {
     }
 
     return {
-      query: this.parsedScript.substring(begin, end),
+      query: (this.parsedScript || '').substring(begin, end),
       begin,
       end,
       from: from.index,

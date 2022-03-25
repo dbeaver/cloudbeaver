@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed, autorun, IReactionDisposer, action } from 'mobx';
+import { observable, computed, autorun, IReactionDisposer, action, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
@@ -161,12 +161,16 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           const context = this.connectionExecutionContextService.get(this.state.executionContext.id);
 
           if (context) {
-            this.sqlDialectInfoService
-              .loadSqlDialectInfo(this.state.executionContext.connectionId)
-              .then(async dialect => {
-                this.parser.setDialect(dialect || null);
-                await this.updateParserScriptsThrottle();
-              });
+            const connectionId = this.state.executionContext.connectionId;
+
+            untracked(() => {
+              this.sqlDialectInfoService
+                .loadSqlDialectInfo(connectionId)
+                .then(async dialect => {
+                  this.parser.setDialect(dialect || null);
+                  await this.updateParserScriptsThrottle();
+                });
+            });
           }
         }
       });
@@ -341,7 +345,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       const connectionId = this.state.executionContext?.connectionId;
       const script = this.parser.actualScript;
 
-      if (!connectionId) {
+      if (!connectionId || !script) {
         return;
       }
 
