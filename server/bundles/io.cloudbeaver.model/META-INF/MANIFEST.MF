@@ -11,7 +11,7 @@ Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
- org.jkiss.bundle.graphql.java;visibility:=reexport,
+ org.jkiss.bundle.graphql.java,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
  jakarta.servlet-api;bundle-version="4.0.0";visibility:=reexport
