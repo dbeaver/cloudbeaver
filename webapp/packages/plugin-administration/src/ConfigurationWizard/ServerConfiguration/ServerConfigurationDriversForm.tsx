@@ -35,9 +35,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
   const translate = useTranslate();
   const driversResource = useMapResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
-  const drivers = driversResource.resource.values
-    .filter(driver => !serverConfig.disabledDrivers?.includes(driver.id))
-    .sort(driversResource.resource.compare);
+  const drivers = driversResource.resource.values.slice().sort(driversResource.resource.compare);
 
   const tags: ITag[] = driversResource.resource.get(resourceKeyList(serverConfig.disabledDrivers || []))
     .filter(Boolean)
@@ -72,6 +70,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
         keySelector={item => item.id}
         valueSelector={value => value.name || value.id}
         iconSelector={value => value.icon}
+        stateSelector={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
         items={drivers}
         placeholder={translate('administration_disabled_drivers_search_placeholder')}
         searchable
