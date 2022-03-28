@@ -9,11 +9,11 @@
 import { css } from 'reshadow';
 
 export const EXPANDABLE_FORM_STYLES = css`
-  Disclosure:global([aria-expanded="true"]) {
-    margin-bottom: 10px;
-  }
   expand-label {
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
+    composes: theme-typography--body2 from global;
+    font-weight: 400;
+    margin: 0;
+    text-transform: uppercase;
+    opacity: 0.9;
   }
 `;
