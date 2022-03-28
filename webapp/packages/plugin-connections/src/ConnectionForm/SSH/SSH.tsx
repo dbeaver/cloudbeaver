@@ -216,7 +216,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>
           )}
-          <Container>
+          <Container gap>
             <Expandable
               style={EXPANDABLE_FORM_STYLES}
               label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}

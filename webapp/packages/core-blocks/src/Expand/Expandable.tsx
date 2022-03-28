@@ -47,6 +47,7 @@ const styles = css`
     width: 16px;
     height: 16px;
     transform: rotate(-90deg);
+    margin-right: 8px;
 
     &[|expanded] {
       transform: rotate(0deg);
@@ -75,7 +76,7 @@ export const Expandable = observer<Props, ExpandableState>(function Expandable({
         <expand-icon {...use({ expanded: disclosure.visible })}>
           <IconOrImage icon='arrow' />
         </expand-icon>
-        <expand-label>{label}</expand-label>
+        <expand-label as='h2'>{label}</expand-label>
       </Disclosure>
       <DisclosureContent {...disclosure}>
         <>{children}</>
