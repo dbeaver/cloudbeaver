@@ -61,6 +61,8 @@ export default [
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentication method'],
   ['connections_network_handler_ssh_tunnel_private_key', 'Private key'],
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Advanced Settings'],
+  ['connections_network_handler_ssh_tunnel_advanced_settings_alive_interval', 'Alive interval (ms)'],
+  ['connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout', 'Connect timeout (ms)'],
   ['connections_driver_search_placeholder', '输入驱动名称...'],
   ['connections_not_found', '未找到数据库连接'],
 

@@ -230,7 +230,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                   mod='surface'
                   tiny
                 >
-                  Alive interval
+                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval')}
                 </InputField>
                 <InputField
                   name='sshConnectTimeout'
@@ -240,7 +240,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                   mod='surface'
                   tiny
                 >
-                  Connect timeout
+                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout')}
                 </InputField>
               </Container>
             </Expandable>
