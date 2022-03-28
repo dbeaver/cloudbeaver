@@ -133,7 +133,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   valueSelector: (item: TValue) => string;
   titleSelector?: (item: TValue) => string | undefined;
   iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
-  stateSelector?: (item: TValue) => boolean;
+  isDisabled?: (item: TValue) => boolean;
   onSwitch?: (state: boolean) => void;
 };
 
@@ -175,7 +175,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   valueSelector = v => v,
   iconSelector,
   titleSelector,
-  stateSelector,
+  isDisabled,
   onChange = () => { },
   onSelect,
   onSwitch,
@@ -203,8 +203,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
       item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
     );
 
-    if (stateSelector) {
-      return result.sort((a, b) => Number(stateSelector(a)) - Number(stateSelector(b)));
+    if (isDisabled) {
+      return result.sort((a, b) => Number(isDisabled(a)) - Number(isDisabled(b)));
     }
 
     return result;
@@ -374,7 +374,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             : (filteredItems.map((item, index) => {
               const icon = iconSelector?.(item);
               const title = titleSelector?.(item);
-              const selected = stateSelector?.(item);
+              const selected = isDisabled?.(item);
 
               return (
                 <MenuItem

@@ -70,7 +70,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
         keySelector={item => item.id}
         valueSelector={value => value.name || value.id}
         iconSelector={value => value.icon}
-        stateSelector={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
+        isDisabled={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
         items={drivers}
         placeholder={translate('administration_disabled_drivers_search_placeholder')}
         searchable
