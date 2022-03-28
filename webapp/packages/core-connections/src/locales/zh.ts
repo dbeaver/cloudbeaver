@@ -11,7 +11,7 @@ export default [
   ['connections_administration_configuration_wizard_title', '添加数据库连接'],
   ['connections_administration_configuration_wizard_message', '您可以在此处手动创建数据库连接或使用数据库服务器搜索。您可以跳过此步骤并稍后配置连接。'],
   ['connections_administration_connection_no_information', '没有可用信息'],
-  ['connections_administration_delete_confirmation', "您将删除这些连接："],
+  ['connections_administration_delete_confirmation', '您将删除这些连接：'],
   ['connections_administration_tools_add_tooltip', '添加新连接'],
   ['connections_administration_tools_refresh_tooltip', '刷新连接列表'],
   ['connections_administration_tools_delete_tooltip', '删除选中的连接'],
@@ -60,6 +60,7 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', '密码'],
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentication method'],
   ['connections_network_handler_ssh_tunnel_private_key', 'Private key'],
+  ['connections_network_handler_ssh_tunnel_advanced_settings', 'Advanced Settings'],
   ['connections_driver_search_placeholder', '输入驱动名称...'],
   ['connections_not_found', '未找到数据库连接'],
 

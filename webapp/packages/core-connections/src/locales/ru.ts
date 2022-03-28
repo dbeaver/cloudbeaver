@@ -57,6 +57,7 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', 'Пароль'],
   ['connections_network_handler_ssh_tunnel_auth_type', 'Метод аутентификации'],
   ['connections_network_handler_ssh_tunnel_private_key', 'Приватный ключ'],
+  ['connections_network_handler_ssh_tunnel_advanced_settings', 'Дополнительные настройки'],
   ['connections_driver_search_placeholder', 'Введите название драйвера...'],
   ['connections_not_found', 'Подключения к базам данных не найдены'],
 

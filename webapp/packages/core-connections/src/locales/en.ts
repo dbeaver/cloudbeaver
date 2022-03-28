@@ -60,6 +60,7 @@ export default [
   ['connections_network_handler_ssh_tunnel_password', 'Password'],
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentication method'],
   ['connections_network_handler_ssh_tunnel_private_key', 'Private key'],
+  ['connections_network_handler_ssh_tunnel_advanced_settings', 'Advanced Settings'],
   ['connections_driver_search_placeholder', 'Type driver name...'],
   ['connections_not_found', 'No database connections were found'],
 
