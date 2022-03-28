@@ -13,7 +13,8 @@ import styled, { css } from 'reshadow';
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
-  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea, UploadArea, Combobox
+  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea,
+  UploadArea, Combobox, Expandable, EXPANDABLE_FORM_STYLES
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -215,6 +216,35 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>
           )}
+          <Container>
+            <Expandable
+              style={EXPANDABLE_FORM_STYLES}
+              label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}
+            >
+              <Container gap>
+                <InputField
+                  name='aliveInterval'
+                  state={state.properties}
+                  disabled={disabled || !enabled}
+                  readOnly={readonly}
+                  mod='surface'
+                  tiny
+                >
+                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval')}
+                </InputField>
+                <InputField
+                  name='sshConnectTimeout'
+                  state={state.properties}
+                  disabled={disabled || !enabled}
+                  readOnly={readonly}
+                  mod='surface'
+                  tiny
+                >
+                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout')}
+                </InputField>
+              </Container>
+            </Expandable>
+          </Container>
           <GroupItem>
             <Button
               type='button'
