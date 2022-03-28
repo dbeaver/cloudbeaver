@@ -4,20 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.service.security.external.remote.model.*;
-import io.cloudbeaver.service.security.external.remote.model.role.DCRole;
-import io.cloudbeaver.service.security.external.remote.model.role.DCRoleCreateRequest;
-import io.cloudbeaver.service.security.external.remote.model.role.DCRoleUpdateRequest;
-import io.cloudbeaver.service.security.external.remote.model.session.DCSessionCreateRequest;
-import io.cloudbeaver.service.security.external.remote.model.session.DCSessionUpdateRequest;
-import io.cloudbeaver.service.security.external.remote.model.subjects.DCDataSourceSubjectAccessUpdateRequest;
-import io.cloudbeaver.service.security.external.remote.model.subjects.DCSubjectUpdateDataSourceAccessRequest;
-import io.cloudbeaver.service.security.external.remote.model.subjects.DCSubjectUpdatePermissionsRequest;
-import io.cloudbeaver.service.security.external.remote.model.user.*;
+import io.cloudbeaver.service.security.remote.external.model.role.DCRole;
+import io.cloudbeaver.service.security.remote.external.model.role.DCRoleCreateRequest;
+import io.cloudbeaver.service.security.remote.external.model.role.DCRoleUpdateRequest;
+import io.cloudbeaver.service.security.remote.external.model.session.DCSessionCreateRequest;
+import io.cloudbeaver.service.security.remote.external.model.session.DCSessionUpdateRequest;
+import io.cloudbeaver.service.security.remote.external.model.subjects.DCDataSourceSubjectAccessUpdateRequest;
+import io.cloudbeaver.service.security.remote.external.model.subjects.DCSubjectUpdateDataSourceAccessRequest;
+import io.cloudbeaver.service.security.remote.external.model.subjects.DCSubjectUpdatePermissionsRequest;
+import io.cloudbeaver.service.security.remote.external.model.user.*;
 import okhttp3.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 
@@ -319,7 +317,7 @@ public class DCServerClient implements DCAdminUserService, DCUsersService, DCAdm
     @NotNull
     @Override
     public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
-        var url = buildUrl(dcApiUrl + SUBJECTS_ENDPOINTS, subjectId);
+        var url = buildUrl( SUBJECTS_ENDPOINTS, subjectId);
         var request = new Request.Builder()
             .url(url)
             .build();
