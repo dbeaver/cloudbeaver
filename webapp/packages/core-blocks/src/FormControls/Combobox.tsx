@@ -374,7 +374,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             : (filteredItems.map((item, index) => {
               const icon = iconSelector?.(item);
               const title = titleSelector?.(item);
-              const selected = isDisabled?.(item);
+              const disabled = isDisabled?.(item);
 
               return (
                 <MenuItem
@@ -383,7 +383,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   type='button'
                   title={title}
                   {...menu}
-                  disabled={selected}
+                  disabled={disabled}
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
                   {iconSelector && (
