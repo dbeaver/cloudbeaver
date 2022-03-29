@@ -76,23 +76,22 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     // Users
 
     @Override
-    public void createUser(WebUser user) throws DBCException {
-        if (isSubjectExists(user.getUserId())) {
-            throw new DBCException("User or role '" + user.getUserId() + "' already exists");
+    public void createUser(String userId, Map<String, String> metaParameters) throws DBCException {
+        if (isSubjectExists(userId)) {
+            throw new DBCException("User or role '" + userId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, user.getUserId(), SUBJECT_USER);
+                createAuthSubject(dbCon, userId, SUBJECT_USER);
                 try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
-                    dbStat.setString(1, user.getUserId());
+                    dbStat.setString(1, userId);
                     dbStat.setString(2, CHAR_BOOL_TRUE);
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
-                Map<String, String> metaParameters = user.getMetaParameters();
                 if (!CommonUtils.isEmpty(metaParameters)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
-                        dbStat.setString(1, user.getUserId());
+                        dbStat.setString(1, userId);
                         for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
                             dbStat.setString(2, mp.getKey());
                             dbStat.setString(3, mp.getValue());

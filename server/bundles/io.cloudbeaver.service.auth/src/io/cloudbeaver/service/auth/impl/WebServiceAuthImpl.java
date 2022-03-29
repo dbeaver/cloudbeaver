@@ -153,7 +153,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                             if (curUser == null) {
                                 curUser = new WebUser(userId);
                                 var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController();
-                                adminSecurityController.createUser(curUser);
+                                adminSecurityController.createUser(curUser.getUserId(), curUser.getMetaParameters());
 
                                 String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
                                 if (!CommonUtils.isEmpty(defaultRoleName)) {

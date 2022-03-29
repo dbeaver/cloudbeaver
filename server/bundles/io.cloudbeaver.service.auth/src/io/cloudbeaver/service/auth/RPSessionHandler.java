@@ -74,7 +74,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                     // User doesn't exist. We can create new user automatically
                     // Create new user
                     curUser = new WebUser(userName);
-                    adminSecurityController.createUser(curUser);
+                    adminSecurityController.createUser(curUser.getUserId(), curUser.getMetaParameters());
 
                     String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
                     if (userRoles.length == 0) {

@@ -128,7 +128,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             WebUser newUser = new WebUser(userName);
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().createUser(newUser);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().createUser(newUser.getUserId(), newUser.getMetaParameters());
             return new AdminUserInfo(webSession, newUser);
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);

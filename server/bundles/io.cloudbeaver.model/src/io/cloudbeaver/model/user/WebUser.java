@@ -41,6 +41,11 @@ public class WebUser implements SMUser {
         this.userId = userId;
     }
 
+    public WebUser(@NotNull String userId, Map<String, String> metaParameters) {
+        this.userId = userId;
+        this.metaParameters.putAll(metaParameters);
+    }
+
     @NotNull
     public String getUserId() {
         return userId;

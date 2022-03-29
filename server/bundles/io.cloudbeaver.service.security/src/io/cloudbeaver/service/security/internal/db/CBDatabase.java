@@ -246,7 +246,7 @@ public class CBDatabase {
         WebUser adminUser = adminSecurityController.getUserById(adminName);
         if (adminUser == null) {
             adminUser = new WebUser(adminName);
-            adminSecurityController.createUser(adminUser);
+            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters());
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
