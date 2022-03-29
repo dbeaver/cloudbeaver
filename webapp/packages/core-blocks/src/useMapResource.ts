@@ -14,6 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import type { ILoadableState } from './Loader/Loader';
+import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
 
 interface IActions<
@@ -137,9 +138,19 @@ export function useMapResource<
     includes = keyObj.includes;
   }
 
+  const keyRef = useObjectRef(() => ({
+    loadedKey: null as TKeyArg | null,
+    get actual() {
+      if (this.loadedKey === this.key) {
+        return true;
+      }
+
+      return resource.isKeyEqual(this.loadedKey, this.key);
+    },
+  }), { key });
+
   const refObj = useObservableRef(() => ({
     loading: false,
-    firstRender: true,
     prevData: undefined as CachedMapResourceLoader<
     TKeyArg,
     CachedMapResourceKey<TResource>,
@@ -178,7 +189,7 @@ export function useMapResource<
           return;
         }
 
-        this.firstRender = false;
+        keyRef.loadedKey = key;
         this.loading = true;
 
         const prevent = await actions?.onLoad?.(resource);
@@ -298,7 +309,7 @@ export function useMapResource<
   const preloaded = refObj.preloaded; // make mobx subscription
 
   useEffect(() => {
-    if (!preloaded || (!outdated && !refObj.firstRender) || refObj.key === null) {
+    if (!preloaded || (!outdated && keyRef.actual) || refObj.key === null) {
       return;
     }
 

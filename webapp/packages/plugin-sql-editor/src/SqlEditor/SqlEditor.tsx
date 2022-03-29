@@ -132,6 +132,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       container={sqlEditorModeService.tabsContainer}
       state={state}
       data={data}
+      lazy
       onChange={tab => state.currentEditorId = tab.tabId}
     >
       <sql-editor className={className}>

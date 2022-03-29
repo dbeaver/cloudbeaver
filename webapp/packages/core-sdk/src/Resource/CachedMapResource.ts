@@ -392,20 +392,20 @@ export abstract class CachedMapResource<
     }, {});
   }
 
+  isKeyEqual(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
+    if (this.isAlias(param) || this.isAlias(second)) {
+      return true;
+    }
+
+    return this.includes(param, second);
+  }
+
   protected dataSet(key: TKey, value: TValue): void {
     this.data.set(key, value);
   }
 
   protected dataDelete(key: TKey): void {
     this.data.delete(key);
-  }
-
-  protected lock(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
-    if (this.isAlias(param) || this.isAlias(second)) {
-      return true;
-    }
-
-    return this.includes(param, second);
   }
 
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
