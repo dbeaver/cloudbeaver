@@ -435,7 +435,11 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     }
 
     private void initializeSecurityController() throws DBException {
-        securityController = SecurityPluginService.getSecurityService(this, databaseConfiguration);
+        securityController = createSecurityController();
+    }
+
+    protected SMAdminController<WebUser, WebRole> createSecurityController() throws DBException {
+        return SecurityPluginService.getSecurityService(this, databaseConfiguration);
     }
 
     private void loadConfiguration(String configPath) {
@@ -543,7 +547,8 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
                     log.error("Error reading static contents from " + staticContentsFile, e);
                 }
             }
-        } catch (IOException e) {
+            parseAdditionalServerConfiguration(serverConfig);
+        } catch (IOException | DBException e) {
             log.error("Error parsing server configuration", e);
         }
 
@@ -591,6 +596,10 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
             }
         }
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void parseAdditionalServerConfiguration(Map<String, Object> serverConfig) throws DBException {
+
     }
 
     private void runWebServer() {
