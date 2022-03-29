@@ -246,7 +246,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   valueSelector={model => model!.displayName}
                   titleSelector={model => model?.description}
                   searchable={applicableAuthModels.length > 10}
-                  readOnly={readonly}
+                  readOnly={readonly || !originLocal}
                   disabled={disabled}
                   tiny
                   fill
