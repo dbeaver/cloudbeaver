@@ -29,6 +29,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
@@ -167,6 +168,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node instanceof DBNDataSource) {
                 // Do not refresh entire tree - just clear child nodes
                 // Otherwise refresh may fail if navigator settings were changed.
+                DBPDataSource dataSource = ((DBNDataSource) node).getDataSource();
+                if (dataSource instanceof DBPRefreshableObject) {
+                    ((DBPRefreshableObject) dataSource).refreshObject(monitor);
+                }
                 ((DBNDataSource) node).cleanupNode();
             } else {
                 node.refreshNode(monitor, this);
