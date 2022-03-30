@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.security.SMController;
 
 import java.nio.file.Path;
 
@@ -31,4 +34,6 @@ public interface WebApplication extends DBPApplication {
     Path getDataDirectory(boolean create);
 
     Path getHomeDirectory();
+
+    SMController<WebUser, WebRole> getSecurityController();
 }

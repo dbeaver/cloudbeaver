@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.SecurityPluginService;
@@ -415,7 +414,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
     @NotNull
     private File getRuntimeAppConfigFile() {
-       return getDataDirectory(false).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
+       return getDataDirectory(true).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
     }
 
     @NotNull
@@ -439,7 +438,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     }
 
     protected SMAdminController<WebUser, WebRole> createSecurityController() throws DBException {
-        return SecurityPluginService.getSecurityService(this, databaseConfiguration);
+        return SecurityPluginService.createSecurityService(this, databaseConfiguration);
     }
 
     private void loadConfiguration(String configPath) {
@@ -665,7 +664,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         }
 
         if (isConfigurationMode()) {
-            SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
+            finishSecurityServiceConfiguration(adminName, adminPassword, authInfoList);
         }
 
         // Save runtime configuration
@@ -690,6 +689,10 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+    }
+
+    protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+        SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
     }
 
     public synchronized void flushConfiguration() throws DBException {

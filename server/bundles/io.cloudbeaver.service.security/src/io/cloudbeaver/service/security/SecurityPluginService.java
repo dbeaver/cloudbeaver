@@ -49,7 +49,7 @@ public class SecurityPluginService implements IPluginService {
 
     }
 
-    public static synchronized SMAdminController<WebUser, WebRole> getSecurityService(WebApplication application, Map<String, Object> databaseConfig) throws DBException {
+    public static synchronized SMAdminController<WebUser, WebRole> createSecurityService(WebApplication application, Map<String, Object> databaseConfig) throws DBException {
         if (CONTROLLER_INSTANCE != null) {
             return CONTROLLER_INSTANCE;
         }
