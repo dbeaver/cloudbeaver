@@ -97,8 +97,8 @@ export class ConnectionSSHTabService extends Bootstrap {
         properties: {
           port: 22,
           host: '',
-          aliveInterval: '',
-          sshConnectTimeout: '',
+          aliveInterval: '0',
+          sshConnectTimeout: '10000',
           ...initialConfig?.properties,
         },
       });

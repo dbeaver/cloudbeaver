@@ -79,6 +79,9 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const passwordSaved = initialConfig?.password === '' && initialConfig.authType === state.authType;
   const keySaved = initialConfig?.key === '';
 
+  const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
+  const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
+
   const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -223,24 +226,28 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             >
               <Container gap>
                 <InputField
+                  type='number'
                   name='aliveInterval'
                   state={state.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
+                  labelTooltip={aliveIntervalLabel}
                   mod='surface'
                   tiny
                 >
-                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval')}
+                  {aliveIntervalLabel}
                 </InputField>
                 <InputField
+                  type='number'
                   name='sshConnectTimeout'
                   state={state.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
+                  labelTooltip={connectTimeoutLabel}
                   mod='surface'
                   tiny
                 >
-                  {translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout')}
+                  {connectTimeoutLabel}
                 </InputField>
               </Container>
             </Expandable>
