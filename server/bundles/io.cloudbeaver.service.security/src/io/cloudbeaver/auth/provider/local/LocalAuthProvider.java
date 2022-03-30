@@ -16,18 +16,21 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.SecurityUtils;
 
 import java.util.Map;
 
@@ -45,7 +48,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider.getId());
+        Map<String, Object> storedCredentials = getSecurityController().getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
         }
@@ -79,7 +82,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         String userName = webSession.getUser().getUserId();
 
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider.getId());
+        Map<String, Object> storedCredentials = getSecurityController().getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
         }
@@ -98,8 +101,12 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
-        CBApplication.getInstance().getSecurityController().setUserCredentials(userName, authProvider.getId(), storedCredentials);
+        getSecurityController().setUserCredentials(userName, authProvider.getId(), storedCredentials);
         return true;
+    }
+
+    private static SMController<WebUser, WebRole> getSecurityController() {
+      return ((WebApplication) DBWorkbench.getPlatform().getApplication()).getSecurityController();
     }
 
 }
