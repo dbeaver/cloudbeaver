@@ -309,6 +309,34 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
+    public WebSQLExecuteInfo readLobValue(
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull String index,
+            @Nullable List<WebSQLResultsRow> row) throws DBWebException
+    {
+        try {
+            WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
+
+            DBExecUtils.tryExecuteRecover(
+                    contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                    contextInfo.getProcessor().getConnection().getDataSource(),
+                    monitor -> {
+                        try {
+                            result[0] = contextInfo.getProcessor().readLobValue(
+                                    monitor, contextInfo, resultsId, index, row.get(0));
+                        } catch (Exception e) {
+                            throw new InvocationTargetException(e);
+                        }
+                    }
+            );
+            return result[0];
+        } catch (DBException e) {
+            throw new DBWebException("Error updating resultset data", e);
+        }
+    }
+
+    @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         try {
             return contextInfo.getProcessor().generateResultsDataUpdateScript(

@@ -605,6 +605,65 @@ public class WebSQLProcessor implements WebSessionProvider {
         return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
     }
 
+    public WebSQLExecuteInfo readLobValue(
+            @NotNull DBRProgressMonitor monitor,
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull String index,
+            @Nullable WebSQLResultsRow row) throws DBException {
+        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
+
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        checkRowIdentifier(resultsInfo, rowIdentifier);
+        DBSEntity dataContainer = rowIdentifier.getEntity();
+        checkDataEditAllowed(dataContainer);
+        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
+        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, null);
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
+            WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
+            DBDDataFilter dataFilter = new DBDDataFilter();
+            DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
+            Object[] rowValues = new Object[allAttributes.length];
+            List<DBDAttributeConstraint> constraints = new ArrayList<>();
+            for (int i = 0; i < allAttributes.length; i++) {
+                DBDAttributeBinding keyAttribute = allAttributes[i];
+                boolean isDocumentValue = allAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+                boolean isBLOBValue = keyAttribute.getDataKind() == DBPDataKind.BINARY;
+
+                if (isBLOBValue) {
+                    continue;
+                }
+                if (isDocumentValue) {
+                    rowValues[i] =
+                            makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                } else {
+                    Object inputCellValue = row.getData().get(keyAttribute.getOrdinalPosition());
+
+                    rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
+                            session,
+                            keyAttribute,
+                            convertInputCellValue(session, keyAttribute,
+                                    inputCellValue, false),
+                            false,
+                            true);
+                }
+                final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
+                constraint.setOperator(DBCLogicalOperator.EQUALS);
+                constraint.setValue(rowValues[i]);
+                constraints.add(constraint);
+            }
+            dataFilter.addConstraints(constraints);
+            DBCStatistics statistics = dataManipulator.readData(
+                    executionSource, session, dataReceiver, dataFilter,
+                    0, 1, DBSDataContainer.FLAG_NONE, 1);
+            result.setStatusMessage(dataReceiver.createBlobFile(CommonUtils.toInt(index)));
+        }
+        return result;
+    }
+
     ////////////////////////////////////////////////
     // Misc
 

@@ -304,6 +304,15 @@ extend type Mutation {
         addedRows: [ SQLResultRow! ],
     ): String!
 
+    #Return BLOB name
+    readLobValue(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        index: ID!,
+        row: [ SQLResultRow! ]
+    ): String!
+
     # Returns SQLExecuteInfo
     asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
 

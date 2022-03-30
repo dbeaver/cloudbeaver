@@ -108,6 +108,13 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
+    WebSQLExecuteInfo readLobValue(
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull String index,
+            @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+
+    @WebAction
     String updateResultsDataBatchScript(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,

@@ -7,12 +7,17 @@ import io.cloudbeaver.service.WebServiceServletBase;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class WebSQLResultServlet extends WebServiceServletBase {
 
@@ -35,38 +40,20 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         if (CommonUtils.isEmpty(valuePath)) {
             throw new DBWebException("Result value ID not specified");
         }
-        Matcher urlMatcher = URL_PATTERN.matcher(valuePath);
-        if (!urlMatcher.matches()) {
-            throw new DBWebException("Invalid URI format");
+        while (valuePath.startsWith("/")) {
+            valuePath = valuePath.substring(1);
         }
 
-        String connectionId = urlMatcher.group(1);
-        String contextId = urlMatcher.group(2);
-        String resultsId = urlMatcher.group(3);
-        String rowNum = urlMatcher.group(4);
-        String attrName = urlMatcher.group(5);
-
-        WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(
-            WebServiceBindingSQL.getWebConnection(session, connectionId));
-        WebSQLContextInfo sqlContext = WebServiceBindingSQL.getSQLContext(sqlProcessor, contextId);
-        WebSQLResultsInfo sqlResults = sqlContext.getResults(resultsId);
-
-
-        throw new DBWebException("Not implemented yet");
-/*
-        response.setHeader("Content-Type", processor.getContentType());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        File dataFile = new File(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER, valuePath);
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
         response.setHeader("Content-Length", String.valueOf(dataFile.length()));
 
         try (InputStream is = new FileInputStream(dataFile)) {
             IOUtils.copyStream(is, response.getOutputStream());
         }
 
-        // TODO: cleanup export files ASAP?
-        if (false) {
-            dtConfig.removeTask(taskInfo);
-        }
-*/
+        dataFile.delete();
     }
 
 }
