@@ -10,6 +10,7 @@ import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,18 +42,20 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     }
 
     public String createBlobFile() throws IOException {
-        StringBuilder fileName = new StringBuilder(dataContainer.getName());
+        String exportFileName = CommonUtils.truncateString(dataContainer.getName(), 32);
+        StringBuilder fileName = new StringBuilder(exportFileName);
         fileName.append("_");
-        fileName.append(binding.getName());
+        fileName.append(CommonUtils.escapeFileName(binding.getName()));
         fileName.append("_");
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         fileName.append(ts.getTime());
-        File file = new File(DATA_EXPORT_FOLDER, fileName.toString());
+        exportFileName = CommonUtils.escapeFileName(fileName.toString());
+        File file = new File(DATA_EXPORT_FOLDER, exportFileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
             byte[] val = (byte[]) row.getRawValue();
             fos.write(val);
         }
-        return fileName.toString();
+        return exportFileName;
     }
 
 

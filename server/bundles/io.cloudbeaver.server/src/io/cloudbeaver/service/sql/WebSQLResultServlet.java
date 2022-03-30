@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +53,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         try (InputStream is = new FileInputStream(dataFile)) {
             IOUtils.copyStream(is, response.getOutputStream());
         }
-
-        dataFile.delete();
+        Files.deleteIfExists(dataFile.toPath());
     }
 
 }

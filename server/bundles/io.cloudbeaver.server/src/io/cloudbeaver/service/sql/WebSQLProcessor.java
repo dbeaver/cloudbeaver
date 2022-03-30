@@ -605,14 +605,13 @@ public class WebSQLProcessor implements WebSessionProvider {
         return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
     }
 
-    public WebSQLExecuteInfo readLobValue(
+
+    public String readLobValue(
             @NotNull DBRProgressMonitor monitor,
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
             @NotNull String index,
             @Nullable WebSQLResultsRow row) throws DBException {
-        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
-
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
@@ -661,12 +660,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                     0, 1, DBSDataContainer.FLAG_NONE, 1);
             try {
                 String fileName = dataReceiver.createBlobFile();
-                result.setStatusMessage(fileName);
+                return fileName;
             } catch (Exception e) {
-                log.error("Error creating a temporary lob file ", e);
+                log.error("Error creating temporary lob file ", e);
+                throw new DBWebException("Error creating temporary lob file ", e);
             }
         }
-        return result;
     }
 
     ////////////////////////////////////////////////
