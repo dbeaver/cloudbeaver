@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
@@ -50,7 +49,7 @@ public class SecurityPluginService implements IPluginService {
 
     }
 
-    public static synchronized SMAdminController<WebUser, WebRole, WebSession> getSecurityService(WebApplication application, Map<String, Object> databaseConfig) throws DBException {
+    public static synchronized SMAdminController<WebUser, WebRole> getSecurityService(WebApplication application, Map<String, Object> databaseConfig) throws DBException {
         if (CONTROLLER_INSTANCE != null) {
             return CONTROLLER_INSTANCE;
         }
