@@ -105,14 +105,14 @@ module.exports = (env, argv) => {
 
   return {
     // target: !devMode ? "web" : "browserslist",
-    // optimization: {
-    //   removeAvailableModules: false,
-    //   removeEmptyChunks: false,
-    //   splitChunks: false
-    // },
-    // output: {
-    //   pathinfo: false
-    // },
+    optimization: {
+      removeAvailableModules: false,
+      removeEmptyChunks: false,
+      splitChunks: false
+    },
+    output: {
+      pathinfo: false
+    },
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
