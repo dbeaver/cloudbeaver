@@ -621,7 +621,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, null);
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(index));
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
@@ -659,7 +659,12 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBCStatistics statistics = dataManipulator.readData(
                     executionSource, session, dataReceiver, dataFilter,
                     0, 1, DBSDataContainer.FLAG_NONE, 1);
-            result.setStatusMessage(dataReceiver.createBlobFile(CommonUtils.toInt(index)));
+            try {
+                String fileName = dataReceiver.createBlobFile();
+                result.setStatusMessage(fileName);
+            } catch (Exception e) {
+                log.error("Error creating a temporary lob file ", e);
+            }
         }
         return result;
     }

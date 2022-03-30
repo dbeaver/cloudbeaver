@@ -14,39 +14,45 @@ import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
 
 public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
-    public static final File DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "SQL object files");
+    public static final File DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
 
     private final WebSQLContextInfo contextInfo;
     private final DBSDataContainer dataContainer;
 
-    private DBDAttributeBinding[] bindings;
-    private Object[] row;
+    private DBDAttributeBinding binding;
+    private DBDValue row;
+    private int rowIndex;
 
-    WebSQLDataLOBReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
+    WebSQLDataLOBReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, int rowIndex) {
         this.contextInfo = contextInfo;
         this.dataContainer = dataContainer;
+        this.rowIndex = rowIndex;
         if (!DATA_EXPORT_FOLDER.exists()){
             DATA_EXPORT_FOLDER.mkdirs();
         }
+
     }
 
-    public String createBlobFile(int rowIndex) {
-        String fileName = UUID.randomUUID().toString();
-
-        File file = new File(DATA_EXPORT_FOLDER, fileName);
+    public String createBlobFile() throws IOException {
+        StringBuilder fileName = new StringBuilder(dataContainer.getName());
+        fileName.append("_");
+        fileName.append(binding.getName());
+        fileName.append("_");
+        Timestamp ts = new Timestamp(System.currentTimeMillis());
+        fileName.append(ts.getTime());
+        File file = new File(DATA_EXPORT_FOLDER, fileName.toString());
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            byte[] val = (byte[]) ((DBDValue) row[rowIndex]).getRawValue();
+            byte[] val = (byte[]) row.getRawValue();
             fos.write(val);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return fileName;
+        return fileName.toString();
     }
 
 
@@ -55,28 +61,21 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) throws DBCException {
         DBCResultSetMetaData meta = resultSet.getMeta();
         List<DBCAttributeMetaData> attributes = meta.getAttributes();
-        bindings = new DBDAttributeBindingMeta[attributes.size()];
-        for (int i = 0; i < attributes.size(); i++) {
-            DBCAttributeMetaData attrMeta = attributes.get(i);
-            bindings[i] = new DBDAttributeBindingMeta(dataContainer, resultSet.getSession(), attrMeta);
-        }
+        DBCAttributeMetaData attrMeta = attributes.get(rowIndex);
+        binding = new DBDAttributeBindingMeta(dataContainer, resultSet.getSession(), attrMeta);
     }
     @Override
     public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
 
-        row = new Object[bindings.length];
-        for (int i = 0; i < bindings.length; i++) {
-            DBDAttributeBinding binding = bindings[i];
-            try {
-                Object cellValue = binding.getValueHandler().fetchValueObject(
-                        resultSet.getSession(),
-                        resultSet,
-                        binding.getMetaAttribute(),
-                        i);
-                row[i] = cellValue;
-            } catch (Throwable e) {
-                row[i] = new DBDValueError(e);
-            }
+        try {
+            Object cellValue = binding.getValueHandler().fetchValueObject(
+                    resultSet.getSession(),
+                    resultSet,
+                    binding.getMetaAttribute(),
+                    rowIndex);
+            row = (DBDValue) cellValue;
+        } catch (Throwable e) {
+            row = new DBDValueError(e);
         }
     }
 
