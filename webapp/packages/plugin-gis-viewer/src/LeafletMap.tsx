@@ -9,8 +9,6 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./react-leaflet.d.ts" />
 
-import 'leaflet/dist/leaflet.css';
-
 import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
@@ -21,6 +19,8 @@ import styled, { css } from 'reshadow';
 import { useSplit } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
+
+import baseStyles from './styles/base.scss';
 
 export interface IAssociatedValue {
   key: string;
@@ -180,7 +180,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
     }
   }, [splitContext.isResizing, splitContext.mode, crs, mapRef]);
 
-  return styled(styles)(
+  return styled(styles, baseStyles)(
     <MapContainer crs={crs} whenCreated={setMapRef} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts
@@ -218,5 +218,4 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
       )}
     </MapContainer>
   );
-}
-;
+};
