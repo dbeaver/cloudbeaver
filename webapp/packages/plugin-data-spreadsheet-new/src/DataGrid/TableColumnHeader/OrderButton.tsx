@@ -56,9 +56,9 @@ export const OrderButton = observer<Props>(function OrderButton({
 
   let icon = 'order-arrow-unknown';
   if (currentOrder === EOrder.asc) {
-    icon = 'order-arrow-up';
+    icon = 'order-arrow-asc';
   } else if (currentOrder === EOrder.desc) {
-    icon = 'order-arrow-down';
+    icon = 'order-arrow-desc';
   }
 
   const handleSort = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -69,7 +69,7 @@ export const OrderButton = observer<Props>(function OrderButton({
     });
   };
 
-  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function preventFocus(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
   }
 

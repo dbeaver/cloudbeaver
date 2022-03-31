@@ -13,7 +13,8 @@ import styled, { css } from 'reshadow';
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
-  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea, UploadArea, Combobox
+  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea,
+  UploadArea, Combobox, Expandable, EXPANDABLE_FORM_STYLES
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -77,6 +78,9 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
   const passwordSaved = initialConfig?.password === '' && initialConfig.authType === state.authType;
   const keySaved = initialConfig?.key === '';
+
+  const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
+  const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
 
   const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -215,6 +219,39 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>
           )}
+          <Container gap>
+            <Expandable
+              style={EXPANDABLE_FORM_STYLES}
+              label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}
+            >
+              <Container gap>
+                <InputField
+                  type='number'
+                  name='aliveInterval'
+                  state={state.properties}
+                  disabled={disabled || !enabled}
+                  readOnly={readonly}
+                  labelTooltip={aliveIntervalLabel}
+                  mod='surface'
+                  tiny
+                >
+                  {aliveIntervalLabel}
+                </InputField>
+                <InputField
+                  type='number'
+                  name='sshConnectTimeout'
+                  state={state.properties}
+                  disabled={disabled || !enabled}
+                  readOnly={readonly}
+                  labelTooltip={connectTimeoutLabel}
+                  mod='surface'
+                  tiny
+                >
+                  {connectTimeoutLabel}
+                </InputField>
+              </Container>
+            </Expandable>
+          </Container>
           <GroupItem>
             <Button
               type='button'

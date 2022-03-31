@@ -63,7 +63,7 @@ export abstract class CachedResource<
   constructor(defaultValue: TData, defaultIncludes: string[] = []) {
     super();
 
-    this.lock = this.lock.bind(this);
+    this.isKeyEqual = this.isKeyEqual.bind(this);
     this.includes = this.includes.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
 
@@ -79,9 +79,9 @@ export abstract class CachedResource<
       exception: null,
       includes: observable([...this.defaultIncludes]),
     }, undefined, { deep: false })));
-    this.scheduler = new TaskScheduler(this.lock);
+    this.scheduler = new TaskScheduler(this.isKeyEqual);
     this.data = defaultValue;
-    this.beforeLoad = new Executor(null, this.lock);
+    this.beforeLoad = new Executor(null, this.isKeyEqual);
     this.onDataOutdated = new SyncExecutor<TParam>(null);
     this.onDataUpdate = new SyncExecutor<TParam>(null);
     this.onDataError = new SyncExecutor<IDataError<TParam>>(null);
@@ -404,7 +404,7 @@ export abstract class CachedResource<
     this.onDataOutdated.execute(param);
   }
 
-  protected lock(param: TParam, second: TParam): boolean {
+  isKeyEqual(param: TParam, second: TParam): boolean {
     if (this.isAlias(param) || this.isAlias(second)) {
       return true;
     }

@@ -62,7 +62,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @NotNull Map<String, Object> authParameters,
         boolean linkWithActiveUser) throws DBWebException {
-        SMController<WebUser, ?, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController<WebUser, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -136,7 +136,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 }
             } else {
                 WebUser curUser = webSession.getUser();
-                userId = securityController.getUserByCredentials(authProvider, userCredentials);
+                userId = securityController.getUserByCredentials(authProvider.getId(), userCredentials);
                 if (userId == null) {
                     // User doesn't exist. We can create new user automatically if auth provider supports this
                     if (authProviderExternal != null) {
@@ -153,7 +153,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                             if (curUser == null) {
                                 curUser = new WebUser(userId);
                                 var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController();
-                                adminSecurityController.createUser(curUser);
+                                adminSecurityController.createUser(curUser.getUserId(), curUser.getMetaParameters());
 
                                 String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
                                 if (!CommonUtils.isEmpty(defaultRoleName)) {
@@ -166,7 +166,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         }
                         // We may need to associate new credentials with active user
                         if (linkWithActiveUser) {
-                            securityController.setUserCredentials(userId, authProvider, userCredentials);
+                            securityController.setUserCredentials(userId, authProvider.getId(), userCredentials);
                         }
                     }
 
@@ -235,7 +235,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean isAdmin = false;
 
         try {
-            Object userId = securityController.getUserByCredentials(authProvider, userCredentials);
+            Object userId = securityController.getUserByCredentials(authProvider.getId(), userCredentials);
 
             if (userId != null) {
                     isAdmin = securityController

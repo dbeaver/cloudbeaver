@@ -28,10 +28,9 @@
         <import plugin="org.apache.felix.scr" version="0.0.0" match="greaterOrEqual"/>
     </requires>
 
-    <includes id="org.jkiss.dbeaver.runtime.feature" version="0.0.0"/>
+    <includes id="io.cloudbeaver.ws.feature" version="0.0.0"/>
     <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
 
-    <plugin id="io.cloudbeaver.model" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.admin" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
@@ -46,12 +45,8 @@
     <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
     <!-- 3rd party deps -->
-    <plugin id="com.ibm.icu.base" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="javax.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.eclipse.jetty.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.eclipse.jetty.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.eclipse.jetty.util" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="com.google.gson" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.jkiss.bundle.graphql.java" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>

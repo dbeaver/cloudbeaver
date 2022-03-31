@@ -194,10 +194,10 @@
     </g>
   </symbol>
 
-  <symbol id="order-arrow-up" viewBox="0 0 16 16">
+  <symbol id="order-arrow-asc" viewBox="0 0 16 16">
     <path fill="#338ECC" fill-rule="evenodd" d="M1 7l7-6 7 6h-5v8H6V7H1z" clip-rule="evenodd"/>
   </symbol>
-  <symbol id="order-arrow-down" viewBox="0 0 16 16">
+  <symbol id="order-arrow-desc" viewBox="0 0 16 16">
     <path fill="#338ECC" fill-rule="evenodd" d="M15 9l-7 6-7-6h5V1h4v8h5z" clip-rule="evenodd"/>
   </symbol>
   <symbol id="order-arrow-unknown" viewBox="0 0 16 16">

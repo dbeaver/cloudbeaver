@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -114,7 +115,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
-    private final SMController<?, ?, WebSession> securityController;
+    private final SMController<?, ?> securityController;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
@@ -124,7 +125,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public WebSession(HttpSession httpSession,
-                      SMController<?, ?, WebSession> securityController,
+                      SMController<?, ?> securityController,
                       WebApplication application,
                       Map<String, DBWSessionHandler> sessionHandlers) {
         this.id = httpSession.getId();
@@ -219,6 +220,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public synchronized WebUser getUser() {
         return user;
+    }
+
+    private synchronized String getUserId() {
+        return user == null ? null : user.getUserId();
     }
 
     public synchronized boolean hasPermission(String perm) {
@@ -450,12 +455,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    securityController.createSession(this);
+                    securityController.createSession(this.id, getUserId(), getSessionParameters());
                     this.persisted = true;
                 } else {
                     if (!application.isConfigurationMode()) {
                         // Update record
-                        securityController.updateSession(this);
+                        //TODO use generate id from SMController
+                        securityController.updateSession(this.id, getUserId(), getSessionParameters());
                     }
                 }
             } catch (Exception e) {
@@ -854,6 +860,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     ///////////////////////////////////////////////////////
     // Utils
+
+    private Map<String, Object> getSessionParameters() {
+        var parameters = new HashMap<String, Object>();
+        parameters.put(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS, getLastRemoteAddr());
+        parameters.put(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT, getLastRemoteUserAgent());
+        return parameters;
+    }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override

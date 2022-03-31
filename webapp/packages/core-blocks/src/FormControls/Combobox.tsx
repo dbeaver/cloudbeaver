@@ -16,6 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { getComputed } from '../getComputed';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
@@ -132,6 +133,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   valueSelector: (item: TValue) => string;
   titleSelector?: (item: TValue) => string | undefined;
   iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
+  isDisabled?: (item: TValue) => boolean;
   onSwitch?: (state: boolean) => void;
 };
 
@@ -173,6 +175,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   valueSelector = v => v,
   iconSelector,
   titleSelector,
+  isDisabled,
   onChange = () => { },
   onSelect,
   onSwitch,
@@ -194,6 +197,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
+
+  const filteredItems = getComputed(() => {
+    const result = items.filter(
+      item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
+    );
+
+    if (isDisabled) {
+      return result.sort((a, b) => Number(isDisabled(a)) - Number(isDisabled(b)));
+    }
+
+    return result;
+  });
+
   let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
   if (state && name !== undefined && name in state) {
@@ -207,10 +223,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
     inputValue = searchValue;
   }
-
-  const filteredItems = items.filter(
-    item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
-  );
 
   function handleClick() {
     if (!searchable) {
@@ -362,6 +374,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             : (filteredItems.map((item, index) => {
               const icon = iconSelector?.(item);
               const title = titleSelector?.(item);
+              const disabled = isDisabled?.(item);
 
               return (
                 <MenuItem
@@ -370,6 +383,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   type='button'
                   title={title}
                   {...menu}
+                  disabled={disabled}
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
                   {iconSelector && (

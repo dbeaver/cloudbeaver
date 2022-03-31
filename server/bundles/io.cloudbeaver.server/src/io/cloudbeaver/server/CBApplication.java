@@ -20,21 +20,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.service.security.SecurityPluginService;
-import io.cloudbeaver.utils.WebAppUtils;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
+import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
+import io.cloudbeaver.service.security.SecurityPluginService;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -47,6 +44,9 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -76,7 +76,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseApplicationImpl implements WebApplication {
+public class CBApplication extends BaseWebApplication implements WebApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -111,7 +111,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
-    private SMAdminController<WebUser, WebRole, WebSession> securityController;
+    private SMAdminController<WebUser, WebRole> securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -174,11 +174,11 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         return productConfiguration;
     }
 
-    public SMController<WebUser, WebRole, WebSession> getSecurityController() {
+    public SMController<WebUser, WebRole> getSecurityController() {
         return securityController;
     }
 
-    public SMAdminController<WebUser, WebRole, WebSession> getAdminSecurityController() {
+    public SMAdminController<WebUser, WebRole> getAdminSecurityController() {
         return securityController;
     }
 
@@ -194,25 +194,8 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
     @Override
     public Object start(IApplicationContext context) {
-        String configPath = CBConstants.DEFAULT_CONFIG_FILE_PATH;
-
-        String[] args = Platform.getCommandLineArgs();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) && args.length > i + 1) {
-                configPath = args[i + 1];
-                break;
-            }
-        }
-        try {
-            loadConfiguration(configPath);
-
-            File runtimeConfigFile = getRuntimeAppConfigFile();
-            if (runtimeConfigFile.exists()) {
-                log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
-                parseConfiguration(runtimeConfigFile);
-            }
-        } catch (Exception e) {
-            log.error("Error parsing configuration", e);
+        Path configPath = loadServerConfiguration();
+        if (configPath == null) {
             return null;
         }
 
@@ -298,7 +281,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
         if (configurationMode) {
             // Try to configure automatically
-            performAutoConfiguration(new File(configPath).getParentFile());
+            performAutoConfiguration(configPath.toFile().getParentFile());
         }
 
         if (enableSecurityManager) {
@@ -415,7 +398,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
 
     @NotNull
     private File getRuntimeAppConfigFile() {
-       return getDataDirectory(false).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
+       return getDataDirectory(true).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
     }
 
     @NotNull
@@ -435,10 +418,29 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
     }
 
     private void initializeSecurityController() throws DBException {
-        securityController = SecurityPluginService.getSecurityService(this, databaseConfiguration);
+        securityController = createSecurityController();
     }
 
-    private void loadConfiguration(String configPath) {
+    protected SMAdminController<WebUser, WebRole> createSecurityController() throws DBException {
+        return SecurityPluginService.createSecurityService(this, databaseConfiguration);
+    }
+
+    @Nullable
+    @Override
+    protected Path loadServerConfiguration() {
+        Path path = super.loadServerConfiguration();
+
+        File runtimeConfigFile = getRuntimeAppConfigFile();
+        if (runtimeConfigFile.exists()) {
+            log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
+            parseConfiguration(runtimeConfigFile);
+        }
+
+        return path;
+    }
+
+    @Override
+    protected void loadConfiguration(String configPath) {
         log.debug("Using configuration [" + configPath + "]");
 
         File configFile = new File(configPath);
@@ -543,7 +545,8 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
                     log.error("Error reading static contents from " + staticContentsFile, e);
                 }
             }
-        } catch (IOException e) {
+            parseAdditionalServerConfiguration(serverConfig);
+        } catch (IOException | DBException e) {
             log.error("Error parsing server configuration", e);
         }
 
@@ -591,6 +594,10 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
             }
         }
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void parseAdditionalServerConfiguration(Map<String, Object> serverConfig) throws DBException {
+
     }
 
     private void runWebServer() {
@@ -656,7 +663,7 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         }
 
         if (isConfigurationMode()) {
-            SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
+            finishSecurityServiceConfiguration(adminName, adminPassword, authInfoList);
         }
 
         // Save runtime configuration
@@ -681,6 +688,10 @@ public class CBApplication extends BaseApplicationImpl implements WebApplication
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+    }
+
+    protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+        SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
     }
 
     public synchronized void flushConfiguration() throws DBException {

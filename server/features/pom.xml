@@ -13,6 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>io.cloudbeaver.ws.feature</module>
+
         <module>io.cloudbeaver.server.feature</module>
         <module>io.cloudbeaver.ce.drivers.feature</module>
 
