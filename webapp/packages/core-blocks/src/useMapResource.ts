@@ -149,6 +149,10 @@ export function useMapResource<
     },
   }), { key });
 
+  if (key === null) {
+    keyRef.loadedKey = null;
+  }
+
   const refObj = useObservableRef(() => ({
     loading: false,
     prevData: undefined as CachedMapResourceLoader<
