@@ -40,6 +40,12 @@
           @include mdc-theme-prop(border-color, $style, true);
         }
       }
+      &.theme-fill-#{$style},
+      .theme-fill-#{$style} {
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(fill, $style, true);
+        }
+      }
     } @else {
       &.theme-text-#{$style},
       .theme-text-#{$style} {
@@ -66,6 +72,12 @@
       .theme-border-color-#{$style} {
         @include mdc-feature-targets($feat-color) {
           @include mdc-theme-prop(border-color, $style, true);
+        }
+      }
+      &.theme-fill-#{$style},
+      .theme-fill-#{$style} {
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(fill, $style);
         }
       }
     }
