@@ -41,6 +41,7 @@ export class LogViewerBootstrap extends Bootstrap {
       order: 0,
       name: 'app_shared_toolsMenu_logViewer',
       isHidden: () => !this.logViewerService.isActive,
+      onClose: () => this.logViewerService.toggle(),
       panel: () => LogViewer,
     });
   }
