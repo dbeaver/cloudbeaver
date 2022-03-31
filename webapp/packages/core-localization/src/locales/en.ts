@@ -76,7 +76,7 @@ export const defaultENLocale = [
   ['app_root_session_expire_warning_message', 'Your session will expire in less than 5 minutes. To keep working, close this popup.'],
   ['app_root_session_expire_warning_button', 'I am here'],
   ['app_root_session_expired_title', 'Session expired'],
-  ['app_root_session_expired_message', 'Session has been expired. Do you want to reload?'],
+  ['app_root_session_expired_message', 'Session has expired. Do you want to reload?'],
   ['app_root_session_expired_reload', 'Reload'],
   ['app_root_quota_exceeded', 'Quota exceeded'],
   ['core_eventsLog_dbeaverErrorDetails', 'Error details'],
