@@ -59,8 +59,8 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
-    public boolean getAdminOnly() {
-        return model.isAdminOnlyModel();
+    public boolean getRequiresLocalConfiguration() {
+        return model.requiresLocalConfiguration();
     }
 
     @Property
