@@ -93,6 +93,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     dynamic.selectedId = currentTabId;
   }
 
+  if (dynamic.container && dynamic.selectedId) {
+    const displayed = dynamic.container.getDisplayed(props);
+    const displayingSelected = displayed.some(tabInfo => tabInfo.key === dynamic.selectedId);
+
+    if (displayed.length && !displayingSelected) {
+      dynamic.state.selectedId = selectedId;
+    }
+  }
+
   useEffect(() => {
     const openHandler: IExecutorHandler<ITabData<T>> = (data, contexts) => {
       dynamic.open?.(data);
