@@ -9,9 +9,8 @@
         </layout>
     </appender>
 
-    <logger name="ch.qos.logback" level="warn">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
+    <!-- Disable logback status messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
     <root level="info">
         <appender-ref ref="CONSOLE"/>
