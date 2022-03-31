@@ -166,6 +166,7 @@ type DatabaseAuthModel {
     displayName: String!
     description: String
     icon: String
+    adminOnly: Boolean
 
     properties: [ObjectPropertyInfo!]!
 }

@@ -59,6 +59,11 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
+    public boolean getAdminOnly() {
+        return model.isAdminOnlyModel();
+    }
+
+    @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
         boolean hasContextCredentials = webSession.hasContextCredentials();
 
