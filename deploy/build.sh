@@ -45,9 +45,9 @@ if [[ -n "${SAMPLE_DATABASE_PATH}"  ]]; then
   cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
 fi
 
+cp -rp  ../conig/core/* cloudbeaver/conf
 cp -rp "${CONFIGURATION_PATH}"/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
 cp -p "${CONFIGURATION_PATH}"/*.conf cloudbeaver/conf/
-cp -p ../samples/sample-databases/*.conf cloudbeaver/conf/
 mv drivers cloudbeaver
 
 echo "Build static content"

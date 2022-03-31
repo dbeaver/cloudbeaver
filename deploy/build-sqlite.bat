@@ -1,1 +1,1 @@
-@call build.bat ..\samples\sample-databases\SQLiteConfiguration ..\samples\sample-databases\db
+@call build.bat ..\config\sample-databases\SQLiteConfiguration ..\config\sample-databases\db
