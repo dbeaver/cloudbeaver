@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -205,8 +206,8 @@ public class WebSQLUtils {
                             if (tempValue instanceof DBDContent) {
                                 try {
                                     ((DBDContent) tempValue).updateContents(session.getProgressMonitor(), storage);
-                                } catch (DBException e) {
-
+                                } catch (Exception e) {
+                                    throw new DBCException("Error with inserting file into DB");
                                 }
                             }
                             value = tempValue;

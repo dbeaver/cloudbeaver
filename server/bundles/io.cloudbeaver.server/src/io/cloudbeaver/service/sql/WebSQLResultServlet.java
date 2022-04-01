@@ -11,6 +11,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.regex.Matcher;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @MultipartConfig
@@ -40,21 +41,24 @@ public class WebSQLResultServlet extends WebServiceServletBase {
     }
 
     @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        String fileName = UUID.randomUUID().toString();
+        for (Part part : request.getParts()) {
+            part.write(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER + "/" + fileName);
+        }
+        response.addHeader("fileName", fileName);
+    }
+
+    @Override
     protected void processServiceRequest(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         if (request.getMethod().equals("POST")) {
             try {
-                request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-                Part filePart = request.getPart("file");
-                String fileName = filePart.getSubmittedFileName();
-                for (Part part : request.getParts()) {
-                    part.write(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER + "/" + fileName);
-                }
+                doPost(request, response);
             } catch (Exception e) {
                 throw new DBWebException("Servlet exception ", e);
             }
         } else {
-
-
             String valuePath = request.getPathInfo();
             if (CommonUtils.isEmpty(valuePath)) {
                 throw new DBWebException("Result value ID not specified");
