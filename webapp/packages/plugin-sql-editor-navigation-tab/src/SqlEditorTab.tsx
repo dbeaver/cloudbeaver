@@ -38,7 +38,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   return styled(useStyles(style))(
-    <Tab 
+    <Tab
       tabId={tab.id}
       style={style}
       title={name}

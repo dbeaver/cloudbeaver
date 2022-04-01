@@ -169,6 +169,8 @@ export class SqlEditorTabService extends Bootstrap {
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
+        || !Array.isArray(tab.handlerState.modeState)
         || !Array.isArray(tab.handlerState.tabs)
         || !Array.isArray(tab.handlerState.executionPlanTabs)
         || !Array.isArray(tab.handlerState.resultGroups)

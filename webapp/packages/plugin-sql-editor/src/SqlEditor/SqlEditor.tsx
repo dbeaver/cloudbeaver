@@ -7,14 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { SqlEditorModeService } from '../SqlEditorModeService';
+import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import type { ISqlEditorProps } from './ISqlEditorProps';
 import { useSqlEditor } from './useSqlEditor';
 import { useTools } from './useTools';
@@ -104,6 +106,11 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const tools = useTools(state);
+  const [modesState] = useState(() => new MetadataMap<string, any>());
+
+  useMemo(() => {
+    modesState.sync(state.modeState);
+  }, [state]);
 
   function preventFocus(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -124,16 +131,21 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     }
   }
 
+  function handleModeSelect(tab: ITabData<ISqlEditorModeProps>) {
+    state.currentModeId = tab.tabId;
+  }
+
   const trimmedValue = data.value.trim();
 
   return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
     <TabsState
-      currentTabId={state.currentEditorId}
+      currentTabId={state.currentModeId}
       container={sqlEditorModeService.tabsContainer}
+      localState={modesState}
       state={state}
       data={data}
       lazy
-      onChange={tab => state.currentEditorId = tab.tabId}
+      onChange={handleModeSelect}
     >
       <sql-editor className={className}>
         <container>
