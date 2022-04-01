@@ -98,7 +98,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     const tabExists = displayed.some(tabInfo => tabInfo.key === dynamic.selectedId);
 
     if (displayed.length && !tabExists) {
-      state.selectedId = selectedId;
+      if (displayed.some(tabInfo => tabInfo.key === selectedId)) {
+        state.selectedId = selectedId;
+      } else {
+        state.selectedId = displayed[0].key;
+      }
     }
   }
 
