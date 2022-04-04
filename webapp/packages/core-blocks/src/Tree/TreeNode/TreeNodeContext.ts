@@ -13,6 +13,7 @@ export interface ITreeNodeContext {
   readonly processing: boolean;
   expanded: boolean;
   externalExpanded: boolean;
+  showInFilter: boolean;
   loading: boolean;
   selected: boolean;
   leaf: boolean;

@@ -13,5 +13,6 @@ export interface ITreeNodeState {
   selected?: boolean;
   externalExpanded?: boolean;
   expanded?: boolean;
+  showInFilter?: boolean;
   leaf?: boolean;
 }

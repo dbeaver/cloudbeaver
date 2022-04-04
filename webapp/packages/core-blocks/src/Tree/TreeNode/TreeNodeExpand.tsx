@@ -28,6 +28,7 @@ const styles = css`
 interface Props {
   leaf?: boolean;
   big?: boolean;
+  filterActive?: boolean;
   disabled?: boolean;
   className?: string;
 }
@@ -35,6 +36,7 @@ interface Props {
 export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   leaf,
   big,
+  filterActive,
   disabled,
   className,
 }) {
@@ -44,6 +46,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     throw new Error('Context not provided');
   }
 
+  const showInFilter = context.showInFilter;
   disabled = getComputed(() => context.externalExpanded || context.disabled) || disabled;
   leaf = context.leaf || leaf;
   const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
@@ -56,18 +59,28 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
       await context.expand();
     }
   }
+
   function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
+  }
+
+  let iconName = 'arrow';
+  let viewBox = '0 0 16 16';
+
+  if (big) {
+    iconName = 'angle';
+    viewBox = '0 0 15 8';
+  }
+
+  if (!showInFilter && filterActive) {
+    iconName = 'add';
+    viewBox = '0 0 24 24';
   }
 
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
-      {expandable && (
-        big
-          ? <Icon name="angle" viewBox="0 0 15 8" />
-          : <Icon name="arrow" viewBox="0 0 16 16" />
-      )}
+      {expandable && <Icon name={iconName} viewBox={viewBox} />}
     </arrow>
   );
 });

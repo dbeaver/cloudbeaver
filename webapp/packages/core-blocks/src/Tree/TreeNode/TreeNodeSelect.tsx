@@ -13,7 +13,6 @@ import styled, { css } from 'reshadow';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
-import { getComputed } from '../../getComputed';
 import { Loader } from '../../Loader/Loader';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';

@@ -45,7 +45,7 @@ export class NavigationTreeService extends View<string> {
     super();
 
     this.treeState = new MetadataMap(() => ({
-      filter: '',
+      showInFilter: false,
       expanded: false,
       selected: false,
     }));

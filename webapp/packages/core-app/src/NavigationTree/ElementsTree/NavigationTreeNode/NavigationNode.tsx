@@ -35,6 +35,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     disabled,
     selected,
     loading,
+    showInFilter,
     expanded,
     leaf,
     handleClick,
@@ -70,6 +71,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       disabled={disabled}
       selected={selected}
       expanded={expanded}
+      showInFilter={showInFilter}
       externalExpanded={expandedExternal}
       leaf={leaf}
       onExpand={handleExpand}

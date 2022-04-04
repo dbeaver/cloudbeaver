@@ -221,7 +221,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     if (!foldersTree && folderExplorer.folder !== baseRoot) {
       folderExplorer.open([], baseRoot);
     }
-    if (!filter && tree.filter !== '') {
+    if (!filter && tree.filtering) {
       tree.setFilter('');
     }
   });

@@ -18,6 +18,7 @@ import { EObjectFeature } from '../../../../shared/NodesManager/EObjectFeature';
 import type { INodeActions } from '../../../../shared/NodesManager/INodeActions';
 import { NavNodeInfoResource } from '../../../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../../../shared/NodesManager/NavTreeResource';
+import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
@@ -58,6 +59,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
   dragging,
 }, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
+  const treeContext = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
@@ -93,7 +95,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
   return styled(TREE_NODE_STYLES, styles)(
     <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging })}>
-      <TreeNodeExpand />
+      <TreeNodeExpand filterActive={treeContext?.tree.filtering} />
       <TreeNodeIcon icon={icon}>
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>

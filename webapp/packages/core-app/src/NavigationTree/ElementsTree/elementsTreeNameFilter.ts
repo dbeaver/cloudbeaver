@@ -25,7 +25,9 @@ export function elementsTreeNameFilter(
   compare: NavNodeFilterCompareFn = compareNodes
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[], state: MetadataMap<string, ITreeNodeState>) => {
-    if (filter === '' || compare(node, filter) === EEquality.full) {
+    const nodeState = state.get(node.id);
+
+    if (filter === '' || nodeState.showInFilter || compare(node, filter) === EEquality.full) {
       return children;
     }
 
@@ -38,7 +40,7 @@ export function elementsTreeNameFilter(
         compare,
         filter,
         child,
-        // state
+        state
       ));
 
     return nodes.map(node => node.id);
@@ -51,12 +53,12 @@ function filterNode(
   compare: NavNodeFilterCompareFn,
   filter: string,
   node: NavNode,
-  // state: MetadataMap<string, ITreeNodeState>
+  state: MetadataMap<string, ITreeNodeState>
 ): boolean {
-  // const nodeState = state.get(node.id);
+  const nodeState = state.get(node.id);
 
 
-  if (compare(node, filter) !== EEquality.none) {
+  if (compare(node, filter) !== EEquality.none || nodeState.showInFilter) {
     return true;
   }
 
@@ -72,7 +74,7 @@ function filterNode(
       compare,
       filter,
       child,
-      // state
+      state
     ));
   // }
 

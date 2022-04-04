@@ -36,6 +36,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
   selected = false,
   disabled = false,
   expanded = false,
+  showInFilter = false,
   externalExpanded,
   leaf = false,
   className,
@@ -95,6 +96,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
     loading,
     selected,
     expanded,
+    showInFilter,
     externalExpanded: externalExpanded || false,
     leaf,
   });

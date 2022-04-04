@@ -37,6 +37,10 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
     () => treeContext?.tree.getNodeChildren(nodeId) || []
   );
 
+  const state = getComputed(
+    () => treeContext?.tree.getNodeState(nodeId)
+  );
+
   const NavigationNode = component;
 
   if (root) {
@@ -49,10 +53,17 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
     }
   }
 
+  const empty = getComputed(() => (
+    children.length === 0 && (
+      !treeContext?.tree.filtering
+      || state?.showInFilter
+    )
+  ));
+
   return styled(TREE_NODE_STYLES)(
     <TreeNodeNested root={root}>
       {children.map(child => <NavigationNode key={child} nodeId={child} path={nextPath} />)}
-      {children.length === 0 && <TreeNodeNestedMessage>{translate('app_navigationTree_node_empty')}</TreeNodeNestedMessage>}
+      {empty && <TreeNodeNestedMessage>{translate('app_navigationTree_node_empty')}</TreeNodeNestedMessage>}
     </TreeNodeNested>
   );
 });

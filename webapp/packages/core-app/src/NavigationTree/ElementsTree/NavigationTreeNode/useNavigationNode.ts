@@ -24,6 +24,7 @@ interface INavigationNode {
   control?: NavTreeControlComponent;
   disabled: boolean;
   group: boolean;
+  showInFilter: boolean;
   selected: boolean;
   loading: boolean;
   expanded: boolean;
@@ -44,6 +45,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const children = useChildren(node.id);
 
   const loading = getComputed(() => isLoading() || children.isLoading());
+  const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.id).showInFilter || false);
   const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
   const leaf = getComputed(() => isLeaf(node));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
@@ -86,6 +88,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
 
   return {
     ref: elementRef,
+    showInFilter,
     empty,
     group,
     control,
