@@ -6,7 +6,7 @@ CONFIGURATION_PATH=$1
 SAMPLE_DATABASE_PATH=$2
 
 if [[ -z "${CONFIGURATION_PATH}"  ]]; then
-  CONFIGURATION_PATH="../samples/sample-databases/DefaultConfiguration"
+  CONFIGURATION_PATH="../config/sample-databases/DefaultConfiguration"
 fi
 
 echo "Clone and build Cloudbeaver"
