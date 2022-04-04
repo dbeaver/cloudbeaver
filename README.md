@@ -21,6 +21,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### CloudBeaver 22.0.2 - 2022-04-04
+-   Keep-Alive interval and Connect timeout parameters can be configured for an SSH Tunnel in the Connection dialog.
+-   Object names can be added to the SQL Editor field by dragging them from the Navigator Tree.
+-   Objects DDL can be opened in the SQL Editor.
+-   Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 22.0.1 - 2022-03-22
 -   The Navigator tree and the Metadata Editor open folders faster.
 -   The application supports authentication with Nginx.
