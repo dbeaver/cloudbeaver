@@ -261,6 +261,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
+        if (updatedRows != null) {
+            readLobValue(monitor, contextInfo, resultsId, "1", updatedRows.get(0));
+        }
         Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
@@ -659,8 +662,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     executionSource, session, dataReceiver, dataFilter,
                     0, 1, DBSDataContainer.FLAG_NONE, 1);
             try {
-                String fileName = dataReceiver.createBlobFile();
-                return fileName;
+                return dataReceiver.createLobFile(session);
             } catch (Exception e) {
                 log.error("Error creating temporary lob file ", e);
                 throw new DBWebException("Error creating temporary lob file ", e);

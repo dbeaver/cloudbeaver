@@ -2,22 +2,20 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDAttributeBindingMeta;
-import org.jkiss.dbeaver.model.data.DBDDataReceiver;
-import org.jkiss.dbeaver.model.data.DBDValue;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 
 public class WebSQLDataLOBReceiver implements DBDDataReceiver {
@@ -28,7 +26,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     private final DBSDataContainer dataContainer;
 
     private DBDAttributeBinding binding;
-    private DBDValue row;
+    private DBDValue lobValue;
     private int rowIndex;
 
     WebSQLDataLOBReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, int rowIndex) {
@@ -41,19 +39,23 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
 
     }
 
-    public String createBlobFile() throws IOException {
+    public String createLobFile(DBCSession session) throws DBCException, IOException {
         String exportFileName = CommonUtils.truncateString(dataContainer.getName(), 32);
         StringBuilder fileName = new StringBuilder(exportFileName);
-        fileName.append("_");
-        fileName.append(CommonUtils.escapeFileName(binding.getName()));
-        fileName.append("_");
+        fileName.append("_")
+                .append(binding.getName())
+                .append("_");
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         fileName.append(ts.getTime());
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
+        byte[] val;
         File file = new File(DATA_EXPORT_FOLDER, exportFileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            byte[] val = (byte[]) row.getRawValue();
-            fos.write(val);
+            if (lobValue instanceof DBDContent) {
+                IOUtils.writeFileFromBuffer(file, ContentUtils.getContentBinaryValue(session.getProgressMonitor(), (DBDContent) lobValue));
+            } else {
+                IOUtils.writeFileFromString(file, lobValue.getRawValue().toString());
+            }
         }
         return exportFileName;
     }
@@ -76,9 +78,9 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
                     resultSet,
                     binding.getMetaAttribute(),
                     rowIndex);
-            row = (DBDValue) cellValue;
+            lobValue = (DBDValue) cellValue;
         } catch (Throwable e) {
-            row = new DBDValueError(e);
+            lobValue = new DBDValueError(e);
         }
     }
 
