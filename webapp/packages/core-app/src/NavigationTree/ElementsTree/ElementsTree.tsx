@@ -103,7 +103,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
 
-    if (!ref.settings?.foldersTree) {
+    if (!ref.settings?.foldersTree && !folderExplorer.options.expandFoldersWithSingleElement) {
       return;
     }
 
