@@ -106,7 +106,7 @@ export const commonDialogBaseStyle = css`
       justify-content: space-between;
       position: relative;
       min-height: 24px;
-      overflow: auto;
+      overflow: hidden;
     }
     icon-container {
       display: flex;
@@ -170,6 +170,7 @@ export const commonDialogBaseStyle = css`
       margin: 0;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
     sub-title {
       composes: theme-typography--caption from global;
