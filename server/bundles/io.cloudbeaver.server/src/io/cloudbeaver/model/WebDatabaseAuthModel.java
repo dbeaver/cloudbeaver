@@ -59,6 +59,11 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
+    public boolean getRequiresLocalConfiguration() {
+        return model.requiresLocalConfiguration();
+    }
+
+    @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
         boolean hasContextCredentials = webSession.hasContextCredentials();
 
