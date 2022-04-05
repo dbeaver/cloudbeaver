@@ -127,7 +127,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getService(env).readLobValue(
                             getSQLContext(env),
                             env.getArgument("resultsId"),
-                            env.getArgument("index"),
+                            env.getArgument("lobColumnIndex"),
                             getResultsRow(env, "row")))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
@@ -298,4 +298,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         return mapList.stream().map(WebSQLResultsRow::new).collect(Collectors.toList());
     }
 
+    private static WebSQLResultsRow getRowValue(DataFetchingEnvironment env, String param) {
+        Map<String, Object> row = env.getArgument(param);
+        if (CommonUtils.isEmpty(row)) {
+            return null;
+        }
+        return new WebSQLResultsRow(row);
+    }
 }

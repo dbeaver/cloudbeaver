@@ -610,7 +610,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             @NotNull DBRProgressMonitor monitor,
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
-            @NotNull String index,
+            @NotNull String lobColumnIndex,
             @Nullable WebSQLResultsRow row) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -620,7 +620,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(index));
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(lobColumnIndex));
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
@@ -661,7 +661,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             try {
                 return dataReceiver.createLobFile(session);
             } catch (Exception e) {
-                log.error("Error creating temporary lob file ", e);
                 throw new DBWebException("Error creating temporary lob file ", e);
             }
         }

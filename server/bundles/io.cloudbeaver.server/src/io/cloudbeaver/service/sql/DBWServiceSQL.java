@@ -111,7 +111,7 @@ public interface DBWServiceSQL extends DBWService {
     String readLobValue(
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
-            @NotNull String index,
+            @NotNull String lobColumnIndex,
             @Nullable List<WebSQLResultsRow> row) throws DBWebException;
 
     @WebAction

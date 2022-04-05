@@ -309,7 +309,7 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
-        index: ID!,
+        lobColumnIndex: ID!,
         row: [ SQLResultRow! ]
     ): String!
 

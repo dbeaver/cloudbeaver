@@ -312,7 +312,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     public String readLobValue(
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
-            @NotNull String index,
+            @NotNull String lobColumnIndex,
             @Nullable List<WebSQLResultsRow> row) throws DBWebException
     {
         try {
@@ -324,7 +324,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor -> {
                         try {
                             result.append(contextInfo.getProcessor().readLobValue(
-                                    monitor, contextInfo, resultsId, index, row.get(0)));
+                                    monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
                         } catch (Exception e) {
                             throw new InvocationTargetException(e);
                         }
@@ -332,7 +332,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             );
             return result.toString();
         } catch (DBException e) {
-            throw new DBWebException("Error updating resultset data", e);
+            throw new DBWebException("Error reading LOB value ", e);
         }
     }
 

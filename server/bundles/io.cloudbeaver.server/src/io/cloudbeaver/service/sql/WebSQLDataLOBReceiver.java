@@ -1,11 +1,14 @@
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
@@ -48,14 +51,23 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         fileName.append(ts.getTime());
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
-        byte[] val;
+        byte[] binaryValue;
+        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
+        if (lobValue instanceof DBDContent) {
+            binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), (DBDContent) lobValue);
+        } else {
+            binaryValue = lobValue.getRawValue().toString().getBytes();
+        }
+        if (binaryValue == null) {
+            throw new DBCException("Lob value is null");
+        }
+        if (binaryValue.length > fileSizeLimit.longValue()) {
+            throw new DBQuotaException(
+                    "Data export quota exceeded", CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length);
+        }
         File file = new File(DATA_EXPORT_FOLDER, exportFileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            if (lobValue instanceof DBDContent) {
-                IOUtils.writeFileFromBuffer(file, ContentUtils.getContentBinaryValue(session.getProgressMonitor(), (DBDContent) lobValue));
-            } else {
-                IOUtils.writeFileFromString(file, lobValue.getRawValue().toString());
-            }
+            IOUtils.writeFileFromBuffer(file, binaryValue);
         }
         return exportFileName;
     }
