@@ -18,14 +18,19 @@ import { action } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
-import { throttleAsync } from '@cloudbeaver/core-utils';
+import type { SqlCompletionProposal } from '@cloudbeaver/core-sdk';
 
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
 import type { ISQLEditorData } from '../useSqlEditor';
 
 interface ISQLCodeEditorPanelData {
+  proposalsWordFrom: Position | null;
+  proposalsWord: string | null;
+  proposalsMode: boolean | null;
+  proposals: SqlCompletionProposal[] | null;
   readonly activeSuggest: boolean;
   readonly bindings: Omit<IControlledCodeMirror, 'value'>;
+  closeHint(): void;
 }
 
 interface ISQLCodeEditorPanelDataPrivate extends ISQLCodeEditorPanelData {
@@ -46,6 +51,7 @@ export function useSQLCodeEditorPanel(
   controller: SQLCodeEditorController | null
 ): ISQLCodeEditorPanelData {
   const editorPanelData = useObservableRef<ISQLCodeEditorPanelDataPrivate>(() => ({
+    proposals: null,
     activeSuggest: true,
     options: {
       theme: 'material',
@@ -121,7 +127,7 @@ export function useSQLCodeEditorPanel(
         const nextCursor = editor.getCursor('from');
 
         if (nextCursor.line !== lastChange.from.line) {
-          editor.closeHint();
+          this.closeHint();
           return;
         }
 
@@ -155,7 +161,7 @@ export function useSQLCodeEditorPanel(
             cursor = from;
 
             if (closeCharacters.test(ch) || from.line !== cursor.line) {
-              editor.closeHint();
+              this.closeHint();
             } else {
               editor.state.completionActive.update();
             }
@@ -165,6 +171,16 @@ export function useSQLCodeEditorPanel(
       });
 
       this.highlightActiveQuery();
+    },
+
+    closeHint() {
+      const editor = this.controller?.getEditor();
+
+      if (!editor) {
+        return;
+      }
+
+      editor.closeHint();
     },
 
     async showHint(activeSuggest: boolean) {
@@ -191,23 +207,61 @@ export function useSQLCodeEditorPanel(
     },
 
 
-    getHandleAutocomplete: throttleAsync(async function getHandleAutocomplete(
+    async getHandleAutocomplete(
       editor: Editor,
       options: ShowHintOptions
     ): Promise<Hints | undefined> {
       const cursor = editor.getCursor('from');
-      const cursorPosition = getAbsolutePosition(editor, cursor);
       const [from, to, word] = getWordRange(editor, cursor);
-
-      let proposals = await editorPanelData.data.getHintProposals(cursorPosition, !options.completeSingle);
-
-      proposals = proposals.filter(
-        ({ displayString }) => displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+      const cursorPosition = getAbsolutePosition(
+        editor, word.length > 0
+          ? { ...from, ch: from.ch + 1 }
+          : from
       );
 
-      if (proposals.length === 0) {
-        return;
+      const proposalWord = word.slice(0, 1);
+      let proposals = editorPanelData.proposals;
+
+      if (
+        proposals === null
+        || editorPanelData.proposalsWord !== proposalWord
+        || editorPanelData.proposalsMode !== options.completeSingle
+        || editorPanelData.proposalsWordFrom?.ch !== from.ch
+        || editorPanelData.proposalsWordFrom.line !== from.line
+        || !word.startsWith(editorPanelData.proposalsWord)
+      ) {
+        const proposalsMode = options.completeSingle ?? false;
+        editorPanelData.proposalsMode = proposalsMode;
+        editorPanelData.proposalsWord = proposalWord;
+        editorPanelData.proposalsWordFrom = from;
+        editorPanelData.proposals = [];
+
+        proposals = await editorPanelData.data.getHintProposals(cursorPosition, !options.completeSingle);
+
+        if (
+          editorPanelData.proposalsWord === proposalWord
+          && editorPanelData.proposalsWordFrom === from
+          && editorPanelData.proposalsMode === proposalsMode
+        ) {
+          editorPanelData.proposals = proposals;
+
+          if (editor.state.completionActive && proposals.length > 0) {
+            editor.state.completionActive.update();
+            return;
+          }
+        }
       }
+
+      proposals = proposals.filter(
+        ({ displayString }) => (
+          displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+          && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
+        )
+      );
+
+      // if (proposals.length === 0) {
+      //   return;
+      // }
 
       const hints: Hints = {
         from,
@@ -219,7 +273,7 @@ export function useSQLCodeEditorPanel(
       };
 
       return hints;
-    }, 1000 / 3),
+    },
 
     highlightActiveQuery() {
       this.controller?.highlightSegment(true);
@@ -249,7 +303,7 @@ export function useSQLCodeEditorPanel(
   useExecutor({
     executor: data.onExecute,
     handlers: [function updateHighlight() {
-      controller?.getEditor()?.closeHint();
+      editorPanelData.closeHint();
       controller?.resetLineStateHighlight();
     }],
   });

@@ -188,7 +188,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       this.onUpdate.execute();
     },
 
-    async getHintProposals(position, simple) {
+    getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
       if (!this.state.executionContext) {
         return [];
       }
@@ -204,7 +204,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         );
 
       return proposals;
-    },
+    }, 1000 / 3),
 
     async formatScript(): Promise<void> {
       if (this.isDisabled || this.isScriptEmpty || !this.state.executionContext) {
@@ -225,8 +225,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         this.setQuery(
           query.substring(0, script.begin)
-        + formatted
-        + query.substring(script.end)
+          + formatted
+          + query.substring(script.end)
         );
       } finally {
         this.readonlyState = false;
@@ -333,7 +333,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     setQuery(query: string): void {
       this.state.query = query;
       this.parser.setScript(query);
-      this.updateParserScriptsThrottle();
+      if (this.parser.isEndsWithDelimiter()) {
+        this.updateParserScriptsThrottle();
+      }
       this.onUpdate.execute();
     },
 
