@@ -316,9 +316,10 @@ export class SQLParser {
     return this;
   }
 
-  isEndsWithDelimiter(): boolean {
+  isEndsWithDelimiter(position?: number): boolean {
     this.update();
-    return this.scriptDelimiters.some(delimiter => this.parsedScript?.endsWith(delimiter));
+    const script = this.parsedScript?.substring(0, position);
+    return this.scriptDelimiters.some(delimiter => script?.endsWith(delimiter));
   }
 
   private update() {

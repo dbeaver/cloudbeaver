@@ -115,6 +115,12 @@ export function useSQLCodeEditorPanel(
 
       // TODO: probably should be moved to SQLCodeEditorController
       editor.on('changes', (cm, changes) => {
+        const nextCursor = editor.getCursor('from');
+
+        if (this.data.parser.isEndsWithDelimiter(getAbsolutePosition(cm, nextCursor))) {
+          this.data.updateParserScriptsThrottle();
+        }
+
         this.controller?.resetLineStateHighlight();
         if (!this.activeSuggest) {
           return;
@@ -123,8 +129,6 @@ export function useSQLCodeEditorPanel(
         const lastChange = changes[changes.length - 1];
         const origin = lastChange.origin || '';
         const change = lastChange.text[0] || '';
-
-        const nextCursor = editor.getCursor('from');
 
         if (nextCursor.line !== lastChange.from.line) {
           this.closeHint();

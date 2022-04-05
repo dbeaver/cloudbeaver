@@ -36,6 +36,7 @@ interface ISegmentExecutionData {
 }
 
 export interface ISQLEditorData {
+  readonly parser: SQLParser;
   readonly dialect: SqlDialectInfo | undefined;
   readonly activeSegment: ISQLScriptSegment | undefined;
   readonly cursorSegment: ISQLScriptSegment | undefined;
@@ -47,6 +48,7 @@ export interface ISQLEditorData {
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
   readonly onUpdate: ISyncExecutor;
+  updateParserScriptsThrottle(): Promise<void>;
   setQuery(query: string): void;
   init(): void;
   destruct(): void;
@@ -72,14 +74,12 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
-  readonly parser: SQLParser;
 
   cursor: ICursor;
   readonlyState: boolean;
   executingScript: boolean;
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
-  updateParserScriptsThrottle(): Promise<void>;
   updateParserScripts(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
@@ -333,9 +333,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     setQuery(query: string): void {
       this.state.query = query;
       this.parser.setScript(query);
-      if (this.parser.isEndsWithDelimiter()) {
-        this.updateParserScriptsThrottle();
-      }
       this.onUpdate.execute();
     },
 
