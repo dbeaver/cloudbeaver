@@ -19,10 +19,7 @@ package io.cloudbeaver.service.security.internal;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import org.jkiss.dbeaver.model.auth.*;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.*;
 import io.cloudbeaver.DBWConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -754,11 +751,11 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @Override
-    public void createSession(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters) throws DBCException {
+    public void createSession(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID) " +
-                    "VALUES(?,?,?,?,?,?,?)")) {
+                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
+                    "VALUES(?,?,?,?,?,?,?,?)")) {
                 dbStat.setString(1, appSessionId);
                 if (userId == null) {
                     dbStat.setNull(2, Types.VARCHAR);
@@ -779,6 +776,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                     dbStat.setNull(6, Types.VARCHAR);
                 }
                 dbStat.setString(7, database.getInstanceId());
+                dbStat.setString(8, sessionType.getSessionType());
                 dbStat.execute();
             }
         } catch (SQLException e) {
