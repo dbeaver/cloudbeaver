@@ -89,6 +89,7 @@ export interface IElementsTree {
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
   isNodeSelected: (nodeId: string) => boolean;
+  isNodeIndeterminateSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
   isGroup?: (node: NavNode) => boolean;
   setFilter: (value: string) => Promise<void>;
@@ -196,7 +197,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
         }
       }
     },
-
     async setSelection(nodeId: string, selected: boolean): Promise<void> {
       const node = navNodeInfoResource.get(nodeId);
 
@@ -303,6 +303,25 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       return this.getNodeState(nodeId).selected;
     },
+    isNodeIndeterminateSelected(nodeId: string): boolean {
+      if (this.isNodeSelected(nodeId)) {
+        return false;
+      }
+
+      const node = navNodeInfoResource.get(nodeId);
+
+      if (node && elementsTree.isGroup?.(node)) {
+        const children = options.getChildren(nodeId) || [];
+
+        if (children.length > 0) {
+          return children.some(child => this.isNodeSelected(child) || this.isNodeIndeterminateSelected(child));
+        }
+
+        return false;
+      }
+
+      return false;
+    },
     getNodeChildren(nodeId: string): string[] {
       const node = navNodeInfoResource.get(nodeId);
 
@@ -330,6 +349,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     collapse() {
       for (const state of this.state.values()) {
         state.expanded = false;
+        state.showInFilter = false;
       }
     },
     async show(nodeId: string, path: string[]): Promise<void> {

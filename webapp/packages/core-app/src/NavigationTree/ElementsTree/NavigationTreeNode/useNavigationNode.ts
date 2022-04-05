@@ -26,6 +26,7 @@ interface INavigationNode {
   group: boolean;
   showInFilter: boolean;
   selected: boolean;
+  indeterminateSelected: boolean;
   loading: boolean;
   expanded: boolean;
   leaf: boolean;
@@ -54,6 +55,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
+  const indeterminateSelected = getComputed(
+    () => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false
+  );
 
   const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, path, leaf);
   const handleOpen = async (leaf: boolean) => await contextRef.context?.onOpen?.(node, path, leaf);
@@ -94,6 +98,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     control,
     disabled,
     selected,
+    indeterminateSelected,
     loading,
     expanded,
     leaf,

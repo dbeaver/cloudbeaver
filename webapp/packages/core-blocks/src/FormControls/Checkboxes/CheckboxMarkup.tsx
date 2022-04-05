@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
@@ -96,6 +97,14 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
   id, label, className, title, mod = ['primary'], ripple = true, style, ...rest
 }) {
+  const checkboxRef = useRef<HTMLInputElement>(null);
+
+  useLayoutEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = rest.indeterminate || false;
+    }
+  });
+
   return styled(
     useStyles(
       checkboxStyles,
@@ -107,7 +116,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   )(
     <checkbox-container className={className} title={title}>
       <checkbox>
-        <checkbox-input as='input' type='checkbox' {...rest} id={id || rest.name} />
+        <checkbox-input ref={checkboxRef} as='input' type='checkbox' {...rest} id={id || rest.name} />
         <checkbox-background>
           <checkbox-checkmark as='svg' viewBox='0 0 24 24'>
             <checkbox-checkmark-path as='path' fill='none' d='M1.73,12.91 8.1,19.28 22.79,4.59' />

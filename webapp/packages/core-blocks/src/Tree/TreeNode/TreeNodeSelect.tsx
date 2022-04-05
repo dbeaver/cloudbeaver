@@ -28,6 +28,7 @@ interface Props {
   group?: boolean;
   onSelect?: () => Promise<boolean | void> | boolean | void;
   selected?: boolean;
+  indeterminate?: boolean;
   disabled?: boolean;
   loadIndicator?: boolean;
   className?: string;
@@ -37,6 +38,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   onSelect,
   group,
   selected,
+  indeterminate,
   disabled,
   loadIndicator,
   className,
@@ -51,6 +53,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   group = group ?? context.group;
   const loading = loadIndicator && context.loading;
   selected = selected ?? context.selected;
+  indeterminate = indeterminate ?? context.indeterminateSelected;
 
   async function handleSelect() {
     await onSelect?.();
@@ -72,6 +75,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
         : (
           <Checkbox
             checked={selected}
+            indeterminate={indeterminate}
             disabled={disabled}
             onChange={handleSelect}
           />

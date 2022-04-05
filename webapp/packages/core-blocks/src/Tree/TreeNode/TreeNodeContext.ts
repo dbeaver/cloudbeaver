@@ -16,6 +16,7 @@ export interface ITreeNodeContext {
   showInFilter: boolean;
   loading: boolean;
   selected: boolean;
+  indeterminateSelected: boolean;
   leaf: boolean;
   group: boolean;
   readonly select: (multiple?: boolean, nested?: boolean) => Promise<void>;
