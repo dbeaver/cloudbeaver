@@ -7,13 +7,9 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { download } from '@cloudbeaver/core-utils';
-import { isResultSetContentValue, ResultSetDataAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { DataViewerContentSaverService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
-
-const RESULT_VALUE_URL = '/api/sql-result-value';
 
 @injectable()
 export class DataGridContextMenuSaveContentService {
@@ -21,7 +17,7 @@ export class DataGridContextMenuSaveContentService {
 
   constructor(
     private readonly dataGridContextMenuService: DataGridContextMenuService,
-    private readonly graphQLService: GraphQLService
+    private readonly dataViewerContentSaverService: DataViewerContentSaverService
   ) { }
 
   getMenuContentSaveToken(): string {
@@ -40,34 +36,17 @@ export class DataGridContextMenuSaveContentService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         onClick: async context => {
-          const result = context.data.model.getResult(context.data.resultIndex);
-          const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
-          const column = data.getColumn(context.data.key.column);
-          const row = data.getRowValue(context.data.key.row);
-
-          if (!result?.id || !row || !column) {
-            return;
-          }
-
-          const response = await this.graphQLService.sdk.getResultsetDataURL({
-            resultsId: result.id,
-            connectionId: result.connectionId,
-            contextId: result.contextId,
-            lobColumnIndex: String(column.position),
-            row: {
-              data: row,
-            },
-          });
-
-          const url = `${RESULT_VALUE_URL}/${response.url}`;
-          download(url, '');
+          await this.dataViewerContentSaverService.saveElementValue(
+            context.data.model,
+            context.data.resultIndex,
+            context.data.key
+          );
         },
-        isHidden(context) {
-          const view = context.data.model.source.getAction(context.data.resultIndex, ResultSetViewAction);
-          const cellValue = view.getCellValue(context.data.key);
-
-          return !isResultSetContentValue(cellValue);
-        },
+        isHidden: context => !this.dataViewerContentSaverService.canSaveElementValue(
+          context.data.model,
+          context.data.resultIndex,
+          context.data.key
+        ),
       }
     );
   }
