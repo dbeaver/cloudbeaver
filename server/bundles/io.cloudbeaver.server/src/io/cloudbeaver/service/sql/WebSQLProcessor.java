@@ -605,6 +605,61 @@ public class WebSQLProcessor implements WebSessionProvider {
         return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
     }
 
+
+    public String readLobValue(
+            @NotNull DBRProgressMonitor monitor,
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull String lobColumnIndex,
+            @Nullable WebSQLResultsRow row) throws DBException {
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        checkRowIdentifier(resultsInfo, rowIdentifier);
+        DBSEntity dataContainer = rowIdentifier.getEntity();
+        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
+        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(lobColumnIndex));
+        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
+            WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
+            DBDDataFilter dataFilter = new DBDDataFilter();
+            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+            Object[] rowValues = new Object[keyAttributes.length];
+            List<DBDAttributeConstraint> constraints = new ArrayList<>();
+            for (int i = 0; i < keyAttributes.length; i++) {
+                DBDAttributeBinding keyAttribute = keyAttributes[i];
+                boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+                if (isDocumentValue) {
+                    rowValues[i] =
+                            makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                } else {
+                    Object inputCellValue = row.getData().get(keyAttribute.getOrdinalPosition());
+
+                    rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
+                            session,
+                            keyAttribute,
+                            convertInputCellValue(session, keyAttribute,
+                                    inputCellValue, false),
+                            false,
+                            true);
+                }
+                final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
+                constraint.setOperator(DBCLogicalOperator.EQUALS);
+                constraint.setValue(rowValues[i]);
+                constraints.add(constraint);
+            }
+            dataFilter.addConstraints(constraints);
+            DBCStatistics statistics = dataManipulator.readData(
+                    executionSource, session, dataReceiver, dataFilter,
+                    0, 1, DBSDataContainer.FLAG_NONE, 1);
+            try {
+                return dataReceiver.createLobFile(session);
+            } catch (Exception e) {
+                throw new DBWebException("Error creating temporary lob file ", e);
+            }
+        }
+    }
+
     ////////////////////////////////////////////////
     // Misc
 

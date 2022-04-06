@@ -76,4 +76,6 @@ public class CBConstants {
     public static final String CB_SESSION_COOKIE_NAME = "cb-session-id";
 
     public static final String APPLICATION_JSON = "application/json";
+
+    public static final String QUOTA_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
 }

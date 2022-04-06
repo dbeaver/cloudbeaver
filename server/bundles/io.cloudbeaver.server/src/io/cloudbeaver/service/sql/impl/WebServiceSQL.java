@@ -309,6 +309,34 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
+    public String readLobValue(
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull String lobColumnIndex,
+            @Nullable List<WebSQLResultsRow> row) throws DBWebException
+    {
+        try {
+            var result = new StringBuilder();
+
+            DBExecUtils.tryExecuteRecover(
+                    contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                    contextInfo.getProcessor().getConnection().getDataSource(),
+                    monitor -> {
+                        try {
+                            result.append(contextInfo.getProcessor().readLobValue(
+                                    monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
+                        } catch (Exception e) {
+                            throw new InvocationTargetException(e);
+                        }
+                    }
+            );
+            return result.toString();
+        } catch (DBException e) {
+            throw new DBWebException("Error reading LOB value ", e);
+        }
+    }
+
+    @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         try {
             return contextInfo.getProcessor().generateResultsDataUpdateScript(

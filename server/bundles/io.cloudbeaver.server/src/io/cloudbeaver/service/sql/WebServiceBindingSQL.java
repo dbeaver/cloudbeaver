@@ -123,7 +123,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                         getSQLContext(env),
                         env.getArgument("resultId"));
                 })
-
+            .dataFetcher("readLobValue", env ->
+                    getService(env).readLobValue(
+                            getSQLContext(env),
+                            env.getArgument("resultsId"),
+                            env.getArgument("lobColumnIndex"),
+                            getResultsRow(env, "row")))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),

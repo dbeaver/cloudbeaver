@@ -20,8 +20,10 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.storage.ExternalContentStorage;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
@@ -29,14 +31,17 @@ import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -191,9 +196,24 @@ public class WebSQLUtils {
                 switch ((String)typeAttr) {
                     case WebSQLConstants.VALUE_TYPE_CONTENT: {
                         if (map.get(WebSQLConstants.ATTR_BINARY) != null) {
-                            throw new DBCException("Binary content edit is not supported yet");
+                            DBDContentStorage storage;
+                            File openFile = new File(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER, (String) map.get("fileName"));
+                            Object tempValue = ((DBDAttributeBinding) attribute).getValueHandler().getValueFromObject(
+                                    session,
+                                    attribute,
+                                    null, false, true);
+                            storage = new ExternalContentStorage(DBWorkbench.getPlatform(), openFile);
+                            if (tempValue instanceof DBDContent) {
+                                try {
+                                    ((DBDContent) tempValue).updateContents(session.getProgressMonitor(), storage);
+                                } catch (Exception e) {
+                                    throw new DBCException("Error with inserting file into DB");
+                                }
+                            }
+                            value = tempValue;
+                        } else {
+                            value = map.get(WebSQLConstants.ATTR_TEXT);
                         }
-                        value = map.get(WebSQLConstants.ATTR_TEXT);
                         break;
                     }
                     default: {
