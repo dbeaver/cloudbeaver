@@ -40,6 +40,8 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
 
     makeObservable(this, {
       setDetails: action,
+      updateNode: action,
+      setParent: action,
     });
 
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
@@ -72,10 +74,9 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
 
     if (keyList.length > 0) {
       this.set(resourceKeyList(keyList), values);
-    } else {
-      this.markUpdated(key);
-      this.onItemAdd.execute(key);
     }
+    this.markUpdated(key);
+    this.onItemAdd.execute(key);
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {

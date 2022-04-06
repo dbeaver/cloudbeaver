@@ -128,8 +128,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const nextChildren: string[] = [];
 
         for (const child of children) {
-          await navNodeInfoResource.waitLoad();
           await navTreeResource.waitLoad();
+          await navNodeInfoResource.waitLoad();
 
           const expanded = elementsTree.isNodeExpanded(child, true);
           if (!expanded && child !== options.root) {
