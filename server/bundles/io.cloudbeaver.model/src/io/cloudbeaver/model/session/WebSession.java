@@ -55,6 +55,7 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMSessionType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -80,6 +81,8 @@ import java.util.stream.Collectors;
 public class WebSession extends AbstractSessionPersistent implements SMSession, SMAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
+
+    private static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
 
     private static final String ATTR_LOCALE = "locale";
     public static final String USER_PROJECTS_FOLDER = "user-projects";
@@ -455,7 +458,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    securityController.createSession(this.id, getUserId(), getSessionParameters());
+                    securityController.createSession(this.id, getUserId(), getSessionParameters(), CB_SESSION_TYPE);
                     this.persisted = true;
                 } else {
                     if (!application.isConfigurationMode()) {
