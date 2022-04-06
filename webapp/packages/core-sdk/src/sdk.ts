@@ -225,6 +225,7 @@ export interface DatabaseAuthModel {
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   properties: Array<ObjectPropertyInfo>;
+  requiresLocalConfiguration?: Maybe<Scalars['Boolean']>;
 }
 
 export interface DatabaseCatalog {
@@ -328,6 +329,7 @@ export interface Mutation {
   /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
+  readLobValue: Scalars['String'];
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -456,6 +458,15 @@ export interface MutationOpenConnectionArgs {
 
 export interface MutationOpenSessionArgs {
   defaultLocale?: InputMaybe<Scalars['String']>;
+}
+
+
+export interface MutationReadLobValueArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  lobColumnIndex: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  row?: InputMaybe<Array<SqlResultRow>>;
 }
 
 
@@ -1994,6 +2005,17 @@ export type GetSqlExecutionPlanResultMutationVariables = Exact<{
 
 export type GetSqlExecutionPlanResultMutation = { result: { query: string; nodes: Array<{ id: string; parentId?: string; kind: string; name?: string; type: string; condition?: string; description?: string; properties: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> } };
 
+export type ReadLobValueMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  lobColumnIndex: Scalars['ID'];
+  row?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+}>;
+
+
+export type ReadLobValueMutation = { lobValue: string };
+
 export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -3232,6 +3254,17 @@ export const GetSqlExecutionPlanResultDocument = `
   }
 }
     `;
+export const ReadLobValueDocument = `
+    mutation readLobValue($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [SQLResultRow!]) {
+  lobValue: readLobValue(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    lobColumnIndex: $lobColumnIndex
+    row: $row
+  )
+}
+    `;
 export const UpdateResultsDataBatchDocument = `
     mutation updateResultsDataBatch($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $updatedRows: [SQLResultRow!], $deletedRows: [SQLResultRow!], $addedRows: [SQLResultRow!]) {
   result: updateResultsDataBatch(
@@ -3747,6 +3780,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecutionPlanResultMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecutionPlanResult', 'mutation');
+    },
+    readLobValue(variables: ReadLobValueMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ReadLobValueMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<ReadLobValueMutation>(ReadLobValueDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readLobValue', 'mutation');
     },
     updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateResultsDataBatchMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatch', 'mutation');

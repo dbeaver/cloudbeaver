@@ -1,0 +1,9 @@
+mutation readLobValue($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [ SQLResultRow! ]) {
+  lobValue: readLobValue(
+    connectionId: $connectionId,
+    contextId: $contextId,
+    resultsId: $resultsId, 
+    lobColumnIndex: $lobColumnIndex,
+    row: $row
+  )
+}

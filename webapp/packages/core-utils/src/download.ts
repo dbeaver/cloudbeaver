@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function download(blob: Blob, fileName: string): void {
+export function download(content: Blob | string, fileName: string): void {
   const saveLink = document.createElement('a');
 
   saveLink.tabIndex = -1;
@@ -15,7 +15,7 @@ export function download(blob: Blob, fileName: string): void {
   document.body.appendChild(saveLink);
 
   try {
-    const url = URL.createObjectURL(blob);
+    const url = typeof content === 'string' ? content : URL.createObjectURL(content);
     saveLink.href = url;
     saveLink.onclick = () => requestAnimationFrame(() => URL.revokeObjectURL(url));
   } catch (e: any) {
