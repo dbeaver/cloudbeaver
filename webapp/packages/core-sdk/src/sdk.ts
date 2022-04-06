@@ -1991,6 +1991,17 @@ export type CloseResultMutationVariables = Exact<{
 
 export type CloseResultMutation = { result: boolean };
 
+export type GetResultsetDataUrlMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  lobColumnIndex: Scalars['ID'];
+  row?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+}>;
+
+
+export type GetResultsetDataUrlMutation = { url: string };
+
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
@@ -2004,17 +2015,6 @@ export type GetSqlExecutionPlanResultMutationVariables = Exact<{
 
 
 export type GetSqlExecutionPlanResultMutation = { result: { query: string; nodes: Array<{ id: string; parentId?: string; kind: string; name?: string; type: string; condition?: string; description?: string; properties: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> } };
-
-export type ReadLobValueMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  lobColumnIndex: Scalars['ID'];
-  row?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
-}>;
-
-
-export type ReadLobValueMutation = { lobValue: string };
 
 export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -3185,6 +3185,17 @@ export const CloseResultDocument = `
   )
 }
     `;
+export const GetResultsetDataUrlDocument = `
+    mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [SQLResultRow!]) {
+  url: readLobValue(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    lobColumnIndex: $lobColumnIndex
+    row: $row
+  )
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
@@ -3252,17 +3263,6 @@ export const GetSqlExecutionPlanResultDocument = `
       }
     }
   }
-}
-    `;
-export const ReadLobValueDocument = `
-    mutation readLobValue($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [SQLResultRow!]) {
-  lobValue: readLobValue(
-    connectionId: $connectionId
-    contextId: $contextId
-    resultsId: $resultsId
-    lobColumnIndex: $lobColumnIndex
-    row: $row
-  )
 }
     `;
 export const UpdateResultsDataBatchDocument = `
@@ -3775,14 +3775,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     closeResult(variables: CloseResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CloseResultMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<CloseResultMutation>(CloseResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeResult', 'mutation');
     },
+    getResultsetDataURL(variables: GetResultsetDataUrlMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetResultsetDataUrlMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetResultsetDataUrlMutation>(GetResultsetDataUrlDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResultsetDataURL', 'mutation');
+    },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecuteTaskResults', 'mutation');
     },
     getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecutionPlanResultMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecutionPlanResult', 'mutation');
-    },
-    readLobValue(variables: ReadLobValueMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ReadLobValueMutation> {
-      return withWrapper(wrappedRequestHeaders => client.request<ReadLobValueMutation>(ReadLobValueDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readLobValue', 'mutation');
     },
     updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<UpdateResultsDataBatchMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatch', 'mutation');

@@ -49,7 +49,7 @@ export class DataGridContextMenuSaveContentService {
             return;
           }
 
-          const response = await this.graphQLService.sdk.readLobValue({
+          const response = await this.graphQLService.sdk.getResultsetDataURL({
             resultsId: result.id,
             connectionId: result.connectionId,
             contextId: result.contextId,
@@ -59,7 +59,7 @@ export class DataGridContextMenuSaveContentService {
             },
           });
 
-          const url = `${RESULT_VALUE_URL}/${response.lobValue}`;
+          const url = `${RESULT_VALUE_URL}/${response.url}`;
           download(url, '');
         },
         isHidden(context) {
