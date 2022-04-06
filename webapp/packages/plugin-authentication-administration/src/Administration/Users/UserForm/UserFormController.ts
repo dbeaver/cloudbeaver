@@ -64,12 +64,12 @@ export class UserFormController implements IInitializableController, IDestructib
   private editing!: boolean;
 
   constructor(
-    private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService,
-    private rolesResource: RolesResource,
-    private usersResource: UsersResource,
-    private connectionsResource: ConnectionsResource,
-    private dbDriverResource: DBDriverResource
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly rolesResource: RolesResource,
+    private readonly usersResource: UsersResource,
+    private readonly connectionsResource: ConnectionsResource,
+    private readonly dbDriverResource: DBDriverResource
   ) {
     makeObservable(this, {
       selectedConnections: observable,
@@ -230,11 +230,6 @@ export class UserFormController implements IInitializableController, IDestructib
       }
     }
 
-    if (!this.isRoleSelected()) {
-      this.setStatusMessage('authentication_user_role_not_set', ENotificationType.Error);
-      return;
-    }
-
     if (!this.credentials.password && !this.editing) {
       this.setStatusMessage('authentication_user_password_not_set', ENotificationType.Error);
       return;
@@ -246,10 +241,6 @@ export class UserFormController implements IInitializableController, IDestructib
     }
 
     return true;
-  }
-
-  private isRoleSelected() {
-    return Array.from(this.credentials.roles.values()).some(Boolean);
   }
 
   private async updateRoles() {
