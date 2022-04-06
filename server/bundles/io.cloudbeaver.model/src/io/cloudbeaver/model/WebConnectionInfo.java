@@ -239,7 +239,7 @@ public class WebConnectionInfo {
         if (dataSource == null) {
             return formats;
         }
-        if (dataSource.getInfo().isDynamicMetadata()) {
+        if (Boolean.TRUE.equals(dataSource.getDataSourceFeature(DBPDataSource.FEATURE_DOCUMENT_DATA_SOURCE))) {
             formats.add(WebDataFormat.document);
         }
         return formats;
