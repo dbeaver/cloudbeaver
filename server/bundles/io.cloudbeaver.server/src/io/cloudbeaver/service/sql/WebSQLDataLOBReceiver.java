@@ -1,3 +1,19 @@
+/*
+ * DBeaver - Universal Database Manager
+ * Copyright (C) 2010-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.server.CBApplication;
@@ -6,17 +22,15 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
-import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -66,9 +80,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
                     "Data export quota exceeded", CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length);
         }
         File file = new File(DATA_EXPORT_FOLDER, exportFileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            IOUtils.writeFileFromBuffer(file, binaryValue);
-        }
+        Files.write(file.toPath(), binaryValue);
         return exportFileName;
     }
 
@@ -83,17 +95,11 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     }
     @Override
     public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
-
-        try {
-            Object cellValue = binding.getValueHandler().fetchValueObject(
-                    resultSet.getSession(),
-                    resultSet,
-                    binding.getMetaAttribute(),
-                    rowIndex);
-            lobValue = (DBDValue) cellValue;
-        } catch (Throwable e) {
-            lobValue = new DBDValueError(e);
-        }
+        lobValue = (DBDValue) binding.getValueHandler().fetchValueObject(
+            resultSet.getSession(),
+            resultSet,
+            binding.getMetaAttribute(),
+            rowIndex);
     }
 
     @Override

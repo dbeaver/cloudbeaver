@@ -617,24 +617,18 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         checkRowIdentifier(resultsInfo, rowIdentifier);
         DBSEntity dataContainer = rowIdentifier.getEntity();
-        checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
         WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(lobColumnIndex));
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
-            DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
-            Object[] rowValues = new Object[allAttributes.length];
+            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+            Object[] rowValues = new Object[keyAttributes.length];
             List<DBDAttributeConstraint> constraints = new ArrayList<>();
-            for (int i = 0; i < allAttributes.length; i++) {
-                DBDAttributeBinding keyAttribute = allAttributes[i];
-                boolean isDocumentValue = allAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
-                boolean isBLOBValue = keyAttribute.getDataKind() == DBPDataKind.BINARY;
-
-                if (isBLOBValue) {
-                    continue;
-                }
+            for (int i = 0; i < keyAttributes.length; i++) {
+                DBDAttributeBinding keyAttribute = keyAttributes[i];
+                boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                 if (isDocumentValue) {
                     rowValues[i] =
                             makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
