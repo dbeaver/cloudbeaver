@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -15,7 +16,7 @@ import { ResultSetDataAction } from './DatabaseDataModel/Actions/ResultSet/Resul
 import { ResultSetViewAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 
-const RESULT_VALUE_URL = '/api/sql-result-value';
+const RESULT_VALUE_PATH = 'sql-result-value';
 
 @injectable()
 export class DataViewerContentSaverService {
@@ -59,6 +60,6 @@ export class DataViewerContentSaverService {
       },
     });
 
-    return `${RESULT_VALUE_URL}/${response.url}`;
+    return `${GlobalConstants.serviceURI}/${RESULT_VALUE_PATH}/${response.url}`;
   }
 }
