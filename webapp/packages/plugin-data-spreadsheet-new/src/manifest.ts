@@ -11,6 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
+import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { LocaleService } from './LocaleService';
@@ -26,5 +27,6 @@ export const manifest: PluginManifest = {
     DataGridContextMenuOrderService,
     DataGridContextMenuFilterService,
     DataGridContextMenuCellEditingService,
+    DataGridContextMenuSaveContentService,
   ],
 };
