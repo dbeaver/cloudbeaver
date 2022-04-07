@@ -610,7 +610,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             @NotNull DBRProgressMonitor monitor,
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
-            @NotNull String lobColumnIndex,
+            @NotNull Integer lobColumnIndex,
             @Nullable WebSQLResultsRow row) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -619,7 +619,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBSEntity dataContainer = rowIdentifier.getEntity();
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, CommonUtils.toInt(lobColumnIndex));
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, lobColumnIndex);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();

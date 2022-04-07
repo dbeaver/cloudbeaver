@@ -312,7 +312,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     public String readLobValue(
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
-            @NotNull String lobColumnIndex,
+            @NotNull Integer lobColumnIndex,
             @Nullable List<WebSQLResultsRow> row) throws DBWebException
     {
         try {

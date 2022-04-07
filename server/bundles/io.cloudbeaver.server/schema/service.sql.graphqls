@@ -309,8 +309,8 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
-        lobColumnIndex: ID!,
-        row: [ SQLResultRow! ]
+        lobColumnIndex: Int!,
+        row: [ SQLResultRow! ]!
     ): String!
 
     # Returns SQLExecuteInfo
