@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -Eeuo pipefail
 
 #command line arguments
 CONFIGURATION_PATH=$1
