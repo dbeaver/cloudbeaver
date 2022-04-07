@@ -36,7 +36,7 @@ export class DataViewerContentSaverService {
     return isResultSetContentValue(cellValue);
   }
 
-  async saveElementValue(
+  async getElementValueURL(
     model: IDatabaseDataModel,
     resultIndex: number,
     element: IResultSetElementKey
@@ -60,7 +60,6 @@ export class DataViewerContentSaverService {
       },
     });
 
-    const url = `${RESULT_VALUE_URL}/${response.url}`;
-    download(url, '');
+    return `${RESULT_VALUE_URL}/${response.url}`;
   }
 }

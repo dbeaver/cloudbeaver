@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { download } from '@cloudbeaver/core-utils';
 import { DataViewerContentSaverService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
@@ -36,11 +37,15 @@ export class DataGridContextMenuSaveContentService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         onClick: async context => {
-          await this.dataViewerContentSaverService.saveElementValue(
+          const url = await this.dataViewerContentSaverService.getElementValueURL(
             context.data.model,
             context.data.resultIndex,
             context.data.key
           );
+
+          if (url) {
+            download(url);
+          }
         },
         isHidden: context => !this.dataViewerContentSaverService.canSaveElementValue(
           context.data.model,

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function download(content: Blob | string, fileName: string): void {
+export function download(content: Blob | string, fileName = ''): void {
   const saveLink = document.createElement('a');
 
   saveLink.tabIndex = -1;
