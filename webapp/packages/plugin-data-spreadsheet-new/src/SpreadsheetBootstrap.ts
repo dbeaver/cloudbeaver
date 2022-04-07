@@ -14,6 +14,7 @@ import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
+import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
@@ -21,12 +22,13 @@ import { SpreadsheetGrid } from './SpreadsheetGrid';
 @injectable()
 export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
-    private dataPresentationService: DataPresentationService,
-    private dataGridSettingsService: DataGridSettingsService,
-    private dataGridContextMenuSortingService: DataGridContextMenuOrderService,
-    private dataGridContextMenuFilterService: DataGridContextMenuFilterService,
-    private dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
-    private dataGridContextMenuService: DataGridContextMenuService,
+    private readonly dataPresentationService: DataPresentationService,
+    private readonly dataGridSettingsService: DataGridSettingsService,
+    private readonly dataGridContextMenuSortingService: DataGridContextMenuOrderService,
+    private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
+    private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
+    private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -45,6 +47,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();
     this.dataGridContextMenuCellEditingService.register();
+    this.dataGridContextMenuSaveContentService.register();
 
     this.dataGridContextMenuService.add(
       this.dataGridContextMenuService.getMenuToken(),

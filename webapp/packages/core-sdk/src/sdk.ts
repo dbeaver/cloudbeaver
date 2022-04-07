@@ -225,6 +225,7 @@ export interface DatabaseAuthModel {
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   properties: Array<ObjectPropertyInfo>;
+  requiresLocalConfiguration?: Maybe<Scalars['Boolean']>;
 }
 
 export interface DatabaseCatalog {
@@ -328,6 +329,7 @@ export interface Mutation {
   /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
+  readLobValue: Scalars['String'];
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -456,6 +458,15 @@ export interface MutationOpenConnectionArgs {
 
 export interface MutationOpenSessionArgs {
   defaultLocale?: InputMaybe<Scalars['String']>;
+}
+
+
+export interface MutationReadLobValueArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  lobColumnIndex: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  row?: InputMaybe<Array<SqlResultRow>>;
 }
 
 
@@ -1980,6 +1991,17 @@ export type CloseResultMutationVariables = Exact<{
 
 export type CloseResultMutation = { result: boolean };
 
+export type GetResultsetDataUrlMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  lobColumnIndex: Scalars['ID'];
+  row?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+}>;
+
+
+export type GetResultsetDataUrlMutation = { url: string };
+
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
@@ -3163,6 +3185,17 @@ export const CloseResultDocument = `
   )
 }
     `;
+export const GetResultsetDataUrlDocument = `
+    mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [SQLResultRow!]) {
+  url: readLobValue(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    lobColumnIndex: $lobColumnIndex
+    row: $row
+  )
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
@@ -3741,6 +3774,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     closeResult(variables: CloseResultMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CloseResultMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<CloseResultMutation>(CloseResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeResult', 'mutation');
+    },
+    getResultsetDataURL(variables: GetResultsetDataUrlMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetResultsetDataUrlMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetResultsetDataUrlMutation>(GetResultsetDataUrlDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResultsetDataURL', 'mutation');
     },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecuteTaskResults', 'mutation');
