@@ -53,7 +53,7 @@ export class DataViewerContentSaverService {
       resultsId: result.id,
       connectionId: result.connectionId,
       contextId: result.contextId,
-      lobColumnIndex: String(column.position),
+      lobColumnIndex: column.position,
       row: {
         data: row,
       },

@@ -1,4 +1,4 @@
-mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [ SQLResultRow! ]) {
+mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: Int!, $row: [ SQLResultRow! ]!) {
   url: readLobValue(
     connectionId: $connectionId,
     contextId: $contextId,

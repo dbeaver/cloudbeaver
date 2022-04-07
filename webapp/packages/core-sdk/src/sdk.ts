@@ -464,9 +464,9 @@ export interface MutationOpenSessionArgs {
 export interface MutationReadLobValueArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
-  lobColumnIndex: Scalars['ID'];
+  lobColumnIndex: Scalars['Int'];
   resultsId: Scalars['ID'];
-  row?: InputMaybe<Array<SqlResultRow>>;
+  row: Array<SqlResultRow>;
 }
 
 
@@ -1995,8 +1995,8 @@ export type GetResultsetDataUrlMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  lobColumnIndex: Scalars['ID'];
-  row?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+  lobColumnIndex: Scalars['Int'];
+  row: Array<SqlResultRow> | SqlResultRow;
 }>;
 
 
@@ -3186,7 +3186,7 @@ export const CloseResultDocument = `
 }
     `;
 export const GetResultsetDataUrlDocument = `
-    mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: ID!, $row: [SQLResultRow!]) {
+    mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: Int!, $row: [SQLResultRow!]!) {
   url: readLobValue(
     connectionId: $connectionId
     contextId: $contextId
