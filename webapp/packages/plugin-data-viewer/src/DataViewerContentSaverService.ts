@@ -8,7 +8,6 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { download } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
