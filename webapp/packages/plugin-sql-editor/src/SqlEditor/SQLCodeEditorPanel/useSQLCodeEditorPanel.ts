@@ -258,14 +258,13 @@ export function useSQLCodeEditorPanel(
 
       proposals = proposals.filter(
         ({ displayString }) => (
-          displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
-          && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
+          word === '*'
+          || (
+            displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+            && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
+          )
         )
       );
-
-      // if (proposals.length === 0) {
-      //   return;
-      // }
 
       const hints: Hints = {
         from,
@@ -275,6 +274,17 @@ export function useSQLCodeEditorPanel(
           displayText: displayString,
         })),
       };
+
+      // fix single completion
+      if (proposals.length === 1 && options.completeSingle) {
+        editor.showHint({
+          completeSingle: true,
+          updateOnCursorActivity: false,
+          closeCharacters,
+          hint: () => hints,
+        });
+        return;
+      }
 
       return hints;
     },
