@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -35,6 +35,7 @@ export const LogViewer = observer(function LogViewer() {
   const style = useStyles(styles, splitStyles);
   const translate = useTranslate();
   const logViewerState = useLogViewer();
+  const splitState = useSplitUserState('log-viewer');
 
   const closeInfoPanel = useCallback(() => {
     logViewerState.selectItem(null);
@@ -46,8 +47,12 @@ export const LogViewer = observer(function LogViewer() {
 
   return styled(style)(
     <log-view-wrapper>
-      <Split mode={logViewerState.selectedItem ? undefined : 'maximize'} keepRatio>
-        <Pane main>
+      <Split
+        {...splitState}
+        mode={logViewerState.selectedItem ? splitState.mode : 'maximize'}
+        keepRatio
+      >
+        <Pane>
           <LogViewerTable
             items={logViewerState.logItems}
             selectedItem={logViewerState.selectedItem}
@@ -58,7 +63,7 @@ export const LogViewer = observer(function LogViewer() {
         {logViewerState.selectedItem && (
           <>
             <ResizerControls />
-            <Pane>
+            <Pane main>
               <LogViewerInfoPanel
                 selectedItem={logViewerState.selectedItem}
                 onClose={closeInfoPanel}

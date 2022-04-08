@@ -20,10 +20,11 @@ export function useUserData<T>(
   const userDataService = useService(UserDataService);
   const ref = useRef<T | null>(null);
   const data = userDataService.getUserData(key, defaultValue, validate);
+  const previous = ref.current;
+  ref.current = data;
 
   useEffect(() => {
-    if (ref.current !== data) {
-      ref.current = data;
+    if (previous !== data) {
       onUpdate(data);
     }
   });

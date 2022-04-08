@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import {
   Split, Pane, ResizerControls, splitStyles, TextPlaceholder,
-  Table, TableHeader, TableColumnHeader, TableBody, Textarea
+  Table, TableHeader, TableColumnHeader, TableBody, Textarea, useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
@@ -38,9 +38,6 @@ const styles = css`
       width: 100%;
       height: 2px;
     }
-    Pane:last-child {
-      flex: 0 0 150px;
-    }
     Textarea > :global(textarea) {
       border: none !important;
     }
@@ -58,10 +55,17 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
 }) {
   const style = useStyles(styles, splitStyles);
   const translate = useTranslate();
+  const splitState = useSplitUserState('execution-plan-block');
   const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
   return styled(style)(
-    <Split className={className} sticky={30} split='horizontal' keepRatio>
+    <Split
+      {...splitState}
+      className={className}
+      sticky={30}
+      split='horizontal'
+      keepRatio
+    >
       <Pane>
         {state.nodes.length && state.columns.length ? (
           <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
@@ -90,7 +94,7 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
         ) : <TextPlaceholder>{translate('sql_execution_plan_placeholder')}</TextPlaceholder>}
       </Pane>
       <ResizerControls />
-      <Pane main>
+      <Pane basis='30%' main>
         <Textarea
           className={className}
           name='value'

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useMapResource
+  splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useMapResource, useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -29,7 +29,6 @@ const mainStyles = css`
     }
     Pane:first-child {
       position: relative;
-      flex: 0 1 auto;
     }
     Pane:last-child {
       overflow: hidden;
@@ -38,6 +37,7 @@ const mainStyles = css`
 
 export const Main = observer(function Main() {
   const styles = useStyles(mainStyles, splitStyles);
+  const splitState = useSplitUserState('main');
   useMapResource(
     Main,
     ConnectionExecutionContextResource,
@@ -47,7 +47,7 @@ export const Main = observer(function Main() {
 
   return styled(styles)(
     <space as="main">
-      <Split sticky={30}>
+      <Split {...splitState} sticky={30}>
         <Pane main>
           <ErrorBoundary remount>
             <NavigationTree />

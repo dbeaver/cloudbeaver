@@ -45,6 +45,7 @@ export * from './Split/Pane';
 export * from './Split/ResizerControls';
 export * from './Split/Split';
 export * from './Split/useSplit';
+export * from './Split/useSplitUserState';
 
 export * from './Table/BASE_TABLE_STYLES';
 export * from './Table/EventTableItemExpandFlag';

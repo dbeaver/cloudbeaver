@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, getComputed } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -42,6 +42,9 @@ const styles = css`
       composes: theme-background-background theme-text-text-primary-on-light from global;
       display: flex;
       overflow: auto;
+    }
+    TextPlaceholder {
+      padding: 24px;
     }
   `;
 
@@ -84,7 +87,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   if (!state.tabs.length) {
-    return <TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>;
+    return styled(style)(<TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>);
   }
 
   const currentId = state.currentTabId || '';

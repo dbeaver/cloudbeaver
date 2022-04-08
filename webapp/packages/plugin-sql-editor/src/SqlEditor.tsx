@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { NodeManagerUtils } from '@cloudbeaver/core-app';
-import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -45,6 +45,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
   const connection = useMapResource(SqlEditor, ConnectionInfoResource, state.executionContext?.connectionId ?? null);
   const driver = useMapResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
+  const splitState = useSplitUserState('sql-editor');
 
   const connected = getComputed(() => connection.data?.connected ?? false);
 
@@ -79,12 +80,12 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
 
   return styled(styles)(
     <>
-      <Split split="horizontal" sticky={30}>
+      <Split {...splitState} split="horizontal" sticky={30}>
         <Pane>
           <SqlEditorLoader state={state} />
         </Pane>
         <ResizerControls />
-        <Pane main>
+        <Pane basis='50%' main>
           <SqlResultTabs state={state} />
         </Pane>
       </Split>

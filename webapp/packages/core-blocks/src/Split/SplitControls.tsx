@@ -7,9 +7,7 @@
  */
 
 import { SplitContext } from 'go-split';
-import {
-  useCallback, useContext, useState, useEffect
-} from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -18,44 +16,41 @@ import { buttonStyles } from './splitButtonStyles';
 
 export const SplitControls: React.FC = function SplitControls() {
   const {
-    split, mode, isResizing, setMode, setSize, isMainSecond, getMainSize, ...splitContext
+    size, split, mode, setMode, isMainSecond, getContainerSize, ...splitContext
   } = useContext(SplitContext);
-  const [state, setState] = useState(-1);
   const styles = useStyles(buttonStyles);
 
   const inverse = isMainSecond();
+
   let inverseMode = mode;
-  if (inverse && mode !== 'resize') {
-    if (mode === 'maximize') {
+
+  if (size > getContainerSize()) {
+    inverseMode = 'maximize';
+  }
+
+  if (inverse && inverseMode !== 'resize') {
+    if (inverseMode === 'maximize') {
       inverseMode = 'minimize';
     } else {
       inverseMode = 'maximize';
     }
   }
 
-  useEffect(() => {
-    setState(getMainSize());
-  }, [isResizing]);
-
   const handleCollapse = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
     if (mode === 'maximize') {
       setMode('resize');
-      setSize(state);
     } else {
       setMode('minimize');
-      setState(getMainSize());
     }
-  }, [mode, state, setMode]);
+  }, [mode, setMode]);
 
   const handleExpand = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
     if (mode === 'minimize') {
       setMode('resize');
-      setSize(state);
     } else {
       setMode('maximize');
-      setState(getMainSize());
     }
-  }, [mode, state, setMode]);
+  }, [mode, setMode]);
 
   return styled(styles)(
     <container

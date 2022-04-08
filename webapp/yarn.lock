@@ -7281,10 +7281,10 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
-go-split@~2.x.x:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/go-split/-/go-split-2.1.1.tgz#2578d020951e6ee58f5f3e314705f1919a67c620"
-  integrity sha512-lMqMOlpc20QhrXuVbYvJpunn2MH7D0i4PD/L44jn7nPWQwnFVwg+MfjXXDb4o54IcT5ZlrcvZbxTiH8uk39mkA==
+go-split@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/go-split/-/go-split-3.0.0.tgz#30189c9ce50474e22dd83af1d2dd56ac972aaa48"
+  integrity sha512-ont1kyjUBXF6cJfEgCr/y0KAsPNeBDOvh4TAFXoqtFKl7O48FMBRjzzV4LTXL9PZrfXXz8fkVCgYc5bQr5yCJQ==
 
 got@^9.6.0:
   version "9.6.0"

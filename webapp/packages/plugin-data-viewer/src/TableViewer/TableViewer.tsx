@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -55,15 +55,12 @@ const viewerStyles = css`
     Pane {
       &:first-child {
         position: relative;
-        flex: 1;
-
+        
         & pane-content {
           margin-right: 4px;
         }
       }
       &:last-child {
-        flex: 0 0 30%;
-
         & pane-content {
           margin-left: 4px;
         }
@@ -114,6 +111,7 @@ export const TableViewer = observer<Props>(function TableViewer({
   const result = dataModel?.getResult(resultIndex);
   const loading = dataModel?.isLoading() ?? true;
   const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
+  const splitState = useSplitUserState('table-viewer');
 
   const localActions = useObjectRef({
     clearConstraints() {
@@ -256,7 +254,12 @@ export const TableViewer = observer<Props>(function TableViewer({
         />
         <table-data>
           <TableHeader model={dataModel} resultIndex={resultIndex} />
-          <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
+          <Split
+            {...splitState}
+            sticky={30}
+            mode={valuePanelDisplayed ? splitState.mode : 'minimize'}
+            keepRatio
+          >
             <Pane>
               <pane-content>
                 <TableGrid

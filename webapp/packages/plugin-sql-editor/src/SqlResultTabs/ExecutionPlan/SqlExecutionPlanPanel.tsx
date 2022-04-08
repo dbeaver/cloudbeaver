@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Split, Pane, ResizerControls, splitStyles, Loader } from '@cloudbeaver/core-blocks';
+import { Split, Pane, ResizerControls, splitStyles, Loader, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -26,9 +26,6 @@ const styles = css`
     Pane:first-child {
       overflow: hidden;
     }
-    Pane:last-child {
-      flex: 0 1 450px;
-    }
  `;
 
 interface Props {
@@ -42,6 +39,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const splitState = useSplitUserState('execution-plan');
 
   if (data?.task.executing || !data?.executionPlan) {
     return (
@@ -53,7 +51,11 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
   }
 
   return styled(style)(
-    <Split mode={selectedNode ? undefined : 'minimize'} sticky={30}>
+    <Split
+      {...splitState}
+      mode={selectedNode ? splitState.mode : 'minimize'}
+      sticky={30}
+    >
       <Pane>
         <ExecutionPlanTreeBlock
           nodeList={data.executionPlan.nodes}
@@ -64,7 +66,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
       {selectedNode && (
         <>
           <ResizerControls />
-          <Pane main>
+          <Pane basis='30%' main>
             <PropertiesPanel selectedNode={selectedNode} nodeList={data.executionPlan.nodes} />
           </Pane>
         </>

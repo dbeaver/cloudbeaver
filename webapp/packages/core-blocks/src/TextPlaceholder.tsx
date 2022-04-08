@@ -25,10 +25,14 @@ const TextPlaceholderStyles = css`
     }
   `;
 
-export const TextPlaceholder: React.FC = function TextPlaceholder(props) {
+interface Props {
+  className?: string;
+}
+
+export const TextPlaceholder: React.FC<Props> = function TextPlaceholder(props) {
   return styled(useStyles(TextPlaceholderStyles))(
     <div>
-      <span>
+      <span className={props.className}>
         {props.children}
       </span>
     </div>

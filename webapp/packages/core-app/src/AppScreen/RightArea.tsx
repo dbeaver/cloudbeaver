@@ -19,7 +19,8 @@ import {
   splitHorizontalStyles,
   splitStyles,
   SlideOverlay,
-  ErrorBoundary
+  ErrorBoundary,
+  useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -32,12 +33,8 @@ import { ToolsPanelService } from '../shared/ToolsPanel/ToolsPanelService';
 const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
-      flex: 1;
       display: flex;
       overflow: auto;
-    }
-    Pane:last-child {
-      flex: 0 0 30%;
     }
     SlideBox {
       flex: 1;
@@ -47,8 +44,9 @@ const styles = css`
 export const RightArea = observer(function RightArea() {
   const toolsPanelService = useService(ToolsPanelService);
   const optionsPanelService = useService(OptionsPanelService);
-  const OptionsPanel = optionsPanelService.getPanelComponent();
+  const splitState = useSplitUserState('right-area');
 
+  const OptionsPanel = optionsPanelService.getPanelComponent();
   const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
@@ -57,14 +55,20 @@ export const RightArea = observer(function RightArea() {
         <ErrorBoundary remount><OptionsPanel /></ErrorBoundary>
       </SlideElement>
       <SlideElement>
-        <Split sticky={30} split="horizontal" mode={activeTools.length ? undefined : 'minimize'} keepRatio>
+        <Split
+          {...splitState}
+          sticky={30}
+          split="horizontal"
+          mode={activeTools.length ? splitState.mode : 'minimize'}
+          keepRatio
+        >
           <Pane>
             <ErrorBoundary remount>
               <NavigationTabsBar />
             </ErrorBoundary>
           </Pane>
           {!!activeTools.length && <ResizerControls />}
-          <Pane main>
+          <Pane basis='30%' main>
             <ErrorBoundary remount>
               <ToolsPanel container={toolsPanelService.tabsContainer} />
             </ErrorBoundary>
