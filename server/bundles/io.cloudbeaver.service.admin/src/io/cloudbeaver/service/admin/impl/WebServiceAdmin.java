@@ -155,10 +155,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty role ID");
         }
         try {
-            WebRole newRole = new WebRole(roleId);
-            newRole.setName(roleName);
-            newRole.setDescription(description);
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().createRole(newRole, webSession.getUser().getUserId());
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
+            WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
@@ -172,10 +170,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty role ID");
         }
         try {
-            WebRole newRole = new WebRole(roleId);
-            newRole.setName(roleName);
-            newRole.setDescription(description);
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().updateRole(newRole);
+            CBPlatform.getInstance().getApplication().getAdminSecurityController().updateRole(roleId, roleName, description);
+            WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(newRole);
         } catch (Exception e) {
             throw new DBWebException("Error updating role " + roleId, e);

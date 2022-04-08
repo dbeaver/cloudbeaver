@@ -348,7 +348,7 @@ public class CBDatabase {
                 if (!CommonUtils.isEmpty(initialData.getRoles())) {
                     // Create roles
                     for (WebRole role : initialData.getRoles()) {
-                        adminSecurityController.createRole(role, adminName);
+                        adminSecurityController.createRole(role.getRoleId(), role.getName(), role.getDescription(), adminName);
                         if (adminName != null) {
                             adminSecurityController.setSubjectPermissions(role.getRoleId(), new ArrayList<>(role.getPermissions()), adminName);
                         }
