@@ -571,23 +571,23 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @Override
-    public void createRole(WebRole role, String grantor) throws DBCException {
-        if (isSubjectExists(role.getRoleId())) {
-            throw new DBCException("User or role '" + role.getRoleId() + "' already exists");
+    public void createRole(String roleId, String name, String description, String grantor) throws DBCException {
+        if (isSubjectExists(roleId)) {
+            throw new DBCException("User or role '" + roleId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
+                createAuthSubject(dbCon, roleId, SUBJECT_ROLE);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
-                    dbStat.setString(1, role.getRoleId());
-                    dbStat.setString(2, CommonUtils.notEmpty(role.getName()));
-                    dbStat.setString(3, CommonUtils.notEmpty(role.getDescription()));
+                    dbStat.setString(1, roleId);
+                    dbStat.setString(2, CommonUtils.notEmpty(name));
+                    dbStat.setString(3, CommonUtils.notEmpty(description));
                     dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
 
-                insertPermissions(dbCon, role.getRoleId(),
+                insertPermissions(dbCon, roleId,
                     new String[] {DBWConstants.PERMISSION_PUBLIC} , grantor);
 
                 txn.commit();
@@ -598,19 +598,19 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @Override
-    public void updateRole(WebRole role) throws DBCException {
-        if (!isSubjectExists(role.getRoleId())) {
-            throw new DBCException("Role '" + role.getRoleId() + "' doesn't exists");
+    public void updateRole(String roleId, String name, String description) throws DBCException {
+        if (!isSubjectExists(roleId)) {
+            throw new DBCException("Role '" + roleId + "' doesn't exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "UPDATE CB_ROLE SET ROLE_NAME=?,ROLE_DESCRIPTION=? WHERE ROLE_ID=?")) {
-                    dbStat.setString(1, CommonUtils.notEmpty(role.getName()));
-                    dbStat.setString(2, CommonUtils.notEmpty(role.getDescription()));
-                    dbStat.setString(3, role.getRoleId());
+                    dbStat.setString(1, CommonUtils.notEmpty(name));
+                    dbStat.setString(2, CommonUtils.notEmpty(description));
+                    dbStat.setString(3, roleId);
                     if (dbStat.executeUpdate() <= 0) {
-                        throw new DBCException("Role '" + role.getRoleId() + "' doesn't exist");
+                        throw new DBCException("Role '" + roleId + "' doesn't exist");
                     }
                 }
                 txn.commit();
