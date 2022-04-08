@@ -46,11 +46,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl {
                 break;
             }
         }
-        Path path = Path.of(configPath);
+        Path path = Path.of(configPath).toAbsolutePath();
         // Configure logging
         Path logbackConfigPath = null;
         for (Path confFolder = path.getParent(); confFolder != null; confFolder = confFolder.getParent()) {
-            Path lbFile = confFolder.resolve("logback.xml").toAbsolutePath();
+            Path lbFile = confFolder.resolve("logback.xml");
             if (Files.exists(lbFile)) {
                 logbackConfigPath = lbFile;
                 break;
@@ -58,7 +58,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl {
         }
 
         if (logbackConfigPath == null) {
-            System.err.println("Can't find slf4j configuration file in " + path.getParent().toAbsolutePath().toString());
+            System.err.println("Can't find slf4j configuration file in " + path.getParent());
         } else {
             System.setProperty("logback.configurationFile", logbackConfigPath.toString());
         }
