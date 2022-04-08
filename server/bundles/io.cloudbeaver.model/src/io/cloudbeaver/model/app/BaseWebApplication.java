@@ -48,9 +48,17 @@ public abstract class BaseWebApplication extends BaseApplicationImpl {
         }
         Path path = Path.of(configPath);
         // Configure logging
-        Path logbackConfigPath = path.getParent().resolve("logback.xml").toAbsolutePath();
-        if (!Files.exists(logbackConfigPath)) {
-            System.err.println("Can't find slf4j configuration file " + logbackConfigPath.toString());
+        Path logbackConfigPath = null;
+        for (Path confFolder = path.getParent(); confFolder != null; confFolder = confFolder.getParent()) {
+            Path lbFile = confFolder.resolve("logback.xml").toAbsolutePath();
+            if (Files.exists(lbFile)) {
+                logbackConfigPath = lbFile;
+                break;
+            }
+        }
+
+        if (logbackConfigPath == null) {
+            System.err.println("Can't find slf4j configuration file in " + path.getParent().toAbsolutePath().toString());
         } else {
             System.setProperty("logback.configurationFile", logbackConfigPath.toString());
         }
