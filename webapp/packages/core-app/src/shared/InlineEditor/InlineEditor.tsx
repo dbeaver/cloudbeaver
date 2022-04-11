@@ -34,7 +34,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   active?: boolean;
   loading?: boolean;
   onChange: (value: string) => void;
-  onSave: () => void;
+  onSave?: () => void;
   onReject?: () => void;
   onUndo?: () => void;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -83,14 +83,14 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
       props.onReject?.();
     } else {
       props.onChange(newValue);
-      props.onSave();
+      props.onSave?.();
     }
   }, []);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case 'Enter':
-        if (!props.disableSave) {
+        if (!props.disableSave && props.onSave) {
           props.onSave();
         }
         break;

@@ -52,6 +52,10 @@ export const InlineEditorStyles = css`
     display: flex;
     flex-direction: row;
     border: solid 1px;
+
+    &:empty {
+      display: none;
+    }
   }
 
   editor:focus-within, editor[|active] {
