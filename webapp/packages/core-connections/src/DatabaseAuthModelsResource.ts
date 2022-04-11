@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import {
   DatabaseAuthModel,
   GraphQLService,
@@ -16,8 +18,21 @@ import {
 
 @injectable()
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
-  constructor(private graphQLService: GraphQLService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly permissionsService: PermissionsService
+  ) {
     super();
+
+    this.isModelAvailable = this.isModelAvailable.bind(this);
+  }
+
+  isModelAvailable(model: DatabaseAuthModel) {
+    if (this.permissionsService.has(EAdminPermission.admin)) {
+      return true;
+    }
+
+    return !model.requiresLocalConfiguration;
   }
 
   protected async loader(key: string): Promise<Map<string, DatabaseAuthModel>> {

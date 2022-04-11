@@ -112,7 +112,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   }, []);
 
-  const { data: applicableAuthModels } = useMapResource(
+  const { data: applicableAuthModels, resource } = useMapResource(
     Options,
     DatabaseAuthModelsResource,
     resourceKeyList(driver?.applicableAuthModels || [])
@@ -133,6 +133,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
+  const availableAuthModels = applicableAuthModels.filter(model => !!model && resource.isModelAvailable(model));
   const drivers = driverMap.resource.values
     .filter(({ id }) => availableDrivers.includes(id))
     .sort(driverMap.resource.compare);
@@ -237,15 +238,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           {(!driver?.anonymousAccess && authentication.authorized) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              {applicableAuthModels.length > 1 && (
+              {availableAuthModels.length > 1 && (
                 <Combobox
                   name='authModelId'
                   state={config}
-                  items={applicableAuthModels}
+                  items={availableAuthModels}
                   keySelector={model => model!.id}
                   valueSelector={model => model!.displayName}
                   titleSelector={model => model?.description}
-                  searchable={applicableAuthModels.length > 10}
+                  searchable={availableAuthModels.length > 10}
                   readOnly={readonly || !originLocal}
                   disabled={disabled}
                   tiny
