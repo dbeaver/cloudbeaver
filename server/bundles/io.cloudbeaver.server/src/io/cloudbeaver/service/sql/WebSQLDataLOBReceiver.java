@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 
@@ -39,15 +40,15 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
     public static final File DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
 
-    private final WebSQLContextInfo contextInfo;
+    private final String tableName;
     private final DBSDataContainer dataContainer;
 
     private DBDAttributeBinding binding;
     private DBDValue lobValue;
     private int rowIndex;
 
-    WebSQLDataLOBReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, int rowIndex) {
-        this.contextInfo = contextInfo;
+    WebSQLDataLOBReceiver(String tableName, DBSDataContainer dataContainer, int rowIndex) {
+        this.tableName = tableName;
         this.dataContainer = dataContainer;
         this.rowIndex = rowIndex;
         if (!DATA_EXPORT_FOLDER.exists()){
@@ -57,13 +58,14 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     }
 
     public String createLobFile(DBCSession session) throws DBCException, IOException {
-        String exportFileName = CommonUtils.truncateString(dataContainer.getName(), 32);
+        String exportFileName = CommonUtils.truncateString(tableName, 32);
         StringBuilder fileName = new StringBuilder(exportFileName);
         fileName.append("_")
                 .append(binding.getName())
                 .append("_");
         Timestamp ts = new Timestamp(System.currentTimeMillis());
-        fileName.append(ts.getTime());
+        String s = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(ts);
+        fileName.append(s);
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
         byte[] binaryValue;
         Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
