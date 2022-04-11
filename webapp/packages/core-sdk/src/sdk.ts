@@ -1782,7 +1782,7 @@ export type ExecutionContextUpdateMutation = { context: boolean };
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type GetAuthModelsQuery = { models: Array<{ id: string; displayName: string; description?: string; icon?: string; properties: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
+export type GetAuthModelsQuery = { models: Array<{ id: string; displayName: string; description?: string; icon?: string; requiresLocalConfiguration?: boolean; properties: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{
   includeOrigin: Scalars['Boolean'];
@@ -2946,6 +2946,7 @@ export const GetAuthModelsDocument = `
     displayName
     description
     icon
+    requiresLocalConfiguration
     properties {
       id
       displayName

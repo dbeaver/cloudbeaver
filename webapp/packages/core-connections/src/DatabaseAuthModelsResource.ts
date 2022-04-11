@@ -16,7 +16,7 @@ import {
 
 @injectable()
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
-  constructor(private graphQLService: GraphQLService) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
   }
 

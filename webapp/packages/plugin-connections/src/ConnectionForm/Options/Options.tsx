@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useAdministrationSettings } from '@cloudbeaver/core-administration';
+import { EAdminPermission, useAdministrationSettings } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   InputField,
@@ -30,6 +30,7 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { usePermission } from '@cloudbeaver/core-root';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -62,6 +63,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     disabled,
   } = state;
 
+  const adminPermission = usePermission(EAdminPermission.admin);
   const authentication = useAuthenticationAction({
     origin: info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
   });
@@ -133,6 +135,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
+  const availableAuthModels = applicableAuthModels.filter(model => !!model && (adminPermission
+    || !model.requiresLocalConfiguration
+  ));
   const drivers = driverMap.resource.values
     .filter(({ id }) => availableDrivers.includes(id))
     .sort(driverMap.resource.compare);
@@ -237,15 +242,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           {(!driver?.anonymousAccess && authentication.authorized) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              {applicableAuthModels.length > 1 && (
+              {availableAuthModels.length > 1 && (
                 <Combobox
                   name='authModelId'
                   state={config}
-                  items={applicableAuthModels}
+                  items={availableAuthModels}
                   keySelector={model => model!.id}
                   valueSelector={model => model!.displayName}
                   titleSelector={model => model?.description}
-                  searchable={applicableAuthModels.length > 10}
+                  searchable={availableAuthModels.length > 10}
                   readOnly={readonly || !originLocal}
                   disabled={disabled}
                   tiny
