@@ -616,12 +616,12 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         checkRowIdentifier(resultsInfo, rowIdentifier);
-        DBSEntity dataContainer = rowIdentifier.getEntity();
-        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
-        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(contextInfo, dataManipulator, lobColumnIndex);
+        DBSDataContainer dataContainer = resultsInfo.getDataContainer();
+        DBCExecutionContext executionContext = getExecutionContext(dataContainer);
+        String tableName = rowIdentifier.getEntity().getName();
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, dataContainer, lobColumnIndex);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
-            WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
+            WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
             DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
             Object[] rowValues = new Object[keyAttributes.length];
@@ -649,7 +649,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 constraints.add(constraint);
             }
             dataFilter.addConstraints(constraints);
-            DBCStatistics statistics = dataManipulator.readData(
+            DBCStatistics statistics = dataContainer.readData(
                     executionSource, session, dataReceiver, dataFilter,
                     0, 1, DBSDataContainer.FLAG_NONE, 1);
             try {
