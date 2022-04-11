@@ -20,6 +20,7 @@ import io.cloudbeaver.server.CBApplication;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -30,10 +31,6 @@ import java.util.Date;
  * Web server configuration
  */
 public class WebProductInfo {
-
-    public WebProductInfo() {
-
-    }
 
     @Property
     public String getId() {
@@ -71,7 +68,7 @@ public class WebProductInfo {
 
     @Property
     public String getLicenseInfo() {
-        return CBApplication.getInstance().getInfoDetails();
+        return CBApplication.getInstance().getInfoDetails(new VoidProgressMonitor());
     }
 
     @Property

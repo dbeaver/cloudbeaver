@@ -42,8 +42,11 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -160,6 +163,11 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
 
     public Path getHomeDirectory() {
         return homeDirectory.toPath();
+    }
+
+    @Override
+    public boolean isMultiNode() {
+        return false;
     }
 
     public long getMaxSessionIdleTime() {
@@ -426,6 +434,12 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
     }
 
     @Nullable
+    public SMSession getServerSession(DBRProgressMonitor monitor) throws DBException {
+        DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
+        return workspace.getAuthContext().getSpaceSession(monitor, workspace, false);
+    }
+
+    @Nullable
     @Override
     protected Path loadServerConfiguration() {
         Path path = super.loadServerConfiguration();
@@ -616,7 +630,7 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
     }
 
     @Override
-    public String getInfoDetails() {
+    public String getInfoDetails(DBRProgressMonitor monitor) {
         return "";
     }
 

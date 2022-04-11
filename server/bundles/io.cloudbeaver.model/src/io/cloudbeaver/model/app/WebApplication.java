@@ -35,5 +35,7 @@ public interface WebApplication extends DBPApplication {
 
     Path getHomeDirectory();
 
+    boolean isMultiNode();
+
     SMController<WebUser, WebRole> getSecurityController();
 }
