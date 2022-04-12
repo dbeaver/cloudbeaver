@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.metadata;
 
-import io.cloudbeaver.DBWService;
+import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.session.WebSession;
