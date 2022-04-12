@@ -892,7 +892,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.persisted = true;
         this.smAuthToken = smAuthInfo.getAuthToken();
         this.sessionPermissions = smAuthInfo.getPermissions();
-        refreshAccessibleConnectionIds();
+        forceUserRefresh(smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId()));
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
