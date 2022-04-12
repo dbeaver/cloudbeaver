@@ -52,10 +52,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMSessionType;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -82,7 +79,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private static final Log log = Log.getLog(WebSession.class);
 
-    private static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
+    public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
 
     private static final String ATTR_LOCALE = "locale";
     public static final String USER_PROJECTS_FOLDER = "user-projects";
@@ -101,6 +98,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private WebUser user;
     private Set<String> sessionPermissions = null;
     private Set<String> accessibleConnectionIds = Collections.emptySet();
+    private String smAuthToken = null;
 
     private String locale;
     private boolean cacheExpired;
@@ -231,6 +229,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public synchronized boolean hasPermission(String perm) {
         return getSessionPermissions().contains(perm);
+    }
+
+    public synchronized boolean isAuthorizedInSecurityManager() {
+        return CommonUtils.isNotEmpty(smAuthToken);
     }
 
     public synchronized Set<String> getSessionPermissions() {
@@ -400,26 +402,33 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void refreshSessionAuth() {
+    private synchronized void refreshSessionAuth() {
         try {
 
-            if (this.user == null) {
-                if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
-                    sessionPermissions = securityController.getSubjectPermissions(
-                        application.getAppConfiguration().getAnonymousUserRole());
-                } else {
-                    sessionPermissions = Collections.emptySet();
-                }
+            if (!isAuthorizedInSecurityManager()) {
+                authAsAnonymousUser();
             } else {
-                sessionPermissions = securityController.getUserPermissions(this.user.getUserId());
+                sessionPermissions = securityController.getUserPermissions(getUserId());
             }
-
-            accessibleConnectionIds = readAccessibleConnectionIds();
+            refreshAccessibleConnectionIds();
 
         } catch (Exception e) {
             addSessionError(e);
             log.error("Error reading session permissions", e);
         }
+    }
+
+    private void refreshAccessibleConnectionIds() {
+        this.accessibleConnectionIds = readAccessibleConnectionIds();
+    }
+
+    private synchronized void authAsAnonymousUser() throws DBCException {
+        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            this.sessionPermissions = Collections.emptySet();
+            return;
+        }
+        var authInfo = securityController.authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
+        updateSMAuthInfo(authInfo);
     }
 
     @NotNull
@@ -447,7 +456,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
+    public synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) throws DBWebException {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -458,8 +467,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 // Persist session
                 if (!this.persisted) {
                     // Create new record
-                    securityController.createSession(this.id, getUserId(), getSessionParameters(), CB_SESSION_TYPE);
-                    this.persisted = true;
+                    authAsAnonymousUser();
                 } else {
                     if (!application.isConfigurationMode()) {
                         // Update record
@@ -545,6 +553,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         for (WebAuthInfo ai : tokensCopy) {
             removeAuthInfo(ai);
         }
+        resetAuthToken();
     }
 
     public DBRProgressMonitor getProgressMonitor() {
@@ -864,11 +873,26 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     ///////////////////////////////////////////////////////
     // Utils
 
-    private Map<String, Object> getSessionParameters() {
+    public Map<String, Object> getSessionParameters() {
         var parameters = new HashMap<String, Object>();
         parameters.put(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS, getLastRemoteAddr());
         parameters.put(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT, getLastRemoteUserAgent());
         return parameters;
+    }
+
+    public synchronized void resetAuthToken() {
+        this.sessionPermissions = null;
+        this.smAuthToken = null;
+    }
+
+    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
+        if (isAuthorizedInSecurityManager() && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
+            throw new DBCException("Another user is already logged in");
+        }
+        this.persisted = true;
+        this.smAuthToken = smAuthInfo.getAuthToken();
+        this.sessionPermissions = smAuthInfo.getPermissions();
+        refreshAccessibleConnectionIds();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
