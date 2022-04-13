@@ -18,9 +18,10 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.storage.ExternalContentStorage;
@@ -41,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -156,14 +156,25 @@ public class WebSQLUtils {
             byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
-                if (previewValue.length > WebSQLConstants.BINARY_PREVIEW_LENGTH) {
-                    previewValue = Arrays.copyOf(previewValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
+                // gets parameters from the configuration file
+                CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+                // the max length of the text preview
+                int textPreviewMaxLength = CommonUtils.toInt(
+                    config.getResourceQuota(
+                        WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
+                        WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+                if (previewValue.length > textPreviewMaxLength) {
+                    previewValue = Arrays.copyOf(previewValue, textPreviewMaxLength);
                 }
                 map.put(WebSQLConstants.ATTR_TEXT, GeneralUtils.convertToString(previewValue, 0, previewValue.length));
-
+                // the max length of the binary preview
+                int binaryPreviewMaxLength = CommonUtils.toInt(
+                    config.getResourceQuota(
+                        WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
+                        WebSQLConstants.BINARY_PREVIEW_MAX_LENGTH));
                 byte[] inlineValue = binaryValue;
-                if (inlineValue.length > WebSQLConstants.BINARY_MAX_LENGTH) {
-                    inlineValue = Arrays.copyOf(inlineValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
+                if (inlineValue.length > binaryPreviewMaxLength) {
+                    inlineValue = Arrays.copyOf(inlineValue, textPreviewMaxLength);
                 }
                 map.put(WebSQLConstants.ATTR_BINARY, Base64.encode(inlineValue));
             } else {
