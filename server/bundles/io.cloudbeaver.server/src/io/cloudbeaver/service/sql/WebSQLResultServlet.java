@@ -3,7 +3,6 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
