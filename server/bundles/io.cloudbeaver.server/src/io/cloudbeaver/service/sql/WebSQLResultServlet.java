@@ -3,6 +3,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
 @MultipartConfig
 public class WebSQLResultServlet extends WebServiceServletBase {
 
+    private static final int STATIC_CACHE_SECONDS = 60 * 60 * 24;
     private static final Log log = Log.getLog(WebSQLResultServlet.class);
     private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.getAbsolutePath());
 
@@ -71,6 +73,8 @@ public class WebSQLResultServlet extends WebServiceServletBase {
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
             response.setHeader("Content-Length", String.valueOf(dataFile.length()));
+            response.setDateHeader("Expires", System.currentTimeMillis() + STATIC_CACHE_SECONDS * 1000);
+            response.setHeader("Cache-Control", "public, max-age=" + STATIC_CACHE_SECONDS);
 
             try (InputStream is = new FileInputStream(dataFile)) {
                 IOUtils.copyStream(is, response.getOutputStream());
