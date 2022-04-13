@@ -525,10 +525,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Refresh active session
             if (configurationMode) {
                 // In config mode we always refresh because admin user doesn't exist yet
-                webSession.forceUserRefresh(null);
+                webSession.resetUserData();
             } else {
                 // Just reload session state
-                webSession.forceUserRefresh(webSession.getUser());
+                webSession.refreshUserData();
             }
             CBPlatform.getInstance().refreshApplicableDrivers();
         } catch (Throwable e) {

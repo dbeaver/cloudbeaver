@@ -237,13 +237,16 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (configMode) {
                 authInfo.setUserCredentials(userCredentials);
             }
-            webSession.addAuthInfo(authInfo);
-            if(!webSession.isAuthorizedInSecurityManager()) {
+
+            if (smAuthInfo != null) {
                 webSession.updateSMAuthInfo(smAuthInfo);
             }
 
+            webSession.addAuthInfo(authInfo);
+
             return authInfo;
         } catch (DBException e) {
+            webSession.resetUserData();
             throw new DBWebException("User authentication failed", e);
         }
     }

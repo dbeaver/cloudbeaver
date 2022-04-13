@@ -242,24 +242,22 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return sessionPermissions;
     }
 
-    // Note: for admin use only
-    public void forceUserRefresh(WebUser user) {
-        if (!CommonUtils.equalObjects(this.user, user)) {
-            // User has changed. We need to reset all session attributes
-            clearAuthTokens();
-            try {
-                resetSessionCache();
-            } catch (DBCException e) {
-                addSessionError(e);
-                log.error(e);
-            }
-        }
-
-        this.user = user;
-
+    public synchronized void refreshUserData() {
         refreshSessionAuth();
 
         initNavigatorModel();
+    }
+
+    // Note: for admin use only
+    public synchronized void resetUserData() {
+        clearAuthTokens();
+        try {
+            resetSessionCache();
+        } catch (DBCException e) {
+            addSessionError(e);
+            log.error(e);
+        }
+        refreshUserData();
     }
 
     private void initNavigatorModel() {
@@ -300,7 +298,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.navigatorModel.initialize();
 
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
-        ((DataSourceRegistry)dataSourceRegistry).setAuthCredentialsProvider(this);
+        ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         {
             // Copy global datasources.
             for (DBPDataSourceContainer ds : globalProject.getDataSourceRegistry().getDataSources()) {
@@ -360,7 +358,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         try {
             return Arrays.stream(securityController
-                .getSubjectConnectionAccess(new String[]{subjectId}))
+                    .getSubjectConnectionAccess(new String[]{subjectId}))
                 .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
         } catch (DBCException e) {
             addSessionError(e);
@@ -372,7 +370,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private void resetSessionCache() throws DBCException {
         // Clear attributes
         synchronized (attributes) {
-            for (Map.Entry<String, Function<Object,Object>> attrDisposer : attributeDisposers.entrySet()) {
+            for (Map.Entry<String, Function<Object, Object>> attrDisposer : attributeDisposers.entrySet()) {
                 Object attrValue = attributes.get(attrDisposer.getKey());
                 attrDisposer.getValue().apply(attrValue);
             }
@@ -407,7 +405,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
             if (!isAuthorizedInSecurityManager()) {
                 authAsAnonymousUser();
-            } else {
+            } else if (getUserId() != null) {
                 sessionPermissions = securityController.getUserPermissions(getUserId());
             }
             refreshAccessibleConnectionIds();
@@ -418,7 +416,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void refreshAccessibleConnectionIds() {
+    private synchronized void refreshAccessibleConnectionIds() {
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
 
@@ -496,7 +494,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(application,this, connectionID);
+            DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(application, this, connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -741,7 +739,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         addAuthTokens(authInfo);
     }
 
-    public void addAuthTokens(@NotNull WebAuthInfo ... tokens) throws DBException {
+    public void addAuthTokens(@NotNull WebAuthInfo... tokens) throws DBException {
         WebUser newUser = null;
         for (WebAuthInfo authInfo : tokens) {
             if (newUser != null && newUser != authInfo.getUser()) {
@@ -749,9 +747,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             }
             newUser = authInfo.getUser();
         }
-        if (this.user == null && newUser != null) {
-            forceUserRefresh(newUser);
-        } else if (!CommonUtils.equalObjects(this.user, newUser)) {
+//        if (this.user == null && newUser != null) {
+//            forceUserRefresh(newUser);
+//        } else
+        if (!CommonUtils.equalObjects(this.user, newUser)) {
             throw new DBException("Can't authorize different users in the single session");
         }
 
@@ -797,7 +796,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             removeAuthInfo(getAuthInfo(providerId));
         }
         if (authTokens.isEmpty()) {
-            forceUserRefresh(null);
+            resetUserData();
         }
     }
 
@@ -886,13 +885,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
-        if (isAuthorizedInSecurityManager() && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
+        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
+        if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
         this.persisted = true;
         this.smAuthToken = smAuthInfo.getAuthToken();
         this.sessionPermissions = smAuthInfo.getPermissions();
-        forceUserRefresh(smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId()));
+        this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
+        refreshUserData();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
