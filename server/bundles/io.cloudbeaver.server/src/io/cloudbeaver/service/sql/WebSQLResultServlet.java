@@ -3,6 +3,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
@@ -71,6 +72,8 @@ public class WebSQLResultServlet extends WebServiceServletBase {
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
             response.setHeader("Content-Length", String.valueOf(dataFile.length()));
+            response.setDateHeader("Expires", System.currentTimeMillis() + CBStaticServlet.STATIC_CACHE_SECONDS * 1000);
+            response.setHeader("Cache-Control", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
 
             try (InputStream is = new FileInputStream(dataFile)) {
                 IOUtils.copyStream(is, response.getOutputStream());
