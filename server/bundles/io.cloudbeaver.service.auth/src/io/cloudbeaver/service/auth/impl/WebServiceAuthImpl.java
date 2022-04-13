@@ -144,7 +144,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     try {
                         smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
                         userId = smAuthInfo.getUserId();
-                    } catch (SMException ignored) {
+                    } catch (SMException e) {
+                        log.debug("Error during user authentication", e);
                     }
                 }
 
