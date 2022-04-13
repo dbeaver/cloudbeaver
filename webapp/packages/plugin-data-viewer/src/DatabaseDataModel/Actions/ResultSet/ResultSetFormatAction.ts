@@ -15,7 +15,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './isResultSetContentValue';
+import { isResultSetContentValue } from './ResultSetContentValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
@@ -27,8 +27,8 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private view: ResultSetViewAction;
-  private edit: ResultSetEditAction;
+  private readonly view: ResultSetViewAction;
+  private readonly edit: ResultSetEditAction;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,

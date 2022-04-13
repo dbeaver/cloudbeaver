@@ -13,7 +13,7 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools, uuid } from '@cloudbeaver/core-utils';
 import {
   IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey,
-  ResultSetConstraintAction, ResultSetDataAction, ResultSetDataKeysUtils,
+  ResultSetConstraintAction, ResultSetDataAction, ResultSetDataElementUtils,
   ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -115,7 +115,7 @@ export function useTableData(
     getColumnByDataIndex(key) {
       return this.columns.find(column => (
         column.columnDataIndex !== null
-        && ResultSetDataKeysUtils.isEqual(column.columnDataIndex, key)
+        && ResultSetDataElementUtils.isKeyEqual(column.columnDataIndex, key)
       ))!;
     },
     getColumnInfo(key) {
@@ -131,11 +131,11 @@ export function useTableData(
       return this.columns
         .findIndex(column => (
           column.columnDataIndex !== null
-          && ResultSetDataKeysUtils.isEqual(columnKey, column.columnDataIndex)
+          && ResultSetDataElementUtils.isKeyEqual(columnKey, column.columnDataIndex)
         ));
     },
     getRowIndexFromKey(rowKey) {
-      return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
+      return this.rows.findIndex(row => ResultSetDataElementUtils.isKeyEqual(rowKey, row));
     },
     getColumnsInRange(startIndex, endIndex) {
       if (startIndex === endIndex) {
@@ -170,7 +170,7 @@ export function useTableData(
 
       return (
         !column.editable
-      || this.format.isReadOnly(key)
+        || this.format.isReadOnly(key)
       );
     },
   }), {

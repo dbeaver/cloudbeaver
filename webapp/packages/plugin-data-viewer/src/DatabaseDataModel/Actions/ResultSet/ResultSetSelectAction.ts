@@ -19,7 +19,7 @@ import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditA
 import type { DatabaseDataSelectActionsData } from '../IDatabaseDataSelectAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey';
 import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
+import { ResultSetDataElementUtils } from './ResultSetDataElementUtils';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
@@ -36,10 +36,10 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
-  private view: ResultSetViewAction;
-  private edit: ResultSetEditAction;
-  private data: ResultSetDataAction;
-  private validationDisposer: IReactionDisposer;
+  private readonly view: ResultSetViewAction;
+  private readonly edit: ResultSetEditAction;
+  private readonly data: ResultSetDataAction;
+  private readonly validationDisposer: IReactionDisposer;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
@@ -68,9 +68,9 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     this.validationDisposer = reaction(() => this.view.rowKeys, (current, previous) => {
       if (this.focusedElement) {
         const focus = this.focusedElement;
-        const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+        const currentIndex = current.findIndex(key => ResultSetDataElementUtils.isKeyEqual(key, focus.row));
 
-        const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+        const focusIndex = previous.findIndex(key => ResultSetDataElementUtils.isKeyEqual(key, focus.row));
 
         if (currentIndex >= 0 && focusIndex === -1) {
           return;
@@ -81,10 +81,10 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
           return;
         }
 
-        if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
+        if (!current.some(key => ResultSetDataElementUtils.isKeyEqual(key, focus.row))) {
           for (let index = focusIndex; index >= 0; index--) {
             const previousElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
+            const row = current.find(key => ResultSetDataElementUtils.isKeyEqual(key, previousElement));
 
             if (row) {
               this.focus({ ...this.focusedElement, row });
@@ -93,7 +93,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
           }
           for (let index = focusIndex; index <= previous.length; index++) {
             const nextElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
+            const row = current.find(key => ResultSetDataElementUtils.isKeyEqual(key, nextElement));
 
             if (row) {
               this.focus({ ...this.focusedElement, row });
@@ -119,8 +119,8 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       return false;
     }
     return (
-      ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column)
-      && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row)
+      ResultSetDataElementUtils.isKeyEqual(key.column, this.focusedElement.column)
+      && ResultSetDataElementUtils.isKeyEqual(key.row, this.focusedElement.row)
     );
   }
 
@@ -135,7 +135,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       return true;
     }
 
-    const row = this.selectedElements.get(ResultSetDataKeysUtils.serialize(key.row));
+    const row = this.selectedElements.get(ResultSetDataElementUtils.serializeKey(key.row));
 
     if (!row) {
       return false;
@@ -153,7 +153,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   }
 
   getRowSelection(row: IResultSetRowKey): IResultSetElementKey[] {
-    return this.selectedElements.get(ResultSetDataKeysUtils.serialize(row)) || [];
+    return this.selectedElements.get(ResultSetDataElementUtils.serializeKey(row)) || [];
   }
 
   getSelectedElements(): IResultSetElementKey[] {
@@ -178,7 +178,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     const elements = this.getSelectedElements();
 
     for (const cell of elements) {
-      const key = ResultSetDataKeysUtils.serialize(cell.row);
+      const key = ResultSetDataElementUtils.serializeKey(cell.row);
 
       if (!rowsKeys.has(key)) {
         cells.push(cell);
@@ -233,14 +233,14 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     }
 
     try {
-      if (!this.selectedElements.has(ResultSetDataKeysUtils.serialize(key.row))) {
+      if (!this.selectedElements.has(ResultSetDataElementUtils.serializeKey(key.row))) {
         if (!selected) {
           return;
         }
-        this.selectedElements.set(ResultSetDataKeysUtils.serialize(key.row), []);
+        this.selectedElements.set(ResultSetDataElementUtils.serializeKey(key.row), []);
       }
 
-      const columns = this.selectedElements.get(ResultSetDataKeysUtils.serialize(key.row))!;
+      const columns = this.selectedElements.get(ResultSetDataElementUtils.serializeKey(key.row))!;
 
       if (selected) {
         if (!this.isColumnSelected(columns, key.column)) {
@@ -250,7 +250,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
         this.removeColumnSelection(columns, key.column);
 
         if (columns.length === 0) {
-          this.selectedElements.delete(ResultSetDataKeysUtils.serialize(key.row));
+          this.selectedElements.delete(ResultSetDataElementUtils.serializeKey(key.row));
         }
       }
     } finally {
@@ -330,13 +330,13 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     for (const update of data.updates) {
       switch (update.type) {
         case DatabaseEditChangeType.add:
-          if (nextFocus === null || ResultSetDataKeysUtils.isEqual(update.row, nextFocus.row)) {
+          if (nextFocus === null || ResultSetDataElementUtils.isKeyEqual(update.row, nextFocus.row)) {
             nextFocus = { ...nextFocus, row: update.newRow };
           }
           break;
 
         case DatabaseEditChangeType.delete:
-          if (nextFocus === null || ResultSetDataKeysUtils.isEqual(update.row, nextFocus.row)) {
+          if (nextFocus === null || ResultSetDataElementUtils.isKeyEqual(update.row, nextFocus.row)) {
             nextFocus = { ...nextFocus, row: update.newRow };
           }
           this.set({ row: update.row }, false, true);
@@ -375,11 +375,11 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   }
 
   private isColumnSelected(list: IResultSetElementKey[], key: IResultSetColumnKey) {
-    return list.some(selected => ResultSetDataKeysUtils.isEqual(selected.column, key));
+    return list.some(selected => ResultSetDataElementUtils.isKeyEqual(selected.column, key));
   }
 
   private removeColumnSelection(list: IResultSetElementKey[], key: IResultSetColumnKey) {
-    const index = list.findIndex(selected => ResultSetDataKeysUtils.isEqual(selected.column, key));
+    const index = list.findIndex(selected => ResultSetDataElementUtils.isKeyEqual(selected.column, key));
 
     if (index >= 0) {
       list.splice(index, 1);

@@ -6,10 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IResultSetColumnKey, IResultSetRowKey } from './IResultSetDataKey';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 
-export const ResultSetDataKeysUtils = {
-  serialize(key: IResultSetColumnKey | IResultSetRowKey): string {
+export const ResultSetDataElementUtils = {
+  serialize(element: IResultSetElementKey): string {
+    return this.serializeKey(element.column) + this.serializeKey(element.row);
+  },
+  isEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
+    return this.isKeyEqual(a.column, b.column) && this.isKeyEqual(a.row, b.row);
+  },
+  serializeKey(key: IResultSetColumnKey | IResultSetRowKey): string {
     let base = `${key.index}`;
 
     if ('key' in key) {
@@ -18,7 +24,7 @@ export const ResultSetDataKeysUtils = {
 
     return base;
   },
-  isEqual<T extends IResultSetColumnKey | IResultSetRowKey>(a: T, b: T): boolean {
+  isKeyEqual<T extends IResultSetColumnKey | IResultSetRowKey>(a: T, b: T): boolean {
     if (a.index !== b.index) {
       return false;
     }

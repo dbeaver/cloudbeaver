@@ -8,10 +8,10 @@ export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
 export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
-export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
-export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataElementUtils';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -38,7 +38,8 @@ export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 export * from './DatabaseDataModel/Order';
 export * from './DataViewerService';
-export * from './DataViewerContentSaverService';
+export * from './DatabaseDataModel/DatabaseDataManager';
+export * from './DatabaseDataModel/IDatabaseDataManager';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';

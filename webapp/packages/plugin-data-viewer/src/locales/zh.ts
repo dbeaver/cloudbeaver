@@ -27,6 +27,8 @@ export default [
   ['data_viewer_presentation_value_image_fit', '适应窗口'],
   ['data_viewer_presentation_value_image_original_size', '原始尺寸'],
   ['data_viewer_presentation_value_boolean_placeholder', '无法将当前值显示为布尔值'],
+  ['data_viewer_presentation_value_content_trimmed_placeholder', 'The size of the value exceeds the limit'],
+  ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_script_preview', '脚本'],
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],

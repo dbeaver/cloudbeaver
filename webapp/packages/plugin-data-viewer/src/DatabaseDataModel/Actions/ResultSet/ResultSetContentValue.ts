@@ -8,9 +8,15 @@
 
 import type { IResultSetContentValue } from './IResultSetContentValue';
 
+const TRUNCATED_LIMIT = 1048576;
+
 export function isResultSetContentValue(value: any): value is IResultSetContentValue {
   return value !== null
     && typeof value === 'object'
     && '$type' in value
     && value.$type === 'content';
+}
+
+export function isResultSetContentValueTruncated(value: IResultSetContentValue) {
+  return (value.contentLength ?? 0) > TRUNCATED_LIMIT;
 }

@@ -19,6 +19,7 @@ export default [
   ['data_grid_table_tooltip_column_header_order', '按列排序'],
   ['data_grid_table_context_menu_filter_dialog_title', '编辑值'],
   ['data_grid_table_context_menu_filter_clipboard_permission', '授予访问剪贴板的权限'],
+  ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', '选择整个表'],
   ['data_grid_table_readonly_tooltip', '只读'],
 ];

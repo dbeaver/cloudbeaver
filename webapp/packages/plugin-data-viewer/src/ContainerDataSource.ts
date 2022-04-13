@@ -14,7 +14,9 @@ import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo,
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { DatabaseDataManager } from './DatabaseDataModel/DatabaseDataManager';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
+import type { IDatabaseDataManager } from './DatabaseDataModel/IDatabaseDataManager';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 
@@ -24,6 +26,7 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
   currentTask: ITask<SqlExecuteInfo> | null;
+  dataManager: IDatabaseDataManager;
 
   get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
@@ -36,6 +39,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   ) {
     super();
 
+    this.dataManager = new DatabaseDataManager(this.graphQLService, this);
     this.currentTask = null;
     this.executionContext = null;
 

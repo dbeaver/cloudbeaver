@@ -19,6 +19,7 @@ export default [
   ['data_grid_table_tooltip_column_header_order', 'Sort by column'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Edit value'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Give access to clipboard'],
+  ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Select whole table'],
   ['data_grid_table_readonly_tooltip', 'Read-only'],
 ];

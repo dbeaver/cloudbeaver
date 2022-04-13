@@ -21,7 +21,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import {
   DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps,
-  IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction
+  IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataElementUtils, ResultSetSelectAction
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
@@ -412,7 +412,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                   formatter: CellFormatter,
                 }}
                 rows={tableData.rows}
-                rowKeyGetter={ResultSetDataKeysUtils.serialize}
+                rowKeyGetter={ResultSetDataElementUtils.serializeKey}
                 headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
                 rowRenderer={RowRenderer}

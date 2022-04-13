@@ -69,6 +69,7 @@ export const defaultENLocale = [
   ['ui_close_all_to_the_right', 'Close all to the Right'],
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
+  ['ui_download', 'Download'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

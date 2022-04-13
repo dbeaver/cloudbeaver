@@ -10,20 +10,23 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetContentValue';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { TextValuePresentationService } from './TextValuePresentationService';
 
 const styles = css`
@@ -32,6 +35,7 @@ const styles = css`
     }
     container {
       display: flex;
+      gap: 16px;
       flex-direction: column;
       overflow: auto;
       flex: 1;
@@ -69,8 +73,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   model,
   resultIndex,
 }) {
+  const translate = useTranslate();
+  const notificationService = useService(NotificationService);
   const textValuePresentationService = useService(TextValuePresentationService);
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES);
+  const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
   const state = useObservableRef(() => ({
     currentContentType: 'text/plain',
     lastContentType: 'text/plain',
@@ -135,8 +141,21 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   };
 
+  const save = async () => {
+    if (!firstSelectedCell) {
+      return;
+    }
+
+    try {
+      await model.source.dataManager.downloadFileFor(firstSelectedCell, resultIndex);
+    } catch (exception) {
+      notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+    }
+  };
+
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
+  const canSave = firstSelectedCell && model.source.dataManager.canGetFileURLFor(firstSelectedCell, resultIndex);
 
   return styled(style)(
     <container>
@@ -175,6 +194,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           embedded
           onChange={handleChange}
         />
+      )}
+      {canSave && (
+        <tools-container>
+          <tools>
+            <tools-action
+              as='button'
+              title={translate('ui_processing_save')}
+              disabled={model.isLoading()}
+              onClick={save}
+            >
+              <IconOrImage icon='/icons/save.svg' />
+            </tools-action>
+          </tools>
+        </tools-container>
       )}
     </container>
   );
