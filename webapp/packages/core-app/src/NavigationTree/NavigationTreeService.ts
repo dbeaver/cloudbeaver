@@ -85,9 +85,12 @@ export class NavigationTreeService extends View<string> {
           return false;
         }
 
-        const connected = await this.tryInitConnection(connection.id);
-
-        if (!connected) {
+        try {
+          const connected = await this.tryInitConnection(connection.id);
+          if (!connected) {
+            return false;
+          }
+        } catch {
           return false;
         }
       }
