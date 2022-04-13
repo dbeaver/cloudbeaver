@@ -18,6 +18,8 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -156,14 +158,21 @@ public class WebSQLUtils {
             byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
-                if (previewValue.length > WebSQLConstants.BINARY_PREVIEW_LENGTH) {
-                    previewValue = Arrays.copyOf(previewValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
+                // get parameters from the configuration file
+                CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+                int binaryPreviewLength = CommonUtils.toInt(
+                    config.getResourceQuota(WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_LENGTH));
+                int binaryMaxLength = CommonUtils.toInt(
+                    config.getResourceQuota(WebSQLConstants.QUOTA_PROP_BINARY_MAX_LENGTH));
+
+                if (previewValue.length > binaryPreviewLength) {
+                    previewValue = Arrays.copyOf(previewValue, binaryPreviewLength);
                 }
                 map.put(WebSQLConstants.ATTR_TEXT, GeneralUtils.convertToString(previewValue, 0, previewValue.length));
 
                 byte[] inlineValue = binaryValue;
-                if (inlineValue.length > WebSQLConstants.BINARY_MAX_LENGTH) {
-                    inlineValue = Arrays.copyOf(inlineValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
+                if (inlineValue.length > binaryMaxLength) {
+                    inlineValue = Arrays.copyOf(inlineValue, binaryPreviewLength);
                 }
                 map.put(WebSQLConstants.ATTR_BINARY, Base64.encode(inlineValue));
             } else {
