@@ -27,8 +27,8 @@ public class WebSQLConstants {
     public static final String QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH = "sqlTextPreviewMaxLength";
     public static final String QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH = "sqlBinaryPreviewMaxLength";
 
-    public static final int TEXT_PREVIEW_MAX_LENGTH = 255;
-    public static final int BINARY_PREVIEW_MAX_LENGTH = 1 * 1024 * 1024;
+    public static final int TEXT_PREVIEW_MAX_LENGTH = 4 * 1024;
+    public static final int BINARY_PREVIEW_MAX_LENGTH = 255 * 1024;
 
     public static final String VALUE_TYPE_ATTR = "$type";
 
