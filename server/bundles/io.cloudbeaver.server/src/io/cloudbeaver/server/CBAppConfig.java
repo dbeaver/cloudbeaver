@@ -294,6 +294,14 @@ public class CBAppConfig implements WebAppConfiguration {
         return (T) resourceQuotas.get(quotaId);
     }
 
+    public <T> T getResourceQuota(String quotaId, T defaultValue) {
+        if (resourceQuotas.containsKey(quotaId)) {
+            return (T) resourceQuotas.get(quotaId);
+        } else {
+            return defaultValue;
+        }
+    }
+
 
     ////////////////////////////////////////////
     // Auth provider configs
