@@ -169,9 +169,9 @@ public class WebSQLUtils {
                 map.put(WebSQLConstants.ATTR_TEXT, GeneralUtils.convertToString(previewValue, 0, previewValue.length));
                 // the max length of the binary preview
                 int binaryPreviewMaxLength = CommonUtils.toInt(
-                        config.getResourceQuota(
-                                WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
-                                WebSQLConstants.BINARY_PREVIEW_MAX_LENGTH));
+                    config.getResourceQuota(
+                        WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
+                        WebSQLConstants.BINARY_PREVIEW_MAX_LENGTH));
                 byte[] inlineValue = binaryValue;
                 if (inlineValue.length > binaryPreviewMaxLength) {
                     inlineValue = Arrays.copyOf(inlineValue, textPreviewMaxLength);
