@@ -48,6 +48,7 @@ export const defaultITLocale = [
   ['ui_close_all_to_the_right', 'Close all to the Right'],
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
+  ['ui_download', 'Download'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

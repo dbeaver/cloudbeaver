@@ -11,7 +11,7 @@ import { observable, makeObservable } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
-import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataManager, DatabaseDataSource, DocumentEditAction, IDatabaseDataManager, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -22,6 +22,7 @@ export interface IQueryRequestInfo extends IRequestInfo {
 }
 
 export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IDatabaseResultSet> {
+  readonly dataManager: IDatabaseDataManager;
   currentTask: ITask<SqlExecuteInfo> | null;
   requestInfo: IQueryRequestInfo;
 
@@ -35,6 +36,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   ) {
     super();
 
+    this.dataManager = new DatabaseDataManager(this.graphQLService, this);
     this.currentTask = null;
     this.requestInfo = {
       requestDuration: 0,

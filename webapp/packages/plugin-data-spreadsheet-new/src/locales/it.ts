@@ -14,6 +14,7 @@ export default [
   ['data_grid_table_tooltip_column_header_order', 'Ordina per colonna'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Modifica valore'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Dai accesso agli appunti'],
+  ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Seleziona tutta la tabella'],
   ['data_grid_table_readonly_tooltip', 'In sola lettura'],
 ];

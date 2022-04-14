@@ -52,7 +52,7 @@ export function useGridSelectionContext(
 
     let selected = true;
     const rowsSelection: IResultSetElementKey[][] = [];
-    const columnsToSelect: Array<IResultSetColumnKey| undefined> = columns.length > 0 ? columns : [undefined];
+    const columnsToSelect: Array<IResultSetColumnKey | undefined> = columns.length > 0 ? columns : [undefined];
 
     for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
       const row = props.tableData.getRow(rowIndex);
