@@ -23,7 +23,7 @@ import type { IDatabaseResultSet } from './IDatabaseResultSet';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 
-export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> implements IDatabaseDataManager {
+export class DatabaseDataManager implements IDatabaseDataManager {
   private readonly cache: Map<string, string>;
   activeElement: IResultSetElementKey | null;
 
@@ -34,13 +34,13 @@ export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> 
     this.cache = new Map();
     this.activeElement = null;
 
-    makeObservable<DatabaseDataManager<TSource>, 'cache'>(this, {
+    makeObservable<this, 'cache'>(this, {
       cache: observable,
       activeElement: observable.ref,
     });
   }
 
-  canDownload(element: IResultSetElementKey, resultIndex: number) {
+  isContent(element: IResultSetElementKey, resultIndex: number) {
     const view = this.source.getAction(resultIndex, ResultSetViewAction);
     const cellValue = view.getCellValue(element);
 

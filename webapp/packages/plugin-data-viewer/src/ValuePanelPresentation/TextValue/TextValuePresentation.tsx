@@ -155,7 +155,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
-  const canSave = firstSelectedCell && model.source.dataManager.canDownload(firstSelectedCell, resultIndex);
+  const canSave = firstSelectedCell && model.source.dataManager.isContent(firstSelectedCell, resultIndex);
 
   return styled(style)(
     <container>

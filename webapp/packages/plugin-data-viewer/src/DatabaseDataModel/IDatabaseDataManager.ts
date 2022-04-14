@@ -10,7 +10,7 @@ import type { IResultSetElementKey } from './Actions/ResultSet/IResultSetDataKey
 
 export interface IDatabaseDataManager {
   activeElement: IResultSetElementKey | null;
-  canDownload: (element: IResultSetElementKey, resultIndex: number) => boolean;
+  isContent: (element: IResultSetElementKey, resultIndex: number) => boolean;
   getFileDataUrl: (element: IResultSetElementKey, resultIndex: number) => Promise<string>;
   resolveFileDataUrl: (element: IResultSetElementKey, resultIndex: number) => Promise<string>;
   retrieveFileDataUrlFromCache: (element: IResultSetElementKey, resultIndex: number) => string | undefined;

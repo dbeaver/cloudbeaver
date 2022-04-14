@@ -6,11 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function download(content: Blob | string, fileName = ''): void {
+export function download(content: Blob | string, fileName = '', blank?: boolean): void {
   const saveLink = document.createElement('a');
 
   saveLink.tabIndex = -1;
   saveLink.download = fileName;
+  if (blank) {
+    saveLink.target = '_blank';
+    saveLink.rel = 'noopener';
+  }
   saveLink.style.display = 'none';
   document.body.appendChild(saveLink);
 

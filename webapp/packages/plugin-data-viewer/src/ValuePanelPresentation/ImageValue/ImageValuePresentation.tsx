@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { isResultSetContentValue, isResultSetContentValueTruncated } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
@@ -138,8 +138,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     get savedSrc() {
       return this.model.source.dataManager.retrieveFileDataUrlFromCache(this.selectedCell, this.resultIndex);
     },
+    get content() {
+      return this.model.source.dataManager.isContent(this.selectedCell, this.resultIndex);
+    },
     get canSave() {
-      return this.model.source.dataManager.canDownload(this.selectedCell, this.resultIndex);
+      return this.content || !!this.src;
     },
     get truncated() {
       return isResultSetContentValue(this.cellValue) && isResultSetContentValueTruncated(this.cellValue);
@@ -150,9 +153,13 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     },
     async save() {
       try {
-        await this.model.source.dataManager.downloadFileData(this.selectedCell, this.resultIndex);
-      } catch (exception) {
-        this.notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+        if (!this.content) {
+          download(this.src, '', true);
+        } else {
+          await this.model.source.dataManager.downloadFileData(this.selectedCell, this.resultIndex);
+        }
+      } catch (exception: any) {
+        this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
       }
     },
   }), {
@@ -170,12 +177,12 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const save = state.canSave ? state.save : undefined;
   const loading = model.isLoading();
 
-  if (state.truncated && state.canSave && !state.savedSrc) {
+  if (state.truncated && !state.savedSrc) {
     const load = async () => {
       try {
         await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
-      } catch (exception) {
-        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+      } catch (exception: any) {
+        notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
       }
     };
 

@@ -39,11 +39,11 @@ export class DataGridContextMenuSaveContentService {
         onClick: async context => {
           try {
             await context.data.model.source.dataManager.downloadFileData(context.data.key, context.data.resultIndex);
-          } catch (exception) {
-            this.notificationService.logException(exception as any, 'data_grid_table_context_menu_save_value_error');
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'data_grid_table_context_menu_save_value_error');
           }
         },
-        isHidden: context => !context.data.model.source.dataManager.canDownload(
+        isHidden: context => !context.data.model.source.dataManager.isContent(
           context.data.key,
           context.data.resultIndex
         ),
