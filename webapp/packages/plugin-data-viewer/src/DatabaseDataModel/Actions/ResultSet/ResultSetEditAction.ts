@@ -18,9 +18,9 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
 import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditActionValue, IDatabaseDataEditApplyActionData, IDatabaseDataEditApplyActionUpdate } from '../IDatabaseDataEditAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './ResultSetContentValue';
+import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataElementUtils } from './ResultSetDataElementUtils';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 export interface IResultSetUpdate {
@@ -100,7 +100,7 @@ export class ResultSetEditAction
   }
 
   isElementEdited(key: IResultSetElementKey): boolean {
-    const update = this.editorData.get(ResultSetDataElementUtils.serializeKey(key.row));
+    const update = this.editorData.get(ResultSetDataKeysUtils.serialize(key.row));
 
     if (!update) {
       return false;
@@ -114,7 +114,7 @@ export class ResultSetEditAction
   }
 
   isRowEdited(key: IResultSetRowKey): boolean {
-    const update = this.editorData.get(ResultSetDataElementUtils.serializeKey(key));
+    const update = this.editorData.get(ResultSetDataKeysUtils.serialize(key));
 
     if (!update) {
       return false;
@@ -124,7 +124,7 @@ export class ResultSetEditAction
   }
 
   getElementState(key: IResultSetElementKey): DatabaseEditChangeType | null {
-    const update = this.editorData.get(ResultSetDataElementUtils.serializeKey(key.row));
+    const update = this.editorData.get(ResultSetDataKeysUtils.serialize(key.row));
 
     if (!update) {
       return null;
@@ -143,7 +143,7 @@ export class ResultSetEditAction
 
   get(key: IResultSetElementKey): IResultSetValue | undefined {
     return this.editorData
-      .get(ResultSetDataElementUtils.serializeKey(key.row))
+      .get(ResultSetDataKeysUtils.serialize(key.row))
       ?.update[key.column.index];
   }
 
@@ -217,7 +217,7 @@ export class ResultSetEditAction
     const rowKeys = new Set<string>();
 
     for (const key of keys) {
-      const serialized = ResultSetDataElementUtils.serializeKey(key.row);
+      const serialized = ResultSetDataKeysUtils.serialize(key.row);
 
       if (!rowKeys.has(serialized)) {
         rows.push(key.row);
@@ -233,7 +233,7 @@ export class ResultSetEditAction
       let value = this.data.getRowValue(row);
 
       const editedValue = this.editorData
-        .get(ResultSetDataElementUtils.serializeKey(row));
+        .get(ResultSetDataKeysUtils.serialize(row));
 
       if (editedValue) {
         value = editedValue.update;
@@ -248,7 +248,7 @@ export class ResultSetEditAction
     const deleted: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
 
     for (const key of keys) {
-      const serializedKey = ResultSetDataElementUtils.serializeKey(key.row);
+      const serializedKey = ResultSetDataKeysUtils.serialize(key.row);
       const update = this.editorData.get(serializedKey);
 
       if (update?.type === DatabaseEditChangeType.add) {
@@ -280,7 +280,7 @@ export class ResultSetEditAction
   }
 
   deleteRow(key: IResultSetRowKey, column?: IResultSetColumnKey, silent?: boolean): void {
-    const serializedKey = ResultSetDataElementUtils.serializeKey(key);
+    const serializedKey = ResultSetDataKeysUtils.serialize(key);
     const update = this.editorData.get(serializedKey);
 
     if (update && update.type !== DatabaseEditChangeType.delete) {
@@ -401,7 +401,7 @@ export class ResultSetEditAction
     const revertedAdditions: Array<IDatabaseDataEditActionValue<IResultSetElementKey, IResultSetValue>> = [];
 
     for (const key of keys) {
-      const row = ResultSetDataElementUtils.serializeKey(key.row);
+      const row = ResultSetDataKeysUtils.serialize(key.row);
       const update = this.editorData.get(row);
 
       if (!update) {
@@ -520,7 +520,7 @@ export class ResultSetEditAction
     if (update.source && !update.source.some(
       (value, i) => !this.compareCellValue(value, update.update[i])
     )) {
-      this.editorData.delete(ResultSetDataElementUtils.serializeKey(update.row));
+      this.editorData.delete(ResultSetDataKeysUtils.serialize(update.row));
     }
   }
 
@@ -529,7 +529,7 @@ export class ResultSetEditAction
     type: DatabaseEditChangeType,
     update?: IResultSetValue[]
   ): [IResultSetUpdate, boolean] {
-    const key = ResultSetDataElementUtils.serializeKey(row);
+    const key = ResultSetDataKeysUtils.serialize(row);
     let created = false;
 
     if (!this.editorData.has(key)) {

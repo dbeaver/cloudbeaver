@@ -18,8 +18,8 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { isResultSetContentValue, isResultSetContentValueTruncated } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetContentValue';
-import { ResultSetDataElementUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataElementUtils';
+import { isResultSetContentValue, isResultSetContentValueTruncated } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
@@ -136,10 +136,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return '';
     },
     get savedSrc() {
-      return this.model.source.dataManager.retrieveFileURLFromCacheFor(this.selectedCell, this.resultIndex);
+      return this.model.source.dataManager.retrieveFileDataUrlFromCache(this.selectedCell, this.resultIndex);
     },
     get canSave() {
-      return this.model.source.dataManager.canGetFileURLFor(this.selectedCell, this.resultIndex);
+      return this.model.source.dataManager.canDownload(this.selectedCell, this.resultIndex);
     },
     get truncated() {
       return isResultSetContentValue(this.cellValue) && isResultSetContentValueTruncated(this.cellValue);
@@ -150,7 +150,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     },
     async save() {
       try {
-        await this.model.source.dataManager.downloadFileFor(this.selectedCell, this.resultIndex);
+        await this.model.source.dataManager.downloadFileData(this.selectedCell, this.resultIndex);
       } catch (exception) {
         this.notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
       }
@@ -173,7 +173,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   if (state.truncated && state.canSave && !state.savedSrc) {
     const load = async () => {
       try {
-        await model.source.dataManager.resolveFileURLFor(state.selectedCell, resultIndex);
+        await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
       } catch (exception) {
         notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
       }
@@ -183,7 +183,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       <container>
         <ContentLoader
           disabled={loading}
-          loading={!!model.source.dataManager.activeElement && ResultSetDataElementUtils.isEqual(
+          loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
             model.source.dataManager.activeElement, state.selectedCell
           )}
           onLoad={load}

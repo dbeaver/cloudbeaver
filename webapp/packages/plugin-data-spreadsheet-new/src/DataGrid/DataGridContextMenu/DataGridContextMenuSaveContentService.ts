@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResultSetDataElementUtils } from '@cloudbeaver/plugin-data-viewer';
+import { ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -38,27 +38,20 @@ export class DataGridContextMenuSaveContentService {
         },
         onClick: async context => {
           try {
-            await context.data.model.source.dataManager.downloadFileFor(
-              context.data.key,
-              context.data.resultIndex
-            );
+            await context.data.model.source.dataManager.downloadFileData(context.data.key, context.data.resultIndex);
           } catch (exception) {
             this.notificationService.logException(exception as any, 'data_grid_table_context_menu_save_value_error');
           }
         },
-        isHidden: context => !context.data.model.source.dataManager.canGetFileURLFor(
+        isHidden: context => !context.data.model.source.dataManager.canDownload(
           context.data.key,
           context.data.resultIndex
         ),
-        isDisabled: context => {
-          const { model, key } = context.data;
-
-          if (!model.source.dataManager.activeElement) {
-            return false;
-          }
-
-          return ResultSetDataElementUtils.isEqual(key, model.source.dataManager.activeElement);
-        },
+        isDisabled: context => context.data.model.isLoading() || (
+          !!context.data.model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+            context.data.key, context.data.model.source.dataManager.activeElement
+          )
+        ),
       }
     );
   }

@@ -19,7 +19,7 @@ import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERL
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetContentValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -135,27 +135,27 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     state.setDefaultContentType(contentType);
   }
 
-  const handleChange = (newValue: string) => {
+  function handleChange(newValue: string) {
     if (firstSelectedCell && !readonly) {
       editor.set(firstSelectedCell, newValue);
     }
-  };
+  }
 
-  const save = async () => {
+  async function save() {
     if (!firstSelectedCell) {
       return;
     }
 
     try {
-      await model.source.dataManager.downloadFileFor(firstSelectedCell, resultIndex);
+      await model.source.dataManager.downloadFileData(firstSelectedCell, resultIndex);
     } catch (exception) {
       notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
     }
-  };
+  }
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
-  const canSave = firstSelectedCell && model.source.dataManager.canGetFileURLFor(firstSelectedCell, resultIndex);
+  const canSave = firstSelectedCell && model.source.dataManager.canDownload(firstSelectedCell, resultIndex);
 
   return styled(style)(
     <container>

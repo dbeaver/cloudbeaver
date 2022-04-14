@@ -12,9 +12,9 @@ import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from './Actions/ResultSet/IResultSetDataKey';
-import { isResultSetContentValue } from './Actions/ResultSet/ResultSetContentValue';
+import { isResultSetContentValue } from './Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataAction } from './Actions/ResultSet/ResultSetDataAction';
-import { ResultSetDataElementUtils } from './Actions/ResultSet/ResultSetDataElementUtils';
+import { ResultSetDataKeysUtils } from './Actions/ResultSet/ResultSetDataKeysUtils';
 import type { IResultSetValue } from './Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetViewAction } from './Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseDataManager } from './IDatabaseDataManager';
@@ -29,7 +29,7 @@ export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> 
 
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly source: TSource
+    private readonly source: IDatabaseDataSource<any, any>
   ) {
     this.cache = new Map();
     this.activeElement = null;
@@ -40,21 +40,21 @@ export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> 
     });
   }
 
-  canGetFileURLFor(element: IResultSetElementKey, resultIndex: number) {
+  canDownload(element: IResultSetElementKey, resultIndex: number) {
     const view = this.source.getAction(resultIndex, ResultSetViewAction);
     const cellValue = view.getCellValue(element);
 
     return isResultSetContentValue(cellValue);
   }
 
-  async getFileURLFor(element: IResultSetElementKey, resultIndex: number) {
+  async getFileDataUrl(element: IResultSetElementKey, resultIndex: number) {
     const result = this.source.getResult(resultIndex);
     const data = this.source.getAction(resultIndex, ResultSetDataAction);
     const column = data.getColumn(element.column);
     const row = data.getRowValue(element.row);
 
     if (!result || !row || !column) {
-      throw new Error('Failed to get arguments data');
+      throw new Error('Failed to get value metadata information');
     }
 
     const url = await this.source.runTask(
@@ -62,7 +62,7 @@ export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> 
         try {
           this.activeElement = element;
           const fileName = await this.loadFileName(result, column.position, row);
-          return this.generateFileURL(fileName);
+          return this.generateFileDataUrl(fileName);
         } finally {
           this.activeElement = null;
         }
@@ -72,39 +72,39 @@ export class DatabaseDataManager<TSource extends IDatabaseDataSource<any, any>> 
     return url;
   }
 
-  async resolveFileURLFor(element: IResultSetElementKey, resultIndex: number) {
-    const hash = this.getHashFor(element, resultIndex);
+  async resolveFileDataUrl(element: IResultSetElementKey, resultIndex: number) {
+    const cache = this.retrieveFileDataUrlFromCache(element, resultIndex);
 
-    if (this.cache.has(hash)) {
-      return this.cache.get(hash)!;
+    if (cache) {
+      return cache;
     }
 
-    const url = await this.getFileURLFor(element, resultIndex);
-    this.cache.set(hash, url);
+    const url = await this.getFileDataUrl(element, resultIndex);
+    this.cache.set(this.getHash(element, resultIndex), url);
 
     return url;
   }
 
-  async downloadFileFor(element: IResultSetElementKey, resultIndex: number) {
-    const url = await this.getFileURLFor(element, resultIndex);
-    download(url);
+  retrieveFileDataUrlFromCache(element: IResultSetElementKey, resultIndex: number) {
+    const hash = this.getHash(element, resultIndex);
+    return this.cache.get(hash);
   }
 
-  retrieveFileURLFromCacheFor(element: IResultSetElementKey, resultIndex: number) {
-    const hash = this.getHashFor(element, resultIndex);
-    return this.cache.get(hash);
+  async downloadFileData(element: IResultSetElementKey, resultIndex: number) {
+    const url = await this.getFileDataUrl(element, resultIndex);
+    download(url);
   }
 
   clearCache() {
     this.cache.clear();
   }
 
-  private generateFileURL(fileName: string) {
+  private generateFileDataUrl(fileName: string) {
     return `${GlobalConstants.serviceURI}/${RESULT_VALUE_PATH}/${fileName}`;
   }
 
-  private getHashFor(element: IResultSetElementKey, resultIndex: number) {
-    return `${ResultSetDataElementUtils.serialize(element)}_${resultIndex}`;
+  private getHash(element: IResultSetElementKey, resultIndex: number) {
+    return `${ResultSetDataKeysUtils.serializeElementKey(element)}_${resultIndex}`;
   }
 
   private async loadFileName(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {

@@ -17,7 +17,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './ResultSetContentValue';
+import { isResultSetContentValue } from './isResultSetContentValue';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()

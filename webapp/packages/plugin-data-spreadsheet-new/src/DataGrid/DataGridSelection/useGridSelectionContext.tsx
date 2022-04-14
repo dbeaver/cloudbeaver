@@ -10,7 +10,7 @@ import { action, observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, ResultSetDataElementUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from '../TableDataContext';
 import type { IDraggingPosition } from '../useGridDragging';
@@ -90,15 +90,15 @@ export function useGridSelectionContext(
         const newElements = rowSelection
           .filter(
             element => !rowsSelection[i]
-              .some(column => ResultSetDataElementUtils.isKeyEqual(column.column, element))
+              .some(column => ResultSetDataKeysUtils.isEqual(column.column, element))
           )
           .map<IResultSetElementKey>(column => ({ row, column }));
 
-        temporarySelection.set(ResultSetDataElementUtils.serializeKey(row),
+        temporarySelection.set(ResultSetDataKeysUtils.serialize(row),
           [...rowsSelection[i], ...newElements]
             .filter(column => {
               if (selected) {
-                return !rowSelection.some(key => ResultSetDataElementUtils.isKeyEqual(key, column.column));
+                return !rowSelection.some(key => ResultSetDataKeysUtils.isEqual(key, column.column));
               }
               return true;
             }));
@@ -174,13 +174,13 @@ export function useGridSelectionContext(
 
     const row = props.tableData.getRow(rowIdx);
 
-    const temporaryRowSelection = state.temporarySelection.get(ResultSetDataElementUtils.serializeKey(row));
+    const temporaryRowSelection = state.temporarySelection.get(ResultSetDataKeysUtils.serialize(row));
 
     if (temporaryRowSelection) {
       if (column === undefined) {
         return (temporaryRowSelection || []).length === props.tableData.columnKeys.length;
       }
-      return temporaryRowSelection.some(key => ResultSetDataElementUtils.isKeyEqual(key.column, column));
+      return temporaryRowSelection.some(key => ResultSetDataKeysUtils.isEqual(key.column, column));
     }
 
     return props.selectionAction.isElementSelected({ row, column });

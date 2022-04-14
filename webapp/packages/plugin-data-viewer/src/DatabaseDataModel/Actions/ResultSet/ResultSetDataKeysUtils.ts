@@ -8,14 +8,14 @@
 
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 
-export const ResultSetDataElementUtils = {
-  serialize(element: IResultSetElementKey): string {
-    return this.serializeKey(element.column) + this.serializeKey(element.row);
+export const ResultSetDataKeysUtils = {
+  serializeElementKey(elementKey: IResultSetElementKey): string {
+    return this.serialize(elementKey.column) + this.serialize(elementKey.row);
   },
-  isEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
-    return this.isKeyEqual(a.column, b.column) && this.isKeyEqual(a.row, b.row);
+  isElementsKeyEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
+    return this.isEqual(a.column, b.column) && this.isEqual(a.row, b.row);
   },
-  serializeKey(key: IResultSetColumnKey | IResultSetRowKey): string {
+  serialize(key: IResultSetColumnKey | IResultSetRowKey): string {
     let base = `${key.index}`;
 
     if ('key' in key) {
@@ -24,7 +24,7 @@ export const ResultSetDataElementUtils = {
 
     return base;
   },
-  isKeyEqual<T extends IResultSetColumnKey | IResultSetRowKey>(a: T, b: T): boolean {
+  isEqual<T extends IResultSetColumnKey | IResultSetRowKey>(a: T, b: T): boolean {
     if (a.index !== b.index) {
       return false;
     }

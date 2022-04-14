@@ -12,7 +12,7 @@ import wellknown from 'wellknown';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataElementUtils } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
@@ -69,7 +69,7 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
     const values: IAssociatedValue[] = [];
 
     for (const column of view.columnKeys) {
-      if (ResultSetDataElementUtils.isKeyEqual(column, cell.column)) {
+      if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
         continue;
       }
 

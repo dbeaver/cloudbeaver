@@ -17,9 +17,9 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './ResultSetContentValue';
+import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataElementUtils } from './ResultSetDataElementUtils';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
@@ -85,11 +85,11 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   rowIndex(key: IResultSetRowKey): number {
-    return this.rowKeys.findIndex(row => ResultSetDataElementUtils.isKeyEqual(row, key));
+    return this.rowKeys.findIndex(row => ResultSetDataKeysUtils.isEqual(row, key));
   }
 
   columnIndex(key: IResultSetColumnKey): number {
-    return this.columnKeys.findIndex(column => ResultSetDataElementUtils.isKeyEqual(column, key));
+    return this.columnKeys.findIndex(column => ResultSetDataKeysUtils.isEqual(column, key));
   }
 
   nextKey(key: IResultSetElementKey): IResultSetElementKey | null {

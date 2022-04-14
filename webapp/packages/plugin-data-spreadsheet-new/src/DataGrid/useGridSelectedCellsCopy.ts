@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataElementUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import type { ITableData } from './TableDataContext';
@@ -47,12 +47,12 @@ function getSelectedCellsValue(
     const rowCellsValues: string[] = [];
     for (const column of tableData.view.columnKeys) {
       if (
-        !selectedColumns.some(columnKey => ResultSetDataElementUtils.isKeyEqual(columnKey, column))
+        !selectedColumns.some(columnKey => ResultSetDataKeysUtils.isEqual(columnKey, column))
       ) {
         continue;
       }
 
-      const cellKey = rowSelection.find(key => ResultSetDataElementUtils.isKeyEqual(key.column, column));
+      const cellKey = rowSelection.find(key => ResultSetDataKeysUtils.isEqual(key.column, column));
 
       if (cellKey) {
         rowCellsValues.push(getCellCopyValue(tableData, cellKey));

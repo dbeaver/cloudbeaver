@@ -11,7 +11,7 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetContentValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
