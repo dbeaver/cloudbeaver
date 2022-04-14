@@ -72,9 +72,24 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     viewBox = '0 0 15 8';
   }
 
-  if (!showInFilter && filterActive) {
-    iconName = 'add';
-    viewBox = '0 0 24 24';
+  if (filterActive) {
+    if (big) {
+      if (showInFilter) {
+        iconName = '/icons/delete_m.svg#root';
+        viewBox = '0 0 24 24';
+      } else {
+        iconName = '/icons/add_m.svg#root';
+        viewBox = '0 0 24 24';
+      }
+    } else {
+      if (showInFilter) {
+        iconName = '/icons/delete_sm.svg#root';
+        viewBox = '0 0 16 16';
+      } else {
+        iconName = '/icons/add_sm.svg#root';
+        viewBox = '0 0 16 16';
+      }
+    }
   }
 
   return styled(styles)(
