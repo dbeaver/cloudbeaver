@@ -882,6 +882,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public synchronized void resetAuthToken() {
         this.sessionPermissions = null;
         this.smAuthToken = null;
+        this.user = null;
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
