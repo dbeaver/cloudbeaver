@@ -6,9 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IResultSetColumnKey, IResultSetRowKey } from './IResultSetDataKey';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 
 export const ResultSetDataKeysUtils = {
+  serializeElementKey(elementKey: IResultSetElementKey): string {
+    return this.serialize(elementKey.column) + this.serialize(elementKey.row);
+  },
+  isElementsKeyEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
+    return this.isEqual(a.column, b.column) && this.isEqual(a.row, b.row);
+  },
   serialize(key: IResultSetColumnKey | IResultSetRowKey): string {
     let base = `${key.index}`;
 

@@ -185,6 +185,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public Map<String, Object> getResourceQuotas() {
+        return application.getAppConfiguration().getResourceQuotas();
+    }
+
+    @Property
     public WebProductInfo getProductInfo() {
         return new WebProductInfo();
     }

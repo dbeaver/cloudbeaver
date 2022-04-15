@@ -36,10 +36,10 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
-  private view: ResultSetViewAction;
-  private edit: ResultSetEditAction;
-  private data: ResultSetDataAction;
-  private validationDisposer: IReactionDisposer;
+  private readonly view: ResultSetViewAction;
+  private readonly edit: ResultSetEditAction;
+  private readonly data: ResultSetDataAction;
+  private readonly validationDisposer: IReactionDisposer;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,

@@ -27,8 +27,8 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private view: ResultSetViewAction;
-  private edit: ResultSetEditAction;
+  private readonly view: ResultSetViewAction;
+  private readonly edit: ResultSetEditAction;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,

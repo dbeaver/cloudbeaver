@@ -23,5 +23,7 @@ export default [
   ['data_viewer_presentation_value_image_fit', 'Adatta alla Finestra'],
   ['data_viewer_presentation_value_image_original_size', 'Dimensioni Originali'],
   ['data_viewer_presentation_value_boolean_placeholder', 'Non posso rappresentare il valore corrente come booleano'],
+  ['data_viewer_presentation_value_content_trimmed_placeholder', 'The size of the value exceeds the limit'],
+  ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_refresh_result_set', 'Refresh result set'],
 ];

@@ -38,7 +38,8 @@ export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 export * from './DatabaseDataModel/Order';
 export * from './DataViewerService';
-export * from './DataViewerContentSaverService';
+export * from './DatabaseDataModel/DatabaseDataManager';
+export * from './DatabaseDataModel/IDatabaseDataManager';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';

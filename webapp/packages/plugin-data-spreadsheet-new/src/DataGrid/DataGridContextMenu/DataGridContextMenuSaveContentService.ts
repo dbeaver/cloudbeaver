@@ -7,8 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { download } from '@cloudbeaver/core-utils';
-import { DataViewerContentSaverService } from '@cloudbeaver/plugin-data-viewer';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -18,7 +18,7 @@ export class DataGridContextMenuSaveContentService {
 
   constructor(
     private readonly dataGridContextMenuService: DataGridContextMenuService,
-    private readonly dataViewerContentSaverService: DataViewerContentSaverService
+    private readonly notificationService: NotificationService
   ) { }
 
   getMenuContentSaveToken(): string {
@@ -37,20 +37,20 @@ export class DataGridContextMenuSaveContentService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         onClick: async context => {
-          const url = await this.dataViewerContentSaverService.getElementValueURL(
-            context.data.model,
-            context.data.resultIndex,
-            context.data.key
-          );
-
-          if (url) {
-            download(url);
+          try {
+            await context.data.model.source.dataManager.downloadFileData(context.data.key, context.data.resultIndex);
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'data_grid_table_context_menu_save_value_error');
           }
         },
-        isHidden: context => !this.dataViewerContentSaverService.canSaveElementValue(
-          context.data.model,
-          context.data.resultIndex,
-          context.data.key
+        isHidden: context => !context.data.model.source.dataManager.isContent(
+          context.data.key,
+          context.data.resultIndex
+        ),
+        isDisabled: context => context.data.model.isLoading() || (
+          !!context.data.model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+            context.data.key, context.data.model.source.dataManager.activeElement
+          )
         ),
       }
     );

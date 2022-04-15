@@ -47,8 +47,8 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return this.result.data?.columns || [];
   }
 
-  private data: ResultSetDataAction;
-  private editor: ResultSetEditAction;
+  private readonly data: ResultSetDataAction;
+  private readonly editor: ResultSetEditAction;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,

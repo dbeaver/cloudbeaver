@@ -170,7 +170,7 @@ export function useTableData(
 
       return (
         !column.editable
-      || this.format.isReadOnly(key)
+        || this.format.isReadOnly(key)
       );
     },
   }), {
