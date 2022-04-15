@@ -10,15 +10,16 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, useObservableRef } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Link, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { isResultSetContentValue, isResultSetContentValueTruncated } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
@@ -44,6 +45,16 @@ const styles = css`
     gap: 16px;
     flex: 1;
     flex-direction: column;
+  }
+
+  p {
+    display: flex;
+    margin: 0;
+    white-space: pre;
+  }
+
+  Link {
+    text-transform: lowercase;
   }
   
   image {
@@ -145,7 +156,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return this.content || !!this.src;
     },
     get truncated() {
-      return isResultSetContentValue(this.cellValue) && isResultSetContentValueTruncated(this.cellValue);
+      return isResultSetContentValue(this.cellValue)
+        && this.model.source.dataManager.isContentTruncated(this.cellValue);
     },
     stretch: false,
     toggleStretch() {
@@ -178,6 +190,9 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const loading = model.isLoading();
 
   if (state.truncated && !state.savedSrc) {
+    const limit = bytesToSize(model.source.dataManager.binaryMaxLength);
+    const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
+
     const load = async () => {
       try {
         await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
@@ -195,7 +210,16 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           )}
           onLoad={load}
         >
-          {translate('data_viewer_presentation_value_content_trimmed_placeholder')}
+          {translate('data_viewer_presentation_value_content_was_truncated')}
+          <p>
+            {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
+            <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
+              {translate('ui_limit')}
+            </Link>
+          </p>
+          {`${translate('ui_limit')}: ${limit}`}
+          <br />
+          {`${translate('data_viewer_presentation_value_content_value_size')}: ${valueSize}`}
         </ContentLoader>
         <Tools loading={loading} onSave={save} />
       </container>

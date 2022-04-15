@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
+import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 
+import type { IResultSetContentValue } from './Actions/ResultSet/IResultSetContentValue';
 import type { IResultSetElementKey } from './Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from './Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataAction } from './Actions/ResultSet/ResultSetDataAction';
@@ -22,13 +24,19 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 import type { IDatabaseResultSet } from './IDatabaseResultSet';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
+const BINARY_MAX_LENGTH_DEFAULT = 261120;
 
 export class DatabaseDataManager implements IDatabaseDataManager {
   private readonly cache: Map<string, string>;
   activeElement: IResultSetElementKey | null;
 
+  get binaryMaxLength() {
+    return this.serverConfigResource.resourceQuotas.sqlBinaryPreviewMaxLength ?? BINARY_MAX_LENGTH_DEFAULT;
+  }
+
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly source: IDatabaseDataSource<any, any>
   ) {
     this.cache = new Map();
@@ -37,6 +45,7 @@ export class DatabaseDataManager implements IDatabaseDataManager {
     makeObservable<this, 'cache'>(this, {
       cache: observable,
       activeElement: observable.ref,
+      binaryMaxLength: computed,
     });
   }
 
@@ -45,6 +54,10 @@ export class DatabaseDataManager implements IDatabaseDataManager {
     const cellValue = view.getCellValue(element);
 
     return isResultSetContentValue(cellValue);
+  }
+
+  isContentTruncated(content: IResultSetContentValue) {
+    return (content.contentLength ?? 0) > this.binaryMaxLength;
   }
 
   async getFileDataUrl(element: IResultSetElementKey, resultIndex: number) {

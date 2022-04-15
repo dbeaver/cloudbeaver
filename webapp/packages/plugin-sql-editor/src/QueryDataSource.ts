@@ -10,6 +10,7 @@ import { observable, makeObservable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ITask } from '@cloudbeaver/core-executor';
+import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { DatabaseDataManager, DatabaseDataSource, DocumentEditAction, IDatabaseDataManager, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
@@ -33,10 +34,11 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly serverConfigResource: ServerConfigResource
   ) {
     super();
 
-    this.dataManager = new DatabaseDataManager(this.graphQLService, this);
+    this.dataManager = new DatabaseDataManager(this.graphQLService, this.serverConfigResource, this);
     this.currentTask = null;
     this.requestInfo = {
       requestDuration: 0,

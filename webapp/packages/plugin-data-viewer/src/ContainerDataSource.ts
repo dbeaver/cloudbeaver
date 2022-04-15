@@ -10,6 +10,7 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ITask } from '@cloudbeaver/core-executor';
+import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
@@ -35,11 +36,12 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly connectionExecutionContextService: ConnectionExecutionContextService
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
 
-    this.dataManager = new DatabaseDataManager(this.graphQLService, this);
+    this.dataManager = new DatabaseDataManager(this.graphQLService, this.serverConfigResource, this);
     this.currentTask = null;
     this.executionContext = null;
 

@@ -10,12 +10,13 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, IconOrImage, Link, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { bytesToSize } from '@cloudbeaver/core-utils';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -26,6 +27,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { ContentLoader } from '../ContentLoader';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { TextValuePresentationService } from './TextValuePresentationService';
 
@@ -49,6 +51,15 @@ const styles = css`
     }
     Textarea {
       flex: 1;
+    }
+    p {
+      display: flex;
+      margin: 0;
+      white-space: pre;
+    }
+  
+    Link {
+      text-transform: lowercase;
     }
     CodeEditorLoader {
       flex: 1;
@@ -102,6 +113,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   let contentType = 'text/plain';
   let firstSelectedCell: IResultSetElementKey | undefined;
   let readonly = true;
+  let valueTruncated = false;
+  let limit: string | undefined;
+  let valueSize: string | undefined;
 
   if (selection.elements.length > 0 || focusCell) {
     const view = model.source.getAction(resultIndex, ResultSetViewAction);
@@ -114,7 +128,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     stringValue = format.getText(value) ?? '';
     readonly = format.isReadOnly(firstSelectedCell);
 
+
     if (isResultSetContentValue(value)) {
+      valueTruncated = model.source.dataManager.isContentTruncated(value);
+
+      if (valueTruncated) {
+        limit = bytesToSize(model.source.dataManager.binaryMaxLength);
+        valueSize = bytesToSize(value.contentLength ?? 0);
+      }
+
       if (value.contentType) {
         contentType = value.contentType;
 
@@ -194,6 +216,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           embedded
           onChange={handleChange}
         />
+      )}
+      {valueTruncated && (
+        <ContentLoader>
+          {translate('data_viewer_presentation_value_content_was_truncated')}
+          <p>
+            {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
+            <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
+              {translate('ui_limit')}
+            </Link>
+          </p>
+          {`${translate('ui_limit')}: ${limit}`}
+          <br />
+          {`${translate('data_viewer_presentation_value_content_value_size')}: ${valueSize}`}
+        </ContentLoader>
       )}
       {canSave && (
         <tools-container>

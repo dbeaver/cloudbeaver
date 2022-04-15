@@ -70,6 +70,8 @@ export const defaultZHLocale = [
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
   ['ui_download', 'Download'],
+  ['ui_limit', 'Limit'],
+  ['ui_file_size', 'File size'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

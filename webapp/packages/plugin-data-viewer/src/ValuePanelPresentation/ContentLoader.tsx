@@ -16,7 +16,7 @@ interface Props {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
-  onLoad: () => void;
+  onLoad?: () => void;
 }
 
 const style = css`
@@ -37,13 +37,15 @@ export const ContentLoader = observer<Props>(function ContentLoader({ disabled, 
   return styled(style)(
     <loader className={className}>
       <loader-label>{children}</loader-label>
-      <Button
-        disabled={disabled}
-        loading={loading}
-        onClick={onLoad}
-      >
-        {translate('ui_download')}
-      </Button>
+      {onLoad && (
+        <Button
+          disabled={disabled}
+          loading={loading}
+          onClick={onLoad}
+        >
+          {translate('ui_download')}
+        </Button>
+      )}
     </loader>
   );
 });

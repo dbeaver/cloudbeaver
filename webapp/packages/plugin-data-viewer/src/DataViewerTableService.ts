@@ -9,6 +9,7 @@
 import { EObjectFeature, NavNode } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
@@ -27,7 +28,8 @@ export class DataViewerTableService {
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
-    private readonly dataViewerService: DataViewerService
+    private readonly dataViewerService: DataViewerService,
+    private readonly serverConfigResource: ServerConfigResource
   ) { }
 
   has(tableId: string): boolean {
@@ -54,7 +56,8 @@ export class DataViewerTableService {
     const source = new ContainerDataSource(
       this.graphQLService,
       this.asyncTaskInfoService,
-      this.connectionExecutionContextService
+      this.connectionExecutionContextService,
+      this.serverConfigResource
     );
 
     source
