@@ -8,6 +8,7 @@ export * from './Action/Actions/ACTION_OPEN';
 export * from './Action/Actions/ACTION_REFRESH';
 export * from './Action/Actions/ACTION_RENAME';
 export * from './Action/Actions/ACTION_SAVE';
+export * from './Action/Actions/ACTION_SETTINGS';
 export * from './Action/Actions/ACTION_ZOOM_IN';
 export * from './Action/Actions/ACTION_ZOOM_OUT';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';

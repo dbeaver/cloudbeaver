@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 export function useUserData<T>(
   key: string,
   defaultValue: () => T,
-  onUpdate: (data: T) => void,
+  onUpdate?: (data: T) => void,
   validate?: (data: T) => boolean
 ): T {
   const userDataService = useService(UserDataService);
@@ -25,7 +25,7 @@ export function useUserData<T>(
 
   useEffect(() => {
     if (previous !== data) {
-      onUpdate(data);
+      onUpdate?.(data);
     }
   });
 

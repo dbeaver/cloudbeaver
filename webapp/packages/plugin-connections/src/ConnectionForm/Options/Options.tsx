@@ -287,7 +287,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           )}
           {driverMap.isLoaded() && driver?.providerProperties && driver.providerProperties.length > 0 && (
             <Group form gap>
-              <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
+              <GroupTitle>{translate('ui_settings')}</GroupTitle>
               {booleanProviderProperties && booleanProviderProperties.length > 0 && (
                 <Container gap wrap>
                   <ObjectPropertyInfoForm

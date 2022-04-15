@@ -62,7 +62,7 @@ export const defaultZHLocale = [
   ['ui_changes_will_be_lost', '您的更改将丢失'],
   ['ui_continue', '继续'],
   ['ui_authentication', '认证'],
-  ['ui_settings', 'Settings'],
+  ['ui_settings', '设置'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
   ['ui_close_others', 'Close others'],

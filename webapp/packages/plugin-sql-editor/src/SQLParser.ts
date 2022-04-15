@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, computed, makeObservable, observable } from 'mobx';
+
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 type RequireOne<T, K extends keyof T> = {
@@ -100,6 +102,33 @@ export class SQLParser {
     this.lines = [];
     this.customScriptDelimiters = [];
     this.customQuotes = [["'", "'"]];
+
+    makeObservable<this, 'dialect' | '_scripts' | 'script' | 'parsedScript' | 'lines' | 'customScriptDelimiters' | 'update' | 'customQuotes'>(this, {
+      scriptDelimiters: computed,
+      quoteStrings: computed,
+      singleLineComments: computed,
+      multiLineComments: computed,
+      actualScript: computed,
+      dialect: observable.ref,
+      _scripts: observable.shallow,
+      script: observable.ref,
+      parsedScript: observable.ref,
+      lines: observable.shallow,
+      customScriptDelimiters: observable.ref,
+      customQuotes: observable.ref,
+      getScriptSegment: action,
+      getSegment: action,
+      getQueryAtPos: action,
+      getLineAtPos: action,
+      getScriptLineAtPos: action,
+      setScript: action,
+      setDialect: action,
+      setCustomDelimiters: action,
+      parse: action,
+      setQueries: action,
+      isEndsWithDelimiter: action,
+      update: action,
+    });
   }
 
   getScriptSegment(): ISQLScriptSegment {

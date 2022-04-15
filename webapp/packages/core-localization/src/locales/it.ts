@@ -41,7 +41,7 @@ export const defaultITLocale = [
   ['ui_no_items_placeholder', 'Non ci sono ancora elementi.'],
   ['ui_search_no_result_placeholder', 'Nessun risultato trovato.'],
   ['ui_save_reminder', 'Ci sono modifiche non salvate.'],
-  ['ui_settings', 'Settings'],
+  ['ui_settings', 'Impostazioni'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
   ['ui_close_others', 'Close others'],

@@ -20,8 +20,8 @@ import type { IControlledCodeMirror } from 'react-codemirror2';
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { SqlCompletionProposal } from '@cloudbeaver/core-sdk';
 
+import type { ISQLEditorData } from '../ISQLEditorData';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
-import type { ISQLEditorData } from '../useSqlEditor';
 
 interface ISQLCodeEditorPanelData {
   proposalsWordFrom: Position | null;

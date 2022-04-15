@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
-import type { ISQLEditorData } from './SqlEditor/useSqlEditor';
+import type { ISQLEditorData } from './SqlEditor/ISQLEditorData';
 
 export interface ISqlEditorModeProps {
   state: ISqlEditorTabState;

@@ -15,7 +15,6 @@ export default [
   ['app_navigationTree_limited', 'Elements are limited to {args.limit} items'],
   ['app_navigationTree_action_link_with_editor', 'Link with editor'],
   ['app_navigationTree_action_collapse_all', 'Collapse all'],
-  ['app_navigationTree_settings_title', 'Settings'],
   ['app_navigationTree_settings_filter_title', 'Filter'],
   ['app_navigationTree_settings_filter_description', 'Show filtering field'],
   ['app_navigationTree_settings_filter_all_title', 'Show collapsed'],
