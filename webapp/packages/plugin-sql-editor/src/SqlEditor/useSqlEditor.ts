@@ -13,57 +13,22 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
-import { SqlEditorService, SQLProposal } from '../SqlEditorService';
+import { SqlEditorService } from '../SqlEditorService';
 import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
+import type { ISQLEditorData } from './ISQLEditorData';
 
 interface ICursor {
   begin: number;
   end: number;
-}
-
-interface ISegmentExecutionData {
-  segment: ISQLScriptSegment;
-  type: 'start' | 'end' | 'error';
-}
-
-export interface ISQLEditorData {
-  readonly parser: SQLParser;
-  readonly dialect: SqlDialectInfo | undefined;
-  readonly activeSegment: ISQLScriptSegment | undefined;
-  readonly cursorSegment: ISQLScriptSegment | undefined;
-  readonly readonly: boolean;
-  readonly isLineScriptEmpty: boolean;
-  readonly isScriptEmpty: boolean;
-  readonly isDisabled: boolean;
-  readonly value: string;
-  readonly onExecute: ISyncExecutor<boolean>;
-  readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
-  readonly onUpdate: ISyncExecutor;
-  updateParserScriptsThrottle(): Promise<void>;
-  setQuery(query: string): void;
-  init(): void;
-  destruct(): void;
-  setCursor(begin: number, end?: number): void;
-  formatScript(): Promise<void>;
-  executeQuery (): Promise<void>;
-  executeQueryNewTab(): Promise<void>;
-  showExecutionPlan(): Promise<void>;
-  executeScript(): Promise<void>;
-  getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
-  executeQueryAction<T>(
-    segment: ISQLScriptSegment | undefined,
-    action: (query: ISQLScriptSegment) => Promise<T>,
-    passEmpty?: boolean
-  ): Promise<T | undefined>;
 }
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
