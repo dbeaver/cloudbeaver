@@ -167,6 +167,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             <button
               disabled={data.isDisabled || data.isScriptEmpty}
               title={translate('sql_editor_sql_execution_script_button_tooltip')}
+              hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={data.executeScript}
             >
               <StaticImage icon="/icons/sql_script_exec.svg" />
@@ -185,6 +186,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             <button
               disabled={data.isDisabled || data.isScriptEmpty}
               title={translate('sql_editor_sql_format_button_tooltip')}
+              hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={data.formatScript}
             >
               <StaticImage icon="/icons/sql_format_sm.svg" />
@@ -192,20 +194,23 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             <button
               disabled={!trimmedValue}
               title={translate('sql_editor_download_script_tooltip')}
+              hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.downloadScript(trimmedValue)}
             >
               <StaticImage icon='/icons/save.svg' />
             </button>
-            <UploadArea
-              accept='.sql'
-              title={translate('sql_editor_upload_script_tooltip')}
-              reset
-              onChange={handleScriptUpload}
-            >
-              <upload>
-                <StaticImage icon='/icons/load.svg' />
-              </upload>
-            </UploadArea>
+            {!data.activeSegmentMode.activeSegmentMode && (
+              <UploadArea
+                accept='.sql'
+                title={translate('sql_editor_upload_script_tooltip')}
+                reset
+                onChange={handleScriptUpload}
+              >
+                <upload>
+                  <StaticImage icon='/icons/load.svg' />
+                </upload>
+              </UploadArea>
+            )}
           </tools>
         </container>
         <TabPanelList />

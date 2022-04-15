@@ -24,12 +24,8 @@ import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
-import type { ISQLEditorData } from './ISQLEditorData';
-
-interface ICursor {
-  begin: number;
-  end: number;
-}
+import type { ICursor, ISQLEditorData } from './ISQLEditorData';
+import { ISQLEditorMode, SQLEditorModeContext } from './SQLEditorModeContext';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -69,8 +65,15 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       return this.sqlDialectInfoService.getDialectInfo(this.state.executionContext.connectionId);
     },
 
+    get activeSegmentMode(): ISQLEditorMode {
+      const contexts =  this.onMode.execute(this);
+      const mode = contexts.getContext(SQLEditorModeContext);
+
+      return mode;
+    },
+
     get activeSegment(): ISQLScriptSegment | undefined {
-      return this.parser.getSegment(this.cursor.begin, this.cursor.end);
+      return this.activeSegmentMode.activeSegment;
     },
 
     get cursorSegment(): ISQLScriptSegment | undefined {
@@ -103,6 +106,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       return this.state.query;
     },
 
+    onMode: new SyncExecutor(),
     onExecute: new SyncExecutor(),
     onSegmentExecute: new SyncExecutor(),
     onUpdate: new SyncExecutor(),
@@ -353,7 +357,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.parser.getScriptSegment();
       }
 
-      return this.parser.getSegment(this.cursor.begin, this.cursor.end);
+      return this.activeSegment;
     },
 
     async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
@@ -361,6 +365,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       if (!connectionId || this.cursor.begin !== this.cursor.end) {
         return this.getSubQuery();
+      }
+
+      if (this.activeSegmentMode.activeSegmentMode) {
+        return this.activeSegment;
       }
 
 
@@ -401,6 +409,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executeQueryNewTab: action.bound,
     showExecutionPlan: action.bound,
     executeScript: action.bound,
+    activeSegmentMode: computed,
     dialect: computed,
     activeSegment: computed,
     isLineScriptEmpty: computed,

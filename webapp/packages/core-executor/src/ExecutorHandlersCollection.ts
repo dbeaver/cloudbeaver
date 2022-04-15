@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
@@ -22,6 +24,14 @@ implements IExecutorHandlersCollection<T, TResult> {
     this.links = new Map();
     this.collections = [];
     this.initialDataGetter = null;
+
+    makeObservable<this, 'links'>(this, {
+      handlers: observable.shallow,
+      postHandlers: observable.shallow,
+      chain: observable.shallow,
+      collections: observable.shallow,
+      links: observable.shallow,
+    });
   }
 
   setInitialDataGetter(getter: (() => T) | null): this {

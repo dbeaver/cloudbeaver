@@ -20,13 +20,21 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { SQLProposal } from '../SqlEditorService';
 import type { SQLParser, ISQLScriptSegment } from '../SQLParser';
+import type { ISQLEditorMode } from './SQLEditorModeContext';
 
 export interface ISegmentExecutionData {
   segment: ISQLScriptSegment;
   type: 'start' | 'end' | 'error';
 }
 
+export interface ICursor {
+  begin: number;
+  end: number;
+}
+
 export interface ISQLEditorData {
+  readonly cursor: ICursor;
+  readonly activeSegmentMode: ISQLEditorMode;
   readonly parser: SQLParser;
   readonly dialect: SqlDialectInfo | undefined;
   readonly activeSegment: ISQLScriptSegment | undefined;
@@ -39,6 +47,8 @@ export interface ISQLEditorData {
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
   readonly onUpdate: ISyncExecutor;
+  readonly onMode: ISyncExecutor<ISQLEditorData>;
+
   updateParserScriptsThrottle(): Promise<void>;
   setQuery(query: string): void;
   init(): void;
