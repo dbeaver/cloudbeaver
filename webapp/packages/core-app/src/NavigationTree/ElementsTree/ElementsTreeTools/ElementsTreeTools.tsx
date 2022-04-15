@@ -119,7 +119,7 @@ export const ElementsTreeTools = observer<Props>(function ElementsTreeTools({
         {tree.settings?.configurable && (
           <IconButton
             name='/icons/settings_cog_sm.svg'
-            title={translate('app_navigationTree_settings_title')}
+            title={translate('ui_settings')}
             style={toolsStyles}
             img
             onClick={() => setOpen(!opened)}

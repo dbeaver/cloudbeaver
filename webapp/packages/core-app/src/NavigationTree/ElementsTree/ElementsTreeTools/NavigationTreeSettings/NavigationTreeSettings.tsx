@@ -49,7 +49,7 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
   return styled(styles)(
     <settings className={className}>
       <Group keepSize form gap dense>
-        <GroupTitle>{translate('app_navigationTree_settings_title')}</GroupTitle>
+        <GroupTitle>{translate('ui_settings')}</GroupTitle>
         <Switch
           id={`${root}.filter`}
           name="filter"

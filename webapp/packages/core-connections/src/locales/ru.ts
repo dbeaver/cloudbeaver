@@ -23,7 +23,6 @@ export default [
   ['connections_connection_credentials_provisioning', 'Аутентификационные данные'],
   ['connections_connection_credentials_provisioning_description', 'Чтобы проверить подключение, необходимо заполнить или подтвердить данные доступа'],
   ['connections_connection_edit_authentication', 'Авторизация'],
-  ['connections_connection_edit_settings', 'Настройки'],
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],
   ['connections_connection_edit_access_role', 'Роль'],

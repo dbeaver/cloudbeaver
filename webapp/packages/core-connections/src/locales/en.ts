@@ -26,7 +26,6 @@ export default [
   ['connections_connection_credentials_provisioning', 'Authentication credentials'],
   ['connections_connection_credentials_provisioning_description', 'You need to fill in or confirm the credentials to test this connection'],
   ['connections_connection_edit_authentication', 'Authentication'],
-  ['connections_connection_edit_settings', 'Settings'],
   ['connections_connection_edit_access', 'Access'],
   ['connections_connection_edit_access_load_failed', 'Fail to get connection access'],
   ['connections_connection_edit_access_role', 'Role'],

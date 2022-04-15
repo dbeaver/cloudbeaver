@@ -25,7 +25,6 @@ export default [
   ['connections_connection_credentials_provisioning', 'Credenziali di autenticazione'],
   ['connections_connection_credentials_provisioning_description', 'Devi compilare o confermare le credenziali per provare questa connessione'],
   ['connections_connection_edit_authentication', 'Autenticazione'],
-  ['connections_connection_edit_settings', 'Impostazioni'],
   ['connections_connection_edit_access', 'Accesso'],
   ['connections_connection_edit_access_load_failed', 'Errore al recupero dell\'accesso alla connessione'],
   ['connections_connection_edit_access_role', 'Ruolo'],

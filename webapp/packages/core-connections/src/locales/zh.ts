@@ -26,7 +26,6 @@ export default [
   ['connections_connection_credentials_provisioning', '认证凭据'],
   ['connections_connection_credentials_provisioning_description', '您却要填写或确认凭据以测试此连接。'],
   ['connections_connection_edit_authentication', '认证'],
-  ['connections_connection_edit_settings', '设置'],
   ['connections_connection_edit_access', '权限'],
   ['connections_connection_edit_access_load_failed', '无法获取连接访问权限'],
   ['connections_connection_edit_access_role', '角色'],
