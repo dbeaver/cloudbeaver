@@ -10,7 +10,6 @@ import type { IResultSetContentValue } from './Actions/ResultSet/IResultSetConte
 import type { IResultSetElementKey } from './Actions/ResultSet/IResultSetDataKey';
 
 export interface IDatabaseDataManager {
-  readonly binaryMaxLength: number;
   activeElement: IResultSetElementKey | null;
   isContent: (element: IResultSetElementKey, resultIndex: number) => boolean;
   isContentTruncated: (content: IResultSetContentValue) => boolean;

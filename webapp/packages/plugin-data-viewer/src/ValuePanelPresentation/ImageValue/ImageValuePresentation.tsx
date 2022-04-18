@@ -10,10 +10,13 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { QuotasService } from '@cloudbeaver/core-app';
 import { IconOrImage, Link, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { usePermission } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
@@ -53,7 +56,7 @@ const styles = css`
     white-space: pre;
   }
 
-  Link {
+  limit {
     text-transform: lowercase;
   }
   
@@ -118,7 +121,9 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const quotasService = useService(QuotasService);
   const style = useStyles(styles);
+  const admin = usePermission(EAdminPermission.admin);
 
   const state = useObservableRef(() => ({
     get selectedCell() {
@@ -190,7 +195,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const loading = model.isLoading();
 
   if (state.truncated && !state.savedSrc) {
-    const limit = bytesToSize(model.source.dataManager.binaryMaxLength);
+    const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
 
     const load = async () => {
@@ -213,9 +218,13 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           {translate('data_viewer_presentation_value_content_was_truncated')}
           <p>
             {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
-            <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
-              {translate('ui_limit')}
-            </Link>
+            <limit>
+              {admin ? (
+                <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
+                  {translate('ui_limit')}
+                </Link>
+              ) : translate('ui_limit')}
+            </limit>
           </p>
           {`${translate('ui_limit')}: ${limit}`}
           <br />

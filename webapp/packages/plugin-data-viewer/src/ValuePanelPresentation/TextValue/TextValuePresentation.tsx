@@ -10,10 +10,13 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { QuotasService } from '@cloudbeaver/core-app';
 import { BASE_CONTAINERS_STYLES, IconOrImage, Link, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { usePermission } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
@@ -58,7 +61,7 @@ const styles = css`
       white-space: pre;
     }
   
-    Link {
+    limit {
       text-transform: lowercase;
     }
     CodeEditorLoader {
@@ -86,8 +89,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const quotasService = useService(QuotasService);
   const textValuePresentationService = useService(TextValuePresentationService);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+  const admin = usePermission(EAdminPermission.admin);
   const state = useObservableRef(() => ({
     currentContentType: 'text/plain',
     lastContentType: 'text/plain',
@@ -133,7 +138,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       valueTruncated = model.source.dataManager.isContentTruncated(value);
 
       if (valueTruncated) {
-        limit = bytesToSize(model.source.dataManager.binaryMaxLength);
+        limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
         valueSize = bytesToSize(value.contentLength ?? 0);
       }
 
@@ -222,9 +227,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           {translate('data_viewer_presentation_value_content_was_truncated')}
           <p>
             {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
-            <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
-              {translate('ui_limit')}
-            </Link>
+            <limit>
+              {admin ? (
+                <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
+                  {translate('ui_limit')}
+                </Link>
+              ) : translate('ui_limit')}
+            </limit>
           </p>
           {`${translate('ui_limit')}: ${limit}`}
           <br />

@@ -52,6 +52,7 @@ export * from './NavigationTree/ElementsTree/useElementsTree';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
 export * from './AppLocaleService';
+export * from './QuotasService';
 
 // Models
 export * from './shared/NavigationTabs/ITab';
