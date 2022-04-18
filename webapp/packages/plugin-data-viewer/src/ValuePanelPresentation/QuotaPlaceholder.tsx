@@ -28,16 +28,16 @@ const style = css`
     justify-content: center;
     flex-direction: column;
   }
-  label {
+  p {
     composes: theme-typography--body2 from global;
     text-align: center;
-  }
-  p {
-    display: flex;
     margin: 0;
+  }
+  reason {
+    display: flex;
     white-space: pre;
   }
-  limit {
+  limit-word {
     text-transform: lowercase;
   }
 `;
@@ -53,22 +53,22 @@ export const QuotaPlaceholder: React.FC<Props> = observer(function QuotaPlacehol
 
   return styled(style)(
     <container className={className}>
-      <label>
+      <p>
         {translate('data_viewer_presentation_value_content_was_truncated')}
-        <p>
+        <reason>
           {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
-          <limit>
+          <limit-word>
             {admin ? (
-              <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank'>
+              <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
                 {translate('ui_limit')}
               </Link>
             ) : translate('ui_limit')}
-          </limit>
-        </p>
+          </limit-word>
+        </reason>
         {limit && `${translate('ui_limit')}: ${limit}`}
         <br />
         {size && `${translate('data_viewer_presentation_value_content_value_size')}: ${size}`}
-      </label>
+      </p>
       {children}
     </container>
   );
