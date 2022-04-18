@@ -35,6 +35,7 @@ query serverConfig {
     defaultNavigatorSettings {
       ...AllNavigatorSettings
     }
+    resourceQuotas
     disabledDrivers
     productInfo {
       id

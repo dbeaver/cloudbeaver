@@ -10,21 +10,23 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, useObservableRef } from '@cloudbeaver/core-blocks';
+import { QuotasService } from '@cloudbeaver/core-app';
+import { Button, IconOrImage, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { isResultSetContentValue, isResultSetContentValueTruncated } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { ContentLoader } from '../ContentLoader';
+import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 
 const styles = css`
@@ -107,6 +109,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const quotasService = useService(QuotasService);
   const style = useStyles(styles);
 
   const state = useObservableRef(() => ({
@@ -145,7 +148,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return this.content || !!this.src;
     },
     get truncated() {
-      return isResultSetContentValue(this.cellValue) && isResultSetContentValueTruncated(this.cellValue);
+      return isResultSetContentValue(this.cellValue)
+        && this.model.source.dataManager.isContentTruncated(this.cellValue);
     },
     stretch: false,
     toggleStretch() {
@@ -178,6 +182,9 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const loading = model.isLoading();
 
   if (state.truncated && !state.savedSrc) {
+    const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+    const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
+
     const load = async () => {
       try {
         await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
@@ -188,15 +195,16 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     return styled(style)(
       <container>
-        <ContentLoader
-          disabled={loading}
-          loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-            model.source.dataManager.activeElement, state.selectedCell
-          )}
-          onLoad={load}
-        >
-          {translate('data_viewer_presentation_value_content_trimmed_placeholder')}
-        </ContentLoader>
+        <QuotaPlaceholder limit={limit} size={valueSize}>
+          <Button
+            disabled={loading}
+            loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+              model.source.dataManager.activeElement, state.selectedCell)}
+            onClick={load}
+          >
+            {translate('ui_download')}
+          </Button>
+        </QuotaPlaceholder>
         <Tools loading={loading} onSave={save} />
       </container>
     );
