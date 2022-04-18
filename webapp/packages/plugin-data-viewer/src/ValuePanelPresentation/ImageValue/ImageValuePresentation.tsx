@@ -10,13 +10,11 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { QuotasService } from '@cloudbeaver/core-app';
-import { IconOrImage, Link, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Button, IconOrImage, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { usePermission } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
@@ -28,7 +26,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { ContentLoader } from '../ContentLoader';
+import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 
 const styles = css`
@@ -48,16 +46,6 @@ const styles = css`
     gap: 16px;
     flex: 1;
     flex-direction: column;
-  }
-
-  p {
-    display: flex;
-    margin: 0;
-    white-space: pre;
-  }
-
-  limit {
-    text-transform: lowercase;
   }
   
   image {
@@ -123,7 +111,6 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const notificationService = useService(NotificationService);
   const quotasService = useService(QuotasService);
   const style = useStyles(styles);
-  const admin = usePermission(EAdminPermission.admin);
 
   const state = useObservableRef(() => ({
     get selectedCell() {
@@ -208,28 +195,16 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     return styled(style)(
       <container>
-        <ContentLoader
-          disabled={loading}
-          loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-            model.source.dataManager.activeElement, state.selectedCell
-          )}
-          onLoad={load}
-        >
-          {translate('data_viewer_presentation_value_content_was_truncated')}
-          <p>
-            {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
-            <limit>
-              {admin ? (
-                <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
-                  {translate('ui_limit')}
-                </Link>
-              ) : translate('ui_limit')}
-            </limit>
-          </p>
-          {`${translate('ui_limit')}: ${limit}`}
-          <br />
-          {`${translate('data_viewer_presentation_value_content_value_size')}: ${valueSize}`}
-        </ContentLoader>
+        <QuotaPlaceholder limit={limit} size={valueSize}>
+          <Button
+            disabled={loading}
+            loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+              model.source.dataManager.activeElement, state.selectedCell)}
+            onClick={load}
+          >
+            {translate('ui_download')}
+          </Button>
+        </QuotaPlaceholder>
         <Tools loading={loading} onSave={save} />
       </container>
     );
