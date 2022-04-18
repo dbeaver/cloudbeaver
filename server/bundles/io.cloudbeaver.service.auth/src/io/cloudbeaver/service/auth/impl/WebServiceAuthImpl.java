@@ -17,10 +17,6 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWConstants;
-import org.jkiss.dbeaver.model.auth.SMAuthInfo;
-import org.jkiss.dbeaver.model.auth.SMAuthProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
-import org.jkiss.dbeaver.model.security.SMController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
@@ -40,7 +36,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -197,7 +197,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (user == null) {
                 user = new WebUser(userId);
             }
-            if (smAuthInfo == null && !webSession.isAuthorizedInSecurityManager()) {
+            if (!configMode && smAuthInfo == null && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
 
