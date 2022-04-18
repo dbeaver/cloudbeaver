@@ -21,6 +21,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### CloudBeaver 22.0.3 - 2022-04-18
+-   LOB-files can be saved to an external file from the Data Editor context menu.
+-   The administrator can use PgPass as an Authentication method for PostgreSQL.
+-   Application fields can be returned to a default size by double-clicking on the field's separator.
+-   Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 22.0.2 - 2022-04-04
 -   Keep-Alive interval and Connect timeout parameters can be configured for an SSH Tunnel in the Connection dialog.
 -   Object names can be added to the SQL Editor field by dragging them from the Navigator Tree.
