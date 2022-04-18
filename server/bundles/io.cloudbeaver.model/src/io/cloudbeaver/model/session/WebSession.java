@@ -52,7 +52,10 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMSessionType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -747,10 +750,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             }
             newUser = authInfo.getUser();
         }
-//        if (this.user == null && newUser != null) {
-//            forceUserRefresh(newUser);
-//        } else
-        if (!CommonUtils.equalObjects(this.user, newUser)) {
+        if (application.isConfigurationMode() && this.user == null && newUser != null) {
+            //FIXME hotfix to avoid exception after external auth provider login in easy config
+            this.user = newUser;
+            refreshUserData();
+        } else if (!CommonUtils.equalObjects(this.user, newUser)) {
             throw new DBException("Can't authorize different users in the single session");
         }
 
