@@ -227,6 +227,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 providerConfig,
                 userCredentials);
 
+            if (securityController.getUserRoles(userId).length == 0) {
+                throw new DBWebException("User \"" + userId + "\" has no roles");
+            }
+
             WebAuthInfo authInfo = new WebAuthInfo(
                 webSession,
                 user,
