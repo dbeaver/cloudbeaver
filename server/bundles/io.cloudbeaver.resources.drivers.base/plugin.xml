@@ -8,7 +8,7 @@
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
         <resource name="drivers/postgresql"/>
-<!--        <resource name="drivers/clickhouse"/>-->
+        <resource name="drivers/clickhouse"/>
         <resource name="drivers/clickhouse_com"/>
         <resource name="drivers/derby"/>
         <resource name="drivers/jaybird"/>
@@ -26,7 +26,7 @@
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
         <bundle id="drivers.oracle" label="Oracle drivers"/>
         <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
-<!--        <bundle id="drivers.clickhouse" label="Clickhouse (legacy) drivers"/>-->
+        <bundle id="drivers.clickhouse" label="Clickhouse (legacy) drivers"/>
         <bundle id="drivers.clickhouse_com" label="Clickhouse drivers"/>
         <bundle id="drivers.derby" label="Derby drivers"/>
         <bundle id="drivers.firebird" label="Firebird drivers"/>
@@ -45,7 +45,7 @@
         <driver id="oracle:oracle_thin"/>
         <driver id="postgresql:postgres-jdbc"/>
         <driver id="jaybird:jaybird"/>
-<!--        <driver id="clickhouse:yandex_clickhouse"/>-->
+        <driver id="clickhouse:yandex_clickhouse"/>
         <driver id="clickhouse:com_clickhouse"/>
         <driver id="generic:derby_server"/>
         <driver id="h2:h2_embedded"/>
