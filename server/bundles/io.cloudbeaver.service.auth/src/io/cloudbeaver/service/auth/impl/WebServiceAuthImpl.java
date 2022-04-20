@@ -107,7 +107,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
             WebUser user = null;
             String userId = null;
-            SMAuthInfo smAuthInfo = null;
             SMSession authSession;
             if (configMode) {
                 if (webSession.getUser() != null) {
@@ -129,7 +128,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 WebUser curUser = webSession.getUser();
                 if (curUser == null) {
                     try {
-                        smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
+                        SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
                         userId = smAuthInfo.getUserId();
                         webSession.updateSMAuthInfo(smAuthInfo);
                     } catch (SMException e) {
@@ -156,7 +155,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (user == null) {
                 user = new WebUser(userId);
             }
-            if (!configMode && smAuthInfo == null && !webSession.isAuthorizedInSecurityManager()) {
+            if (!configMode && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
 
