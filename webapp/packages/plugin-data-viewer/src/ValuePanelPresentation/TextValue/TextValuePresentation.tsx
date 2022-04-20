@@ -10,12 +10,14 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { QuotasService } from '@cloudbeaver/core-app';
 import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { bytesToSize } from '@cloudbeaver/core-utils';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -26,6 +28,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { TextValuePresentationService } from './TextValuePresentationService';
 
@@ -75,6 +78,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const quotasService = useService(QuotasService);
   const textValuePresentationService = useService(TextValuePresentationService);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
   const state = useObservableRef(() => ({
@@ -102,6 +106,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   let contentType = 'text/plain';
   let firstSelectedCell: IResultSetElementKey | undefined;
   let readonly = true;
+  let valueTruncated = false;
+  let limit: string | undefined;
+  let valueSize: string | undefined;
 
   if (selection.elements.length > 0 || focusCell) {
     const view = model.source.getAction(resultIndex, ResultSetViewAction);
@@ -114,7 +121,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     stringValue = format.getText(value) ?? '';
     readonly = format.isReadOnly(firstSelectedCell);
 
+
     if (isResultSetContentValue(value)) {
+      valueTruncated = model.source.dataManager.isContentTruncated(value);
+
+      if (valueTruncated) {
+        limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+        valueSize = bytesToSize(value.contentLength ?? 0);
+      }
+
       if (value.contentType) {
         contentType = value.contentType;
 
@@ -195,6 +210,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           onChange={handleChange}
         />
       )}
+      {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
       {canSave && (
         <tools-container>
           <tools>

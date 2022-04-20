@@ -1265,6 +1265,7 @@ export interface ServerConfig {
   productInfo: ProductInfo;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   redirectOnFederatedAuth?: Maybe<Scalars['Boolean']>;
+  resourceQuotas: Scalars['Object'];
   rootURI: Scalars['String'];
   serverURL: Scalars['String'];
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
@@ -2156,7 +2157,7 @@ export type ReadSessionLogQuery = { log: Array<{ time?: any; type: string; messa
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
+export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; resourceQuotas: any; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3440,6 +3441,7 @@ export const ServerConfigDocument = `
     defaultNavigatorSettings {
       ...AllNavigatorSettings
     }
+    resourceQuotas
     disabledDrivers
     productInfo {
       id

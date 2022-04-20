@@ -8,9 +8,11 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import type { QuotasService } from '@cloudbeaver/core-app';
 import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 
+import type { IResultSetContentValue } from './Actions/ResultSet/IResultSetContentValue';
 import type { IResultSetElementKey } from './Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from './Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataAction } from './Actions/ResultSet/ResultSetDataAction';
@@ -29,6 +31,7 @@ export class DatabaseDataManager implements IDatabaseDataManager {
 
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly quotasService: QuotasService,
     private readonly source: IDatabaseDataSource<any, any>
   ) {
     this.cache = new Map();
@@ -45,6 +48,10 @@ export class DatabaseDataManager implements IDatabaseDataManager {
     const cellValue = view.getCellValue(element);
 
     return isResultSetContentValue(cellValue);
+  }
+
+  isContentTruncated(content: IResultSetContentValue) {
+    return (content.contentLength ?? 0) > this.quotasService.getQuota('sqlBinaryPreviewMaxLength');
   }
 
   async getFileDataUrl(element: IResultSetElementKey, resultIndex: number) {

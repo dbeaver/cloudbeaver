@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavNode } from '@cloudbeaver/core-app';
+import { EObjectFeature, NavNode, QuotasService } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -27,7 +27,8 @@ export class DataViewerTableService {
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
-    private readonly dataViewerService: DataViewerService
+    private readonly dataViewerService: DataViewerService,
+    private readonly quotasService: QuotasService
   ) { }
 
   has(tableId: string): boolean {
@@ -54,7 +55,8 @@ export class DataViewerTableService {
     const source = new ContainerDataSource(
       this.graphQLService,
       this.asyncTaskInfoService,
-      this.connectionExecutionContextService
+      this.connectionExecutionContextService,
+      this.quotasService
     );
 
     source

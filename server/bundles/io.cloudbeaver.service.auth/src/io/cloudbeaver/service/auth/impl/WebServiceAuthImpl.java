@@ -156,7 +156,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (user == null) {
                 user = new WebUser(userId);
             }
-            if (smAuthInfo == null && !webSession.isAuthorizedInSecurityManager()) {
+            if (!configMode && smAuthInfo == null && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
 
@@ -185,6 +185,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 webSession,
                 providerConfig,
                 userCredentials);
+
+            if (securityController.getUserPermissions(userId).isEmpty()) {
+                throw new DBWebException("Access denied (no permissions)");
+            }
 
             WebAuthInfo authInfo = new WebAuthInfo(
                 webSession,

@@ -8,6 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import type { QuotasService } from '@cloudbeaver/core-app';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
@@ -33,10 +34,11 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly quotasService: QuotasService
   ) {
     super();
 
-    this.dataManager = new DatabaseDataManager(this.graphQLService, this);
+    this.dataManager = new DatabaseDataManager(this.graphQLService, this.quotasService, this);
     this.currentTask = null;
     this.requestInfo = {
       requestDuration: 0,

@@ -8,6 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { QuotasService } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -47,7 +48,8 @@ export class SqlQueryService {
     private readonly sqlQueryResultService: SqlQueryResultService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService,
-    private readonly dataViewerService: DataViewerService
+    private readonly dataViewerService: DataViewerService,
+    private readonly quotasService: QuotasService
   ) {
     this.statisticsMap = new Map();
 
@@ -81,7 +83,7 @@ export class SqlQueryService {
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService);
+      source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.quotasService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -171,7 +173,7 @@ export class SqlQueryService {
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
-        source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService);
+        source = new QueryDataSource(this.graphQLService, this.asyncTaskInfoService, this.quotasService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       }
