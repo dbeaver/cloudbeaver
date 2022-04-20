@@ -74,7 +74,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, String userName) throws DBWebException {
         try {
             List<AdminUserInfo> webUsers = new ArrayList<>();
-            for (WebUser user : CBPlatform.getInstance().getApplication().getAdminSecurityController().findUsers(userName)) {
+            for (WebUser user : webSession.getAdminSecurityController().findUsers(userName)) {
                 webUsers.add(new AdminUserInfo(webSession, user));
             }
             return webUsers;
@@ -156,7 +156,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
-            WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
+            WebRole newRole = webSession.getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
@@ -171,7 +171,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().updateRole(roleId, roleName, description);
-            WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
+            WebRole newRole = webSession.getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error updating role " + roleId, e);

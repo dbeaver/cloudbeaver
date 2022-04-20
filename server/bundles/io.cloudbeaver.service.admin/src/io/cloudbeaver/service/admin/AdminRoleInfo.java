@@ -18,7 +18,6 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -66,7 +65,7 @@ public class AdminRoleInfo {
 
     @Property
     public String[] getGrantedUsers() throws DBCException {
-        return CBPlatform.getInstance().getApplication().getAdminSecurityController().getRoleSubjects(getRoleId());
+        return session.getAdminSecurityController().getRoleSubjects(getRoleId());
     }
 
 }

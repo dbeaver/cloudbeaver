@@ -191,10 +191,6 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
         return securityController;
     }
 
-    public SMAdminController<WebUser, WebRole> getAdminSecurityController() {
-        return securityController;
-    }
-
     @Override
     public SMAdminController<WebUser, WebRole> getAdminSecurityController(String smAuthToken) {
         return securityController;
