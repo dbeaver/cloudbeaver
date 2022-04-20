@@ -77,6 +77,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
         // Check enabled auth providers
         boolean providerEnabled = isProviderEnabled(providerId, authProvider);
+        boolean resetUserStateOnError = webSession.getUser() != null;
 
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
@@ -201,7 +202,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
             return authInfo;
         } catch (DBException e) {
-            webSession.resetUserData();
+            if (resetUserStateOnError) {
+                webSession.resetUserState();
+            }
             throw new DBWebException("User authentication failed", e);
         }
     }

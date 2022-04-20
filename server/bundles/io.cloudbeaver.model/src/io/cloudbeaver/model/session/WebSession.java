@@ -255,7 +255,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     // Note: for admin use only
-    public synchronized void resetUserData() {
+    public synchronized void resetUserState() {
         clearAuthTokens();
         try {
             resetSessionCache();
@@ -802,7 +802,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             removeAuthInfo(getAuthInfo(providerId));
         }
         if (authTokens.isEmpty()) {
-            resetUserData();
+            resetUserState();
         }
     }
 

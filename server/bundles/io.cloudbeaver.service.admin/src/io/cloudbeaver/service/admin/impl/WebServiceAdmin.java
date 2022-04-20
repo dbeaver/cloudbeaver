@@ -528,7 +528,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Refresh active session
             if (configurationMode) {
                 // In config mode we always refresh because admin user doesn't exist yet
-                webSession.resetUserData();
+                webSession.resetUserState();
             } else {
                 // Just reload session state
                 webSession.refreshUserData();
