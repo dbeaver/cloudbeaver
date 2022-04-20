@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.model.app;
 
-import com.sun.istack.NotNull;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import org.eclipse.jgit.annotations.Nullable;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
