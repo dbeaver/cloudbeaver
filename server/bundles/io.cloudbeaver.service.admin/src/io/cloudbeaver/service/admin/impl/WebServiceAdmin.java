@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
-import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
@@ -29,6 +27,8 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
@@ -50,7 +50,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -89,13 +89,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             List<AdminRoleInfo> roles = new ArrayList<>();
             if (CommonUtils.isEmpty(roleId)) {
-                for (WebRole role : CBPlatform.getInstance().getApplication().getAdminSecurityController().readAllRoles()) {
-                    roles.add(new AdminRoleInfo(role));
+                for (WebRole role : webSession.getAdminSecurityController().readAllRoles()) {
+                    roles.add(new AdminRoleInfo(webSession, role));
                 }
             } else {
-                WebRole role = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
+                WebRole role = webSession.getAdminSecurityController().findRole(roleId);
                 if (role != null) {
-                    roles.add(new AdminRoleInfo(role));
+                    roles.add(new AdminRoleInfo(webSession, role));
                 }
             }
             return roles;
@@ -128,7 +128,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             WebUser newUser = new WebUser(userName);
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().createUser(newUser.getUserId(), newUser.getMetaParameters());
+            webSession.getAdminSecurityController().createUser(newUser.getUserId(), newUser.getMetaParameters());
             return new AdminUserInfo(webSession, newUser);
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
@@ -141,7 +141,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("You cannot delete yourself");
         }
         try {
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().deleteUser(userName);
+            webSession.getAdminSecurityController().deleteUser(userName);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
@@ -155,9 +155,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty role ID");
         }
         try {
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
+            webSession.getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
             WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
-            return new AdminRoleInfo(newRole);
+            return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
         }
@@ -170,9 +170,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty role ID");
         }
         try {
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().updateRole(roleId, roleName, description);
+            webSession.getAdminSecurityController().updateRole(roleId, roleName, description);
             WebRole newRole = CBPlatform.getInstance().getApplication().getAdminSecurityController().findRole(roleId);
-            return new AdminRoleInfo(newRole);
+            return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error updating role " + roleId, e);
         }
@@ -181,11 +181,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
-            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(webSession.getUser().getUserId());
+            var adminSecurityController = webSession.getAdminSecurityController();
+            WebRole[] userRoles = adminSecurityController.getUserRoles(webSession.getUser().getUserId());
             if (Arrays.stream(userRoles).anyMatch(DBRole -> DBRole.getRoleId().equals(roleId))) {
                 throw new DBWebException("You can not delete your own role");
             }
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().deleteRole(roleId);
+            adminSecurityController.deleteRole(roleId);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting role", e);
@@ -202,11 +203,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
-            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
+            var adminSecurityController = webSession.getAdminSecurityController();
+            WebRole[] userRoles = adminSecurityController.getUserRoles(user);
             List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
             if (!roleIds.contains(role)) {
                 roleIds.add(role);
-                CBPlatform.getInstance().getApplication().getAdminSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+                adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' already has role '" + role + "'");
             }
@@ -226,11 +228,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
-            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
+            var adminSecurityController = webSession.getAdminSecurityController();
+            WebRole[] userRoles = adminSecurityController.getUserRoles(user);
             List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
             if (roleIds.contains(role)) {
                 roleIds.remove(role);
-                CBPlatform.getInstance().getApplication().getAdminSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+                adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have role '" + role + "'");
             }
@@ -247,7 +250,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
         try {
-            CBPlatform.getInstance().getApplication().getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
+            webSession.getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting role permissions", e);
@@ -266,7 +269,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             credentials.put(LocalAuthProvider.CRED_USER, userID);
         }
         try {
-            CBPlatform.getInstance().getApplication().getSecurityController().setUserCredentials(userID, authProvider.getId(), credentials);
+            webSession.getAdminSecurityController().setUserCredentials(userID, authProvider.getId(), credentials);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting user credentials", e);
@@ -370,7 +373,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         WebServiceUtils.getGlobalDataSourceRegistry().flushConfig();
 
         try {
-            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(id, null, null);
+            webSession.getSecurityController().setConnectionSubjectAccess(id, null, null);
         } catch (DBCException e) {
             log.error(e);
         }
@@ -554,7 +557,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
-            return CBApplication.getInstance().getSecurityController().getConnectionSubjectAccess(connectionId);
+            return webSession.getSecurityController().getConnectionSubjectAccess(connectionId);
         } catch (DBCException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -571,7 +574,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
+            webSession.getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
@@ -581,7 +584,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
-            return CBApplication.getInstance().getSecurityController().getSubjectConnectionAccess(new String[] { subjectId } );
+            return webSession.getSecurityController().getSubjectConnectionAccess(new String[]{subjectId});
         } catch (DBCException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -599,7 +602,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
+            webSession.getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }
@@ -619,7 +622,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
         try {
-            CBApplication.getInstance().getAdminSecurityController().setUserMeta(userId, parameters);
+            webSession.getAdminSecurityController().setUserMeta(userId, parameters);
             return true;
         } catch (DBCException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);

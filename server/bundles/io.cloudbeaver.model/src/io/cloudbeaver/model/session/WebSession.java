@@ -22,6 +22,7 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -93,7 +94,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private long lastAccessTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
-    private boolean persisted;
 
     private WebUser user;
     private Set<String> sessionPermissions = null;
@@ -116,7 +116,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
-    private final SMController<?, ?> securityController;
+    private SMController<WebUser, WebRole> securityController;
+    private SMAdminController<WebUser, WebRole> adminSecurityController;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
@@ -126,7 +127,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public WebSession(HttpSession httpSession,
-                      SMController<?, ?> securityController,
                       WebApplication application,
                       Map<String, DBWSessionHandler> sessionHandlers) {
         this.id = httpSession.getId();
@@ -135,16 +135,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionAuthContext = new SessionContextImpl(null);
         this.sessionAuthContext.addSession(this);
-        this.securityController = securityController;
         this.application = application;
         this.sessionHandlers = sessionHandlers;
-
-        try {
-            // Check persistent state
-            this.persisted = securityController.isSessionPersisted(this.id);
-        } catch (Exception e) {
-            log.error("Error checking session state,", e);
-        }
+        this.securityController = application.getSecurityController(null);
 
         initNavigatorModel();
     }
@@ -240,6 +233,19 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             refreshSessionAuth();
         }
         return sessionPermissions;
+    }
+
+    @NotNull
+    public synchronized SMController<WebUser, WebRole> getSecurityController() {
+        return securityController;
+    }
+
+    @Nullable
+    public synchronized SMAdminController<WebUser, WebRole> getAdminSecurityController() {
+        if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            return null;
+        }
+        return adminSecurityController;
     }
 
     public synchronized void refreshUserData() {
@@ -463,7 +469,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (!httpSession.isNew()) {
             try {
                 // Persist session
-                if (!this.persisted) {
+                if (!isAuthorizedInSecurityManager()) {
                     // Create new record
                     authAsAnonymousUser();
                 } else {
@@ -883,6 +889,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionPermissions = null;
         this.smAuthToken = null;
         this.user = null;
+        this.securityController = application.getSecurityController(null);
+        this.adminSecurityController = null;
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
@@ -890,11 +898,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.persisted = true;
         this.smAuthToken = smAuthInfo.getAuthToken();
         this.sessionPermissions = smAuthInfo.getPermissions();
         this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
+        this.securityController = application.getSecurityController(this.smAuthToken);
+        this.adminSecurityController = application.getAdminSecurityController(this.smAuthToken);
         refreshUserData();
+    }
+
+    public String getSMAuthToken() {
+        return smAuthToken;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

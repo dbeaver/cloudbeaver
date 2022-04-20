@@ -56,7 +56,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         return false;
     }
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
-        SMController<WebUser, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController<WebUser, ?> securityController = webSession.getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(AUTH_PROVIDER);
 
         String userName = request.getHeader(X_USER);

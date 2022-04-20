@@ -186,7 +186,17 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
         return securityController;
     }
 
+    @Override
+    public SMController<WebUser, WebRole> getSecurityController(@Nullable String smAuthToken) {
+        return securityController;
+    }
+
     public SMAdminController<WebUser, WebRole> getAdminSecurityController() {
+        return securityController;
+    }
+
+    @Override
+    public SMAdminController<WebUser, WebRole> getAdminSecurityController(String smAuthToken) {
         return securityController;
     }
 
@@ -426,10 +436,10 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
     }
 
     private void initializeSecurityController() throws DBException {
-        securityController = createSecurityController();
+        securityController = createGlobalSecurityController();
     }
 
-    protected SMAdminController<WebUser, WebRole> createSecurityController() throws DBException {
+    protected SMAdminController<WebUser, WebRole> createGlobalSecurityController() throws DBException {
         return SecurityPluginService.createSecurityService(this, databaseConfiguration);
     }
 

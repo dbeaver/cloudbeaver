@@ -25,4 +25,6 @@ public interface WebAppConfiguration {
     boolean isAnonymousAccessEnabled();
 
     <T> T getResourceQuota(String quotaId);
+
+    String getDefaultUserRole();
 }

@@ -16,19 +16,23 @@
  */
 package io.cloudbeaver.service.security.internal;
 
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
-import org.jkiss.dbeaver.model.auth.*;
-import org.jkiss.dbeaver.model.security.*;
-import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
-import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -811,6 +815,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var userId = getUserByCredentials(authProviderId, userCredentials);
                 if (userId == null) {
+                    userId = createNewUserIfPossible(authProviderId, userCredentials);
+                }
+                if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
                 createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
@@ -819,9 +826,35 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                 txn.commit();
                 return new SMAuthInfo(token, userId, permissions);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DBException e) {
             throw new DBCException("Error during auth", e);
         }
+    }
+
+    private String createNewUserIfPossible(@NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
+            return null;
+        }
+        var authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
+
+        String newUserId = authProviderExternal.validateLocalAuth(
+            new VoidProgressMonitor(),
+            this,
+            Collections.emptyMap(),
+            userCredentials,
+            null);
+
+        var newUser = new WebUser(newUserId);
+        createUser(newUser.getUserId(), newUser.getMetaParameters());
+
+        String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
+        if (!CommonUtils.isEmpty(defaultRoleName)) {
+            setUserRoles(newUserId, new String[]{defaultRoleName}, newUserId);
+        }
+        setUserCredentials(newUserId, authProvider.getId(), userCredentials);
+
+        return newUserId;
     }
 
     private String generateAuthToken(@NotNull String appSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {

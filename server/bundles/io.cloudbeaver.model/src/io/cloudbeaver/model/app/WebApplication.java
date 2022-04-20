@@ -16,9 +16,12 @@
  */
 package io.cloudbeaver.model.app;
 
+import com.sun.istack.NotNull;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import org.eclipse.jgit.annotations.Nullable;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 
 import java.nio.file.Path;
@@ -37,5 +40,7 @@ public interface WebApplication extends DBPApplication {
 
     boolean isMultiNode();
 
-    SMController<WebUser, WebRole> getSecurityController();
+    SMController<WebUser, WebRole> getSecurityController(@Nullable String smAuthToken);
+
+    SMAdminController<WebUser, WebRole> getAdminSecurityController(@NotNull String smAuthToken);
 }
