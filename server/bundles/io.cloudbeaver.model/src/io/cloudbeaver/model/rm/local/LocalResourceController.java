@@ -21,6 +21,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -72,8 +73,9 @@ public class LocalResourceController implements RMController {
     }
 
     private Path getPrivateProjectPath() {
-        String userId = credentialsProvider.getSMAuthToken();
-        return this.userProjectsPath.resolve(userId);
+        SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
+        String userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
+        return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
     @NotNull
@@ -99,7 +101,7 @@ public class LocalResourceController implements RMController {
     }
 
     private RMProject makeProjectFromPath(Path path, String prefix) {
-        if (!Files.exists(path) || !Files.isDirectory(path)) {
+        if (path == null || !Files.exists(path) || !Files.isDirectory(path)) {
             return null;
         }
         RMProject project = new RMProject();
