@@ -84,7 +84,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
 
     private static final String ATTR_LOCALE = "locale";
-    public static final String USER_PROJECTS_FOLDER = "user-projects";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
@@ -124,7 +123,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @NotNull
     public static Path getUserProjectsFolder() {
-        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(USER_PROJECTS_FOLDER);
+        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBWConstants.USER_PROJECTS_FOLDER);
     }
 
     public WebSession(HttpSession httpSession,

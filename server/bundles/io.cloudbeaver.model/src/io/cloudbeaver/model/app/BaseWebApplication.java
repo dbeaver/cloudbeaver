@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.model.rm.local.LocalResourceController;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -91,7 +92,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-
-        throw new IllegalStateException("Not implemented");
+        return LocalResourceController.builder(credentialsProvider).build();
     }
+
 }
