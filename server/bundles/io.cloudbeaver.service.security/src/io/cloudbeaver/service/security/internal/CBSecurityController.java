@@ -397,7 +397,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @Nullable
-    private String getUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
+    private String findUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
@@ -813,10 +813,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = getUserByCredentials(authProviderId, userCredentials);
-                if (userId == null) {
-                    userId = createNewUserIfPossible(authProviderId, userCredentials);
-                }
+                var userId = findOrCreateExternalUserByCredentials(authProviderId, userCredentials);
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
@@ -831,30 +828,35 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
         }
     }
 
-    private String createNewUserIfPossible(@NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+        var userId = findUserByCredentials(authProviderId, userCredentials);
+        if (userId != null) {
+            return userId;
+        }
+
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
             return null;
         }
-        var authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-
-        String newUserId = authProviderExternal.validateLocalAuth(
+        var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
+        userId = externalAuthProvider.validateLocalAuth(
             new VoidProgressMonitor(),
             this,
             Collections.emptyMap(),
             userCredentials,
             null);
 
-        var newUser = new WebUser(newUserId);
-        createUser(newUser.getUserId(), newUser.getMetaParameters());
-
+        if (!isSubjectExists(userId)) {
+            var newUser = new WebUser(userId);
+            createUser(newUser.getUserId(), newUser.getMetaParameters());
+        }
         String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
         if (!CommonUtils.isEmpty(defaultRoleName)) {
-            setUserRoles(newUserId, new String[]{defaultRoleName}, newUserId);
+            setUserRoles(userId, new String[]{defaultRoleName}, userId);
         }
-        setUserCredentials(newUserId, authProvider.getId(), userCredentials);
+        setUserCredentials(userId, authProviderId, userCredentials);
 
-        return newUserId;
+        return userId;
     }
 
     private String generateAuthToken(@NotNull String appSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
