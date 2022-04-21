@@ -98,7 +98,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private WebUser user;
     private Set<String> sessionPermissions = null;
     private Set<String> accessibleConnectionIds = Collections.emptySet();
-    private String smAuthToken = null;
+    private SMCredentials smCredentials = null;
 
     private String locale;
     private boolean cacheExpired;
@@ -225,7 +225,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public synchronized boolean isAuthorizedInSecurityManager() {
-        return CommonUtils.isNotEmpty(smAuthToken);
+        return smCredentials != null;
     }
 
     public synchronized Set<String> getSessionPermissions() {
@@ -888,7 +888,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public synchronized void resetAuthToken() {
         this.sessionPermissions = null;
-        this.smAuthToken = null;
+        this.smCredentials = null;
         this.user = null;
         this.securityController = application.getSecurityController(null);
         this.adminSecurityController = null;
@@ -899,7 +899,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smAuthToken = smAuthInfo.getAuthToken();
+        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), smAuthInfo.getUserId());
         this.sessionPermissions = smAuthInfo.getPermissions();
         this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
         this.securityController = application.getSecurityController(this);
@@ -908,8 +908,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     @Override
-    public String getSMAuthToken() {
-        return smAuthToken;
+    public SMCredentials getActiveUserCredentials() {
+        return smCredentials;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
