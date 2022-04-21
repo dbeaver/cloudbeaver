@@ -36,6 +36,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -76,7 +77,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent implements SMSession, SMAuthCredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -137,7 +138,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionAuthContext.addSession(this);
         this.application = application;
         this.sessionHandlers = sessionHandlers;
-        this.securityController = application.getSecurityController(null);
+        this.securityController = application.getSecurityController(this);
 
         initNavigatorModel();
     }
@@ -808,7 +809,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public boolean hasContextCredentials() {
-        return getAdapter(SMAuthCredentialsProvider.class) != null;
+        return getAdapter(DBACredentialsProvider.class) != null;
     }
 
     // Auth credentials provider
@@ -818,7 +819,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         try {
             // Properties from nested auth sessions
             // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
-            SMAuthCredentialsProvider nestedProvider = getAdapter(SMAuthCredentialsProvider.class);
+            DBACredentialsProvider nestedProvider = getAdapter(DBACredentialsProvider.class);
             if (nestedProvider != null) {
                 if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
                     return false;
@@ -902,11 +903,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.smAuthToken = smAuthInfo.getAuthToken();
         this.sessionPermissions = smAuthInfo.getPermissions();
         this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
-        this.securityController = application.getSecurityController(this.smAuthToken);
-        this.adminSecurityController = application.getAdminSecurityController(this.smAuthToken);
+        this.securityController = application.getSecurityController(this);
+        this.adminSecurityController = application.getAdminSecurityController(this);
         refreshUserData();
     }
 
+    @Override
     public String getSMAuthToken() {
         return smAuthToken;
     }

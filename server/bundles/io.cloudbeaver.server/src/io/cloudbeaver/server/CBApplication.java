@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -187,12 +188,12 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
     }
 
     @Override
-    public SMController<WebUser, WebRole> getSecurityController(@Nullable String smAuthToken) {
+    public SMController<WebUser, WebRole> getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
         return securityController;
     }
 
     @Override
-    public SMAdminController<WebUser, WebRole> getAdminSecurityController(String smAuthToken) {
+    public SMAdminController<WebUser, WebRole> getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
         return securityController;
     }
 
