@@ -21,8 +21,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -69,7 +67,7 @@ public class AdminUserInfo {
     @Property
     public String[] getGrantedRoles() throws DBCException {
         if (user.getRoles() == null) {
-            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(getUserId());
+            WebRole[] userRoles = session.getSecurityController().getUserRoles(getUserId());
             user.setRoles(userRoles);
         }
         return user.getGrantedRoles();
@@ -77,7 +75,7 @@ public class AdminUserInfo {
 
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBCException {
-        return CBPlatform.getInstance().getApplication().getSecurityController().getSubjectConnectionAccess(new String[] { getUserId()} );
+        return session.getSecurityController().getSubjectConnectionAccess(new String[]{getUserId()});
     }
 
     @Property
@@ -104,7 +102,7 @@ public class AdminUserInfo {
             return userLinkedProviders;
         }
         try {
-            userLinkedProviders = CBApplication.getInstance().getSecurityController().getUserLinkedProviders(user.getUserId());
+            userLinkedProviders = session.getSecurityController().getUserLinkedProviders(user.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error reading user linked providers", e);
         }

@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.model.app.WebApplication;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
+
 import java.nio.file.Path;
 
 public class WebAppUtils {
@@ -28,6 +31,10 @@ public class WebAppUtils {
             return path;
         }
         return curDir.resolve(path).toAbsolutePath().toString();
+    }
+
+    public static WebApplication getWebApplication() {
+        return (WebApplication) DBWorkbench.getPlatform().getApplication();
     }
 
 }

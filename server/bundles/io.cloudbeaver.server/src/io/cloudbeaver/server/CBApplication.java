@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -186,7 +187,13 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
         return securityController;
     }
 
-    public SMAdminController<WebUser, WebRole> getAdminSecurityController() {
+    @Override
+    public SMController<WebUser, WebRole> getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
+        return securityController;
+    }
+
+    @Override
+    public SMAdminController<WebUser, WebRole> getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
         return securityController;
     }
 
@@ -426,10 +433,10 @@ public class CBApplication extends BaseWebApplication implements WebApplication 
     }
 
     private void initializeSecurityController() throws DBException {
-        securityController = createSecurityController();
+        securityController = createGlobalSecurityController();
     }
 
-    protected SMAdminController<WebUser, WebRole> createSecurityController() throws DBException {
+    protected SMAdminController<WebUser, WebRole> createGlobalSecurityController() throws DBException {
         return SecurityPluginService.createSecurityService(this, databaseConfiguration);
     }
 

@@ -100,7 +100,7 @@ public class WebSessionManager {
                 Map<String, DBWSessionHandler> sessionHandlers = WebHandlerRegistry.getInstance().getSessionHandlers()
                     .stream()
                     .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
-                webSession = new WebSession(httpSession, CBApplication.getInstance().getSecurityController(), application, sessionHandlers);
+                webSession = new WebSession(httpSession, application, sessionHandlers);
                 sessionMap.put(sessionId, webSession);
 
                 if (!CBApplication.getInstance().isConfigurationMode()) {

@@ -56,7 +56,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         return false;
     }
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
-        SMController<WebUser, ?> securityController = CBPlatform.getInstance().getApplication().getSecurityController();
+        SMController<WebUser, ?> securityController = webSession.getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(AUTH_PROVIDER);
 
         String userName = request.getHeader(X_USER);
@@ -69,7 +69,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                 WebUser user = securityController.getUserById(userName);
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
-                var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController();
+                var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController(null);
                 if (user == null) {
                     // User doesn't exist. We can create new user automatically
                     // Create new user

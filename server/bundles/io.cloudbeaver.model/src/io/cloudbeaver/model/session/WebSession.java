@@ -22,6 +22,7 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -35,6 +36,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -52,10 +54,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMSessionType;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -78,7 +77,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent implements SMSession, SMAuthCredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -96,7 +95,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private long lastAccessTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
-    private boolean persisted;
 
     private WebUser user;
     private Set<String> sessionPermissions = null;
@@ -119,7 +117,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
-    private final SMController<?, ?> securityController;
+    private SMController<WebUser, WebRole> securityController;
+    private SMAdminController<WebUser, WebRole> adminSecurityController;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
@@ -129,7 +128,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public WebSession(HttpSession httpSession,
-                      SMController<?, ?> securityController,
                       WebApplication application,
                       Map<String, DBWSessionHandler> sessionHandlers) {
         this.id = httpSession.getId();
@@ -138,16 +136,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionAuthContext = new SessionContextImpl(null);
         this.sessionAuthContext.addSession(this);
-        this.securityController = securityController;
         this.application = application;
         this.sessionHandlers = sessionHandlers;
-
-        try {
-            // Check persistent state
-            this.persisted = securityController.isSessionPersisted(this.id);
-        } catch (Exception e) {
-            log.error("Error checking session state,", e);
-        }
+        this.securityController = application.getSecurityController(this);
 
         initNavigatorModel();
     }
@@ -245,6 +236,19 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return sessionPermissions;
     }
 
+    @NotNull
+    public synchronized SMController<WebUser, WebRole> getSecurityController() {
+        return securityController;
+    }
+
+    @Nullable
+    public synchronized SMAdminController<WebUser, WebRole> getAdminSecurityController() {
+        if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            return null;
+        }
+        return adminSecurityController;
+    }
+
     public synchronized void refreshUserData() {
         refreshSessionAuth();
 
@@ -252,7 +256,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     // Note: for admin use only
-    public synchronized void resetUserData() {
+    public synchronized void resetUserState() {
         clearAuthTokens();
         try {
             resetSessionCache();
@@ -466,7 +470,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (!httpSession.isNew()) {
             try {
                 // Persist session
-                if (!this.persisted) {
+                if (!isAuthorizedInSecurityManager()) {
                     // Create new record
                     authAsAnonymousUser();
                 } else {
@@ -800,12 +804,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             removeAuthInfo(getAuthInfo(providerId));
         }
         if (authTokens.isEmpty()) {
-            resetUserData();
+            resetUserState();
         }
     }
 
     public boolean hasContextCredentials() {
-        return getAdapter(SMAuthCredentialsProvider.class) != null;
+        return getAdapter(DBACredentialsProvider.class) != null;
     }
 
     // Auth credentials provider
@@ -815,7 +819,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         try {
             // Properties from nested auth sessions
             // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
-            SMAuthCredentialsProvider nestedProvider = getAdapter(SMAuthCredentialsProvider.class);
+            DBACredentialsProvider nestedProvider = getAdapter(DBACredentialsProvider.class);
             if (nestedProvider != null) {
                 if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
                     return false;
@@ -887,6 +891,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionPermissions = null;
         this.smAuthToken = null;
         this.user = null;
+        this.securityController = application.getSecurityController(null);
+        this.adminSecurityController = null;
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
@@ -894,11 +900,17 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.persisted = true;
         this.smAuthToken = smAuthInfo.getAuthToken();
         this.sessionPermissions = smAuthInfo.getPermissions();
         this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
+        this.securityController = application.getSecurityController(this);
+        this.adminSecurityController = application.getAdminSecurityController(this);
         refreshUserData();
+    }
+
+    @Override
+    public String getSMAuthToken() {
+        return smAuthToken;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

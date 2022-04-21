@@ -19,7 +19,6 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -66,8 +65,8 @@ public class WebUserInfo {
     public List<String> getLinkedAuthProviders() throws DBWebException {
         if (linkedProviders == null) {
             try {
-                linkedProviders = CBApplication.getInstance().getSecurityController()
-                    .getUserLinkedProviders(session.getUser().getUserId());
+
+                linkedProviders = session.getSecurityController().getUserLinkedProviders(session.getUser().getUserId());
             } catch (DBCException e) {
                 throw new DBWebException("Error reading user linked providers", e);
             }
@@ -83,7 +82,7 @@ public class WebUserInfo {
     @Property
     public Map<String, Object> getConfigurationParameters() throws DBWebException {
         try {
-            return CBApplication.getInstance().getSecurityController().getUserParameters(user.getUserId());
+            return session.getSecurityController().getUserParameters(user.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error reading user parameters", e);
         }
