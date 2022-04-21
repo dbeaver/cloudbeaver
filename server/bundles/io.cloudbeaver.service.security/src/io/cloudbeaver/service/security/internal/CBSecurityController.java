@@ -414,7 +414,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
             }
         }
         if (identCredentials.isEmpty()) {
-            throw new DBCException("No identifying credentials in provider '" + authProvider.getId() + "'");
+            return null;
         }
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT U.USER_ID,U.IS_ACTIVE FROM CB_USER U,CB_USER_CREDENTIALS UC\n");
