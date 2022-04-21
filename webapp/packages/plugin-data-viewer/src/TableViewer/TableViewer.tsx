@@ -279,7 +279,7 @@ export const TableViewer = observer<Props>(function TableViewer({
               </pane-content>
             </Pane>
             {valuePanelDisplayed && <ResizerControls />}
-            <Pane main>
+            <Pane basis='30%' main>
               <pane-content>
                 {resultExist && (
                   <TableToolsPanel
