@@ -26,6 +26,7 @@ import {
   Combobox,
   Container,
   useFormValidator,
+  Loader,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -157,7 +158,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const booleanProviderProperties = driver?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
-    <SubmittingForm ref={formRef} onChange={handleFormChange}>
+    <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
@@ -194,48 +195,50 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 {translate('connections_connection_name')}
               </InputField>
             </Container>
-            {JDBC ? (
-              <InputField
-                type="text"
-                name="url"
-                state={config}
-                disabled={disabled}
-                readOnly={readonly}
-                autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
-                mod='surface'
-              >
-                {translate('customConnection_url_JDBC')}
-              </InputField>
-            ) : (
-              <ParametersForm
-                config={config}
-                embedded={driver?.embedded}
-                disabled={disabled}
-                readOnly={readonly}
-                originLocal={originLocal}
-              />
-            )}
-            {admin && originLocal && (
-              <FieldCheckbox
-                id={config.connectionId}
-                name="template"
-                state={config}
-                disabled={edit || disabled}
-                readOnly={readonly}
+            <Loader state={driverMap} inline inlineException>
+              {JDBC ? (
+                <InputField
+                  type="text"
+                  name="url"
+                  state={config}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
+                  mod='surface'
+                >
+                  {translate('customConnection_url_JDBC')}
+                </InputField>
+              ) : (
+                <ParametersForm
+                  config={config}
+                  embedded={driver?.embedded}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  originLocal={originLocal}
+                />
+              )}
+              {admin && originLocal && (
+                <FieldCheckbox
+                  id={config.connectionId}
+                  name="template"
+                  state={config}
+                  disabled={edit || disabled}
+                  readOnly={readonly}
                 // autoHide // maybe better to use autoHide
+                >
+                  {translate('connections_connection_template')}
+                </FieldCheckbox>
+              )}
+              <Textarea
+                name="description"
+                rows={3}
+                state={config}
+                disabled={disabled}
+                readOnly={readonly}
               >
-                {translate('connections_connection_template')}
-              </FieldCheckbox>
-            )}
-            <Textarea
-              name="description"
-              rows={3}
-              state={config}
-              disabled={disabled}
-              readOnly={readonly}
-            >
-              {translate('connections_connection_description')}
-            </Textarea>
+                {translate('connections_connection_description')}
+              </Textarea>
+            </Loader>
           </Group>
         </Container>
         <Container medium gap>
@@ -285,7 +288,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
-          {driverMap.isLoaded() && driver?.providerProperties && driver.providerProperties.length > 0 && (
+          {driver?.providerProperties && driver.providerProperties.length > 0 && (
             <Group form gap>
               <GroupTitle>{translate('ui_settings')}</GroupTitle>
               {booleanProviderProperties && booleanProviderProperties.length > 0 && (
