@@ -23,7 +23,6 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -80,7 +79,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseWebApplication implements WebApplication {
+public class CBApplication extends BaseWebApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 

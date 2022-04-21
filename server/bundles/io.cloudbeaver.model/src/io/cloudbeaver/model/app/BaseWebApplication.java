@@ -16,10 +16,17 @@
  */
 package io.cloudbeaver.model.app;
 
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,13 +34,19 @@ import java.nio.file.Path;
 /**
  * Web application
  */
-public abstract class BaseWebApplication extends BaseApplicationImpl {
+public abstract class BaseWebApplication extends BaseApplicationImpl implements WebApplication {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
+
+    @NotNull
+    @Override
+    public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
+        return new EclipseWorkspaceImpl(platform, eclipseWorkspace);
+    }
 
     @Nullable
     protected Path loadServerConfiguration() {
@@ -76,4 +89,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl {
 
     protected abstract void loadConfiguration(String configPath);
 
+    @Override
+    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+
+        throw new IllegalStateException("Not implemented");
+    }
 }
