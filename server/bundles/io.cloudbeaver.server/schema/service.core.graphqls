@@ -194,6 +194,7 @@ type DriverInfo {
     driverPropertiesURL: String
     embedded: Boolean
     enabled: Boolean!
+    requiresServerName: Boolean
 
     # this fields must be removed and be replaced by DriverAuthModel
     allowsEmptyPassword: Boolean @deprecated

@@ -42,6 +42,7 @@ import java.util.Map;
  */
 public class WebDatabaseDriverConfig {
 
+    public static final String URL_SERVER_FIELD = "{server}";
     private final WebSession webSession;
     private final DBPDriver driver;
     private String id;
@@ -238,5 +239,13 @@ public class WebDatabaseDriverConfig {
     @Property
     public boolean isEnabled() {
         return ConfigurationUtils.isDriverEnabled(driver);
+    }
+
+    @Property
+    public boolean getRequiresServerName() {
+        if (driver.getSampleURL() == null) {
+            return false;
+        }
+        return driver.getSampleURL().contains(URL_SERVER_FIELD);
     }
 }
