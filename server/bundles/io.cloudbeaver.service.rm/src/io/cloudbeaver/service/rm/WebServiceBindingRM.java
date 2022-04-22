@@ -17,13 +17,10 @@
 package io.cloudbeaver.service.rm;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.rm.impl.WebServiceRM;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-
-import java.util.Map;
+import org.jkiss.utils.CommonUtils;
 
 /**
  * Web service implementation
@@ -38,15 +35,17 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("metadataGetNodeDDL", env -> {
-            WebSession webSession = getWebSession(env);
-
-            String nodePath = env.getArgument("nodeId");
-            DBNNode node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
-            Map<String, Object> options = env.getArgument("options");
-
-            return getService(env).getNodeDDL(webSession, node, options);
-        });
+        model.getQueryType()
+            .dataFetcher("rmListProjects",
+                env -> getService(env).listProjects(getWebSession(env)))
+            .dataFetcher("rmListResources",
+                env -> getService(env).listResources(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("folder"),
+                    env.getArgument("nameMask"),
+                    CommonUtils.toBoolean(env.getArgument("readProperties")),
+                    CommonUtils.toBoolean(env.getArgument("readHistory"))))
+        ;
 
     }
 }

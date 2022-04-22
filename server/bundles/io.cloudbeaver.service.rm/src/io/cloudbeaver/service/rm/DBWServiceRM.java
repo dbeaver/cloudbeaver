@@ -20,9 +20,11 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-
-import java.util.Map;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMResource;
 
 /**
  * Web service API
@@ -30,6 +32,14 @@ import java.util.Map;
 public interface DBWServiceRM extends DBWService {
 
     @WebAction
-    String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
+    RMProject[] listProjects(WebSession webSession) throws DBWebException;
 
+    @NotNull
+    RMResource[] listResources(
+        WebSession webSession,
+        @NotNull String projectId,
+        @Nullable String folder,
+        @Nullable String nameMask,
+        boolean readProperties,
+        boolean readHistory) throws DBException;
 }

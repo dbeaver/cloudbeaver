@@ -198,7 +198,7 @@ public class LocalResourceController implements RMController {
         RMProject project = new RMProject();
         project.setName(path.getFileName().toString());
         project.setId(prefix + project.getName());
-        project.setShared(prefix.equals(PROJECT_PREFIX_SHARED));
+        project.setShared(prefix.equals(PROJECT_PREFIX_SHARED) || prefix.equals(PROJECT_PREFIX_GLOBAL));
         try {
             project.setCreateTime(new Date(Files.getLastModifiedTime(path).toMillis()));
         } catch (IOException e) {

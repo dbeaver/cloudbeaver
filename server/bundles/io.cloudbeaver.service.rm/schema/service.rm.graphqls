@@ -3,11 +3,32 @@
 type RMProject {
     id: String!
     name: String!
+    description: String
+    shared: Boolean!
+
+    createTime: DateTime!
+    creator: String!
+}
+
+type RMResource {
+    name: String!
+    folder: Boolean!
+    contentType: String
+    contentCharset: String
+    length: Int!
 }
 
 extend type Query {
 
     # List accessible projects
     rmListProjects: [RMProject!]!
+
+    # List accessible projects
+    rmListResources(
+        projectId: String!,
+        folder: String,
+        nameMask: String,
+        readProperties: Boolean,
+        readHistory: Boolean): [RMResource!]!
 
 }

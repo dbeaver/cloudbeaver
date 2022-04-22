@@ -18,40 +18,40 @@ package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.rm.DBWServiceRM;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPScriptObject;
-import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMResource;
 
 /**
  * Web service implementation
  */
 public class WebServiceRM implements DBWServiceRM {
 
-
     @Override
-    public String getNodeDDL(WebSession webSession, DBNNode dbNode, Map<String, Object> options) throws DBWebException {
-        if (dbNode instanceof DBNDatabaseNode) {
-            DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
-            if (object instanceof DBPScriptObject) {
-                if (options == null) {
-                    options = new LinkedHashMap<>();
-                }
-                try {
-                    return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
-                } catch (DBException e) {
-                    throw new DBWebException("Error extracting DDL", e);
-                }
-            } else {
-                throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
-            }
-        } else {
-            throw new DBWebException("Node '" + dbNode.getNodeItemPath() + "' is not database node");
+    public RMProject[] listProjects(WebSession webSession) throws DBWebException {
+        try {
+            return getResourceController(webSession).listAccessibleProjects();
+        } catch (DBException e) {
+            throw new DBWebException("Error reading list of accessible projects", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public RMResource[] listResources(WebSession webSession, @NotNull String projectId, @Nullable String folder, @Nullable String nameMask, boolean readProperties, boolean readHistory) throws DBException {
+        try {
+            return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory);
+        } catch (DBException e) {
+            throw new DBWebException("Error reading list of accessible projects", e);
+        }
+    }
+
+    private RMController getResourceController(WebSession webSession) {
+        return CBApplication.getInstance().getResourceController(webSession);
     }
 }
