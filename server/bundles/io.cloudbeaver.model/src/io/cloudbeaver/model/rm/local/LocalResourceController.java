@@ -33,6 +33,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ public class LocalResourceController implements RMController {
     private static final String PROJECT_PREFIX_GLOBAL = "g_";
     private static final String PROJECT_PREFIX_SHARED = "s_";
     private static final String PROJECT_PREFIX_USER = "u_";
+    public static final String DEFAULT_CHANGE_ID = "0";
 
     private final SMCredentialsProvider credentialsProvider;
 
@@ -140,32 +142,48 @@ public class LocalResourceController implements RMController {
         boolean readProperties,
         boolean readHistory) throws DBException
     {
-        if (folder != null && folder.contains("..")) {
-            throw new DBException("Invalid folder path");
-        }
         Path projectPath = getProjectPath(projectId);
         try {
             Path folderPath = CommonUtils.isEmpty(folder) ?
                 projectPath :
                 projectPath.resolve(folder);
+            folderPath = folderPath.normalize();
+            // Test that folder is inside the project
+            if (!folderPath.startsWith(projectPath)) {
+                throw new DBException("Invalid folder path");
+            }
             return Files.list(folderPath)
                 .filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
                 .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory))
                 .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
+        } catch (NoSuchFileException e) {
+            throw new DBException("Invalid resource folder " + folder);
         } catch (IOException e) {
             throw new DBException("Error reading resources", e);
         }
     }
 
     @Override
-    public String createResource(@NotNull String projectId, @NotNull String folder, @NotNull RMResource resource) throws DBException {
-        throw new DBCFeatureNotSupportedException();
-    }
-
-    @Override
-    public String updateResource(@NotNull String projectId, @NotNull String folder, @NotNull RMResource resource) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+    public String createResource(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        boolean isFolder) throws DBException
+    {
+        Path targetPath = getTargetPath(projectId, resourcePath);
+        if (Files.exists(targetPath)) {
+            throw new DBException("Resource '" + resourcePath + "' already exists");
+        }
+        try {
+            if (isFolder) {
+                Files.createDirectory(targetPath);
+            } else {
+                Files.createFile(targetPath);
+            }
+        } catch (IOException e) {
+            throw new DBException("Error creating resource '" + resourcePath + "'", e);
+        }
+        return DEFAULT_CHANGE_ID;
     }
 
     @Override
@@ -175,21 +193,60 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteResource(@NotNull String projectId, @NotNull String resourcePath, boolean recursive) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        Path targetPath = getTargetPath(projectId, resourcePath);
+        if (!Files.exists(targetPath)) {
+            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
+        }
+        try {
+            Files.delete(targetPath);
+        } catch (IOException e) {
+            throw new DBException("Error deleting resource '" + resourcePath + "'", e);
+        }
     }
 
     @NotNull
     @Override
     public byte[] getResourceContents(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        Path targetPath = getTargetPath(projectId, resourcePath);
+        if (!Files.exists(targetPath)) {
+            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
+        }
+        try {
+            return Files.readAllBytes(targetPath);
+        } catch (IOException e) {
+            throw new DBException("Error reading resource '" + resourcePath + "'", e);
+        }
     }
 
     @NotNull
     @Override
-    public String setResourceContents(@NotNull String projectId, @NotNull String resourcePath, @NotNull String contentType, @NotNull byte[] data) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+    public String setResourceContents(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull byte[] data) throws DBException
+    {
+        Path targetPath = getTargetPath(projectId, resourcePath);
+        if (!Files.exists(targetPath)) {
+            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
+        }
+        try {
+            Files.write(targetPath, data);
+        } catch (IOException e) {
+            throw new DBException("Error reading resource '" + resourcePath + "'", e);
+        }
+
+        return DEFAULT_CHANGE_ID;
     }
 
+    @NotNull
+    private Path getTargetPath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        Path projectPath = getProjectPath(projectId);
+        Path targetPath = projectPath.resolve(resourcePath).normalize();
+        if (!targetPath.startsWith(projectPath)) {
+            throw new DBException("Invalid resource path");
+        }
+        return targetPath;
+    }
 
     private RMProject makeProjectFromPath(Path path, String prefix) {
         if (path == null || !Files.exists(path) || !Files.isDirectory(path)) {
@@ -248,7 +305,7 @@ public class LocalResourceController implements RMController {
                 resource.setChanges(
                     Collections.singletonList(
                         new RMResourceChange(
-                            "0",
+                            DEFAULT_CHANGE_ID,
                             new Date(Files.getLastModifiedTime(path).toMillis()),
                             null
                         ))

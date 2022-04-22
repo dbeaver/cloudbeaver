@@ -32,14 +32,19 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 public interface DBWServiceRM extends DBWService {
 
     @WebAction
-    RMProject[] listProjects(WebSession webSession) throws DBWebException;
+    RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException;
 
     @NotNull
     RMResource[] listResources(
-        WebSession webSession,
+        @NotNull WebSession webSession,
         @NotNull String projectId,
         @Nullable String folder,
         @Nullable String nameMask,
         boolean readProperties,
         boolean readHistory) throws DBException;
+
+    String readResourceAsString(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String resourcePath) throws DBException;
 }

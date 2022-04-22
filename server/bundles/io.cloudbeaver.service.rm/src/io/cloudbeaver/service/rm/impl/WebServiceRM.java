@@ -27,6 +27,8 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Web service implementation
  */
@@ -47,6 +49,16 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory);
         } catch (DBException e) {
+            throw new DBWebException("Error reading list of accessible projects", e);
+        }
+    }
+
+    @Override
+    public String readResourceAsString(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        try {
+            byte[] data = getResourceController(webSession).getResourceContents(projectId, resourcePath);
+            return new String(data, StandardCharsets.UTF_8);
+        } catch (Exception e) {
             throw new DBWebException("Error reading list of accessible projects", e);
         }
     }

@@ -13,8 +13,6 @@ type RMProject {
 type RMResource {
     name: String!
     folder: Boolean!
-    contentType: String
-    contentCharset: String
     length: Int!
 }
 
@@ -31,4 +29,32 @@ extend type Query {
         readProperties: Boolean,
         readHistory: Boolean): [RMResource!]!
 
+    # Reads resource contents as string in UTF-8
+    rmReadResourceAsString(
+        projectId: String!,
+        resourcePath: String!): String!
+
+}
+
+extend type Mutation {
+
+    rmCreateResource(
+        projectId: String!,
+        resourcePath: String!,
+        isFolder: Boolean!): String!
+
+    rmMoveResource(
+        projectId: String!,
+        oldResourcePath: String!,
+        newResourcePath: String): String!
+
+    rmDeleteResource(
+        projectId: String!,
+        resourcePath: String!,
+        recursive: Boolean!): Boolean
+
+    rmWriteResourceStringContent(
+        projectId: String!,
+        resourcePath: String!,
+        data: String!): String!
 }

@@ -45,6 +45,10 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                     env.getArgument("nameMask"),
                     CommonUtils.toBoolean(env.getArgument("readProperties")),
                     CommonUtils.toBoolean(env.getArgument("readHistory"))))
+            .dataFetcher("rmReadResourceAsString",
+                env -> getService(env).readResourceAsString(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("resourcePath")))
         ;
 
     }
