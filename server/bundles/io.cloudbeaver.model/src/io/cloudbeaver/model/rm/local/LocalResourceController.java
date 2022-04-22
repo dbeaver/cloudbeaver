@@ -34,10 +34,7 @@ import org.jkiss.utils.CommonUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -85,10 +82,15 @@ public class LocalResourceController implements RMController {
     @Override
     public RMProject[] listAccessibleProjects() throws DBException {
         try {
-            List<RMProject> projects = Files.list(sharedProjectsPath)
-                .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED))
-                .filter(Objects::isNull)
-                .collect(Collectors.toList());
+            List<RMProject> projects;
+            if (Files.exists(sharedProjectsPath)) {
+                projects = Files.list(sharedProjectsPath)
+                    .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            } else {
+                projects = new ArrayList<>();
+            }
             RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), PROJECT_PREFIX_GLOBAL);
             if (globalProject != null) {
                 projects.add(globalProject);
@@ -107,9 +109,12 @@ public class LocalResourceController implements RMController {
     @Override
     public RMProject[] listSharedProjects() throws DBException {
         try {
+            if (!Files.exists(sharedProjectsPath)) {
+                return new RMProject[0];
+            }
             return Files.list(sharedProjectsPath)
                 .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED))
-                .filter(Objects::isNull)
+                .filter(Objects::nonNull)
                 .toArray(RMProject[]::new);
         } catch (IOException e) {
             throw new DBException("Error reading shared projects", e);
@@ -135,14 +140,18 @@ public class LocalResourceController implements RMController {
         boolean readProperties,
         boolean readHistory) throws DBException
     {
+        if (folder != null && folder.contains("..")) {
+            throw new DBException("Invalid folder path");
+        }
         Path projectPath = getProjectPath(projectId);
         try {
             Path folderPath = CommonUtils.isEmpty(folder) ?
                 projectPath :
                 projectPath.resolve(folder);
             return Files.list(folderPath)
+                .filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
                 .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory))
-                .filter(Objects::isNull)
+                .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
         } catch (IOException e) {
             throw new DBException("Error reading resources", e);
@@ -208,7 +217,7 @@ public class LocalResourceController implements RMController {
             prefix = PROJECT_PREFIX_USER;
             projectName = projectId;
         } else {
-            prefix = projectId.substring(0, divPos);
+            prefix = projectId.substring(0, divPos + 1);
             projectName = projectId.substring(divPos + 1);
         }
         switch (prefix) {

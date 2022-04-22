@@ -1,0 +1,13 @@
+# Metadata queries
+
+type RMProject {
+    id: String!
+    name: String!
+}
+
+extend type Query {
+
+    # List accessible projects
+    rmListProjects: [RMProject!]!
+
+}

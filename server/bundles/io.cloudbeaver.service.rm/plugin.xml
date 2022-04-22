@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+    <extension point="io.cloudbeaver.service">
+        <service id="metadata" label="Resource management " description="Resource management  services" class="io.cloudbeaver.service.rm.WebServiceBindingRM">
+
+        </service>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.navigator">
+        <extender id="rm" class="io.cloudbeaver.service.rm.RMNavigatorModelExtender"/>
+    </extension>
+
+</plugin>
