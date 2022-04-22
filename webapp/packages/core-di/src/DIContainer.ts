@@ -52,8 +52,12 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     return this.container.resolve(ctor);
   }
 
-  addServiceByClass(Ctor: IServiceConstructor<any>): void {
-    this.container.bind(Ctor).toSelf();
+  addServiceByClass(Ctor: IServiceConstructor<any>, value?: any): void {
+    if (value) {
+      this.container.bind(Ctor).toConstantValue(value);
+    } else {
+      this.container.bind(Ctor).toSelf();
+    }
   }
 
   addServiceByToken<T extends Record<string, any>>(

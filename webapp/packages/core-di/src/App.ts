@@ -9,21 +9,19 @@
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
-import { RootContainerService } from './entities/RootContainerService';
 import type { IServiceCollection, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
 
 export class App {
-  private plugins: PluginManifest[];
+  private readonly plugins: PluginManifest[];
 
-  private diWrapper: IDiWrapper = inversifyWrapper;
+  private readonly diWrapper: IDiWrapper = inversifyWrapper;
 
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
 
-    const rootContainerService = new RootContainerService(container => this.registerChildContainer(container));
-    this.getServiceCollection().addServiceByToken(RootContainerService, rootContainerService);
+    this.getServiceCollection().addServiceByClass(App, this);
   }
 
   registerChildContainer(container: DIContainer): void {
@@ -45,7 +43,7 @@ export class App {
   // first phase register all dependencies
   registerServices(): void {
     for (const plugin of this.plugins) {
-      if (plugin.providers?.length) {
+      if (plugin.providers.length) {
         plugin.providers.forEach(provider => {
           // console.log('provider', provider.name);
           this.diWrapper.collection.addServiceByClass(provider);

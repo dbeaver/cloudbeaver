@@ -11,7 +11,7 @@ import type { ITypedConstructor } from './ITypedConstructor';
 
 export interface IServiceCollection {
   addServiceByToken: <T extends Record<string, any>>(token: any, value: T) => void;
-  addServiceByClass: (ctor: IServiceConstructor<any>) => void;
+  addServiceByClass: (ctor: IServiceConstructor<any>, value?: any) => void;
 }
 
 export type ExtractInitArgs<T> = T extends IInitializableController<infer TArgs>? TArgs : never;
@@ -24,8 +24,7 @@ export interface IInitializableController<TArgs extends any[] = any[]> {
   init: (...args: TArgs) => void;
 }
 
-export interface IServiceConstructor<T> extends ITypedConstructor<T> {
-}
+export type IServiceConstructor<T> = ITypedConstructor<T>;
 
 export interface IServiceInjector {
   getServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;

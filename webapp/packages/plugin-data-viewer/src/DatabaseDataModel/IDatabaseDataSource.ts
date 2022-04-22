@@ -7,6 +7,7 @@
  */
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
+import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseDataManager } from './DatabaseDataManager';
@@ -43,6 +44,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly error: Error | null;
   readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
+  readonly serviceInjector: IServiceInjector;
 
   isReadonly: () => boolean;
   isLoading: () => boolean;

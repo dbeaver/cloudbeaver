@@ -8,7 +8,7 @@
 
 import { EObjectFeature, NavNode, QuotasService } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { App, injectable } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
@@ -23,6 +23,7 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 @injectable()
 export class DataViewerTableService {
   constructor(
+    private readonly app: App,
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -53,6 +54,7 @@ export class DataViewerTableService {
     node: NavNode | undefined
   ): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
     const source = new ContainerDataSource(
+      this.app.getServiceInjector(),
       this.graphQLService,
       this.asyncTaskInfoService,
       this.connectionExecutionContextService,
