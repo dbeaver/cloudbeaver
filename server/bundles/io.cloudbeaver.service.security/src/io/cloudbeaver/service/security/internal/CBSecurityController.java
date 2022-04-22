@@ -817,6 +817,10 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
+                if (sessionParameters.get("roles") != null) {
+                    setUserRoles(userId, ((List<?>) sessionParameters.get("roles")).stream().map(Object::toString).toArray(String[]::new),userId);
+                }
+
                 createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
                 var token = generateAuthToken(appSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
