@@ -47,4 +47,23 @@ public interface DBWServiceRM extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String projectId,
         @NotNull String resourcePath) throws DBException;
+
+    String createResource(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        boolean isFolder) throws DBException;
+
+    boolean deleteResource(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String resourcePath) throws DBException;
+
+    @NotNull
+    String writeResourceStringContent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull String data) throws DBException;
+
 }

@@ -49,7 +49,7 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory);
         } catch (DBException e) {
-            throw new DBWebException("Error reading list of accessible projects", e);
+            throw new DBWebException("Error reading list of resources", e);
         }
     }
 
@@ -59,7 +59,37 @@ public class WebServiceRM implements DBWServiceRM {
             byte[] data = getResourceController(webSession).getResourceContents(projectId, resourcePath);
             return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new DBWebException("Error reading list of accessible projects", e);
+            throw new DBWebException("Error reading resource '" + resourcePath + "' data", e);
+        }
+    }
+
+    @Override
+    public String createResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, boolean isFolder) throws DBException {
+        try {
+            return getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
+        } catch (Exception e) {
+            throw new DBWebException("Error creating resource " + resourcePath, e);
+        }
+    }
+
+    @Override
+    public boolean deleteResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        try {
+            getResourceController(webSession).deleteResource(projectId, resourcePath, false);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error deleting resource " + resourcePath, e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public String writeResourceStringContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, @NotNull String data) throws DBException {
+        try {
+            byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+            return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes);
+        } catch (Exception e) {
+            throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
         }
     }
 

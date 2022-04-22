@@ -50,6 +50,23 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                     env.getArgument("projectId"),
                     env.getArgument("resourcePath")))
         ;
+        model.getMutationType()
+            .dataFetcher("rmCreateResource",
+                env -> getService(env).createResource(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("resourcePath"),
+                    CommonUtils.toBoolean(env.getArgument("isFolder"))))
+            .dataFetcher("rmDeleteResource",
+                env -> getService(env).deleteResource(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("resourcePath")))
+            .dataFetcher("rmWriteResourceStringContent",
+                env -> getService(env).writeResourceStringContent(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("resourcePath"),
+                    env.getArgument("data")))
+
+        ;
 
     }
 }
