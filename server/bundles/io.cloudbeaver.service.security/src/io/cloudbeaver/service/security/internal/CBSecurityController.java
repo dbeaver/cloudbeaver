@@ -849,11 +849,12 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
         if (!isSubjectExists(userId)) {
             var newUser = new WebUser(userId);
             createUser(newUser.getUserId(), newUser.getMetaParameters());
+            String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
+            if (!CommonUtils.isEmpty(defaultRoleName)) {
+                setUserRoles(userId, new String[]{defaultRoleName}, userId);
+            }
         }
-        String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
-        if (!CommonUtils.isEmpty(defaultRoleName)) {
-            setUserRoles(userId, new String[]{defaultRoleName}, userId);
-        }
+
         setUserCredentials(userId, authProviderId, userCredentials);
 
         return userId;
