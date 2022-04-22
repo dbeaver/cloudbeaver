@@ -28,9 +28,13 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
+import org.jkiss.dbeaver.runtime.IVariableResolver;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Web application
@@ -94,5 +98,28 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
         return LocalResourceController.builder(credentialsProvider).build();
     }
+
+    @SuppressWarnings("unchecked")
+    protected void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+        for (Map.Entry<String, Object> entry : configProps.entrySet()) {
+            Object propValue = entry.getValue();
+            if (propValue instanceof String) {
+                entry.setValue(GeneralUtils.replaceVariables((String) propValue, varResolver));
+            } else if (propValue instanceof Map) {
+                patchConfigurationWithProperties((Map<String, Object>) propValue, varResolver);
+            } else if (propValue instanceof List) {
+                List value = (List) propValue;
+                for (int i = 0; i < value.size(); i++) {
+                    Object colItem = value.get(i);
+                    if (colItem instanceof String) {
+                        value.set(i, GeneralUtils.replaceVariables((String) colItem, varResolver));
+                    } else if (colItem instanceof Map) {
+                        patchConfigurationWithProperties((Map<String, Object>) colItem, varResolver);
+                    }
+                }
+            }
+        }
+    }
+
 
 }
