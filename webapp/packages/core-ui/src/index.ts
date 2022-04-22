@@ -5,6 +5,7 @@ export * from './ContextMenu/MenuItemElement';
 export * from './ContextMenu/ContextMenu';
 export * from './ContextMenu/MenuBar/MenuBar';
 export * from './ContextMenu/MenuBar/MENU_BAR_DEFAULT_STYLES';
+export * from './ContextMenu/MenuBar/MENU_BAR_SMALL_STYLES';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE';
 export * from './DragAndDrop/DND_NATIVE_TYPE';
