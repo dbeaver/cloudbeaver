@@ -890,7 +890,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionPermissions = null;
         this.smCredentials = null;
         this.user = null;
-        this.securityController = application.getSecurityController(null);
+        this.securityController = application.getSecurityController(this);
         this.adminSecurityController = null;
     }
 
