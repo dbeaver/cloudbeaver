@@ -123,11 +123,11 @@ public class DBWebException extends DBException implements GraphQLError {
         }
         divPos = stString.indexOf(':');
         if (divPos != -1) {
-            String exceptionClass = stString.substring(0, divPos);
+            String exceptionClass = stString.substring(0, divPos).trim();
             extensions.put("exceptionClass", exceptionClass);
             //stString = stString.substring(divPos + 1).trim();
         }
-        extensions.put("stackTrace", stString);
+        extensions.put("stackTrace", stString.trim());
         int errorCode = getErrorCode();
         if (errorCode != ERROR_CODE_NONE) {
             extensions.put("errorCode", errorCode);
