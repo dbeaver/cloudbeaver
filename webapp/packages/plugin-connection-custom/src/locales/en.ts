@@ -7,6 +7,7 @@ export default [
   ['customConnection_custom_host', 'Host'],
   ['customConnection_custom_obligatory', '(obligatory)'],
   ['customConnection_custom_port', 'Port'],
+  ['customConnection_custom_server_name', 'Server name'],
   ['customConnection_custom_database', 'Database'],
   ['customConnection_custom_server', 'Server'],
   ['customConnection_url_JDBC', 'JDBC URL'],

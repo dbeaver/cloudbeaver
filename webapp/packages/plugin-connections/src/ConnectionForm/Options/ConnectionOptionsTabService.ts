@@ -146,6 +146,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     state.config.host = state.info.host;
     state.config.port = state.info.port;
+    state.config.serverName = state.info.serverName;
     state.config.databaseName = state.info.databaseName;
     state.config.url = state.info.url;
 
@@ -210,6 +211,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
         tempConfig.host = state.config.host;
         tempConfig.port = state.config.port;
       }
+      if (driver.requiresServerName) {
+        tempConfig.serverName = state.config.serverName;
+      }
       tempConfig.databaseName = state.config.databaseName;
     }
 
@@ -270,6 +274,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       || (config.url !== undefined && !isValuesEqual(config.url, data.info.url, ''))
       || (config.host !== undefined && !isValuesEqual(config.host, data.info.host, ''))
       || (config.port !== undefined && !isValuesEqual(config.port, data.info.port, ''))
+      || (config.serverName !== undefined && !isValuesEqual(config.serverName, data.info.serverName, ''))
       || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
       || config.credentials !== undefined
       || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))

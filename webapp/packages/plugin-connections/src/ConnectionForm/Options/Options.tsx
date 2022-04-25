@@ -212,6 +212,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 <ParametersForm
                   config={config}
                   embedded={driver?.embedded}
+                  requiresServerName={driver?.requiresServerName}
                   disabled={disabled}
                   readOnly={readonly}
                   originLocal={originLocal}
