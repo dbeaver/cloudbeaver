@@ -8,42 +8,44 @@
 
 @import "react-data-grid/dist/react-data-grid.css";
 
-.cb-metadata-grid-theme {
-  font-family: inherit;
-  outline: 0;
-  font-size: 12px;
-  height: 100%;
-  background-color: inherit;
-  border: none;
+.metadata-grid-container {
+  .cb-metadata-grid-theme {
+    font-family: inherit;
+    outline: 0;
+    font-size: 12px;
+    height: 100%;
+    background-color: inherit;
+    border: none;
 
-  .rdg-header-row,
-  .rdg-row {
-    background-color: transparent;
-  }
+    .rdg-header-row,
+    .rdg-row {
+      background-color: transparent;
+    }
 
-  .rdg-header-row {
-    text-transform: uppercase;
-  }
+    .rdg-header-row {
+      text-transform: uppercase;
+    }
 
-  .rdg-cell {
-    border-color: transparent;
-    display: flex;
-    flex-direction: row;
-  }
+    .rdg-cell {
+      border-color: transparent;
+      display: flex;
+      flex-direction: row;
+    }
 
-  .rdg-cell-selected {
-    box-shadow: none;
-  }
+    .rdg-cell-selected {
+      box-shadow: none;
+    }
 
-  .cell-formatter {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
+    .cell-formatter {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
 
-  .cell-formatter__value {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    .cell-formatter__value {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 }

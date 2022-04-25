@@ -131,7 +131,7 @@ export const Table = observer<Props>(function Table({
 
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <wrapper ref={tableContainer}>
+      <wrapper ref={tableContainer} className='metadata-grid-container'>
         <DataGrid
           className='cb-metadata-grid-theme'
           rows={objects}
