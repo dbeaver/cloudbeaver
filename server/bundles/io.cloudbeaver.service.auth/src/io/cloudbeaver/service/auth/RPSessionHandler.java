@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RPSessionHandler implements DBWSessionHandler {
@@ -57,6 +58,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         }
         return false;
     }
+
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
         SMController<WebUser, ?> securityController = webSession.getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
@@ -68,15 +70,14 @@ public class RPSessionHandler implements DBWSessionHandler {
         }
         String userName = request.getHeader(RPAuthProvider.X_USER);
         String roles = request.getHeader(RPAuthProvider.X_ROLE);
-        String[] userRoles = roles.split("\\|");
-        WebUser curUser = webSession.getUser();
+        List<String> userRoles = roles == null ? null : List.of(roles.split("\\|"));
         SMSession authSession;
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
-                sessionParameters.put("roles", userRoles);
+                sessionParameters.put(RPAuthProvider.X_ROLE, userRoles);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
                         webSession.getProgressMonitor(), sessionParameters, credentials);
                 try {
@@ -115,6 +116,7 @@ public class RPSessionHandler implements DBWSessionHandler {
             }
         }
     }
+
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
         return false;

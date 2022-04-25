@@ -61,6 +61,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
 
+    private static final String REVERSE_PROXY_USER_ROLES = "X-Role";
+
+
     private final CBDatabase database;
 
     public CBSecurityController(CBDatabase database) {
@@ -817,8 +820,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
-                if (sessionParameters.get("roles") != null) {
-                    setUserRoles(userId, ((List<?>) sessionParameters.get("roles")).stream().map(Object::toString).toArray(String[]::new),userId);
+                Object reverseProxyUserRoles = sessionParameters.get(REVERSE_PROXY_USER_ROLES);
+                if (reverseProxyUserRoles != null) {
+                    setUserRoles(userId, ((List<Object>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new),userId);
                 }
 
                 createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
