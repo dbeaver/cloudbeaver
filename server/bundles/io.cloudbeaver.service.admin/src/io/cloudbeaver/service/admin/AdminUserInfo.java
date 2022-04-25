@@ -18,13 +18,13 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 
@@ -67,7 +67,7 @@ public class AdminUserInfo {
     @Property
     public String[] getGrantedRoles() throws DBCException {
         if (user.getRoles() == null) {
-            WebRole[] userRoles = session.getSecurityController().getUserRoles(getUserId());
+            SMRole[] userRoles = session.getSecurityController().getUserRoles(getUserId());
             user.setRoles(userRoles);
         }
         return user.getGrantedRoles();

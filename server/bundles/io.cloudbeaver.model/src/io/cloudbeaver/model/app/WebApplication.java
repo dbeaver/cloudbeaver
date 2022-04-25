@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -41,9 +39,9 @@ public interface WebApplication extends DBPApplication {
 
     boolean isMultiNode();
 
-    SMController<WebUser, WebRole> getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
+    SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 
-    SMAdminController<WebUser, WebRole> getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
+    SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 
     RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider);
 

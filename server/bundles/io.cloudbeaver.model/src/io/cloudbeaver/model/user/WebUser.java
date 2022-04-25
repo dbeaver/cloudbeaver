@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 
 import java.util.*;
@@ -24,7 +25,7 @@ import java.util.*;
 /**
  * Web user.
  */
-public class WebUser implements SMUser {
+public class WebUser {
     @NotNull
     private final String userId;
     private String displayName;
@@ -32,17 +33,13 @@ public class WebUser implements SMUser {
     private final Map<String, String> metaParameters = new LinkedHashMap<>();
     private final Map<String, Object> configurationParameters = new LinkedHashMap<>();
 
-    private WebRole[] roles = null;
+    private SMRole[] roles = null;
 
     private String activeAuthModel;
     private final Map<String, Map<String, Object>> authCredentials = new HashMap<>();
 
-    public WebUser(@NotNull String userId) {
-        this.userId = userId;
-    }
-
-    public WebUser(@NotNull String userId, Map<String, String> metaParameters) {
-        this.userId = userId;
+    public WebUser(@NotNull SMUser smUser) {
+        this.userId = smUser.getUserId();
         this.metaParameters.putAll(metaParameters);
     }
 
@@ -63,7 +60,7 @@ public class WebUser implements SMUser {
     }
 
     public String[] getGrantedRoles() {
-        return Arrays.stream(roles).map(WebRole::getRoleId).toArray(String[]::new);
+        return Arrays.stream(roles).map(SMRole::getRoleId).toArray(String[]::new);
     }
 
     public boolean hasRole(String roleId) {
@@ -90,11 +87,11 @@ public class WebUser implements SMUser {
         return Collections.unmodifiableMap(configurationParameters);
     }
 
-    public WebRole[] getRoles() {
+    public SMRole[] getRoles() {
         return roles;
     }
 
-    public void setRoles(WebRole[] roles) {
+    public void setRoles(SMRole[] roles) {
         this.roles = roles;
     }
 
