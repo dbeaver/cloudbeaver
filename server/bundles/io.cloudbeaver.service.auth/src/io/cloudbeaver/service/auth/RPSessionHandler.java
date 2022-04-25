@@ -29,7 +29,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
-import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
@@ -41,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,15 +62,13 @@ public class RPSessionHandler implements DBWSessionHandler {
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
         SMController<WebUser, ?> securityController = webSession.getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
-        SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
-        SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
-                (SMAuthProviderExternal<?>) authProviderInstance : null;
-        if (authProviderExternal == null) {
-            throw new DBWebException("Error during user authentication");
+        if (authProvider == null) {
+            throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
+        SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
         String userName = request.getHeader(RPAuthProvider.X_USER);
         String roles = request.getHeader(RPAuthProvider.X_ROLE);
-        List<String> userRoles = roles == null ? null : List.of(roles.split("\\|"));
+        List<String> userRoles = roles == null ? Collections.emptyList() : List.of(roles.split("\\|"));
         SMSession authSession;
         if (userName != null) {
             try {
@@ -96,7 +94,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                 if (CommonUtils.isEmpty(user.getDisplayName())) {
                     user.setDisplayName(userIdentity.getDisplayName());
                 }
-                authSession = authProviderInstance.openSession(
+                authSession = authProviderExternal.openSession(
                         webSession.getProgressMonitor(),
                         webSession,
                         sessionParameters,

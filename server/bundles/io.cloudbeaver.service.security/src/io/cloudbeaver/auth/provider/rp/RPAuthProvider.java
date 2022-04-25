@@ -17,7 +17,7 @@
 package io.cloudbeaver.auth.provider.rp;
 
 import io.cloudbeaver.DBWUserIdentity;
-import io.cloudbeaver.auth.provider.AbstractExternalAuthProvider;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -32,7 +32,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 
 import java.util.Map;
 
-public class RPAuthProvider extends AbstractExternalAuthProvider<SMSession> {
+public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
 
     private static final Log log = Log.getLog(RPAuthProvider.class);
 
