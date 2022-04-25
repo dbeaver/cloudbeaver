@@ -15,11 +15,11 @@ export interface IScrollState {
 
 export function useControlledScroll(element: HTMLDivElement | null, state: IScrollState): void {
   useEffect(() => {
-    const box = element;
-
-    if (box) {
-      box.scrollTop = state.scrollTop;
-      box.scrollLeft = state.scrollLeft;
+    if (element) {
+      setTimeout(() => {
+        element.scrollTop = state.scrollTop;
+        element.scrollLeft = state.scrollLeft;
+      }, 0);
     }
   }, [element, state]);
 

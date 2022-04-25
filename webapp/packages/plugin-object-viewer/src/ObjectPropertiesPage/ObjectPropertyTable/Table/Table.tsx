@@ -8,15 +8,16 @@
 
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
-import DataGrid, { DataGridHandle } from 'react-data-grid';
+import DataGrid from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
-import { useTable } from '@cloudbeaver/core-blocks';
+import { IScrollState, useControlledScroll, useTable } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 
 import { getValue } from '../../helpers';
@@ -71,7 +72,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
       for (let i = 0; i < row.object.properties.length; i++) {
         const value = getValue(row.object.properties[i].value);
 
-        if (value.length > rowStrings[i].length) {
+        if (value.length > (rowStrings[i] ?? '').length) {
           rowStrings[i] = value;
         }
       }
@@ -81,7 +82,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   return TextTools.getWidth({
     font: '400 12px Roboto',
     text: columnNames.map((cell, i) => {
-      if (cell.length > (rowStrings[i] || '').length) {
+      if (cell.length > (rowStrings[i] ?? '').length) {
         return cell;
       }
       return rowStrings[i];
@@ -95,10 +96,14 @@ export const Table = observer<Props>(function Table({
   objects,
   truncated,
 }) {
-  const ref = useRef<DataGridHandle | null>(null);
+  const tableContainer = useRef<HTMLDivElement | null>(null);
   const navTreeResource = useService(NavTreeResource);
   const styles = useStyles(style, baseStyles, tableStyles);
   const tableState = useTable();
+  const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
+
+  const scrollBox = (tableContainer.current?.firstChild as HTMLDivElement | undefined) ?? null;
+  useControlledScroll(scrollBox, tabLocalState);
 
   const baseObject = objects
     .slice()
@@ -126,9 +131,8 @@ export const Table = observer<Props>(function Table({
 
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <wrapper>
+      <wrapper ref={tableContainer} className='metadata-grid-container'>
         <DataGrid
-          ref={ref}
           className='cb-metadata-grid-theme'
           rows={objects}
           rowKeyGetter={row => row.id}
