@@ -10,6 +10,7 @@ fragment DatabaseDriver on DriverInfo {
   sampleURL
   embedded
   enabled
+  requiresServerName
   anonymousAccess
   promotedScore
 

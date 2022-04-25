@@ -18,6 +18,7 @@ interface Props {
   config: ConnectionConfig;
   disabled?: boolean;
   embedded?: boolean;
+  requiresServerName?: boolean;
   readOnly?: boolean;
   originLocal?: boolean;
 }
@@ -25,6 +26,7 @@ interface Props {
 export const ParametersForm = observer<Props>(function ParametersForm({
   config,
   embedded,
+  requiresServerName,
   disabled,
   readOnly,
   originLocal,
@@ -67,6 +69,18 @@ export const ParametersForm = observer<Props>(function ParametersForm({
       >
         {translate('customConnection_custom_database')}
       </InputField>
+      {requiresServerName && (
+        <InputField
+          type="text"
+          name="serverName"
+          state={config}
+          disabled={disabled}
+          readOnly={readOnly}
+          required
+        >
+          {translate('customConnection_custom_server_name')}
+        </InputField>
+      )}
     </Container>
   );
 });

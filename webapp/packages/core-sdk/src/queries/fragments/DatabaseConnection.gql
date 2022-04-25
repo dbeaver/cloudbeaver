@@ -16,6 +16,7 @@ fragment DatabaseConnection on ConnectionInfo {
 
   host
   port
+  serverName
   databaseName
   url
   properties
