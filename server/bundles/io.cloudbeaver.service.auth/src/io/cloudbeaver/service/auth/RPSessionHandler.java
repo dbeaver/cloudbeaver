@@ -87,7 +87,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                     log.debug("Error during user authentication", e);
                     throw e;
                 }
-                WebUser user = new WebUser(userName);
+                WebUser user = webSession.getUser();
                 DBWUserIdentity userIdentity = authProviderExternal.getUserIdentity(
                         webSession.getProgressMonitor(), sessionParameters, credentials);
 
