@@ -283,6 +283,7 @@ type ConnectionInfo {
 
     host: String
     port: String
+    serverName: String
     databaseName: String
     url: String
 
@@ -391,6 +392,7 @@ input ConnectionConfig {
 
     host: String
     port: String
+    serverName: String
     databaseName: String
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
