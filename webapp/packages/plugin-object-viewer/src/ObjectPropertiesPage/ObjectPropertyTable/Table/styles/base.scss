@@ -1,0 +1,49 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import "react-data-grid/dist/react-data-grid.css";
+
+.cb-metadata-grid-theme {
+  font-family: inherit;
+  outline: 0;
+  font-size: 12px;
+  height: 100%;
+  background-color: inherit;
+  border: none;
+
+  .rdg-header-row,
+  .rdg-row {
+    background-color: transparent;
+  }
+
+  .rdg-header-row {
+    text-transform: uppercase;
+  }
+
+  .rdg-cell {
+    border-color: transparent;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .rdg-cell-selected {
+    box-shadow: none;
+  }
+
+  .cell-formatter {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .cell-formatter__value {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

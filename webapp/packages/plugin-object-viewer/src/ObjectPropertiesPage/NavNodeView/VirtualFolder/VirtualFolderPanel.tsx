@@ -15,7 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { ObjectChildrenPropertyTable } from '../../ObjectPropertyTable/ObjectChildrenPropertyTable';
+import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
 const style = css`
@@ -65,7 +65,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <tab-wrapper>
-            <ObjectChildrenPropertyTable objects={objects} truncated={truncated > 0} />
+            <TableLoader objects={objects} truncated={truncated > 0} />
           </tab-wrapper>
         )}
       </>

@@ -1,0 +1,40 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import "@cloudbeaver/core-theming/src/styles/branding";
+
+@mixin base-metadata-grid() {
+  :global {
+    .cb-metadata-grid-theme {
+      @include mdc-theme-prop(color, on-surface, false);
+
+      .rdg-header-row {
+        @include mdc-theme-prop(background-color, surface, false);
+      }
+
+      .rdg-row {
+        @include mdc-theme-prop(border-color, background, false);
+      }
+
+      .rdg-row:hover {
+        @include stripes-background($mdc-theme-secondary);
+      }
+
+      .rdg-cell {
+        @include mdc-theme-prop(border-color, background, false);
+        &:focus {
+          outline: 0;
+        }
+      }
+
+      .rdg-cell-frozen {
+        @include mdc-theme-prop(background-color, surface, false);
+      }
+    }
+  }
+}

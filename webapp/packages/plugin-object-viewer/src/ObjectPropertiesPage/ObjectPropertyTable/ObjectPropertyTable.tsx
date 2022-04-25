@@ -17,7 +17,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
+import { TableLoader } from './Table/TableLoader';
 
 const styles = css`
   div {
@@ -81,7 +81,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <div>
-            <ObjectChildrenPropertyTable objects={objects} truncated={limited.truncated > 0} />
+            <TableLoader objects={objects} truncated={limited.truncated > 0} />
           </div>
         )}
       </>
