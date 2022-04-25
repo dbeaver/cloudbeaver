@@ -60,7 +60,7 @@ public class RPSessionHandler implements DBWSessionHandler {
     }
 
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
-        SMController<WebUser, ?> securityController = webSession.getSecurityController();
+        SMController securityController = webSession.getSecurityController();
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
         if (authProvider == null) {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");

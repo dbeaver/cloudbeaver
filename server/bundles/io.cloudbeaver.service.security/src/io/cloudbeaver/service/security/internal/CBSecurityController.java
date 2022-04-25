@@ -20,8 +20,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -35,6 +33,8 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBSecurityController implements SMAdminController<WebUser, WebRole> {
+public class CBSecurityController implements SMAdminController {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
@@ -154,19 +154,19 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
 
     @NotNull
     @Override
-    public WebRole[] getUserRoles(String userId) throws DBCException {
+    public SMRole[] getUserRoles(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
                     "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
                 dbStat.setString(1, userId);
-                List<WebRole> roles = new ArrayList<>();
+                List<SMRole> roles = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         roles.add(fetchRole(dbResult));
                     }
                 }
-                return roles.toArray(new WebRole[0]);
+                return roles.toArray(new SMRole[0]);
             }
         } catch (SQLException e) {
             throw new DBCException("Error while reading user roles", e);
@@ -174,24 +174,25 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @Override
-    public WebUser getUserById(String userId) throws DBCException {
+    public SMUser getUserById(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            WebUser user;
+            SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        user = new WebUser(dbResult.getString(1));
+                        user = new SMUser(dbResult.getString(1));
                     } else {
                         return null;
                     }
                 }
             }
+            var metaParams = new LinkedHashMap<String, String>();
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        user.setMetaParameter(
+                        metaParams.put(
                             dbResult.getString(1),
                             dbResult.getString(2)
                         );
@@ -206,9 +207,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
 
     @NotNull
     @Override
-    public WebUser[] findUsers(String userNameMask) throws DBCException {
+    public SMUser[] findUsers(String userNameMask) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            Map<String, WebUser> result = new LinkedHashMap<>();
+            Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER" +
                 (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?"))) {
@@ -218,7 +219,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
-                        result.put(userId, new WebUser(userId));
+                        result.put(userId, new SMUser(userId));
                     }
                 }
             }
@@ -231,7 +232,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
-                        WebUser user = result.get(userId);
+                        SMUser user = result.get(userId);
                         if (user != null) {
                             user.setMetaParameter(
                                 dbResult.getString(2),
@@ -241,7 +242,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                     }
                 }
             }
-            return result.values().toArray(new WebUser[0]);
+            return result.values().toArray(new SMUser[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
         }
@@ -520,13 +521,13 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
 
     @NotNull
     @Override
-    public WebRole[] readAllRoles() throws DBCException {
+    public SMRole[] readAllRoles() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            Map<String, WebRole> roles = new LinkedHashMap<>();
+            Map<String, SMRole> roles = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_ROLE ORDER BY ROLE_ID")) {
                     while (dbResult.next()) {
-                        WebRole role = fetchRole(dbResult);
+                        SMRole role = fetchRole(dbResult);
                         roles.put(role.getRoleId(), role);
                     }
                 }
@@ -534,21 +535,21 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
                     "FROM CB_AUTH_PERMISSIONS AP,CB_ROLE R\n" +
                     "WHERE AP.SUBJECT_ID=R.ROLE_ID\n")) {
                     while (dbResult.next()) {
-                        WebRole role = roles.get(dbResult.getString(1));
+                        SMRole role = roles.get(dbResult.getString(1));
                         if (role != null) {
                             role.addPermission(dbResult.getString(2));
                         }
                     }
                 }
             }
-            return roles.values().toArray(new WebRole[0]);
+            return roles.values().toArray(new SMRole[0]);
         } catch (SQLException e) {
             throw new DBCException("Error reading roles from database", e);
         }
     }
 
     @Override
-    public WebRole findRole(String roleId) throws DBCException {
+    public SMRole findRole(String roleId) throws DBCException {
         return Arrays.stream(readAllRoles())
             .filter(r -> r.getRoleId().equals(roleId))
             .findFirst().orElse(null);
@@ -575,11 +576,11 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     }
 
     @NotNull
-    private WebRole fetchRole(ResultSet dbResult) throws SQLException {
-        WebRole role = new WebRole(dbResult.getString("ROLE_ID"));
-        role.setName(dbResult.getString("ROLE_NAME"));
-        role.setDescription(dbResult.getString("ROLE_DESCRIPTION"));
-        return role;
+    private SMRole fetchRole(ResultSet dbResult) throws SQLException {
+        return new SMRole(dbResult.getString("ROLE_ID"),
+            dbResult.getString("ROLE_NAME"),
+            dbResult.getString("ROLE_DESCRIPTION")
+        );
     }
 
     @Override
@@ -830,7 +831,9 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
         }
     }
 
-    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId, @NotNull Map<String, Object> sessionParameters, @NotNull Map<String, Object> userCredentials) throws DBException {
+    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId,
+                                                         @NotNull Map<String, Object> sessionParameters,
+                                                         @NotNull Map<String, Object> userCredentials) throws DBException {
         var userId = findUserByCredentials(authProviderId, userCredentials);
         if (userId == null) {
             AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
@@ -839,14 +842,14 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
             }
             var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
             userId = externalAuthProvider.validateLocalAuth(
-                    new VoidProgressMonitor(),
-                    this,
-                    Collections.emptyMap(),
-                    userCredentials,
-                    null);
+                new VoidProgressMonitor(),
+                this,
+                Collections.emptyMap(),
+                userCredentials,
+                null);
 
             if (!isSubjectExists(userId)) {
-                var newUser = new WebUser(userId);
+                var newUser = new SMUser(userId);
                 createUser(newUser.getUserId(), newUser.getMetaParameters());
                 String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
                 if (!CommonUtils.isEmpty(defaultRoleName)) {
@@ -858,7 +861,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
         if (authProviderId.equals(RPAuthProvider.AUTH_PROVIDER)) {
             Object reverseProxyUserRoles = sessionParameters.get(RPAuthProvider.X_ROLE);
             if (reverseProxyUserRoles instanceof List) {
-                setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new),userId);
+                setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new), userId);
             }
         }
         return userId;

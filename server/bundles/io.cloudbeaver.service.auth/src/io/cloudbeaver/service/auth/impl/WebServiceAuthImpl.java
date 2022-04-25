@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
@@ -64,7 +65,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @NotNull Map<String, Object> authParameters,
         boolean linkWithActiveUser) throws DBWebException {
-        SMController<WebUser, ?> securityController = webSession.getSecurityController();
+        SMController securityController = webSession.getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -132,6 +133,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
                         userId = smAuthInfo.getUserId();
                         webSession.updateSMAuthInfo(smAuthInfo);
+                        curUser = webSession.getUser();
                     } catch (SMException e) {
                         log.debug("Error during user authentication", e);
                         throw e;
@@ -153,9 +155,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
                 user = curUser;
             }
-            if (user == null) {
-                user = new WebUser(userId);
-            }
+
             if (!configMode && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
@@ -278,11 +278,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             return null;
         }
         try {
-            // Read user from security controller. It will also read meta parsameters
-            WebUser userWithDetails = webSession.getSecurityController().getUserById(webSession.getUser().getUserId());
+            // Read user from security controller. It will also read meta parameters
+            SMUser userWithDetails = webSession.getSecurityController().getUserById(webSession.getUser().getUserId());
             if (userWithDetails != null) {
                 // USer not saved yet. This may happen in easy config mode
-                return new WebUserInfo(webSession, userWithDetails);
+                return new WebUserInfo(webSession, new WebUser(userWithDetails));
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }

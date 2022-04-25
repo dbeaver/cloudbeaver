@@ -27,7 +27,6 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
-import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
@@ -51,6 +50,8 @@ import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -74,8 +75,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, String userName) throws DBWebException {
         try {
             List<AdminUserInfo> webUsers = new ArrayList<>();
-            for (WebUser user : webSession.getAdminSecurityController().findUsers(userName)) {
-                webUsers.add(new AdminUserInfo(webSession, user));
+            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(userName)) {
+                webUsers.add(new AdminUserInfo(webSession, new WebUser(smUser)));
             }
             return webUsers;
         } catch (Exception e) {
@@ -89,11 +90,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             List<AdminRoleInfo> roles = new ArrayList<>();
             if (CommonUtils.isEmpty(roleId)) {
-                for (WebRole role : webSession.getAdminSecurityController().readAllRoles()) {
+                for (SMRole role : webSession.getAdminSecurityController().readAllRoles()) {
                     roles.add(new AdminRoleInfo(webSession, role));
                 }
             } else {
-                WebRole role = webSession.getAdminSecurityController().findRole(roleId);
+                SMRole role = webSession.getAdminSecurityController().findRole(roleId);
                 if (role != null) {
                     roles.add(new AdminRoleInfo(webSession, role));
                 }
@@ -127,9 +128,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty user name");
         }
         try {
-            WebUser newUser = new WebUser(userName);
-            webSession.getAdminSecurityController().createUser(newUser.getUserId(), newUser.getMetaParameters());
-            return new AdminUserInfo(webSession, newUser);
+            var securityController = webSession.getAdminSecurityController();
+            securityController.createUser(userName, Map.of());
+            var smUser = securityController.getUserById(userName);
+            return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
         }
@@ -156,7 +158,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
-            WebRole newRole = webSession.getAdminSecurityController().findRole(roleId);
+            SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error creating new role", e);
@@ -171,7 +173,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().updateRole(roleId, roleName, description);
-            WebRole newRole = webSession.getAdminSecurityController().findRole(roleId);
+            SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
             return new AdminRoleInfo(webSession, newRole);
         } catch (Exception e) {
             throw new DBWebException("Error updating role " + roleId, e);
@@ -182,7 +184,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            WebRole[] userRoles = adminSecurityController.getUserRoles(webSession.getUser().getUserId());
+            SMRole[] userRoles = adminSecurityController.getUserRoles(webSession.getUser().getUserId());
             if (Arrays.stream(userRoles).anyMatch(DBRole -> DBRole.getRoleId().equals(roleId))) {
                 throw new DBWebException("You can not delete your own role");
             }
@@ -204,8 +206,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            WebRole[] userRoles = adminSecurityController.getUserRoles(user);
-            List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
+            SMRole[] userRoles = adminSecurityController.getUserRoles(user);
+            List<String> roleIds = Arrays.stream(userRoles).map(SMRole::getRoleId).collect(Collectors.toList());
             if (!roleIds.contains(role)) {
                 roleIds.add(role);
                 adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
@@ -229,8 +231,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            WebRole[] userRoles = adminSecurityController.getUserRoles(user);
-            List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
+            SMRole[] userRoles = adminSecurityController.getUserRoles(user);
+            List<String> roleIds = Arrays.stream(userRoles).map(SMRole::getRoleId).collect(Collectors.toList());
             if (roleIds.contains(role)) {
                 roleIds.remove(role);
                 adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());

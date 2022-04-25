@@ -24,8 +24,6 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.model.user.WebRole;
-import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
@@ -114,7 +112,7 @@ public class CBApplication extends BaseWebApplication {
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
     // Persistence
-    private SMAdminController<WebUser, WebRole> securityController;
+    private SMAdminController securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -182,17 +180,17 @@ public class CBApplication extends BaseWebApplication {
         return productConfiguration;
     }
 
-    public SMController<WebUser, WebRole> getSecurityController() {
+    public SMController getSecurityController() {
         return securityController;
     }
 
     @Override
-    public SMController<WebUser, WebRole> getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
+    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
         return securityController;
     }
 
     @Override
-    public SMAdminController<WebUser, WebRole> getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
+    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
         return securityController;
     }
 
@@ -435,7 +433,7 @@ public class CBApplication extends BaseWebApplication {
         securityController = createGlobalSecurityController();
     }
 
-    protected SMAdminController<WebUser, WebRole> createGlobalSecurityController() throws DBException {
+    protected SMAdminController createGlobalSecurityController() throws DBException {
         return SecurityPluginService.createSecurityService(this, databaseConfiguration);
     }
 

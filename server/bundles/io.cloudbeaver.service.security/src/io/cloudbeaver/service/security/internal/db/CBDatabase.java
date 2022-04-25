@@ -20,10 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.utils.WebAppUtils;
-import org.jkiss.dbeaver.model.security.SMAdminController;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -38,7 +36,9 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
-import io.cloudbeaver.model.user.WebRole;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
@@ -80,14 +80,14 @@ public class CBDatabase {
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
-    private SMAdminController<WebUser, WebRole> adminSecurityController;
+    private SMAdminController adminSecurityController;
 
     public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
 
-    public void setAdminSecurityController(SMAdminController<WebUser, WebRole> adminSecurityController) {
+    public void setAdminSecurityController(SMAdminController adminSecurityController) {
         this.adminSecurityController = adminSecurityController;
     }
 
@@ -242,10 +242,10 @@ public class CBDatabase {
     }
 
     @NotNull
-    private WebUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
-        WebUser adminUser = adminSecurityController.getUserById(adminName);
+    private SMUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
+        SMUser adminUser = adminSecurityController.getUserById(adminName);
         if (adminUser == null) {
-            adminUser = new WebUser(adminName);
+            adminUser = new SMUser(adminName);
             adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters());
         }
 
@@ -270,10 +270,10 @@ public class CBDatabase {
 
     private void grantAdminPermissionsToUser(String userId) throws DBCException {
         // Grant all roles
-        WebRole[] allRoles = adminSecurityController.readAllRoles();
+        SMRole[] allRoles = adminSecurityController.readAllRoles();
         adminSecurityController.setUserRoles(
             userId,
-            Arrays.stream(allRoles).map(WebRole::getRoleId).toArray(String[]::new),
+            Arrays.stream(allRoles).map(SMRole::getRoleId).toArray(String[]::new),
             userId);
     }
 
@@ -347,7 +347,7 @@ public class CBDatabase {
 
                 if (!CommonUtils.isEmpty(initialData.getRoles())) {
                     // Create roles
-                    for (WebRole role : initialData.getRoles()) {
+                    for (SMRole role : initialData.getRoles()) {
                         adminSecurityController.createRole(role.getRoleId(), role.getName(), role.getDescription(), adminName);
                         if (adminName != null) {
                             adminSecurityController.setSubjectPermissions(role.getRoleId(), new ArrayList<>(role.getPermissions()), adminName);

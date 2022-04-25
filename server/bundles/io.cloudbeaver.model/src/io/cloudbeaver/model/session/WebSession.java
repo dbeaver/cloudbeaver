@@ -22,7 +22,6 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -116,8 +115,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
-    private SMController<WebUser, WebRole> securityController;
-    private SMAdminController<WebUser, WebRole> adminSecurityController;
+    private SMController securityController;
+    private SMAdminController adminSecurityController;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
@@ -236,12 +235,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     @NotNull
-    public synchronized SMController<WebUser, WebRole> getSecurityController() {
+    public synchronized SMController getSecurityController() {
         return securityController;
     }
 
     @Nullable
-    public synchronized SMAdminController<WebUser, WebRole> getAdminSecurityController() {
+    public synchronized SMAdminController getAdminSecurityController() {
         if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
             return null;
         }
@@ -901,9 +900,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
         this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), smAuthInfo.getUserId());
         this.sessionPermissions = smAuthInfo.getPermissions();
-        this.user = smAuthInfo.getUserId() == null ? null : new WebUser(smAuthInfo.getUserId());
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
+
+        this.user = smAuthInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(smAuthInfo.getUserId()));
         refreshUserData();
     }
 
