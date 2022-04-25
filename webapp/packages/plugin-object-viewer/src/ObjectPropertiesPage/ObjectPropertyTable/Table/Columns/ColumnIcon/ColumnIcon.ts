@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Column } from '../../Column';
+import type { ICustomColumn } from '../../Column';
 import { IconFormatter } from './IconFormatter';
 
-export const ColumnIcon: Column = {
+export const ColumnIcon: ICustomColumn = {
   key: 'columnIcon',
   columnDataIndex: null,
   name: '',
@@ -17,4 +17,5 @@ export const ColumnIcon: Column = {
   maxWidth: 40,
   frozen: true,
   formatter: IconFormatter,
+  order: 1,
 };

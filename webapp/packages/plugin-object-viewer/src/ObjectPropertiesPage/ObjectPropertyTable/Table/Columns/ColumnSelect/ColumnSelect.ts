@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Column } from '../../Column';
+import type { ICustomColumn } from '../../Column';
 import { SelectorFormatter } from './SelectorFormatter';
 
-export const ColumnSelect: Column = {
+export const ColumnSelect: ICustomColumn = {
   key: 'columnSelector',
   columnDataIndex: null,
   name: '',
@@ -17,4 +17,5 @@ export const ColumnSelect: Column = {
   maxWidth: 40,
   frozen: true,
   formatter: SelectorFormatter,
+  order: 0,
 };

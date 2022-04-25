@@ -7,7 +7,8 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import DataGrid, { Column } from 'react-data-grid';
+import { useRef } from 'react';
+import DataGrid, { DataGridHandle } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
@@ -27,6 +28,7 @@ import { RowRenderer } from './RowRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import { TableContext } from './TableContext';
+import { useTableData } from './useTableData';
 
 const style = css`
     wrapper {
@@ -59,7 +61,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 
   let rowStrings: string[] = [];
 
-  for (const row of rows) {
+  for (const row of rows.slice(0, 100)) {
     if (row.object?.properties) {
       if (rowStrings.length === 0) {
         rowStrings = row.object.properties.map(p => getValue(p.value));
@@ -87,17 +89,16 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   }).map(v => v + 32 + 8);
 }
 
+const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
+
 export const Table = observer<Props>(function Table({
   objects,
   truncated,
 }) {
+  const ref = useRef<DataGridHandle | null>(null);
   const navTreeResource = useService(NavTreeResource);
   const styles = useStyles(style, baseStyles, tableStyles);
   const tableState = useTable();
-
-  if (objects.length === 0) {
-    return null;
-  }
 
   const baseObject = objects
     .slice()
@@ -105,10 +106,9 @@ export const Table = observer<Props>(function Table({
 
   const nodeIds = objects.map(object => object.id);
   const properties = baseObject[0].object?.properties || [];
-
   const measuredCells = getMeasuredCells(properties, objects);
-  const customColumns = [ColumnSelect, ColumnIcon];
-  const columns: Column<DBObject>[] = customColumns.concat(properties.map((property, index) => ({
+
+  const dataColumns = properties.map((property, index) => ({
     key: property.id!,
     name: property.displayName ?? '',
     columnDataIndex: null,
@@ -116,17 +116,24 @@ export const Table = observer<Props>(function Table({
     minWidth: 40,
     resizable: true,
     formatter: CellFormatter,
-  })));
+  }));
+
+  const tableData = useTableData(dataColumns, CUSTOM_COLUMNS);
+
+  if (objects.length === 0) {
+    return null;
+  }
 
   return styled(styles)(
-    <TableContext.Provider value={{ customColumns, tableState }}>
+    <TableContext.Provider value={{ tableData, tableState }}>
       <wrapper>
         <DataGrid
+          ref={ref}
           className='cb-metadata-grid-theme'
           rows={objects}
           rowKeyGetter={row => row.id}
           rowRenderer={RowRenderer}
-          columns={columns}
+          columns={tableData.columns}
           rowHeight={40}
         />
         {truncated && (

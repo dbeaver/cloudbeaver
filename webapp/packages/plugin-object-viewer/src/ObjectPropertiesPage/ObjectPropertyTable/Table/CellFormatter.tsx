@@ -98,9 +98,14 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
 
 export const CellFormatter = observer<FormatterProps<DBObject>>(function CellFormatter(props) {
   const tableContext = useContext(TableContext);
+
+  if (!tableContext.tableData) {
+    throw new Error('Table data must be provided');
+  }
+
   const { node } = useNode(props.row.id);
 
-  const columnIdx = props.column.idx - tableContext.customColumns.length;
+  const columnIdx = tableContext.tableData.getColumnIdx(props.column);
   const property = props.row.object?.properties?.[columnIdx];
   const value = property ? getValue(property.value) : '';
 

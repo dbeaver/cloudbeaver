@@ -10,14 +10,14 @@ import { createContext } from 'react';
 
 import type { TableState } from '@cloudbeaver/core-blocks';
 
-import type { Column } from './Column';
+import type { ITableData } from './useTableData';
 
 interface ITableContext {
-  customColumns: Column[];
+  tableData: ITableData | null;
   tableState: TableState | null;
 }
 
 export const TableContext = createContext<ITableContext>({
-  customColumns: [],
+  tableData: null,
   tableState: null,
 });
