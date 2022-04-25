@@ -23,6 +23,8 @@ const styles = css`
   div {
     flex: auto;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   ExceptionMessage {
     padding: 24px;

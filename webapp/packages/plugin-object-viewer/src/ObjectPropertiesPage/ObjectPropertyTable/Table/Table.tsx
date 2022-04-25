@@ -72,7 +72,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
       for (let i = 0; i < row.object.properties.length; i++) {
         const value = getValue(row.object.properties[i].value);
 
-        if (value.length > rowStrings[i].length) {
+        if (value.length > (rowStrings[i] ?? '').length) {
           rowStrings[i] = value;
         }
       }
@@ -82,7 +82,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   return TextTools.getWidth({
     font: '400 12px Roboto',
     text: columnNames.map((cell, i) => {
-      if (cell.length > (rowStrings[i] || '').length) {
+      if (cell.length > (rowStrings[i] ?? '').length) {
         return cell;
       }
       return rowStrings[i];

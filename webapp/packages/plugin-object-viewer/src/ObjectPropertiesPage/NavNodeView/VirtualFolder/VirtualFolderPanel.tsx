@@ -23,6 +23,8 @@ const style = css`
     position: relative;
     width: 100%;
     flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
   }
 `;
 
