@@ -18,6 +18,7 @@ package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -60,6 +61,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
+
 
     private final CBDatabase database;
 
@@ -813,7 +815,7 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
     public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = findOrCreateExternalUserByCredentials(authProviderId, userCredentials);
+                var userId = findOrCreateExternalUserByCredentials(authProviderId, sessionParameters, userCredentials);
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
@@ -828,35 +830,37 @@ public class CBSecurityController implements SMAdminController<WebUser, WebRole>
         }
     }
 
-    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId, @NotNull Map<String, Object> sessionParameters, @NotNull Map<String, Object> userCredentials) throws DBException {
         var userId = findUserByCredentials(authProviderId, userCredentials);
-        if (userId != null) {
-            return userId;
-        }
+        if (userId == null) {
+            AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+            if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
+                return null;
+            }
+            var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
+            userId = externalAuthProvider.validateLocalAuth(
+                    new VoidProgressMonitor(),
+                    this,
+                    Collections.emptyMap(),
+                    userCredentials,
+                    null);
 
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
-        if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
-            return null;
+            if (!isSubjectExists(userId)) {
+                var newUser = new WebUser(userId);
+                createUser(newUser.getUserId(), newUser.getMetaParameters());
+                String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
+                if (!CommonUtils.isEmpty(defaultRoleName)) {
+                    setUserRoles(userId, new String[]{defaultRoleName}, userId);
+                }
+            }
+            setUserCredentials(userId, authProviderId, userCredentials);
         }
-        var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        userId = externalAuthProvider.validateLocalAuth(
-            new VoidProgressMonitor(),
-            this,
-            Collections.emptyMap(),
-            userCredentials,
-            null);
-
-        if (!isSubjectExists(userId)) {
-            var newUser = new WebUser(userId);
-            createUser(newUser.getUserId(), newUser.getMetaParameters());
-            String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
-            if (!CommonUtils.isEmpty(defaultRoleName)) {
-                setUserRoles(userId, new String[]{defaultRoleName}, userId);
+        if (authProviderId.equals(RPAuthProvider.AUTH_PROVIDER)) {
+            Object reverseProxyUserRoles = sessionParameters.get(RPAuthProvider.X_ROLE);
+            if (reverseProxyUserRoles instanceof List) {
+                setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new),userId);
             }
         }
-
-        setUserCredentials(userId, authProviderId, userCredentials);
-
         return userId;
     }
 

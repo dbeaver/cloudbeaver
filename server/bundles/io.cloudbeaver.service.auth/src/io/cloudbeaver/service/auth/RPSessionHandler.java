@@ -18,17 +18,20 @@ package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.auth.provider.local.LocalAuthSession;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -37,14 +40,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
-    public static final String X_USER = "X-User";
-    public static final String X_ROLE = "X-Role";
-    public static final String AUTH_PROVIDER = "local";
+    private static final Log log = Log.getLog(RPSessionHandler.class);
 
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
@@ -55,45 +58,47 @@ public class RPSessionHandler implements DBWSessionHandler {
         }
         return false;
     }
+
     public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
         SMController<WebUser, ?> securityController = webSession.getSecurityController();
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(AUTH_PROVIDER);
-
-        String userName = request.getHeader(X_USER);
-        String roles = request.getHeader(X_ROLE);
-        String[] userRoles = roles.split("\\|");
-        WebUser curUser = webSession.getUser();
+        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
+        if (authProvider == null) {
+            throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
+        }
+        SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
+        String userName = request.getHeader(RPAuthProvider.X_USER);
+        String roles = request.getHeader(RPAuthProvider.X_ROLE);
+        List<String> userRoles = roles == null ? Collections.emptyList() : List.of(roles.split("\\|"));
         SMSession authSession;
         if (userName != null) {
             try {
-                WebUser user = securityController.getUserById(userName);
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
-                var adminSecurityController = CBPlatform.getInstance().getApplication().getAdminSecurityController(null);
-                if (user == null) {
-                    // User doesn't exist. We can create new user automatically
-                    // Create new user
-                    curUser = new WebUser(userName);
-                    adminSecurityController.createUser(curUser.getUserId(), curUser.getMetaParameters());
-
-                    String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
-                    if (userRoles.length == 0) {
-                        userRoles = new String[]{defaultRoleName};
-                    }
-                    // We need to associate new credentials with active user
-                    securityController.setUserCredentials(userName, authProvider.getId(), credentials);
+                Map<String, Object> sessionParameters = webSession.getSessionParameters();
+                sessionParameters.put(RPAuthProvider.X_ROLE, userRoles);
+                Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
+                        webSession.getProgressMonitor(), sessionParameters, credentials);
+                try {
+                    SMAuthInfo smAuthInfo = securityController.authenticate(
+                            webSession.getSessionId(), sessionParameters,
+                            WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
+                    webSession.updateSMAuthInfo(smAuthInfo);
+                } catch (SMException e) {
+                    log.debug("Error during user authentication", e);
+                    throw e;
                 }
-                adminSecurityController.setUserRoles(userName, userRoles, userName);
-                user = curUser;
-                if (user == null) {
-                    user = new WebUser(userName);
-                }
-                DBWUserIdentity userIdentity = new DBWUserIdentity(userName, userName);
+                WebUser user = webSession.getUser();
+                DBWUserIdentity userIdentity = authProviderExternal.getUserIdentity(
+                        webSession.getProgressMonitor(), sessionParameters, credentials);
 
                 if (CommonUtils.isEmpty(user.getDisplayName())) {
                     user.setDisplayName(userIdentity.getDisplayName());
                 }
-                authSession = new LocalAuthSession(webSession, userName);
+                authSession = authProviderExternal.openSession(
+                        webSession.getProgressMonitor(),
+                        webSession,
+                        sessionParameters,
+                        userCredentials);
 
                 WebAuthInfo authInfo = new WebAuthInfo(
                         webSession,
@@ -109,6 +114,7 @@ public class RPSessionHandler implements DBWSessionHandler {
             }
         }
     }
+
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
         return false;

@@ -16,6 +16,12 @@
             </credentials>
 
         </authProvider>
+        <authProvider id="reverseProxy" label="reverseProxy" description="Reverse proxy header based authentication" hidden="true" class="io.cloudbeaver.auth.provider.rp.RPAuthProvider">
+            <credentials>
+                <propertyGroup label="General">
+                    <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
+                </propertyGroup>
+            </credentials>
+        </authProvider>
     </extension>
-
 </plugin>
