@@ -18,7 +18,7 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
 
 export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataActions<TOptions, TResult> {
+implements IDatabaseDataActions<TOptions, TResult> {
   private readonly actions: Map<string, ActionsList<TOptions, TResult>>;
   private readonly source: IDatabaseDataSource<TOptions, TResult>;
 
@@ -61,9 +61,15 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
         const allDeps = getDependingDataActions(Action)
           .slice(2); // skip source and result arguments
 
-        const depends = allDeps
-          .filter(isDatabaseDataAction)
-          .map(action => this.get<IDatabaseDataAction<TOptions, TResult>>(result, action));
+        const depends: any[] = [];
+
+        for (const dependency of allDeps) {
+          if (isDatabaseDataAction(dependency)) {
+            depends.push(this.get<IDatabaseDataAction<TOptions, TResult>>(result, dependency));
+          } else {
+            depends.push(this.source.serviceInjector.getServiceByClass(dependency as any));
+          }
+        }
 
         if (allDeps.length !== depends.length) {
           throw new Error('Unsupported inject in: ' + Action.name);

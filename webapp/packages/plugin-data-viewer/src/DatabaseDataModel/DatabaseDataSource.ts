@@ -9,6 +9,7 @@
 import { observable, makeObservable, action, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
+import type { IServiceInjector } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataActions } from './DatabaseDataActions';
@@ -19,7 +20,7 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataSource<TOptions, TResult> {
+implements IDatabaseDataSource<TOptions, TResult> {
   abstract readonly dataManager: IDatabaseDataManager;
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
@@ -37,13 +38,15 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   abstract get canCancel(): boolean;
 
+  readonly serviceInjector: IServiceInjector;
   protected disabled: boolean;
   private activeRequest: Promise<TResult[] | null> | null;
   private activeSave: Promise<TResult[]> | null;
   private activeTask: Promise<any> | null;
   private lastAction: () => Promise<void>;
 
-  constructor() {
+  constructor(serviceInjector: IServiceInjector) {
+    this.serviceInjector = serviceInjector;
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
@@ -93,11 +96,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T | undefined
+  ): T | undefined;
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T | undefined
+  ): T | undefined;
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
@@ -115,11 +118,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T
+  ): T;
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T
+  ): T;
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
     action: IDatabaseDataActionClass<TOptions, TResult, T>
@@ -137,11 +140,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
     action: IDatabaseDataActionInterface<TOptions, TResult, T>
-  ): T | undefined
+  ): T | undefined;
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
     action: IDatabaseDataActionInterface<TOptions, TResult, T>
-  ): T | undefined
+  ): T | undefined;
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
     action: IDatabaseDataActionInterface<TOptions, TResult, T>

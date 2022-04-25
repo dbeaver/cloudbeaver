@@ -6,7 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ITab } from '@cloudbeaver/core-ui';
-import { createValueToken } from '@cloudbeaver/core-di';
+import { css } from 'reshadow';
 
-export const TabToken = createValueToken<ITab>('ITab');
+export const MENU_BAR_SMALL_STYLES = css`
+    menu-bar-item {
+      padding: 0 12px;
+    }
+    menu-bar {
+      height: 32px;
+    }
+  `;

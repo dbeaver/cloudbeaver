@@ -57,7 +57,6 @@ export * from './QuotasService';
 // Models
 export * from './shared/NavigationTabs/ITab';
 export * from './shared/NavigationTabs/TabHandler';
-export * from './shared/TabEntity/TabEntity';
 // Enums
 export * from './shared/NodesManager/ENodeFeature';
 export * from './shared/NodesManager/EObjectFeature';
@@ -78,8 +77,3 @@ export * from './TopNavBar/Logo';
 // Interfaces
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NodesManager/EntityTypes';
-
-// tab entity
-export * from './shared/TabEntity/TabContainerEntity';
-export * from './shared/TabEntity/TabEntity';
-export * from './shared/TabEntity/TabToken';

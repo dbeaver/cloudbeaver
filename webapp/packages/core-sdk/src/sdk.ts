@@ -296,6 +296,7 @@ export interface DriverInfo {
   promotedScore?: Maybe<Scalars['Int']>;
   providerId?: Maybe<Scalars['ID']>;
   providerProperties: Array<ObjectPropertyInfo>;
+  requiresServerName?: Maybe<Scalars['Boolean']>;
   sampleURL?: Maybe<Scalars['String']>;
 }
 

@@ -32,8 +32,8 @@ export const inversifyWrapper: IDiWrapper = {
   },
 
   collection: {
-    addServiceByClass(Ctor: IServiceConstructor<any>): void {
-      mainContainer.addServiceByClass(Ctor);
+    addServiceByClass(Ctor: IServiceConstructor<any>, value?: any): void {
+      mainContainer.addServiceByClass(Ctor, value);
     },
 
     addServiceByToken<T extends Record<string, unknown>>(

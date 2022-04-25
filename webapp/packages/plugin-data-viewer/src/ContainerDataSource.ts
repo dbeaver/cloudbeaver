@@ -10,6 +10,7 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import type { QuotasService } from '@cloudbeaver/core-app';
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
@@ -34,12 +35,13 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   constructor(
+    readonly serviceInjector: IServiceInjector,
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly quotasService: QuotasService,
   ) {
-    super();
+    super(serviceInjector);
 
     this.dataManager = new DatabaseDataManager(this.graphQLService, this.quotasService, this);
     this.currentTask = null;

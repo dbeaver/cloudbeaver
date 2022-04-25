@@ -111,6 +111,7 @@ export const BASE_TAB_ACTION_STYLES = css`
     top: 0;
     right: 0;
     z-index: 1;
+    overflow: hidden;
 
     &:not(:empty) + BaseTab {
       padding-right: 14px;
