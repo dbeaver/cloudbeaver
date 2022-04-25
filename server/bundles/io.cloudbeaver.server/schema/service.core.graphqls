@@ -283,6 +283,7 @@ type ConnectionInfo {
 
     host: String
     port: String
+    serverName: String
     databaseName: String
     url: String
 
