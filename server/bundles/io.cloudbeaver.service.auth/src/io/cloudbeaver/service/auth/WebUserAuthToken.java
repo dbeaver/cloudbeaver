@@ -16,6 +16,28 @@
  */
 package io.cloudbeaver.service.auth;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// UGADAY, KTO TYT BYL?
+
+
+
+
+
+
+
+
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
