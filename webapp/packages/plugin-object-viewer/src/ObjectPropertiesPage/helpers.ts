@@ -19,7 +19,7 @@ export function getValue(value: Value): string {
     case 'string':
       return value;
     case 'object':
-      return Array.isArray(value) ? value.join(' ') : value.displayName;
+      return Array.isArray(value) ? value.join(', ') : value.displayName;
     default:
       return '';
   }

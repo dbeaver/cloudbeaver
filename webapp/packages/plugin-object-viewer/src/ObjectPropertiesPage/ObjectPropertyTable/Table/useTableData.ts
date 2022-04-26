@@ -12,17 +12,17 @@ import type { CalculatedColumn as GridCalculatedColumn } from 'react-data-grid';
 import type { DBObject } from '@cloudbeaver/core-app';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
-import type { DataColumn, ICustomColumn } from './Column';
+import type { IDataColumn, ICustomColumn } from './Column';
 
 type CalculatedColumn = GridCalculatedColumn<DBObject>;
 
 export interface ITableData {
-  columns: DataColumn[];
+  columns: IDataColumn[];
   isCustomColumn: (column: CalculatedColumn) => boolean;
   getColumnIdx: (column: CalculatedColumn) => number;
 }
 
-export function useTableData(dataColumns: DataColumn[], customColumns: ICustomColumn[]): ITableData {
+export function useTableData(dataColumns: IDataColumn[], customColumns: ICustomColumn[]): ITableData {
   return useObservableRef(() => ({
     get columns() {
       return this.customColumns.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).concat(this.dataColumns);
