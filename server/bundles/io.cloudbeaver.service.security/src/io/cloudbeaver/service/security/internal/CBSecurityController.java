@@ -808,7 +808,7 @@ public class CBSecurityController implements SMAdminController {
                 return new SMAuthInfo(token, null, permissions);
             }
         } catch (SQLException e) {
-            throw new DBException("Error during auth", e);
+            throw new DBException(e.getMessage(), e);
         }
     }
 
@@ -827,7 +827,7 @@ public class CBSecurityController implements SMAdminController {
                 return new SMAuthInfo(token, userId, permissions);
             }
         } catch (SQLException e) {
-            throw new DBException("Error during auth", e);
+            throw new DBException(e.getMessage(), e);
         }
     }
 
