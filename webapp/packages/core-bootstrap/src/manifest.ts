@@ -43,7 +43,8 @@ import {
   ConnectionSchemaManagerBootstrap,
   NavigationTreeBootstrap,
   ToolsPanelService,
-  QuotasService
+  QuotasService,
+  WorkspacePanelService
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -123,6 +124,7 @@ export const coreManifests: PluginManifest[] = [
       ThemeSettingsService,
       ThemeService,
       ToolsPanelService,
+      WorkspacePanelService,
     ],
   },
   coreSDKManifest,

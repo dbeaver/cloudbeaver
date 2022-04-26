@@ -11,9 +11,10 @@ import { action } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
+import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -24,6 +25,7 @@ interface State {
   tryReadScript: (file: File, prevScript: string) => Promise<string | null>;
   readScript: (file: File) => Promise<string | null>;
   downloadScript: (script: string) => void;
+  saveScript: (script: string) => void;
   checkFileValidity: (file: File) => boolean;
 }
 
@@ -32,6 +34,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
+  const scriptsManagerService = useService(ScriptsManagerService);
 
   return useObservableRef(() => ({
     async tryReadScript(file: File, prevScript: string) {
@@ -100,18 +103,36 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
       download(blob, generateFileName(name, '.sql'));
     },
+    async saveScript(script: string) {
+      const name = await this.commonDialogService.open(RenameDialog, {
+        value: '',
+        objectName: '',
+        title: 'plugin_resource_manager_script_name',
+        confirmActionText: 'ui_processing_save',
+      });
+
+      if (name != DialogueStateResult.Rejected && name !== DialogueStateResult.Resolved) {
+        try {
+          await this.scriptsManagerService.saveScript(name, script);
+        } catch (exception) {
+          this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+        }
+      }
+    },
   }),
-  {
-    tryReadScript: action.bound,
-    readScript: action.bound,
-    checkFileValidity: action.bound,
-    downloadScript: action.bound,
-  },
-  {
-    commonDialogService,
-    connectionInfoResource,
-    notificationService,
-    sqlEditorSettingsService,
-    state,
-  });
+    {
+      tryReadScript: action.bound,
+      readScript: action.bound,
+      checkFileValidity: action.bound,
+      downloadScript: action.bound,
+      saveScript: action.bound,
+    },
+    {
+      commonDialogService,
+      connectionInfoResource,
+      notificationService,
+      sqlEditorSettingsService,
+      scriptsManagerService,
+      state,
+    });
 }

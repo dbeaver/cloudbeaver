@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
+import { IconOrImage, StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
@@ -71,7 +71,7 @@ const styles = css`
       flex-shrink: 0;
     }
   
-    StaticImage {
+    StaticImage, IconOrImage {
       height: 16px;
       width: 16px;
       cursor: pointer;
@@ -192,12 +192,20 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               <StaticImage icon="/icons/sql_format_sm.svg" />
             </button>
             <button
+              title={translate('plugin_resource_manager_save_script')}
+              disabled={!trimmedValue}
+              hidden={data.activeSegmentMode.activeSegmentMode}
+              onClick={() => tools.saveScript(trimmedValue)}
+            >
+              <StaticImage icon='/icons/save.svg' />
+            </button>
+            <button
               disabled={!trimmedValue}
               title={translate('sql_editor_download_script_tooltip')}
               hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.downloadScript(trimmedValue)}
             >
-              <StaticImage icon='/icons/save.svg' />
+              <IconOrImage icon='export' />
             </button>
             {!data.activeSegmentMode.activeSegmentMode && (
               <UploadArea

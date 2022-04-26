@@ -31,6 +31,7 @@ const style = css`
 export interface RenameDialogPayload {
   value: string;
   objectName: string;
+  title?: string;
   icon?: string;
   subTitle?: string;
   bigIcon?: boolean;
@@ -48,8 +49,8 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const { icon, subTitle, bigIcon, viewBox, value, objectName, confirmActionText } = payload;
-  const title = `${translate('ui_rename')} ${objectName}`;
+  const { title, icon, subTitle, bigIcon, viewBox, value, objectName, confirmActionText } = payload;
+  const dialogTitle = `${translate(title ?? 'ui_rename')} ${objectName}`;
 
   const state = useObservableRef(() => ({
     value,
@@ -70,7 +71,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     <CommonDialogWrapper
       size='small'
       subTitle={subTitle}
-      title={title}
+      title={dialogTitle}
       icon={icon}
       viewBox={viewBox}
       bigIcon={bigIcon}
