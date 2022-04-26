@@ -365,7 +365,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             return Arrays.stream(securityController
                     .getSubjectConnectionAccess(new String[]{subjectId}))
                 .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
-        } catch (DBCException e) {
+        } catch (DBException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);
             return Collections.emptySet();
@@ -425,12 +425,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
 
-    private synchronized void authAsAnonymousUser() throws DBCException {
+    private synchronized void authAsAnonymousUser() throws DBException {
         if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
             this.sessionPermissions = Collections.emptySet();
             return;
         }
-        var authInfo = securityController.authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
+        SMAuthInfo authInfo = securityController.authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMAuthInfo(authInfo);
     }
 
@@ -893,7 +893,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.adminSecurityController = null;
     }
 
-    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
+    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
         if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
@@ -904,6 +904,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.adminSecurityController = application.getAdminSecurityController(this);
 
         this.user = smAuthInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(smAuthInfo.getUserId()));
+
         refreshUserData();
     }
 

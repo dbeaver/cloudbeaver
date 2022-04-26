@@ -239,7 +239,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
 
             isAdmin = authInfo.getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
-        } catch (DBCException e) {
+        } catch (DBException e) {
             log.error(e);
         }
 
@@ -285,7 +285,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error reading user details", e);
         }
     }
@@ -324,7 +324,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 name,
                 value);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
         }
     }

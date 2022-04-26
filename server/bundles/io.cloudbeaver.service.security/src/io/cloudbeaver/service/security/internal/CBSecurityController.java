@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security.internal;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -155,7 +154,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMRole[] getUserRoles(String userId) throws DBCException {
+    public SMRole[] getUserRoles(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
@@ -175,7 +174,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMUser getUserById(String userId) throws DBCException {
+    public SMUser getUserById(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
@@ -298,7 +297,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserParameter(String userId, String name, Object value) throws DBCException {
+    public void setUserParameter(String userId, String name, Object value) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 if (value == null) {
@@ -358,7 +357,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
         List<String[]> transformedCredentials;
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
@@ -495,7 +494,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public String[] getUserLinkedProviders(String userId) throws DBCException {
+    public String[] getUserLinkedProviders(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
@@ -696,7 +695,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
+    public Set<String> getSubjectPermissions(String subjectId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
@@ -715,7 +714,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public Set<String> getUserPermissions(String userId) throws DBCException {
+    public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -747,7 +746,7 @@ public class CBSecurityController implements SMAdminController {
     // Sessions
 
     @Override
-    public boolean isSessionPersisted(String id) throws DBCException {
+    public boolean isSessionPersisted(String id) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT 1 FROM CB_SESSION WHERE SESSION_ID=?")) {
@@ -764,8 +763,8 @@ public class CBSecurityController implements SMAdminController {
         }
     }
 
-    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBCException {
-        if(isSessionPersisted(appSessionId)) {
+    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBException {
+        if (isSessionPersisted(appSessionId)) {
             return;
         }
         try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -798,7 +797,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBCException {
+    public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
@@ -809,12 +808,12 @@ public class CBSecurityController implements SMAdminController {
                 return new SMAuthInfo(token, null, permissions);
             }
         } catch (SQLException e) {
-            throw new DBCException("Error during auth", e);
+            throw new DBException("Error during auth", e);
         }
     }
 
     @Override
-    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBCException {
+    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var userId = findOrCreateExternalUserByCredentials(authProviderId, sessionParameters, userCredentials);
@@ -827,8 +826,8 @@ public class CBSecurityController implements SMAdminController {
                 txn.commit();
                 return new SMAuthInfo(token, userId, permissions);
             }
-        } catch (SQLException | DBException e) {
-            throw new DBCException("Error during auth", e);
+        } catch (SQLException e) {
+            throw new DBException("Error during auth", e);
         }
     }
 
@@ -930,7 +929,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBException {
         if (subjectIds.length == 0) {
             return new SMDataSourceGrant[0];
         }
@@ -1005,7 +1004,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1031,7 +1030,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
+    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 // Delete all permissions

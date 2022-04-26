@@ -242,8 +242,9 @@ public class CBDatabase {
     }
 
     @NotNull
-    private SMUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
+    private SMUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBException {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
+
         if (adminUser == null) {
             adminUser = new SMUser(adminName);
             adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters());
