@@ -78,7 +78,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   return TextTools.getWidth({
     font: '400 12px Roboto',
     text: columnNames.map((cell, i) => {
-      if (cell.length > rowStrings[i].length) {
+      if (cell.length >= rowStrings[i].length) {
         return cell;
       }
       return rowStrings[i];
