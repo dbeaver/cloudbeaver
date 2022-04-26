@@ -80,7 +80,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private static final Log log = Log.getLog(WebSession.class);
 
-    public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
+    public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
 
     private static final String ATTR_LOCALE = "locale";
 
