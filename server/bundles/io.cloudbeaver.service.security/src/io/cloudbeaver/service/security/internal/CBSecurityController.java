@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebApplication;
@@ -835,8 +836,8 @@ public class CBSecurityController implements SMAdminController {
                                                          @NotNull Map<String, Object> sessionParameters,
                                                          @NotNull Map<String, Object> userCredentials) throws DBException {
         var userId = findUserByCredentials(authProviderId, userCredentials);
+        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         if (userId == null) {
-            AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
@@ -858,8 +859,11 @@ public class CBSecurityController implements SMAdminController {
             }
             setUserCredentials(userId, authProviderId, userCredentials);
         }
-        if (authProviderId.equals(RPAuthProvider.AUTH_PROVIDER)) {
-            Object reverseProxyUserRoles = sessionParameters.get(RPAuthProvider.X_ROLE);
+        if (authProvider.isTrusted()) {
+            if (WebAppUtils.getWebApplication().isMultiNode()) {
+                throw new DBWebException("Authorization through trusted provider is not available in multi node");
+            }
+            Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
             if (reverseProxyUserRoles instanceof List) {
                 setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new), userId);
             }

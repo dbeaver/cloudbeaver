@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.service.sql.WebSQLConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -28,6 +30,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.rm.RMResourceChange;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
