@@ -23,8 +23,10 @@ import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
 import { CellFormatter } from './CellFormatter';
+import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
+import { HeaderRenderer } from './HeaderRenderer';
 import { RowRenderer } from './RowRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
@@ -58,21 +60,15 @@ interface Props {
 }
 
 function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
-  const columnNames = columns.map(column => column.displayName).filter(isDefined);
-
-  let rowStrings: string[] = [];
+  const columnNames = columns.map(column => column.displayName?.toUpperCase()).filter(isDefined);
+  const rowStrings: string[] = Array(columns.length).fill('');
 
   for (const row of rows.slice(0, 100)) {
     if (row.object?.properties) {
-      if (rowStrings.length === 0) {
-        rowStrings = row.object.properties.map(p => getValue(p.value));
-        continue;
-      }
-
       for (let i = 0; i < row.object.properties.length; i++) {
         const value = getValue(row.object.properties[i].value);
 
-        if (value.length > (rowStrings[i] ?? '').length) {
+        if (value.length > rowStrings[i].length) {
           rowStrings[i] = value;
         }
       }
@@ -82,12 +78,12 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   return TextTools.getWidth({
     font: '400 12px Roboto',
     text: columnNames.map((cell, i) => {
-      if (cell.length > (rowStrings[i] ?? '').length) {
+      if (cell.length >= rowStrings[i].length) {
         return cell;
       }
       return rowStrings[i];
     }),
-  }).map(v => v + 32 + 8);
+  }).map(v => v + 16 + 8);
 }
 
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
@@ -107,20 +103,22 @@ export const Table = observer<Props>(function Table({
 
   const baseObject = objects
     .slice()
-    .sort((a, b) => (a.object?.properties?.length || 0) - (b.object?.properties?.length || 0));
+    .sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
   const nodeIds = objects.map(object => object.id);
-  const properties = baseObject[0].object?.properties || [];
+  const properties = baseObject[0].object?.properties ?? [];
   const measuredCells = getMeasuredCells(properties, objects);
 
-  const dataColumns = properties.map((property, index) => ({
+  const dataColumns: IDataColumn[] = properties.map((property, index) => ({
     key: property.id!,
     name: property.displayName ?? '',
+    description: property.description,
     columnDataIndex: null,
     width: Math.min(300, measuredCells[index]),
     minWidth: 40,
     resizable: true,
     formatter: CellFormatter,
+    headerRenderer: HeaderRenderer,
   }));
 
   const tableData = useTableData(dataColumns, CUSTOM_COLUMNS);

@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.service.sql.WebSQLConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -28,6 +30,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.rm.RMResourceChange;
+import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -225,6 +228,16 @@ public class LocalResourceController implements RMController {
         @NotNull String resourcePath,
         @NotNull byte[] data) throws DBException
     {
+        Number fileSizeLimit = WebAppUtils.getWebApplication()
+                .getAppConfiguration()
+                .getResourceQuota(WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT);
+        if (fileSizeLimit != null && data.length > fileSizeLimit.longValue()) {
+            throw new DBQuotaException(
+                    "File size quota exceeded",
+                    WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT,
+                    fileSizeLimit.longValue(),
+                    data.length);
+        }
         Path targetPath = getTargetPath(projectId, resourcePath);
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");

@@ -10,8 +10,10 @@ import type { Column as DataGridColumn } from 'react-data-grid';
 
 import type { DBObject } from '@cloudbeaver/core-app';
 
-export type DataColumn = DataGridColumn<DBObject>;
+export interface IDataColumn extends DataGridColumn<DBObject> {
+  description?: string;
+}
 
-export interface ICustomColumn extends DataColumn {
+export interface ICustomColumn extends IDataColumn {
   order?: number;
 }
