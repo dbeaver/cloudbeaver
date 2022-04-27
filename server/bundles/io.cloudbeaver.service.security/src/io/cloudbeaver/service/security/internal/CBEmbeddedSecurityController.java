@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -43,6 +44,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,9 +52,9 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBSecurityController implements SMAdminController {
+public class CBEmbeddedSecurityController implements SMAdminController {
 
-    private static final Log log = Log.getLog(CBSecurityController.class);
+    private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
     private static final int TOKEN_HOURS_ALIVE_TIME = 1;
 
@@ -65,7 +67,7 @@ public class CBSecurityController implements SMAdminController {
 
     private final CBDatabase database;
 
-    public CBSecurityController(CBDatabase database) {
+    public CBEmbeddedSecurityController(CBDatabase database) {
         this.database = database;
     }
 
@@ -802,14 +804,18 @@ public class CBSecurityController implements SMAdminController {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
                 var token = generateAuthToken(appSessionId, null, dbCon);
-                var anonymousUserRole = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserRole();
-                var permissions = getSubjectPermissions(anonymousUserRole);
+                var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, null, permissions);
+                return new SMAuthInfo(token, new SMAuthPermissions(null, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    private Set<String> getAnonymousUserPermissions() throws DBException {
+        var anonymousUserRole = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserRole();
+        return getSubjectPermissions(anonymousUserRole);
     }
 
     @Override
@@ -827,7 +833,7 @@ public class CBSecurityController implements SMAdminController {
                 var token = generateAuthToken(appSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
-                return new SMAuthInfo(token, userId, permissions);
+                return new SMAuthInfo(token, new SMAuthPermissions(userId, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -898,6 +904,30 @@ public class CBSecurityController implements SMAdminController {
             dbStat.execute();
             return authToken;
         }
+    }
+
+    @Override
+    public SMAuthPermissions getTokenPermissions(String token) throws DBException {
+        String userId;
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID, EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+        ) {
+            dbStat.setString(1, token);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Invalid token");
+                }
+                userId = dbResult.getString(1);
+                var expiredDate = dbResult.getTimestamp(2);
+                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                    throw new SMException("Token expired");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
+        return new SMAuthPermissions(userId, permissions);
     }
 
     @Override
