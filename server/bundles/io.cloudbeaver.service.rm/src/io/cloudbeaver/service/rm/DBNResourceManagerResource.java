@@ -82,10 +82,10 @@ public class DBNResourceManagerResource extends DBNNode {
 
     private String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
-        for (DBNNode parent = getParentNode(); parent != null; parent = parent.getParentNode()) {
+        for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
-                if (folder.length() > 0) folder.append('/');
-                folder.append(parent.getName());
+                if (folder.length() > 0) folder.insert(0, '/');
+                folder.insert(0, parent.getName());
             } else {
                 break;
             }
