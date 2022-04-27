@@ -49,13 +49,17 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
 
     @NotNull
     @Override
-    public String validateLocalAuth(@NotNull DBRProgressMonitor monitor, @NotNull SMController securityController, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials, @Nullable WebUser activeUser) throws DBException {
+    public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,
+                                    @NotNull SMController securityController,
+                                    @NotNull Map<String, Object> providerConfig,
+                                    @NotNull Map<String, Object> userCredentials,
+                                    @Nullable String activeUserId) throws DBException {
         String userName = (String) userCredentials.get("user");
 
-        if (activeUser == null) {
+        if (activeUserId == null) {
             return userName;
         } else {
-            return activeUser.getUserId();
+            return activeUserId;
         }
     }
 

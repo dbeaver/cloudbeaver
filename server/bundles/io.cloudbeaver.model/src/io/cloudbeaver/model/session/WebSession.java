@@ -215,7 +215,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return user;
     }
 
-    private synchronized String getUserId() {
+    public synchronized String getUserId() {
         return user == null ? null : user.getUserId();
     }
 
