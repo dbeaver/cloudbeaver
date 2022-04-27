@@ -54,6 +54,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Nullable
+    @Override
+    public Path getDefaultWorkingFolder() {
+        return null;
+    }
+
+    @Nullable
     protected Path loadServerConfiguration() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
