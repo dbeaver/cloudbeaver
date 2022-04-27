@@ -29,6 +29,11 @@ export class ResourceManagerService {
     this.enabled = !this.enabled;
   }
 
+  getResourceName(resourceId: string) {
+    const parts = resourceId.replace('//', '\\').split('/');
+    return parts[parts.length - 1];
+  }
+
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
     await this.graphQLService.sdk.createResource({
       projectId,

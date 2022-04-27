@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ResourceManagerService, ROOT_NODE_PATH } from './ResourceManagerService';
 
 const SCRIPTS_FOLDER = 'cbadmin';
+const SCRIPT_EXTENSION = '.sql';
 
 @injectable()
 export class ScriptsManagerService {
@@ -21,9 +22,18 @@ export class ScriptsManagerService {
   ) { }
 
   async saveScript(name: string, script: string) {
+    name = name + SCRIPT_EXTENSION;
     await this.resourceManagerService.createResource(SCRIPTS_FOLDER, name, false);
     await this.resourceManagerService.writeResource(script, SCRIPTS_FOLDER, name);
     await this.updateScriptNodes();
+  }
+
+  async readScript(name: string) {
+    return await this.resourceManagerService.readResource(SCRIPTS_FOLDER, name);
+  }
+
+  isScript(nodeId: string) {
+    return this.resourceManagerService.getResourceName(nodeId).includes(SCRIPT_EXTENSION);
   }
 
   private async updateScriptNodes() {

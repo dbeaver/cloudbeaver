@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
+import { ResourceManagerMenuService } from './ResourceManagerMenuService';
 import { ResourceManagerService } from './ResourceManagerService';
 import { ScriptsManagerService } from './ScriptsManagerService';
 
@@ -20,5 +21,6 @@ export const resourceManagerPlugin: PluginManifest = {
     LocaleService,
     ResourceManagerService,
     ScriptsManagerService,
+    ResourceManagerMenuService,
   ],
 };

@@ -11,6 +11,7 @@ import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ResourceManager } from './ResourceManager';
+import { ResourceManagerMenuService } from './ResourceManagerMenuService';
 import { ResourceManagerService } from './ResourceManagerService';
 
 @injectable()
@@ -19,7 +20,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly mainMenuService: MainMenuService,
     private readonly authInfoService: AuthInfoService,
     private readonly resourceManagerService: ResourceManagerService,
-    private readonly workspacePanelService: WorkspacePanelService
+    private readonly workspacePanelService: WorkspacePanelService,
+    private readonly resourceManagerMenuService: ResourceManagerMenuService
   ) {
     super();
   }
@@ -46,6 +48,8 @@ export class PluginBootstrap extends Bootstrap {
       onClose: this.resourceManagerService.toggleEnabled,
       panel: () => ResourceManager,
     });
+
+    this.resourceManagerMenuService.register();
   }
 
   load(): void | Promise<void> { }
