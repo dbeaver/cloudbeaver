@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.service.security.internal.CBSecurityController;
+import io.cloudbeaver.service.security.internal.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.db.CBDatabaseConfig;
 import org.jkiss.dbeaver.DBException;
@@ -36,7 +36,7 @@ public class SecurityPluginService implements IPluginService {
     private static final Log log = Log.getLog(SecurityPluginService.class);
 
     private static CBDatabase DB_INSTANCE;
-    private static CBSecurityController CONTROLLER_INSTANCE;
+    private static CBEmbeddedSecurityController CONTROLLER_INSTANCE;
 
     public static void finishConfiguration(String adminName, String adminPassword, List<WebAuthInfo> authInfoList) throws DBException {
         DB_INSTANCE.finishConfiguration(adminName, adminPassword, authInfoList);
@@ -61,7 +61,7 @@ public class SecurityPluginService implements IPluginService {
         gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
         DB_INSTANCE = new CBDatabase(application, databaseConfiguration);
-        CONTROLLER_INSTANCE = new CBSecurityController(DB_INSTANCE);
+        CONTROLLER_INSTANCE = new CBEmbeddedSecurityController(DB_INSTANCE);
         //FIXME circular dependency
         DB_INSTANCE.setAdminSecurityController(CONTROLLER_INSTANCE);
 

@@ -895,16 +895,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
-        if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
+        var tokenInfo = smAuthInfo.getUserInfo();
+        if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), tokenInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), smAuthInfo.getUserId());
-        this.sessionPermissions = smAuthInfo.getPermissions();
+        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), tokenInfo.getUserId());
+        this.sessionPermissions = tokenInfo.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
 
-        this.user = smAuthInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(smAuthInfo.getUserId()));
-
+        this.user = tokenInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(tokenInfo.getUserId()));
         refreshUserData();
     }
 

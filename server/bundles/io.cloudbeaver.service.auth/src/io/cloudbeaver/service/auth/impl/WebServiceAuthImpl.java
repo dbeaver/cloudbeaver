@@ -130,9 +130,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 if (curUser == null) {
                     try {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
-                        userId = smAuthInfo.getUserId();
+                        userId = smAuthInfo.getUserInfo().getUserId();
                         webSession.updateSMAuthInfo(smAuthInfo);
                         curUser = webSession.getUser();
+                        securityController = webSession.getSecurityController();
                     } catch (SMException e) {
                         log.debug("Error during user authentication", e);
                         throw e;
@@ -238,7 +239,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
 
-            isAdmin = authInfo.getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
+            isAdmin = authInfo.getUserInfo().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
         } catch (DBException e) {
             log.error(e);
         }
