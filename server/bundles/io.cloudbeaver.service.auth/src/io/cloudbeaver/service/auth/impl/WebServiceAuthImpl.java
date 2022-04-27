@@ -101,7 +101,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     linkWithActiveUser = true;
                 }
             } else if (!providerEnabled) {
-                if (!isAdminAuthTry(webSession, authProvider, userCredentials)) {
+                if (!isAdminAuthTry(webSession, authProvider, authParameters)) {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
             }
@@ -121,7 +121,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         securityController,
                         providerConfig,
                         userCredentials,
-                        webSession.getUser());
+                        webSession.getUserId());
                 } else {
                     userId = "temp_config_admin";
                 }

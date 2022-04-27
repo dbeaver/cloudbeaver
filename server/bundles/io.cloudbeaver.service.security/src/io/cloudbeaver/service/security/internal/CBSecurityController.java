@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
@@ -30,6 +29,7 @@ import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
@@ -816,7 +816,10 @@ public class CBSecurityController implements SMAdminController {
     public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = findOrCreateExternalUserByCredentials(authProviderId, sessionParameters, userCredentials);
+                var userId = findOrCreateExternalUserByCredentials(authProviderId,
+                    sessionParameters,
+                    userCredentials,
+                    new VoidProgressMonitor());
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
@@ -833,21 +836,27 @@ public class CBSecurityController implements SMAdminController {
 
     private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId,
                                                          @NotNull Map<String, Object> sessionParameters,
-                                                         @NotNull Map<String, Object> userCredentials) throws DBException {
-        var userId = findUserByCredentials(authProviderId, userCredentials);
+                                                         @NotNull Map<String, Object> userCredentials,
+                                                         @NotNull DBRProgressMonitor progressMonitor) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
+        String userId = findUserByCredentials(authProviderId, userCredentials);
+        String expectedUserId;
+        try {
+            expectedUserId = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
+        } catch (DBException e) {
+            return null;
+        }
+        if (userId != null && !expectedUserId.equals(userId)) {
+            return null;
+        }
+
         if (userId == null) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
-            var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
-            userId = externalAuthProvider.validateLocalAuth(
-                new VoidProgressMonitor(),
-                this,
-                Collections.emptyMap(),
-                userCredentials,
-                null);
 
+            userId = expectedUserId;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
                 createUser(newUser.getUserId(), newUser.getMetaParameters());
@@ -860,7 +869,7 @@ public class CBSecurityController implements SMAdminController {
         }
         if (authProvider.isTrusted()) {
             if (WebAppUtils.getWebApplication().isMultiNode()) {
-                throw new DBWebException("Authorization through trusted provider is not available in multi node");
+                throw new SMException("Authorization through trusted provider is not available in multi node");
             }
             Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
             if (reverseProxyUserRoles instanceof List) {

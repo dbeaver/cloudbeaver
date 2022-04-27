@@ -16,9 +16,6 @@
  */
 package io.cloudbeaver.auth;
 
-import org.jkiss.dbeaver.model.auth.SMAuthProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
-import org.jkiss.dbeaver.model.security.SMController;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -26,6 +23,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.Map;
@@ -46,18 +45,6 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
         @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException;
 
-    /**
-     * Validates that external user may be associated with local user
-     * @param userCredentials credentials from authExternalUser
-     * @return new user ID. If activeUser is not null then it must be the same as activeUser ID.
-     */
-    @NotNull
-    String validateLocalAuth(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull SMController securityController,
-        @NotNull Map<String, Object> providerConfig,
-        @NotNull Map<String, Object> userCredentials,
-        @Nullable WebUser activeUser) throws DBException;
 
     @NotNull
     DBWUserIdentity getUserIdentity(

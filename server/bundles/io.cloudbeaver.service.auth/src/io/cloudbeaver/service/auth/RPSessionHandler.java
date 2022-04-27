@@ -78,7 +78,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES, userRoles);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
-                        webSession.getProgressMonitor(), sessionParameters, credentials);
+                    webSession.getProgressMonitor(), sessionParameters, credentials);
                 try {
                     SMAuthInfo smAuthInfo = securityController.authenticate(
                             webSession.getSessionId(), sessionParameters,
