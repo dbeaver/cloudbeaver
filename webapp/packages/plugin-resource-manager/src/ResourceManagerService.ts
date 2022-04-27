@@ -11,7 +11,8 @@ import { makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-export const ROOT_NODE_PATH = 'ext://resources/cbadmin';
+export const ROOT_NODE_PATH = 'ext://resources';
+export const RESOURCE_MANAGER_NODE_TYPE = 'rm.resource';
 
 @injectable()
 export class ResourceManagerService {
@@ -42,11 +43,11 @@ export class ResourceManagerService {
     });
   }
 
-  async writeResource(data: string, projectId: string, resourcePath: string) {
+  async writeResource(projectId: string, resourcePath: string, data: string) {
     await this.graphQLService.sdk.writeResourceContent({
-      data,
       projectId,
       resourcePath,
+      data,
     });
   }
 

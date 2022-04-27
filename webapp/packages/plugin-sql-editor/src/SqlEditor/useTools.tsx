@@ -18,6 +18,7 @@ import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { SqlEditorService } from '../SqlEditorService';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
 import { ScriptImportDialog } from './ScriptImportDialog';
 
@@ -26,6 +27,7 @@ interface State {
   readScript: (file: File) => Promise<string | null>;
   downloadScript: (script: string) => void;
   saveScript: (script: string) => void;
+  updateAssociatedScript: (scriptId: string, value: string) => void;
   checkFileValidity: (file: File) => boolean;
 }
 
@@ -35,6 +37,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const scriptsManagerService = useService(ScriptsManagerService);
+  const sqlEditorService = useService(SqlEditorService);
 
   return useObservableRef(() => ({
     async tryReadScript(file: File, prevScript: string) {
@@ -103,7 +106,21 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
       download(blob, generateFileName(name, '.sql'));
     },
+    async updateAssociatedScript(scriptId: string, value: string) {
+      try {
+        await this.scriptsManagerService.writeScript(scriptId, value);
+        const name = this.scriptsManagerService.getScriptName(scriptId);
+        this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success', message: name });
+      } catch (exception) {
+        this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      }
+    },
     async saveScript(script: string) {
+      if (this.state.associatedScriptId) {
+        await this.updateAssociatedScript(this.state.associatedScriptId, script);
+        return;
+      }
+
       const name = await this.commonDialogService.open(RenameDialog, {
         value: '',
         objectName: '',
@@ -113,7 +130,10 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
       if (name != DialogueStateResult.Rejected && name !== DialogueStateResult.Resolved) {
         try {
-          await this.scriptsManagerService.saveScript(name, script);
+          const scriptId = await this.scriptsManagerService.saveScript(name, script);
+          this.sqlEditorService.linkScript(scriptId, this.state);
+
+          this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: name });
         } catch (exception) {
           this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
         }
@@ -133,6 +153,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       notificationService,
       sqlEditorSettingsService,
       scriptsManagerService,
+      sqlEditorService,
       state,
     });
 }

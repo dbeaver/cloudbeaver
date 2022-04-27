@@ -30,7 +30,8 @@ export class SqlEditorService {
     name?: string,
     source?: string,
     query?: string,
-    contextInfo?: IConnectionExecutionContextInfo
+    contextInfo?: IConnectionExecutionContextInfo,
+    associatedScriptId?: string,
   ): ISqlEditorTabState {
     return {
       name,
@@ -45,6 +46,7 @@ export class SqlEditorService {
       statisticsTabs: [],
 
       currentModeId: '',
+      associatedScriptId: associatedScriptId ?? '',
       modeState: [],
     };
   }
@@ -93,6 +95,14 @@ export class SqlEditorService {
     });
 
     return proposals as SQLProposal[];
+  }
+
+  linkScript(scriptId: string, state: ISqlEditorTabState) {
+    state.associatedScriptId = scriptId;
+  }
+
+  setQuery(query: string, state: ISqlEditorTabState) {
+    state.query = query;
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {

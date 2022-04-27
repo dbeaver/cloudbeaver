@@ -8,6 +8,6 @@
 
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_OPEN_SCRIPT = createAction('open-script', {
-  label: 'plugin_resource_manager_open_script_in_new_tab',
+export const ACTION_OPEN_SCRIPT_IN_CURRENT_TAB = createAction('open-script-in-current-tab', {
+  label: 'plugin_resource_manager_open_script_in_current_tab',
 });

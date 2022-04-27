@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { ROOT_NODE_PATH } from '../ResourceManagerService';
+import { SCRIPTS_ROOT_PATH } from '../ScriptsManagerService';
 
 const styles = css`
   CaptureView {
@@ -37,7 +37,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   return styled(styles)(
     <CaptureView view={navTreeService}>
       <ElementsTree
-        root={ROOT_NODE_PATH}
+        root={SCRIPTS_ROOT_PATH}
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         control={NavigationNodeControl}
