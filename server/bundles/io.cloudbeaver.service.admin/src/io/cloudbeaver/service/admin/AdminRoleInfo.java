@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -59,7 +60,7 @@ public class AdminRoleInfo {
     }
 
     @Property
-    public SMDataSourceGrant[] getGrantedConnections() throws DBCException {
+    public SMDataSourceGrant[] getGrantedConnections() throws DBException {
         return session.getSecurityController().getSubjectConnectionAccess(new String[]{getRoleId()});
     }
 

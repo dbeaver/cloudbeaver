@@ -101,7 +101,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     linkWithActiveUser = true;
                 }
             } else if (!providerEnabled) {
-                if (!isAdminAuthTry(webSession, authProvider, userCredentials)) {
+                if (!isAdminAuthTry(webSession, authProvider, authParameters)) {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
             }
@@ -121,7 +121,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         securityController,
                         providerConfig,
                         userCredentials,
-                        webSession.getUser());
+                        webSession.getUserId());
                 } else {
                     userId = "temp_config_admin";
                 }
@@ -239,7 +239,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
 
             isAdmin = authInfo.getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
-        } catch (DBCException e) {
+        } catch (DBException e) {
             log.error(e);
         }
 
@@ -285,7 +285,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error reading user details", e);
         }
     }
@@ -324,7 +324,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 name,
                 value);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
         }
     }

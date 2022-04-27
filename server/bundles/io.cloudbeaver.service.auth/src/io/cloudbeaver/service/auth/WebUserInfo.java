@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -65,9 +66,8 @@ public class WebUserInfo {
     public List<String> getLinkedAuthProviders() throws DBWebException {
         if (linkedProviders == null) {
             try {
-
                 linkedProviders = session.getSecurityController().getUserLinkedProviders(session.getUser().getUserId());
-            } catch (DBCException e) {
+            } catch (DBException e) {
                 throw new DBWebException("Error reading user linked providers", e);
             }
         }

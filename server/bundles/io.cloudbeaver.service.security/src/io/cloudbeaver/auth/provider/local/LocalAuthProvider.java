@@ -18,11 +18,13 @@ package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -38,17 +40,19 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;
     public static final String CRED_PASSWORD = LocalAuthProviderConstants.CRED_PASSWORD;
 
+    @NotNull
     @Override
-    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,
+                                    @NotNull SMController securityController,
+                                    @NotNull Map<String, Object> providerConfig,
+                                    @NotNull Map<String, Object> userCredentials,
+                                    @Nullable String activeUserId) throws DBException {
+
+
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
-        if (!WebSession.class.isAssignableFrom(mainSession.getClass())) {
-            throw new DBException("Invalid parent session, expected web session");
-        }
-        
-        var mainWebSession = (WebSession) mainSession;
         AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = mainWebSession.getSecurityController().getUserCredentials(userName, authProvider.getId());
+        Map<String, Object> storedCredentials = securityController.getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
         }
@@ -64,6 +68,16 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         String clientPasswordHash = AuthPropertyEncryption.hash.encrypt(userName, clientPassword);
         if (!storedPasswordHash.equals(clientPasswordHash)) {
             throw new DBException("Invalid user name or password");
+        }
+
+        return activeUserId == null ? userName : activeUserId;
+    }
+
+    @Override
+    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+        String userName = CommonUtils.toString(userCredentials.get(CRED_USER));
+        if (CommonUtils.isEmpty(userName)) {
+            throw new DBException("Invalid user name");
         }
         return new LocalAuthSession(mainSession, userName);
     }

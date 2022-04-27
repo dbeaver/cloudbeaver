@@ -8,11 +8,21 @@
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-export function getValue(value: string | { displayName: string }): string {
+type Value = string | null | undefined | { displayName: string } | string[];
+
+export function getValue(value: Value): string {
   if (value === null || value === undefined) {
     return '';
   }
-  return typeof value === 'string' ? value : value.displayName;
+
+  switch (typeof value) {
+    case 'string':
+      return value;
+    case 'object':
+      return Array.isArray(value) ? value.join(', ') : value.displayName;
+    default:
+      return '';
+  }
 }
 
 export function matchType(type?: string) {
