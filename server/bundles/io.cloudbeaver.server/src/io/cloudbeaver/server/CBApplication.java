@@ -643,6 +643,12 @@ public class CBApplication extends BaseWebApplication {
         return "GlobalConfiguration";
     }
 
+    @Nullable
+    @Override
+    public Path getDefaultWorkingFolder() {
+        return null;
+    }
+
     public boolean isDevelMode() {
         return develMode;
     }
