@@ -27,8 +27,8 @@ export class UsersAdministrationService extends Bootstrap {
   readonly userDetailsInfoPlaceholder = new PlaceholderContainer<IUserDetailsInfoProps>();
 
   constructor(
-    private administrationItemService: AdministrationItemService,
-    private createUserService: CreateUserService,
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly createUserService: CreateUserService,
     private readonly rolesResource: RolesResource,
     private readonly createRoleService: CreateRoleService,
   ) {

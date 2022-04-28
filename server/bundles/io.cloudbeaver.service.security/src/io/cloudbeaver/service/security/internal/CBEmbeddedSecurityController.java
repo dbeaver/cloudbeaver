@@ -189,12 +189,11 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                     }
                 }
             }
-            var metaParams = new LinkedHashMap<String, String>();
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        metaParams.put(
+                        user.setMetaParameter(
                             dbResult.getString(1),
                             dbResult.getString(2)
                         );

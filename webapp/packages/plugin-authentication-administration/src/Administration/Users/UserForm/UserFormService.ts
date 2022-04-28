@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import type { UserFormController } from './UserFormController';
 
