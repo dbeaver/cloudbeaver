@@ -101,7 +101,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     linkWithActiveUser = true;
                 }
             } else if (!providerEnabled) {
-                if (!isAdminAuthTry(webSession, authProvider, authParameters)) {
+                if (!isAdminAuthTry(webSession, authProvider, userCredentials)) {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
             }
@@ -155,7 +155,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
                 user = curUser;
             }
-
+            if (user == null) {
+                user = new WebUser(new SMUser(userId));
+            }
             if (!configMode && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
