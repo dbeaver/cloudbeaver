@@ -17,10 +17,15 @@
 
 package io.cloudbeaver.service.rm;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
+import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.DBPObjectWithDetails;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -30,7 +35,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBNResourceManagerResource extends DBNNode {
+public class DBNResourceManagerResource extends DBNNode implements DBPObjectWithDetails {
     private static final Log log = Log.getLog(DBNResourceManagerResource.class);
 
     private final RMResource resource;
@@ -127,4 +132,9 @@ public class DBNResourceManagerResource extends DBNNode {
         return getNodeName();
     }
 
+    @Nullable
+    @Override
+    public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
+        return resource;
+    }
 }
