@@ -40,7 +40,7 @@ public class WebUser {
 
     public WebUser(@NotNull SMUser smUser) {
         this.userId = smUser.getUserId();
-        this.metaParameters.putAll(metaParameters);
+        this.metaParameters.putAll(smUser.getMetaParameters());
     }
 
     @NotNull
