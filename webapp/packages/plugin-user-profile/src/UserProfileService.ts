@@ -73,7 +73,7 @@ export class UserProfileService {
     this.close(true);
   }
 
-  private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
+  private readonly closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (!this.formState || !this.optionsPanelService.isOpen(formGetter)) {
       return;
     }
@@ -99,7 +99,7 @@ export class UserProfileService {
     }
 
     if (this.userInfoResource.data === null) {
-      this.clearFormState();
+      this.save();
     }
   }
 
