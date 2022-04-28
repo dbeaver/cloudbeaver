@@ -16,6 +16,10 @@
  */
 package io.cloudbeaver.model.app;
 
+import org.jkiss.code.NotNull;
+
+import java.util.Map;
+
 /**
  * Application configuration
  */
@@ -27,4 +31,9 @@ public interface WebAppConfiguration {
     <T> T getResourceQuota(String quotaId);
 
     String getDefaultUserRole();
+
+    <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
+
+    Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create);
+
 }
