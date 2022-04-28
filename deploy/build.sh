@@ -2,12 +2,8 @@
 set -Eeuo pipefail
 
 #command line arguments
-CONFIGURATION_PATH=$1
-SAMPLE_DATABASE_PATH=$2
-
-if [[ -z "${CONFIGURATION_PATH}"  ]]; then
-  CONFIGURATION_PATH="../config/sample-databases/DefaultConfiguration"
-fi
+CONFIGURATION_PATH=${1-"../config/sample-databases/DefaultConfiguration"}
+SAMPLE_DATABASE_PATH=${2-""}
 
 echo "Clone and build Cloudbeaver"
 
@@ -40,7 +36,7 @@ cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/a
 cp -p ./scripts/* ./cloudbeaver
 mkdir cloudbeaver/samples
 
-if [[ -n "${SAMPLE_DATABASE_PATH}"  ]]; then
+if [[ ! -z "${SAMPLE_DATABASE_PATH}"  ]]; then
   mkdir cloudbeaver/samples/db
   cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
 fi
