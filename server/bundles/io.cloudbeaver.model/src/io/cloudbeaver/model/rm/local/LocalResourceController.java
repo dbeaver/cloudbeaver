@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -270,7 +272,8 @@ public class LocalResourceController implements RMController {
         project.setId(prefix + project.getName());
         project.setShared(prefix.equals(PROJECT_PREFIX_SHARED) || prefix.equals(PROJECT_PREFIX_GLOBAL));
         try {
-            project.setCreateTime(new Date(Files.getLastModifiedTime(path).toMillis()));
+            project.setCreateTime(
+                OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")));
         } catch (IOException e) {
             log.error(e);
         }
