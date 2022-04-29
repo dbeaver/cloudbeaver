@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -605,7 +604,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }
         return true;
@@ -626,7 +625,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             webSession.getAdminSecurityController().setUserMeta(userId, parameters);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);
         }
     }
