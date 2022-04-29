@@ -18,7 +18,7 @@ interface IState {
   isDragging: boolean;
 }
 
-interface IDNDData {
+export interface IDNDData {
   state: IState;
   setTargetRef: (element: React.ReactElement | Element | null) => void;
   setPreviewRef: (element: React.ReactElement | Element | null) => void;
@@ -60,8 +60,8 @@ export function useDNDData(context: IDataContextProvider, options: IOptions): ID
     setTargetRef(element) {
       this.setTarget(element);
     },
-    setPreview(element) {
+    setPreviewRef(element) {
       this.setPreview(element);
     },
-  }), { setTarget, setPreview }, ['setTargetRef', 'setPreview']);
+  }), { setTarget, setPreview }, ['setTargetRef', 'setPreviewRef']);
 }

@@ -23,6 +23,7 @@ const KEY = {
 interface Props extends ITreeNodeState {
   title?: string;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onMouseDown?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
   big?: boolean;
   children?: React.ReactNode;
@@ -38,6 +39,7 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNode
   externalExpanded,
   leaf,
   onClick,
+  onMouseDown,
   className,
   children,
 }, ref) {
@@ -105,6 +107,11 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNode
     }
     await context.open();
   }
+  function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    if (onMouseDown) {
+      onMouseDown(event);
+    }
+  }
 
   return (
     <div
@@ -114,6 +121,7 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNode
       aria-selected={context.selected}
       className={className}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
       onKeyDown={handleEnter}
       onDoubleClick={handleDbClick}
     >

@@ -18,6 +18,7 @@ import type { DNDAcceptType } from './DNDAcceptType';
 interface IState {
   isOver: boolean;
   canDrop: boolean;
+  context: IDataContextProvider | null;
 }
 
 interface IMousePosition {
@@ -27,6 +28,7 @@ interface IMousePosition {
 
 interface IOptions {
   type?: DNDAcceptType;
+  onHover?: (context: IDataContextProvider, pos: IMousePosition | null) => void;
   onDrop?: (context: IDataContextProvider, pos: IMousePosition | null) => void;
   canDrop?: (context: IDataContextProvider) => boolean;
 }
@@ -53,10 +55,16 @@ export function useDNDBox(options: IOptions): IDNDBox {
   const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(() => ({
     accept: options.type as string | string[],
     drop: (item, monitor) => options.onDrop?.(item, monitor.getClientOffset()),
+    hover: (item, monitor) => {
+      if (monitor.canDrop()) {
+        options.onHover?.(item, monitor.getClientOffset());
+      }
+    },
     canDrop: context => (options.canDrop?.(context) || true),
     collect: monitor => {
       state.isOver = monitor.isOver();
       state.canDrop = monitor.canDrop();
+      state.context = monitor.getItem();
     },
   }), [options]);
 
