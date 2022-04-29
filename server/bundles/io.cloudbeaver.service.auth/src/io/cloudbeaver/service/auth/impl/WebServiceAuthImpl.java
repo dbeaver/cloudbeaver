@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -102,7 +101,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     linkWithActiveUser = true;
                 }
             } else if (!providerEnabled) {
-                if (!isAdminAuthTry(webSession, authProvider, userCredentials)) {
+                if (!isAdminAuthTry(webSession, authProvider, authParameters)) {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
             }
@@ -122,7 +121,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         securityController,
                         providerConfig,
                         userCredentials,
-                        webSession.getUser());
+                        webSession.getUserId());
                 } else {
                     userId = "temp_config_admin";
                 }
@@ -131,9 +130,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 if (curUser == null) {
                     try {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
-                        userId = smAuthInfo.getUserId();
+                        userId = smAuthInfo.getUserInfo().getUserId();
                         webSession.updateSMAuthInfo(smAuthInfo);
                         curUser = webSession.getUser();
+                        securityController = webSession.getSecurityController();
                     } catch (SMException e) {
                         log.debug("Error during user authentication", e);
                         throw e;
@@ -239,8 +239,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
 
-            isAdmin = authInfo.getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
-        } catch (DBCException e) {
+            isAdmin = authInfo.getUserInfo().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
+        } catch (DBException e) {
             log.error(e);
         }
 
@@ -286,7 +286,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error reading user details", e);
         }
     }
@@ -294,7 +294,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAuthProviderInfo[] getAuthProviders() {
         return AuthProviderRegistry.getInstance().getAuthProviders()
-            .stream().filter(f -> !f.isHidden()).map(WebAuthProviderInfo::new)
+            .stream().filter(f -> !f.isTrusted()).map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);
     }
 
@@ -325,7 +325,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 name,
                 value);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
         }
     }

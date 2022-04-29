@@ -4,6 +4,8 @@ export * from './Promises/Deferred';
 export * from './Promises/PromiseCancelledError';
 export * from './Promises/PromiseExecutor';
 
+export * from './Quadtree/index';
+
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
 export * from './filterUndefined';
@@ -18,6 +20,7 @@ export * from './md5';
 export * from './MetadataMap';
 export * from './OrderedMap';
 export * from './parseJSONFlat';
+export * from './PriorityQueue';
 export * from './replaceMiddle';
 export * from './TextTools';
 export * from './throttle';

@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -75,9 +76,9 @@ public class RPSessionHandler implements DBWSessionHandler {
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
-                sessionParameters.put(RPAuthProvider.X_ROLE, userRoles);
+                sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES, userRoles);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
-                        webSession.getProgressMonitor(), sessionParameters, credentials);
+                    webSession.getProgressMonitor(), sessionParameters, credentials);
                 try {
                     SMAuthInfo smAuthInfo = securityController.authenticate(
                             webSession.getSessionId(), sessionParameters,

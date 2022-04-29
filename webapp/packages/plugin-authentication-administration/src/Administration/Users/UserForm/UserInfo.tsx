@@ -11,10 +11,10 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IUserFormProps } from './UserFormService';

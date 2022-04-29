@@ -17,10 +17,15 @@
 
 package io.cloudbeaver.service.rm;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
+import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.DBPObjectWithDetails;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -30,7 +35,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBNResourceManagerResource extends DBNNode {
+public class DBNResourceManagerResource extends DBNNode implements DBPObjectWithDetails {
     private static final Log log = Log.getLog(DBNResourceManagerResource.class);
 
     private final RMResource resource;
@@ -82,10 +87,10 @@ public class DBNResourceManagerResource extends DBNNode {
 
     private String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
-        for (DBNNode parent = getParentNode(); parent != null; parent = parent.getParentNode()) {
+        for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
-                if (folder.length() > 0) folder.append('/');
-                folder.append(parent.getName());
+                if (folder.length() > 0) folder.insert(0, '/');
+                folder.insert(0, parent.getName());
             } else {
                 break;
             }
@@ -127,4 +132,9 @@ public class DBNResourceManagerResource extends DBNNode {
         return getNodeName();
     }
 
+    @Nullable
+    @Override
+    public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
+        return resource;
+    }
 }
