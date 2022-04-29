@@ -10,6 +10,7 @@ export * from './ContextMenu/MenuBar/MENU_BAR_SMALL_STYLES';
 export * from './DragAndDrop/DND_ELEMENT_TYPE';
 export * from './DragAndDrop/DND_NATIVE_TYPE';
 export * from './DragAndDrop/DNDAcceptType';
+export * from './DragAndDrop/DNDPreview';
 export * from './DragAndDrop/DNDProvider';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';

@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DATA_CONTEXT_NAV_NODE, NavNodeManagerService } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNode, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
+import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorModeProps } from '../../SqlEditorModeService';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
@@ -43,7 +44,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
     onDrop: async (context, mouse) => {
-      const node = context.get(DATA_CONTEXT_NAV_NODE);
+      const nodes = getNodes(context);
       const editor = sqlCodeEditorController?.getEditor();
 
       if (editor && mouse) {
@@ -52,13 +53,18 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
           editor.setCursor(pos);
 
           await data.executeQueryAction(data.cursorSegment, async () => {
-            const alias = await navNodeManagerService.getNodeDatabaseAlias(node.id);
+            const alias: string[] = [];
 
-            if (alias) {
+            for (const node of nodes) {
+              alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
+            }
+
+            const replacement = alias.join(', ');
+            if (replacement) {
               const doc = editor.getDoc();
 
-              doc.replaceRange(alias, pos);
-              editor.setCursor({ ...pos, ch: pos.ch + alias.length });
+              doc.replaceRange(replacement, pos);
+              editor.setCursor({ ...pos, ch: pos.ch + replacement.length });
             }
 
             editor.focus();
@@ -69,6 +75,22 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       }
     },
   });
+
+  function getNodes(context: IDataContextProvider): NavNode[] {
+    const node = context.get(DATA_CONTEXT_NAV_NODE);
+    const getNodes = context.get(DATA_CONTEXT_NAV_NODES);
+    let nodes = getNodes();
+
+    if (nodes.length < 2) {
+      nodes = [];
+    }
+
+    if (!nodes.includes(node)) {
+      nodes.push(node);
+    }
+
+    return nodes;
+  }
 
   useEffect(() => {
     sqlCodeEditorController?.focus();

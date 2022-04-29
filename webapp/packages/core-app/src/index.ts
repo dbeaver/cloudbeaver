@@ -18,6 +18,7 @@ export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/DBObjectResource';
 export * from './shared/NodesManager/DATA_CONTEXT_ACTIVE_NODE';
 export * from './shared/NodesManager/DATA_CONTEXT_NAV_NODE';
+export * from './shared/NodesManager/DATA_CONTEXT_NAV_NODES';
 export * from './shared/NodesManager/NavNodeContextMenuService';
 export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';

@@ -13,16 +13,17 @@ import type { IExecutor, IExecutorHandler, IExecutorHandlersCollection } from '@
 import { useObjectRef } from './useObjectRef';
 
 interface IUseExecutorOptions<T> {
-  executor: IExecutor<T> | IExecutorHandlersCollection<T>;
+  executor?: IExecutor<T> | IExecutorHandlersCollection<T>;
   handlers?: Array<IExecutorHandler<T>>;
   postHandlers?: Array<IExecutorHandler<T>>;
 }
 
 export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
   const props = useObjectRef(options);
+  const executor = props.executor;
 
   useEffect(() => {
-    if (!props.executor) {
+    if (!executor) {
       return;
     }
 
@@ -32,25 +33,25 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
     if (props.handlers) {
       for (let i = 0; i < props.handlers.length; i++) {
         const handler: IExecutorHandler<T> = (data, contexts) => props.handlers?.[i](data, contexts);
-        props.executor.addHandler(handler);
+        executor.addHandler(handler);
         handlers.push(handler);
       }
     }
     if (props.postHandlers) {
       for (let i = 0; i < props.postHandlers.length; i++) {
         const handler: IExecutorHandler<T> = (data, contexts) => props.postHandlers?.[i](data, contexts);
-        props.executor.addPostHandler(handler);
+        executor.addPostHandler(handler);
         postHandlers.push(handler);
       }
     }
 
     return () => {
       for (const handler of handlers) {
-        props.executor.removeHandler(handler);
+        executor.removeHandler(handler);
       }
       for (const handler of postHandlers) {
-        props.executor.removePostHandler(handler);
+        executor.removePostHandler(handler);
       }
     };
-  }, [props.executor, props.handlers?.length, props.postHandlers?.length]);
+  }, [executor, props.handlers?.length, props.postHandlers?.length]);
 }
