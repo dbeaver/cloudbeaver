@@ -31,7 +31,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -269,7 +268,7 @@ public class CBDatabase {
         return adminUser;
     }
 
-    private void grantAdminPermissionsToUser(String userId) throws DBCException {
+    private void grantAdminPermissionsToUser(String userId) throws DBException {
         // Grant all roles
         SMRole[] allRoles = adminSecurityController.readAllRoles();
         adminSecurityController.setUserRoles(
