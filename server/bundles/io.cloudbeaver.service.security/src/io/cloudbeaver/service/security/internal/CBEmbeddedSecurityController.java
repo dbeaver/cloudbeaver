@@ -359,6 +359,10 @@ public class CBEmbeddedSecurityController implements SMAdminController {
 
     @Override
     public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
+        var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
+        if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
+            throw new DBException("Another user is already linked to the specified credentials");
+        }
         List<String[]> transformedCredentials;
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
@@ -846,22 +850,18 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);
-        String expectedUserId;
+        String userIdFromCredentials;
         try {
-            expectedUserId = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
+            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
         } catch (DBException e) {
             return null;
         }
-        if (userId != null && !expectedUserId.equals(userId)) {
-            return null;
-        }
-
         if (userId == null) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
 
-            userId = expectedUserId;
+            userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
                 createUser(newUser.getUserId(), newUser.getMetaParameters());
