@@ -206,8 +206,14 @@ public class CBApplication extends BaseWebApplication {
 
     @Override
     public Object start(IApplicationContext context) {
-        Path configPath = loadServerConfiguration();
-        if (configPath == null) {
+        Path configPath = null;
+        try {
+            configPath = loadServerConfiguration();
+            if (configPath == null) {
+                return null;
+            }
+        } catch (DBException e) {
+            log.error(e);
             return null;
         }
 
@@ -445,7 +451,7 @@ public class CBApplication extends BaseWebApplication {
 
     @Nullable
     @Override
-    protected Path loadServerConfiguration() {
+    protected Path loadServerConfiguration() throws DBException {
         Path path = super.loadServerConfiguration();
 
         File runtimeConfigFile = getRuntimeAppConfigFile();
@@ -458,7 +464,7 @@ public class CBApplication extends BaseWebApplication {
     }
 
     @Override
-    protected void loadConfiguration(String configPath) {
+    protected void loadConfiguration(String configPath) throws DBException {
         log.debug("Using configuration [" + configPath + "]");
 
         File configFile = new File(configPath);
@@ -471,7 +477,7 @@ public class CBApplication extends BaseWebApplication {
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
     }
 
-    private void parseConfiguration(File configFile) {
+    private void parseConfiguration(File configFile) throws DBException {
         String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = System.getProperty("user.dir");
@@ -565,7 +571,7 @@ public class CBApplication extends BaseWebApplication {
             }
             parseAdditionalServerConfiguration(serverConfig);
         } catch (IOException | DBException e) {
-            log.error("Error parsing server configuration", e);
+            throw new DBException("Error parsing server configuration", e);
         }
 
         // Merge new config with old one
@@ -594,7 +600,7 @@ public class CBApplication extends BaseWebApplication {
                 try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile), StandardCharsets.UTF_8)) {
                     productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
                 } catch (Exception e) {
-                    log.error("Error reading product configuration", e);
+                    throw new DBException("Error reading product configuration", e);
                 }
             }
         }
@@ -607,7 +613,7 @@ public class CBApplication extends BaseWebApplication {
                 try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                     productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
                 } catch (Exception e) {
-                    log.error("Error reading product runtime configuration", e);
+                    throw new DBException("Error reading product runtime configuration", e);
                 }
             }
         }
