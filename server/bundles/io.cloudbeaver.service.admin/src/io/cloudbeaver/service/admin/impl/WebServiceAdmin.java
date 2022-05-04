@@ -278,19 +278,19 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Boolean setUserStatus(@NotNull WebSession webSession, @NotNull String userID, @NotNull Boolean status) throws DBWebException {
+    public Boolean enableUser(@NotNull WebSession webSession, @NotNull String userID, @NotNull Boolean enabled) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
-            throw new DBWebException("Cannot change status in anonymous mode");
+            throw new DBWebException("Cannot activate user in anonymous mode");
         }
         if (CommonUtils.equalObjects(userID, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
-            webSession.getAdminSecurityController().setUserStatus(userID, status);
+            webSession.getAdminSecurityController().enableUser(userID, enabled);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error setting user status", e);
+            throw new DBWebException("Error activating user", e);
         }
     }
 

@@ -60,8 +60,8 @@ public class AdminUserInfo {
     }
 
     @Property
-    public boolean getActive() {
-        return user.getStatus();
+    public boolean getEnabled() {
+        return user.getEnabled();
     }
 
     @Property

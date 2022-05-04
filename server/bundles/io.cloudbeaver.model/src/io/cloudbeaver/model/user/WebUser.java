@@ -33,7 +33,7 @@ public class WebUser {
     private final Map<String, String> metaParameters = new LinkedHashMap<>();
     private final Map<String, Object> configurationParameters = new LinkedHashMap<>();
 
-    private boolean active;
+    private boolean enabled;
 
     private SMRole[] roles = null;
 
@@ -43,7 +43,7 @@ public class WebUser {
     public WebUser(@NotNull SMUser smUser) {
         this.userId = smUser.getUserId();
         this.metaParameters.putAll(smUser.getMetaParameters());
-        this.active = smUser.getStatus();
+        this.enabled = smUser.isEnabled();
     }
 
     @NotNull
@@ -62,12 +62,12 @@ public class WebUser {
         this.displayName = displayName;
     }
 
-    public boolean getStatus() {
-        return active;
+    public boolean getEnabled() {
+        return enabled;
     }
 
-    public void setStatus(boolean active) {
-        this.active = active;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String[] getGrantedRoles() {

@@ -336,10 +336,10 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         }
     }
 
-    public void setUserStatus(String userId, boolean active) throws DBException {
+    public void enableUser(String userId, boolean enabled) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
-                dbStat.setString(1, active ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+                dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                 dbStat.setString(2, userId);
                 dbStat.executeUpdate();
             }
