@@ -21,6 +21,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### CloudBeaver 22.0.4 - 2022-05-03
+- Improvements for the Metadata Editor Performance: table scrolling and switching tabs are faster now.
+- The Value Panel:
+  - support of BLOB images has been added;
+  - big values can be saved to an external file;
+  - the size of the displayed content can be set in the configuration file.
+- Different bug fixes and enhancements have been made.
+
+
 ### CloudBeaver 22.0.3 - 2022-04-18
 -   LOB-files can be saved to an external file from the Data Editor context menu.
 -   The administrator can use PgPass as an Authentication method for PostgreSQL.
