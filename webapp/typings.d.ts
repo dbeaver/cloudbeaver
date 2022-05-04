@@ -11,6 +11,25 @@ declare module '*.json5' {
   export default json
 }
 
+
+
+
+
+
+
+// ROMAN TESTS
+
+
+
+
+
+
+
+
+
+
+
+
 declare module '*.scss' {
   const classes: { readonly [key: string]: string }
   export default classes
