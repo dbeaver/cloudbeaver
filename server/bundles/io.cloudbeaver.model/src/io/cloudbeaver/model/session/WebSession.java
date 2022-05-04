@@ -80,7 +80,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private static final Log log = Log.getLog(WebSession.class);
 
-    public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("Cloudbeaver");
+    public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
 
     private static final String ATTR_LOCALE = "locale";
 
@@ -215,7 +215,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return user;
     }
 
-    private synchronized String getUserId() {
+    public synchronized String getUserId() {
         return user == null ? null : user.getUserId();
     }
 
@@ -365,7 +365,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             return Arrays.stream(securityController
                     .getSubjectConnectionAccess(new String[]{subjectId}))
                 .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
-        } catch (DBCException e) {
+        } catch (DBException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);
             return Collections.emptySet();
@@ -425,12 +425,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
 
-    private synchronized void authAsAnonymousUser() throws DBCException {
+    private synchronized void authAsAnonymousUser() throws DBException {
         if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
             this.sessionPermissions = Collections.emptySet();
             return;
         }
-        var authInfo = securityController.authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
+        SMAuthInfo authInfo = securityController.authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMAuthInfo(authInfo);
     }
 
@@ -893,17 +893,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.adminSecurityController = null;
     }
 
-    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBCException {
+    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
-        if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), smAuthInfo.getUserId())) {
+        var tokenInfo = smAuthInfo.getUserInfo();
+        if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), tokenInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), smAuthInfo.getUserId());
-        this.sessionPermissions = smAuthInfo.getPermissions();
+        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), tokenInfo.getUserId());
+        this.sessionPermissions = tokenInfo.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
 
-        this.user = smAuthInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(smAuthInfo.getUserId()));
+        this.user = tokenInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(tokenInfo.getUserId()));
         refreshUserData();
     }
 

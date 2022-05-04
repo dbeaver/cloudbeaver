@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
@@ -54,7 +55,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Nullable
-    protected Path loadServerConfiguration() {
+    @Override
+    public Path getDefaultWorkingFolder() {
+        return null;
+    }
+
+    @Nullable
+    protected Path loadServerConfiguration() throws DBException {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -92,7 +99,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return path;
     }
 
-    protected abstract void loadConfiguration(String configPath);
+    protected abstract void loadConfiguration(String configPath) throws DBException;
 
     @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {

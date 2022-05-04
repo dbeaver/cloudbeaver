@@ -7,8 +7,11 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GraphQLService, UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
+
+import { UserInfoResource } from './UserInfoResource';
 
 export type UserMetaParameter = UserConnectionAuthPropertiesFragment;
 export interface IUserMetaParameterOptions{
@@ -21,12 +24,16 @@ export interface IUserMetaParameterOptions{
 @injectable()
 export class UserMetaParametersResource extends CachedDataResource<UserMetaParameter[]> {
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     sessionResource: SessionResource,
+    userInfoResource: UserInfoResource
   ) {
     super([]);
 
     this.sync(sessionResource);
+    this
+      .preloadResource(userInfoResource)
+      .before(ExecutorInterrupter.interrupter(() => userInfoResource.data === null));
   }
 
   async add(options: IUserMetaParameterOptions): Promise<UserMetaParameter> {

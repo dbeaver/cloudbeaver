@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -376,7 +375,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
         try {
             webSession.getSecurityController().setConnectionSubjectAccess(id, null, null);
-        } catch (DBCException e) {
+        } catch (DBException e) {
             log.error(e);
         }
         return true;
@@ -560,7 +559,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
             return webSession.getSecurityController().getConnectionSubjectAccess(connectionId);
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
     }
@@ -577,7 +576,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
         return true;
@@ -587,7 +586,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
             return webSession.getSecurityController().getSubjectConnectionAccess(new String[]{subjectId});
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
     }
@@ -605,7 +604,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }
         return true;
@@ -626,7 +625,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             webSession.getAdminSecurityController().setUserMeta(userId, parameters);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);
         }
     }

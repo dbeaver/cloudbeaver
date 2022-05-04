@@ -121,7 +121,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         securityController,
                         providerConfig,
                         userCredentials,
-                        webSession.getUser());
+                        webSession.getUserId());
                 } else {
                     userId = "temp_config_admin";
                 }
@@ -130,9 +130,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 if (curUser == null) {
                     try {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
-                        userId = smAuthInfo.getUserId();
+                        userId = smAuthInfo.getUserInfo().getUserId();
                         webSession.updateSMAuthInfo(smAuthInfo);
                         curUser = webSession.getUser();
+                        securityController = webSession.getSecurityController();
                     } catch (SMException e) {
                         log.debug("Error during user authentication", e);
                         throw e;
@@ -154,7 +155,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
                 user = curUser;
             }
-
+            if (user == null) {
+                user = new WebUser(new SMUser(userId));
+            }
             if (!configMode && !webSession.isAuthorizedInSecurityManager()) {
                 throw new DBCException("No authorization in the security manager");
             }
@@ -238,8 +241,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
 
-            isAdmin = authInfo.getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
-        } catch (DBCException e) {
+            isAdmin = authInfo.getUserInfo().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
+        } catch (DBException e) {
             log.error(e);
         }
 
@@ -285,7 +288,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error reading user details", e);
         }
     }
@@ -324,7 +327,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 name,
                 value);
             return true;
-        } catch (DBCException e) {
+        } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
         }
     }

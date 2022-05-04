@@ -17,9 +17,7 @@
 package io.cloudbeaver.service.security.internal;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -31,9 +29,11 @@ import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -44,6 +44,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,9 +52,9 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBSecurityController implements SMAdminController {
+public class CBEmbeddedSecurityController implements SMAdminController {
 
-    private static final Log log = Log.getLog(CBSecurityController.class);
+    private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
     private static final int TOKEN_HOURS_ALIVE_TIME = 1;
 
@@ -66,7 +67,7 @@ public class CBSecurityController implements SMAdminController {
 
     private final CBDatabase database;
 
-    public CBSecurityController(CBDatabase database) {
+    public CBEmbeddedSecurityController(CBDatabase database) {
         this.database = database;
     }
 
@@ -155,7 +156,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMRole[] getUserRoles(String userId) throws DBCException {
+    public SMRole[] getUserRoles(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
@@ -175,7 +176,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMUser getUserById(String userId) throws DBCException {
+    public SMUser getUserById(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
@@ -188,12 +189,11 @@ public class CBSecurityController implements SMAdminController {
                     }
                 }
             }
-            var metaParams = new LinkedHashMap<String, String>();
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        metaParams.put(
+                        user.setMetaParameter(
                             dbResult.getString(1),
                             dbResult.getString(2)
                         );
@@ -298,7 +298,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserParameter(String userId, String name, Object value) throws DBCException {
+    public void setUserParameter(String userId, String name, Object value) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 if (value == null) {
@@ -358,7 +358,11 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException {
+    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
+        var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
+        if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
+            throw new DBException("Another user is already linked to the specified credentials");
+        }
         List<String[]> transformedCredentials;
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
@@ -495,7 +499,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public String[] getUserLinkedProviders(String userId) throws DBCException {
+    public String[] getUserLinkedProviders(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
@@ -696,7 +700,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
+    public Set<String> getSubjectPermissions(String subjectId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
@@ -715,7 +719,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public Set<String> getUserPermissions(String userId) throws DBCException {
+    public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -747,7 +751,7 @@ public class CBSecurityController implements SMAdminController {
     // Sessions
 
     @Override
-    public boolean isSessionPersisted(String id) throws DBCException {
+    public boolean isSessionPersisted(String id) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT 1 FROM CB_SESSION WHERE SESSION_ID=?")) {
@@ -764,8 +768,8 @@ public class CBSecurityController implements SMAdminController {
         }
     }
 
-    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBCException {
-        if(isSessionPersisted(appSessionId)) {
+    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBException {
+        if (isSessionPersisted(appSessionId)) {
             return;
         }
         try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -798,26 +802,33 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBCException {
+    public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
                 var token = generateAuthToken(appSessionId, null, dbCon);
-                var anonymousUserRole = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserRole();
-                var permissions = getSubjectPermissions(anonymousUserRole);
+                var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, null, permissions);
+                return new SMAuthInfo(token, new SMAuthPermissions(null, permissions));
             }
         } catch (SQLException e) {
-            throw new DBCException("Error during auth", e);
+            throw new DBException(e.getMessage(), e);
         }
     }
 
+    private Set<String> getAnonymousUserPermissions() throws DBException {
+        var anonymousUserRole = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserRole();
+        return getSubjectPermissions(anonymousUserRole);
+    }
+
     @Override
-    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBCException {
+    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = findOrCreateExternalUserByCredentials(authProviderId, sessionParameters, userCredentials);
+                var userId = findOrCreateExternalUserByCredentials(authProviderId,
+                    sessionParameters,
+                    userCredentials,
+                    new VoidProgressMonitor());
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
@@ -825,30 +836,32 @@ public class CBSecurityController implements SMAdminController {
                 var token = generateAuthToken(appSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
-                return new SMAuthInfo(token, userId, permissions);
+                return new SMAuthInfo(token, new SMAuthPermissions(userId, permissions));
             }
-        } catch (SQLException | DBException e) {
-            throw new DBCException("Error during auth", e);
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage(), e);
         }
     }
 
     private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId,
                                                          @NotNull Map<String, Object> sessionParameters,
-                                                         @NotNull Map<String, Object> userCredentials) throws DBException {
-        var userId = findUserByCredentials(authProviderId, userCredentials);
+                                                         @NotNull Map<String, Object> userCredentials,
+                                                         @NotNull DBRProgressMonitor progressMonitor) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
+        String userId = findUserByCredentials(authProviderId, userCredentials);
+        String userIdFromCredentials;
+        try {
+            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
+        } catch (DBException e) {
+            return null;
+        }
         if (userId == null) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
-            var externalAuthProvider = (SMAuthProviderExternal<?>) authProvider.getInstance();
-            userId = externalAuthProvider.validateLocalAuth(
-                new VoidProgressMonitor(),
-                this,
-                Collections.emptyMap(),
-                userCredentials,
-                null);
 
+            userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
                 createUser(newUser.getUserId(), newUser.getMetaParameters());
@@ -861,7 +874,7 @@ public class CBSecurityController implements SMAdminController {
         }
         if (authProvider.isTrusted()) {
             if (WebAppUtils.getWebApplication().isMultiNode()) {
-                throw new DBWebException("Authorization through trusted provider is not available in multi node");
+                throw new SMException("Authorization through trusted provider is not available in multi node");
             }
             Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
             if (reverseProxyUserRoles instanceof List) {
@@ -890,6 +903,30 @@ public class CBSecurityController implements SMAdminController {
             dbStat.execute();
             return authToken;
         }
+    }
+
+    @Override
+    public SMAuthPermissions getTokenPermissions(String token) throws DBException {
+        String userId;
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID, EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+        ) {
+            dbStat.setString(1, token);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Invalid token");
+                }
+                userId = dbResult.getString(1);
+                var expiredDate = dbResult.getTimestamp(2);
+                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                    throw new SMException("Token expired");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
+        return new SMAuthPermissions(userId, permissions);
     }
 
     @Override
@@ -930,7 +967,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBException {
         if (subjectIds.length == 0) {
             return new SMDataSourceGrant[0];
         }
@@ -1005,7 +1042,7 @@ public class CBSecurityController implements SMAdminController {
 
     @NotNull
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1031,7 +1068,7 @@ public class CBSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
+    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 // Delete all permissions

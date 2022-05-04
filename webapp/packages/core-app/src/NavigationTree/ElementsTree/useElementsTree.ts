@@ -88,6 +88,7 @@ export interface IElementsTree {
   userData: IElementsTreeUserState;
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
+  getSelected: () => string[];
   isNodeSelected: (nodeId: string) => boolean;
   isNodeIndeterminateSelected: (nodeId: string) => boolean;
   getNodeChildren: (nodeId: string) => string[];
@@ -287,6 +288,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const nodeState = this.getNodeState(nodeId);
 
       return nodeState.expanded || nodeState.showInFilter;
+    },
+    getSelected(): string[] {
+      return Array.from(this.state).filter(([key, state]) => state.selected).map(([key]) => key);
     },
     isNodeSelected(nodeId: string): boolean {
       const node = navNodeInfoResource.get(nodeId);

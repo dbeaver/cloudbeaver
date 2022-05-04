@@ -30,6 +30,7 @@
       border-color: transparent;
       display: flex;
       flex-direction: row;
+      user-select: text;
     }
 
     .rdg-cell-selected {

@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useDNDData } from '@cloudbeaver/core-ui';
+import { DNDPreview, useDNDData } from '@cloudbeaver/core-ui';
 import { useDataContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
+import { DATA_CONTEXT_NAV_NODES } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODES';
 import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
@@ -43,6 +44,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     handleExpand,
     handleOpen,
     handleSelect,
+    getSelected,
   } = useNavigationNode(node, path);
   const context = useDataContext();
   const dndData = useDNDData(context, {
@@ -52,6 +54,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     },
   });
   context.set(DATA_CONTEXT_NAV_NODE, node);
+  context.set(DATA_CONTEXT_NAV_NODES, getSelected);
 
   const Control = control || NavigationNodeControl;
 
@@ -81,6 +84,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       onOpen={handleOpen}
       onSelect={handleSelect}
     >
+      <DNDPreview data={dndData} src="/icons/empty.svg" />
       <Control ref={setRef} dragging={dndData.state.isDragging} node={node} />
       {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
     </TreeNode>

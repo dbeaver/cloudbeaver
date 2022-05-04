@@ -9,10 +9,13 @@
 import React, { useContext, useEffect, useRef } from 'react';
 
 import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { useNode } from '../../../shared/NodesManager/useNode';
 import { useChildren } from '../../../shared/useChildren';
 import { ElementsTreeContext } from '../ElementsTreeContext';
@@ -35,10 +38,12 @@ interface INavigationNode {
   handleOpen: (leaf: boolean) => Promise<void>;
   handleClick: (leaf: boolean) => Promise<void>;
   handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
+  getSelected: () => NavNode[];
 }
 
 export function useNavigationNode(node: NavNode, path: string[]): INavigationNode {
   const elementRef = useRef<HTMLDivElement>(null);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
@@ -55,6 +60,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
+  const getSelected = () => navNodeInfoResource
+    .get(resourceKeyList(contextRef.context?.tree.getSelected() || []))
+    .filter(Boolean) as NavNode[];
   const indeterminateSelected = getComputed(
     () => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false
   );
@@ -106,6 +114,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     handleClick,
     handleOpen,
     handleSelect,
+    getSelected,
   };
 }
 
