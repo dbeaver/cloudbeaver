@@ -30,6 +30,7 @@ type AdminUserInfo {
     origins: [ObjectOrigin!]!
 
     linkedAuthProviders: [String!]!
+    active: Boolean!
 }
 
 type AdminRoleInfo {
@@ -118,6 +119,8 @@ extend type Query {
     setSubjectPermissions(roleId: ID!, permissions: [ID!]!): Boolean
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
+
+    setUserStatus(userId: ID!, active: Boolean!): Boolean
 
     #### Connection management
 

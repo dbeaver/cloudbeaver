@@ -191,6 +191,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
                 throw new DBWebException("Access denied (no permissions)");
             }
+            if (!configMode && !securityController.getUserById(userId).getStatus()) {
+                throw new DBWebException("Access denied (user is disabled)");
+            }
 
             WebAuthInfo authInfo = new WebAuthInfo(
                 webSession,

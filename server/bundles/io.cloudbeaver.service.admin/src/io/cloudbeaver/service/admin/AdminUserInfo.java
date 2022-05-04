@@ -60,6 +60,11 @@ public class AdminUserInfo {
     }
 
     @Property
+    public boolean getActive() {
+        return user.getStatus();
+    }
+
+    @Property
     public Map<String, Object> getConfigurationParameters() {
         return user.getConfigurationParameters();
     }
