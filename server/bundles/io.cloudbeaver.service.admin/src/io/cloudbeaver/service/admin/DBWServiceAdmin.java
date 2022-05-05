@@ -151,4 +151,6 @@ public interface DBWServiceAdmin extends DBWService {
     Boolean deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    Boolean enableUser(WebSession webSession, String userId, Boolean enabled) throws DBWebException;
 }

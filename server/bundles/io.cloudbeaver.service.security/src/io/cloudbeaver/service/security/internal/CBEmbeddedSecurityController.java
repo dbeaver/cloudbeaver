@@ -183,7 +183,9 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        user = new SMUser(dbResult.getString(1));
+                        String userName = dbResult.getString(1);
+                        String active = dbResult.getString(2);
+                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active));
                     } else {
                         return null;
                     }
@@ -220,7 +222,8 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
-                        result.put(userId, new SMUser(userId));
+                        String active = dbResult.getString(2);
+                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active)));
                     }
                 }
             }
@@ -327,6 +330,18 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                     }
                 }
                 txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
+    public void enableUser(String userId, boolean enabled) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
+                dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+                dbStat.setString(2, userId);
+                dbStat.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
