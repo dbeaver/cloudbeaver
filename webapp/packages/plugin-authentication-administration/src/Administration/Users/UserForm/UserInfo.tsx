@@ -106,6 +106,15 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
             </FieldCheckbox>
           );
         })}
+        <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
+        <FieldCheckbox
+          id={uuid()}
+          name='enabled'
+          state={controller}
+          disabled={controller.isSaving}
+        >
+          {translate('authentication_user_activated')}
+        </FieldCheckbox>
       </Group>
       <Loader state={userMetaParameters} inline>
         {() => userMetaParameters.data.length > 0 && styled(style)(

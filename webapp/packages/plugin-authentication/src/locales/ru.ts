@@ -17,6 +17,8 @@ export default [
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],
   ['authentication_user_role', 'Роль'],
+  ['authentication_user_status', 'Статус пользователя'],
+  ['authentication_user_activated', 'Активирован'],
   ['authentication_user_login_not_set', 'Логин не может быть пустым'],
   ['authentication_user_role_not_set', 'Должна быть выбрана минимум одна роль'],
   ['authentication_user_password_not_set', 'Пароль не задан'],

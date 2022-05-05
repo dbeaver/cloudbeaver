@@ -41,15 +41,16 @@ interface UserCreateOptions {
   credentials: IAuthCredentials;
   metaParameters: Record<string, any>;
   grantedConnections: string[];
+  enabled: boolean;
 }
 
 @injectable()
 export class UsersResource extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
   constructor(
-    private graphQLService: GraphQLService,
-    private serverConfigResource: ServerConfigResource,
-    private authProviderService: AuthProviderService,
-    private authInfoService: AuthInfoService
+    private readonly graphQLService: GraphQLService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly authProviderService: AuthProviderService,
+    private readonly authInfoService: AuthInfoService
   ) {
     super();
     this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
@@ -74,6 +75,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         displayName: 'Local',
       }],
       linkedAuthProviders: [AUTH_PROVIDER_LOCAL_ID],
+      enabled: true,
     };
   }
 
@@ -92,7 +94,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async create({
-    userId, roles, credentials, metaParameters, grantedConnections,
+    userId, roles, credentials, metaParameters, grantedConnections, enabled,
   }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
@@ -102,6 +104,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
     try {
       await this.updateCredentials(userId, credentials);
+      await this.enableUser(userId, enabled, true);
       for (const roleId of roles) {
         await this.grantRole(userId, roleId, true);
       }
@@ -128,6 +131,14 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
   async revokeRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.revokeUserRole({ userId, roleId });
+
+    if (!skipUpdate) {
+      await this.refresh(userId);
+    }
+  }
+
+  async enableUser(userId: string, enabled: boolean, skipUpdate?: boolean): Promise<void> {
+    await this.graphQLService.sdk.enableUser({ userId, enabled });
 
     if (!skipUpdate) {
       await this.refresh(userId);
