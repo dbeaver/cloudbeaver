@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.sample.feature"
         label="%featureName"
-        version="1.0.52.qualifier"
+        version="1.0.53.qualifier"
         provider-name="%providerName">
 
     <description>
