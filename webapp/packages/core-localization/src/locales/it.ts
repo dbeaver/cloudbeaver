@@ -22,6 +22,7 @@ export const defaultITLocale = [
   ['ui_error_close', 'Chiudi'],
   ['ui_close', 'Chiudi'],
   ['ui_errors_details', 'Dettagli'],
+  ['ui_open', 'Open'],
   ['ui_search', 'Cerca...'],
   ['ui_delete', 'Elimina'],
   ['ui_add', 'Aggiungi'],

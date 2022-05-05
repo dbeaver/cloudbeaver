@@ -6,16 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DATA_CONTEXT_NAV_NODE, MENU_NAV_TREE, NavigationTabsService } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_NAV_NODE, MENU_NAV_TREE } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
-import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
+import { ACTION_DELETE_RESOURCE } from './Actions/ACTION_DELETE_RESOURCE';
 import { ACTION_OPEN_SCRIPT } from './Actions/ACTION_OPEN_SCRIPT';
-import { ACTION_OPEN_SCRIPT_IN_CURRENT_TAB } from './Actions/ACTION_OPEN_SCRIPT_IN_CURRENT_TAB';
-import { ScriptsManagerService } from './ScriptsManagerService';
+import { ScriptsManagerService } from './ScriptsManager/ScriptsManagerService';
 
 @injectable()
 export class ResourceManagerMenuService {
@@ -23,10 +21,7 @@ export class ResourceManagerMenuService {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly scriptsManagerService: ScriptsManagerService,
-    private readonly notificationService: NotificationService,
-    private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly sqlEditorService: SqlEditorService,
-    private readonly navigationTabsService: NavigationTabsService
+    private readonly commonDialogService: CommonDialogService,
   ) { }
 
   register() {
@@ -38,46 +33,34 @@ export class ResourceManagerMenuService {
         }
 
         const node = contexts.get(DATA_CONTEXT_NAV_NODE);
-        const isScript = this.scriptsManagerService.isScript(node.id);
 
-        switch (action) {
-          case ACTION_OPEN_SCRIPT:
-            return isScript;
-          case ACTION_OPEN_SCRIPT_IN_CURRENT_TAB: {
-            const selectedTab = this.sqlEditorTabService.sqlEditorTabs.find(
-              tab => tab.id === this.navigationTabsService.currentTabId
-            );
-
-            return isScript && !!selectedTab;
-          }
-          default:
-            return false;
+        if (action === ACTION_OPEN_SCRIPT || action === ACTION_DELETE_RESOURCE) {
+          return this.scriptsManagerService.isScript(node.id);
         }
+
+        return false;
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
-        try {
-          if (action === ACTION_OPEN_SCRIPT) {
-            await this.scriptsManagerService.openScript(node.id);
-          } else {
-            const selectedTab = this.sqlEditorTabService.sqlEditorTabs.find(
-              tab => tab.id === this.navigationTabsService.currentTabId
-            );
+        switch (action) {
+          case ACTION_OPEN_SCRIPT:
+            await this.scriptsManagerService.openScript(node);
+            break;
+          case ACTION_DELETE_RESOURCE: {
+            const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+              title: 'ui_data_delete_confirmation',
+              message: `You are going to delete "${node.name}". Are you sure?`,
+              confirmActionText: 'ui_delete',
+            });
 
-            if (selectedTab) {
-              const script = await this.scriptsManagerService.readScript(node.id);
-              /* we need access to the SQLEditorData object so we can set query properly */
-              this.sqlEditorService.setQuery(script, selectedTab.handlerState);
-
-              /* in case of associatedScriptId exists in state we should show dialog and ask whether user wants to relink editor or not */
-              if (!selectedTab.handlerState.associatedScriptId) {
-                this.sqlEditorService.linkScript(node.id, selectedTab.handlerState);
-              }
+            if (result === DialogueStateResult.Resolved) {
+              this.scriptsManagerService.deleteScript(node.id);
             }
           }
-        } catch (exception) {
-          this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
+            break;
+          default:
+            break;
         }
       },
     });
@@ -86,7 +69,7 @@ export class ResourceManagerMenuService {
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_NAV_TREE,
       getItems: (context, items) => [
         ACTION_OPEN_SCRIPT,
-        ACTION_OPEN_SCRIPT_IN_CURRENT_TAB,
+        ACTION_DELETE_RESOURCE,
         ...items,
       ],
     });

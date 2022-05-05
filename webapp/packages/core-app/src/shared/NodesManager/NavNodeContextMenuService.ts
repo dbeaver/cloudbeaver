@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
-import { RESOURCE_MANAGER_NODE_TYPE } from '@cloudbeaver/plugin-resource-manager';
+import { RESOURCE_MANAGER_RESOURCE_NODE_TYPE, RESOURCE_MANAGER_PROJECT_NODE_TYPE } from '@cloudbeaver/plugin-resource-manager';
 
 import { CoreSettingsService } from '../../CoreSettingsService';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
@@ -72,7 +72,8 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_OPEN) {
-          return node.nodeType !== RESOURCE_MANAGER_NODE_TYPE;
+          return node.nodeType !== RESOURCE_MANAGER_RESOURCE_NODE_TYPE
+            && node.nodeType !== RESOURCE_MANAGER_PROJECT_NODE_TYPE;
         }
 
         return [

@@ -2202,7 +2202,7 @@ export type DeleteResourceMutation = { rmDeleteResource?: boolean };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string; name: string; description?: string; shared: boolean; createTime: any; creator: string }> };
+export type GetProjectListQuery = { projects: Array<{ id: string; name: string; shared: boolean }> };
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -3509,10 +3509,7 @@ export const GetProjectListDocument = `
   projects: rmListProjects {
     id
     name
-    description
     shared
-    createTime
-    creator
   }
 }
     `;

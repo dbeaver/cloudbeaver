@@ -11,10 +11,11 @@ import { action } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
-import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerService, SaveScriptDialog, ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -37,7 +38,9 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const scriptsManagerService = useService(ScriptsManagerService);
+  const resourceManagerService = useService(ResourceManagerService);
   const sqlEditorService = useService(SqlEditorService);
+  const sqlEditorTabService = useService(SqlEditorTabService);
 
   return useObservableRef(() => ({
     async tryReadScript(file: File, prevScript: string) {
@@ -108,9 +111,8 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
     },
     async updateAssociatedScript(scriptId: string, value: string) {
       try {
-        await this.scriptsManagerService.writeScript(scriptId, value);
-        const name = this.scriptsManagerService.getScriptName(scriptId);
-        this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success', message: name });
+        const node = await this.scriptsManagerService.writeScript(scriptId, value);
+        this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success', message: node.name });
       } catch (exception) {
         this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       }
@@ -121,19 +123,23 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
         return;
       }
 
-      const name = await this.commonDialogService.open(RenameDialog, {
-        value: '',
-        objectName: '',
-        title: 'plugin_resource_manager_script_name',
-        confirmActionText: 'ui_processing_save',
+      const tabName = this.sqlEditorTabService.getName(this.state);
+      const name = await this.commonDialogService.open(SaveScriptDialog, {
+        defaultScriptName: tabName,
       });
 
       if (name != DialogueStateResult.Rejected && name !== DialogueStateResult.Resolved) {
         try {
-          const scriptId = await this.scriptsManagerService.saveScript(name, script);
-          this.sqlEditorService.linkScript(scriptId, this.state);
+          const node = await this.scriptsManagerService.saveScript(name.trim(), script);
+          this.sqlEditorService.setAssociatedScriptId(node.id, this.state);
+          this.sqlEditorService.setName(node.name ?? name, this.state);
 
-          this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: name });
+          this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
+
+          if (!this.resourceManagerService.enabled) {
+            this.resourceManagerService.toggleEnabled();
+          }
+
         } catch (exception) {
           this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
         }
@@ -154,6 +160,8 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       sqlEditorSettingsService,
       scriptsManagerService,
       sqlEditorService,
+      sqlEditorTabService,
+      resourceManagerService,
       state,
     });
 }

@@ -193,7 +193,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             </button>
             <button
               title={translate('plugin_resource_manager_save_script')}
-              disabled={!trimmedValue}
+              disabled={!trimmedValue || !!state.associatedScriptId}
               hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.saveScript(trimmedValue)}
             >
@@ -205,7 +205,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.downloadScript(trimmedValue)}
             >
-              <IconOrImage icon='export' />
+              <IconOrImage icon='/icons/save.svg' />
             </button>
             {!data.activeSegmentMode.activeSegmentMode && (
               <UploadArea

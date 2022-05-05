@@ -50,12 +50,13 @@ export interface ISQLEditorData {
   readonly onMode: ISyncExecutor<ISQLEditorData>;
 
   updateParserScriptsThrottle(): Promise<void>;
+  updateAssociatedScriptThrottle(): Promise<void>;
   setQuery(query: string): void;
   init(): void;
   destruct(): void;
   setCursor(begin: number, end?: number): void;
   formatScript(): Promise<void>;
-  executeQuery (): Promise<void>;
+  executeQuery(): Promise<void>;
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;

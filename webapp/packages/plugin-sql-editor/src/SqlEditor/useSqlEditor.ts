@@ -13,9 +13,11 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { throttleAsync } from '@cloudbeaver/core-utils';
+import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
@@ -35,6 +37,8 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
+  readonly scriptsManagerService: ScriptsManagerService;
+  readonly notificationService: NotificationService;
 
   cursor: ICursor;
   readonlyState: boolean;
@@ -42,6 +46,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
   updateParserScripts(): Promise<void>;
+  updateAssociatedScript(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
@@ -55,6 +60,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
+  const notificationService = useService(NotificationService);
+  const scriptsManagerService = useService(ScriptsManagerService);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(() => ({
     get dialect(): SqlDialectInfo | undefined {
@@ -66,7 +73,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     get activeSegmentMode(): ISQLEditorMode {
-      const contexts =  this.onMode.execute(this);
+      const contexts = this.onMode.execute(this);
       const mode = contexts.getContext(SQLEditorModeContext);
 
       return mode;
@@ -302,12 +309,27 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     setQuery(query: string): void {
       this.state.query = query;
       this.parser.setScript(query);
+      this.updateAssociatedScriptThrottle();
       this.onUpdate.execute();
     },
 
     updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
       await data.updateParserScripts();
     }, 1000 / 2),
+
+    updateAssociatedScriptThrottle: throttleAsync(async function updateAssociatedScriptThrottle() {
+      await data.updateAssociatedScript();
+    }, 1000),
+
+    async updateAssociatedScript() {
+      if (this.state.associatedScriptId) {
+        try {
+          await this.scriptsManagerService.writeScript(this.state.associatedScriptId, this.state.query);
+        } catch (exception) {
+          this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
+        }
+      }
+    },
 
     async updateParserScripts() {
       const connectionId = this.state.executionContext?.connectionId;
@@ -428,6 +450,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     sqlExecutionPlanService,
     sqlResultTabsService,
     commonDialogService,
+    scriptsManagerService,
+    notificationService,
   });
 
   data.init();

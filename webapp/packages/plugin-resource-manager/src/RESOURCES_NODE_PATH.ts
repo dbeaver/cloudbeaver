@@ -6,8 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from '@cloudbeaver/core-view';
-
-export const ACTION_OPEN_SCRIPT_IN_CURRENT_TAB = createAction('open-script-in-current-tab', {
-  label: 'plugin_resource_manager_open_script_in_current_tab',
-});
+export const RESOURCES_NODE_PATH = 'ext://resources';

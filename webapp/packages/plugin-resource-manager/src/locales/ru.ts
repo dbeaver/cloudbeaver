@@ -11,4 +11,7 @@ export default [
   ['plugin_resource_manager_open_script_error', 'Не удалось открыть скрипт'],
   ['plugin_resource_manager_save_script_error', 'Возникла ошибка при попытки сохранить скрипт'],
   ['plugin_resource_manager_update_script_error', 'Не удалось обновить скрипт'],
+  ['plugin_resource_manager_sync_script_error', 'Не удалось синхронизировать данные редактора'],
+  ['plugin_resource_manager_script_not_found_title', 'Не удалось найти привязанный скрипт'],
+  ['plugin_resource_manager_script_not_found_message', 'Возможно скрипт был удален или переименован. Будет использовано последнее известное значение'],
 ];

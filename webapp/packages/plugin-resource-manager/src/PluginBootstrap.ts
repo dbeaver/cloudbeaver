@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EMainMenu, MainMenuService, NavTreeResource, WorkspacePanelService } from '@cloudbeaver/core-app';
+import { EMainMenu, MainMenuService, WorkspacePanelService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 
 import { ResourceManager } from './ResourceManager';
 import { ResourceManagerMenuService } from './ResourceManagerMenuService';
 import { ResourceManagerService } from './ResourceManagerService';
-import { SCRIPTS_ROOT_PATH } from './ScriptsManagerService';
+import { ScriptManagerSyncService } from './ScriptsManager/ScriptManagerSyncService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -23,12 +24,16 @@ export class PluginBootstrap extends Bootstrap {
     private readonly resourceManagerService: ResourceManagerService,
     private readonly workspacePanelService: WorkspacePanelService,
     private readonly resourceManagerMenuService: ResourceManagerMenuService,
-    private readonly navTreeResource: NavTreeResource
+    private readonly scriptManagerSyncService: ScriptManagerSyncService,
+    private readonly sessionExpireService: SessionExpireService,
+
   ) {
     super();
   }
 
   register(): void | Promise<void> {
+    this.sessionExpireService.onSessionExpire.addHandler(this.scriptManagerSyncService.stop);
+
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuToolsPanel,
       {
@@ -52,9 +57,8 @@ export class PluginBootstrap extends Bootstrap {
     });
 
     this.resourceManagerMenuService.register();
+    this.scriptManagerSyncService.start();
   }
 
-  async load(): Promise<void> {
-    await this.navTreeResource.load(SCRIPTS_ROOT_PATH);
-  }
+  async load(): Promise<void> { }
 }

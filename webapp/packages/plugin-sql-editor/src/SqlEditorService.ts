@@ -21,9 +21,8 @@ export class SqlEditorService {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly notificationService: NotificationService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
-    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
-  ) {
-  }
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+  ) { }
 
   getState(
     order: number,
@@ -97,8 +96,12 @@ export class SqlEditorService {
     return proposals as SQLProposal[];
   }
 
-  linkScript(scriptId: string, state: ISqlEditorTabState) {
+  setAssociatedScriptId(scriptId: string, state: ISqlEditorTabState) {
     state.associatedScriptId = scriptId;
+  }
+
+  setName(name: string, state: ISqlEditorTabState) {
+    state.name = name;
   }
 
   setQuery(query: string, state: ISqlEditorTabState) {

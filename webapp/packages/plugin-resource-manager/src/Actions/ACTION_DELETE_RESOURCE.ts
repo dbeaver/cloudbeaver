@@ -8,6 +8,6 @@
 
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_OPEN_SCRIPT = createAction('open-script', {
-  label: 'ui_open',
+export const ACTION_DELETE_RESOURCE = createAction('delete-resource', {
+  label: 'ui_delete',
 });

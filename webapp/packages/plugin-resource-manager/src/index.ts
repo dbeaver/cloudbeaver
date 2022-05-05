@@ -4,4 +4,5 @@ export default resourceManagerPlugin;
 
 export * from './Tree/ResourceManagerTree';
 export * from './ResourceManagerService';
-export * from './ScriptsManagerService';
+export * from './ScriptsManager/ScriptsManagerService';
+export * from './ScriptsManager/SaveScriptDialog';

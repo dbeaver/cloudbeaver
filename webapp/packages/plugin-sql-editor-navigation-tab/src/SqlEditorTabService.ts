@@ -28,6 +28,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -55,21 +56,22 @@ export class SqlEditorTabService extends Bootstrap {
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
-      key: sqlEditorTabHandlerKey,
-      getTabComponent: () => SqlEditorTab,
-      getPanelComponent: () => SqlEditorPanel,
-      onRestore: this.handleTabRestore.bind(this),
-      onClose: this.handleTabClose.bind(this),
-      canClose: this.handleCanTabClose.bind(this),
-      extensions: [
-        connectionProvider(this.getConnectionId.bind(this)),
-        objectCatalogProvider(this.getObjectCatalogId.bind(this)),
-        objectSchemaProvider(this.getObjectSchemaId.bind(this)),
-        connectionSetter((connectionId, tab) => this.setConnectionId(tab, connectionId)),
-        objectCatalogSetter(this.setObjectCatalogId.bind(this)),
-        objectSchemaSetter(this.setObjectSchemaId.bind(this)),
-      ],
-    });
+        key: sqlEditorTabHandlerKey,
+        getTabComponent: () => SqlEditorTab,
+        getPanelComponent: () => SqlEditorPanel,
+        onRestore: this.handleTabRestore.bind(this),
+        onSelect: this.handleTabSelect.bind(this),
+        onClose: this.handleTabClose.bind(this),
+        canClose: this.handleCanTabClose.bind(this),
+        extensions: [
+          connectionProvider(this.getConnectionId.bind(this)),
+          objectCatalogProvider(this.getObjectCatalogId.bind(this)),
+          objectSchemaProvider(this.getObjectSchemaId.bind(this)),
+          connectionSetter((connectionId, tab) => this.setConnectionId(tab, connectionId)),
+          objectCatalogSetter(this.setObjectCatalogId.bind(this)),
+          objectSchemaSetter(this.setObjectSchemaId.bind(this)),
+        ],
+      });
 
     makeObservable(this, {
       sqlEditorTabs: computed,
@@ -82,7 +84,7 @@ export class SqlEditorTabService extends Bootstrap {
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
 
-  load(): void {}
+  load(): void { }
 
   getName(tabState: ISqlEditorTabState): string {
     const connection = this.connectionInfoResource.get(tabState.executionContext?.connectionId || '');
@@ -161,22 +163,22 @@ export class SqlEditorTabService extends Bootstrap {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
     if (typeof tab.handlerState.query !== 'string'
-        || typeof tab.handlerState.order !== 'number'
-        || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.id)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
-        || !Array.isArray(tab.handlerState.modeState)
-        || !Array.isArray(tab.handlerState.tabs)
-        || !Array.isArray(tab.handlerState.executionPlanTabs)
-        || !Array.isArray(tab.handlerState.resultGroups)
-        || !Array.isArray(tab.handlerState.resultTabs)
-        || !Array.isArray(tab.handlerState.statisticsTabs)
+      || typeof tab.handlerState.order !== 'number'
+      || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.id)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
+      || !Array.isArray(tab.handlerState.modeState)
+      || !Array.isArray(tab.handlerState.tabs)
+      || !Array.isArray(tab.handlerState.executionPlanTabs)
+      || !Array.isArray(tab.handlerState.resultGroups)
+      || !Array.isArray(tab.handlerState.resultTabs)
+      || !Array.isArray(tab.handlerState.statisticsTabs)
     ) {
       return false;
     }
@@ -299,6 +301,10 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
+  }
+
+  private handleTabSelect(tab: ITab<ISqlEditorTabState>) {
+
   }
 }
 

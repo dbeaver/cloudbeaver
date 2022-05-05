@@ -41,6 +41,7 @@ export const defaultZHLocale = [
   ['ui_revoke', '撤销'],
   ['ui_grant', '授予'],
   ['ui_edit', '编辑'],
+  ['ui_open', 'Open'],
   ['ui_open_in_tab', '在选项卡中打开'],
   ['ui_rename', '重命名'],
   ['ui_rename_processing', '重命名中...'],

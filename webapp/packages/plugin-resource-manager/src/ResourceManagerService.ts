@@ -11,14 +11,16 @@ import { makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-export const ROOT_NODE_PATH = 'ext://resources';
-export const RESOURCE_MANAGER_NODE_TYPE = 'rm.resource';
+export const RESOURCE_MANAGER_RESOURCE_NODE_TYPE = 'rm.resource';
+export const RESOURCE_MANAGER_PROJECT_NODE_TYPE = 'rm.project';
 
 @injectable()
 export class ResourceManagerService {
   enabled = false;
 
-  constructor(private readonly graphQLService: GraphQLService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+  ) {
     this.toggleEnabled = this.toggleEnabled.bind(this);
 
     makeObservable(this, {
@@ -28,11 +30,6 @@ export class ResourceManagerService {
 
   toggleEnabled() {
     this.enabled = !this.enabled;
-  }
-
-  getResourceName(resourceId: string) {
-    const parts = resourceId.replace('//', '\\').split('/');
-    return parts[parts.length - 1];
   }
 
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
@@ -58,5 +55,13 @@ export class ResourceManagerService {
     });
 
     return result.value;
+  }
+
+  async deleteResource(projectId: string, resourcePath: string) {
+    await this.graphQLService.sdk.deleteResource({
+      projectId,
+      resourcePath,
+      recursive: false,
+    });
   }
 }
