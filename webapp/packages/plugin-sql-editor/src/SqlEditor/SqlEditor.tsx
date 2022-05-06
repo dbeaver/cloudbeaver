@@ -15,8 +15,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
 import { useSqlEditor } from './useSqlEditor';
 import { useTools } from './useTools';
@@ -111,6 +113,10 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   useMemo(() => {
     modesState.sync(state.modeState);
   }, [state]);
+
+  useCaptureViewContext(context => {
+    context?.set(DATA_CONTEXT_SQL_EDITOR_DATA, data);
+  });
 
   function preventFocus(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
