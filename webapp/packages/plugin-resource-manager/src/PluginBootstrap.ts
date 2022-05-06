@@ -9,7 +9,7 @@
 import { EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { SideBarPanelService } from '@cloudbeaver/core-app';
+import { SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { ResourceManager } from './ResourceManager';
 import { ResourceManagerService } from './ResourceManagerService';

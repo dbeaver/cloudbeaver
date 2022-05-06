@@ -16,10 +16,9 @@ import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@clo
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTree } from '../NavigationTree';
-import { SideBarPanel } from '../shared/SideBarPanel/SideBarPanel';
-import { SideBarPanelService } from '../shared/SideBarPanel/SideBarPanelService';
 import { RightArea } from './RightArea';
 
 const mainStyles = css`

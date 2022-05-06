@@ -14,6 +14,7 @@ import { ClipboardService } from './Clipboard/ClipboardService';
 import { LocaleService } from './LocaleService';
 import { NavigationService } from './Screens/AppScreen/NavigationService';
 import { OptionsPanelService } from './Screens/AppScreen/OptionsPanelService';
+import { SideBarPanelService } from './SideBarPanel/SideBarPanelService';
 import { TabsBootstrap } from './Tabs/TabsBootstrap';
 
 export const manifest: PluginManifest = {
@@ -27,6 +28,7 @@ export const manifest: PluginManifest = {
     ClipboardBootstrap,
     ClipboardService,
     TabsBootstrap,
+    SideBarPanelService,
     LocaleService,
   ],
 };

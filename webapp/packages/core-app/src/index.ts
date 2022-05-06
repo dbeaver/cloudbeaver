@@ -33,7 +33,6 @@ export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
 export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 export * from './shared/ToolsPanel/ToolsPanelService';
-export * from './shared/SideBarPanel/SideBarPanelService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
