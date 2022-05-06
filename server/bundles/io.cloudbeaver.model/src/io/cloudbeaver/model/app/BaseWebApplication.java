@@ -72,6 +72,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
             }
         }
         Path path = Path.of(configPath).toAbsolutePath();
+        log.debug("Loading configuration from " + path);
+
         // Configure logging
         Path logbackConfigPath = null;
         for (Path confFolder = path.getParent(); confFolder != null; confFolder = confFolder.getParent()) {
