@@ -43,7 +43,7 @@ import {
   ConnectionSchemaManagerBootstrap,
   NavigationTreeBootstrap,
   ToolsPanelService,
-  QuotasService
+  QuotasService,
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';

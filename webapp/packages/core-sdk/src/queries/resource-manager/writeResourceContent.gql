@@ -1,0 +1,3 @@
+mutation writeResourceContent($projectId: String!, $resourcePath: String!, $data: String!) {
+  rmWriteResourceStringContent(projectId: $projectId, resourcePath: $resourcePath, data: $data)
+}

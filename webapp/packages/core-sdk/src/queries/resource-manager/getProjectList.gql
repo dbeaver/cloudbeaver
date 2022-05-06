@@ -1,0 +1,7 @@
+query getProjectList {
+  projects: rmListProjects {
+    id,
+    name,
+    shared,
+  }
+}

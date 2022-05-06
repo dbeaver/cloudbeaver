@@ -13,8 +13,10 @@ import {
   splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useMapResource, useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTree } from '../NavigationTree';
 import { RightArea } from './RightArea';
@@ -36,6 +38,8 @@ const mainStyles = css`
   `;
 
 export const Main = observer(function Main() {
+  const sideBarPanelService = useService(SideBarPanelService);
+
   const styles = useStyles(mainStyles, splitStyles);
   const splitState = useSplitUserState('main');
   useMapResource(
@@ -44,6 +48,8 @@ export const Main = observer(function Main() {
     CachedMapAllKey
   );
   useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
+
+  const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
 
   return styled(styles)(
     <space as="main">
@@ -55,7 +61,21 @@ export const Main = observer(function Main() {
         </Pane>
         <ResizerControls />
         <Pane>
-          <RightArea />
+          <Split>
+            <Pane>
+              <RightArea />
+            </Pane>
+            {activeBars.length > 0 && (
+              <>
+                <ResizerControls />
+                <Pane main>
+                  <ErrorBoundary remount>
+                    <SideBarPanel container={sideBarPanelService.tabsContainer} />
+                  </ErrorBoundary>
+                </Pane>
+              </>
+            )}
+          </Split>
         </Pane>
       </Split>
     </space>

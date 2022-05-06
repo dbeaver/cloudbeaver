@@ -1,0 +1,3 @@
+mutation deleteResource($projectId: String!, $resourcePath: String!, $recursive: Boolean!) {
+  rmDeleteResource(projectId: $projectId, resourcePath: $resourcePath, recursive: $recursive)
+}

@@ -18,6 +18,7 @@ import help from '@cloudbeaver/plugin-help';
 import localization from '@cloudbeaver/plugin-localization';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
+import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
@@ -57,6 +58,7 @@ const PLUGINS: PluginManifest[] = [
   settingsMenu,
   settingsMenuAdministration,
   help,
+  resourceManager,
 ];
 
 bootstrap(PLUGINS);

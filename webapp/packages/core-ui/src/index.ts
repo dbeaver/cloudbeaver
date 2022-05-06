@@ -51,6 +51,9 @@ export * from './Tabs/TabsBootstrap';
 export * from './Tabs/TabsBox/TabsBox';
 export * from './Tabs/TabsBox/TabsBoxFromArray';
 
+export * from './SideBarPanel/SideBarPanel';
+export * from './SideBarPanel/SideBarPanelService';
+
 export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
 export { manifest as coreUIManifest } from './manifest';
