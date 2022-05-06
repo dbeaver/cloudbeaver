@@ -17,7 +17,8 @@ import {
   objectSchemaProvider,
   NavNodeManagerService,
   objectNavNodeProvider,
-  IDataContextActiveNode
+  IDataContextActiveNode,
+  NodeManagerUtils
 } from '@cloudbeaver/core-app';
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -97,7 +98,7 @@ export class ObjectViewerTabService {
       tab.handlerState.tabIcon = nodeInfo.icon;
       tab.handlerState.tabTitle = nodeInfo.name;
       tabInfo.registerTab(tab);
-    } else {
+    } else if (NodeManagerUtils.isDatabaseObject(data.nodeId)) {
       tabInfo.openNewTab<IObjectViewerTabState>({
         handlerId: objectViewerTabHandlerKey,
         handlerState: {
