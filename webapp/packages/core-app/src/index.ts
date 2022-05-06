@@ -33,6 +33,7 @@ export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
 export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 export * from './shared/ToolsPanel/ToolsPanelService';
+export * from './shared/SideBarPanel/SideBarPanelService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
@@ -44,6 +45,7 @@ export * from './NavigationTree/ElementsTree/ACTION_LINK_OBJECT';
 export * from './NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE';
 export * from './NavigationTree/ElementsTree/ElementsTree';
 export * from './NavigationTree/ElementsTree/ElementsTreeContext';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl';
 export * from './NavigationTree/ElementsTree/KEY_BINDING_COLLAPSE_ALL';
 export * from './NavigationTree/ElementsTree/KEY_BINDING_LINK_OBJECT';
 export * from './NavigationTree/ElementsTree/MENU_NAV_TREE';

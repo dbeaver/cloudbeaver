@@ -1,0 +1,3 @@
+mutation createResource($projectId: String!, $resourcePath: String!, $isFolder: Boolean!) {
+  rmCreateResource(projectId: $projectId, resourcePath: $resourcePath, isFolder: $isFolder)
+} 

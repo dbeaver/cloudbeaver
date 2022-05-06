@@ -1,0 +1,13 @@
+query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
+  resources: rmListResources(
+      projectId: $projectId,
+      folder: $folder,
+      nameMask: $nameMask,
+      readProperties: $readProperties,
+      readHistory: $readHistory
+    ) {
+    name,
+    folder,
+    length
+  }
+}
