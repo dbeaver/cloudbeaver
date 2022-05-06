@@ -15,7 +15,6 @@ import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTi
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IUserFormProps } from './UserFormService';
 
@@ -95,7 +94,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           return (
             <FieldCheckbox
               key={role.roleId}
-              id={uuid()}
+              id={`${controller.user.userId}_${role.roleId}`}
               title={tooltip}
               name='role'
               checked={!!controller.credentials.roles.get(role.roleId)}
@@ -108,7 +107,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         })}
         <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
         <FieldCheckbox
-          id={uuid()}
+          id={`${controller.user.userId}_user_enabled`}
           name='enabled'
           state={controller}
           disabled={controller.isSaving}

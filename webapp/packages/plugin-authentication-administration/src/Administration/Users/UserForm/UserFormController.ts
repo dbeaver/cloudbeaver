@@ -39,7 +39,7 @@ export class UserFormController implements IInitializableController, IDestructib
   isSaving: boolean;
   isLoading: boolean;
   credentials: IUserCredentials;
-  enabled = true;
+  enabled: boolean;
   statusMessage: IStatusMessage | null;
 
   get connections(): DatabaseConnection[] {
@@ -95,6 +95,7 @@ export class UserFormController implements IInitializableController, IDestructib
       metaParameters: {},
       roles: new Map(),
     };
+    this.enabled = true;
     this.error = new GQLErrorCatcher();
     this.isDestructed = false;
     this.connectionAccessChanged = false;
