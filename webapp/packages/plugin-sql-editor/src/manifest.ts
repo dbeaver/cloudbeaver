@@ -9,11 +9,13 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
+import { MenuBootstrap } from './MenuBootstrap';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SQLCodeEditorPanelBootstrap } from './SqlEditor/SQLCodeEditorPanel/SQLCodeEditorPanelBootstrap';
 import { SqlEditorModeService } from './SqlEditorModeService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
+import { SqlEditorView } from './SqlEditorView';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
@@ -35,5 +37,7 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlEditorSettingsService,
     SqlEditorModeService,
     SQLCodeEditorPanelBootstrap,
+    SqlEditorView,
+    MenuBootstrap,
   ],
 };

@@ -10,6 +10,7 @@ import type { IAction } from '../Action/IAction';
 import type { IActiveView } from './IActiveView';
 
 export interface IView<T> {
+  parent: IView<T> | null;
   actions: IAction[];
   getView: () => IActiveView<T> | null;
   registerAction: (action: IAction) => void;

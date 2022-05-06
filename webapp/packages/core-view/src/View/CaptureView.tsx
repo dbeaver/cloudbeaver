@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import styled, { css } from 'reshadow';
 
@@ -36,7 +37,8 @@ export const CaptureView = observer<Props>(function CaptureView({
   children,
   className,
 }) {
-  const viewContext = useViewContext(view);
+  const parentContext = useContext(CaptureViewContext);
+  const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
   const [onFocus, onBlur] = useActiveView(view);
   const [ref, state] = useFocus<HTMLDivElement>({ onFocus, onBlur });

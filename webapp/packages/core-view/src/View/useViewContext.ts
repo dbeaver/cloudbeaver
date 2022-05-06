@@ -14,9 +14,9 @@ import { CaptureViewContext } from './CaptureViewContext';
 import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW';
 import type { IView } from './IView';
 
-export function useViewContext(view: IView<any>): IDataContext {
+export function useViewContext(view: IView<any>, parentContext: IDataContext | undefined): IDataContext {
   const context = useContext(CaptureViewContext);
-  const viewContext = useDataContext(context);
+  const viewContext = useDataContext(parentContext ?? context);
 
   viewContext.set(DATA_CONTEXT_VIEW, view);
 

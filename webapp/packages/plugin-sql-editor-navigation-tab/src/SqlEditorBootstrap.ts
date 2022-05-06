@@ -120,8 +120,8 @@ export class SqlEditorBootstrap extends Bootstrap {
               objectName: name,
               icon: '/icons/sql_script_m.svg',
               validation: name => !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
-                tab.handlerState.order !== state.order 
-                  && this.sqlEditorTabService.getName(tab.handlerState) === name.trim()
+                tab.handlerState.order !== state.order
+                && this.sqlEditorTabService.getName(tab.handlerState) === name.trim()
               )),
             });
 
@@ -182,13 +182,13 @@ export class SqlEditorBootstrap extends Bootstrap {
     this.sqlEditorNavigatorService.openNewEditor({ connectionId, catalogId, schemaId });
   }
 
-  private readonly handleAction: IExecutorHandler<ISessionAction | null, any> = (data, contexts) => {
+  private readonly handleAction: IExecutorHandler<ISessionAction | null> = (data, contexts) => {
     const processInfo = contexts.getContext(sessionActionContext);
 
     if (isSessionActionOpenSQLEditor(data)) {
       try {
         this.sqlEditorNavigatorService.openNewEditor({
-          name: data['editor-name'], 
+          name: data['editor-name'],
           connectionId: data['connection-id'],
           source: SQL_EDITOR_SOURCE_ACTION,
         });
