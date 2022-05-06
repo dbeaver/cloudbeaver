@@ -39,6 +39,7 @@ export class UserFormController implements IInitializableController, IDestructib
   isSaving: boolean;
   isLoading: boolean;
   credentials: IUserCredentials;
+  enabled: boolean;
   statusMessage: IStatusMessage | null;
 
   get connections(): DatabaseConnection[] {
@@ -77,6 +78,7 @@ export class UserFormController implements IInitializableController, IDestructib
       isSaving: observable,
       isLoading: observable,
       credentials: observable,
+      enabled: observable.ref,
       statusMessage: observable,
       connections: computed,
       roles: computed,
@@ -93,6 +95,7 @@ export class UserFormController implements IInitializableController, IDestructib
       metaParameters: {},
       roles: new Map(),
     };
+    this.enabled = true;
     this.error = new GQLErrorCatcher();
     this.isDestructed = false;
     this.connectionAccessChanged = false;
@@ -133,6 +136,7 @@ export class UserFormController implements IInitializableController, IDestructib
             profile: '0',
             credentials: { password: this.credentials.password },
           },
+          enabled: this.enabled,
           roles: this.getGrantedRoles(),
           metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
@@ -150,6 +154,7 @@ export class UserFormController implements IInitializableController, IDestructib
           );
         }
         await this.updateRoles();
+        await this.saveUserStatus();
         await this.saveConnectionPermissions();
         await this.saveMetaParameters();
         await this.usersResource.refresh(this.user.userId);
@@ -274,6 +279,10 @@ export class UserFormController implements IInitializableController, IDestructib
     await this.usersResource.setMetaParameters(this.user.userId, this.credentials.metaParameters);
   }
 
+  private async saveUserStatus() {
+    await this.usersResource.enableUser(this.user.userId, this.enabled);
+  }
+
   private async saveConnectionPermissions() {
     if (!this.connectionAccessChanged) {
       return;
@@ -300,6 +309,7 @@ export class UserFormController implements IInitializableController, IDestructib
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
+      this.enabled = this.user.enabled;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load user');
     }

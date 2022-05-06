@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, getComputed, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -147,6 +147,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 <TableColumnHeader min />
                 <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
                 <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
+                <TableColumnHeader>{translate('authentication_user_activated')}</TableColumnHeader>
                 <TableColumnHeader />
               </TableHeader>
               <TableBody>

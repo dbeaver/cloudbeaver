@@ -70,6 +70,7 @@ export enum AdminSubjectType {
 
 export interface AdminUserInfo {
   configurationParameters: Scalars['Object'];
+  enabled: Scalars['Boolean'];
   grantedConnections: Array<AdminConnectionGrantInfo>;
   grantedRoles: Array<Scalars['ID']>;
   linkedAuthProviders: Array<Scalars['String']>;
@@ -724,6 +725,7 @@ export interface Query {
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
+  enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
   getSubjectConnectionAccess: Array<AdminConnectionGrantInfo>;
   grantUserRole?: Maybe<Scalars['Boolean']>;
@@ -882,6 +884,12 @@ export interface QueryDeleteUserMetaParameterArgs {
 
 export interface QueryDriverListArgs {
   id?: InputMaybe<Scalars['ID']>;
+}
+
+
+export interface QueryEnableUserArgs {
+  enabled: Scalars['Boolean'];
+  userId: Scalars['ID'];
 }
 
 
@@ -1497,7 +1505,7 @@ export type CreateUserQueryVariables = Exact<{
 }>;
 
 
-export type CreateUserQuery = { user: { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> } };
+export type CreateUserQuery = { user: { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; enabled: boolean; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> } };
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1512,6 +1520,14 @@ export type DeleteUserMetaParameterQueryVariables = Exact<{
 
 
 export type DeleteUserMetaParameterQuery = { state: boolean };
+
+export type EnableUserQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  enabled: Scalars['Boolean'];
+}>;
+
+
+export type EnableUserQuery = { enableUser?: boolean };
 
 export type GetPermissionsListQueryVariables = Exact<{
   roleId?: InputMaybe<Scalars['ID']>;
@@ -1534,7 +1550,7 @@ export type GetUsersListQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersListQuery = { users: Array<{ userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> }> };
+export type GetUsersListQuery = { users: Array<{ userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; enabled: boolean; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> }> };
 
 export type GrantUserRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1907,7 +1923,7 @@ export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCa
 
 export type AdminRoleInfoFragment = { roleId: string; roleName?: string; description?: string };
 
-export type AdminUserInfoFragment = { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
+export type AdminUserInfoFragment = { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; enabled: boolean; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
 
 export type AllNavigatorSettingsFragment = { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean };
 
@@ -2275,6 +2291,7 @@ export const AdminUserInfoFragmentDoc = `
   origins {
     ...ObjectOriginInfo
   }
+  enabled
 }
     ${ObjectOriginInfoFragmentDoc}`;
 export const AsyncTaskInfoFragmentDoc = `
@@ -2716,6 +2733,11 @@ export const DeleteUserDocument = `
 export const DeleteUserMetaParameterDocument = `
     query deleteUserMetaParameter($id: ID!) {
   state: deleteUserMetaParameter(id: $id)
+}
+    `;
+export const EnableUserDocument = `
+    query enableUser($userId: ID!, $enabled: Boolean!) {
+  enableUser(userId: $userId, enabled: $enabled)
 }
     `;
 export const GetPermissionsListDocument = `
@@ -3632,6 +3654,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteUserMetaParameter(variables: DeleteUserMetaParameterQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteUserMetaParameterQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<DeleteUserMetaParameterQuery>(DeleteUserMetaParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUserMetaParameter', 'query');
+    },
+    enableUser(variables: EnableUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<EnableUserQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'enableUser', 'query');
     },
     getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetPermissionsListQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList', 'query');

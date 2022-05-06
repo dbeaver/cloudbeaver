@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -49,6 +49,9 @@ export const User = observer<Props>(function User({ user, selectable }) {
       </TableColumnValue>
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
       <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
+      <TableColumnValue>
+        <Checkbox checked={user.enabled} disabled />
+      </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
       </TableColumnValue>

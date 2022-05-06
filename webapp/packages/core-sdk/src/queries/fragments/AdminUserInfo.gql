@@ -7,4 +7,5 @@ fragment AdminUserInfo on AdminUserInfo {
   origins {
     ...ObjectOriginInfo
   }
+  enabled
 }
