@@ -103,6 +103,32 @@ export class SqlEditorService {
     state.executionContext = undefined;
   }
 
+  async setConnection(
+    state: ISqlEditorTabState,
+    connectionId: string,
+    catalogId?: string,
+    schemaId?: string
+  ): Promise<boolean> {
+    try {
+      const executionContext = await this.initContext(connectionId, catalogId, schemaId);
+
+      if (!executionContext?.context) {
+        return false;
+      }
+
+      const previousContext = state.executionContext;
+      state.executionContext = { ...executionContext.context };
+
+      if (previousContext) {
+        await this.destroyContext(previousContext);
+      }
+      return true;
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
+      return false;
+    }
+  }
+
   async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
     if (!state.executionContext) {
       console.error('executeEditorQuery executionContext is not provided');
