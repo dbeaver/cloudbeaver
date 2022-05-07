@@ -13,6 +13,7 @@ import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
 
 interface FocusOptions {
+  autofocus?: boolean;
   focusFirstChild?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -21,28 +22,40 @@ interface FocusOptions {
 interface IState<T extends HTMLElement> {
   focus: boolean;
   reference: T | null;
-  updateFocus: (ref: T | null) => void;
+  setRef: (ref: T | null) => void;
+  updateFocus: () => void;
   focusFirstChild: () => void;
 }
 
 export function useFocus<T extends HTMLElement>({
+  autofocus,
   focusFirstChild,
   onFocus,
   onBlur,
 }: FocusOptions): [(obj: T | null) => void, IState<T>] {
-  const handlersRef = useObjectRef({ onFocus, onBlur });
+  const optionsRef = useObjectRef({ autofocus, focusFirstChild, onFocus, onBlur });
   const state = useObservableRef<IState<T>>(
     () => ({
       reference: null,
       focus: false,
-      updateFocus(ref: T | null) {
+      setRef(ref: T | null) {
         if (this.reference !== ref) {
           this.reference = ref;
+
+          this.updateFocus();
+        }
+      },
+      updateFocus() {
+        if (this.reference) {
+          if (optionsRef.autofocus) {
+            this.reference.focus();
+          }
+
           this.focusFirstChild();
         }
       },
       focusFirstChild() {
-        if (this.reference !== null && focusFirstChild) {
+        if (this.reference !== null && optionsRef.focusFirstChild) {
           const firstFocusable = this.reference
             .querySelectorAll<T>(`
             button:not([disabled=disabled]), 
@@ -71,6 +84,7 @@ export function useFocus<T extends HTMLElement>({
     {
       focus: observable.ref,
       reference: observable.ref,
+      setRef: action.bound,
       updateFocus: action.bound,
     },
     false,
@@ -86,16 +100,16 @@ export function useFocus<T extends HTMLElement>({
     }
 
     const focusHandler = () => {
-      if (handlersRef.onFocus) {
-        handlersRef.onFocus();
+      if (optionsRef.onFocus) {
+        optionsRef.onFocus();
       }
 
       state.focus = true;
     };
 
     const blurHandler = () => {
-      if (handlersRef.onBlur) {
-        handlersRef.onBlur();
+      if (optionsRef.onBlur) {
+        optionsRef.onBlur();
       }
 
       state.focus = false;
@@ -110,5 +124,5 @@ export function useFocus<T extends HTMLElement>({
     };
   }, [state.reference]);
 
-  return [state.updateFocus, state];
+  return [state.setRef, state];
 }

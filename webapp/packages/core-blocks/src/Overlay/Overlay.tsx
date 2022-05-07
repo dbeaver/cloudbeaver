@@ -15,11 +15,13 @@ import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
   active?: boolean;
+  fill?: boolean;
   className?: string;
 }
 
 export const Overlay = observer<Props>(function Overlay({
   active,
+  fill,
   className,
   children,
 }) {
@@ -30,7 +32,7 @@ export const Overlay = observer<Props>(function Overlay({
   }
 
   return styled(styles)(
-    <overlay className={className} {...use({ active })}>
+    <overlay className={className} {...use({ active, fill })}>
       <box>
         {children}
       </box>
