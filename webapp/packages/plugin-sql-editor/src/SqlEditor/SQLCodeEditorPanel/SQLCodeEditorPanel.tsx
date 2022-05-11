@@ -68,7 +68,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
             }
 
             editor.focus();
-          }, true);
+          }, true, true);
         } catch (exception: any) {
           notificationService.logException(exception, 'sql_editor_alias_loading_error');
         }

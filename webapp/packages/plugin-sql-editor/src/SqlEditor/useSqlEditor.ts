@@ -331,9 +331,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     async executeQueryAction<T>(
       segment: ISQLScriptSegment | undefined,
       action: (query: ISQLScriptSegment) => Promise<T>,
-      passEmpty?: boolean
+      passEmpty?: boolean,
+      passDisabled?: boolean
     ): Promise<T | undefined> {
-      if (!segment || this.isDisabled || (!passEmpty && this.isLineScriptEmpty)) {
+      if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isLineScriptEmpty)) {
         return;
       }
 

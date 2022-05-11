@@ -18,8 +18,12 @@ export const OVERLAY_BASE_STYLES = css`
       height: 100%;
       background-color: rgba(0, 0, 0, 0.4);
 
-      [|active=false] {
+      &:not([|active]) {
         display: none;
+      }
+      
+      &[|fill] {
+        background-color: var(--theme-background-surface);
       }
     }
   
@@ -43,6 +47,10 @@ export const OVERLAY_BASE_STYLES = css`
       max-height: calc(100% - 48px);
     }
 
+    overlay[|fill] box {
+      box-shadow: none;
+    }
+
     actions {
       gap: 16px;
       display: flex;
@@ -54,10 +62,13 @@ export const OVERLAY_BASE_STYLES = css`
     }
 
     message {
-      padding-top: 0px;
       padding-right: 0px;
       overflow: auto;
       flex: 1;
+
+      &:not(:first-child) {
+        padding-top: 0px;
+      }
     }
 
     message-box {

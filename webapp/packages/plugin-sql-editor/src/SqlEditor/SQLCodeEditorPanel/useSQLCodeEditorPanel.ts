@@ -62,14 +62,14 @@ export function useSQLCodeEditorPanel(
       showHint: true,
       extraKeys: {
         // Execute sql script
-        'Ctrl-Enter': () => { editorPanelData.data.executeQuery(); },
+        // 'Ctrl-Enter': () => { editorPanelData.data.executeQuery(); },
         // Execute sql script in new tab
-        'Ctrl-\\': () => { editorPanelData.data.executeQueryNewTab(); },
-        'Shift-Ctrl-Enter': () => { editorPanelData.data.executeQueryNewTab(); },
-        'Shift-Ctrl-E': () => { editorPanelData.data.showExecutionPlan(); },
-        'Shift-Ctrl-F': () => { editorPanelData.data.formatScript(); },
+        // 'Ctrl-\\': () => { editorPanelData.data.executeQueryNewTab(); },
+        // 'Shift-Ctrl-Enter': () => { editorPanelData.data.executeQueryNewTab(); },
+        // 'Shift-Ctrl-E': () => { editorPanelData.data.showExecutionPlan(); },
+        // 'Shift-Ctrl-F': () => { editorPanelData.data.formatScript(); },
 
-        'Alt-X': () => { editorPanelData.data.executeScript(); },
+        // 'Alt-X': () => { editorPanelData.data.executeScript(); },
 
         // Autocomplete
         'Ctrl-Space': () => { editorPanelData.showHint(false); }, // classic for windows, linux

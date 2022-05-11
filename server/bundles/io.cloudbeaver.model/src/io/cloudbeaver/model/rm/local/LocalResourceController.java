@@ -92,17 +92,17 @@ public class LocalResourceController implements RMController {
             List<RMProject> projects;
             if (Files.exists(sharedProjectsPath)) {
                 projects = Files.list(sharedProjectsPath)
-                    .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED))
+                    .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED, true))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             } else {
                 projects = new ArrayList<>();
             }
-            RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), PROJECT_PREFIX_GLOBAL);
+            RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), PROJECT_PREFIX_GLOBAL, true);
             if (globalProject != null) {
                 projects.add(globalProject);
             }
-            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), PROJECT_PREFIX_USER);
+            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), PROJECT_PREFIX_USER, false);
             if (userProject != null) {
                 projects.add(0, userProject);
             }
@@ -120,7 +120,7 @@ public class LocalResourceController implements RMController {
                 return new RMProject[0];
             }
             return Files.list(sharedProjectsPath)
-                .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED))
+                .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED, false))
                 .filter(Objects::nonNull)
                 .toArray(RMProject[]::new);
         } catch (IOException e) {
@@ -149,6 +149,9 @@ public class LocalResourceController implements RMController {
     {
         Path projectPath = getProjectPath(projectId);
         try {
+            if (!Files.exists(projectPath)) {
+                return new RMResource[0];
+            }
             Path folderPath = CommonUtils.isEmpty(folder) ?
                 projectPath :
                 projectPath.resolve(folder);
@@ -256,6 +259,13 @@ public class LocalResourceController implements RMController {
     @NotNull
     private Path getTargetPath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
         Path projectPath = getProjectPath(projectId);
+        if (!Files.exists(projectPath)) {
+            try {
+                Files.createDirectories(projectPath);
+            } catch (IOException e) {
+                throw new DBException("Error creating project path", e);
+            }
+        }
         Path targetPath = projectPath.resolve(resourcePath).normalize();
         if (!targetPath.startsWith(projectPath)) {
             throw new DBException("Invalid resource path");
@@ -263,10 +273,19 @@ public class LocalResourceController implements RMController {
         return targetPath;
     }
 
-    private RMProject makeProjectFromPath(Path path, String prefix) {
-        if (path == null || !Files.exists(path) || !Files.isDirectory(path)) {
+    private RMProject makeProjectFromPath(Path path, String prefix, boolean checkExistence) {
+        if (path == null) {
             return null;
         }
+        if (Files.exists(path)) {
+            if (!Files.isDirectory(path)) {
+                log.error("Project path " + path + " is not a directory");
+                return null;
+            }
+        } else if (checkExistence) {
+            return null;
+        }
+
         RMProject project = new RMProject();
         project.setName(path.getFileName().toString());
         project.setId(prefix + project.getName());

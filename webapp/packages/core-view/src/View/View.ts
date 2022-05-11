@@ -13,9 +13,11 @@ import type { IActiveView } from './IActiveView';
 import type { IView } from './IView';
 
 export abstract class View<T> implements IView<T> {
+  readonly parent: IView<T> | null;
   readonly actions: IAction[];
 
-  constructor() {
+  constructor(parent: IView<T> | null = null) {
+    this.parent = parent;
     this.actions = observable([], { deep: false });
   }
 

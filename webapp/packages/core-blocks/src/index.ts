@@ -142,6 +142,7 @@ export * from './Code';
 export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
+export * from './useCombinedHandler';
 export * from './useDataResource';
 export * from './useExecutor';
 export * from './useFocus';

@@ -220,25 +220,7 @@ export class SqlEditorTabService extends Bootstrap {
     catalogId?: string,
     schemaId?: string
   ) {
-    try {
-      const executionContext = await this.sqlEditorService.initContext(connectionId, catalogId, schemaId);
-
-      if (!executionContext?.context) {
-        return false;
-      }
-
-      const previousContext = tab.handlerState.executionContext;
-      tab.handlerState.executionContext = { ...executionContext.context };
-
-      if (previousContext) {
-        await this.sqlEditorService.destroyContext(previousContext);
-      }
-
-      return true;
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
-      return false;
-    }
+    return await this.sqlEditorService.setConnection(tab.handlerState, connectionId, catalogId, schemaId);
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {

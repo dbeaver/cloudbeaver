@@ -44,7 +44,7 @@ export class PluginBootstrap extends Bootstrap {
       isBindingApplicable: (contexts, action) => action === ACTION_OPEN_IN_TAB,
       handler: this.openTab.bind(this),
     });
-    
+
     this.menuService.addCreator({
       isApplicable: context => (
         context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE) !== undefined

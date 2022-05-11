@@ -16,13 +16,19 @@ import { ConnectionExecutionContextResource, ConnectionInfoResource, DBDriverRes
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { CaptureView } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorService } from './SqlEditorService';
+import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 
 const viewerStyles = css`
+  CaptureView {
+    flex: 1;
+    display: flex;
+  }
   Pane {
     composes: theme-typography--body2 from global;
     display: flex;
@@ -41,6 +47,7 @@ interface Props {
 
 export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const translate = useTranslate();
+  const sqlEditorView = useService(SqlEditorView);
   const sqlEditorService = useService(SqlEditorService);
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
   const connection = useMapResource(SqlEditor, ConnectionInfoResource, state.executionContext?.connectionId ?? null);
@@ -79,7 +86,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   }, [connected, initExecutionContext]);
 
   return styled(styles)(
-    <>
+    <CaptureView view={sqlEditorView}>
       <Split {...splitState} split="horizontal" sticky={30}>
         <Pane>
           <SqlEditorLoader state={state} />
@@ -116,6 +123,6 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
           </Button>
         </OverlayActions>
       </Overlay>
-    </>
+    </CaptureView>
   );
 });

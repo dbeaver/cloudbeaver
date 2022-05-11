@@ -63,6 +63,7 @@ export interface ISQLEditorData {
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,
-    passEmpty?: boolean
+    passEmpty?: boolean,
+    passDisabled?: boolean
   ): Promise<T | undefined>;
 }
