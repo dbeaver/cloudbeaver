@@ -9,8 +9,10 @@
 import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { isScript, NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE } from '@cloudbeaver/plugin-resource-manager';
 import { SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+
+import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -33,27 +35,34 @@ export class PluginBootstrap extends Bootstrap {
   load(): void | Promise<void> { }
 
   private async navigationHandler(data: INodeNavigationData) {
-    if (isScript(data.nodeId)) {
-      try {
-        const existingTab = this.sqlEditorTabService.sqlEditorTabs.find(
-          tab => tab.handlerState.associatedScriptId === data.nodeId
-        );
+    try {
+      const node = await this.navNodeInfoResource.load(data.nodeId);
 
-        if (existingTab) {
-          this.navigationTabsService.selectTab(existingTab.id);
-        } else {
-          const value = await this.navResourceNodeService.read(data.nodeId);
-
-          const node = await this.navNodeInfoResource.load(data.nodeId);
-          await this.sqlEditorNavigatorService.openNewEditor({
-            name: node.name ?? 'Unknown script',
-            query: value,
-            associatedScriptId: data.nodeId,
-          });
-        }
-      } catch (exception) {
-        this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
+      if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
+        return;
       }
+
+      const existingTab = this.sqlEditorTabService.sqlEditorTabs.find(
+        tab => tab.handlerState.associatedScriptId === data.nodeId
+      );
+
+      if (existingTab) {
+        this.navigationTabsService.selectTab(existingTab.id);
+      } else {
+        const value = await this.navResourceNodeService.read(data.nodeId);
+
+        await this.sqlEditorNavigatorService.openNewEditor({
+          name: node.name ?? 'Unknown script',
+          query: value,
+          associatedScriptId: data.nodeId,
+        });
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
     }
   }
+}
+
+function isScript(nodeId: string) {
+  return nodeId.split('.').pop() === SCRIPT_EXTENSION;
 }

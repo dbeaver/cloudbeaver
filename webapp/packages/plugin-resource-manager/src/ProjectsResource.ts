@@ -13,6 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, RmProject } from '@cloudbeaver/core-sdk';
 
 export type Project = Omit<RmProject, 'creator' | 'description' | 'createTime'>;
+export const PROJECT_NODE_TYPE = 'rm.project';
 
 @injectable()
 export class ProjectsResource extends CachedDataResource<Project[]> {

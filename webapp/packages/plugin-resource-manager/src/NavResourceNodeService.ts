@@ -12,7 +12,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ProjectsResource } from './ProjectsResource';
 import { ResourceManagerResource } from './ResourceManagerResource';
 import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
-import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
 
 interface IResourceData {
   projectId: string;
@@ -27,14 +26,10 @@ export class NavResourceNodeService {
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async saveScript(name: string, script: string) {
-    name = name + SCRIPT_EXTENSION;
-    const projectName = await this.getUserProjectName();
-    await this.resourceManagerResource.createResource(projectName, name, false);
-    await this.resourceManagerResource.writeResource(projectName, name, script);
+  async saveScript(projectId: string, name: string, script: string) {
+    await this.resourceManagerResource.createResource(projectId, name, false);
+    await this.resourceManagerResource.writeResource(projectId, name, script);
     await this.syncNodes();
-
-    return name;
   }
 
   async delete(nodeId: string) {
@@ -79,8 +74,4 @@ export class NavResourceNodeService {
     await this.projectsResource.load();
     return this.projectsResource.userProject ? this.projectsResource.userProject.name : '';
   }
-}
-
-export function isScript(nodeId: string) {
-  return nodeId.includes(SCRIPT_EXTENSION);
 }
