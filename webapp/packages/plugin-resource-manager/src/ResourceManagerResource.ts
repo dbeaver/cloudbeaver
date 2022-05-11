@@ -9,8 +9,6 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, GraphQLService, RmResource } from '@cloudbeaver/core-sdk';
 
-export const RESOURCE_NODE_TYPE = 'rm.resource';
-
 @injectable()
 export class ResourceManagerResource extends CachedMapResource<string, RmResource[]> {
   constructor(

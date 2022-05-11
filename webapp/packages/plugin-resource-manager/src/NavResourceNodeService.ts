@@ -18,6 +18,9 @@ interface IResourceData {
   resourcePath: string;
 }
 
+export const PROJECT_NODE_TYPE = 'rm.project';
+export const RESOURCE_NODE_TYPE = 'rm.resource';
+
 @injectable()
 export class NavResourceNodeService {
   constructor(
