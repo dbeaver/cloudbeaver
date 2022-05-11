@@ -9,11 +9,11 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
+import { NavResourceNodeService } from './NavResourceNodeService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { ProjectsResource } from './ProjectsResource';
 import { ResourceManagerResource } from './ResourceManagerResource';
 import { ResourceManagerService } from './ResourceManagerService';
-import { ScriptsManagerService } from './ScriptsManager/ScriptsManagerService';
 
 export const resourceManagerPlugin: PluginManifest = {
   info: { name: 'Resource manager plugin' },
@@ -23,6 +23,6 @@ export const resourceManagerPlugin: PluginManifest = {
     ResourceManagerService,
     ProjectsResource,
     ResourceManagerResource,
-    ScriptsManagerService,
+    NavResourceNodeService,
   ],
 };

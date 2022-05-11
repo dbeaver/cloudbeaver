@@ -9,14 +9,14 @@
 import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ScriptsManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { isScript, NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly scriptsManagerService: ScriptsManagerService,
+    private readonly navResourceNodeService: NavResourceNodeService,
     private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
@@ -33,7 +33,7 @@ export class PluginBootstrap extends Bootstrap {
   load(): void | Promise<void> { }
 
   private async navigationHandler(data: INodeNavigationData) {
-    if (this.scriptsManagerService.isScript(data.nodeId)) {
+    if (isScript(data.nodeId)) {
       try {
         const existingTab = this.sqlEditorTabService.sqlEditorTabs.find(
           tab => tab.handlerState.associatedScriptId === data.nodeId
@@ -42,12 +42,12 @@ export class PluginBootstrap extends Bootstrap {
         if (existingTab) {
           this.navigationTabsService.selectTab(existingTab.id);
         } else {
-          const scriptValue = await this.scriptsManagerService.readScript(data.nodeId);
+          const value = await this.navResourceNodeService.read(data.nodeId);
 
           const node = await this.navNodeInfoResource.load(data.nodeId);
           await this.sqlEditorNavigatorService.openNewEditor({
             name: node.name ?? 'Unknown script',
-            query: scriptValue,
+            query: value,
             associatedScriptId: data.nodeId,
           });
         }
