@@ -22,6 +22,9 @@
     <extension point="io.cloudbeaver.handler">
         <sessionHandler id="RPSessionHandler" class="io.cloudbeaver.service.auth.RPSessionHandler"/>
     </extension>
-
+    <extension point="io.cloudbeaver.handler">
+        <servletHandler id="LocalServletHandler" class="io.cloudbeaver.service.auth.local.LocalServletHandler"/>
+        <sessionHandler id="LocalSessionHandler" class="io.cloudbeaver.service.auth.local.LocalSessionHandler"/>
+    </extension>
 
 </plugin>
