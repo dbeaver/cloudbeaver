@@ -8,13 +8,21 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { NavNodeInfoResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
+
+interface IResourceData {
+  projectId: string;
+  resourcePath: string;
+}
 
 @injectable()
 export class ResourceManagerService {
   enabled = false;
 
-  constructor() {
+  constructor(
+    private readonly navNodeResource: NavNodeInfoResource
+  ) {
     this.toggleEnabled = this.toggleEnabled.bind(this);
 
     makeObservable(this, {
@@ -25,4 +33,15 @@ export class ResourceManagerService {
   toggleEnabled() {
     this.enabled = !this.enabled;
   }
-} 
+
+  async getResourceData(nodeId: string, parents: string[]): Promise<IResourceData> {
+    const workspace = parents[1];
+    const workspaceNode = await this.navNodeResource.load(workspace);
+    const resourcePath = nodeId.substring(workspace.length).slice(1);
+
+    return {
+      projectId: workspaceNode.name ?? '',
+      resourcePath,
+    };
+  }
+}

@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { ProjectsResource } from '../ProjectsResource';
 import { ResourceManagerResource } from '../ResourceManagerResource';
+import { ResourceManagerService } from '../ResourceManagerService';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 const SCRIPT_EXTENSION = '.sql';
@@ -21,7 +22,8 @@ export class ScriptsManagerService {
     private readonly navTreeResource: NavTreeResource,
     private readonly projectsResource: ProjectsResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly resourceManagerResource: ResourceManagerResource
+    private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly resourceManagerService: ResourceManagerService,
   ) { }
 
   isScript(nodeId: string) {
@@ -42,34 +44,24 @@ export class ScriptsManagerService {
   }
 
   async deleteScript(nodeId: string) {
-    const node = await this.navNodeInfoResource.load(nodeId);
-    const projectName = await this.getUserProjectName();
-    if (node.name) {
-      await this.resourceManagerResource.deleteResource(projectName, node.name);
-      await this.syncNodes();
-    }
+    const parents = await this.getScriptParents(nodeId);
+    const resourceData = await this.resourceManagerService.getResourceData(nodeId, parents);
+
+    await this.resourceManagerResource.deleteResource(resourceData.projectId, resourceData.resourcePath);
+    await this.syncNodes();
   }
 
   async readScript(nodeId: string) {
-    const node = await this.navNodeInfoResource.load(nodeId);
+    const parents = await this.getScriptParents(nodeId);
+    const resourceData = await this.resourceManagerService.getResourceData(nodeId, parents);
 
-    if (!node.name) {
-      return;
-    }
-
-    const projectName = await this.getUserProjectName();
-    return await this.resourceManagerResource.readResource(projectName, node.name);
+    return await this.resourceManagerResource.readResource(resourceData.projectId, resourceData.resourcePath);
   }
 
   async writeScript(nodeId: string, value: string) {
-    const node = await this.navNodeInfoResource.load(nodeId);
-
-    if (node.name) {
-      const projectName = await this.getUserProjectName();
-      await this.resourceManagerResource.writeResource(projectName, node.name, value);
-    }
-
-    return node;
+    const parents = await this.getScriptParents(nodeId);
+    const resourceData = await this.resourceManagerService.getResourceData(nodeId, parents);
+    await this.resourceManagerResource.writeResource(resourceData.projectId, resourceData.resourcePath, value);
   }
 
   private async getNodeIdFromScript(scriptName: string) {
@@ -94,5 +86,9 @@ export class ScriptsManagerService {
   private async getUserProjectName() {
     await this.projectsResource.load();
     return this.projectsResource.userProject ? this.projectsResource.userProject.name : '';
+  }
+
+  private async getScriptParents(nodeId: string) {
+    return [RESOURCES_NODE_PATH, await this.getScriptsPath()];
   }
 }
