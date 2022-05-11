@@ -17,6 +17,7 @@ import { CaptureView } from '@cloudbeaver/core-view';
 
 import { ProjectsResource } from '../ProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
+import { ScriptsManagerService } from '../ScriptsManager/ScriptsManagerService';
 
 const styles = css`
   CaptureView {
@@ -39,6 +40,7 @@ const styles = css`
 export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const translate = useTranslate();
   const navTreeService = useService(NavigationTreeService);
+  const scriptsManagerService = useService(ScriptsManagerService);
 
   const { resource } = useDataResource(ResourceManagerTree, ProjectsResource, undefined);
 
@@ -46,7 +48,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     <Loader state={[resource]}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={RESOURCES_NODE_PATH}
+          root={`${RESOURCES_NODE_PATH}${resource.userProject ? '/' + resource.userProject.name : ''}`}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}
@@ -55,6 +57,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
               {translate('plugin_resource_manager_no_resources_placeholder')}
             </div>
           )}
+          onOpen={node => scriptsManagerService.openScript(node.id)}
         />
       </CaptureView>
     </Loader>
