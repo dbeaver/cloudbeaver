@@ -87,6 +87,15 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         )}
       </Group>
       <Group small gap overflow>
+        <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
+        <FieldCheckbox
+          id={`${controller.user.userId}_user_enabled`}
+          name='enabled'
+          state={controller}
+          disabled={controller.isSaving}
+        >
+          {translate('authentication_user_activated')}
+        </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
         {controller.roles.map(role => {
           const label = `${role.roleId}${role.roleName && role.roleName !== role.roleId ? ' (' + role.roleName + ')' : ''}`;
@@ -105,15 +114,6 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
             </FieldCheckbox>
           );
         })}
-        <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
-        <FieldCheckbox
-          id={`${controller.user.userId}_user_enabled`}
-          name='enabled'
-          state={controller}
-          disabled={controller.isSaving}
-        >
-          {translate('authentication_user_activated')}
-        </FieldCheckbox>
       </Group>
       <Loader state={userMetaParameters} inline>
         {() => userMetaParameters.data.length > 0 && styled(style)(
