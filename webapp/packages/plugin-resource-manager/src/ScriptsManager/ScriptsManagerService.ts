@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavTreeResource, NavNodeInfoResource, NavigationTabsService } from '@cloudbeaver/core-app';
+import { NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ProjectsResource } from '../ProjectsResource';
 import { ResourceManagerResource } from '../ResourceManagerResource';
@@ -21,42 +19,13 @@ const SCRIPT_EXTENSION = '.sql';
 export class ScriptsManagerService {
   constructor(
     private readonly navTreeResource: NavTreeResource,
-    private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly projectsResource: ProjectsResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly navigationTabsService: NavigationTabsService,
-    private readonly notificationService: NotificationService,
     private readonly resourceManagerResource: ResourceManagerResource
-  ) {
-
-  }
+  ) { }
 
   isScript(nodeId: string) {
     return nodeId.includes(SCRIPT_EXTENSION);
-  }
-
-  async openScript(nodeId: string) {
-    try {
-      const existingTab = this.sqlEditorTabService.sqlEditorTabs.find(
-        tab => tab.handlerState.associatedScriptId === nodeId
-      );
-
-      if (existingTab) {
-        this.navigationTabsService.selectTab(existingTab.id);
-      } else {
-        const scriptValue = await this.readScript(nodeId);
-
-        const node = await this.navNodeInfoResource.load(nodeId);
-        await this.sqlEditorNavigatorService.openNewEditor({
-          name: node.name ?? 'Unknown script',
-          query: scriptValue,
-          associatedScriptId: nodeId,
-        });
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
-    }
   }
 
   async saveScript(name: string, script: string) {
