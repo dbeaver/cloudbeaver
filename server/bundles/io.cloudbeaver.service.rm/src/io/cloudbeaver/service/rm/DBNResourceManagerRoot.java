@@ -112,3 +112,13 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject {
         return true;
     }
 }
+
+
+
+
+
+
+
+
+
+// checkstyle test
