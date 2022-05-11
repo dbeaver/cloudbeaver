@@ -192,7 +192,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 throw new DBWebException("Access denied (no permissions)");
             }
             if (!configMode && !securityController.getUserById(userId).isEnabled()) {
-                throw new DBWebException("Access denied (user is disabled)");
+                throw new DBWebException("User account is locked");
             }
 
             WebAuthInfo authInfo = new WebAuthInfo(
@@ -286,6 +286,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             // Read user from security controller. It will also read meta parameters
             SMUser userWithDetails = webSession.getSecurityController().getUserById(webSession.getUser().getUserId());
             if (userWithDetails != null) {
+                if (!userWithDetails.isEnabled()) {
+                    throw new DBWebException("User account is locked");
+                }
                 // USer not saved yet. This may happen in easy config mode
                 return new WebUserInfo(webSession, new WebUser(userWithDetails));
             } else {
