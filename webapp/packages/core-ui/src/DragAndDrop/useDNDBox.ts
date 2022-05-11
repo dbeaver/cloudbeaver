@@ -47,9 +47,11 @@ export function useDNDBox(options: IOptions): IDNDBox {
   const state = useObservableRef<IState>(() => ({
     isOver: false,
     canDrop: false,
+    context: null,
   }), {
     isOver: observable.ref,
     canDrop: observable.ref,
+    context: observable.ref,
   }, false);
 
   const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(() => ({
@@ -60,7 +62,7 @@ export function useDNDBox(options: IOptions): IDNDBox {
         options.onHover?.(item, monitor.getClientOffset());
       }
     },
-    canDrop: context => (options.canDrop?.(context) || true),
+    canDrop: context => (options.canDrop?.(context) ?? true),
     collect: monitor => {
       state.isOver = monitor.isOver();
       state.canDrop = monitor.canDrop();
