@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavTreeResource } from '@cloudbeaver/core-app';
+import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ProjectsResource } from './ProjectsResource';
 import { ResourceManagerResource } from './ResourceManagerResource';
 import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
@@ -25,20 +24,22 @@ export const RESOURCE_NODE_TYPE = 'rm.resource';
 export class NavResourceNodeService {
   constructor(
     private readonly navTreeResource: NavTreeResource,
-    private readonly projectsResource: ProjectsResource,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async saveScript(projectId: string, name: string, script: string) {
-    await this.resourceManagerResource.createResource(projectId, name, false);
-    await this.resourceManagerResource.writeResource(projectId, name, script);
-    await this.syncNodes();
+  async saveScript(projectId: string, name: string, script: string, path?: string) {
+    const resourcePath = `${path ? path + '/' : ''}${name}`;
+    await this.resourceManagerResource.createResource(projectId, resourcePath, false);
+    await this.resourceManagerResource.writeResource(projectId, resourcePath, script);
+    await this.navTreeResource.refreshTree(`${RESOURCES_NODE_PATH}/${projectId}${path ? '/' + path : ''}`);
   }
 
   async delete(nodeId: string) {
     const resourceData = this.getResourceData(nodeId);
+    const node = await this.navNodeInfoResource.load(nodeId);
     await this.resourceManagerResource.deleteResource(resourceData.projectId, resourceData.resourcePath);
-    await this.syncNodes();
+    this.navTreeResource.deleteInNode(node.parentId, [nodeId]);
   }
 
   async read(nodeId: string) {
@@ -51,17 +52,6 @@ export class NavResourceNodeService {
     await this.resourceManagerResource.writeResource(resourceData.projectId, resourceData.resourcePath, value);
   }
 
-  private async syncNodes() {
-    const userProjectName = await this.getUserProjectName();
-    let path = RESOURCES_NODE_PATH;
-
-    if (userProjectName) {
-      path = path + '/' + userProjectName;
-    }
-
-    await this.navTreeResource.refreshTree(path);
-  }
-
   private getResourceData(nodeId: string): IResourceData {
     const parts = nodeId.replace('//', '\\').split('/');
     const projectId = parts[1];
@@ -71,10 +61,5 @@ export class NavResourceNodeService {
       projectId,
       resourcePath,
     };
-  }
-
-  private async getUserProjectName() {
-    await this.projectsResource.load();
-    return this.projectsResource.userProject ? this.projectsResource.userProject.name : '';
   }
 }
