@@ -24,7 +24,7 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.service.DBWSessionHandler;
+import io.cloudbeaver.server.WebSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RPSessionHandler implements DBWSessionHandler {
+public class RPSessionHandler extends WebSessionHandler {
 
     private static final Log log = Log.getLog(RPSessionHandler.class);
 
@@ -114,10 +114,5 @@ public class RPSessionHandler implements DBWSessionHandler {
                 throw new DBWebException("Error", e);
             }
         }
-    }
-
-    @Override
-    public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
-        return false;
     }
 }

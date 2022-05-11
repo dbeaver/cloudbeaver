@@ -20,47 +20,37 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBServerAction;
-import io.cloudbeaver.service.DBWSessionHandler;
+import io.cloudbeaver.server.WebSessionHandler;
 import org.jkiss.dbeaver.DBException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class LocalSessionHandler implements DBWSessionHandler {
-    public static final String ACTION_CONSOLE = "console";
-    @Override
-    public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        return handleSessionAuth(webSession);
-    }
+public class LocalSessionHandler extends WebSessionHandler {
 
     @Override
-    public boolean handleSessionAuth(WebSession webSession) throws DBException, IOException {
-        if (webSession.getUser() == null) {
-            return false;
-        }
-        CBServerAction action = CBServerAction.fromSession(webSession, true);
-        if (action != null) {
-            if (ACTION_CONSOLE.equals(action.getActionId())) {
-                openDatabaseConsole(webSession, action);
+    protected void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException {
+        String connectionId = action.getParameter(LocalServletHandler.PARAM_CONNECTION_ID);
+        String connectionName = action.getParameter(LocalServletHandler.PARAM_CONNECTION_NAME);
+        String connectionURL = action.getParameter(LocalServletHandler.PARAM_CONNECTION_URL);
+        List<WebConnectionInfo> connectionInfoList = webSession.getConnections();
+        WebConnectionInfo connectionInfo = null;
+        if (connectionId != null) {
+            connectionInfo = webSession.getWebConnectionInfo(connectionId);
+        } else if (connectionName != null) {
+            List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getName().equals(connectionName)).collect(Collectors.toList());
+            if (filteredConnections.size() == 1) {
+                connectionInfo = webSession.getWebConnectionInfo(filteredConnections.get(0).getId());
+            }
+        } else if (connectionURL != null) {
+            List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getUrl().equals(connectionURL)).collect(Collectors.toList());
+            if (filteredConnections.size() == 1) {
+                connectionInfo = webSession.getWebConnectionInfo(filteredConnections.get(0).getId());
             }
         }
-        return false;
-    }
-
-    private void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException {
-        String connectionId = action.getParameter(LocalServletHandler.PARAM_CONNECTION_ID);
-        if (connectionId == null) {
-            throw new DBException("Connection id not in request");
+        if (connectionInfo == null) {
+            throw new DBException("Connection info is null");
         }
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
         WebServiceUtils.fireActionParametersOpenEditor(webSession, connectionInfo.getDataSourceContainer());
-
-
-    }
-
-    @Override
-    public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
-        return false;
     }
 }

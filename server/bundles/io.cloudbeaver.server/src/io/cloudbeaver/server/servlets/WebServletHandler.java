@@ -14,40 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.auth.local;
+package io.cloudbeaver.server.servlets;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.servlets.WebServletHandler;
+import io.cloudbeaver.server.CBServerAction;
+import io.cloudbeaver.service.DBWServletHandler;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
-public class LocalServletHandler extends WebServletHandler {
+public class WebServletHandler implements DBWServletHandler {
 
-    public static final String URI_PREFIX = "open";
-    public static final String PARAM_CONNECTION_ID = "id";
-    public static final String PARAM_CONNECTION_NAME = "name";
-    public static final String PARAM_CONNECTION_URL = "url";
+    public static final String ACTION_CONSOLE = "console";
 
-    private static final Log log = Log.getLog(LocalServletHandler.class);
 
     @Override
     public boolean handleRequest(Servlet servlet, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        if (URI_PREFIX.equals(WebServiceUtils.removeSideSlashes(request.getPathInfo()))) {
-            try {
-                WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, true);
-                createActionFromParams(webSession, request, response);
-                return true;
-            } catch (Exception e) {
-                log.error("Error saving open DB action in session", e);
-            }
-        }
         return false;
+    }
+
+    protected void createActionFromParams(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
+        Map<String, Object> parameters = new HashMap<>();
+        for (Enumeration<String> ne = request.getParameterNames(); ne.hasMoreElements(); ) {
+            String paramName = ne.nextElement();
+            parameters.put(paramName, request.getParameter(paramName));
+        }
+        CBServerAction action = new CBServerAction(ACTION_CONSOLE, parameters);
+        action.saveInSession(session);
+
+        // Redirect to home
+        response.sendRedirect("/");
     }
 }
