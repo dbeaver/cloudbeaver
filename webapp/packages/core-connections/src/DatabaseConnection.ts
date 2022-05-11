@@ -24,3 +24,14 @@ export function isCloudConnection(connection: DatabaseConnection): boolean {
   }
   return connection.origin.type === 'cloud';
 }
+
+
+
+
+
+
+
+
+
+
+// checkstyle test
