@@ -8,7 +8,6 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -39,9 +38,7 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
     value: payload.defaultScriptName,
   }), {
     value: observable.ref,
-  }, {
-    payload,
-  });
+  }, false);
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper

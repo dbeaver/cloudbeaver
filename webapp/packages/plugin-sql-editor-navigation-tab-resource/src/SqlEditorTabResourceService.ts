@@ -11,15 +11,15 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { throttleAsync } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
+const SYNC_DELAY = 5 * 1000;
+
 @injectable()
 export class SqlEditorTabResourceService {
-  private synced = false;
-  private interval: NodeJS.Timer | null = null;
-
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
     private readonly sqlEditorService: SqlEditorService,
@@ -35,26 +35,20 @@ export class SqlEditorTabResourceService {
 
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
+
+    this.syncTab = throttleAsync(this.syncTab, SYNC_DELAY);
   }
 
   start() {
     this.navTreeResource.onItemDelete.addHandler(this.onNodeDeleteHandler);
     this.navigationTabsService.onTabSelect.addHandler(this.onTabSelectHandler);
     this.windowEventsService.onFocusChange.addHandler(this.onFocusChangeHandler);
-
-    this.interval = setInterval(() => {
-      this.setSynced(false);
-    }, 15 * 1000);
   }
 
   stop() {
     this.navTreeResource.onItemDelete.removeHandler(this.onNodeDeleteHandler);
     this.navigationTabsService.onTabSelect.removeHandler(this.onTabSelectHandler);
     this.windowEventsService.onFocusChange.removeHandler(this.onFocusChangeHandler);
-
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
   }
 
   private onFocusChangeHandler(focused: boolean) {
@@ -78,22 +72,13 @@ export class SqlEditorTabResourceService {
     });
   }
 
-  private setSynced(synced: boolean) {
-    this.synced = synced;
-  }
-
   private async syncCurrentTab() {
-    if (this.synced) {
-      return;
-    }
-
     const current = this.sqlEditorTabService.sqlEditorTabs.find(
       tab => tab.id === this.navigationTabsService.currentTabId
     );
 
     if (current) {
       await this.syncTab(current);
-      this.setSynced(true);
     }
   }
 
