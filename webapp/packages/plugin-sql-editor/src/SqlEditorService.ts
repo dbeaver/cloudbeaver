@@ -31,7 +31,6 @@ export class SqlEditorService {
     source?: string,
     query?: string,
     contextInfo?: IConnectionExecutionContextInfo,
-    associatedScriptId?: string,
   ): ISqlEditorTabState {
     return {
       name,
@@ -46,7 +45,6 @@ export class SqlEditorService {
       statisticsTabs: [],
 
       currentModeId: '',
-      associatedScriptId: associatedScriptId ?? '',
       modeState: [],
     };
   }
@@ -95,10 +93,6 @@ export class SqlEditorService {
     });
 
     return proposals as SQLProposal[];
-  }
-
-  setAssociatedScriptId(scriptId: string, state: ISqlEditorTabState) {
-    state.associatedScriptId = scriptId;
   }
 
   setName(name: string, state: ISqlEditorTabState) {

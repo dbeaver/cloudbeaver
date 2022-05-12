@@ -59,9 +59,12 @@ export class PluginBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (action === ACTION_SAVE) {
-          if (state.associatedScriptId) {
+          const currentTab = this.navigationTabsService.currentTab;
+          const resourceTabState = this.sqlEditorTabResourceService.state.get(currentTab?.id ?? '');
+
+          if (resourceTabState) {
             try {
-              await this.navResourceNodeService.write(state.associatedScriptId, state.query);
+              await this.navResourceNodeService.write(resourceTabState.nodeId, state.query);
               this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success' });
             } catch (exception) {
               this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
@@ -82,7 +85,10 @@ export class PluginBootstrap extends Bootstrap {
                 await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
                 const node = await this.navNodeInfoResource.load(nodeId);
 
-                this.sqlEditorService.setAssociatedScriptId(node.id, state);
+                if (currentTab) {
+                  this.sqlEditorTabResourceService.linkTab(currentTab.id, node.id);
+                }
+
                 this.sqlEditorService.setName(node.name ?? scriptName, state);
                 this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
 
@@ -127,20 +133,23 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const existingTab = this.sqlEditorTabService.sqlEditorTabs.find(
-        tab => tab.handlerState.associatedScriptId === data.nodeId
-      );
+      const tabId = this.sqlEditorTabResourceService.getResourceTab(node.id);
 
-      if (existingTab) {
-        this.navigationTabsService.selectTab(existingTab.id);
+      if (tabId) {
+        this.navigationTabsService.selectTab(tabId);
       } else {
-        const value = await this.navResourceNodeService.read(data.nodeId);
+        const value = await this.navResourceNodeService.read(node.id);
 
-        await this.sqlEditorNavigatorService.openNewEditor({
+        const contextProvider = await this.sqlEditorNavigatorService.openNewEditor({
           name: node.name ?? 'Unknown script',
           query: value,
-          associatedScriptId: data.nodeId,
         });
+
+        const context = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
+
+        if (context.tab) {
+          this.sqlEditorTabResourceService.linkTab(context.tab.id, node.id);
+        }
       }
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');

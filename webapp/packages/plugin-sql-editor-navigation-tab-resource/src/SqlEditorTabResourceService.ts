@@ -6,20 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import { ITab, NavigationTabsService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 const SYNC_DELAY = 5 * 1000;
+const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
+
+interface IResourceTabData {
+  nodeId: string;
+  parents: string[];
+}
+
+type ResourceTabState = Map<string, IResourceTabData>;
 
 @injectable()
 export class SqlEditorTabResourceService {
+  state: ResourceTabState;
+
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
     private readonly sqlEditorService: SqlEditorService,
@@ -27,21 +40,32 @@ export class SqlEditorTabResourceService {
     private readonly notificationService: NotificationService,
     private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly windowEventsService: WindowEventsService
+    private readonly windowEventsService: WindowEventsService,
+    private readonly localStorageSaveService: LocalStorageSaveService,
   ) {
+    this.state = new Map();
+
     this.onNodeDeleteHandler = this.onNodeDeleteHandler.bind(this);
     this.onTabSelectHandler = this.onTabSelectHandler.bind(this);
+    this.onTabCloseHandler = this.onTabCloseHandler.bind(this);
     this.onFocusChangeHandler = this.onFocusChangeHandler.bind(this);
 
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
 
     this.syncTab = throttleAsync(this.syncTab, SYNC_DELAY);
+
+    makeObservable(this, {
+      state: observable,
+    });
+
+    this.localStorageSaveService.withAutoSave(this.state, RESOURCE_TAB_STATE);
   }
 
   start() {
     this.navTreeResource.onItemDelete.addHandler(this.onNodeDeleteHandler);
     this.navigationTabsService.onTabSelect.addHandler(this.onTabSelectHandler);
+    this.navigationTabsService.onTabClose.addHandler(this.onTabCloseHandler);
     this.windowEventsService.onFocusChange.addHandler(this.onFocusChangeHandler);
   }
 
@@ -49,6 +73,36 @@ export class SqlEditorTabResourceService {
     this.navTreeResource.onItemDelete.removeHandler(this.onNodeDeleteHandler);
     this.navigationTabsService.onTabSelect.removeHandler(this.onTabSelectHandler);
     this.windowEventsService.onFocusChange.removeHandler(this.onFocusChangeHandler);
+  }
+
+  linkTab(tabId: string, nodeId: string) {
+    const parents = NodeManagerUtils.parentsFromPath(nodeId);
+
+    this.state.set(tabId, {
+      nodeId,
+      parents,
+    });
+  }
+
+  unlinkTab(tabId: string, cascade = false) {
+    const state = this.state.get(tabId);
+
+    if (state) {
+      this.state.delete(tabId);
+      if (cascade) {
+        this.closeTab(tabId);
+      }
+    }
+  }
+
+  getResourceTab(nodeId: string) {
+    for (const [tabId, data] of this.state) {
+      if (data.nodeId === nodeId) {
+        return tabId;
+      }
+    }
+
+    return;
   }
 
   private onFocusChangeHandler(focused: boolean) {
@@ -63,13 +117,23 @@ export class SqlEditorTabResourceService {
     }
   }
 
+  private onTabCloseHandler(tab: ITab | undefined) {
+    if (tab && this.state.has(tab.id)) {
+      this.unlinkTab(tab.id);
+    }
+  }
+
   private onNodeDeleteHandler(keyObj: ResourceKey<string>) {
     ResourceKeyUtils.forEach(keyObj, key => {
-      const tab = this.sqlEditorTabService.sqlEditorTabs.find(tab => tab.handlerState.associatedScriptId === key);
-      if (tab) {
-        this.navigationTabsService.closeTab(tab.id);
+      const tabId = this.getResourceTab(key);
+      if (tabId) {
+        this.closeTab(tabId);
       }
     });
+  }
+
+  private closeTab(tabId: string) {
+    this.navigationTabsService.closeTab(tabId);
   }
 
   private async syncCurrentTab() {
@@ -84,14 +148,12 @@ export class SqlEditorTabResourceService {
 
   private async syncTab(tab: ITab<ISqlEditorTabState>) {
     try {
-      if (!tab.handlerState.associatedScriptId) {
+      if (!this.state.has(tab.id)) {
         return;
       }
 
-      const parents = NodeManagerUtils.parentsFromPath(tab.handlerState.associatedScriptId);
-      const found = await this.navTreeResource.preloadNodeParents(
-        parents, tab.handlerState.associatedScriptId
-      );
+      const state = this.state.get(tab.id)!;
+      const found = await this.navTreeResource.preloadNodeParents(state.parents, state.nodeId);
 
       if (!found) {
         this.notificationService.logInfo({
@@ -100,11 +162,11 @@ export class SqlEditorTabResourceService {
           persistent: true,
         });
 
-        this.sqlEditorService.setAssociatedScriptId('', tab.handlerState);
+        this.unlinkTab(tab.id);
         return;
       }
 
-      const query = await this.navResourceNodeService.read(tab.handlerState.associatedScriptId);
+      const query = await this.navResourceNodeService.read(state.nodeId);
       this.sqlEditorService.setQuery(query, tab.handlerState);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
