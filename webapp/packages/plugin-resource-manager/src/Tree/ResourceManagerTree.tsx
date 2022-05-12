@@ -13,6 +13,7 @@ import { ElementsTree, NavigationTreeService, NavigationNodeControl } from '@clo
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { ProjectsResource } from '../ProjectsResource';
@@ -50,7 +51,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     <Loader state={[resource]}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={[RESOURCES_NODE_PATH, resource.userProject?.name].filter(Boolean).join('/')}
+          root={createPath([RESOURCES_NODE_PATH, resource.userProject?.name])}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}

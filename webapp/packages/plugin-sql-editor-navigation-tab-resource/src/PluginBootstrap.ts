@@ -10,6 +10,7 @@ import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNod
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
@@ -69,7 +70,7 @@ export class PluginBootstrap extends Bootstrap {
               try {
                 await this.projectsResource.load();
                 const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-                const folder = [RESOURCES_NODE_PATH, this.projectsResource.userProject?.name].filter(Boolean).join('/');
+                const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
                 const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
 
                 await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
