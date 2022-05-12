@@ -63,6 +63,7 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
           <Button
             type="button"
             mod={['unelevated']}
+            disabled={!state.value?.trim()}
             onClick={() => resolveDialog(state.value)}
           >
             <Translate token='ui_processing_save' />
