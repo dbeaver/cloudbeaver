@@ -9,13 +9,21 @@
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 export type SQLProposal = SqlCompletionProposal;
 
+export interface IQueryChangeData {
+  query: string;
+  state: ISqlEditorTabState;
+}
+
 @injectable()
 export class SqlEditorService {
+  readonly onQueryChange: Executor<IQueryChangeData>;
+
   constructor(
     private readonly gql: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,
@@ -23,6 +31,7 @@ export class SqlEditorService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
+    this.onQueryChange = new Executor();
   }
 
   getState(
@@ -101,6 +110,7 @@ export class SqlEditorService {
 
   setQuery(query: string, state: ISqlEditorTabState) {
     state.query = query;
+    this.onQueryChange.execute({ query, state });
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {

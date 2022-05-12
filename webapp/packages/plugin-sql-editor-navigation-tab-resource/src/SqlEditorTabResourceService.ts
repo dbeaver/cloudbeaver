@@ -16,10 +16,11 @@ import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
-import { ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { IQueryChangeData, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 const SYNC_DELAY = 5 * 1000;
+const VALUE_SYNC_DELAY = 0.5 * 1000;
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 
 interface IResourceTabData {
@@ -49,11 +50,13 @@ export class SqlEditorTabResourceService {
     this.onTabSelectHandler = this.onTabSelectHandler.bind(this);
     this.onTabCloseHandler = this.onTabCloseHandler.bind(this);
     this.onFocusChangeHandler = this.onFocusChangeHandler.bind(this);
+    this.onTabResourceValueChangeHandler = this.onTabResourceValueChangeHandler.bind(this);
 
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
 
     this.syncTab = throttleAsync(this.syncTab, SYNC_DELAY);
+    this.syncTabResourceValue = throttleAsync(this.syncTabResourceValue, VALUE_SYNC_DELAY);
 
     makeObservable(this, {
       state: observable,
@@ -67,12 +70,15 @@ export class SqlEditorTabResourceService {
     this.navigationTabsService.onTabSelect.addHandler(this.onTabSelectHandler);
     this.navigationTabsService.onTabClose.addHandler(this.onTabCloseHandler);
     this.windowEventsService.onFocusChange.addHandler(this.onFocusChangeHandler);
+    this.sqlEditorService.onQueryChange.addHandler(this.onTabResourceValueChangeHandler);
   }
 
   stop() {
     this.navTreeResource.onItemDelete.removeHandler(this.onNodeDeleteHandler);
     this.navigationTabsService.onTabSelect.removeHandler(this.onTabSelectHandler);
+    this.navigationTabsService.onTabClose.removeHandler(this.onTabCloseHandler);
     this.windowEventsService.onFocusChange.removeHandler(this.onFocusChangeHandler);
+    this.sqlEditorService.onQueryChange.removeHandler(this.onTabResourceValueChangeHandler);
   }
 
   linkTab(tabId: string, nodeId: string) {
@@ -103,6 +109,19 @@ export class SqlEditorTabResourceService {
     }
 
     return;
+  }
+
+  private onTabResourceValueChangeHandler(data: IQueryChangeData) {
+    this.syncTabResourceValue(data.query);
+  }
+
+  private async syncTabResourceValue(value: string) {
+    const currentTab = this.navigationTabsService.currentTab;
+
+    if (currentTab && this.state.has(currentTab.id)) {
+      const state = this.state.get(currentTab.id)!;
+      await this.navResourceNodeService.write(state.nodeId, value);
+    }
   }
 
   private onFocusChangeHandler(focused: boolean) {
