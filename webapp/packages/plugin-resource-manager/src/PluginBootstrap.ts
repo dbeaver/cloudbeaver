@@ -11,10 +11,9 @@ import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
 import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
 
-import { ACTION_DELETE_RESOURCE } from './actions/ACTION_DELETE_RESOURCE';
 import { NavResourceNodeService, PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE } from './NavResourceNodeService';
 import { ResourceManager } from './ResourceManager';
 import { ResourceManagerService } from './ResourceManagerService';
@@ -66,7 +65,7 @@ export class PluginBootstrap extends Bootstrap {
 
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
-        if (action === ACTION_DELETE_RESOURCE) {
+        if (action === ACTION_DELETE) {
           return isScript(node.id);
         }
 
@@ -75,7 +74,7 @@ export class PluginBootstrap extends Bootstrap {
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
-        if (action === ACTION_DELETE_RESOURCE) {
+        if (action === ACTION_DELETE) {
           const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
             title: 'ui_data_delete_confirmation',
             message: `You are going to delete "${node.name}". Are you sure?`,
@@ -94,10 +93,7 @@ export class PluginBootstrap extends Bootstrap {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
         return !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
       },
-      getItems: (context, items) => [
-        ...items,
-        ACTION_DELETE_RESOURCE,
-      ],
+      getItems: (context, items) => items,
     });
   }
 

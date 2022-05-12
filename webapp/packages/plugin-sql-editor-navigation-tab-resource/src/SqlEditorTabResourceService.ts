@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { NavResourceNodeService, ProjectsResource } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -27,7 +27,6 @@ export class SqlEditorTabResourceService {
     private readonly notificationService: NotificationService,
     private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly projectsResource: ProjectsResource,
     private readonly windowEventsService: WindowEventsService
   ) {
     this.onNodeDeleteHandler = this.onNodeDeleteHandler.bind(this);
@@ -100,8 +99,6 @@ export class SqlEditorTabResourceService {
 
   private async syncTab(tab: ITab<ISqlEditorTabState>) {
     try {
-      await this.projectsResource.load();
-
       if (!tab.handlerState.associatedScriptId) {
         return;
       }

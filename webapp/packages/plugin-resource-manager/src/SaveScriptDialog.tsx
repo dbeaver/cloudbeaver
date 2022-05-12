@@ -43,12 +43,6 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
     payload,
   });
 
-  const handleChange = useCallback((value: string | undefined) => {
-    if (value !== undefined) {
-      state.value = value;
-    }
-  }, []);
-
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper
       size='small'
@@ -83,7 +77,9 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
           <InputField
             name='value'
             state={state}
-            onChange={handleChange}
+            onChange={value => {
+              state.value = value;
+            }}
           >
             {translate('ui_name') + ':'}
           </InputField>

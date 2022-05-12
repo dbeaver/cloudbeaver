@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-app';
+import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { ACTION_SAVE_SCRIPT, NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
+import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -23,6 +23,7 @@ import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly sqlEditorService: SqlEditorService,
@@ -50,40 +51,53 @@ export class PluginBootstrap extends Bootstrap {
       handler: async (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-        if (state.associatedScriptId) {
-          try {
-            await this.navResourceNodeService.write(state.associatedScriptId, state.query);
-            this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success' });
-          } catch (exception) {
-            this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
-          }
-        } else {
-          const tabName = this.sqlEditorTabService.getName(state);
-          const result = await this.commonDialogService.open(SaveScriptDialog, {
-            defaultScriptName: tabName,
-          });
-
-          if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+        if (action === ACTION_SAVE) {
+          if (state.associatedScriptId) {
             try {
-              const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-              const projectName = this.projectsResource.userProject?.name;
-              const folder = `${RESOURCES_NODE_PATH}${projectName ? '/' + projectName : ''}`;
-              const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
-              const node = await this.navNodeInfoResource.load(nodeId);
-
-              this.sqlEditorService.setAssociatedScriptId(node.id, state);
-              this.sqlEditorService.setName(node.name ?? scriptName, state);
-              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
-
-              if (!this.resourceManagerService.enabled) {
-                this.resourceManagerService.toggleEnabled();
-              }
-
+              await this.navResourceNodeService.write(state.associatedScriptId, state.query);
+              this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success' });
             } catch (exception) {
-              this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+              this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+            }
+          } else {
+            const tabName = this.sqlEditorTabService.getName(state);
+            const result = await this.commonDialogService.open(SaveScriptDialog, {
+              defaultScriptName: tabName,
+            });
+
+            if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              try {
+                await this.projectsResource.load();
+                const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
+                const folder = [RESOURCES_NODE_PATH, this.projectsResource.userProject?.name].filter(Boolean).join('/');
+                const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
+
+                await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
+                const node = await this.navNodeInfoResource.load(nodeId);
+
+                this.sqlEditorService.setAssociatedScriptId(node.id, state);
+                this.sqlEditorService.setName(node.name ?? scriptName, state);
+                this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
+
+                if (!this.resourceManagerService.enabled) {
+                  this.resourceManagerService.toggleEnabled();
+                }
+
+              } catch (exception) {
+                this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+              }
             }
           }
         }
+      },
+      getActionInfo: (context, action) => {
+        if (action === ACTION_SAVE) {
+          return {
+            ...action.info,
+            label: '',
+          };
+        }
+        return action.info;
       },
     });
 
@@ -91,7 +105,7 @@ export class PluginBootstrap extends Bootstrap {
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU,
       getItems: (context, items) => [
         ...items,
-        ACTION_SAVE_SCRIPT,
+        ACTION_SAVE,
       ],
     });
   }

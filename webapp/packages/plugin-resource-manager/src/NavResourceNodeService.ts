@@ -30,7 +30,7 @@ export class NavResourceNodeService {
 
   async saveScript(folderNodeId: string, name: string, script: string) {
     const resourceData = this.getResourceData(folderNodeId);
-    const resourcePath = `${resourceData.resourcePath ? resourceData.resourcePath + '/' : ''}${name}`;
+    const resourcePath = [resourceData.resourcePath, name].filter(Boolean).join('/');
     await this.resourceManagerResource.createResource(resourceData.projectId, resourcePath, false);
     await this.resourceManagerResource.writeResource(resourceData.projectId, resourcePath, script);
     await this.navTreeResource.refreshTree(folderNodeId);
