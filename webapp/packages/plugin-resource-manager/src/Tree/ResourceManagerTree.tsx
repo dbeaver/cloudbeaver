@@ -31,6 +31,10 @@ const styles = css`
     width: max-content;
   }
   div {
+    box-sizing: border-box;
+    max-width: 240px;
+    padding: 24px;
+    margin: auto;
     text-align: center;
   }
 `;
