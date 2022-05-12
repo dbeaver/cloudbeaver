@@ -48,7 +48,13 @@ export class PluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'scripts-base-handler',
-      isActionApplicable: (context, action) => context.has(DATA_CONTEXT_SQL_EDITOR_STATE),
+      isActionApplicable: (context, action) => {
+        if (action === ACTION_SAVE) {
+          return context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
+        }
+
+        return false;
+      },
       handler: async (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 

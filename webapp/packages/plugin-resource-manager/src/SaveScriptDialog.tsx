@@ -74,13 +74,7 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
     >
       <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
         <Container center>
-          <InputField
-            name='value'
-            state={state}
-            onChange={value => {
-              state.value = value;
-            }}
-          >
+          <InputField name='value' state={state}>
             {translate('ui_name') + ':'}
           </InputField>
         </Container>
