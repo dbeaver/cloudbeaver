@@ -75,8 +75,7 @@ public class WebPlatformActivator extends Plugin {
     /**
      * Returns configuration file
      */
-    public static synchronized File getConfigurationFile(String fileName)
-    {
+    public static synchronized File getConfigurationFile(String fileName) {
         if (configDir == null) {
             configDir = getInstance().getStateLocation().toFile();
         }
@@ -94,17 +93,7 @@ public class WebPlatformActivator extends Plugin {
         return ResourcesPlugin.getWorkspace();
     }
 
-    private void shutdownPlatform() {
-        try {
-            // Dispose core
-            if (CBPlatform.instance != null) {
-                CBPlatform.instance.dispose();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.err.println("Internal error after shutdown process:" + e.getMessage()); //$NON-NLS-1$
-        }
+    protected void shutdownPlatform() {
+
     }
-
-
 }

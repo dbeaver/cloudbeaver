@@ -7,7 +7,7 @@ Bundle-Version: 22.0.5.qualifier
 Bundle-Release-Date: 20220516
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: io.cloudbeaver.server.WebPlatformActivator
+Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,

@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -33,19 +33,15 @@ import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Application configuration
  */
-public class CBAppConfig implements WebAppConfiguration {
+public class CBAppConfig extends BaseWebAppConfiguration {
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
-    private boolean anonymousAccessEnabled;
-    private String anonymousUserRole;
-    private String defaultUserRole;
     private boolean supportsCustomConnections;
     private boolean supportsConnectionBrowser;
     private boolean supportsUserWorkspaces;
@@ -61,15 +57,13 @@ public class CBAppConfig implements WebAppConfiguration {
     private String[] enabledFeatures;
     private String[] enabledAuthProviders;
     private DataSourceNavigatorSettings defaultNavigatorSettings;
-    private final Map<String, Object> plugins;
+
     private final Map<String, AuthProviderConfig> authConfiguration;
 
     private final Map<String, Object> resourceQuotas;
 
     public CBAppConfig() {
-        this.anonymousAccessEnabled = true;
-        this.anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
-        this.defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
+        super();
         this.supportsCustomConnections = true;
         this.supportsConnectionBrowser = false;
         this.supportsUserWorkspaces = false;
@@ -82,16 +76,13 @@ public class CBAppConfig implements WebAppConfiguration {
         this.enabledFeatures = null;
         this.enabledAuthProviders = null;
         this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
-        this.plugins = new LinkedHashMap<>();
         this.authConfiguration = new LinkedHashMap<>();
         this.resourceQuotas = new LinkedHashMap<>();
         this.enableReverseProxyAuth = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
-        this.anonymousAccessEnabled = src.anonymousAccessEnabled;
-        this.anonymousUserRole = src.anonymousUserRole;
-        this.defaultUserRole = src.defaultUserRole;
+        super(src);
         this.supportsCustomConnections = src.supportsCustomConnections;
         this.supportsConnectionBrowser = src.supportsConnectionBrowser;
         this.supportsUserWorkspaces = src.supportsUserWorkspaces;
@@ -104,26 +95,14 @@ public class CBAppConfig implements WebAppConfiguration {
         this.enabledFeatures = src.enabledFeatures;
         this.enabledAuthProviders = src.enabledAuthProviders;
         this.defaultNavigatorSettings = src.defaultNavigatorSettings;
-        this.plugins = new LinkedHashMap<>(src.plugins);
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
         this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
     }
 
-    public boolean isAnonymousAccessEnabled() {
-        return anonymousAccessEnabled;
-    }
 
     public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
         this.anonymousAccessEnabled = anonymousAccessEnabled;
-    }
-
-    public String getAnonymousUserRole() {
-        return anonymousUserRole;
-    }
-
-    public String getDefaultUserRole() {
-        return defaultUserRole;
     }
 
     public boolean isSupportsCustomConnections() {
@@ -249,25 +228,6 @@ public class CBAppConfig implements WebAppConfiguration {
 
     public Map<String, Object> getPluginConfig(@NotNull String pluginId) {
         return getPluginConfig(pluginId, false);
-    }
-
-    public Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create) {
-        Object config = plugins.get(pluginId);
-        if (config instanceof Map) {
-            return (Map<String, Object>) config;
-        } else {
-            if (create) {
-                Map<String, Object> newConfig = new LinkedHashMap<>();
-                plugins.put(pluginId, newConfig);
-                return newConfig;
-            } else {
-                return Collections.emptyMap();
-            }
-        }
-    }
-
-    public <T> T getPluginOption(@NotNull String pluginId, @NotNull String option) {
-        return (T)getPluginConfig(pluginId).get(option);
     }
 
     public <T> T getPluginOptions(@NotNull String pluginId, @NotNull String option, Class<T> theClass) throws DBException {
