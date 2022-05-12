@@ -36,7 +36,7 @@ export class NavResourceNodeService {
     await this.resourceManagerResource.writeResource(resourceData.projectId, resourcePath, script);
     await this.navTreeResource.refreshTree(folderNodeId);
 
-    return `${RESOURCES_NODE_PATH}/${resourceData.projectId}/${resourcePath}`;
+    return createPath([RESOURCES_NODE_PATH, resourceData.projectId, resourcePath]);
   }
 
   async delete(nodeId: string) {
