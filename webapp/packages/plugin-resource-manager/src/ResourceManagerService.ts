@@ -25,4 +25,4 @@ export class ResourceManagerService {
   toggleEnabled() {
     this.enabled = !this.enabled;
   }
-} 
+}

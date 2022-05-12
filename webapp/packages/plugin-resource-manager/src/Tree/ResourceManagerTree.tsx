@@ -46,7 +46,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     <Loader state={[resource]}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={RESOURCES_NODE_PATH}
+          root={`${RESOURCES_NODE_PATH}${resource.userProject ? '/' + resource.userProject.name : ''}`}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}
@@ -55,6 +55,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
               {translate('plugin_resource_manager_no_resources_placeholder')}
             </div>
           )}
+          onOpen={node => navTreeService.navToNode(node.id, node.parentId)}
         />
       </CaptureView>
     </Loader>
