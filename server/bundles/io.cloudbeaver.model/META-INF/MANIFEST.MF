@@ -23,6 +23,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model.app,
  io.cloudbeaver.model.session,
  io.cloudbeaver.model.user,
+ io.cloudbeaver.server,
  io.cloudbeaver.service,
  io.cloudbeaver.service.sql,
  io.cloudbeaver.utils

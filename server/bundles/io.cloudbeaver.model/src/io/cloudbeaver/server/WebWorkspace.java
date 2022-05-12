@@ -23,14 +23,14 @@ import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
 
 /**
  * Web workspace.
- *
+ * <p>
  * Basically just a wrapper around Eclipse workspace.
  */
-public class CBWorkspace extends BaseWorkspaceImpl {
+public class WebWorkspace extends BaseWorkspaceImpl {
 
     private final String workspaceId;
 
-    public CBWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
+    public WebWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
         super(platform, eclipseWorkspace);
         workspaceId = readWorkspaceId();
     }
