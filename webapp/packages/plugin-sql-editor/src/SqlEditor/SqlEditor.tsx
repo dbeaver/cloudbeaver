@@ -20,6 +20,7 @@ import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
+import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { useSqlEditor } from './useSqlEditor';
 import { useTools } from './useTools';
 
@@ -189,6 +190,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             )}
           </actions>
           <tools onMouseDown={preventFocus}>
+            <SqlEditorActionsMenu state={state} />
             <button
               disabled={data.isDisabled || data.isScriptEmpty}
               title={translate('sql_editor_sql_format_button_tooltip')}

@@ -37,3 +37,4 @@ export * from './getTextBetween';
 export * from './timestampToDate';
 export * from './bytesToSize';
 export * from './isDefined';
+export * from './createPath';
