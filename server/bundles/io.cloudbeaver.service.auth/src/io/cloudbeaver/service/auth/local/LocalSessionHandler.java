@@ -19,14 +19,14 @@ package io.cloudbeaver.service.auth.local;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBServerAction;
-import io.cloudbeaver.server.WebSessionHandler;
+import io.cloudbeaver.server.actions.CBServerAction;
+import io.cloudbeaver.server.actions.AbstractActionSessionHandler;
 import org.jkiss.dbeaver.DBException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LocalSessionHandler extends WebSessionHandler {
+public class LocalSessionHandler extends AbstractActionSessionHandler {
 
     @Override
     protected void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException {

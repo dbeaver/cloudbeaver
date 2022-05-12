@@ -19,7 +19,7 @@ package io.cloudbeaver.service.auth.local;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.servlets.WebServletHandler;
+import io.cloudbeaver.server.actions.AbstractActionServletHandler;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class LocalServletHandler extends WebServletHandler {
+public class LocalServletHandler extends AbstractActionServletHandler {
 
     public static final String URI_PREFIX = "open";
     public static final String PARAM_CONNECTION_ID = "id";

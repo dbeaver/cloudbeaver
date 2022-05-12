@@ -14,7 +14,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from DBeaver Corp.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.server.actions;
 
 import io.cloudbeaver.model.session.WebSession;
 

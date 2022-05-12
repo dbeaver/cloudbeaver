@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.servlets;
+package io.cloudbeaver.server.actions;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBServerAction;
 import io.cloudbeaver.service.DBWServletHandler;
 import org.jkiss.dbeaver.DBException;
 
@@ -29,7 +28,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WebServletHandler implements DBWServletHandler {
+public class AbstractActionServletHandler implements DBWServletHandler {
 
     public static final String ACTION_CONSOLE = "console";
 

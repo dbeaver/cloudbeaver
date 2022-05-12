@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.server.actions;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWSessionHandler;
@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class WebSessionHandler implements DBWSessionHandler {
+public class AbstractActionSessionHandler implements DBWSessionHandler {
+
     public static final String ACTION_CONSOLE = "console";
-    private CBServerAction action;
 
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
