@@ -10,7 +10,6 @@ import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { ResourceManagerResource } from './ResourceManagerResource';
-import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
 interface IResourceData {
   projectId: string;
@@ -28,11 +27,12 @@ export class NavResourceNodeService {
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async saveScript(projectId: string, name: string, script: string, path?: string) {
-    const resourcePath = `${path ? path + '/' : ''}${name}`;
-    await this.resourceManagerResource.createResource(projectId, resourcePath, false);
-    await this.resourceManagerResource.writeResource(projectId, resourcePath, script);
-    await this.navTreeResource.refreshTree(`${RESOURCES_NODE_PATH}/${projectId}${path ? '/' + path : ''}`);
+  async saveScript(folderNodeId: string, name: string, script: string) {
+    const resourceData = this.getResourceData(folderNodeId);
+    const resourcePath = `${resourceData.resourcePath}/${name}`;
+    await this.resourceManagerResource.createResource(resourceData.projectId, resourcePath, false);
+    await this.resourceManagerResource.writeResource(resourceData.projectId, resourcePath, script);
+    await this.navTreeResource.refreshTree(folderNodeId);
   }
 
   async delete(nodeId: string) {
