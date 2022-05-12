@@ -35,13 +35,11 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     }
 
     @Override
-
     public String getAnonymousUserRole() {
         return anonymousUserRole;
     }
 
     @Override
-
     public String getDefaultUserRole() {
         return defaultUserRole;
     }
