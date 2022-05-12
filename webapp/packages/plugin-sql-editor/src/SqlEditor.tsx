@@ -28,6 +28,7 @@ const viewerStyles = css`
   CaptureView {
     flex: 1;
     display: flex;
+    overflow: auto;
   }
   Pane {
     composes: theme-typography--body2 from global;
