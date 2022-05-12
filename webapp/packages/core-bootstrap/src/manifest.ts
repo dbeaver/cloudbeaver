@@ -134,3 +134,8 @@ export const coreManifests: PluginManifest[] = [
   coreRootManifest,
   coreConnectionsManifest,
 ];
+
+
+
+
+// test checkstyle multifile
