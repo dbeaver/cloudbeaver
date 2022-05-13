@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { throttleAsync } from '@cloudbeaver/core-utils';
+import { debounce, throttleAsync } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { IQueryChangeData, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -55,8 +55,8 @@ export class SqlEditorTabResourceService {
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
 
-    this.syncTab = throttleAsync(this.syncTab, SYNC_DELAY);
-    this.syncTabResourceValue = throttleAsync(this.syncTabResourceValue, VALUE_SYNC_DELAY);
+    this.updateTabQuery = throttleAsync(this.updateTabQuery, SYNC_DELAY);
+    this.updateResource = debounce(this.updateResource, VALUE_SYNC_DELAY);
 
     makeObservable(this, {
       state: observable,
@@ -90,12 +90,12 @@ export class SqlEditorTabResourceService {
     });
   }
 
-  unlinkTab(tabId: string, cascade = false) {
+  unlinkTab(tabId: string, closeTab = false) {
     const state = this.state.get(tabId);
 
     if (state) {
       this.state.delete(tabId);
-      if (cascade) {
+      if (closeTab) {
         this.closeTab(tabId);
       }
     }
@@ -108,14 +108,16 @@ export class SqlEditorTabResourceService {
       }
     }
 
-    return;
+    return null;
   }
 
   private onTabResourceValueChangeHandler(data: IQueryChangeData) {
-    this.syncTabResourceValue(data.query);
+    if (data.prevQuery !== data.query) {
+      this.updateResource(data.query);
+    }
   }
 
-  private async syncTabResourceValue(value: string) {
+  private async updateResource(value: string) {
     const currentTab = this.navigationTabsService.currentTab;
 
     if (currentTab && this.state.has(currentTab.id)) {
@@ -132,7 +134,7 @@ export class SqlEditorTabResourceService {
 
   private onTabSelectHandler(tab: ITab) {
     if (isSQLEditorTab(tab)) {
-      this.syncTab(tab);
+      this.updateTabQuery(tab);
     }
   }
 
@@ -161,17 +163,18 @@ export class SqlEditorTabResourceService {
     );
 
     if (current) {
-      await this.syncTab(current);
+      await this.updateTabQuery(current);
     }
   }
 
-  private async syncTab(tab: ITab<ISqlEditorTabState>) {
+  private async updateTabQuery(tab: ITab<ISqlEditorTabState>) {
     try {
-      if (!this.state.has(tab.id)) {
+      const state = this.state.get(tab.id);
+
+      if (!state) {
         return;
       }
 
-      const state = this.state.get(tab.id)!;
       const found = await this.navTreeResource.preloadNodeParents(state.parents, state.nodeId);
 
       if (!found) {

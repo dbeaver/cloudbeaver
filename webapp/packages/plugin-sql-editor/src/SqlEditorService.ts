@@ -16,6 +16,7 @@ import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 export type SQLProposal = SqlCompletionProposal;
 
 export interface IQueryChangeData {
+  prevQuery: string;
   query: string;
   state: ISqlEditorTabState;
 }
@@ -109,8 +110,10 @@ export class SqlEditorService {
   }
 
   setQuery(query: string, state: ISqlEditorTabState) {
+    const prevQuery = state.query;
+
     state.query = query;
-    this.onQueryChange.execute({ query, state });
+    this.onQueryChange.execute({ prevQuery, query, state });
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {
