@@ -23,6 +23,7 @@ import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import theme from '@cloudbeaver/plugin-theme';
 import userProfile from '@cloudbeaver/plugin-user-profile';
@@ -59,6 +60,7 @@ const PLUGINS: PluginManifest[] = [
   settingsMenuAdministration,
   help,
   resourceManager,
+  sqlEditorResource,
 ];
 
 bootstrap(PLUGINS);

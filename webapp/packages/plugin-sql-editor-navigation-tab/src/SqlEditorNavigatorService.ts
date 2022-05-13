@@ -33,7 +33,6 @@ export interface ISQLEditorOptions {
   schemaId?: string;
   source?: string;
   query?: string;
-  associatedScriptId?: string;
 }
 
 export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
@@ -66,8 +65,8 @@ export class SqlEditorNavigatorService {
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(options: ISQLEditorOptions): Promise<void> {
-    await this.navigator.execute({
+  async openNewEditor(options: ISQLEditorOptions) {
+    return await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       ...options,
     });
@@ -111,7 +110,6 @@ export class SqlEditorNavigatorService {
             data.name,
             data.source,
             data.query,
-            data.associatedScriptId
           );
 
           if (tabOptions) {
