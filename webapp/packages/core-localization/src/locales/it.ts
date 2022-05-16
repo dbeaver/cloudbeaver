@@ -1,6 +1,6 @@
 export const defaultITLocale = [
   ['name', 'it'],
-  ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
+  ['ui_rename_taken_or_invalid', 'Nome non valido o non disponibile'],
   ['ui_tag_new', 'Nuovo'],
   ['ui_light_theme', 'Light'],
   ['ui_dark_theme', 'Dark'],
@@ -50,15 +50,15 @@ export const defaultITLocale = [
   ['ui_search_no_result_placeholder', 'Nessun risultato trovato.'],
   ['ui_save_reminder', 'Ci sono modifiche non salvate.'],
   ['ui_settings', 'Impostazioni'],
-  ['ui_expand', 'Expand'],
-  ['ui_close_all', 'Close all'],
-  ['ui_close_others', 'Close others'],
-  ['ui_close_all_to_the_right', 'Close all to the Right'],
-  ['ui_close_all_to_the_left', 'Close all to the Left'],
-  ['ui_or', 'Or'],
+  ['ui_expand', 'Expandi'],
+  ['ui_close_all', 'Chiudi tutto'],
+  ['ui_close_others', 'Chiudi gli altri'],
+  ['ui_close_all_to_the_right', 'Chiudi tutti a destra'],
+  ['ui_close_all_to_the_left', 'Chiudi tutti a sinistra'],
+  ['ui_or', 'Oppure'],
   ['ui_download', 'Download'],
   ['ui_limit', 'Limit'],
-  ['ui_file_size', 'File size'],
+  ['ui_file_size', 'Dimensione File'],
   ['ui_processing_synchronization', 'Synchronization...'],
 
   ['root_permission_denied', 'Non hai i permessi'],
@@ -69,4 +69,8 @@ export const defaultITLocale = [
   ['app_root_session_expired_message', 'La sessione è scaduta. Vuoi ricaricare?'],
   ['app_root_session_expired_reload', 'Ricarica'],
   ['core_eventsLog_dbeaverErrorDetails', 'Dettagli dell\'errore'],
+
+  ['ui_no_connection', 'Nessuna Connessione.'],
+  ['ui_connect_your_db', 'Usa il menù in altro per impostare una nuova connessione.'],
+
 ];

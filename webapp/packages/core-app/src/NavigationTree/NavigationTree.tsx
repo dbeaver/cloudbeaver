@@ -28,6 +28,9 @@ import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
 
+import { useTranslate } from '@cloudbeaver/core-localization';
+
+
 const navigationTreeStyles = css`
   CaptureView {
     outline: none;
@@ -98,6 +101,8 @@ export const NavigationTree = observer(function NavigationTree() {
     return null;
   }
 
+  const translate = useTranslate();
+
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>
       <ElementsTree
@@ -108,8 +113,8 @@ export const NavigationTree = observer(function NavigationTree() {
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>
-              No connections.<br />
-              Use the top menu to setup connection to your database.
+              {translate('ui_no_connection')}<br />
+              {translate('ui_connect_your_db')}
             </message>
           </center>
         )}
