@@ -17,8 +17,8 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.registry.WebDriverRegistry;
+import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -79,7 +79,7 @@ public class CBPlatform extends BasePlatformImpl {
     private QMControllerImpl queryManager;
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
-    private CBWorkspace workspace;
+    private WebWorkspace workspace;
 
     private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
@@ -137,7 +137,7 @@ public class CBPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new CBWorkspace(this, ResourcesPlugin.getWorkspace());
+        this.workspace = new WebWorkspace(this, ResourcesPlugin.getWorkspace());
         this.workspace.initializeProjects();
 
         QMUtils.initApplication(this);

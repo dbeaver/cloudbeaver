@@ -8,9 +8,9 @@
 
 import { computed, makeObservable } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, RmProject } from '@cloudbeaver/core-sdk';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
 
 export type Project = Omit<RmProject, 'creator' | 'description' | 'createTime'>;
 
@@ -37,4 +37,4 @@ export class ProjectsResource extends CachedDataResource<Project[]> {
     const { projects } = await this.graphQLService.sdk.getProjectList();
     return projects;
   }
-} 
+}

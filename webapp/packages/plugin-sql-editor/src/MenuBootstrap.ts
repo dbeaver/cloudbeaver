@@ -106,9 +106,17 @@ export class MenuBootstrap extends Bootstrap {
         data.executeQueryNewTab();
         break;
       case ACTION_SQL_EDITOR_EXECUTE_SCRIPT:
+        if (data.activeSegmentMode.activeSegmentMode) {
+          return;
+        }
+
         data.executeScript();
         break;
       case ACTION_SQL_EDITOR_FORMAT:
+        if (data.activeSegmentMode.activeSegmentMode) {
+          return;
+        }
+
         data.formatScript();
         break;
       case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:

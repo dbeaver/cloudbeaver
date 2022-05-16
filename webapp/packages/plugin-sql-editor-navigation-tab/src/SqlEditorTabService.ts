@@ -100,7 +100,7 @@ export class SqlEditorTabService extends Bootstrap {
 
     return {
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(order, name, source, query),
+      handlerState: this.sqlEditorService.getState(order, name, source, query, undefined),
     };
   }
 

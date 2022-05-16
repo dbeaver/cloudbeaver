@@ -9,13 +9,22 @@
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 export type SQLProposal = SqlCompletionProposal;
 
+export interface IQueryChangeData {
+  prevQuery: string;
+  query: string;
+  state: ISqlEditorTabState;
+}
+
 @injectable()
 export class SqlEditorService {
+  readonly onQueryChange: Executor<IQueryChangeData>;
+
   constructor(
     private readonly gql: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,
@@ -23,6 +32,7 @@ export class SqlEditorService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
+    this.onQueryChange = new Executor();
   }
 
   getState(
@@ -30,7 +40,7 @@ export class SqlEditorService {
     name?: string,
     source?: string,
     query?: string,
-    contextInfo?: IConnectionExecutionContextInfo
+    contextInfo?: IConnectionExecutionContextInfo,
   ): ISqlEditorTabState {
     return {
       name,
@@ -93,6 +103,17 @@ export class SqlEditorService {
     });
 
     return proposals as SQLProposal[];
+  }
+
+  setName(name: string, state: ISqlEditorTabState) {
+    state.name = name;
+  }
+
+  setQuery(query: string, state: ISqlEditorTabState) {
+    const prevQuery = state.query;
+
+    state.query = query;
+    this.onQueryChange.execute({ prevQuery, query, state });
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {

@@ -65,8 +65,8 @@ export class SqlEditorNavigatorService {
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(options: ISQLEditorOptions): Promise<void> {
-    await this.navigator.execute({
+  async openNewEditor(options: ISQLEditorOptions) {
+    return await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       ...options,
     });
@@ -109,7 +109,7 @@ export class SqlEditorNavigatorService {
           const tabOptions = this.sqlEditorTabService.createNewEditor(
             data.name,
             data.source,
-            data.query
+            data.query,
           );
 
           if (tabOptions) {
