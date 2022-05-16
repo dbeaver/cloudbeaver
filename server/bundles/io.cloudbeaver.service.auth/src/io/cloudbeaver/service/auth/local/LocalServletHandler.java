@@ -50,4 +50,9 @@ public class LocalServletHandler extends AbstractActionServletHandler {
         }
         return false;
     }
+
+    @Override
+    protected String getActionConsole() {
+        return LocalSessionHandler.ACTION_LOCAL_CONSOLE;
+    }
 }

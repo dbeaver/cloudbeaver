@@ -23,10 +23,30 @@ import io.cloudbeaver.server.actions.CBServerAction;
 import io.cloudbeaver.server.actions.AbstractActionSessionHandler;
 import org.jkiss.dbeaver.DBException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * LocalSessionHandler
+ */
 public class LocalSessionHandler extends AbstractActionSessionHandler {
+
+    public static final String ACTION_LOCAL_CONSOLE = "local-console";
+
+    @Override
+    public boolean handleSessionAuth(WebSession webSession) throws DBException, IOException {
+        if (webSession.getUser() == null) {
+            return false;
+        }
+        executeAction(webSession);
+        return false;
+    }
+
+    @Override
+    protected String getActionConsole() {
+        return ACTION_LOCAL_CONSOLE;
+    }
 
     @Override
     protected void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException {

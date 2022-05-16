@@ -44,10 +44,14 @@ public class AbstractActionServletHandler implements DBWServletHandler {
             String paramName = ne.nextElement();
             parameters.put(paramName, request.getParameter(paramName));
         }
-        CBServerAction action = new CBServerAction(ACTION_CONSOLE, parameters);
+        CBServerAction action = new CBServerAction(getActionConsole(), parameters);
         action.saveInSession(session);
 
         // Redirect to home
         response.sendRedirect("/");
+    }
+
+    protected String getActionConsole() {
+        return ACTION_CONSOLE;
     }
 }

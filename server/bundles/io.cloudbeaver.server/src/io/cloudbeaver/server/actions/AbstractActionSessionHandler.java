@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AbstractActionSessionHandler implements DBWSessionHandler {
+public abstract class AbstractActionSessionHandler implements DBWSessionHandler {
 
     public static final String ACTION_CONSOLE = "console";
 
@@ -34,17 +34,20 @@ public class AbstractActionSessionHandler implements DBWSessionHandler {
     }
 
     @Override
-    public boolean handleSessionAuth(WebSession webSession) throws DBException, IOException {
-        if (webSession.getUser() == null) {
-            return false;
-        }
+    public abstract boolean handleSessionAuth(WebSession webSession) throws DBException, IOException;
+
+    public void executeAction(WebSession webSession) throws DBException {
         CBServerAction action = CBServerAction.fromSession(webSession, false);
         if (action != null) {
-            if (ACTION_CONSOLE.equals(action.getActionId())) {
+            if (getActionConsole().equals(action.getActionId())) {
                 openDatabaseConsole(webSession, action);
+                CBServerAction.removeAction(webSession);
             }
         }
-        return false;
+    }
+
+    protected String getActionConsole() {
+        return ACTION_CONSOLE;
     }
 
     @Override
@@ -52,7 +55,5 @@ public class AbstractActionSessionHandler implements DBWSessionHandler {
         return false;
     }
 
-    protected void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException {
-
-    }
+    protected abstract void openDatabaseConsole(WebSession webSession, CBServerAction action) throws DBException;
 }
