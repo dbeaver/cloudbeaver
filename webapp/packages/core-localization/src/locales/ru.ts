@@ -81,4 +81,7 @@ export const defaultRULocale = [
   ['app_root_session_expired_reload', 'Перезагрузить'],
   ['app_root_quota_exceeded', 'Квота превышена'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
+
+  ['ui_no_connection', "No Connections."],
+  ['ui_connect_your_db', 'Use the top menu to setup connection to your database.']
 ];
