@@ -28,15 +28,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AbstractActionServletHandler implements DBWServletHandler {
-
-    public static final String ACTION_CONSOLE = "console";
-
+public abstract class AbstractActionServletHandler implements DBWServletHandler {
 
     @Override
-    public boolean handleRequest(Servlet servlet, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        return false;
-    }
+    public abstract boolean handleRequest(Servlet servlet, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException;
 
     protected void createActionFromParams(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         Map<String, Object> parameters = new HashMap<>();
@@ -51,7 +46,5 @@ public class AbstractActionServletHandler implements DBWServletHandler {
         response.sendRedirect("/");
     }
 
-    protected String getActionConsole() {
-        return ACTION_CONSOLE;
-    }
+    protected abstract String getActionConsole();
 }

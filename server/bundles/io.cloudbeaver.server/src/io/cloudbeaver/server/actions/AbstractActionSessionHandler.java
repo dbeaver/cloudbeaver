@@ -26,8 +26,6 @@ import java.io.IOException;
 
 public abstract class AbstractActionSessionHandler implements DBWSessionHandler {
 
-    public static final String ACTION_CONSOLE = "console";
-
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         return handleSessionAuth(webSession);
@@ -46,9 +44,7 @@ public abstract class AbstractActionSessionHandler implements DBWSessionHandler 
         }
     }
 
-    protected String getActionConsole() {
-        return ACTION_CONSOLE;
-    }
+    protected abstract String getActionConsole();
 
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
