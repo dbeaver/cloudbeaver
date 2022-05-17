@@ -61,7 +61,7 @@ export class PluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'resource-manager-base-actions',
       isActionApplicable: (context, action) => {
-        if (!this.resourceManagerService.enabled || !context.has(DATA_CONTEXT_NAV_NODE)) {
+        if (!context.has(DATA_CONTEXT_NAV_NODE)) {
           return false;
         }
 
@@ -93,7 +93,8 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-        return !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
+        return this.resourceManagerService.enabled
+          && !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
       },
       getItems: (context, items) => items,
     });
