@@ -54,7 +54,7 @@ export class PluginBootstrap extends Bootstrap {
       id: 'scripts-base-handler',
       isActionApplicable: (context, action) => {
         if (action === ACTION_SAVE) {
-          return this.resourceManagerService.enabled && context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
+          return context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
         }
 
         return false;
@@ -119,7 +119,8 @@ export class PluginBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU,
+      isApplicable: context => this.resourceManagerService.enabled
+        && context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU,
       getItems: (context, items) => [
         ...items,
         ACTION_SAVE,
