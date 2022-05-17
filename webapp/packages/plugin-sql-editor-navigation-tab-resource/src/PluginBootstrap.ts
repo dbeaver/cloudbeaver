@@ -70,6 +70,7 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
+              const tab = this.navigationTabsService.currentTab;
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
@@ -78,8 +79,8 @@ export class PluginBootstrap extends Bootstrap {
               await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
               const node = await this.navNodeInfoResource.load(nodeId);
 
-              if (this.navigationTabsService.currentTab) {
-                this.sqlEditorTabResourceService.linkTab(this.navigationTabsService.currentTab.id, node.id);
+              if (tab) {
+                this.sqlEditorTabResourceService.linkTab(tab.id, node.id);
               }
 
               this.sqlEditorService.setName(node.name ?? scriptName, state);

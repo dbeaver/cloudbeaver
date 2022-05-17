@@ -7,10 +7,9 @@
  */
 
 import { DATA_CONTEXT_NAV_NODE, EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
-import { AuthInfoService } from '@cloudbeaver/core-authentication';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
 import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
@@ -23,11 +22,10 @@ import { ResourceManagerService } from './ResourceManagerService';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly mainMenuService: MainMenuService,
-    private readonly authInfoService: AuthInfoService,
     private readonly resourceManagerService: ResourceManagerService,
     private readonly sideBarPanelService: SideBarPanelService,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly serverConfigResource: ServerConfigResource,
+    private readonly appAuthService: AppAuthService,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -43,8 +41,7 @@ export class PluginBootstrap extends Bootstrap {
         order: 3,
         type: 'checkbox',
         title: 'plugin_resource_manager_title',
-        isHidden: () => !this.resourceManagerService.enabled
-          || (!this.authInfoService.userInfo && !this.serverConfigResource.data?.anonymousAccessEnabled),
+        isHidden: () => !this.resourceManagerService.enabled || !this.appAuthService.authenticated,
         isChecked: () => this.resourceManagerService.panelEnabled,
         onClick: this.resourceManagerService.togglePanel,
       }
@@ -56,7 +53,7 @@ export class PluginBootstrap extends Bootstrap {
       name: 'plugin_resource_manager_title',
       isHidden: () => !this.resourceManagerService.enabled
         || !this.resourceManagerService.panelEnabled
-        || (!this.authInfoService.userInfo && !this.serverConfigResource.data?.anonymousAccessEnabled),
+        || !this.appAuthService.authenticated,
       onClose: this.resourceManagerService.togglePanel,
       panel: () => ResourceManager,
     });
