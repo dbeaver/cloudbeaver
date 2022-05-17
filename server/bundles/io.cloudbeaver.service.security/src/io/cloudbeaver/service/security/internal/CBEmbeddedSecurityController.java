@@ -941,14 +941,14 @@ public class CBEmbeddedSecurityController implements SMAdminController {
             throw new DBCException("Error reading token info in database", e);
         }
         var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
+        permissions.add(getSessionFromToken(token));
         return new SMAuthPermissions(userId, permissions);
     }
 
-    @Override
     public String getSessionFromToken(String token) throws DBException {
         String sessionId;
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement("SELECT SESSION_ID, EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT SESSION_ID FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
         ) {
             dbStat.setString(1, token);
             try (var dbResult = dbStat.executeQuery()) {
@@ -956,10 +956,6 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                     throw new SMException("Invalid token");
                 }
                 sessionId = dbResult.getString(1);
-                var expiredDate = dbResult.getTimestamp(2);
-                if (Timestamp.from(Instant.now()).after(expiredDate)) {
-                    throw new SMException("Token expired");
-                }
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
