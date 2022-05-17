@@ -93,8 +93,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-        return this.resourceManagerService.enabled
-          && !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
+        return !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
       },
       getItems: (context, items) => items,
     });
