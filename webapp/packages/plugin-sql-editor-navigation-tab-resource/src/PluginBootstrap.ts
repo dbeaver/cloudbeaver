@@ -54,7 +54,7 @@ export class PluginBootstrap extends Bootstrap {
       id: 'scripts-base-handler',
       isActionApplicable: (context, action) => {
         if (action === ACTION_SAVE) {
-          return context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
+          return !this.sqlEditorTabResourceService.state.has(this.navigationTabsService.currentTab?.id ?? '') && context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
         }
 
         return false;
@@ -63,46 +63,34 @@ export class PluginBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (action === ACTION_SAVE) {
-          const currentTab = this.navigationTabsService.currentTab;
-          const resourceTabState = this.sqlEditorTabResourceService.state.get(currentTab?.id ?? '');
+          const tabName = this.sqlEditorTabService.getName(state);
+          const result = await this.commonDialogService.open(SaveScriptDialog, {
+            defaultScriptName: tabName,
+          });
 
-          if (resourceTabState) {
+          if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
-              await this.navResourceNodeService.write(resourceTabState.nodeId, state.query);
-              this.notificationService.logSuccess({ title: 'plugin_resource_manager_update_script_success' });
-            } catch (exception) {
-              this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
-            }
-          } else {
-            const tabName = this.sqlEditorTabService.getName(state);
-            const result = await this.commonDialogService.open(SaveScriptDialog, {
-              defaultScriptName: tabName,
-            });
+              await this.projectsResource.load();
+              const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
+              const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
+              const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
 
-            if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-              try {
-                await this.projectsResource.load();
-                const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-                const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
-                const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
+              await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
+              const node = await this.navNodeInfoResource.load(nodeId);
 
-                await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
-                const node = await this.navNodeInfoResource.load(nodeId);
-
-                if (currentTab) {
-                  this.sqlEditorTabResourceService.linkTab(currentTab.id, node.id);
-                }
-
-                this.sqlEditorService.setName(node.name ?? scriptName, state);
-                this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
-
-                if (!this.resourceManagerService.panelEnabled) {
-                  this.resourceManagerService.togglePanel();
-                }
-
-              } catch (exception) {
-                this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+              if (this.navigationTabsService.currentTab) {
+                this.sqlEditorTabResourceService.linkTab(this.navigationTabsService.currentTab.id, node.id);
               }
+
+              this.sqlEditorService.setName(node.name ?? scriptName, state);
+              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
+
+              if (!this.resourceManagerService.panelEnabled) {
+                this.resourceManagerService.togglePanel();
+              }
+
+            } catch (exception) {
+              this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
             }
           }
         }
