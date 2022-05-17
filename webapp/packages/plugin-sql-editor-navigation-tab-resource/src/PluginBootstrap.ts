@@ -10,6 +10,7 @@ import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNod
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
@@ -38,19 +39,22 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly sessionExpireService: SessionExpireService
   ) {
     super();
   }
 
   register(): void | Promise<void> {
     this.sqlEditorTabResourceService.start();
+
+    this.sessionExpireService.onSessionExpire.addHandler(this.sqlEditorTabResourceService.stop);
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
 
     this.actionService.addHandler({
       id: 'scripts-base-handler',
       isActionApplicable: (context, action) => {
         if (action === ACTION_SAVE) {
-          return context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
+          return this.resourceManagerService.enabled && context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
         }
 
         return false;
@@ -92,8 +96,8 @@ export class PluginBootstrap extends Bootstrap {
                 this.sqlEditorService.setName(node.name ?? scriptName, state);
                 this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
 
-                if (!this.resourceManagerService.enabled) {
-                  this.resourceManagerService.toggleEnabled();
+                if (!this.resourceManagerService.panelEnabled) {
+                  this.resourceManagerService.togglePanel();
                 }
 
               } catch (exception) {
@@ -126,6 +130,10 @@ export class PluginBootstrap extends Bootstrap {
   load(): void | Promise<void> { }
 
   private async navigationHandler(data: INodeNavigationData) {
+    if (!this.resourceManagerService.enabled) {
+      return;
+    }
+
     try {
       const node = await this.navNodeInfoResource.load(data.nodeId);
 
