@@ -28,7 +28,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
   ) {
     super();
   }
@@ -41,9 +41,9 @@ export class PluginBootstrap extends Bootstrap {
         order: 3,
         type: 'checkbox',
         title: 'plugin_resource_manager_title',
-        isHidden: () => !this.authInfoService.userInfo,
-        isChecked: () => this.resourceManagerService.enabled,
-        onClick: this.resourceManagerService.toggleEnabled,
+        isHidden: () => !this.resourceManagerService.enabled || !this.authInfoService.userInfo,
+        isChecked: () => this.resourceManagerService.panelEnabled,
+        onClick: this.resourceManagerService.togglePanel,
       }
     );
 
@@ -51,8 +51,10 @@ export class PluginBootstrap extends Bootstrap {
       key: 'resource-manager-tab',
       order: 0,
       name: 'plugin_resource_manager_title',
-      isHidden: () => !this.authInfoService.userInfo || !this.resourceManagerService.enabled,
-      onClose: this.resourceManagerService.toggleEnabled,
+      isHidden: () => !this.resourceManagerService.enabled
+        || !this.resourceManagerService.panelEnabled
+        || !this.authInfoService.userInfo,
+      onClose: this.resourceManagerService.togglePanel,
       panel: () => ResourceManager,
     });
 

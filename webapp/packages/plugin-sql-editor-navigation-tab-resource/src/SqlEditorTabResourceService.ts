@@ -15,7 +15,7 @@ import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { debounce, throttleAsync } from '@cloudbeaver/core-utils';
-import { NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { IQueryChangeData, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -41,6 +41,7 @@ export class SqlEditorTabResourceService {
     private readonly notificationService: NotificationService,
     private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
+    private readonly resourceManagerService: ResourceManagerService,
     private readonly windowEventsService: WindowEventsService,
     private readonly localStorageSaveService: LocalStorageSaveService,
   ) {
@@ -118,11 +119,19 @@ export class SqlEditorTabResourceService {
   }
 
   private async updateResource(value: string) {
+    if (!this.resourceManagerService.enabled) {
+      return;
+    }
+
     const currentTab = this.navigationTabsService.currentTab;
 
     if (currentTab && this.state.has(currentTab.id)) {
       const state = this.state.get(currentTab.id)!;
-      await this.navResourceNodeService.write(state.nodeId, value);
+      try {
+        await this.navResourceNodeService.write(state.nodeId, value);
+      } catch (exception) {
+        this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      }
     }
   }
 
@@ -145,6 +154,10 @@ export class SqlEditorTabResourceService {
   }
 
   private onNodeDeleteHandler(keyObj: ResourceKey<string>) {
+    if (!this.resourceManagerService.enabled) {
+      return;
+    }
+
     ResourceKeyUtils.forEach(keyObj, key => {
       const tabId = this.getResourceTab(key);
       if (tabId) {
@@ -168,6 +181,10 @@ export class SqlEditorTabResourceService {
   }
 
   private async updateTabQuery(tab: ITab<ISqlEditorTabState>) {
+    if (!this.resourceManagerService.enabled) {
+      return;
+    }
+
     try {
       const state = this.state.get(tab.id);
 

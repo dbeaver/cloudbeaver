@@ -6,23 +6,34 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
+import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
+
 @injectable()
 export class ResourceManagerService {
-  enabled = false;
+  get enabled() {
+    return !this.resourceManagerSettingsService.settings.getValue('disabled');
+  }
 
-  constructor() {
-    this.toggleEnabled = this.toggleEnabled.bind(this);
+  panelEnabled: boolean;
+
+  constructor(
+    private readonly resourceManagerSettingsService: ResourceManagerSettingsService
+  ) {
+    this.togglePanel = this.togglePanel.bind(this);
+
+    this.panelEnabled = false;
 
     makeObservable(this, {
-      enabled: observable.ref,
+      panelEnabled: observable.ref,
+      enabled: computed,
     });
   }
 
-  toggleEnabled() {
-    this.enabled = !this.enabled;
+  togglePanel() {
+    this.panelEnabled = !this.panelEnabled;
   }
 }

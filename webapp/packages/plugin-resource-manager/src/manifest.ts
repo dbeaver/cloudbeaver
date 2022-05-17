@@ -14,10 +14,12 @@ import { PluginBootstrap } from './PluginBootstrap';
 import { ProjectsResource } from './ProjectsResource';
 import { ResourceManagerResource } from './ResourceManagerResource';
 import { ResourceManagerService } from './ResourceManagerService';
+import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
 
 export const resourceManagerPlugin: PluginManifest = {
   info: { name: 'Resource manager plugin' },
   providers: [
+    ResourceManagerSettingsService,
     PluginBootstrap,
     LocaleService,
     ResourceManagerService,
