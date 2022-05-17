@@ -61,6 +61,7 @@ export class PluginBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const tab = this.navigationTabsService.currentTab;
 
         if (action === ACTION_SAVE) {
           const tabName = this.sqlEditorTabService.getName(state);
@@ -70,7 +71,6 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
-              const tab = this.navigationTabsService.currentTab;
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
