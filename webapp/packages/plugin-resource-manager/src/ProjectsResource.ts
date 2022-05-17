@@ -22,11 +22,14 @@ export class ProjectsResource extends CachedDataResource<Project[]> {
 
   constructor(
     private readonly graphQLService: GraphQLService,
-    userInfoResource: UserInfoResource,
+    private readonly userInfoResource: UserInfoResource,
   ) {
     super([]);
 
-    this.sync(userInfoResource);
+    this.userInfoResource.userChange.addPostHandler(() => {
+      this.loaded = false;
+      this.markOutdated();
+    });
 
     makeObservable(this, {
       userProject: computed,

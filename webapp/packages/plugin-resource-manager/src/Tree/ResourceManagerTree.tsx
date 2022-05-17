@@ -31,6 +31,12 @@ const styles = css`
     min-width: 100%;
     width: max-content;
   }
+  Loader {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    min-width: 240px;
+  }
   div {
     box-sizing: border-box;
     max-width: 240px;
@@ -48,7 +54,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const { resource } = useDataResource(ResourceManagerTree, ProjectsResource, undefined);
 
   return styled(styles)(
-    <Loader state={[resource]}>
+    <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
           root={createPath([RESOURCES_NODE_PATH, resource.userProject?.name])}
