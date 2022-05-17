@@ -945,6 +945,29 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
+    public String getSessionFromToken(String token) throws DBException {
+        String sessionId;
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT SESSION_ID, EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+        ) {
+            dbStat.setString(1, token);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Invalid token");
+                }
+                sessionId = dbResult.getString(1);
+                var expiredDate = dbResult.getTimestamp(2);
+                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                    throw new SMException("Token expired");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+        return sessionId;
+    }
+
+    @Override
     public void updateSession(@NotNull String sessionId, @Nullable String userId, @NotNull Map<String, Object> parameters) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
