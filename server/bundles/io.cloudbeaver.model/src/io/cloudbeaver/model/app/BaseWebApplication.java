@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
@@ -47,6 +48,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
+
 
     @NotNull
     @Override
@@ -89,6 +91,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         } else {
             System.setProperty("logback.configurationFile", logbackConfigPath.toString());
         }
+        Log.setLogHandler(new SLF4JLogHandler());
 
         // Load config file
         try {
