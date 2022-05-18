@@ -115,11 +115,12 @@ export class SqlEditorTabResourceService {
   }
 
   private async onTabResourceValueChangeHandler(data: IQueryChangeData) {
-    if (!this.navigationTabsService.currentTab) {
+    const tabId = this.navigationTabsService.currentTab?.id;
+    if (!tabId) {
       return;
     }
 
-    const tab = this.getTab(this.navigationTabsService.currentTab.id);
+    const tab = this.getTab(tabId);
     if (tab && data.prevQuery !== data.query) {
       await this.updateResource(tab, data.query);
     }
