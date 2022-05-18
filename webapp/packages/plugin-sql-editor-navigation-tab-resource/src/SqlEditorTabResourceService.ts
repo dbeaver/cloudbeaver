@@ -15,13 +15,13 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { debounce, throttleAsync } from '@cloudbeaver/core-utils';
+import { debounce, throttle } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { IQueryChangeData, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 const SYNC_DELAY = 5 * 1000;
-const VALUE_SYNC_DELAY = 0.5 * 1000;
+const VALUE_SYNC_DELAY = 0.25 * 1000;
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 
 interface IResourceTabData {
@@ -58,7 +58,7 @@ export class SqlEditorTabResourceService {
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
 
-    this.updateTabQuery = throttleAsync(this.updateTabQuery, SYNC_DELAY);
+    this.updateTabQuery = throttle(this.updateTabQuery, SYNC_DELAY, false);
     this.updateResource = debounce(this.updateResource, VALUE_SYNC_DELAY);
 
     makeObservable(this, {
@@ -133,7 +133,7 @@ export class SqlEditorTabResourceService {
   }
 
   private async onTabSelectHandler(tab: ITab) {
-    if (isSQLEditorTab(tab)) {
+    if (isSQLEditorTab(tab) && this.state.has(tab.id)) {
       await this.updateTabQuery(tab);
     }
   }
@@ -168,7 +168,7 @@ export class SqlEditorTabResourceService {
   private async syncCurrentTab() {
     const tab = this.getTab(this.navigationTabsService.currentTabId);
 
-    if (tab) {
+    if (tab && this.state.has(tab.id)) {
       await this.updateTabQuery(tab);
     }
   }

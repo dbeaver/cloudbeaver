@@ -8,7 +8,7 @@
 
 type ThrottleAsync<TResult, TArguments extends any[]> = (...args: TArguments) => Promise<TResult>;
 
-export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: T, delay: number): T {
+export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: T, delay: number, tail = true): T {
   let throttle = false;
   let pending = false;
   let functionArgs: any[] = [];
@@ -16,9 +16,11 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
 
   return function exec(this: any, ...args: any[]) {
     if (throttle) {
-      functionArgs = args;
-      thisObject = this;
-      pending = true;
+      if (tail) {
+        functionArgs = args;
+        thisObject = this;
+        pending = true;
+      }
       return;
     }
 

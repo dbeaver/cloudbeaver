@@ -21,6 +21,7 @@ const tableFooterStyles = css`
     ToolsPanel {
       align-items: center;
       flex: 0 0 auto;
+      overflow: auto;
     }
     count input,
     count placeholder {
@@ -56,6 +57,7 @@ const tableFooterStyles = css`
     }
     time {
       composes: theme-typography--caption from global;
+      white-space: nowrap;
       margin-left: auto;
       margin-right: 16px;
     }
