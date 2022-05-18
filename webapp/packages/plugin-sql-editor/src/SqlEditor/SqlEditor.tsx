@@ -205,7 +205,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.downloadScript(trimmedValue)}
             >
-              <StaticImage icon='/icons/save.svg' />
+              <StaticImage icon='/icons/export.svg' />
             </button>
             {!data.activeSegmentMode.activeSegmentMode && (
               <UploadArea
@@ -215,7 +215,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                 onChange={handleScriptUpload}
               >
                 <upload>
-                  <StaticImage icon='/icons/load.svg' />
+                  <StaticImage icon='/icons/import.svg' />
                 </upload>
               </UploadArea>
             )}
