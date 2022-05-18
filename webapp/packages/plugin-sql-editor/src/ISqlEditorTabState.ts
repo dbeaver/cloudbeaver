@@ -7,12 +7,6 @@
  */
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-
-export interface ISqlEditorProcess {
-  processing: boolean;
-  label?: TLocalizationToken;
-}
 
 export interface IResultTab {
   tabId: string;
@@ -55,7 +49,6 @@ export interface ISqlEditorTabState {
   order: number;
   query: string;
   executionContext?: IConnectionExecutionContextInfo;
-  process: ISqlEditorProcess | null;
   currentTabId?: string;
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];

@@ -205,8 +205,6 @@ export class SqlEditorTabResourceService {
     }
 
     try {
-      this.sqlEditorService.setProcess({ processing: true, label: 'ui_processing_synchronization' }, tab.handlerState);
-
       const found = await this.navTreeResource.preloadNodeParents(state.parents, state.nodeId);
 
       if (!found) {
@@ -218,8 +216,6 @@ export class SqlEditorTabResourceService {
       this.sqlEditorService.setQuery(query, tab.handlerState);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
-    } finally {
-      this.sqlEditorService.setProcess(null, tab.handlerState);
     }
   }
 }

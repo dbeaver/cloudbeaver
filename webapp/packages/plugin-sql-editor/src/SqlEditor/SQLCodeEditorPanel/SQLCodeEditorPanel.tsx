@@ -11,7 +11,6 @@ import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNode, NavNodeManagerService } from '@cloudbeaver/core-app';
-import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
@@ -36,7 +35,6 @@ const styles = css`
 `;
 
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({
-  state,
   data,
 }) {
   const notificationService = useService(NotificationService);
@@ -99,16 +97,14 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   }, [sqlCodeEditorController]);
 
   return styled(styles)(
-    <Loader loading={!!state.process?.processing} message={state.process?.label}>
-      <box ref={dndBox.setRef}>
-        <SQLCodeEditorLoader
-          ref={setEditor}
-          readonly={data.readonly}
-          bindings={panelData.bindings}
-          dialect={data.dialect}
-          value={data.value}
-        />
-      </box>
-    </Loader>
+    <box ref={dndBox.setRef}>
+      <SQLCodeEditorLoader
+        ref={setEditor}
+        readonly={data.readonly}
+        bindings={panelData.bindings}
+        dialect={data.dialect}
+        value={data.value}
+      />
+    </box>
   );
 });
