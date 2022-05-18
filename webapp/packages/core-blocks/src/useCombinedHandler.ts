@@ -8,13 +8,15 @@
 
 import { useObjectRef } from './useObjectRef';
 
-export function useCombinedHandler<T extends any[]>(...handlers: Array<(...args: T) => any>): (...args: T) => void  {
+export function useCombinedHandler<T extends any[]>(
+  ...handlers: Array<((...args: T) => any) | undefined>
+): (...args: T) => void  {
   const optionsRef = useObjectRef({ handlers });
   const state = useObjectRef(
     () => ({
       handler(...args: T) {
         for (const handler of optionsRef.handlers) {
-          handler(...args);
+          handler?.(...args);
         }
       },
     }),

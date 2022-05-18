@@ -15,6 +15,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { getDefaultRowsCount } from '../../getDefaultRowsCount';
+import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = css`
@@ -41,6 +42,9 @@ const tableFooterStyles = css`
       padding: 0 16px;
 
       & IconOrImage {
+        & :global(use) {
+          fill: var(--theme-primary) !important;
+        }
         width: 24px;
         height: 24px;
       }
@@ -106,6 +110,7 @@ export const TableFooter = observer<Props>(function TableFooter({
       <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload>
+      <AutoRefreshButton model={model} disabled={disabled} />
       <count>
         <SubmittingForm onSubmit={handleChange}>
           <input
