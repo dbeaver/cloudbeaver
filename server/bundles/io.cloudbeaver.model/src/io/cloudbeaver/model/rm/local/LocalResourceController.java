@@ -321,6 +321,11 @@ public class LocalResourceController implements RMController {
             case PROJECT_PREFIX_SHARED:
                 return sharedProjectsPath.resolve(projectName);
             default:
+                var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
+                var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
+                if (!projectName.equals(userId)) {
+                    throw new DBException("No access to the project: " + projectName);
+                }
                 return userProjectsPath.resolve(projectName);
         }
     }
