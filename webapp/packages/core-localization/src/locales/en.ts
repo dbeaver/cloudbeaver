@@ -72,6 +72,7 @@ export const defaultENLocale = [
   ['ui_download', 'Download'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
+  ['ui_processing_synchronization', 'Synchronization...'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

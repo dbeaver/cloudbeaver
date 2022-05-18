@@ -72,6 +72,7 @@ export const defaultZHLocale = [
   ['ui_download', 'Download'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
+  ['ui_processing_synchronization', 'Synchronization...'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

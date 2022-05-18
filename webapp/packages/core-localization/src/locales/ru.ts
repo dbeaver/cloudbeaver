@@ -70,6 +70,7 @@ export const defaultRULocale = [
   ['ui_download', 'Загрузить'],
   ['ui_limit', 'Лимит'],
   ['ui_file_size', 'Размер файла'],
+  ['ui_processing_synchronization', 'Синхронизация...'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

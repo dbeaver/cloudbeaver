@@ -13,6 +13,8 @@ import { Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
+import type { ISqlEditorProcess } from './ISqlEditorTabState';
+
 export type SQLProposal = SqlCompletionProposal;
 
 export interface IQueryChangeData {
@@ -53,7 +55,7 @@ export class SqlEditorService {
       resultTabs: [],
       executionPlanTabs: [],
       statisticsTabs: [],
-
+      process: null,
       currentModeId: '',
       modeState: [],
     };
@@ -107,6 +109,10 @@ export class SqlEditorService {
 
   setName(name: string, state: ISqlEditorTabState) {
     state.name = name;
+  }
+
+  setProcess(process: ISqlEditorProcess | null, state: ISqlEditorTabState) {
+    state.process = process;
   }
 
   setQuery(query: string, state: ISqlEditorTabState) {

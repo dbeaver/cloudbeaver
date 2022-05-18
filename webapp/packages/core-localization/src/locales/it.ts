@@ -51,6 +51,7 @@ export const defaultITLocale = [
   ['ui_download', 'Download'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
+  ['ui_processing_synchronization', 'Synchronization...'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],
