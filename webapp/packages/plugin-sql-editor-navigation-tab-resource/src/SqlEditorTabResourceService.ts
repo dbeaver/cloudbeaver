@@ -9,6 +9,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ITab, NavigationTabsService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
@@ -44,6 +45,7 @@ export class SqlEditorTabResourceService {
     private readonly resourceManagerService: ResourceManagerService,
     private readonly windowEventsService: WindowEventsService,
     private readonly localStorageSaveService: LocalStorageSaveService,
+    private readonly userInfoResource: UserInfoResource
   ) {
     this.state = new Map();
 
@@ -112,38 +114,27 @@ export class SqlEditorTabResourceService {
     return null;
   }
 
-  private onTabResourceValueChangeHandler(data: IQueryChangeData) {
-    if (data.prevQuery !== data.query) {
-      this.updateResource(data.query);
-    }
-  }
-
-  private async updateResource(value: string) {
-    if (!this.resourceManagerService.enabled) {
+  private async onTabResourceValueChangeHandler(data: IQueryChangeData) {
+    const tabId = this.navigationTabsService.currentTab?.id;
+    if (!tabId) {
       return;
     }
 
-    const currentTab = this.navigationTabsService.currentTab;
-
-    if (currentTab && this.state.has(currentTab.id)) {
-      const state = this.state.get(currentTab.id)!;
-      try {
-        await this.navResourceNodeService.write(state.nodeId, value);
-      } catch (exception) {
-        this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
-      }
+    const tab = this.getTab(tabId);
+    if (tab && data.prevQuery !== data.query) {
+      await this.updateResource(tab, data.query);
     }
   }
 
-  private onFocusChangeHandler(focused: boolean) {
+  private async onFocusChangeHandler(focused: boolean) {
     if (focused) {
-      this.syncCurrentTab();
+      await this.syncCurrentTab();
     }
   }
 
-  private onTabSelectHandler(tab: ITab) {
+  private async onTabSelectHandler(tab: ITab) {
     if (isSQLEditorTab(tab)) {
-      this.updateTabQuery(tab);
+      await this.updateTabQuery(tab);
     }
   }
 
@@ -166,42 +157,58 @@ export class SqlEditorTabResourceService {
     });
   }
 
+  private getTab(tabId: string) {
+    return this.sqlEditorTabService.sqlEditorTabs.find(tab => tab.id === tabId);
+  }
+
   private closeTab(tabId: string) {
     this.navigationTabsService.closeTab(tabId);
   }
 
   private async syncCurrentTab() {
-    const current = this.sqlEditorTabService.sqlEditorTabs.find(
-      tab => tab.id === this.navigationTabsService.currentTabId
-    );
+    const tab = this.getTab(this.navigationTabsService.currentTabId);
 
-    if (current) {
-      await this.updateTabQuery(current);
+    if (tab) {
+      await this.updateTabQuery(tab);
     }
   }
 
-  private async updateTabQuery(tab: ITab<ISqlEditorTabState>) {
-    if (!this.resourceManagerService.enabled) {
+  private handleNotFound(tab: ITab<ISqlEditorTabState>) {
+    this.notificationService.logInfo({
+      title: 'plugin_resource_manager_script_not_found_title',
+      message: tab.handlerState.name,
+      persistent: true,
+    });
+
+    this.unlinkTab(tab.id);
+  }
+
+  private async updateResource(tab: ITab<ISqlEditorTabState>, value: string) {
+    const state = this.state.get(tab.id);
+
+    if (!this.resourceManagerService.enabled || !state || this.userInfoResource.getId() !== tab.userId) {
       return;
     }
 
     try {
-      const state = this.state.get(tab.id);
+      await this.navResourceNodeService.write(state.nodeId, value);
+    } catch (exception) {
+      this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+    }
+  }
 
-      if (!state) {
-        return;
-      }
+  private async updateTabQuery(tab: ITab<ISqlEditorTabState>) {
+    const state = this.state.get(tab.id);
 
+    if (!this.resourceManagerService.enabled || !state || this.userInfoResource.getId() !== tab.userId) {
+      return;
+    }
+
+    try {
       const found = await this.navTreeResource.preloadNodeParents(state.parents, state.nodeId);
 
       if (!found) {
-        this.notificationService.logInfo({
-          title: 'plugin_resource_manager_script_not_found_title',
-          message: tab.handlerState.name,
-          persistent: true,
-        });
-
-        this.unlinkTab(tab.id);
+        this.handleNotFound(tab);
         return;
       }
 
