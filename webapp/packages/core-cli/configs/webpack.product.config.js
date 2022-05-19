@@ -34,7 +34,9 @@ const excludedFromVendor = [
   'svg-tag-names',
   'html-tags',
   'codemirror',
-  'react-codemirror2'
+  'react-codemirror2',
+  'd3',
+  'dagre'
 ]
 
 const timestampVersion = withTimestamp(package.version)
