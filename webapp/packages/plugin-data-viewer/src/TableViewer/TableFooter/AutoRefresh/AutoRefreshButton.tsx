@@ -103,6 +103,7 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({
         </>
       )}
       disabled={disabled}
+      modal
       disclosure
     >
       <auto-reload aria-disabled={disabled}>
