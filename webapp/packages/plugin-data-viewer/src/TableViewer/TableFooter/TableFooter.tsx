@@ -107,10 +107,13 @@ export const TableFooter = observer<Props>(function TableFooter({
 
   return styled(useStyles(tableFooterStyles))(
     <ToolsPanel>
-      <reload aria-disabled={disabled} onClick={() => model.refresh()}>
+      {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />
-      </reload>
-      <AutoRefreshButton model={model} disabled={disabled} />
+      </reload> */}
+      <AutoRefreshButton
+        model={model}
+        disabled={disabled}
+      />
       <count>
         <SubmittingForm onSubmit={handleChange}>
           <input

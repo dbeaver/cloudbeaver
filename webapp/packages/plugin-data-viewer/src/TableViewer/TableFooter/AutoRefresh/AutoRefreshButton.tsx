@@ -23,23 +23,42 @@ auto-reload {
   display: flex;
   cursor: pointer;
   align-items: center;
-  padding: 0 16px;
 
-  & IconOrImage {
-    width: 24px;
-    height: 24px;
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
+  & icon-box {
+    position: relative;
+    padding-left: 16px;
+    display: flex;
+    align-items: center;
 
-  & > Icon {
-    & :global(use) {
+    & Icon {
+      width: 24px;
+      height: 24px;
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+    
+    &:hover > Icon :global(use) {
       fill: var(--theme-primary) !important;
     }
-    width: 16px;
-    height: 16px;
-    flex-grow: 0;
-    flex-shrink: 0;
+  }
+
+  & arrow-box {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-right: 16px;
+
+    & > Icon {
+      width: 16px;
+      height: 16px;
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    &:hover > Icon :global(use) {
+      fill: var(--theme-primary) !important;
+    }
   }
 }
 `;
@@ -60,6 +79,24 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({
   const interval = autoRefresh.settings.interval;
   const intervals_messages: string[] = [];
 
+  const buttonTitle = translate(
+    interval === null
+      ? 'data_viewer_action_refresh'
+      : 'data_viewer_action_auto_refresh_stop'
+  );
+
+  function handleClick() {
+    if (disabled) {
+      return;
+    }
+
+    if (interval === null) {
+      model.refresh();
+    } else {
+      autoRefresh.stop();
+    }
+  }
+
   for (let interval of intervals) {
     let message = ['ui_second_first_form', 'ui_second_second_form', 'ui_second_third_form'];
 
@@ -74,45 +111,53 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({
   }
 
   return styled(styles)(
-    <Menu
-      label='Auto refresh'
-      items={(
-        <>
-          <MenuItem label={translate('ui_custom')} close onClick={autoRefresh.configure}>
-            <MenuItemElement label={translate('ui_custom')} />
-          </MenuItem>
-          {intervals.map((inte, i) => (
-            <MenuItem
-              key={inte}
-              label={intervals_messages[i]}
-              selected={interval === inte}
-              close
-              onClick={() => autoRefresh.setInterval(inte)}
-            >
-              <MenuItemElement label={intervals_messages[i]} />
+    <auto-reload aria-disabled={disabled}>
+      <icon-box title={buttonTitle} onClick={handleClick}>
+        {interval === null ? (
+          <Icon name='/icons/refresh_m.svg#root' viewBox="0 0 24 24" />
+        ) : (
+          <TimerIcon
+            state="stop"
+            interval={interval}
+          />
+        )}
+      </icon-box>
+      <Menu
+        label='Auto refresh'
+        items={(
+          <>
+            <MenuItem label={translate('ui_custom')} close onClick={autoRefresh.configure}>
+              <MenuItemElement label={translate('ui_custom')} />
             </MenuItem>
-          ))}
-          <MenuItem
-            label={translate('ui_processing_stop')}
-            selected={interval === null}
-            close
-            onClick={autoRefresh.stop}
-          >
-            <MenuItemElement label={translate('ui_processing_stop')} />
-          </MenuItem>
-        </>
-      )}
-      disabled={disabled}
-      modal
-      disclosure
-    >
-      <auto-reload aria-disabled={disabled}>
-        <TimerIcon
-          state={interval === null ? 'play' : 'stop'}
-          interval={interval ?? 5}
-        />
-        <Icon name="arrow" viewBox="0 0 16 16" />
-      </auto-reload>
-    </Menu>
+            {intervals.map((inte, i) => (
+              <MenuItem
+                key={inte}
+                label={intervals_messages[i]}
+                selected={interval === inte}
+                close
+                onClick={() => autoRefresh.setInterval(inte)}
+              >
+                <MenuItemElement label={intervals_messages[i]} />
+              </MenuItem>
+            ))}
+            <MenuItem
+              label={translate('ui_processing_stop')}
+              selected={interval === null}
+              close
+              onClick={autoRefresh.stop}
+            >
+              <MenuItemElement label={translate('ui_processing_stop')} />
+            </MenuItem>
+          </>
+        )}
+        disabled={disabled}
+        modal
+        disclosure
+      >
+        <arrow-box title={translate('data_viewer_action_auto_refresh')}>
+          <Icon name="arrow" viewBox="0 0 16 16" />
+        </arrow-box>
+      </Menu>
+    </auto-reload>
   );
 });
