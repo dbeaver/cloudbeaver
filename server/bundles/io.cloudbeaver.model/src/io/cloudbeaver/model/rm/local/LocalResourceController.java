@@ -302,9 +302,9 @@ public class LocalResourceController implements RMController {
 
 
     private Path getProjectPath(String projectId) throws DBException {
-        RMResourceName resourceName = parseResourceName(projectId);
+        RMProjectName resourceName = parseProjectName(projectId);
         String prefix = resourceName.getPrefix();
-        String projectName = resourceName.getProjectName();
+        String projectName = resourceName.getName();
         switch (prefix) {
             case PROJECT_PREFIX_GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
@@ -389,38 +389,38 @@ public class LocalResourceController implements RMController {
         }
     }
 
-    public static class RMResourceName {
+    public static class RMProjectName {
         String prefix;
-        String projectName;
-        private RMResourceName(String prefix, String projectName) {
+        String name;
+        private RMProjectName(String prefix, String name) {
             this.prefix = prefix;
-            this.projectName = projectName;
+            this.name = name;
         }
 
         public String getPrefix() {
             return prefix;
         }
 
-        public String getProjectName() {
-            return projectName;
+        public String getName() {
+            return name;
         }
     }
-    public static RMResourceName parseResourceName(String projectId) {
+    public static RMProjectName parseProjectName(String projectId) {
         String prefix;
-        String projectName;
+        String name;
         int divPos = projectId.indexOf("_");
         if (divPos < 0) {
             prefix = PROJECT_PREFIX_USER;
-            projectName = projectId;
+            name = projectId;
         } else {
             prefix = projectId.substring(0, divPos + 1);
-            projectName = projectId.substring(divPos + 1);
+            name = projectId.substring(divPos + 1);
         }
-        return new RMResourceName(prefix, projectName);
+        return new RMProjectName(prefix, name);
     }
 
     public static boolean isUserProject(String projectId) {
-        return PROJECT_PREFIX_USER.equals(parseResourceName(projectId).getPrefix());
+        return PROJECT_PREFIX_USER.equals(parseProjectName(projectId).getPrefix());
     }
 
 }
