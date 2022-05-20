@@ -302,16 +302,9 @@ public class LocalResourceController implements RMController {
 
 
     private Path getProjectPath(String projectId) throws DBException {
-        String prefix;
-        String projectName;
-        int divPos = projectId.indexOf("_");
-        if (divPos < 0) {
-            prefix = PROJECT_PREFIX_USER;
-            projectName = projectId;
-        } else {
-            prefix = projectId.substring(0, divPos + 1);
-            projectName = projectId.substring(divPos + 1);
-        }
+        RMResourceName resourceName = parseResourceName(projectId);
+        String prefix = resourceName.getPrefix();
+        String projectName = resourceName.getProjectName();
         switch (prefix) {
             case PROJECT_PREFIX_GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
@@ -395,4 +388,39 @@ public class LocalResourceController implements RMController {
             return new LocalResourceController(credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath);
         }
     }
+
+    public static class RMResourceName {
+        String prefix;
+        String projectName;
+        private RMResourceName(String prefix, String projectName) {
+            this.prefix = prefix;
+            this.projectName = projectName;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public String getProjectName() {
+            return projectName;
+        }
+    }
+    public static RMResourceName parseResourceName(String projectId) {
+        String prefix;
+        String projectName;
+        int divPos = projectId.indexOf("_");
+        if (divPos < 0) {
+            prefix = PROJECT_PREFIX_USER;
+            projectName = projectId;
+        } else {
+            prefix = projectId.substring(0, divPos + 1);
+            projectName = projectId.substring(divPos + 1);
+        }
+        return new RMResourceName(prefix, projectName);
+    }
+
+    public static boolean isUserProject(String projectId) {
+        return PROJECT_PREFIX_USER.equals(parseResourceName(projectId).getPrefix());
+    }
+
 }
