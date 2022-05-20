@@ -302,9 +302,9 @@ public class LocalResourceController implements RMController {
 
 
     private Path getProjectPath(String projectId) throws DBException {
-        RMProjectName resourceName = parseProjectName(projectId);
-        String prefix = resourceName.getPrefix();
-        String projectName = resourceName.getName();
+        RMProjectName project = parseProjectName(projectId);
+        String prefix = project.getPrefix();
+        String projectName = project.getName();
         switch (prefix) {
             case PROJECT_PREFIX_GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
