@@ -7,9 +7,9 @@
  */
 
 import type { SplitProps, SplitterMode } from 'go-split';
-import { runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 
-import { useObjectRef } from '../useObjectRef';
+import { useObservableRef } from '../useObservableRef';
 import { useUserData } from '../useUserData';
 
 type SplitState = Pick<SplitProps, 'mode' | 'size' | 'ratio' | 'onModeChange' | 'onResize'>;
@@ -21,7 +21,7 @@ export function useSplitUserState(id: string): SplitState {
     () => {},
   );
 
-  return useObjectRef<SplitState & { state: SplitState }>(() => ({
+  return useObservableRef<SplitState & { state: SplitState }>(() => ({
     get mode(): SplitterMode | undefined {
       return this.state.mode;
     },
@@ -40,5 +40,12 @@ export function useSplitUserState(id: string): SplitState {
         state.size = size;
       });
     },
-  }), { state });
+  }), {
+    mode: computed,
+    size: computed,
+    ratio: computed,
+    onModeChange: action,
+    onResize: action,
+    state: observable.ref,
+  }, { state });
 }
