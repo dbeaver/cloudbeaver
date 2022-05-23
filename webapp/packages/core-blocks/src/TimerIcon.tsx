@@ -16,37 +16,40 @@ import { Icon } from './Icon';
 const style = css`
   timer {
     position: relative;
-    width: 28px;
+    width: 24px;
     height: 24px;
 
     & > Icon {
       width: 24px;
       height: 24px;
     }
-  }
-  state, interval {
-    composes: theme-background-secondary from global;
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
-  }
-  state {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    display: flex;
 
-    & > Icon {
-      width: 12px;
-      height: 12px;
+    & state {
+      opacity: 0;
+
+      & > Icon {
+        width: 12px;
+        height: 12px;
+      }
     }
   }
-  interval {
+  state, interval {
     position: absolute;
     right: 0;
     top: 0;
-
     display: flex;
+    width: 12px;
+    height: 12px;
+  }
+  timer:hover {
+    & state {
+      opacity: 1;
+    }
+    & interval {
+      opacity: 0;
+    }
+  }
+  interval {
     font-size: 8px;
     font-weight: bold;
     line-height: normal;
