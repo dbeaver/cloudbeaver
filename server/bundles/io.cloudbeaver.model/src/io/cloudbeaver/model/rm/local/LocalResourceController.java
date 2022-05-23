@@ -419,8 +419,8 @@ public class LocalResourceController implements RMController {
         return new RMProjectName(prefix, name);
     }
 
-    public static boolean isUserProject(String projectId) {
-        return PROJECT_PREFIX_USER.equals(parseProjectName(projectId).getPrefix());
+    public static boolean isShared(String projectId) {
+        return PROJECT_PREFIX_SHARED.equals(parseProjectName(projectId).getPrefix());
     }
 
 }
