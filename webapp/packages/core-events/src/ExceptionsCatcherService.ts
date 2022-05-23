@@ -14,10 +14,10 @@ import { NotificationService } from './NotificationService';
 export class ExceptionsCatcherService extends Bootstrap {
   baseCatcher: OnErrorEventHandler | null = null;
 
-  private ignored: string[] = [];
-  private messageTitle = 'Uncatched exception';
+  private readonly ignored: string[] = [];
+  private readonly messageTitle = 'Uncatched exception';
 
-  constructor(private notificationService: NotificationService) {
+  constructor(private readonly notificationService: NotificationService) {
     super();
   }
 
@@ -36,7 +36,7 @@ export class ExceptionsCatcherService extends Bootstrap {
     this.ignored.push(message);
   }
 
-  private catcher = (
+  private readonly catcher = (
     event: Event | string,
     source?: string,
     lineno?: number,
