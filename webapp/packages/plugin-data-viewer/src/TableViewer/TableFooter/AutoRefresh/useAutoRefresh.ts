@@ -34,7 +34,9 @@ export function useAutoRefresh(model: IDatabaseDataModel<any, any>) {
   }, false);
 
   useInterval(async () => {
-    await model.refresh();
+    try {
+      await model.refresh();
+    } catch { }
 
     if (model.source.error && settings.stopOnError) {
       settings.interval = null;
