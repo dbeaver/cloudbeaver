@@ -29,12 +29,14 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     protected boolean anonymousAccessEnabled;
     protected String anonymousUserRole;
     protected String defaultUserRole;
+    protected boolean resourceManagerEnabled;
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
         this.anonymousAccessEnabled = true;
         this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.defaultUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
+        this.resourceManagerEnabled = true;
 
     }
 
@@ -43,6 +45,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.anonymousAccessEnabled = src.anonymousAccessEnabled;
         this.anonymousUserRole = src.anonymousUserRole;
         this.defaultUserRole = src.defaultUserRole;
+        this.resourceManagerEnabled = src.resourceManagerEnabled;
     }
 
     @Override
@@ -59,7 +62,6 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     public String getDefaultUserRole() {
         return defaultUserRole;
     }
-
 
     @Override
     public <T> T getPluginOption(@NotNull String pluginId, @NotNull String option) {
@@ -80,5 +82,10 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
                 return Collections.emptyMap();
             }
         }
+    }
+
+    @Override
+    public boolean isResourceManagerEnabled() {
+        return resourceManagerEnabled;
     }
 }

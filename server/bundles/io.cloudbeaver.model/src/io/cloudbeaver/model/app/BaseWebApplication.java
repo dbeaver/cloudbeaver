@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.model.log.SLF4JLogHandler;
+import io.cloudbeaver.model.rm.RMControllerCheckStatusProxy;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
@@ -108,6 +109,10 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+        return new RMControllerCheckStatusProxy(createResourceController(credentialsProvider), this);
+    }
+
+    protected @NotNull RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
         return LocalResourceController.builder(credentialsProvider).build();
     }
 
