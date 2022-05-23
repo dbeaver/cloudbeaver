@@ -7,11 +7,12 @@
  */
 
 import { SplitContext } from 'go-split';
-import { useCallback, useContext } from 'react';
+import { useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useObjectRef } from '../useObjectRef';
 import { buttonStyles } from './splitButtonStyles';
 
 export const SplitControls: React.FC = function SplitControls() {
@@ -36,21 +37,22 @@ export const SplitControls: React.FC = function SplitControls() {
     }
   }
 
-  const handleCollapse = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    if (mode === 'maximize') {
-      setMode('resize');
-    } else {
-      setMode('minimize');
-    }
-  }, [mode, setMode]);
-
-  const handleExpand = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    if (mode === 'minimize') {
-      setMode('resize');
-    } else {
-      setMode('maximize');
-    }
-  }, [mode, setMode]);
+  const handlers = useObjectRef(() => ({
+    handleCollapse(event: React.SyntheticEvent<HTMLButtonElement>) {
+      if (this.mode === 'maximize') {
+        this.setMode('resize');
+      } else {
+        this.setMode('minimize');
+      }
+    },
+    handleExpand(event: React.SyntheticEvent<HTMLButtonElement>) {
+      if (this.mode === 'minimize') {
+        this.setMode('resize');
+      } else {
+        this.setMode('maximize');
+      }
+    },
+  }), { mode, setMode }, ['handleCollapse', 'handleExpand']);
 
   return styled(styles)(
     <container
@@ -65,7 +67,7 @@ export const SplitControls: React.FC = function SplitControls() {
         <button
           type="button"
           {...use({ isPrimary: !inverse })}
-          onClick={handleCollapse}
+          onClick={handlers.handleCollapse}
         >
           <ripple />
         </button>
@@ -74,7 +76,7 @@ export const SplitControls: React.FC = function SplitControls() {
         <button
           type="button"
           {...use({ isPrimary: inverse })}
-          onClick={handleExpand}
+          onClick={handlers.handleExpand}
         >
           <ripple />
         </button>
