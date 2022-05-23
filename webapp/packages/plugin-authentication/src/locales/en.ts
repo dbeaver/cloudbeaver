@@ -18,7 +18,7 @@ export default [
   ['authentication_user_password_repeat', 'Repeat password'],
   ['authentication_user_role', 'User role'],
   ['authentication_user_status', 'User status'],
-  ['authentication_user_activated', 'Activated'],
+  ['authentication_user_enabled', 'Enabled'],
   ['authentication_user_login_not_set', 'Login can\'t be empty'],
   ['authentication_user_role_not_set', 'At least one role must be selected'],
   ['authentication_user_password_not_set', 'Password is required'],
