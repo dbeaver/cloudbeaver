@@ -90,7 +90,7 @@ export class ConnectionSSHTabService extends Bootstrap {
         enabled: false,
         authType: NetworkHandlerAuthType.Password,
         password: '',
-        savePassword: true,
+        savePassword: false,
         userName: '',
         key: '',
         ...initialConfig,
