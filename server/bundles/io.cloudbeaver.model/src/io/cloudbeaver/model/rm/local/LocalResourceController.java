@@ -183,9 +183,7 @@ public class LocalResourceController implements RMController {
         @NotNull String resourcePath,
         boolean isFolder) throws DBException
     {
-        if (!resourcePath.matches(FILE_REGEX)) {
-            throw new DBException("Resource '" + resourcePath + "' has illegal characters");
-        }
+        validateResourcePath(resourcePath);
         Path targetPath = getTargetPath(projectId, resourcePath);
         if (Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' already exists");
@@ -209,6 +207,7 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteResource(@NotNull String projectId, @NotNull String resourcePath, boolean recursive) throws DBException {
+        validateResourcePath(resourcePath);
         Path targetPath = getTargetPath(projectId, resourcePath);
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
@@ -223,6 +222,7 @@ public class LocalResourceController implements RMController {
     @NotNull
     @Override
     public byte[] getResourceContents(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        validateResourcePath(resourcePath);
         Path targetPath = getTargetPath(projectId, resourcePath);
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
@@ -241,6 +241,7 @@ public class LocalResourceController implements RMController {
         @NotNull String resourcePath,
         @NotNull byte[] data) throws DBException
     {
+        validateResourcePath(resourcePath);
         Number fileSizeLimit = WebAppUtils.getWebApplication()
                 .getAppConfiguration()
                 .getResourceQuota(WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT);
@@ -262,6 +263,12 @@ public class LocalResourceController implements RMController {
         }
 
         return DEFAULT_CHANGE_ID;
+    }
+
+    private void validateResourcePath(String resourcePath) throws DBException {
+        if (!resourcePath.matches(FILE_REGEX)) {
+            throw new DBException("Resource path '" + resourcePath + "' contains illegal characters");
+        }
     }
 
     @NotNull
