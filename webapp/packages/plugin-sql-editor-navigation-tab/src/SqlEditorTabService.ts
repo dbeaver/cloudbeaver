@@ -27,6 +27,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
 
@@ -41,6 +42,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
+  readonly onCanClose: Executor<ITab<ISqlEditorTabState>>;
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
@@ -52,6 +54,8 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
+
+    this.onCanClose = new Executor();
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
@@ -82,7 +86,7 @@ export class SqlEditorTabService extends Bootstrap {
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
 
-  load(): void {}
+  load(): void { }
 
   getName(tabState: ISqlEditorTabState): string {
     const connection = this.connectionInfoResource.get(tabState.executionContext?.connectionId || '');
@@ -271,7 +275,12 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    return await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+    if (await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState)) {
+      const contexts = await this.onCanClose.execute(editorTab);
+      return !ExecutorInterrupter.isInterrupted(contexts);
+    }
+
+    return false;
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
