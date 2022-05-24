@@ -38,6 +38,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
@@ -273,11 +274,15 @@ public class LocalResourceController implements RMController {
                 throw new DBException("Error creating project path", e);
             }
         }
-        Path targetPath = projectPath.resolve(resourcePath).normalize();
-        if (!targetPath.startsWith(projectPath)) {
-            throw new DBException("Invalid resource path");
+        try {
+            Path targetPath = projectPath.resolve(resourcePath).normalize();
+            if (!targetPath.startsWith(projectPath)) {
+                throw new DBException("Invalid resource path");
+            }
+            return ((WebApplication) BaseWebApplication.getInstance()).getHomeDirectory().relativize(targetPath);
+        } catch (InvalidPathException e) {
+            throw new DBException("Resource path contains invalid characters");
         }
-        return ((WebApplication) BaseWebApplication.getInstance()).getHomeDirectory().relativize(targetPath);
     }
 
     private RMProject makeProjectFromPath(Path path, String prefix, boolean checkExistence) {
