@@ -302,16 +302,9 @@ public class LocalResourceController implements RMController {
 
 
     private Path getProjectPath(String projectId) throws DBException {
-        String prefix;
-        String projectName;
-        int divPos = projectId.indexOf("_");
-        if (divPos < 0) {
-            prefix = PROJECT_PREFIX_USER;
-            projectName = projectId;
-        } else {
-            prefix = projectId.substring(0, divPos + 1);
-            projectName = projectId.substring(divPos + 1);
-        }
+        RMProjectName project = parseProjectName(projectId);
+        String prefix = project.getPrefix();
+        String projectName = project.getName();
         switch (prefix) {
             case PROJECT_PREFIX_GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
@@ -395,4 +388,39 @@ public class LocalResourceController implements RMController {
             return new LocalResourceController(credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath);
         }
     }
+
+    public static class RMProjectName {
+        String prefix;
+        String name;
+        private RMProjectName(String prefix, String name) {
+            this.prefix = prefix;
+            this.name = name;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+    public static RMProjectName parseProjectName(String projectId) {
+        String prefix;
+        String name;
+        int divPos = projectId.indexOf("_");
+        if (divPos < 0) {
+            prefix = PROJECT_PREFIX_USER;
+            name = projectId;
+        } else {
+            prefix = projectId.substring(0, divPos + 1);
+            name = projectId.substring(divPos + 1);
+        }
+        return new RMProjectName(prefix, name);
+    }
+
+    public static boolean isShared(String projectId) {
+        return PROJECT_PREFIX_SHARED.equals(parseProjectName(projectId).getPrefix());
+    }
+
 }
