@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.service.rm;
 
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNModelExtender;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -26,7 +27,7 @@ public class RMNavigatorModelExtender implements DBNModelExtender {
 
     @Override
     public DBNNode[] getExtraNodes(@NotNull DBNNode parentNode) {
-        if (parentNode instanceof DBNProject) {
+        if (parentNode instanceof DBNProject && WebAppUtils.getWebApplication().getAppConfiguration().isResourceManagerEnabled()) {
             // We need project to get access to data source registry.
             // In order to register cloud connections there.
             return createCloudNodes((DBNProject) parentNode);
