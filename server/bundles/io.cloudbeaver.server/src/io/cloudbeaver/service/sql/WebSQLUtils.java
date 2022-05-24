@@ -54,6 +54,9 @@ public class WebSQLUtils {
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (type instanceof DBDAttributeBinding &&
             (cellValue instanceof Date || cellValue instanceof Number)) {
+            if (cellValue instanceof BigDecimal) {
+                cellValue = ((BigDecimal) cellValue).stripTrailingZeros();
+            }
             return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
         }
 
