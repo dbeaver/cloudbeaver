@@ -286,7 +286,7 @@ public class LocalResourceController implements RMController {
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
             }
-            return ((WebApplication) BaseWebApplication.getInstance()).getHomeDirectory().relativize(targetPath);
+            return WebAppUtils.getWebApplication().getHomeDirectory().relativize(targetPath);
         } catch (InvalidPathException e) {
             throw new DBException("Resource path contains invalid characters");
         }
