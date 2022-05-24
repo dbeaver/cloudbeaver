@@ -38,6 +38,7 @@ public class CBConstants {
     public static final String PARAM_EXTERNAL_PROPERTIES = "externalProperties";
     public static final String PARAM_STATIC_CONTENT = "staticContent";
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
+    public static final String PARAM_RESOURCE_MANAGER_ENABLED = "resourceManagerEnabled";
     public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
     public static final String PARAM_DB_CONFIGURATION = "database";
 

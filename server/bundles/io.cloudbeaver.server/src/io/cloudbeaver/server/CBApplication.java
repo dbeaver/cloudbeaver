@@ -778,6 +778,7 @@ public class CBApplication extends BaseWebApplication {
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
                     JSONUtils.field(json, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
+                    JSONUtils.field(json, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
                     Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
                     if (!CommonUtils.isEmpty(resourceQuotas)) {
