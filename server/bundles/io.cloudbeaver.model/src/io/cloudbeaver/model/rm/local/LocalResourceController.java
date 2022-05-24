@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -49,6 +51,8 @@ import java.util.stream.Collectors;
 public class LocalResourceController implements RMController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
+
+    private static final String FILE_REGEX = "(?U)[\\w.$-]+";
 
     private static final String PROJECT_PREFIX_GLOBAL = "g_";
     private static final String PROJECT_PREFIX_SHARED = "s_";
@@ -178,6 +182,9 @@ public class LocalResourceController implements RMController {
         @NotNull String resourcePath,
         boolean isFolder) throws DBException
     {
+        if (!resourcePath.matches(FILE_REGEX)) {
+            throw new DBException("Resource '" + resourcePath + "' has illegal characters");
+        }
         Path targetPath = getTargetPath(projectId, resourcePath);
         if (Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' already exists");
@@ -270,7 +277,7 @@ public class LocalResourceController implements RMController {
         if (!targetPath.startsWith(projectPath)) {
             throw new DBException("Invalid resource path");
         }
-        return targetPath;
+        return ((WebApplication) BaseWebApplication.getInstance()).getHomeDirectory().relativize(targetPath);
     }
 
     private RMProject makeProjectFromPath(Path path, String prefix, boolean checkExistence) {
