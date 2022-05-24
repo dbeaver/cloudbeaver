@@ -154,7 +154,9 @@ export class SqlEditorTabResourceService {
       return;
     }
 
-    if (!await this.updateResource(tab, tab.handlerState.query)) {
+    try {
+      await this.updateResource(tab, tab.handlerState.query);
+    } catch {
       const result = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'plugin_resource_manager_save_script_error_confirmation_title',
         message: 'plugin_resource_manager_save_script_error_confirmation_message',
@@ -182,7 +184,7 @@ export class SqlEditorTabResourceService {
     ResourceKeyUtils.forEach(keyObj, key => {
       const tabId = this.getResourceTab(key);
       if (tabId) {
-        this.closeTab(tabId);
+        this.unlinkTab(tabId, true);
       }
     });
   }
@@ -217,15 +219,14 @@ export class SqlEditorTabResourceService {
     const state = this.state.get(tab.id);
 
     if (!this.resourceManagerService.enabled || !state || this.userInfoResource.getId() !== tab.userId) {
-      return false;
+      return;
     }
 
     try {
       await this.navResourceNodeService.write(state.nodeId, value);
-      return true;
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
-      return false;
+      throw (exception);
     }
   }
 
