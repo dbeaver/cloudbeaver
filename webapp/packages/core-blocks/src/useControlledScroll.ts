@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 export interface IScrollState {
   scrollTop: number;
@@ -14,7 +14,7 @@ export interface IScrollState {
 }
 
 export function useControlledScroll(element: HTMLDivElement | null, state: IScrollState): void {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (element) {
       setTimeout(() => {
         element.scrollTop = state.scrollTop;
