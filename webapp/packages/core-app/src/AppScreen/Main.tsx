@@ -61,20 +61,16 @@ export const Main = observer(function Main() {
         </Pane>
         <ResizerControls />
         <Pane>
-          <Split>
+          <Split disable={activeBars.length === 0}>
             <Pane>
               <RightArea />
             </Pane>
-            {activeBars.length > 0 && (
-              <>
-                <ResizerControls />
-                <Pane main>
-                  <ErrorBoundary remount>
-                    <SideBarPanel container={sideBarPanelService.tabsContainer} />
-                  </ErrorBoundary>
-                </Pane>
-              </>
-            )}
+            <ResizerControls />
+            <Pane main>
+              <ErrorBoundary remount>
+                <SideBarPanel container={sideBarPanelService.tabsContainer} />
+              </ErrorBoundary>
+            </Pane>
           </Split>
         </Pane>
       </Split>
