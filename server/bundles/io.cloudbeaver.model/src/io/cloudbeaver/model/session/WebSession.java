@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -117,6 +118,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final SessionContextImpl sessionAuthContext;
     private SMController securityController;
     private SMAdminController adminSecurityController;
+    private RMController rmController;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
@@ -245,6 +247,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             return null;
         }
         return adminSecurityController;
+    }
+
+    public synchronized RMController getRmController() {
+        return rmController;
     }
 
     public synchronized void refreshUserData() {
@@ -891,6 +897,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.user = null;
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = null;
+        this.rmController = application.getResourceController(this);
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
@@ -903,6 +910,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionPermissions = tokenInfo.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
+        this.rmController = application.getResourceController(this);
 
         this.user = tokenInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(tokenInfo.getUserId()));
         refreshUserData();

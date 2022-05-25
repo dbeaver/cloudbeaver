@@ -18,7 +18,6 @@ package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.rm.DBWServiceRM;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -94,6 +93,6 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     private RMController getResourceController(WebSession webSession) {
-        return CBApplication.getInstance().getResourceController(webSession);
+        return webSession.getRmController();
     }
 }
