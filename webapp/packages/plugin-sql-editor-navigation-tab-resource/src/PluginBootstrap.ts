@@ -69,7 +69,8 @@ export class PluginBootstrap extends Bootstrap {
             defaultScriptName: tabName,
           });
 
-          if (result != DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+          if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+
             try {
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
