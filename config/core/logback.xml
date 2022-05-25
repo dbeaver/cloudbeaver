@@ -10,9 +10,11 @@
     </appender>
 
     <!-- Disable logback status messages -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <logger name="org.jkiss" level="DEBUG"/>
+    <logger name="io.cloudbeaver" level="DEBUG"/>
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
