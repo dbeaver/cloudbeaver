@@ -23,6 +23,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.storage.ExternalContentStorage;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -56,6 +57,10 @@ public class WebSQLUtils {
             (cellValue instanceof Date || cellValue instanceof Number)) {
             if (cellValue instanceof BigDecimal) {
                 cellValue = ((BigDecimal) cellValue).stripTrailingZeros();
+            }
+            DBDAttributeBinding castedType = (DBDAttributeBinding) type;
+            if (DBPDataKind.DOCUMENT.equals(castedType.getTopParent().getDataKind()) && castedType.getAttribute().getName().equals("_id")) {
+                return cellValue;
             }
             return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
         }
