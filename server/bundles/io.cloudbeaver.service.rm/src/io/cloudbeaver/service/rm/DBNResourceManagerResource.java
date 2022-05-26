@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.DBPObjectWithDetails;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -35,11 +34,10 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBNResourceManagerResource extends DBNNode implements DBPObjectWithDetails {
+public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     private static final Log log = Log.getLog(DBNResourceManagerResource.class);
 
     private final RMResource resource;
-    private DBNResourceManagerResource[] children;
 
     DBNResourceManagerResource(DBNNode parentNode, RMResource resource) {
         super(parentNode);
@@ -135,6 +133,10 @@ public class DBNResourceManagerResource extends DBNNode implements DBPObjectWith
     @Nullable
     @Override
     public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
+        return resource;
+    }
+
+    public RMResource getResource() {
         return resource;
     }
 }
