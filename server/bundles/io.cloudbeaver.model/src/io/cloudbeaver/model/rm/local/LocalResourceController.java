@@ -264,6 +264,9 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
+        if (resourcePath.startsWith(".")) {
+            throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
+        }
         if (!resourcePath.matches(FILE_REGEX)) {
             String illegalCharacters = resourcePath.replaceAll(FILE_REGEX, " ").strip();
             throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
