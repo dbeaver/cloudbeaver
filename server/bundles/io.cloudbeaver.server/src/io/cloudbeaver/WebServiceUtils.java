@@ -351,11 +351,13 @@ public class WebServiceUtils extends WebCommonUtils {
         return apiPrefix;
     }
 
-    public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource) {
+    public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource, boolean addEditorName) {
         Map<String, Object> actionParameters = new HashMap<>();
         actionParameters.put("action", "open-sql-editor");
         actionParameters.put("connection-id", dataSource.getId());
-        actionParameters.put("editor-name", dataSource.getName() + "-sql");
+        if (addEditorName) {
+            actionParameters.put("editor-name", dataSource.getName() + "-sql");
+        }
         WebActionParameters.saveToSession(webSession, actionParameters);
     }
 
