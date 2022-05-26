@@ -90,6 +90,7 @@ input ServerConfigInput {
     customConnectionsEnabled: Boolean
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
+    resourceManagerEnabled: Boolean
 
     enabledFeatures: [ID!]
     enabledAuthProviders: [ID!]

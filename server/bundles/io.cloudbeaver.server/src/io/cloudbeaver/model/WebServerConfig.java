@@ -79,6 +79,7 @@ public class WebServerConfig {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }
 
+
     @Property
     public boolean isAuthenticationEnabled() {
         String[] enabledAuthProviders = getEnabledAuthProviders();
@@ -133,6 +134,11 @@ public class WebServerConfig {
     @Property
     public boolean isRedirectOnFederatedAuth() {
         return application.getAppConfiguration().isRedirectOnFederatedAuth();
+    }
+
+    @Property
+    public boolean isResourceManagerEnabled() {
+        return application.getAppConfiguration().isResourceManagerEnabled();
     }
 
     @Property

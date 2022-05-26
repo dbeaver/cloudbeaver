@@ -492,6 +492,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
             appConfig.setEnabledDrivers(config.getEnabledDrivers());
             appConfig.setDisabledDrivers(config.getDisabledDrivers());
+            appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
 
             if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
                 // All of them
