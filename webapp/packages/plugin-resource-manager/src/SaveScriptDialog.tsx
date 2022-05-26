@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -25,6 +25,15 @@ interface Payload {
   defaultScriptName?: string;
 }
 
+interface State {
+  value: string;
+  errorMessage: string | null;
+  validate: () => void;
+  submit: () => Promise<void>;
+}
+
+const regex = /[`!@#%^&*()+=[\]{};':"\\|,<>/?~]/;
+
 export const SaveScriptDialog: DialogComponent<Payload, string> = observer(function SaveScriptDialog({
   payload,
   resolveDialog,
@@ -34,10 +43,36 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const state = useObservableRef(() => ({
-    value: payload.defaultScriptName,
+  const state = useObservableRef<State>(() => ({
+    value: payload.defaultScriptName ?? '',
+    errorMessage: null,
+    validate() {
+      this.errorMessage = null;
+
+      const match = this.value.match(regex);
+
+      if (match) {
+        const message = translate(
+          'plugin_resource_manager_script_name_invalid_characters_message',
+          undefined,
+          { character: match[0] }
+        );
+
+        this.errorMessage = message;
+      }
+    },
+    async submit() {
+      this.validate();
+
+      if (!this.errorMessage) {
+        resolveDialog(this.value);
+      }
+    },
   }), {
     value: observable.ref,
+    errorMessage: observable.ref,
+    validate: action.bound,
+    submit: action.bound,
   }, false);
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
@@ -60,8 +95,8 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
           <Button
             type="button"
             mod={['unelevated']}
-            disabled={!state.value?.trim()}
-            onClick={() => resolveDialog(state.value)}
+            disabled={!state.value.trim()}
+            onClick={state.submit}
           >
             <Translate token='ui_processing_save' />
           </Button>
@@ -70,9 +105,14 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
       fixedWidth
       onReject={rejectDialog}
     >
-      <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
+      <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
         <Container center>
-          <InputField name='value' state={state}>
+          <InputField
+            name='value'
+            state={state}
+            error={!!state.errorMessage}
+            description={state.errorMessage ?? undefined}
+          >
             {translate('ui_name') + ':'}
           </InputField>
         </Container>

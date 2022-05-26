@@ -14,4 +14,5 @@ export default [
   ['plugin_resource_manager_sync_script_error', "Failed to sync editor's query"],
   ['plugin_resource_manager_script_not_found_title', 'Failed to find the associated script'],
   ['plugin_resource_manager_script_not_found_message', 'The script was probably removed or renamed. The last known value will be used'],
+  ['plugin_resource_manager_script_name_invalid_characters_message', 'Invalid character "{args.character}"'],
 ];
