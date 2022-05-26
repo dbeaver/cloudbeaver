@@ -17,8 +17,6 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -267,7 +265,8 @@ public class LocalResourceController implements RMController {
 
     private void validateResourcePath(String resourcePath) throws DBException {
         if (!resourcePath.matches(FILE_REGEX)) {
-            throw new DBException("Resource path '" + resourcePath + "' contains illegal characters");
+            String illegalCharacters = resourcePath.replaceAll(FILE_REGEX, " ").strip();
+            throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
         }
     }
 
