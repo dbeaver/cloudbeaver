@@ -26,10 +26,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.rm.RMResourceChange;
+import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -42,6 +39,7 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +54,7 @@ public class LocalResourceController implements RMController {
     private static final String PROJECT_PREFIX_USER = "u_";
     public static final String DEFAULT_CHANGE_ID = "0";
 
+    private final List<RMEventListener> listeners = new CopyOnWriteArrayList<>();
     private final SMCredentialsProvider credentialsProvider;
 
     private final Path rootPath;
@@ -139,6 +138,11 @@ public class LocalResourceController implements RMController {
         throw new DBCFeatureNotSupportedException();
     }
 
+    @Override
+    public RMProject getProject(@NotNull String projectId) throws DBException {
+        return makeProjectFromId(projectId);
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(
@@ -146,8 +150,7 @@ public class LocalResourceController implements RMController {
         @Nullable String folder,
         @Nullable String nameMask,
         boolean readProperties,
-        boolean readHistory) throws DBException
-    {
+        boolean readHistory) throws DBException {
         Path projectPath = getProjectPath(projectId);
         try {
             if (!Files.exists(projectPath)) {
@@ -206,13 +209,25 @@ public class LocalResourceController implements RMController {
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
         }
+        List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath);
         try {
             Files.delete(targetPath);
         } catch (IOException e) {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
+        fireEvent(
+            new RMEvent(RMEvent.Action.RESOURCE_DELETE,
+                makeProjectFromId(projectId),
+                rmResourcePath
+            )
+        );
     }
 
+    @Override
+    public RMResource[] getResourcePath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        return makeResourcePath(projectId, getTargetPath(projectId, resourcePath)).toArray(RMResource[]::new);
+    }
+    
     @NotNull
     @Override
     public byte[] getResourceContents(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
@@ -257,6 +272,26 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
+    @Override
+    public void addRMEventListener(RMEventListener listener) {
+        this.listeners.add(listener);
+    }
+
+    @Override
+    public void removeRMEventListener(RMEventListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    private void fireEvent(RMEvent event) {
+        for (var listener : listeners) {
+            try {
+                listener.handleRMEvent(event);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
     @NotNull
     private Path getTargetPath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
         Path projectPath = getProjectPath(projectId);
@@ -276,6 +311,13 @@ public class LocalResourceController implements RMController {
         } catch (InvalidPathException e) {
             throw new DBException("Resource path contains invalid characters");
         }
+    }
+
+
+    private RMProject makeProjectFromId(String projectId) throws DBException {
+        var projectName = parseProjectName(projectId);
+        var projectPath = getProjectPath(projectId);
+        return makeProjectFromPath(projectPath, projectName.getPrefix(), false);
     }
 
     private RMProject makeProjectFromPath(Path path, String prefix, boolean checkExistence) {
@@ -326,6 +368,21 @@ public class LocalResourceController implements RMController {
                 }
                 return userProjectsPath.resolve(projectName);
         }
+    }
+
+    private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
+        var projectPath = getProjectPath(projectId);
+        var relativeResourcePath = projectPath.relativize(targetPath);
+        var resourcePath = projectPath;
+
+        var result = new ArrayList<RMResource>();
+
+        for (var resourceName : relativeResourcePath) {
+            resourcePath = resourcePath.resolve(resourceName);
+            result.add(makeResourceFromPath(resourcePath, false, false));
+        }
+
+        return result;
     }
 
     private RMResource makeResourceFromPath(Path path, boolean readProperties, boolean readHistory) {
