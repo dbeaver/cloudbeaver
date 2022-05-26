@@ -17,6 +17,8 @@ query serverConfig {
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
 
+    resourceManagerEnabled
+
     licenseRequired
     licenseValid
 
