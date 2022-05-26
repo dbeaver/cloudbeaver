@@ -32,7 +32,7 @@ interface State {
   submit: () => Promise<void>;
 }
 
-const regex = /[`!@#%^&*()+=[\]{};':"\\|,<>/?~]/;
+const regex = /^(?!\.)[\p{L}\w\-$.\s]+$/u;
 
 export const SaveScriptDialog: DialogComponent<Payload, string> = observer(function SaveScriptDialog({
   payload,
@@ -49,16 +49,10 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
     validate() {
       this.errorMessage = null;
 
-      const match = this.value.match(regex);
+      const valid = regex.test(this.value.trim());
 
-      if (match) {
-        const message = translate(
-          'plugin_resource_manager_script_name_invalid_characters_message',
-          undefined,
-          { character: match[0] }
-        );
-
-        this.errorMessage = message;
+      if (!valid) {
+        this.errorMessage = translate('plugin_resource_manager_script_name_invalid_characters_message');
       }
     },
     async submit() {
