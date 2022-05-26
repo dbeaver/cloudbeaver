@@ -209,7 +209,7 @@ public class LocalResourceController implements RMController {
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
         }
-        List<RMResource> rmResourcePath = makeResourceTree(projectId, targetPath);
+        List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath);
         try {
             Files.delete(targetPath);
         } catch (IOException e) {
@@ -224,8 +224,8 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public RMResource[] getResourceTree(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
-        return makeResourceTree(projectId, getTargetPath(projectId, resourcePath)).toArray(RMResource[]::new);
+    public RMResource[] getResourcePath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        return makeResourcePath(projectId, getTargetPath(projectId, resourcePath)).toArray(RMResource[]::new);
     }
     
     @NotNull
@@ -275,6 +275,11 @@ public class LocalResourceController implements RMController {
     @Override
     public void addRMEventListener(RMEventListener listener) {
         this.listeners.add(listener);
+    }
+
+    @Override
+    public void removeRMEventListener(RMEventListener listener) {
+        this.listeners.remove(listener);
     }
 
     private void fireEvent(RMEvent event) {
@@ -365,7 +370,7 @@ public class LocalResourceController implements RMController {
         }
     }
 
-    private @NotNull List<RMResource> makeResourceTree(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
+    private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
         var projectPath = getProjectPath(projectId);
         var relativeResourcePath = projectPath.relativize(targetPath);
         var resourcePath = projectPath;
