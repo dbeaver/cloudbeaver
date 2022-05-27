@@ -94,6 +94,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.resourceQuotas ?? {};
   }
 
+  get resourceManagerEnabled() {
+    return this.update.resourceManagerEnabled ?? this.data?.resourceManagerEnabled ?? false;
+  }
+
   isFeatureEnabled(feature: string, serverSide = false): boolean {
     if (serverSide) {
       return this.data?.enabledFeatures.includes(feature) || false;
@@ -116,6 +120,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       || this.update.sessionExpireTime !== this.data.sessionExpireTime
 
       || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
+
+      || this.update.resourceManagerEnabled !== this.data.resourceManagerEnabled
 
       || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
       || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
@@ -218,6 +224,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     this.update.adminCredentialsSaveEnabled = serverConfig.adminCredentialsSaveEnabled;
     this.update.publicCredentialsSaveEnabled = serverConfig.publicCredentialsSaveEnabled;
+
+    this.update.resourceManagerEnabled = serverConfig.resourceManagerEnabled;
 
     this.update.customConnectionsEnabled = serverConfig.supportsCustomConnections;
     this.update.enabledAuthProviders = [...serverConfig.enabledAuthProviders];

@@ -10,20 +10,19 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-
-import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 @injectable()
 export class ResourceManagerService {
   get enabled() {
-    return !this.resourceManagerSettingsService.settings.getValue('disabled') && !!this.authInfoService.userInfo;
+    return this.serverConfigResource.resourceManagerEnabled && !!this.authInfoService.userInfo;
   }
 
   panelEnabled: boolean;
 
   constructor(
-    private readonly resourceManagerSettingsService: ResourceManagerSettingsService,
     private readonly authInfoService: AuthInfoService,
+    private readonly serverConfigResource: ServerConfigResource
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 

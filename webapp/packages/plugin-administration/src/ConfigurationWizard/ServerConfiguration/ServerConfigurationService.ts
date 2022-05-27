@@ -45,7 +45,7 @@ export class ServerConfigurationService {
   readonly saveTask: IExecutor<IServerConfigSaveData>;
   readonly validationTask: IExecutor<IServerConfigSaveData>;
   readonly configurationContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
-  readonly pluginsContainer: PlaceholderContainer;
+  readonly pluginsContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
 
   private done: boolean;
   private stateLinked: boolean;
