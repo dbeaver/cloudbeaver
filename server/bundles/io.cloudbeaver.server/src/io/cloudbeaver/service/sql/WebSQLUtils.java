@@ -22,6 +22,7 @@ import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.data.*;
@@ -32,6 +33,8 @@ import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.ContentUtils;
@@ -53,16 +56,27 @@ public class WebSQLUtils {
     private static final Log log = Log.getLog(WebSQLUtils.class);
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
-        if (type instanceof DBDAttributeBinding &&
-            (cellValue instanceof Date || cellValue instanceof Number)) {
-            if (cellValue instanceof BigDecimal) {
-                cellValue = ((BigDecimal) cellValue).stripTrailingZeros();
+        if (type instanceof DBDAttributeBinding) {
+            if (cellValue instanceof Date || cellValue instanceof Number) {
+                if (cellValue instanceof BigDecimal) {
+                    cellValue = ((BigDecimal) cellValue).stripTrailingZeros();
+                }
+                DBDAttributeBinding castedType = (DBDAttributeBinding) type;
+                DBSEntity entity = castedType.getDataContainer() instanceof DBSEntity ? (DBSEntity) castedType.getDataContainer() : null;
+                if (entity != null) {
+                    try {
+                        // get attrId
+                        DBSEntityAttribute attrId = entity.getAttribute(session.getProgressMonitor(), castedType.getName());
+                        // if attrId instance of IdAttribute (MongoDB)
+                        if (attrId != null && DBPDataKind.ROWID.equals(attrId.getDataKind())) {
+                            return cellValue;
+                        }
+                    } catch (DBException e) {
+                        return e;
+                    }
+                }
+                return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
             }
-            DBDAttributeBinding castedType = (DBDAttributeBinding) type;
-            if (DBPDataKind.DOCUMENT.equals(castedType.getTopParent().getDataKind()) && castedType.getAttribute().getName().equals("_id")) {
-                return cellValue;
-            }
-            return ((DBDAttributeBinding) type).getValueHandler().getValueDisplayString(type, cellValue, DBDDisplayFormat.EDIT);
         }
 
         if (cellValue instanceof Boolean) {
