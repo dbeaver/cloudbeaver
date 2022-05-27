@@ -32,7 +32,7 @@ interface State {
   submit: () => Promise<void>;
 }
 
-const regex = /^(?!\.)[\p{L}\w\-$.\s]+$/u;
+const regex = /^(?!\.)[\p{L}\w\-$.\s()]+$/u;
 
 export const SaveScriptDialog: DialogComponent<Payload, string> = observer(function SaveScriptDialog({
   payload,
