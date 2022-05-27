@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, PlaceholderComponent, Switch } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, GroupTitle, PlaceholderComponent, Switch } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
@@ -18,7 +18,7 @@ export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceho
     const translate = useTranslate();
 
     return styled(BASE_CONTAINERS_STYLES)(
-      <Group key='resourceManager' gap>
+      <>
         <GroupTitle>{translate('plugin_resource_manager_title')}</GroupTitle>
         <Switch
           name='resourceManagerEnabled'
@@ -30,6 +30,6 @@ export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceho
         >
           {translate('plugin_resource_manager_administration_settings_enable')}
         </Switch>
-      </Group>
+      </>
     );
   });

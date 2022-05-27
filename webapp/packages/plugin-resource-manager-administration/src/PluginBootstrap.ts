@@ -27,7 +27,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.serverConfigurationService.configurationContainer.add(ResourceManagerSettings, 1);
+    this.serverConfigurationService.pluginsContainer.add(ResourceManagerSettings, 0);
     this.serverConfigurationService.loadConfigTask.addHandler(this.loadConfigHandler);
   }
 
