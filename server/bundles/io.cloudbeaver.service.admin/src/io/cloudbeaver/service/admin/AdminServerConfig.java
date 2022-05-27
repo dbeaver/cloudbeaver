@@ -36,6 +36,7 @@ public class AdminServerConfig {
     private String adminPassword;
 
     private final boolean anonymousAccessEnabled;
+    private final boolean resourceManagerEnabled;
     private final boolean customConnectionsEnabled;
     private final boolean publicCredentialsSaveEnabled;
     private final boolean adminCredentialsSaveEnabled;
@@ -57,6 +58,7 @@ public class AdminServerConfig {
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
         this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
         this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+        this.resourceManagerEnabled = JSONUtils.getBoolean(params, "resourceManagerEnabled", appConfig.isResourceManagerEnabled());
 
         if (params.containsKey("enabledFeatures")) {
             this.enabledFeatures = JSONUtils.getStringList(params, "enabledFeatures");
@@ -155,5 +157,9 @@ public class AdminServerConfig {
 
     public String[] getDisabledDrivers() {
         return disabledDrivers;
+    }
+
+    public boolean isResourceManagerEnabled() {
+        return resourceManagerEnabled;
     }
 }

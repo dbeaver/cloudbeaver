@@ -258,6 +258,7 @@ export const TableViewer = observer<Props>(function TableViewer({
             {...splitState}
             sticky={30}
             mode={valuePanelDisplayed ? splitState.mode : 'minimize'}
+            disable={!valuePanelDisplayed}
             keepRatio
           >
             <Pane>
@@ -278,7 +279,7 @@ export const TableViewer = observer<Props>(function TableViewer({
                 />
               </pane-content>
             </Pane>
-            {valuePanelDisplayed && <ResizerControls />}
+            <ResizerControls />
             <Pane basis='30%' main>
               <pane-content>
                 {resultExist && (

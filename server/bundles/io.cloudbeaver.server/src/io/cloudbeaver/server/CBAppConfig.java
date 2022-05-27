@@ -105,6 +105,10 @@ public class CBAppConfig extends BaseWebAppConfiguration {
         this.anonymousAccessEnabled = anonymousAccessEnabled;
     }
 
+    public void setResourceManagerEnabled(boolean resourceManagerEnabled) {
+        this.resourceManagerEnabled = resourceManagerEnabled;
+    }
+    
     public boolean isSupportsCustomConnections() {
         return supportsCustomConnections;
     }

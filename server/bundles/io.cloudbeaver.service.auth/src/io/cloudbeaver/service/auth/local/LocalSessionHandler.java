@@ -72,6 +72,6 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
         if (connectionInfo == null) {
             throw new DBException("Connection info is null");
         }
-        WebServiceUtils.fireActionParametersOpenEditor(webSession, connectionInfo.getDataSourceContainer());
+        WebServiceUtils.fireActionParametersOpenEditor(webSession, connectionInfo.getDataSourceContainer(), false);
     }
 }

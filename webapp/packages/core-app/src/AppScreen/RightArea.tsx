@@ -60,6 +60,7 @@ export const RightArea = observer(function RightArea() {
           sticky={30}
           split="horizontal"
           mode={activeTools.length ? splitState.mode : 'minimize'}
+          disable={activeTools.length === 0}
           keepRatio
         >
           <Pane>
@@ -67,7 +68,7 @@ export const RightArea = observer(function RightArea() {
               <NavigationTabsBar />
             </ErrorBoundary>
           </Pane>
-          {!!activeTools.length && <ResizerControls />}
+          <ResizerControls />
           <Pane basis='30%' main>
             <ErrorBoundary remount>
               <ToolsPanel container={toolsPanelService.tabsContainer} />

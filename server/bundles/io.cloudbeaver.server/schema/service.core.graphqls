@@ -121,6 +121,7 @@ type ServerConfig {
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
+    resourceManagerEnabled: Boolean
 
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean

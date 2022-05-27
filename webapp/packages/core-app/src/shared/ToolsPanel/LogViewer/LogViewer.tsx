@@ -50,6 +50,7 @@ export const LogViewer = observer(function LogViewer() {
       <Split
         {...splitState}
         mode={logViewerState.selectedItem ? splitState.mode : 'maximize'}
+        disable={!logViewerState.selectedItem}
         keepRatio
       >
         <Pane>
@@ -60,17 +61,15 @@ export const LogViewer = observer(function LogViewer() {
             onClear={() => logViewerState.clearLog()}
           />
         </Pane>
-        {logViewerState.selectedItem && (
-          <>
-            <ResizerControls />
-            <Pane main>
-              <LogViewerInfoPanel
-                selectedItem={logViewerState.selectedItem}
-                onClose={closeInfoPanel}
-              />
-            </Pane>
-          </>
-        )}
+        <ResizerControls />
+        <Pane main>
+          {logViewerState.selectedItem && (
+            <LogViewerInfoPanel
+              selectedItem={logViewerState.selectedItem}
+              onClose={closeInfoPanel}
+            />
+          )}
+        </Pane>
       </Split>
     </log-view-wrapper>
   );
