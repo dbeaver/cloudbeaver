@@ -70,7 +70,6 @@ export class PluginBootstrap extends Bootstrap {
           });
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-
             try {
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
