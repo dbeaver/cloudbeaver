@@ -14,8 +14,8 @@ import { SessionExpireService } from '@cloudbeaver/core-root';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
-import { SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
 import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
@@ -27,7 +27,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly sqlEditorService: SqlEditorService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
@@ -64,9 +63,9 @@ export class PluginBootstrap extends Bootstrap {
         const tab = this.navigationTabsService.currentTab;
 
         if (action === ACTION_SAVE) {
-          const tabName = this.sqlEditorTabService.getName(state);
+          const name = getSqlEditorName(state);
           const result = await this.commonDialogService.open(SaveScriptDialog, {
-            defaultScriptName: tabName,
+            defaultScriptName: name,
           });
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
