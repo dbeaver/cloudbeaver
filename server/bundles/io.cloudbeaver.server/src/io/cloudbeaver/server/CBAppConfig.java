@@ -46,6 +46,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
     private boolean supportsConnectionBrowser;
     private boolean supportsUserWorkspaces;
     private boolean enableReverseProxyAuth;
+    private boolean forwardProxy;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
 
@@ -79,6 +80,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
         this.authConfiguration = new LinkedHashMap<>();
         this.resourceQuotas = new LinkedHashMap<>();
         this.enableReverseProxyAuth = false;
+        this.forwardProxy = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -98,6 +100,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
         this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
+        this.forwardProxy = src.forwardProxy;
     }
 
 
@@ -308,6 +311,13 @@ public class CBAppConfig extends BaseWebAppConfiguration {
 
     public boolean isEnabledReverseProxyAuth() {
         return enableReverseProxyAuth;
+    }
+
+    ////////////////////////////////////////////
+    // Forward proxy
+
+    public boolean isEnabledForwardProxy() {
+        return forwardProxy;
     }
 
 }
