@@ -154,7 +154,9 @@ public class WebNavigatorNodeInfo {
                     features.add("canDelete");
                 }
                 if (objectManager instanceof DBEObjectRenamer && ((DBEObjectRenamer) objectManager).canRenameObject(object)) {
-                    features.add("canRename");
+                    if (!object.getDataSource().getContainer().getNavigatorSettings().isShowOnlyEntities()) {
+                        features.add("canRename");
+                    }
                 }
             }
         }
