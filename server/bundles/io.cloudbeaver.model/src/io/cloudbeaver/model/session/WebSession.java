@@ -546,7 +546,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
         clearAuthTokens();
         this.sessionAuthContext.close();
-        this.user = null;
+        setUser(null);
 
         if (this.sessionProject != null) {
             this.sessionProject.dispose();
@@ -760,7 +760,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
         if (application.isConfigurationMode() && this.user == null && newUser != null) {
             //FIXME hotfix to avoid exception after external auth provider login in easy config
-            this.user = newUser;
+            setUser(newUser);
             refreshUserData();
         } else if (!CommonUtils.equalObjects(this.user, newUser)) {
             throw new DBException("Can't authorize different users in the single session");
@@ -912,8 +912,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.rmController = application.getResourceController(this);
 
-        this.user = tokenInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(tokenInfo.getUserId()));
+        setUser(tokenInfo.getUserId() == null ? null : new WebUser(securityController.getUserById(tokenInfo.getUserId())));
         refreshUserData();
+    }
+
+    private synchronized void setUser(@Nullable WebUser user) {
+        this.user = user;
     }
 
     @Override
