@@ -77,11 +77,6 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   });
 
   const folders = navNodeViewService.getFolders(nodeId) || [];
-
-  function openFolder(tabData: ITabData) {
-    navNodeManagerService.navToNode(nodeId, parentId, tabData.tabId);
-  }
-
   const wrongFolder = (
     !folders.includes(folderId)
     && folders.length > 0
@@ -93,6 +88,15 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   if (wrongFolder) {
     folderId = folders[0];
   }
+
+  function openFolder(tabData: ITabData) {
+    if (tabData.tabId === folderId) {
+      return;
+    }
+
+    navNodeManagerService.navToNode(nodeId, parentId, tabData.tabId);
+  }
+
 
   useEffect(() => {
     if (wrongFolder) {

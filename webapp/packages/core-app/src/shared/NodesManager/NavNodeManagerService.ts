@@ -327,13 +327,7 @@ export class NavNodeManagerService extends Bootstrap {
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
-      let connection: Connection | null;
-      try {
-        connection = await this.connectionsManagerService.requireConnection(nodeInfo.connection.id);
-      } catch (exception: any) {
-        this.notificationService.logException(exception);
-        throw exception;
-      }
+      const connection = await this.connectionsManagerService.requireConnection(nodeInfo.connection.id);
 
       if (!connection?.connected) {
         throw new Error('Connection not established');
