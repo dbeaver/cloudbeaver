@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
@@ -245,6 +246,7 @@ public class WebServiceUtils extends WebCommonUtils {
             if (authProperties == null) {
                 authProperties = new LinkedHashMap<>();
             }
+            authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
         } else {
             if (authProperties == null) {
                 // No changes
