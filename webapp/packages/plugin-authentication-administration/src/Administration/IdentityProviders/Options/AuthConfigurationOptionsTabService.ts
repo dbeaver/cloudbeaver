@@ -180,6 +180,9 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     if (state.info.signOutLink) {
       state.config.signOutLink = state.info.signOutLink;
     }
+    if (state.info.redirectLink) {
+      state.config.redirectLink = state.info.redirectLink;
+    }
     if (state.info.parameters) {
       state.config.parameters = { ...state.info.parameters };
     }

@@ -25,6 +25,7 @@ query saveAuthProviderConfiguration(
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }

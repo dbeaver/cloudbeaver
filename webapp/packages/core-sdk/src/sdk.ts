@@ -26,6 +26,7 @@ export interface AdminAuthProviderConfiguration {
   metadataLink?: Maybe<Scalars['String']>;
   parameters: Scalars['Object'];
   providerId: Scalars['ID'];
+  redirectLink?: Maybe<Scalars['String']>;
   signInLink?: Maybe<Scalars['String']>;
   signOutLink?: Maybe<Scalars['String']>;
 }
@@ -1532,7 +1533,7 @@ export type GetAuthProviderConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; metadataLink?: string }> };
+export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; redirectLink?: string; metadataLink?: string }> };
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1555,7 +1556,7 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
 }>;
 
 
-export type SaveAuthProviderConfigurationQuery = { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; metadataLink?: string } };
+export type SaveAuthProviderConfigurationQuery = { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; redirectLink?: string; metadataLink?: string } };
 
 export type SaveUserMetaParametersQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2759,6 +2760,7 @@ export const GetAuthProviderConfigurationsDocument = `
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }
@@ -2827,6 +2829,7 @@ export const SaveAuthProviderConfigurationDocument = `
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }
