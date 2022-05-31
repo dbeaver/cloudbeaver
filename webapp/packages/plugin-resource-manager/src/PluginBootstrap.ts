@@ -9,6 +9,8 @@
 import { DATA_CONTEXT_NAV_NODE, EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
 import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
@@ -24,9 +26,11 @@ export class PluginBootstrap extends Bootstrap {
     private readonly resourceManagerService: ResourceManagerService,
     private readonly sideBarPanelService: SideBarPanelService,
     private readonly navResourceNodeService: NavResourceNodeService,
+    private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -75,12 +79,16 @@ export class PluginBootstrap extends Bootstrap {
         if (action === ACTION_DELETE) {
           const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
             title: 'ui_data_delete_confirmation',
-            message: `You are going to delete "${node.name}". Are you sure?`,
+            message: this.localizationService.translate('plugin_resource_manager_script_delete_confirmation', undefined, { name: node.name }),
             confirmActionText: 'ui_delete',
           });
 
           if (result === DialogueStateResult.Resolved) {
-            this.navResourceNodeService.delete(node.id);
+            try {
+              await this.navResourceNodeService.delete(node.id);
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'plugin_resource_manager_delete_script_error');
+            }
           }
         }
       },
