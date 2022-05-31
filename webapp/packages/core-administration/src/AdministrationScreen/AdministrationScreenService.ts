@@ -62,17 +62,17 @@ export class AdministrationScreenService {
     return this.serverConfigResource.publicDisabled;
   }
 
-  readonly ensurePermissions: IExecutor<void>;
+  readonly ensurePermissions: IExecutor;
   readonly activationEvent: IExecutor<boolean>;
 
   constructor(
-    private permissionsResource: PermissionsResource,
-    private permissionsService: PermissionsService,
-    private screenService: ScreenService,
-    private administrationItemService: AdministrationItemService,
-    private autoSaveService: LocalStorageSaveService,
-    private serverConfigResource: ServerConfigResource,
-    private notificationService: NotificationService
+    private readonly permissionsResource: PermissionsResource,
+    private readonly permissionsService: PermissionsService,
+    private readonly screenService: ScreenService,
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly autoSaveService: LocalStorageSaveService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly notificationService: NotificationService
   ) {
     this.info = {
       workspaceId: '',
@@ -163,8 +163,8 @@ export class AdministrationScreenService {
     );
   }
 
-  getItemState<T>(name: string): T | undefined
-  getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T
+  getItemState<T>(name: string): T | undefined;
+  getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T;
   getItemState<T>(
     name: string,
     defaultState?: () => T,
@@ -224,7 +224,7 @@ export class AdministrationScreenService {
   }
 
   async handleCanDeActivate(fromState: RouterState, toState: RouterState): Promise<boolean> {
-    if (!fromState.params?.item) {
+    if (!fromState.params.item) {
       return true;
     }
 
@@ -243,7 +243,7 @@ export class AdministrationScreenService {
   }
 
   async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
-    if (!toState.params?.item) {
+    if (!toState.params.item) {
       return false;
     }
 

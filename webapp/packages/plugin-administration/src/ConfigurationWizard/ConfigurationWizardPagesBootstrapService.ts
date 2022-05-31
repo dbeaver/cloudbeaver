@@ -21,9 +21,9 @@ import { WelcomePage } from './Welcome/WelcomePage';
 @injectable()
 export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
   constructor(
-    private administrationItemService: AdministrationItemService,
-    private configurationWizardService: ConfigurationWizardService,
-    private serverConfigurationService: ServerConfigurationService
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly configurationWizardService: ConfigurationWizardService,
+    private readonly serverConfigurationService: ServerConfigurationService
   ) {
     super();
   }
@@ -57,7 +57,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         ),
       },
       order: 4,
-      onActivate: () => this.serverConfigurationService.loadConfig(),
+      onActivate: () => this.serverConfigurationService.activate(),
       onDeActivate: this.serverConfigurationService.deactivate.bind(this.serverConfigurationService),
       onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService, false),
       getContentComponent: () => ServerConfigurationPage,

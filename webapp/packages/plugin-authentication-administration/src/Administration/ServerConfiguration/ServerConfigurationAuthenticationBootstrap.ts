@@ -31,7 +31,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
 
   load(): void { }
 
-  private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
+  private readonly loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
     if (!data.reset) {
       return;
     }
@@ -63,7 +63,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     }
   };
 
-  private validateForm: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
+  private readonly validateForm: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
     await this.authProvidersResource.loadAll();
     const administratorPresented = data.configurationWizard && this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
 

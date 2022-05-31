@@ -20,12 +20,12 @@ export type ApplicationFeature = WebFeatureSet;
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[], void | any> {
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
   ) {
     super([]);
 
-    this.sync(serverConfigResource);
+    this.sync(serverConfigResource, () => {}, () => {});
   }
 
   protected async loader(): Promise<ApplicationFeature[]> {

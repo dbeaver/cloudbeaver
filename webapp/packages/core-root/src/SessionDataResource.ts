@@ -12,13 +12,13 @@ import { CachedDataResource } from '@cloudbeaver/core-sdk';
 import { SessionResource } from './SessionResource';
 
 @injectable()
-export class SessionDataResource extends CachedDataResource<null, void> {
+export class SessionDataResource extends CachedDataResource<null> {
   constructor(
     sessionResource: SessionResource
   ) {
     super(null);
 
-    this.sync(sessionResource);
+    this.sync(sessionResource, () => {}, () => {});
   }
 
   protected async loader(): Promise<null> {

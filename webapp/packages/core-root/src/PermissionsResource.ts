@@ -15,12 +15,12 @@ import { SessionDataResource } from './SessionDataResource';
 @injectable()
 export class PermissionsResource extends CachedDataResource<Set<string>> {
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource
   ) {
     super(new Set());
 
-    this.sync(sessionDataResource);
+    this.sync(sessionDataResource, () => {}, () => {});
   }
 
   require(resource: CachedResource<any, any, any, any>, ...permissions: string[]): this {

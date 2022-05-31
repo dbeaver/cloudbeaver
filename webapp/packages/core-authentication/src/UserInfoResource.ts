@@ -41,7 +41,7 @@ UserInfoIncludes
 
     this.userChange = new SyncExecutor();
 
-    this.sync(sessionResource);
+    this.sync(sessionResource, () => {}, () => {});
 
     makeObservable(this, {
       parametersAvailable: computed,

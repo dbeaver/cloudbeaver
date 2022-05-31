@@ -42,7 +42,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   ) {
     super();
 
-    this.preloadResource(serverConfigResource, () => undefined);
+    this.preloadResource(serverConfigResource, () => {});
     this.serverConfigResource.outdateResource(this);
 
     this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
