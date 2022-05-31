@@ -16,5 +16,5 @@ export default [
   ['plugin_resource_manager_script_not_found_title', 'Не удалось найти привязанный скрипт'],
   ['plugin_resource_manager_script_delete_confirmation', 'Вы удаляете "{args.name}". Удалить?'],
   ['plugin_resource_manager_script_not_found_message', 'Возможно скрипт был удален или переименован. Будет использовано последнее известное значение'],
-  ['plugin_resource_manager_script_name_invalid_characters_message', 'Имя скрипта может содержать следующие символы "_-$.()" и не может начинаться с точки'],
+  ['plugin_resource_manager_script_name_invalid_characters_message', 'Имя скрипта может содержать следующие символы "_-$.()@" и не может начинаться с точки'],
 ];

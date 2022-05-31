@@ -16,5 +16,5 @@ export default [
   ['plugin_resource_manager_script_delete_confirmation', 'You are going to delete "{args.name}". Are you sure?'],
   ['plugin_resource_manager_script_not_found_title', '找不到关联的脚本'],
   ['plugin_resource_manager_script_not_found_message', '脚本可能被删除或重命名，将使用最后的有效值'],
-  ['plugin_resource_manager_script_name_invalid_characters_message', 'Script\'s name may contain the following symbols "_-$.()" and can\'t start with a dot'],
+  ['plugin_resource_manager_script_name_invalid_characters_message', 'Script\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
 ];

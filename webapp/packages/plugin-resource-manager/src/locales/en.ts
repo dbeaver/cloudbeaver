@@ -16,5 +16,5 @@ export default [
   ['plugin_resource_manager_script_not_found_title', 'Failed to find the associated script'],
   ['plugin_resource_manager_script_delete_confirmation', 'You are going to delete "{args.name}". Are you sure?'],
   ['plugin_resource_manager_script_not_found_message', 'The script was probably removed or renamed. The last known value will be used'],
-  ['plugin_resource_manager_script_name_invalid_characters_message', 'Script\'s name may contain the following symbols "_-$.()" and can\'t start with a dot'],
+  ['plugin_resource_manager_script_name_invalid_characters_message', 'Script\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
 ];
