@@ -84,6 +84,12 @@ public class WebAuthProviderConfiguration {
     }
 
     @Property
+    public String getRedirectLink() throws DBException {
+        SMAuthProvider<?> instance = providerDescriptor.getInstance();
+        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getRedirectLink(getId(), config.getParameters()) : null;
+    }
+
+    @Property
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;

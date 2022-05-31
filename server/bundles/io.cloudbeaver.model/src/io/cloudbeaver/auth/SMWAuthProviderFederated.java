@@ -41,4 +41,9 @@ public interface SMWAuthProviderFederated {
     @Nullable
     String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
+    @Nullable
+    default String getRedirectLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
+        return null;
+    }
+
 }

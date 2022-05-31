@@ -49,7 +49,7 @@ public class LocalResourceController implements RMController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
 
-    private static final String FILE_REGEX = "(?U)[\\w.$() -]+";
+    private static final String FILE_REGEX = "(?U)[\\w.$()@ -]+";
 
     private static final String PROJECT_PREFIX_GLOBAL = "g_";
     private static final String PROJECT_PREFIX_SHARED = "s_";
@@ -388,7 +388,7 @@ public class LocalResourceController implements RMController {
 
     private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
         var projectPath = getProjectPath(projectId);
-        var relativeResourcePath = projectPath.relativize(targetPath);
+        var relativeResourcePath = projectPath.relativize(targetPath.toAbsolutePath());
         var resourcePath = projectPath;
 
         var result = new ArrayList<RMResource>();

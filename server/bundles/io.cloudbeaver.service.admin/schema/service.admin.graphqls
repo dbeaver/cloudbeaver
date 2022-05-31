@@ -66,6 +66,7 @@ type AdminAuthProviderConfiguration {
 
     signInLink: String
     signOutLink: String
+    redirectLink: String
     metadataLink: String
 }
 
