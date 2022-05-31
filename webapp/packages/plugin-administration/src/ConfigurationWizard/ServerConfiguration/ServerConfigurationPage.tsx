@@ -126,7 +126,11 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                 <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
                 <ServerConfigurationNavigatorViewForm configs={service.state} />
                 <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
-                <Placeholder container={service.pluginsContainer} />
+                <Placeholder
+                  container={service.pluginsContainer}
+                  configurationWizard={configurationWizard}
+                  state={service.state}
+                />
               </Group>
               <Placeholder
                 container={service.configurationContainer}

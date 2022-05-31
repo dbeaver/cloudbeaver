@@ -26,7 +26,6 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  io.cloudbeaver.model;visibility:=reexport,
  io.cloudbeaver.service.security;visibility:=reexport
 Export-Package: io.cloudbeaver,
- io.cloudbeaver.auth.provider.fa,
  io.cloudbeaver.model,
  io.cloudbeaver.model.resources,
  io.cloudbeaver.model.user,

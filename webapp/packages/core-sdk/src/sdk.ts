@@ -1341,6 +1341,7 @@ export interface ServerConfig {
   productInfo: ProductInfo;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   redirectOnFederatedAuth?: Maybe<Scalars['Boolean']>;
+  resourceManagerEnabled?: Maybe<Scalars['Boolean']>;
   resourceQuotas: Scalars['Object'];
   rootURI: Scalars['String'];
   serverURL: Scalars['String'];
@@ -1365,6 +1366,7 @@ export interface ServerConfigInput {
   enabledAuthProviders?: InputMaybe<Array<Scalars['ID']>>;
   enabledFeatures?: InputMaybe<Array<Scalars['ID']>>;
   publicCredentialsSaveEnabled?: InputMaybe<Scalars['Boolean']>;
+  resourceManagerEnabled?: InputMaybe<Scalars['Boolean']>;
   serverName?: InputMaybe<Scalars['String']>;
   serverURL?: InputMaybe<Scalars['String']>;
   sessionExpireTime?: InputMaybe<Scalars['Int']>;
@@ -2292,7 +2294,7 @@ export type ReadSessionLogQuery = { log: Array<{ time?: any; type: string; messa
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; resourceQuotas: any; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
+export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; resourceManagerEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; resourceQuotas: any; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3627,6 +3629,7 @@ export const ServerConfigDocument = `
     anonymousAccessEnabled
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
+    resourceManagerEnabled
     licenseRequired
     licenseValid
     configurationMode
