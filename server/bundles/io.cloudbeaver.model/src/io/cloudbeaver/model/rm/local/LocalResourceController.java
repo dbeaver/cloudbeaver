@@ -388,7 +388,7 @@ public class LocalResourceController implements RMController {
 
     private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
         var projectPath = getProjectPath(projectId);
-        var relativeResourcePath = projectPath.relativize(targetPath);
+        var relativeResourcePath = projectPath.relativize(targetPath.toAbsolutePath());
         var resourcePath = projectPath;
 
         var result = new ArrayList<RMResource>();
