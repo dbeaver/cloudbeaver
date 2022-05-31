@@ -181,7 +181,11 @@ public class WebDatabaseObjectInfo {
             }
         }
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
-        if (object instanceof DBSEntity && !(object instanceof DBSDataType) && isDiagramSupported) {
+        if (object instanceof DBSEntity &&
+            !(object instanceof DBSDataType) &&
+            !(object instanceof DBSDocumentContainer) &&
+            isDiagramSupported
+        ) {
             features.add(OBJECT_FEATURE_ENTITY);
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
