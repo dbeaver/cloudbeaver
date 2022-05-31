@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
+import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 import org.jkiss.utils.CommonUtils;
 
@@ -181,7 +182,11 @@ public class WebDatabaseObjectInfo {
             }
         }
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
-        if (object instanceof DBSEntity && !(object instanceof DBSDataType) && isDiagramSupported) {
+        if (object instanceof DBSEntity &&
+            !(object instanceof DBSDataType) &&
+            !(object instanceof DBSDocumentContainer) &&
+            isDiagramSupported
+        ) {
             features.add(OBJECT_FEATURE_ENTITY);
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
@@ -190,7 +195,7 @@ public class WebDatabaseObjectInfo {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
-                if (DBSEntity.class.isAssignableFrom(childType)) {
+                if (DBSTable.class.isAssignableFrom(childType)) {
                     features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
             } catch (Exception e) {
