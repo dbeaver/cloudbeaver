@@ -7,4 +7,3 @@ export * from './ObjectPage/DBObjectPageService';
 export * from './ObjectPage/ObjectPage';
 export * from './ObjectViewerTabService';
 export * from './IObjectViewerTabState';
-export * from './DATA_CONTEXT_OBJECT_ID';
