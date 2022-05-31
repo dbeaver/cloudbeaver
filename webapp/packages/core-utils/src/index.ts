@@ -39,3 +39,7 @@ export * from './bytesToSize';
 export * from './isDefined';
 export * from './createPath';
 export * from './debounce';
+export * from './blobToData';
+export * from './svgToDataUri';
+export * from './uriToBlob';
+export * from './utf8ToBase64';
