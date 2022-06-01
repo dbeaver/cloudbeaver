@@ -280,7 +280,9 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private async saveUserStatus() {
-    await this.usersResource.enableUser(this.user.userId, this.enabled);
+    if (this.enabled !== this.user.enabled) {
+      await this.usersResource.enableUser(this.user.userId, this.enabled);
+    }
   }
 
   private async saveConnectionPermissions() {
