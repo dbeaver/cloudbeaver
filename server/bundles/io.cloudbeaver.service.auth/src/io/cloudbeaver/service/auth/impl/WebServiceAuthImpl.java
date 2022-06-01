@@ -287,7 +287,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             SMUser userWithDetails = webSession.getSecurityController().getUserById(webSession.getUser().getUserId());
             if (userWithDetails != null) {
                 // USer not saved yet. This may happen in easy config mode
-                return new WebUserInfo(webSession, new WebUser(userWithDetails));
+                var webUser = new WebUser(userWithDetails);
+                webUser.setDisplayName(webSession.getUser().getDisplayName());
+                return new WebUserInfo(webSession, webUser);
             } else {
                 return new WebUserInfo(webSession, webSession.getUser());
             }

@@ -217,6 +217,17 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return user;
     }
 
+    public synchronized Map<String, String> getUserMetaParameters() {
+        if (user == null) {
+            return Map.of();
+        }
+        var allMetaParams = new HashMap<>(user.getMetaParameters());
+
+        getAllAuthInfo().forEach(authInfo -> allMetaParams.putAll(authInfo.getUserIdentity().getMetaParameters()));
+
+        return allMetaParams;
+    }
+
     public synchronized String getUserId() {
         return user == null ? null : user.getUserId();
     }
