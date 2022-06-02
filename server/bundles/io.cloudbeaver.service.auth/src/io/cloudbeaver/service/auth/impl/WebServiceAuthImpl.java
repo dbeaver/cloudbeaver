@@ -57,6 +57,7 @@ import java.util.Map;
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
+    public static final String CONFIG_TEMP_ADMIN_USER_ID = "temp_config_admin";
 
     @Override
     public WebAuthInfo authLogin(
@@ -107,7 +108,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
 
             WebUser user = null;
-            String userId = null;
+            String userId;
             SMSession authSession;
             if (configMode) {
                 if (webSession.getUser() != null) {
@@ -123,7 +124,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         userCredentials,
                         webSession.getUserId());
                 } else {
-                    userId = "temp_config_admin";
+                    userId = CONFIG_TEMP_ADMIN_USER_ID;
                 }
             } else {
                 WebUser curUser = webSession.getUser();
@@ -131,6 +132,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     try {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
                         userId = smAuthInfo.getUserInfo().getUserId();
+                        if (userId == null) {
+                            throw new SMException("Anonymous authentication restricted");
+                        }
                         webSession.updateSMAuthInfo(smAuthInfo);
                         curUser = webSession.getUser();
                         securityController = webSession.getSecurityController();
@@ -242,7 +246,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean isAdmin = false;
 
         try {
-            SMAuthInfo authInfo = securityController.authenticate(session.getSessionId(), session.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
+            SMAuthInfo authInfo = securityController.authenticate(
+                session.getSessionId(),
+                session.getSessionParameters(),
+                WebSession.CB_SESSION_TYPE,
+                authProvider.getId(),
+                userCredentials);
 
             isAdmin = authInfo.getUserInfo().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
         } catch (DBException e) {
@@ -258,23 +267,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         webSession.removeAuthInfo(providerId);
-    }
-
-    @Override
-    public WebAuthInfo tryFederatedLogin(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
-        return null;
-/*
-        try {
-            DBASession spaceSession = webSession.getSessionContext().getSpaceSession(webSession.getProgressMonitor(), webSession.getSessionSpace());
-            if (spaceSession instanceof DBASessionFederated) {
-                throw new DBCException("Federated session discover not implemented yet");
-            } else {
-                throw new DBCException("Federated session required");
-            }
-        } catch (DBException e) {
-            throw new DBWebException("Error while discovering federated session", e);
-        }
-*/
     }
 
     @Override

@@ -373,7 +373,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
+    public void setUserCredentials(@NotNull String userId, @NotNull String authProviderId, @NotNull Map<String, Object> credentials) throws DBException {
         var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
@@ -514,7 +514,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public String[] getUserLinkedProviders(String userId) throws DBException {
+    public String[] getUserLinkedProviders(@NotNull String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
