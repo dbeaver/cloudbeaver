@@ -7,7 +7,7 @@
  */
 
 import { action, computed, observable, runInAction } from 'mobx';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -117,7 +117,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
       await connectionInfoResource.load(CachedMapAllKey);
-      const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.fullPath);
+      const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.state.fullPath);
 
       if (!preloaded) {
         return;
@@ -459,19 +459,23 @@ export function useElementsTree(options: IOptions): IElementsTree {
     runInAction(() => {
       const folderExplorer = options.folderExplorer;
 
-      if (folderExplorer.fullPath.length === 1) {
+      if (folderExplorer.state.fullPath.length === 1 || nodeId === options.baseRoot) {
         return;
       }
 
-      const pathIndex = folderExplorer.fullPath.indexOf(nodeId);
+      const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
 
       if (pathIndex >= 0) {
-        folderExplorer.fullPath = folderExplorer.fullPath.slice(0, pathIndex);
-        folderExplorer.folder = folderExplorer.fullPath[pathIndex - 1];
-        folderExplorer.path = folderExplorer.fullPath.slice(0, pathIndex - 1);
+        folderExplorer.state.fullPath = folderExplorer.state.fullPath.slice(0, pathIndex);
+        folderExplorer.state.folder = folderExplorer.state.fullPath[pathIndex - 1];
+        folderExplorer.state.path = folderExplorer.state.fullPath.slice(0, pathIndex - 1);
       }
     });
   }
+
+  useEffect(() => {
+    functionsRef.loadTree(options.root);
+  }, [options.root]);
 
   const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
     functionsRef.loadTree(options.root);
@@ -483,7 +487,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   });
 
   useExecutor({
-    executor: navNodeInfoResource.onItemAdd,
+    executor: navTreeResource.onItemAdd,
     handlers: [function exitFolder(key) {
       ResourceKeyUtils.forEach(key, key => {
         const children = navTreeResource.get(key);

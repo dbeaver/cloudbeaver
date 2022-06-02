@@ -92,13 +92,15 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
-  const folderExplorer = useFolderExplorer(baseRoot);
+  const folderExplorer = useFolderExplorer(baseRoot, {
+    saveState: settings?.saveExpanded,
+  });
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const ref = useObjectRef({ settings, getChildren, loadChildren });
 
-  const root = folderExplorer.folder;
-  const fullPath = folderExplorer.fullPath;
+  const root = folderExplorer.state.folder;
+  const fullPath = folderExplorer.state.fullPath;
 
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
@@ -137,7 +139,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         return false;
       }
 
-      return await autoOpenFolders(root, folderExplorer.path);
+      return await autoOpenFolders(root, folderExplorer.state.path);
     },
   });
 
@@ -218,7 +220,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const filter = settings?.filter;
 
   useEffect(() => {
-    if (!foldersTree && folderExplorer.folder !== baseRoot) {
+    if (!foldersTree && folderExplorer.state.folder !== baseRoot) {
       folderExplorer.open([], baseRoot);
     }
     if (!filter && tree.filtering) {
@@ -249,7 +251,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                   <NavigationNodeNested
                     nodeId={root}
                     component={NavigationNodeElement}
-                    path={folderExplorer.path}
+                    path={folderExplorer.state.path}
                     root
                   />
                   {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
