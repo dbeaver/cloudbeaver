@@ -64,8 +64,6 @@ public class WebServiceUtils extends WebCommonUtils {
     private static final Log log = Log.getLog(WebServiceUtils.class);
 
     private static final Gson gson = new GsonBuilder().create();
-    private static final String DRIVER_PROPERTY_REGEX = "^\\{\\w+}$";
-    private static final String SERVER_NAME = "{server}";
 
     @NotNull
     public static DBPDriver getDriverById(String id) throws DBWebException {
