@@ -43,6 +43,7 @@ import java.util.Map;
 public class WebDatabaseDriverConfig {
 
     public static final String URL_SERVER_FIELD = "{server}";
+    public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
     private final DBPDriver driver;
     private String id;
@@ -247,5 +248,13 @@ public class WebDatabaseDriverConfig {
             return false;
         }
         return driver.getSampleURL().contains(URL_SERVER_FIELD);
+    }
+
+    @Property
+    public boolean getRequiresDatabaseName() {
+        if (driver.getSampleURL() == null) {
+            return false;
+        }
+        return driver.getSampleURL().matches(URL_DATABASE_FIELD);
     }
 }

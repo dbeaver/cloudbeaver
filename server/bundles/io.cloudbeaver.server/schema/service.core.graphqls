@@ -196,6 +196,7 @@ type DriverInfo {
     embedded: Boolean
     enabled: Boolean!
     requiresServerName: Boolean
+    requiresDatabaseName: Boolean
 
     # this fields must be removed and be replaced by DriverAuthModel
     allowsEmptyPassword: Boolean @deprecated
