@@ -78,6 +78,7 @@ export class ServerConfigurationService {
 
     this.loadConfigTask
       .next(this.validationTask, () => this.getSaveData(false))
+      .addHandler(ExecutorInterrupter.interrupter(() => this.loading))
       .addHandler(() => { this.loading = true; })
       .addHandler(this.loadServerConfig)
       .addPostHandler(() => {
@@ -133,6 +134,10 @@ export class ServerConfigurationService {
 
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
         this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
+
+        if (reset) {
+          this.serverConfigResource.resetUpdate();
+        }
 
         this.stateLinked = true;
       }
@@ -263,6 +268,7 @@ export class ServerConfigurationService {
 
     if (
       close
+      || !this.stateLinked
       || this.unSaveNotification
       || this.administrationScreenService.isConfigurationMode
       // || !this.administrationScreenService.isAdministrationPageActive
