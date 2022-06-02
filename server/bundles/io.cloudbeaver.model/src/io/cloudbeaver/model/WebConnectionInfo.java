@@ -29,14 +29,12 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -318,7 +316,26 @@ public class WebConnectionInfo {
 
     @Property
     public Map<String, String> getProviderProperties() {
-        return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
+        Map<String, String> properties = new LinkedHashMap<>(dataSourceContainer.getConnectionConfiguration().getProviderProperties());
+        DBPPropertyDescriptor[] propertyDescriptors = dataSourceContainer.getDriver().getProviderPropertyDescriptors();
+        for (DBPPropertyDescriptor descriptor : propertyDescriptors) {
+            String descriptorId = descriptor.getId();
+            switch (descriptorId.substring(1, descriptorId.length() - 1)) {
+                case (DBPConnectionConfiguration.VARIABLE_DATABASE):
+                    properties.put(descriptorId, getDatabaseName());
+                    break;
+                case (DBPConnectionConfiguration.VARIABLE_SERVER):
+                    properties.put(descriptorId, getServerName());
+                    break;
+                case (DBPConnectionConfiguration.VARIABLE_HOST):
+                    properties.put(descriptorId, getHost());
+                    break;
+                case (DBPConnectionConfiguration.VARIABLE_PORT):
+                    properties.put(descriptorId, getPort());
+                    break;
+            }
+        }
+        return properties;
     }
 
     @Override

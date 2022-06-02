@@ -64,8 +64,8 @@ public class WebServiceUtils extends WebCommonUtils {
     private static final Log log = Log.getLog(WebServiceUtils.class);
 
     private static final Gson gson = new GsonBuilder().create();
-    private static final String DATABASE_NAME = "database";
-    private static final String SERVER_NAME = "server";
+    private static final String DRIVER_PROPERTY_REGEX = "^\\{\\w+}$";
+    private static final String SERVER_NAME = "{server}";
 
     @NotNull
     public static DBPDriver getDriverById(String id) throws DBWebException {
@@ -149,10 +149,29 @@ public class WebServiceUtils extends WebCommonUtils {
     public static void setConnectionConfiguration(DBPDriver driver, DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
         // Save provider props
         if (config.getProviderProperties() != null) {
-            dsConfig.setProviderProperties(new LinkedHashMap<>());
+            Map<String, String> properties = new LinkedHashMap<>();
             for (Map.Entry<String, Object> e : config.getProviderProperties().entrySet()) {
-                dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
+                String descriptorId = e.getKey();
+                String value = CommonUtils.toString(e.getValue());
+                switch (descriptorId.substring(1, descriptorId.length() - 1)) {
+                    case (DBPConnectionConfiguration.VARIABLE_DATABASE):
+                        dsConfig.setDatabaseName(value);
+                        break;
+                    case (DBPConnectionConfiguration.VARIABLE_SERVER):
+                        dsConfig.setServerName(value);
+                        break;
+                    case (DBPConnectionConfiguration.VARIABLE_HOST):
+                        dsConfig.setHostName(value);
+                        break;
+                    case (DBPConnectionConfiguration.VARIABLE_PORT):
+                        dsConfig.setHostPort(value);
+                        break;
+                    default:
+                        properties.put(descriptorId, value);
+                        break;
+                }
             }
+            dsConfig.setProviderProperties(properties);
         }
         if (!CommonUtils.isEmpty(config.getUrl())) {
             dsConfig.setUrl(config.getUrl());
@@ -165,13 +184,9 @@ public class WebServiceUtils extends WebCommonUtils {
             }
             if (config.getDatabaseName() != null) {
                 dsConfig.setDatabaseName(config.getDatabaseName());
-            } else {
-                dsConfig.setDatabaseName(dsConfig.getProviderProperty(DATABASE_NAME));
             }
             if (config.getServerName() != null) {
                 dsConfig.setServerName(config.getServerName());
-            } else {
-                dsConfig.setServerName(dsConfig.getProviderProperty(SERVER_NAME));
             }
             dsConfig.setUrl(driver.getConnectionURL(dsConfig));
         }
