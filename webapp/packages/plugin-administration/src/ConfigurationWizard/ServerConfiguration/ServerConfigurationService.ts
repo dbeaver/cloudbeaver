@@ -78,7 +78,6 @@ export class ServerConfigurationService {
 
     this.loadConfigTask
       .next(this.validationTask, () => this.getSaveData(false))
-      .addHandler(ExecutorInterrupter.interrupter(() => this.loading))
       .addHandler(() => { this.loading = true; })
       .addHandler(this.loadServerConfig)
       .addPostHandler(() => {
@@ -130,6 +129,7 @@ export class ServerConfigurationService {
           }
         );
 
+        this.stateLinked = true;
         await this.serverConfigResource.load();
 
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
@@ -139,7 +139,6 @@ export class ServerConfigurationService {
           this.serverConfigResource.resetUpdate();
         }
 
-        this.stateLinked = true;
       }
 
       await this.loadConfigTask.execute({
