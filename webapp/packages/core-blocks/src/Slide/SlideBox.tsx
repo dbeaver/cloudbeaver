@@ -30,7 +30,7 @@ export const SlideBox: React.FC<Props> = function SlideBox({ children, className
       div.addEventListener('scroll', handleScroll);
     }
 
-    return () => { 
+    return () => {
       if (div) {
         div.removeEventListener('scroll', handleScroll);
       }
