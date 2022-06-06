@@ -49,7 +49,7 @@ public class LocalResourceController implements RMController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
 
-    private static final String FILE_REGEX = "(?U)[\\w.$()@ -]+";
+    private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
 
     private static final String PROJECT_PREFIX_GLOBAL = "g_";
     private static final String PROJECT_PREFIX_SHARED = "s_";
