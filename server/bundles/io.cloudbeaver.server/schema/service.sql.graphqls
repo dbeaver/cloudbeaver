@@ -109,6 +109,7 @@ type SQLResultSet {
     singleEntity: Boolean!
     # server always returns hasMoreData = false
     hasMoreData: Boolean!
+    hasKeyIdentifier: Boolean!
 }
 
 type SQLQueryResults {
