@@ -139,7 +139,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setSingleEntity(isSingleEntity);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        webResultSet.setHasKeyIdentifier(rowIdentifier != null && rowIdentifier.isValidIdentifier());
+        webResultSet.setHasRowIdentifier(rowIdentifier != null && rowIdentifier.isValidIdentifier());
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {

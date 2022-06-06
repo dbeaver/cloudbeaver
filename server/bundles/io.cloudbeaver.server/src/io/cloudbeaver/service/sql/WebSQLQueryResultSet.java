@@ -32,7 +32,7 @@ public class WebSQLQueryResultSet {
     private boolean hasMoreData;
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
-    private boolean hasKeyIdentifier;
+    private boolean hasRowIdentifier;
 
     public WebSQLQueryResultSet() {
     }
@@ -95,11 +95,11 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
-    public boolean isHasKeyIdentifier() {
-        return hasKeyIdentifier;
+    public boolean isHasRowIdentifier() {
+        return hasRowIdentifier;
     }
 
-    public void setHasKeyIdentifier(boolean hasKeyIdentifier) {
-        this.hasKeyIdentifier = hasKeyIdentifier;
+    public void setHasRowIdentifier(boolean hasRowIdentifier) {
+        this.hasRowIdentifier = hasRowIdentifier;
     }
 }
