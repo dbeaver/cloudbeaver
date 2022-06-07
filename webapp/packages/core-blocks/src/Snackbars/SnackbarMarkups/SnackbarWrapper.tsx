@@ -49,14 +49,14 @@ const SNACKBAR_WRAPPER_STYLES = css`
     }
   }`;
 
-interface ISnackbarWrapperProps {
+interface Props {
   closing?: boolean;
   unclosable?: boolean;
   onClose?: () => void;
   className?: string;
 }
 
-export const SnackbarWrapper: React.FC<ISnackbarWrapperProps> = function SnackbarWrapper({
+export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = function SnackbarWrapper({
   closing = false, unclosable, onClose, children, className,
 }) {
   const styles = useStyles(SNACKBAR_WRAPPER_STYLES);

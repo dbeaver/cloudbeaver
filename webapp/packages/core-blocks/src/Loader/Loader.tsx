@@ -167,8 +167,7 @@ export const Loader = observer<Props>(function Loader({
   if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
       if (typeof children === 'function') {
-        // TODO: fix type error
-        return <LoaderContext.Provider value={contextState}>{(children as any)()}</LoaderContext.Provider>;
+        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
       } else {
         return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
       }
@@ -181,7 +180,11 @@ export const Loader = observer<Props>(function Loader({
 
   if ((!isVisible && overlay) || !loading) {
     if (overlay) {
-      return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
+      if (typeof children === 'function') {
+        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
+      } else {
+        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
+      }
     }
 
     return null;
@@ -199,23 +202,25 @@ export const Loader = observer<Props>(function Loader({
 
   return styled(style)(
     <LoaderContext.Provider value={contextState}>
-      {overlay && children}
-      <loader className={className} {...use({ small, fullSize, inline })}>
-        <icon><StaticImage icon={spinnerURL} /></icon>
-        {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
-        {onCancel && (
-          <actions>
-            <Button
-              type="button"
-              mod={['unelevated']}
-              disabled={cancelDisabled}
-              onClick={onCancel}
-            >
-              <Translate token='ui_processing_cancel' />
-            </Button>
-          </actions>
-        )}
-      </loader>
+      <>
+        {overlay && children}
+        <loader className={className} {...use({ small, fullSize, inline })}>
+          <icon><StaticImage icon={spinnerURL} /></icon>
+          {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
+          {onCancel && (
+            <actions>
+              <Button
+                type="button"
+                mod={['unelevated']}
+                disabled={cancelDisabled}
+                onClick={onCancel}
+              >
+                <Translate token='ui_processing_cancel' />
+              </Button>
+            </actions>
+          )}
+        </loader>
+      </>
     </LoaderContext.Provider>
   );
 });

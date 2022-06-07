@@ -116,10 +116,12 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
-      alias: {
-        "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
-        "react/jsx-runtime": "react/jsx-runtime.js",
-      },
+      // alias: {
+        // "react/jsx-dev-runtime": "react/jsx-dev-runtime.js", // 17->18
+        // "react/jsx-runtime": "react/jsx-runtime.js",
+        // "react/jsx-runtime.js": "react/jsx-runtime", // 18->17
+        // "react/jsx-dev-runtime.js": "react/jsx-dev-runtime"
+      // },
       fallback: {
         path: require.resolve("path-browserify"),
       },

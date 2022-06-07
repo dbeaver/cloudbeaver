@@ -41,12 +41,12 @@ const SNACKBAR_BODY_STYLES = css`
   }
 `;
 
-interface ISnackbarBodyProps {
+interface Props {
   title: string;
   className?: string;
 }
 
-export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({
+export const SnackbarBody: React.FC<React.PropsWithChildren<Props>> = function SnackbarBody({
   title, className, children,
 }) {
   return styled(SNACKBAR_BODY_STYLES)(

@@ -16,7 +16,7 @@ interface IProps {
   className?: string;
 }
 
-export const TabTitle: React.FC<IProps> = function TabTitle({ children, className }) {
+export const TabTitle: React.FC<React.PropsWithChildren<IProps>> = function TabTitle({ children, className }) {
   return styled(useStyles(BASE_TAB_STYLES))(
     <tab-title className={className}>
       {children || <placeholder />}

@@ -66,7 +66,7 @@ interface Props {
   onItemSelect: (name: string) => void;
 }
 
-export const Administration = observer<Props>(function Administration({
+export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
   configurationWizard, activeScreen, onItemSelect, children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);

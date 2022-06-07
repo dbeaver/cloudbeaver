@@ -9,7 +9,7 @@
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-export const DNDProvider: React.FC = function DNDProvider({ children }) {
+export const DNDProvider: React.FC<React.PropsWithChildren> = function DNDProvider({ children }) {
   return (
     <DndProvider backend={HTML5Backend}>
       {children}

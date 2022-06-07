@@ -12,12 +12,12 @@ import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Styles, ITEM_LIST_STYLES } from './styles';
 
-interface IProps {
+interface Props {
   className?: string;
   styles?: ComponentStyle;
 }
 
-export const ItemList: React.FC<IProps> = function ItemList({
+export const ItemList: React.FC<React.PropsWithChildren<Props>> = function ItemList({
   children, className, styles,
 }) {
   return styled(useStyles(styles || ITEM_LIST_STYLES))(

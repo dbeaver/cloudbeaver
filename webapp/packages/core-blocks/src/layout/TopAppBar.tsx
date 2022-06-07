@@ -21,7 +21,7 @@ export const topAppBarStyles = css`
     }
   `;
 
-export const TopAppBar: React.FC = function TopAppBar({ children }) {
+export const TopAppBar: React.FC<React.PropsWithChildren> = function TopAppBar({ children }) {
   return styled(useStyles(topAppBarStyles))(
     <header>
       {children}

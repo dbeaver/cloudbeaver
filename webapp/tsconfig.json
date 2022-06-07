@@ -46,6 +46,7 @@
     "noEmit": false,
     "strictNullChecks": true,
     "isolatedModules": true,
+    "composite": true,
     "types": [
       "reflect-metadata",
       "node"

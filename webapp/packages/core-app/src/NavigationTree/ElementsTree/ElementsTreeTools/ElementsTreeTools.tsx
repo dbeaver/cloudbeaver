@@ -67,7 +67,7 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const ElementsTreeTools = observer<Props>(function ElementsTreeTools({
+export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({
   tree,
   style,
   children,

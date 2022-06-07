@@ -26,7 +26,7 @@ export interface IMenuPanelProps {
   style?: ComponentStyle;
 }
 
-export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
+export const MenuPanel = observer<React.PropsWithChildren<IMenuPanelProps>>(function MenuPanel({
   label,
   menu,
   panelAvailable = true,

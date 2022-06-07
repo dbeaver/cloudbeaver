@@ -18,7 +18,7 @@ import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 
-interface Props {
+interface Props extends React.PropsWithChildren {
   style?: ComponentStyle;
 }
 

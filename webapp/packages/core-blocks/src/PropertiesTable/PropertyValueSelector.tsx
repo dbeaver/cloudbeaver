@@ -39,7 +39,7 @@ interface Props {
   onSwitch: (state: boolean) => void;
 }
 
-export const PropertyValueSelector = observer<Props>(function PropertyValueSelector({
+export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(function PropertyValueSelector({
   propertyName,
   values,
   container,

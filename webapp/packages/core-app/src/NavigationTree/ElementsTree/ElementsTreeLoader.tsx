@@ -30,7 +30,7 @@ interface Props {
   hasChildren?: boolean;
 }
 
-export const ElementsTreeLoader = observer<Props>(function ElementsTreeLoader({
+export const ElementsTreeLoader = observer<React.PropsWithChildren<Props>>(function ElementsTreeLoader({
   root,
   context,
   childrenState,

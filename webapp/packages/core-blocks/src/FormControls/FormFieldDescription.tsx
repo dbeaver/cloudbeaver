@@ -25,7 +25,7 @@ interface Props {
   className?: string;
 }
 
-export const FormFieldDescription: React.FC<Props> = function FormFieldDescription({
+export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = function FormFieldDescription({
   label,
   title,
   children,
