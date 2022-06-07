@@ -40,7 +40,7 @@
     "@cloudbeaver/core-view": "~0.1.0",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
-    "react": "~17.x.x",
+    "react": "~18.x.x",
     "reshadow": "~0.x.x"
   },
   "dependencies": {
