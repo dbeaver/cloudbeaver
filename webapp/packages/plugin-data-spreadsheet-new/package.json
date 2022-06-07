@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "react-data-grid": "7.0.0-canary.34",
-    "@popperjs/core": "~2.11.2",
-    "react-popper": "~2.2.5"
+    "@popperjs/core": "~2.11.5",
+    "react-popper": "~2.3.0"
   },
   "peerDependencies": {
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",

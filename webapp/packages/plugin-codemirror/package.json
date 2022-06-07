@@ -15,7 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "codemirror": "~5.65.2",
+    "codemirror": "~5.65.5",
     "react-codemirror2": "~7.2.1"
   },
   "devDependencies": {

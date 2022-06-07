@@ -7,7 +7,7 @@
  */
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { databaseDataAction, IResultSetElementKey, IDatabaseResultSet, DatabaseDataAction, IDatabaseDataSource, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import { databaseDataAction, IResultSetElementKey, type IDatabaseResultSet, DatabaseDataAction, type IDatabaseDataSource, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction';
 
@@ -25,7 +25,7 @@ export class ResultSetGISAction extends DatabaseDataAction<any, IDatabaseResultS
 
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private view: ResultSetViewAction;
+  private readonly view: ResultSetViewAction;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);

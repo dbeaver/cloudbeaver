@@ -15,8 +15,8 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "react-dnd": "~15.1.1",
-    "react-dnd-html5-backend": "~15.1.2"
+    "react-dnd": "~16.0.1",
+    "react-dnd-html5-backend": "~16.0.1"
   },
   "peerDependencies": {
     "@cloudbeaver/core-authentication": "~0.1.0",
