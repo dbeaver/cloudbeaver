@@ -9,7 +9,7 @@
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetElementKey } from './IResultSetDataKey';
 
-export interface IResultSetDataContentManager {
+export interface IResultSetDataContentAction {
   activeElement: IResultSetElementKey | null;
   isContentTruncated: (content: IResultSetContentValue) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;

@@ -17,7 +17,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IResultSetContentValue } from './IResultSetContentValue';
-import type { IResultSetDataContentManager } from './IResultSetDataContentManager';
+import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -28,8 +28,8 @@ import { ResultSetViewAction } from './ResultSetViewAction';
 const RESULT_VALUE_PATH = 'sql-result-value';
 
 @databaseDataAction()
-export class ResultSetDataContentManager extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IResultSetDataContentManager {
+export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
 
   private readonly view: ResultSetViewAction;

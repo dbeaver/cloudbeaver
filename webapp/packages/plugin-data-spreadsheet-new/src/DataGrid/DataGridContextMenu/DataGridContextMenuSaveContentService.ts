@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResultSetDataContentManager, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { ResultSetDataContentAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -37,23 +37,23 @@ export class DataGridContextMenuSaveContentService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         onClick: async context => {
-          const manager = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentManager);
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
           try {
-            await manager.downloadFileData(context.data.key);
+            await content.downloadFileData(context.data.key);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'data_grid_table_context_menu_save_value_error');
           }
         },
         isHidden: context => {
-          const manager = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentManager);
-          return !manager.isDownloadable(context.data.key);
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+          return !content.isDownloadable(context.data.key);
         },
         isDisabled: context => {
-          const manager = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentManager);
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
           return context.data.model.isLoading() || (
-            !!manager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-              context.data.key, manager.activeElement
+            !!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+              context.data.key, content.activeElement
             )
           );
         },

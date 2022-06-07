@@ -16,7 +16,7 @@ export * from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataContentManager';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
 export * from './DatabaseDataModel/Actions/DatabaseEditAction';
 export * from './DatabaseDataModel/Actions/DatabaseSelectAction';

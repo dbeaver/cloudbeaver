@@ -21,7 +21,7 @@ import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@clou
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { ResultSetDataContentManager } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentManager';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
@@ -113,7 +113,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const quotasService = useService(QuotasService);
   const style = useStyles(styles);
 
-  const contentManager = model.source.getAction(resultIndex, ResultSetDataContentManager);
+  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
   const state = useObservableRef(() => ({
     get selectedCell() {
@@ -142,17 +142,17 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return '';
     },
     get savedSrc() {
-      return contentManager.retrieveFileDataUrlFromCache(this.selectedCell);
+      return content.retrieveFileDataUrlFromCache(this.selectedCell);
     },
     get canSave() {
       if (this.truncated) {
-        return contentManager.isDownloadable(this.selectedCell);
+        return content.isDownloadable(this.selectedCell);
       }
 
       return !!this.src;
     },
     get truncated() {
-      return isResultSetContentValue(this.cellValue) && contentManager.isContentTruncated(this.cellValue);
+      return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
     },
     stretch: false,
     toggleStretch() {
@@ -161,7 +161,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     async save() {
       try {
         if (this.truncated) {
-          await contentManager.downloadFileData(this.selectedCell);
+          await content.downloadFileData(this.selectedCell);
         } else {
           download(this.src, '', true);
         }
@@ -190,7 +190,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     const load = async () => {
       try {
-        await contentManager.resolveFileDataUrl(state.selectedCell);
+        await content.resolveFileDataUrl(state.selectedCell);
       } catch (exception: any) {
         notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
       }
@@ -199,11 +199,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     return styled(style)(
       <container>
         <QuotaPlaceholder limit={limit} size={valueSize}>
-          {contentManager.isDownloadable(state.selectedCell) && (
+          {content.isDownloadable(state.selectedCell) && (
             <Button
               disabled={loading}
-              loading={!!contentManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-                contentManager.activeElement, state.selectedCell)}
+              loading={!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+                content.activeElement, state.selectedCell)}
               onClick={load}
             >
               {translate('ui_download')}
