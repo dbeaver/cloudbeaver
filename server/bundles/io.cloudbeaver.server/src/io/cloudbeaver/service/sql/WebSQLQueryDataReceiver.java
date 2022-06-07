@@ -21,10 +21,7 @@ import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDAttributeBindingMeta;
-import org.jkiss.dbeaver.model.data.DBDAttributeBindingType;
-import org.jkiss.dbeaver.model.data.DBDDataReceiver;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -140,6 +137,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;
 
         webResultSet.setSingleEntity(isSingleEntity);
+
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        webResultSet.setHasRowIdentifier(rowIdentifier != null && rowIdentifier.isValidIdentifier());
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {

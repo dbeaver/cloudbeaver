@@ -109,6 +109,8 @@ type SQLResultSet {
     singleEntity: Boolean!
     # server always returns hasMoreData = false
     hasMoreData: Boolean!
+    # can't update data or load LOB file if hasRowIdentifier = false
+    hasRowIdentifier: Boolean!
 }
 
 type SQLQueryResults {
