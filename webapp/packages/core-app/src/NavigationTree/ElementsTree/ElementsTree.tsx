@@ -102,6 +102,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const root = folderExplorer.state.folder;
   const fullPath = folderExplorer.state.fullPath;
 
+  function exitFolders(path: string[]) {
+    path = path.filter(nodeId => ref.getChildren(nodeId) !== undefined);
+    folderExplorer.open(path.slice(0, path.length - 1), path[path.length - 1]);
+  }
+
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
     path = [...path];
 
@@ -136,7 +141,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       const preload = await resource.preloadNodeParents(fullPath);
 
       if (!preload) {
-        return false;
+        exitFolders(fullPath);
+        return true;
       }
 
       return await autoOpenFolders(root, folderExplorer.state.path);
