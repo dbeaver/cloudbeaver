@@ -8,7 +8,6 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { QuotasService } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -50,7 +49,6 @@ export class SqlQueryService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService,
     private readonly dataViewerService: DataViewerService,
-    private readonly quotasService: QuotasService
   ) {
     this.statisticsMap = new Map();
 
@@ -88,7 +86,6 @@ export class SqlQueryService {
         this.app.getServiceInjector(),
         this.graphQLService,
         this.asyncTaskInfoService,
-        this.quotasService
       );
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
@@ -183,7 +180,6 @@ export class SqlQueryService {
           this.app.getServiceInjector(),
           this.graphQLService,
           this.asyncTaskInfoService,
-          this.quotasService
         );
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
