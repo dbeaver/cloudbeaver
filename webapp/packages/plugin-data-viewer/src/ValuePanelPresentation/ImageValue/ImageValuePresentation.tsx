@@ -21,6 +21,7 @@ import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@clou
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentManager } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentManager';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
@@ -112,6 +113,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const quotasService = useService(QuotasService);
   const style = useStyles(styles);
 
+  const contentManager = model.source.getAction(resultIndex, ResultSetDataContentManager);
+
   const state = useObservableRef(() => ({
     get selectedCell() {
       const selection = this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
@@ -139,17 +142,17 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return '';
     },
     get savedSrc() {
-      return this.model.source.dataManager.retrieveFileDataUrlFromCache(this.selectedCell, this.resultIndex);
-    },
-    get content() {
-      return this.model.source.dataManager.isContent(this.selectedCell, this.resultIndex);
+      return contentManager.retrieveFileDataUrlFromCache(this.selectedCell);
     },
     get canSave() {
-      return this.content || !!this.src;
+      if (this.truncated) {
+        return contentManager.isDownloadable(this.selectedCell);
+      }
+
+      return !!this.src;
     },
     get truncated() {
-      return isResultSetContentValue(this.cellValue)
-        && this.model.source.dataManager.isContentTruncated(this.cellValue);
+      return isResultSetContentValue(this.cellValue) && contentManager.isContentTruncated(this.cellValue);
     },
     stretch: false,
     toggleStretch() {
@@ -157,10 +160,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     },
     async save() {
       try {
-        if (!this.content) {
-          download(this.src, '', true);
+        if (this.truncated) {
+          await contentManager.downloadFileData(this.selectedCell);
         } else {
-          await this.model.source.dataManager.downloadFileData(this.selectedCell, this.resultIndex);
+          download(this.src, '', true);
         }
       } catch (exception: any) {
         this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
@@ -187,7 +190,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     const load = async () => {
       try {
-        await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
+        await contentManager.resolveFileDataUrl(state.selectedCell);
       } catch (exception: any) {
         notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
       }
@@ -196,14 +199,16 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     return styled(style)(
       <container>
         <QuotaPlaceholder limit={limit} size={valueSize}>
-          <Button
-            disabled={loading}
-            loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-              model.source.dataManager.activeElement, state.selectedCell)}
-            onClick={load}
-          >
-            {translate('ui_download')}
-          </Button>
+          {contentManager.isDownloadable(state.selectedCell) && (
+            <Button
+              disabled={loading}
+              loading={!!contentManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+                contentManager.activeElement, state.selectedCell)}
+              onClick={load}
+            >
+              {translate('ui_download')}
+            </Button>
+          )}
         </QuotaPlaceholder>
         <Tools loading={loading} onSave={save} />
       </container>

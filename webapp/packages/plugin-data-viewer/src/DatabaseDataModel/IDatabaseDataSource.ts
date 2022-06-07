@@ -10,10 +10,8 @@ import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections'
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { DatabaseDataManager } from './DatabaseDataManager';
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataManager } from './IDatabaseDataManager';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IRequestInfo {
@@ -29,7 +27,6 @@ export enum DatabaseDataAccessMode {
 }
 
 export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
-  readonly dataManager: IDatabaseDataManager;
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];

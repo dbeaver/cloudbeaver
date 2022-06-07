@@ -22,6 +22,7 @@ import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentManager } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentManager';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -81,6 +82,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const quotasService = useService(QuotasService);
   const textValuePresentationService = useService(TextValuePresentationService);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+
   const state = useObservableRef(() => ({
     currentContentType: 'text/plain',
     lastContentType: 'text/plain',
@@ -99,6 +101,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
+  const contentManager = model.source.getAction(resultIndex, ResultSetDataContentManager);
 
   const focusCell = selection.getFocusedElement();
 
@@ -123,7 +126,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
 
     if (isResultSetContentValue(value)) {
-      valueTruncated = model.source.dataManager.isContentTruncated(value);
+      valueTruncated = contentManager.isContentTruncated(value);
 
       if (valueTruncated) {
         limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
@@ -162,7 +165,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
 
     try {
-      await model.source.dataManager.downloadFileData(firstSelectedCell, resultIndex);
+      await contentManager.downloadFileData(firstSelectedCell);
     } catch (exception) {
       notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
     }
@@ -170,7 +173,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
-  const canSave = firstSelectedCell && model.source.dataManager.isContent(firstSelectedCell, resultIndex);
+  const canSave = !!firstSelectedCell && contentManager.isDownloadable(firstSelectedCell);
 
   return styled(style)(
     <container>
