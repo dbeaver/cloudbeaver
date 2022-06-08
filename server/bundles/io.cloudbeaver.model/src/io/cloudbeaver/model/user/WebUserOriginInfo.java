@@ -127,7 +127,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             Type[] typeArguments = ((ParameterizedType) providerSuperClass).getActualTypeArguments();
             if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
                 // Wrong session type for this auth provider
-                return ((Class) typeArguments[0]).isInstance(authSession);
+                return ((Class<?>) typeArguments[0]).isInstance(authSession);
             }
         }
         return true;
