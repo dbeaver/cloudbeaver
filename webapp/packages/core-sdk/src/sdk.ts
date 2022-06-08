@@ -803,7 +803,6 @@ export interface Query {
   sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
-  tryFederatedLogin: UserAuthToken;
   updateConnectionConfiguration: ConnectionInfo;
   updateRole: AdminRoleInfo;
   userConnections: Array<ConnectionInfo>;
@@ -1146,11 +1145,6 @@ export interface QuerySqlSupportedOperationsArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-}
-
-
-export interface QueryTryFederatedLoginArgs {
-  provider: Scalars['ID'];
 }
 
 
