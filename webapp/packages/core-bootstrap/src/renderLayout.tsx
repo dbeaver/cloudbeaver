@@ -6,19 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { Body } from '@cloudbeaver/core-app';
 import { ErrorBoundary } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 export function renderLayout(serviceInjector: IServiceInjector): void {
-  ReactDOM.render(
+  const container = document.getElementById('root');
+  const root = createRoot(container!);
+
+  root.render(
     <ErrorBoundary root>
       <AppContext app={serviceInjector}>
         <Body />
       </AppContext>
-    </ErrorBoundary>,
-    document.getElementById('root')
+    </ErrorBoundary>
   );
 }
