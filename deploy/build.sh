@@ -15,10 +15,14 @@ mkdir ./cloudbeaver/conf
 mkdir ./cloudbeaver/workspace
 mkdir ./cloudbeaver/web
 
-echo "Clone dbeaver platform"
+echo "Pull cloudbeaver platform"
 
 cd ../..
+[ ! -d react-data-grid ] && git clone https://github.com/dbeaver/react-data-grid.git
+
+echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone https://github.com/dbeaver/dbeaver.git
+
 cd cloudbeaver/deploy
 
 echo "Build CloudBeaver server"
@@ -48,8 +52,16 @@ mv drivers cloudbeaver
 
 echo "Build static content"
 
-cd ../webapp
+cd ../../react-data-grid
 
+npm i
+npm run build
+npm run build:types
+yarn link
+
+cd ../cloudbeaver/webapp
+
+yarn link "react-data-grid"
 yarn
 lerna run bootstrap
 lerna run build --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map

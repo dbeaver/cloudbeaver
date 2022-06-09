@@ -157,6 +157,7 @@ export * from './useClipboard';
 export * from './useCombinedHandler';
 export * from './useDataResource';
 export * from './useExecutor';
+export * from './useFn';
 export * from './useFocus';
 export * from './useFormValidator';
 export * from './useMapResource';

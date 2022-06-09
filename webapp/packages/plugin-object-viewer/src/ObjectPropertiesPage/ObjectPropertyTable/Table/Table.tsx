@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import DataGrid from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
@@ -27,7 +27,6 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import { RowRenderer } from './RowRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import { TableContext } from './TableContext';
@@ -134,7 +133,6 @@ export const Table = observer<Props>(function Table({
           className='cb-metadata-grid-theme'
           rows={objects}
           rowKeyGetter={row => row.id}
-          rowRenderer={RowRenderer}
           columns={tableData.columns}
           rowHeight={40}
         />
