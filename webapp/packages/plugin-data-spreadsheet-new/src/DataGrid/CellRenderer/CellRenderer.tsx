@@ -23,7 +23,7 @@ import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
-  const { row, column, isCellSelected } = props;
+  const { row, column, isCellSelected, selectCell } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
@@ -97,7 +97,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
 
   const state = useObjectRef(() => ({
     mouseDown(event: React.MouseEvent<HTMLDivElement>) {
-      props.selectCell(props.row, props.column);
+      // this.selectCell(this.row, this.column);
     },
     mouseUp(event: React.MouseEvent<HTMLDivElement>) {
       if (
@@ -129,6 +129,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       this.editingContext.edit(cellContext.position);
     },
   }), {
+    row,
     column,
     rowIdx,
     isCellSelected,
@@ -137,7 +138,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
     editingContext,
     tableDataContext,
     isEditable,
-  }, ['doubleClick', 'mouseUp']);
+    selectCell,
+  }, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   useEffect(() => () => editingContext.closeEditor(cellContext.position), []);
 

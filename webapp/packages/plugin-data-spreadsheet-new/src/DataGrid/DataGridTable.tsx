@@ -293,6 +293,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         }
         return;
       }
+
       dataGridRef.current?.selectCell({ idx, rowIdx });
     }
 
