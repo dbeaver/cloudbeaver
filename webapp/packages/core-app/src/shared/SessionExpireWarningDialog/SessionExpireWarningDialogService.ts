@@ -9,7 +9,7 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionExpireService, SessionResource, CookiesService } from '@cloudbeaver/core-root';
 import { getCookies } from '@cloudbeaver/core-utils';
 
 import { SessionExpireWarningDialog } from '../SessionExpireWarningDialog/SessionExpireWarningDialog';
@@ -23,11 +23,12 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
 
   constructor(
-    private commonDialogService: CommonDialogService,
-    private sessionExpireService: SessionExpireService,
-    private serverConfigResource: ServerConfigResource,
-    private sessionResource: SessionResource,
-    private userInfoResource: UserInfoResource
+    private readonly commonDialogService: CommonDialogService,
+    private readonly sessionExpireService: SessionExpireService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly sessionResource: SessionResource,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly cookiesService: CookiesService
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -38,7 +39,9 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   }
 
   load(): void {
-    this.startSessionPolling();
+    if (this.cookiesService.cookiesEnabled) {
+      this.startSessionPolling();
+    }
   }
 
   private startSessionPolling() {
