@@ -78,7 +78,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return apiInterface.cast(proxyImpl);
     }
 
-    public static TypeDefinitionRegistry loadSchemaDefinition(Class theClass, String schemaPath) throws DBWebException {
+    public static TypeDefinitionRegistry loadSchemaDefinition(Class<?> theClass, String schemaPath) throws DBWebException {
         try (InputStream schemaStream = theClass.getClassLoader().getResourceAsStream(schemaPath)) {
             if (schemaStream == null) {
                 throw new IOException("Schema file '" + schemaPath + "' not found");

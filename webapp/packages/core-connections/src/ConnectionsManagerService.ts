@@ -35,10 +35,14 @@ export class ConnectionsManagerService {
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
-    const context = await this.connectionExecutor.execute(connectionId);
-    const connection = context.getContext(this.connectionContext);
+    try {
+      const context = await this.connectionExecutor.execute(connectionId);
+      const connection = context.getContext(this.connectionContext);
 
-    return connection.connection;
+      return connection.connection;
+    } catch {
+      return null;
+    }
   }
 
   async addOpenedConnection(connection: Connection): Promise<void> {
@@ -50,7 +54,7 @@ export class ConnectionsManagerService {
     objectCatalogId?: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
-    if (objectCatalogId){
+    if (objectCatalogId) {
       const objectContainers = this.containerContainers.getCatalogData(connectionId, objectCatalogId);
 
       if (!objectContainers) {
@@ -60,7 +64,7 @@ export class ConnectionsManagerService {
       if (!objectSchemaId) {
         return objectContainers.catalog;
       }
-      
+
       return objectContainers.schemaList.find(
         objectContainer => objectContainer.name === objectSchemaId
       );

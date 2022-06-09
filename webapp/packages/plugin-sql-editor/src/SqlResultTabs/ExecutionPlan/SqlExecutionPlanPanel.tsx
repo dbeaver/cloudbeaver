@@ -54,6 +54,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
     <Split
       {...splitState}
       mode={selectedNode ? splitState.mode : 'minimize'}
+      disable={!selectedNode}
       sticky={30}
     >
       <Pane>
@@ -63,14 +64,10 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
           onNodeSelect={setSelectedNode}
         />
       </Pane>
-      {selectedNode && (
-        <>
-          <ResizerControls />
-          <Pane basis='30%' main>
-            <PropertiesPanel selectedNode={selectedNode} nodeList={data.executionPlan.nodes} />
-          </Pane>
-        </>
-      )}
+      <ResizerControls />
+      <Pane basis='30%' main>
+        {selectedNode && <PropertiesPanel selectedNode={selectedNode} nodeList={data.executionPlan.nodes} />}
+      </Pane>
     </Split>
   );
 });

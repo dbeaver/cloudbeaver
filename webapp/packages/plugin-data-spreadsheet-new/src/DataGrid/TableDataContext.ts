@@ -38,9 +38,10 @@ export interface ITableData {
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];
   gridDiv: HTMLDivElement | null;
-  getMetrics: (columnIndex: number) => IColumnMetrics;
-  getRow: (rowIndex: number) => IResultSetRowKey;
-  getColumn: (columnIndex: number) => Column<IResultSetRowKey, any>;
+  inBounds: (position: IResultSetElementKey) => boolean;
+  getMetrics: (columnIndex: number) => IColumnMetrics | undefined;
+  getRow: (rowIndex: number) => IResultSetRowKey | undefined;
+  getColumn: (columnIndex: number) => Column<IResultSetRowKey, any> | undefined;
   getColumnByDataIndex: (key: IResultSetColumnKey) => Column<IResultSetRowKey, any>;
   getCellValue: (key: IResultSetElementKey) => IResultSetValue | undefined;
   getColumnInfo: (key: IResultSetColumnKey) => SqlResultColumn | undefined;

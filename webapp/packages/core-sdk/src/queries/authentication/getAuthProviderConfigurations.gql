@@ -9,6 +9,7 @@ query getAuthProviderConfigurations($providerId: ID) {
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }

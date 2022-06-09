@@ -102,6 +102,10 @@ public class CBStaticServlet extends DefaultServlet {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {
                             String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
+                            //ignore current routing if non-root page is open
+                            if (!signInLink.endsWith("#")) {
+                                signInLink += "#";
+                            }
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);

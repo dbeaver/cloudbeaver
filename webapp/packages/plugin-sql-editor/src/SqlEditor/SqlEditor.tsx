@@ -85,6 +85,8 @@ const tabStyles = css`
   tabs {
     composes: theme-background-secondary theme-text-on-secondary from global;
     overflow-x: hidden;
+    padding-right: 8px;
+    padding-left: 4px;
   }
   Tab {
     composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
@@ -205,7 +207,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               hidden={data.activeSegmentMode.activeSegmentMode}
               onClick={() => tools.downloadScript(trimmedValue)}
             >
-              <StaticImage icon='/icons/save.svg' />
+              <StaticImage icon='/icons/export.svg' />
             </button>
             {!data.activeSegmentMode.activeSegmentMode && (
               <UploadArea
@@ -215,7 +217,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                 onChange={handleScriptUpload}
               >
                 <upload>
-                  <StaticImage icon='/icons/load.svg' />
+                  <StaticImage icon='/icons/import.svg' />
                 </upload>
               </UploadArea>
             )}

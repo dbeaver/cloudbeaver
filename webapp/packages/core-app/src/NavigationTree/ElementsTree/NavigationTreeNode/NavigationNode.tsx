@@ -84,7 +84,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       onOpen={handleOpen}
       onSelect={handleSelect}
     >
-      <DNDPreview data={dndData} src="/icons/empty.svg" />
+      {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <Control ref={setRef} dragging={dndData.state.isDragging} node={node} />
       {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
     </TreeNode>

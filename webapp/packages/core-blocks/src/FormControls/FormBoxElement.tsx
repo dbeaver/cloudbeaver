@@ -24,7 +24,7 @@ interface Props {
   max?: boolean;
 }
 
-export const FormBoxElement: React.FC<Props> = function FormBoxElement({ children, className, max }) {
+export const FormBoxElement: React.FC<React.PropsWithChildren<Props>> = function FormBoxElement({ children, className, max }) {
   return styled(styles)(
     <box-element as='div' className={className} {...use({ max })}>
       {children}

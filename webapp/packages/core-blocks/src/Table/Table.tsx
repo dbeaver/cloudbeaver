@@ -26,7 +26,7 @@ interface Props {
   isItemSelectable?: (item: any) => boolean;
 }
 
-export const Table = observer<Props>(function Table({
+export const Table = observer<React.PropsWithChildren<Props>>(function Table({
   keys, isItemSelectable, selectedItems, expandedItems, className, size, children, onSelect,
 }) {
   const props = useObjectRef({ onSelect });

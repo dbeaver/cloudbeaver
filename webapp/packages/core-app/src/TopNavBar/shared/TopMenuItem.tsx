@@ -50,7 +50,6 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
       disclosure
       onClick={() => menuItem.onClick?.()}
     >
-      
       <TopNavButton
         title={title}
         icon={menuItem.icon}

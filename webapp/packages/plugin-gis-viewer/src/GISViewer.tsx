@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { createComplexLoader, ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import type { IDataValuePanelProps, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 const loader = createComplexLoader(async function loader() {

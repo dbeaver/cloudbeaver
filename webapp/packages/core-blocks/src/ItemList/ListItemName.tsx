@@ -13,11 +13,11 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Styles } from './styles';
 
-interface IProps {
+interface Props {
   className?: string;
 }
 
-export const ListItemName: React.FC<IProps> = function ListItemName({
+export const ListItemName: React.FC<React.PropsWithChildren<Props>> = function ListItemName({
   children,
   className,
 }) {

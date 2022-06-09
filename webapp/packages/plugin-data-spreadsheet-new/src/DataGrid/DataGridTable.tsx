@@ -28,11 +28,11 @@ import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
+import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
 import { CellFormatter } from './Formatters/CellFormatter';
-import { RowRenderer } from './RowRenderer/RowRenderer';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
@@ -76,7 +76,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       const column = tableData.getColumn(position.idx);
       const row = tableData.getRow(position.rowIdx);
 
-      if (!column.columnDataIndex) {
+      if (!column?.columnDataIndex || !row) {
         return false;
       }
 
@@ -114,13 +114,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('.rdg-focus-sink');
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[tabindex="0"]');
     focusSink?.focus();
   }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector('.rdg-focus-sink');
+    const focusSink = gridDiv?.querySelector('[tabindex="0"]');
 
     if (!gridDiv || !focusSink) {
       return false;
@@ -131,15 +131,17 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     return gridDiv === active || focusSink === active;
   }
 
-  function setContainersRef(element: HTMLDivElement) {
+  function setContainersRef(element: HTMLDivElement | null) {
     gridContainerRef.current = element;
 
-    const gridDiv = gridContainerRef.current?.firstChild;
+    if (element) {
+      const gridDiv = element.firstChild;
 
-    if (gridDiv instanceof HTMLDivElement) {
-      dataGridDivRef.current = gridDiv;
-    } else {
-      dataGridDivRef.current = null;
+      if (gridDiv instanceof HTMLDivElement) {
+        dataGridDivRef.current = gridDiv;
+      } else {
+        dataGridDivRef.current = null;
+      }
     }
   }
 
@@ -344,13 +346,16 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       focusSyncRef.current = null;
       return;
     }
+
     const column = tableData.getColumn(position.idx);
     const row = tableData.getRow(position.rowIdx);
 
-    selectionAction.focus({
-      row,
-      column: { index: 0, ...column.columnDataIndex },
-    });
+    if (column && row) {
+      selectionAction.focus({
+        row,
+        column: { index: 0, ...column.columnDataIndex },
+      });
+    }
   };
 
   const handleScroll = useCallback(
@@ -364,7 +369,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         return;
       }
 
-      const result = model?.getResult(resultIndex);
+      const result = model.getResult(resultIndex);
       if (result?.loadedFully) {
         return;
       }
@@ -415,7 +420,9 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 rowKeyGetter={ResultSetDataKeysUtils.serialize}
                 headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
-                rowRenderer={RowRenderer}
+                components={{
+                  cellRenderer: CellRenderer,
+                }}
                 onSelectedCellChange={handleFocusChange}
                 onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
                 onScroll={handleScroll}

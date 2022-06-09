@@ -27,7 +27,7 @@ interface Props {
 }
 
 // TODO: we probably can get name from NavNodeInfoResource but element can be not loaded
-export const NodeLink: React.FC<Props> = function NodeLink({ children, name, nodeId }) {
+export const NodeLink: React.FC<React.PropsWithChildren<Props>> = function NodeLink({ children, name, nodeId }) {
   const navigationTreeService = useService(NavigationTreeService);
 
   const handleClick = useCallback(() => {

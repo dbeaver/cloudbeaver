@@ -147,7 +147,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 <TableColumnHeader min />
                 <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
                 <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
-                <TableColumnHeader>{translate('authentication_user_activated')}</TableColumnHeader>
+                <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
                 <TableColumnHeader />
               </TableHeader>
               <TableBody>

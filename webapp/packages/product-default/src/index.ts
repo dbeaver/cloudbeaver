@@ -19,6 +19,7 @@ import localization from '@cloudbeaver/plugin-localization';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
+import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
@@ -60,6 +61,7 @@ const PLUGINS: PluginManifest[] = [
   settingsMenuAdministration,
   help,
   resourceManager,
+  resourceManagerAdministration,
   sqlEditorResource,
 ];
 

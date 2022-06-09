@@ -17,7 +17,7 @@ interface Props {
   className?: string;
 }
 
-export const OverlayMessage = observer<Props>(function OverlayMessage({
+export const OverlayMessage = observer<React.PropsWithChildren<Props>>(function OverlayMessage({
   className,
   children,
 }) {

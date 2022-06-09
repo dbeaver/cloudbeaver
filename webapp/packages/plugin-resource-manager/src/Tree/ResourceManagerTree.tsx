@@ -31,12 +31,23 @@ const styles = css`
     min-width: 100%;
     width: max-content;
   }
-  div {
+  Loader {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    min-width: 240px;
+  }
+  center {
+    height: 100%;
+    width: 100%;
+    display: flex;
+  }
+  message {
+    padding: 24px;
     box-sizing: border-box;
     max-width: 240px;
-    padding: 24px;
-    margin: auto;
     text-align: center;
+    margin: auto;
   }
 `;
 
@@ -48,7 +59,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const { resource } = useDataResource(ResourceManagerTree, ProjectsResource, undefined);
 
   return styled(styles)(
-    <Loader state={[resource]}>
+    <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
           root={createPath([RESOURCES_NODE_PATH, resource.userProject?.name])}
@@ -56,9 +67,11 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}
           emptyPlaceholder={() => styled(styles)(
-            <div>
-              {translate('plugin_resource_manager_no_resources_placeholder')}
-            </div>
+            <center>
+              <message>
+                {translate('plugin_resource_manager_no_resources_placeholder')}
+              </message>
+            </center>
           )}
           onOpen={node => navTreeService.navToNode(node.id, node.parentId)}
         />

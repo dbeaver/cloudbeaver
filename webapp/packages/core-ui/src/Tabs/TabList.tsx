@@ -21,7 +21,7 @@ interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   childrenFirst?: boolean;
 }
 
-export const TabList = observer<Props>(function TabList({
+export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({
   style,
   children,
   childrenFirst,

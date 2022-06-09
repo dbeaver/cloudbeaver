@@ -18,7 +18,7 @@ export default [
   ['authentication_user_password_repeat', '重复密码'],
   ['authentication_user_role', '用户角色'],
   ['authentication_user_status', 'User status'],
-  ['authentication_user_activated', 'Activated'],
+  ['authentication_user_enabled', 'Enabled'],
   ['authentication_user_login_not_set', '用户名不能为空'],
   ['authentication_user_role_not_set', '至少选择一个角色'],
   ['authentication_user_password_not_set', '密码是必须的'],

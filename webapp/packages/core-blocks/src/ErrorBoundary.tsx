@@ -19,7 +19,7 @@ const style = css`
   }
 `;
 
-interface IProps {
+interface Props {
   onRefresh?: () => any;
   root?: boolean;
   remount?: boolean;
@@ -30,8 +30,8 @@ interface IState {
   errorInfo: ErrorInfo | null;
 }
 
-export class ErrorBoundary extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props>, IState> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       error: null,

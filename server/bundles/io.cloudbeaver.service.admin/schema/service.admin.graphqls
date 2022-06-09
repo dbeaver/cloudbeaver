@@ -66,6 +66,7 @@ type AdminAuthProviderConfiguration {
 
     signInLink: String
     signOutLink: String
+    redirectLink: String
     metadataLink: String
 }
 
@@ -90,6 +91,7 @@ input ServerConfigInput {
     customConnectionsEnabled: Boolean
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
+    resourceManagerEnabled: Boolean
 
     enabledFeatures: [ID!]
     enabledAuthProviders: [ID!]

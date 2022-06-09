@@ -28,8 +28,8 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
 
   generator?: (tabId: string, props?: TProps) => string[];
 
-  tab?: () => TabContainerTabComponent<TProps>;
-  panel: () => TabContainerPanelComponent<TProps>;
+  tab?: () => (TabContainerTabComponent<TProps> | React.ExoticComponent);
+  panel: () => (TabContainerPanelComponent<TProps> | React.ExoticComponent);
 
   stateGetter?: (props: TProps) => MetadataValueGetter<string, any>;
 

@@ -140,7 +140,7 @@ export class DataGridContextMenuOrderService {
         },
         isHidden: context => {
           const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
-          return constraints.orderConstraints.length < 2;
+          return !constraints.orderConstraints.length;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {

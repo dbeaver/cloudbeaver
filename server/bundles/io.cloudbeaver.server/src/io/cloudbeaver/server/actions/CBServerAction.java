@@ -14,7 +14,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from DBeaver Corp.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.server.actions;
 
 import io.cloudbeaver.model.session.WebSession;
 
@@ -54,9 +54,13 @@ public class CBServerAction {
     public static CBServerAction fromSession(WebSession session, boolean remove) {
         CBServerAction action = session.getAttribute(PARAM_ACTION_PARAMETERS);
         if (action != null && remove) {
-            session.removeAttribute(PARAM_ACTION_PARAMETERS);
+            removeAction(session);
         }
         return action;
+    }
+
+    public static void removeAction(WebSession session) {
+        session.removeAttribute(PARAM_ACTION_PARAMETERS);
     }
 
 

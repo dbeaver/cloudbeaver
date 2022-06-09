@@ -26,6 +26,7 @@ export interface AdminAuthProviderConfiguration {
   metadataLink?: Maybe<Scalars['String']>;
   parameters: Scalars['Object'];
   providerId: Scalars['ID'];
+  redirectLink?: Maybe<Scalars['String']>;
   signInLink?: Maybe<Scalars['String']>;
   signOutLink?: Maybe<Scalars['String']>;
 }
@@ -802,7 +803,6 @@ export interface Query {
   sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
-  tryFederatedLogin: UserAuthToken;
   updateConnectionConfiguration: ConnectionInfo;
   updateRole: AdminRoleInfo;
   userConnections: Array<ConnectionInfo>;
@@ -1148,11 +1148,6 @@ export interface QuerySqlSupportedOperationsArgs {
 }
 
 
-export interface QueryTryFederatedLoginArgs {
-  provider: Scalars['ID'];
-}
-
-
 export interface QueryUpdateConnectionConfigurationArgs {
   config: ConnectionConfig;
   id: Scalars['ID'];
@@ -1307,6 +1302,7 @@ export interface SqlResultRow {
 export interface SqlResultSet {
   columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
   hasMoreData: Scalars['Boolean'];
+  hasRowIdentifier: Scalars['Boolean'];
   id: Scalars['ID'];
   rows?: Maybe<Array<Maybe<Array<Maybe<Scalars['Object']>>>>>;
   singleEntity: Scalars['Boolean'];
@@ -1341,6 +1337,7 @@ export interface ServerConfig {
   productInfo: ProductInfo;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   redirectOnFederatedAuth?: Maybe<Scalars['Boolean']>;
+  resourceManagerEnabled?: Maybe<Scalars['Boolean']>;
   resourceQuotas: Scalars['Object'];
   rootURI: Scalars['String'];
   serverURL: Scalars['String'];
@@ -1365,6 +1362,7 @@ export interface ServerConfigInput {
   enabledAuthProviders?: InputMaybe<Array<Scalars['ID']>>;
   enabledFeatures?: InputMaybe<Array<Scalars['ID']>>;
   publicCredentialsSaveEnabled?: InputMaybe<Scalars['Boolean']>;
+  resourceManagerEnabled?: InputMaybe<Scalars['Boolean']>;
   serverName?: InputMaybe<Scalars['String']>;
   serverURL?: InputMaybe<Scalars['String']>;
   sessionExpireTime?: InputMaybe<Scalars['Int']>;
@@ -1530,7 +1528,7 @@ export type GetAuthProviderConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; metadataLink?: string }> };
+export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; redirectLink?: string; metadataLink?: string }> };
 
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1553,7 +1551,7 @@ export type SaveAuthProviderConfigurationQueryVariables = Exact<{
 }>;
 
 
-export type SaveAuthProviderConfigurationQuery = { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; metadataLink?: string } };
+export type SaveAuthProviderConfigurationQuery = { configuration: { providerId: string; id: string; displayName: string; disabled: boolean; iconURL?: string; description?: string; parameters: any; signInLink?: string; signOutLink?: string; redirectLink?: string; metadataLink?: string } };
 
 export type SaveUserMetaParametersQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2092,7 +2090,7 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 }>;
 
 
-export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
+export type GetSqlExecuteTaskResultsMutation = { result: { duration: number; statusMessage?: string; filterText?: string; results: Array<{ title?: string; updateRowCount?: number; sourceQuery?: string; dataFormat?: ResultDataFormat; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean; hasRowIdentifier: boolean; columns?: Array<{ dataKind?: string; entityName?: string; fullTypeName?: string; icon?: string; label?: string; maxLength?: number; name?: string; position: number; precision?: number; required: boolean; readOnly: boolean; readOnlyStatus?: string; scale?: number; typeName?: string; supportedOperations: Array<{ id: string; expression: string; argumentCount?: number }> }> } }> } };
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -2111,7 +2109,7 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
 }>;
 
 
-export type UpdateResultsDataBatchMutation = { result: { duration: number; filterText?: string; results: Array<{ updateRowCount?: number; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean } }> } };
+export type UpdateResultsDataBatchMutation = { result: { duration: number; filterText?: string; results: Array<{ updateRowCount?: number; resultSet?: { id: string; rows?: Array<Array<any>>; singleEntity: boolean; hasMoreData: boolean; hasRowIdentifier: boolean } }> } };
 
 export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -2292,7 +2290,7 @@ export type ReadSessionLogQuery = { log: Array<{ time?: any; type: string; messa
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 
-export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; resourceQuotas: any; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
+export type ServerConfigQuery = { serverConfig: { name: string; version: string; workspaceId: string; serverURL: string; rootURI: string; hostName: string; productConfiguration: any; supportsCustomConnections?: boolean; supportsConnectionBrowser?: boolean; supportsWorkspaces?: boolean; sessionExpireTime?: number; anonymousAccessEnabled?: boolean; adminCredentialsSaveEnabled?: boolean; publicCredentialsSaveEnabled?: boolean; resourceManagerEnabled?: boolean; licenseRequired: boolean; licenseValid: boolean; configurationMode?: boolean; developmentMode?: boolean; redirectOnFederatedAuth?: boolean; enabledFeatures: Array<string>; enabledAuthProviders: Array<string>; resourceQuotas: any; disabledDrivers: Array<string>; supportedLanguages: Array<{ isoCode: string; displayName?: string; nativeName?: string }>; defaultNavigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean }; productInfo: { id: string; version: string; latestVersionInfo?: string; name: string; description?: string; buildTime: string; releaseTime: string; licenseInfo?: string } } };
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2757,6 +2755,7 @@ export const GetAuthProviderConfigurationsDocument = `
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }
@@ -2825,6 +2824,7 @@ export const SaveAuthProviderConfigurationDocument = `
     parameters
     signInLink
     signOutLink
+    redirectLink
     metadataLink
   }
 }
@@ -3378,6 +3378,7 @@ export const GetSqlExecuteTaskResultsDocument = `
         rows
         singleEntity
         hasMoreData
+        hasRowIdentifier
       }
     }
   }
@@ -3429,6 +3430,7 @@ export const UpdateResultsDataBatchDocument = `
         rows
         singleEntity
         hasMoreData
+        hasRowIdentifier
       }
     }
   }
@@ -3627,6 +3629,7 @@ export const ServerConfigDocument = `
     anonymousAccessEnabled
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
+    resourceManagerEnabled
     licenseRequired
     licenseValid
     configurationMode

@@ -93,12 +93,17 @@ public class CBJettyServer {
 
             }
 
+            boolean forwardProxy = application.getAppConfiguration().isEnabledForwardProxy();
             {
                 // HTTP config
                 for(Connector y : server.getConnectors()) {
                     for(ConnectionFactory x  : y.getConnectionFactories()) {
                         if(x instanceof HttpConnectionFactory) {
-                            ((HttpConnectionFactory)x).getHttpConfiguration().setSendServerVersion(false);
+                            HttpConfiguration httpConfiguration = ((HttpConnectionFactory)x).getHttpConfiguration();
+                            httpConfiguration.setSendServerVersion(false);
+                            if (forwardProxy) {
+                                httpConfiguration.addCustomizer(new ForwardedRequestCustomizer());
+                            }
                         }
                     }
                 }

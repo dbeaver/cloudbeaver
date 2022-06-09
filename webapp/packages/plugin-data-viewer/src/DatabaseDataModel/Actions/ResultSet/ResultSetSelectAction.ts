@@ -266,6 +266,10 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   }
 
   focus(key: IResultSetElementKey | null): void {
+    if (key && !this.view.has(key)) {
+      key = null;
+    }
+
     if (
       (key && this.isFocused(key))
       || key === this.focusedElement

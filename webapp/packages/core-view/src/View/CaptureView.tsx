@@ -32,7 +32,7 @@ interface Props {
   className?: string;
 }
 
-export const CaptureView = observer<Props>(function CaptureView({
+export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({
   view,
   children,
   className,

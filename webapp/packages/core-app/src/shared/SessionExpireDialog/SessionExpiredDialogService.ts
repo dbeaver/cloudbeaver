@@ -17,15 +17,15 @@ import { SessionExpiredDialog } from './SessionExpiredDialog';
 @injectable()
 export class SessionExpiredDialogService extends Bootstrap {
   constructor(
-    private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService,
-    private sessionExpireService: SessionExpireService
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly sessionExpireService: SessionExpireService
   ) {
     super();
   }
 
   register(): void {
-    this.sessionExpireService.onSessionExpire.addHandler(this.handleSessionExpired.bind(this));
+    this.sessionExpireService.onSessionExpire.addPostHandler(this.handleSessionExpired.bind(this));
   }
 
   load(): void | Promise<void> { }

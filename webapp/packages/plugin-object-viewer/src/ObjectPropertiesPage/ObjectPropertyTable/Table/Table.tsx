@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useState } from 'react';
 import DataGrid from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
@@ -27,7 +27,6 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import { RowRenderer } from './RowRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import { TableContext } from './TableContext';
@@ -92,13 +91,13 @@ export const Table = observer<Props>(function Table({
   objects,
   truncated,
 }) {
-  const tableContainer = useRef<HTMLDivElement | null>(null);
+  const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const navTreeResource = useService(NavTreeResource);
   const styles = useStyles(style, baseStyles, tableStyles);
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
 
-  const scrollBox = (tableContainer.current?.firstChild as HTMLDivElement | undefined) ?? null;
+  const scrollBox = (tableContainer?.firstChild as HTMLDivElement | undefined) ?? null;
   useControlledScroll(scrollBox, tabLocalState);
 
   const baseObject = objects
@@ -129,12 +128,11 @@ export const Table = observer<Props>(function Table({
 
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <wrapper ref={tableContainer} className='metadata-grid-container'>
+      <wrapper ref={setTableContainerRef} className='metadata-grid-container'>
         <DataGrid
           className='cb-metadata-grid-theme'
           rows={objects}
           rowKeyGetter={row => row.id}
-          rowRenderer={RowRenderer}
           columns={tableData.columns}
           rowHeight={40}
         />

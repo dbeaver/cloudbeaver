@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.DBPObjectWithDetails;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -35,11 +34,10 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBNResourceManagerProject extends DBNNode implements DBPObjectWithDetails {
+public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
     private static final Log log = Log.getLog(DBNResourceManagerProject.class);
 
     private final RMProject project;
-    private DBNResourceManagerResource[] rootFolders;
 
     DBNResourceManagerProject(DBNResourceManagerRoot parentNode, RMProject project) {
         super(parentNode);
@@ -77,7 +75,7 @@ public class DBNResourceManagerProject extends DBNNode implements DBPObjectWithD
 
     @Override
     public DBNResourceManagerResource[] getChildren(DBRProgressMonitor monitor) throws DBException {
-        if (rootFolders == null) {
+        if (children == null) {
             List<DBNResourceManagerResource> rfList = new ArrayList<>();
             for (RMResource resource : getResourceController().listResources(
                 project.getId(), null, null, false, false)) {
@@ -85,9 +83,9 @@ public class DBNResourceManagerProject extends DBNNode implements DBPObjectWithD
                 rfList.add(new DBNResourceManagerResource(this, resource));
             }
 
-            rootFolders = rfList.toArray(new DBNResourceManagerResource[0]);
+            children = rfList.toArray(new DBNResourceManagerResource[0]);
         }
-        return rootFolders;
+        return children;
     }
 
     public RMController getResourceController() {
@@ -101,7 +99,7 @@ public class DBNResourceManagerProject extends DBNNode implements DBPObjectWithD
 
     @Override
     public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
-        rootFolders = null;
+        children = null;
         return this;
     }
 

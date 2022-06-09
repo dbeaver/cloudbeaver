@@ -44,7 +44,7 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
   const NavigationNode = component;
 
   if (root) {
-    const rootFolder = getComputed(() => treeContext?.folderExplorer.folder !== treeContext?.folderExplorer.root);
+    const rootFolder = getComputed(() => treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root);
 
     if (rootFolder) {
       return styled(TREE_NODE_STYLES)(

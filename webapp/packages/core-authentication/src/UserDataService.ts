@@ -45,13 +45,12 @@ export class UserDataService {
     const data = this.userData.get(userId)!;
 
     untracked(() => {
-      if (key in data) {
-        if (!validate || validate(data[key])) {
-          return data[key];
-        }
+      if (
+        !(key in data)
+        || validate?.(data[key]) === false
+      ) {
+        data[key] = observable(defaultValue());
       }
-
-      data[key] = observable(defaultValue());
     });
 
     return data[key];

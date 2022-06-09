@@ -373,7 +373,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
+    public void setUserCredentials(@NotNull String userId, @NotNull String authProviderId, @NotNull Map<String, Object> credentials) throws DBException {
         var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
@@ -514,7 +514,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public String[] getUserLinkedProviders(String userId) throws DBException {
+    public String[] getUserLinkedProviders(@NotNull String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
@@ -824,7 +824,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 var token = generateAuthToken(appSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(null, permissions));
+                return new SMAuthInfo(token, new SMAuthPermissions(null, appSessionId, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -851,7 +851,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 var token = generateAuthToken(appSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(userId, permissions));
+                return new SMAuthInfo(token, new SMAuthPermissions(userId, appSessionId, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -923,8 +923,9 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     @Override
     public SMAuthPermissions getTokenPermissions(String token) throws DBException {
         String userId;
+        String sessionId;
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID, EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID, EXPIRATION_TIME, SESSION_ID FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
         ) {
             dbStat.setString(1, token);
             try (var dbResult = dbStat.executeQuery()) {
@@ -936,12 +937,13 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 if (Timestamp.from(Instant.now()).after(expiredDate)) {
                     throw new SMException("Token expired");
                 }
+                sessionId = dbResult.getString(3);
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
         }
         var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
-        return new SMAuthPermissions(userId, permissions);
+        return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
     @Override

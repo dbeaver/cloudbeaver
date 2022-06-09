@@ -20,14 +20,14 @@ import { MenuItemRenderer } from './MenuItemRenderer';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
 
-interface IMenuProps {
+interface IMenuProps extends React.PropsWithChildren {
   loading: boolean;
   disabled: boolean;
 }
 
-type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode;
+type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode | React.ReactElement;
 
-interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
+interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'children'> {
   menu: IMenuData;
   style?: ComponentStyle;
   disclosure?: boolean;

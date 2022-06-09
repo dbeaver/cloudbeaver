@@ -37,7 +37,7 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     super();
 
     this.latestVersionNumber = null;
-    this.preloadResource(this.serverConfigResource);
+    this.preloadResource(this.serverConfigResource, () => {});
 
     makeObservable<this, 'latestVersionNumber'>(this, {
       latestVersionNumber: observable.ref,

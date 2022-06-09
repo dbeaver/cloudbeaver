@@ -53,7 +53,6 @@ export class SqlEditorService {
       resultTabs: [],
       executionPlanTabs: [],
       statisticsTabs: [],
-
       currentModeId: '',
       modeState: [],
     };

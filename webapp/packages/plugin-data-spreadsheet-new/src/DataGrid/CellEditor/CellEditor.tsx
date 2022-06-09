@@ -150,7 +150,7 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
             onUndo={handleUndo}
           />
         </editor>
-      ), dataGridContext.getEditorPortal()!)}
+      ), dataGridContext.getEditorPortal()!) as any}
     </box>
   );
 }, { forwardRef: true });

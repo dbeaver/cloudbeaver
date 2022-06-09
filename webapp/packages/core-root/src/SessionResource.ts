@@ -33,7 +33,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     super(null);
 
     this.action = null;
-    this.sync(serverConfigResource);
+    this.sync(serverConfigResource, () => {}, () => {});
   }
 
   processAction(): ISessionAction | null {
@@ -72,7 +72,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  protected setData(data: SessionState | null) { 
+  protected setData(data: SessionState | null) {
     if (!this.action) {
       this.action = data?.actionParameters;
     }

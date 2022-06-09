@@ -7,7 +7,6 @@
  */
 
 import type { SplitProps, SplitterMode } from 'go-split';
-import { runInAction } from 'mobx';
 
 import { useObjectRef } from '../useObjectRef';
 import { useUserData } from '../useUserData';
@@ -32,13 +31,11 @@ export function useSplitUserState(id: string): SplitState {
       return this.state.ratio;
     },
     onModeChange(mode) {
-      state.mode = mode;
+      this.state.mode = mode;
     },
     onResize(size, ratio) {
-      runInAction(() => {
-        state.ratio = ratio;
-        state.size = size;
-      });
+      this.state.ratio = ratio;
+      this.state.size = size;
     },
-  }), { state });
+  }), { state }, ['onModeChange', 'onResize']);
 }

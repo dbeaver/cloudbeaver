@@ -36,4 +36,6 @@ public interface WebAppConfiguration {
 
     Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create);
 
+    boolean isResourceManagerEnabled();
+
 }

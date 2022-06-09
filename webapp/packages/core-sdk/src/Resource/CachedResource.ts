@@ -105,10 +105,12 @@ export abstract class CachedResource<
     });
   }
 
-  sync(
-    resource: CachedResource<any, TParam, any, any>
+  sync<T = TParam>(
+    resource: CachedResource<any, T, any, any>,
+    mapTo?: (param: TParam) => T,
+    mapOut?: (param: T) => TParam
   ): void {
-    resource.outdateResource(this);
+    resource.outdateResource(this, mapOut);
 
     if (this.logActivity) {
       // resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate > ' + this.getName()));
@@ -120,7 +122,7 @@ export abstract class CachedResource<
       // resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate < ' + this.getName()));
     }
 
-    this.preloadResource(resource);
+    this.preloadResource(resource, mapTo);
   }
 
   updateResource<T = TParam>(resource: CachedResource<any, T, any, any>, map?: (param: TParam) => T): this {
@@ -145,7 +147,10 @@ export abstract class CachedResource<
     return this;
   }
 
-  outdateResource<T = TParam>(resource: CachedResource<any, T, any, any>, map?: (param: TParam) => T): this {
+  outdateResource<T = TParam>(
+    resource: CachedResource<any, T, any, any>,
+    map?: (param: TParam) => T
+  ): this {
     this.onDataOutdated.addHandler(param => {
       try {
         if (this.logActivity) {

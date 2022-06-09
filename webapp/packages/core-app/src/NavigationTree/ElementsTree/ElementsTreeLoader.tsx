@@ -30,7 +30,7 @@ interface Props {
   hasChildren?: boolean;
 }
 
-export const ElementsTreeLoader = observer<Props>(function ElementsTreeLoader({
+export const ElementsTreeLoader = observer<React.PropsWithChildren<Props>>(function ElementsTreeLoader({
   root,
   context,
   childrenState,
@@ -59,7 +59,7 @@ export const ElementsTreeLoader = observer<Props>(function ElementsTreeLoader({
           <Loader />
         </center>
       );
-    } else if (context.folderExplorer.root === context.folderExplorer.folder) {
+    } else if (context.folderExplorer.root === context.folderExplorer.state.folder) {
       return <>{Placeholder && <Placeholder />}</>;
     }
   }

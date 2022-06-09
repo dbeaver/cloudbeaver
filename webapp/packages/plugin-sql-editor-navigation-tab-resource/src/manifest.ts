@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
@@ -15,6 +16,7 @@ export const manifest: PluginManifest = {
   info: { name: 'Sql Editor Resource plugin' },
   providers: [
     PluginBootstrap,
+    LocaleService,
     SqlEditorTabResourceService,
   ],
 };

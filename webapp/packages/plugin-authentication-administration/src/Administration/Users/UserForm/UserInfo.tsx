@@ -94,7 +94,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           state={controller}
           disabled={controller.isSaving}
         >
-          {translate('authentication_user_activated')}
+          {translate('authentication_user_enabled')}
         </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
         {controller.roles.map(role => {

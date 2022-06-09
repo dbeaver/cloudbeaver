@@ -45,7 +45,7 @@ export class ServerConfigurationService {
   readonly saveTask: IExecutor<IServerConfigSaveData>;
   readonly validationTask: IExecutor<IServerConfigSaveData>;
   readonly configurationContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
-  readonly pluginsContainer: PlaceholderContainer;
+  readonly pluginsContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
 
   private done: boolean;
   private stateLinked: boolean;
@@ -113,6 +113,11 @@ export class ServerConfigurationService {
     }
   }
 
+  async activate(): Promise<void> {
+    // this.unSaveNotification?.close(true);
+    await this.loadConfig();
+  }
+
   async loadConfig(reset = false): Promise<void> {
     try {
       if (!this.stateLinked) {
@@ -124,10 +129,16 @@ export class ServerConfigurationService {
           }
         );
 
+        this.stateLinked = true;
+        await this.serverConfigResource.load();
+
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
         this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
 
-        this.stateLinked = true;
+        if (reset) {
+          this.serverConfigResource.resetUpdate();
+        }
+
       }
 
       await this.loadConfigTask.execute({
@@ -244,14 +255,23 @@ export class ServerConfigurationService {
 
   private showUnsavedNotification(close: boolean) {
     if (
-      !this.serverConfigResource.isChanged()
-      && !this.serverConfigResource.isNavigatorSettingsChanged()
+      (
+        !this.serverConfigResource.isChanged()
+        && !this.serverConfigResource.isNavigatorSettingsChanged()
+      )
+      || this.administrationScreenService.activeScreen?.item === ADMINISTRATION_SERVER_CONFIGURATION_ITEM
     ) {
       this.unSaveNotification?.close(true);
       return;
     }
 
-    if (close || this.unSaveNotification || this.administrationScreenService.isConfigurationMode) {
+    if (
+      close
+      || !this.stateLinked
+      || this.unSaveNotification
+      || this.administrationScreenService.isConfigurationMode
+      // || !this.administrationScreenService.isAdministrationPageActive
+    ) {
       return;
     }
 

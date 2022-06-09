@@ -21,7 +21,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeIcon: React.FC<Props> = function TreeNodeIcon({
+export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function TreeNodeIcon({
   icon,
   className,
   children,

@@ -11,7 +11,6 @@ import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
   InputField, Link, ObjectPropertyInfoForm, SubmittingForm,
@@ -20,6 +19,7 @@ import {
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';
 
@@ -180,6 +180,17 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               onCustomCopy={() => copy(state.config.signOutLink!, true)}
             >
               Sign out
+            </InputField>
+            <InputField
+              name='redirectLink'
+              state={state.config}
+              title={state.config.redirectLink}
+              disabled={state.disabled}
+              autoHide
+              readOnly
+              onCustomCopy={() => copy(state.config.redirectLink!, true)}
+            >
+              Redirect
             </InputField>
             {state.config.metadataLink && (
               <Link

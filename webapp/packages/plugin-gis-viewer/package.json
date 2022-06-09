@@ -40,16 +40,16 @@
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
-    "react": "~17.x.x",
+    "react": "~18.x.x",
     "reshadow": "~0.x.x"
   },
   "dependencies": {
-    "leaflet": "~1.7.1",
-    "react-leaflet": "~3.2.5",
+    "leaflet": "~1.8.0",
+    "react-leaflet": "~4.0.0",
     "wellknown": "~0.5.0"
   },
   "devDependencies": {
     "@types/react-leaflet": "~2.8.2",
-    "@types/wellknown": "~0.5.1"
+    "@types/wellknown": "~0.5.3"
   }
 }

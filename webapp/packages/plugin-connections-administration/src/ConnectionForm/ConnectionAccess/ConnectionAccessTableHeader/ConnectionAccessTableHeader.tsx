@@ -43,7 +43,7 @@ const styles = css`
     }
   `;
 
-export const ConnectionAccessTableHeader = observer<Props>(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
+export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Props>>(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <header className={className}>

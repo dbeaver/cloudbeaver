@@ -92,13 +92,17 @@ export function useTableData(
       return columns;
     },
     getMetrics(columnIndex) {
+      if (columnIndex < 0 || columnIndex > this.columns.length) {
+        return undefined;
+      }
+
       let left = 0;
       for (let i = 0; i < columnIndex; i++) {
         const column = this.columns[i];
         left += column.width as number;
       }
 
-      const column = this.getColumn(columnIndex);
+      const column = this.getColumn(columnIndex)!;
 
       return {
         left,
@@ -148,6 +152,9 @@ export function useTableData(
     },
     getEditionState(key) {
       return this.editor.getElementState(key);
+    },
+    inBounds(position) {
+      return this.view.has(position);
     },
     isCellEdited(key) {
       return this.editor.isElementEdited(key);

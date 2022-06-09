@@ -19,7 +19,7 @@ interface Props {
   className?: string;
 }
 
-export const FormGroup: React.FC<Props> = function FormGroup({ children, className }) {
+export const FormGroup: React.FC<React.PropsWithChildren<Props>> = function FormGroup({ children, className }) {
   return styled(styles)(
     <group as='div' className={className}>
       {children}
