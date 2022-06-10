@@ -19,6 +19,7 @@ package io.cloudbeaver.model.app;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.qm.QMService;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -44,5 +45,7 @@ public interface WebApplication extends DBPApplication {
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 
     RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider);
+
+    QMService getQueryManagerService(@NotNull SMCredentialsProvider credentialsProvider);
 
 }
