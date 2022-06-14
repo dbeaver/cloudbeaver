@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMController;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class RMControllerInvocationHandler implements InvocationHandler {
@@ -40,7 +41,11 @@ public class RMControllerInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        checkIsRmEnabled();
-        return method.invoke(rmController, args);
+        try {
+            checkIsRmEnabled();
+            return method.invoke(rmController, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 }
