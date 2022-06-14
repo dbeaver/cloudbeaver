@@ -131,7 +131,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 if (curUser == null) {
                     try {
                         SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
-                        userId = smAuthInfo.getUserInfo().getUserId();
+                        userId = smAuthInfo.getAuthPermissions().getUserId();
                         if (userId == null) {
                             throw new SMException("Anonymous authentication restricted");
                         }
@@ -253,7 +253,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 authProvider.getId(),
                 userCredentials);
 
-            isAdmin = authInfo.getUserInfo().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
+            isAdmin = authInfo.getAuthPermissions().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
         } catch (DBException e) {
             log.error(e);
         }
