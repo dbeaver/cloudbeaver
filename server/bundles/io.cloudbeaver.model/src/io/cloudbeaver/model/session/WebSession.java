@@ -937,11 +937,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
-
-        private String name;
         @Override
         public void beginTask(String name, int totalWork) {
-            this.name = name;
             synchronized (sessionMessages) {
                 sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
             }
@@ -951,13 +948,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         public void subTask(String name) {
             synchronized (sessionMessages) {
                 sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
-            }
-        }
-
-        @Override
-        public void done() {
-            synchronized (sessionMessages) {
-                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, "Task \"" + name + "\" finished"));
             }
         }
     }
