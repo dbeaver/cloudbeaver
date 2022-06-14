@@ -24,12 +24,15 @@ import type {
 import { MenuPanelItem } from './MenuPanelItem';
 import { menuPanelStyles } from './menuPanelStyles';
 
+export type MenuState = MenuStateReturn;
+
 /**
  * MenuTrigger
  */
 
 interface IMenuTriggerBaseProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
+  menuRef?: React.RefObject<MenuState | undefined>;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   modal?: boolean;
@@ -50,6 +53,7 @@ interface IMenuTriggerProps extends IMenuTriggerBaseProps {
 
 export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger({
   panel,
+  menuRef,
   getPanel,
   disclosure,
   children,
@@ -64,6 +68,11 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
+
+  if (menuRef) {
+    //@ts-expect-error ref mutation
+    menuRef.current = menu;
+  }
 
   const handleItemClose = useCallback(() => {
     menu.hide();

@@ -6,7 +6,7 @@ export * from './CommonDialog/RenameDialog';
 export * from './CommonDialog/DialogsPortal';
 
 export * from './Menu/IMenuPanel';
-export { MenuTrigger } from './Menu/MenuPanel/MenuTrigger';
+export { MenuTrigger, type MenuState } from './Menu/MenuPanel/MenuTrigger';
 export * from './Menu/StaticMenu/StaticMenu';
 
 export * from './Menu/models/ComputedContextMenuModel';
