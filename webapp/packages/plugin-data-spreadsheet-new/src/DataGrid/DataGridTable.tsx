@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataGrid from 'react-data-grid';
-import type { DataGridHandle } from 'react-data-grid';
+import type { DataGridHandle, Position } from 'react-data-grid';
 import styled from 'reshadow';
 
 import { TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -145,10 +145,22 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }
   }
 
+  const hamdlers = useObjectRef(() => ({
+    selectCell(pos: Position, scroll = false): void {
+      if (
+        dataGridRef.current?.selectedCell.idx !== pos.idx
+        || dataGridRef.current?.selectedCell.rowIdx !== pos.rowIdx
+        || scroll
+      ) {
+        dataGridRef.current?.selectCell(pos);
+      }
+    },
+  }));
+
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
-      dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
+      hamdlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
     },
     onDragOver: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
@@ -214,11 +226,11 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
           if (editingState === DatabaseEditChangeType.add) {
             if (rowIdx - 1 > 0) {
-              dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx - 1 });
+              hamdlers.selectCell({ idx, rowIdx: rowIdx - 1 });
             }
           } else {
             if (rowIdx + 1 < tableData.rows.length) {
-              dataGridRef.current?.selectCell({ idx, rowIdx: rowIdx + 1 });
+              hamdlers.selectCell({ idx, rowIdx: rowIdx + 1 });
             }
           }
         }
@@ -294,7 +306,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         return;
       }
 
-      dataGridRef.current?.selectCell({ idx, rowIdx });
+      hamdlers.selectCell({ idx, rowIdx });
     }
 
     tableData.editor.action.addHandler(syncEditor);
@@ -310,7 +322,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           const rowIdx = tableData.getRowIndexFromKey(data.key.row);
 
           focusSyncRef.current = { idx, rowIdx };
-          dataGridRef.current?.selectCell({ idx, rowIdx });
+
+          hamdlers.selectCell({ idx, rowIdx });
         }
       }, 1);
     }

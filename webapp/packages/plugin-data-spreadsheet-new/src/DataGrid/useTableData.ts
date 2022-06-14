@@ -28,6 +28,7 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   name: '#',
   minWidth: 60,
   width: 60,
+  selectable: false,
   resizable: false,
   frozen: true,
   headerRenderer: TableIndexColumnHeader,
@@ -77,7 +78,8 @@ export function useTableData(
 
       const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>(
         (col, index) => ({
-          key: uuid(),
+          // key: uuid(),
+          key: ResultSetDataKeysUtils.serialize(col),
           columnDataIndex: { index },
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,

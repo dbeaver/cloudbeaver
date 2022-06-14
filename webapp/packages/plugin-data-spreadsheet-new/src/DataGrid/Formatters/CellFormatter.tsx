@@ -30,11 +30,13 @@ const styles = css`
     flex: 1;
     display: flex;
     overflow: hidden;
-    position: relative;
   }
   formatter-container {
     flex: 1;
     overflow: hidden;
+  }
+  menu-container {
+    width: 20px;
   }
 `;
 
@@ -47,7 +49,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
   const isEditing = cellContext.isEditing;
   const showCellMenu = getComputed(() => !isEditing && (
     rest.isCellSelected
-    || cellContext?.mouse.state.mouseEnter
+    || cellContext.mouse.state.mouseEnter
     || menuVisible
   ));
 
@@ -67,7 +69,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && cellContext.cell && (
+      {showCellMenu && cellContext.cell && !rest.isScrolling  && (
         <menu-container>
           <CellMenu
             cellKey={cellContext.cell}
