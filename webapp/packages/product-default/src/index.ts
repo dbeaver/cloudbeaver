@@ -1,5 +1,14 @@
 import 'reflect-metadata';
 
+
+
+
+
+
+
+                                                                                                                                                                                                                                        // test
+
+
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
