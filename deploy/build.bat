@@ -61,8 +61,8 @@ call yarn link
 
 cd ..\cloudbeaver\webapp
 
-call yarn link "react-data-grid"
 call yarn
+call yarn link "react-data-grid"
 call lerna bootstrap
 call lerna run build --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
 
