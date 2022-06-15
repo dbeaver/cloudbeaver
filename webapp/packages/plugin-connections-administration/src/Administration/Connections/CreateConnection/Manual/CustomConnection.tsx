@@ -22,14 +22,13 @@ export const CustomConnection = observer(function CustomConnection() {
   const service = useService(ConnectionManualService);
   const dbDriverResource = useMapResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
-  const loading = dbDriverResource.isLoading();
   const drivers = useMemo(() => computed(() => (
     dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  return <DriverList drivers={drivers.get()} onSelect={service.select} />;
+  return (
+    <Loader state={[dbDriverResource]}>
+      <DriverList drivers={drivers.get()} onSelect={service.select} />
+    </Loader>
+  );
 });
