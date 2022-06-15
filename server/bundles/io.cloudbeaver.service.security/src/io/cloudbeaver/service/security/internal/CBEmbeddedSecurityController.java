@@ -783,36 +783,43 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         }
     }
 
-    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBException {
-        if (isSessionPersisted(appSessionId)) {
-            return;
-        }
+    private String createSessionIfNotExist(
+        @NotNull String appSessionId,
+        @Nullable String userId,
+        @NotNull Map<String, Object> parameters,
+        @NotNull SMSessionType sessionType,
+        Connection dbCon
+    ) throws SQLException, DBException {
+        var sessionId = UUID.randomUUID().toString();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
-                "VALUES(?,?,?,?,?,?,?,?)")) {
-            dbStat.setString(1, appSessionId);
+            "INSERT INTO CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME,"
+                + "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) "
+                + "VALUES(?,?,?,?,?,?,?,?,?)")) {
+            dbStat.setString(1, sessionId);
+            dbStat.setString(2, appSessionId);
             if (userId != null) {
-                dbStat.setString(2, userId);
+                dbStat.setString(3, userId);
             } else {
-                dbStat.setNull(2, Types.VARCHAR);
+                dbStat.setNull(3, Types.VARCHAR);
             }
 
             Timestamp currentTS = new Timestamp(System.currentTimeMillis());
-            dbStat.setTimestamp(3, currentTS);
             dbStat.setTimestamp(4, currentTS);
+            dbStat.setTimestamp(5, currentTS);
             if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
-                dbStat.setString(5, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
-            } else {
-                dbStat.setNull(5, Types.VARCHAR);
-            }
-            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
-                dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
+                dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
             } else {
                 dbStat.setNull(6, Types.VARCHAR);
             }
-            dbStat.setString(7, database.getInstanceId());
-            dbStat.setString(8, sessionType.getSessionType());
+            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
+                dbStat.setString(7, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
+            } else {
+                dbStat.setNull(7, Types.VARCHAR);
+            }
+            dbStat.setString(8, database.getInstanceId());
+            dbStat.setString(9, sessionType.getSessionType());
             dbStat.execute();
+            return sessionId;
         }
     }
 
@@ -820,11 +827,11 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(appSessionId, null, dbCon);
+                var smSessionId = createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
+                var token = generateAuthToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(null, appSessionId, permissions));
+                return new SMAuthInfo(token, new SMAuthPermissions(null, smSessionId, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -847,11 +854,11 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 if (userId == null) {
                     throw new SMException("Invalid user credentials");
                 }
-                createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(appSessionId, userId, dbCon);
+                var smSessionId = createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
+                var token = generateAuthToken(smSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(userId, appSessionId, permissions));
+                return new SMAuthInfo(token, new SMAuthPermissions(userId, smSessionId, permissions));
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -899,15 +906,15 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         return userId;
     }
 
-    private String generateAuthToken(@NotNull String appSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
-        JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", appSessionId);
+    private String generateAuthToken(@NotNull String smSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
+        JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID, SESSION_ID, USER_ID, EXPIRATION_TIME) " +
                 "VALUES(?,?,?,?)")) {
 
             String authToken = SecurityUtils.generatePassword(32);
             dbStat.setString(1, authToken);
-            dbStat.setString(2, appSessionId);
+            dbStat.setString(2, smSessionId);
             if (userId == null) {
                 dbStat.setNull(3, Types.VARCHAR);
             } else {
