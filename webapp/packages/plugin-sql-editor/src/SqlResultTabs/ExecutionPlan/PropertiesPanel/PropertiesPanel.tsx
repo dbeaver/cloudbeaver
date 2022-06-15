@@ -77,8 +77,8 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
         </TableColumnHeader>
       </TableHeader>
       <TableBody>
-        {general.length && <PropertiesPanelItemsGroup properties={general} name={translate('sql_execution_plan_properties_panel_general')} />}
-        {details.length && <PropertiesPanelItemsGroup properties={details} name={translate('sql_execution_plan_properties_panel_details')} />}
+        {!!general.length && <PropertiesPanelItemsGroup properties={general} name={translate('sql_execution_plan_properties_panel_general')} />}
+        {!!details.length && <PropertiesPanelItemsGroup properties={details} name={translate('sql_execution_plan_properties_panel_details')} />}
       </TableBody>
     </Table>
   );
