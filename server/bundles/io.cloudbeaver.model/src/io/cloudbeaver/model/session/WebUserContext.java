@@ -33,6 +33,10 @@ import org.jkiss.dbeaver.model.security.SMController;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Web user context.
+ * Contains user state and services based on available permissions
+ */
 public class WebUserContext implements SMCredentialsProvider {
     private final WebApplication application;
 
@@ -45,13 +49,18 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMAdminController adminSecurityController;
     private RMController rmController;
 
-
     public WebUserContext(WebApplication application) {
         this.application = application;
         this.securityController = application.getSecurityController(this);
         this.userPermissions = getDefaultPermissions();
     }
 
+    /**
+     * refresh context state based on new token from security manager
+     *
+     * @param smAuthInfo - auth info from security manager
+     * @throws DBException - if user already authorized and new token
+     */
     public void refresh(SMAuthInfo smAuthInfo) throws DBException {
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
         var tokenInfo = smAuthInfo.getAuthPermissions();
@@ -68,6 +77,9 @@ public class WebUserContext implements SMCredentialsProvider {
 
     }
 
+    /**
+     * reset the state as if the user is not logged in
+     */
     public void reset() {
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
@@ -117,6 +129,9 @@ public class WebUserContext implements SMCredentialsProvider {
         return userPermissions;
     }
 
+    /**
+     * reread the current user's permissions
+     */
     public synchronized void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
             this.userPermissions = securityController.getTokenPermissions(smCredentials.getSmToken()).getPermissions();
