@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Filter, FolderExplorer, FolderExplorerPath, Loader, useFocus, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
+import { FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
@@ -138,9 +137,11 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
+      let fullPath = folderExplorer.state.fullPath;
       const preload = await resource.preloadNodeParents(fullPath);
 
       if (!preload) {
+        fullPath = folderExplorer.state.fullPath;
         exitFolders(fullPath);
         return true;
       }
