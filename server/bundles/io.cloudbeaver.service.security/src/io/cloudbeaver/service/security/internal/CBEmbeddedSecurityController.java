@@ -783,11 +783,18 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         }
     }
 
-    private String createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBException {
+    private String createSessionIfNotExist(
+        @NotNull String appSessionId,
+        @Nullable String userId,
+        @NotNull Map<String, Object> parameters,
+        @NotNull SMSessionType sessionType,
+        Connection dbCon
+    ) throws SQLException, DBException {
         var sessionId = UUID.randomUUID().toString();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
-                "VALUES(?,?,?,?,?,?,?,?,?)")) {
+            "INSERT INTO CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME,"
+                + "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) "
+                + "VALUES(?,?,?,?,?,?,?,?,?)")) {
             dbStat.setString(1, sessionId);
             dbStat.setString(2, appSessionId);
             if (userId != null) {
