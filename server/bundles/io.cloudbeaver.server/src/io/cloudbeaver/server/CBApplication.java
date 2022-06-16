@@ -489,36 +489,10 @@ public class CBApplication extends BaseWebApplication {
         String productConfigPath = null;
 
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
-
-        // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
-        InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
-        InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
-
-        Gson gson = new GsonBuilder()
-            .setLenient()
-            .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
-            .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .create();
-
-        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-            Map<String, Object> configProps = JSONUtils.parseMap(gson, reader);
-
+        Gson gson = getGson();
+        try {
+            Map<String, Object> configProps = readConfiguration(configFile);
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
-
-            String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
-            if (!CommonUtils.isEmpty(externalPropertiesFile)) {
-                Properties props = new Properties();
-                try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
-                    props.load(is);
-                } catch (IOException e) {
-                    log.error("Error loading external properties from " + externalPropertiesFile, e);
-                }
-                for (String propName : props.stringPropertyNames()) {
-                    this.externalProperties.put(propName, props.getProperty(propName));
-                }
-            }
-
-            patchConfigurationWithProperties(configProps);
 
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
             serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
@@ -618,6 +592,52 @@ public class CBApplication extends BaseWebApplication {
             }
         }
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected Map<String, Object> readConfiguration(File configFile) throws DBException {
+        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+            Map<String, Object> configProps = JSONUtils.parseMap(getGson(), reader);
+            Map<String, Object> serverConfig = getServerConfigProps(configProps);
+            readAdditionalConfiguration(serverConfig);
+
+            String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
+            if (!CommonUtils.isEmpty(externalPropertiesFile)) {
+                Properties props = new Properties();
+                try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
+                    props.load(is);
+                } catch (IOException e) {
+                    log.error("Error loading external properties from " + externalPropertiesFile, e);
+                }
+                for (String propName : props.stringPropertyNames()) {
+                    this.externalProperties.put(propName, props.getProperty(propName));
+                }
+            }
+
+            patchConfigurationWithProperties(configProps);
+            return configProps;
+        } catch (IOException e) {
+            throw new DBException("Error parsing server configuration", e);
+        }
+    }
+
+    private Gson getGson() {
+        // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
+        InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
+        InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
+
+        return new GsonBuilder()
+            .setLenient()
+            .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
+            .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
+            .create();
+    }
+
+    protected void readAdditionalConfiguration(Map<String, Object> serverConfig) throws DBException {
+
+    }
+
+    private Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+        return JSONUtils.getObject(configProps, "server");
     }
 
     protected void parseAdditionalServerConfiguration(Map<String, Object> serverConfig) throws DBException {

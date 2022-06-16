@@ -121,7 +121,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @SuppressWarnings("unchecked")
-    protected void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+    public static void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
         for (Map.Entry<String, Object> entry : configProps.entrySet()) {
             Object propValue = entry.getValue();
             if (propValue instanceof String) {
