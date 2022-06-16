@@ -20,6 +20,10 @@ import io.cloudbeaver.model.app.WebApplication;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WebAppUtils {
     public static String getRelativePath(String path, String curDir) {
@@ -35,6 +39,34 @@ public class WebAppUtils {
 
     public static WebApplication getWebApplication() {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> mergeConfigurations(Map<String, Object> origin, Map<String, Object> additional) {
+        var resultConfig = new HashMap<String, Object>();
+        Set<String> rootKeys = new HashSet<>(origin.keySet());
+        rootKeys.addAll(additional.keySet());
+
+        for (var rootKey : rootKeys) {
+            var originValue = origin.get(rootKey);
+            var additionalValue = additional.get(rootKey);
+
+            if (originValue == null || additionalValue == null) {
+                var resultValue = originValue != null ? originValue : additionalValue;
+                resultConfig.put(rootKey, resultValue);
+                continue;
+            }
+
+            if (originValue instanceof Map) {
+                var resultValue = mergeConfigurations((Map<String, Object>) originValue, (Map<String, Object>) additionalValue);
+                resultConfig.put(rootKey, resultValue);
+            } else {
+                resultConfig.put(rootKey, additionalValue);
+            }
+
+        }
+
+        return resultConfig;
     }
 
 }

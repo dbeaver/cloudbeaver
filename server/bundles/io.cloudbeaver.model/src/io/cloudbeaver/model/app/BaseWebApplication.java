@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
@@ -118,6 +119,10 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     protected @NotNull RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
         return LocalResourceController.builder(credentialsProvider).build();
+    }
+
+    protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+        return JSONUtils.getObject(configProps, "server");
     }
 
     @SuppressWarnings("unchecked")
