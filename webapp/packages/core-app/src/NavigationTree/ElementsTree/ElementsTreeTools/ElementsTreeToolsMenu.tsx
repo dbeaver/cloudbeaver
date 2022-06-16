@@ -51,16 +51,6 @@ const MENU_STYLES = css`
     & Loader {
         width: 16px;
     }
-
-    & item-label {
-        display: block;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-
-    & IconOrImage + item-label, & Loader + item-label {
-        padding-left: 8px
-    }
   }
   
   MenuSeparator {
