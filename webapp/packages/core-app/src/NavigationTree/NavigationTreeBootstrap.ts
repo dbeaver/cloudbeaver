@@ -13,6 +13,7 @@ import { ActionService, ACTION_COLLAPSE_ALL, ACTION_FILTER, IAction, IDataContex
 import { ConnectionSchemaManagerService } from '../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
 import { DATA_CONTEXT_ELEMENTS_TREE } from './ElementsTree/DATA_CONTEXT_ELEMENTS_TREE';
+import  { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService';
 import { createElementsTreeSettings, validateElementsTreeSettings } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 import { KEY_BINDING_ENABLE_FILTER } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
@@ -27,49 +28,13 @@ export class NavigationTreeBootstrap extends Bootstrap {
     private readonly keyBindingService: KeyBindingService,
     private readonly userDataService: UserDataService,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private readonly elementsTreeToolsMenuService: ElementsTreeToolsMenuService
   ) {
     super();
   }
 
   register(): void | Promise<void> {
-    this.actionService.addHandler({
-      id: 'nav-tree-filter',
-      isActionApplicable: (contexts, action) => (
-        action === ACTION_FILTER
-        && contexts.has(DATA_CONTEXT_NAV_TREE_ROOT)
-      ),
-      handler: this.switchFilter.bind(this),
-    });
-
-    this.actionService.addHandler({
-      id: 'elements-tree-base',
-      isActionApplicable: (contexts, action) => (
-        contexts.has(DATA_CONTEXT_ELEMENTS_TREE)
-        && [ACTION_COLLAPSE_ALL, ACTION_LINK_OBJECT].includes(action)
-      ),
-      handler: this.elementsTreeActionHandler.bind(this),
-    });
-
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'nav-tree-filter',
-      binding: KEY_BINDING_ENABLE_FILTER,
-      isBindingApplicable: (contexts, action) => action === ACTION_FILTER,
-      handler: this.switchFilter.bind(this),
-    });
-
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'elements-tree-collapse',
-      binding: KEY_BINDING_COLLAPSE_ALL,
-      isBindingApplicable: (contexts, action) => action === ACTION_COLLAPSE_ALL,
-      handler: this.elementsTreeActionHandler.bind(this),
-    });
-
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'elements-tree-link',
-      binding: KEY_BINDING_LINK_OBJECT,
-      isBindingApplicable: (contexts, action) => action === ACTION_LINK_OBJECT,
-      handler: this.elementsTreeActionHandler.bind(this),
-    });
+    this.elementsTreeToolsMenuService.register();
   }
 
   private switchFilter(contexts: IDataContextProvider, action: IAction) {

@@ -44,6 +44,7 @@ import {
   NavigationTreeBootstrap,
   ToolsPanelService,
   QuotasService,
+  ElementsTreeToolsMenuService,
 } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -115,6 +116,7 @@ export const coreManifests: PluginManifest[] = [
       NavNodeInfoResource,
       SqlGeneratorsBootstrap,
       SqlGeneratorsResource,
+      ElementsTreeToolsMenuService,
       NavigationTreeBootstrap,
       NavTreeResource,
       DBObjectResource,

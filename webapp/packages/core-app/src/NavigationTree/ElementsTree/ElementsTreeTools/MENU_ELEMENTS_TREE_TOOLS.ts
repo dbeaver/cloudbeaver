@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from '@cloudbeaver/core-view';
+import { createMenu } from '@cloudbeaver/core-view';
 
-
-export const ACTION_LINK_OBJECT = createAction('link-object', {
-  label: 'link-object',
-  icon: '/icons/link_editor_sm.svg',
-});
+export const MENU_ELEMENTS_TREE_TOOLS = createMenu('elements-tree-tools', 'Tree tools menu');
