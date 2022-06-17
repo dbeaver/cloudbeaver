@@ -16,7 +16,6 @@ import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
-import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL';
 import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
 import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
@@ -83,14 +82,6 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
       <actions>
         <fill />
         <ElementsTreeToolsMenu />
-        <IconButton
-          name='/icons/collapse_sm.svg'
-          title={translate('app_navigationTree_action_collapse_all') + ` (${KEY_BINDING_COLLAPSE_ALL.label})`}
-          style={toolsStyles}
-          img
-          onClick={tree.collapse}
-          {...use({ primary: true })}
-        />
         {tree.settings?.configurable && (
           <IconButton
             name='/icons/settings_cog_sm.svg'

@@ -48,6 +48,10 @@ const MENU_STYLES = css`
         width: 16px;
     }
 
+    & item-label {
+        display: none;
+    }
+
     & Loader {
         width: 16px;
     }

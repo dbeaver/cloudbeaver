@@ -16,7 +16,11 @@ import {
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaSetter,
-  ITabOptions
+  ITabOptions,
+  objectNavNodeProvider,
+  NodeManagerUtils,
+  ConnectionSchemaManagerService,
+  NavNodeManagerService
 } from '@cloudbeaver/core-app';
 import {
   ConnectionExecutionContextResource,
@@ -52,6 +56,8 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private readonly navNodeManagerService: NavNodeManagerService
   ) {
     super();
 
@@ -66,6 +72,7 @@ export class SqlEditorTabService extends Bootstrap {
       onClose: this.handleTabClose.bind(this),
       canClose: this.handleCanTabClose.bind(this),
       extensions: [
+        objectNavNodeProvider(this.getNavNode.bind(this)),
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
@@ -122,6 +129,29 @@ export class SqlEditorTabService extends Bootstrap {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
+  }
+
+  private getNavNode() {
+    const objectCatalog = this.connectionSchemaManagerService.currentObjectCatalog;
+    const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
+
+    const nodeId = objectSchema?.id ?? objectCatalog?.id;
+
+    if (!nodeId) {
+      return;
+    }
+
+    const parents = NodeManagerUtils.parentsFromPath(nodeId);
+    const parent = this.navNodeManagerService.getNode(parents[0]);
+
+    if (parent) {
+      parents.unshift(parent.parentId);
+    }
+
+    return {
+      nodeId,
+      path: parents,
+    };
   }
 
   private async handleExecutionContextUpdate(key: ResourceKey<string>) {

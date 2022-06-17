@@ -12,8 +12,6 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ActionService, ACTION_COLLAPSE_ALL, ACTION_FILTER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
-import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
-import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../../../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId';
 import { ACTION_LINK_OBJECT } from '../ACTION_LINK_OBJECT';
@@ -35,58 +33,48 @@ export class ElementsTreeToolsMenuService {
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly navNodeManagerService: NavNodeManagerService,
   ) {}
 
   register() {
     this.actionService.addHandler({
       id: 'tree-tools-menu-base-handler',
       isActionApplicable(context, action) {
-        return [ACTION_LINK_OBJECT].includes(action);
+        return [ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL].includes(action);
       },
       getActionInfo: (context, action) => {
-        if (action === ACTION_LINK_OBJECT) {
-          const tooltip = this.localizationService.translate('app_navigationTree_action_link_with_editor') + ` (${KEY_BINDING_LINK_OBJECT.label})`;
-          return {
-            ...action.info,
-            label: '',
-            tooltip,
-          };
+        switch (action) {
+          case ACTION_LINK_OBJECT: {
+            const tooltip = this.localizationService.translate('app_navigationTree_action_link_with_editor') + ` (${KEY_BINDING_LINK_OBJECT.label})`;
+            return {
+              ...action.info,
+              tooltip,
+            };
+          }
+          case ACTION_COLLAPSE_ALL: {
+            const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + ` (${KEY_BINDING_COLLAPSE_ALL.label})`;
+            return {
+              ...action.info,
+              tooltip,
+            };
+          }
         }
 
-        return { ...action.info, label: '' };
+        return action.info;
       },
       isHidden: (context, action) => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (action === ACTION_LINK_OBJECT && tree) {
-          const objectCatalog = this.connectionSchemaManagerService.currentObjectCatalog;
-          const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
           const navNode = this.connectionSchemaManagerService.activeNavNode;
-
-          const nodeId = navNode?.nodeId ?? objectSchema?.id ?? objectCatalog?.id;
-
-          if (nodeId) {
-            const parents = NodeManagerUtils.parentsFromPath(nodeId);
-            const parent = this.navNodeManagerService.getNode(parents[0]);
-
-            if (parent && parent.id !== parent.parentId) {
-              parents.unshift(parent.parentId);
-            }
-
-            const nodeInTree = parents.includes(tree.baseRoot) && this.navNodeInfoResource.has(nodeId);
-            return !nodeInTree;
-          }
+          const nodeInTree = navNode?.path.includes(tree.baseRoot) && this.navNodeInfoResource.has(navNode.nodeId);
+          return !nodeInTree;
         }
 
-        return true;
+        return false;
       },
       handler: async (context, action) => {
-        switch (action) {
-          case ACTION_LINK_OBJECT: {
-            this.elementsTreeActionHandler(context, action);
-            break;
-          }
+        if (action === ACTION_COLLAPSE_ALL || action === ACTION_LINK_OBJECT) {
+          this.elementsTreeActionHandler(context, action);
         }
       },
     });
@@ -96,6 +84,7 @@ export class ElementsTreeToolsMenuService {
       getItems: (context, items) => [
         ...items,
         ACTION_LINK_OBJECT,
+        ACTION_COLLAPSE_ALL,
       ],
     });
 
@@ -171,23 +160,10 @@ export class ElementsTreeToolsMenuService {
         tree.collapse();
         break;
       case ACTION_LINK_OBJECT: {
-        const objectCatalog = this.connectionSchemaManagerService.currentObjectCatalog;
-        const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
-        const nodeId = navNode?.nodeId ?? objectSchema?.id ?? objectCatalog?.id;
-
-        if (nodeId) {
-          const parents = NodeManagerUtils.parentsFromPath(nodeId);
-          const parent = this.navNodeManagerService.getNode(parents[0]);
-
-          if (parent && parent.id !== parent.parentId) {
-            parents.unshift(parent.parentId);
-          }
-
-          if (parents.includes(tree.baseRoot) && this.navNodeInfoResource.has(nodeId)) {
-            tree.show(nodeId, parents);
-          }
+        if (navNode?.path.includes(tree.baseRoot) && this.navNodeInfoResource.has(navNode.nodeId)) {
+          tree.show(navNode.nodeId, navNode.path);
         }
         break;
       }
