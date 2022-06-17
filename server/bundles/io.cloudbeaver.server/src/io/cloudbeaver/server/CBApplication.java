@@ -790,7 +790,12 @@ public class CBApplication extends BaseWebApplication {
         }
     }
 
-    protected Map<String, Object> collectConfigurationProperties(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) {
+    protected Map<String, Object> collectConfigurationProperties(
+        String newServerName,
+        String newServerURL,
+        long sessionExpireTime,
+        CBAppConfig appConfig
+    ) {
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var serverConfigProperties = new LinkedHashMap<String, Object>();
@@ -830,20 +835,27 @@ public class CBApplication extends BaseWebApplication {
                 var navigatorProperties = new LinkedHashMap<String, Object>();
                 appConfigProperties.put("defaultNavigatorSettings", navigatorProperties);
 
-                if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects())
+                if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects()) {
                     navigatorProperties.put("showSystemObjects", navSettings.isShowSystemObjects());
-                if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects())
+                }
+                if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects()) {
                     navigatorProperties.put("showUtilityObjects", navSettings.isShowUtilityObjects());
-                if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities())
+                }
+                if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities()) {
                     navigatorProperties.put("showOnlyEntities", navSettings.isShowOnlyEntities());
-                if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities())
+                }
+                if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities()) {
                     navigatorProperties.put("mergeEntities", navSettings.isMergeEntities());
-                if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
+                }
+                if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders()) {
                     navigatorProperties.put("hideFolders", navSettings.isHideFolders());
-                if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
+                }
+                if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas()) {
                     navigatorProperties.put("hideSchemas", navSettings.isHideSchemas());
-                if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
+                }
+                if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel()) {
                     navigatorProperties.put("hideVirtualModel", navSettings.isHideVirtualModel());
+                }
             }
             if (appConfig.getEnabledFeatures() != null) {
                 appConfigProperties.put("enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()));
