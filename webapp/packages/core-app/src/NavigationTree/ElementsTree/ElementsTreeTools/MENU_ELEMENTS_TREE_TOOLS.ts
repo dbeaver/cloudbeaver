@@ -6,9 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from '../createAction';
+import { createMenu } from '@cloudbeaver/core-view';
 
-export const ACTION_COLLAPSE_ALL = createAction('collapse-all', {
-  label: 'collapse-all',
-  icon: '/icons/collapse_sm.svg',
-});
+export const MENU_ELEMENTS_TREE_TOOLS = createMenu('elements-tree-tools', 'Tree tools menu');
