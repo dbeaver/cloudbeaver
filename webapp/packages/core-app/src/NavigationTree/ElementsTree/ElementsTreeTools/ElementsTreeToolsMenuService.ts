@@ -11,7 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ActionService, ACTION_COLLAPSE_ALL, ACTION_FILTER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
-import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { ConnectionSchemaManagerService } from '../../../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId';
 import { ACTION_LINK_OBJECT } from '../ACTION_LINK_OBJECT';
@@ -32,7 +31,6 @@ export class ElementsTreeToolsMenuService {
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {}
 
   register() {
@@ -66,7 +64,7 @@ export class ElementsTreeToolsMenuService {
 
         if (action === ACTION_LINK_OBJECT && tree) {
           const navNode = this.connectionSchemaManagerService.activeNavNode;
-          const nodeInTree = navNode?.path.includes(tree.baseRoot) && this.navNodeInfoResource.has(navNode.nodeId);
+          const nodeInTree = navNode?.path.includes(tree.baseRoot);
           return !nodeInTree;
         }
 
@@ -162,7 +160,7 @@ export class ElementsTreeToolsMenuService {
       case ACTION_LINK_OBJECT: {
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
-        if (navNode?.path.includes(tree.baseRoot) && this.navNodeInfoResource.has(navNode.nodeId)) {
+        if (navNode?.path.includes(tree.baseRoot)) {
           tree.show(navNode.nodeId, navNode.path);
         }
         break;
