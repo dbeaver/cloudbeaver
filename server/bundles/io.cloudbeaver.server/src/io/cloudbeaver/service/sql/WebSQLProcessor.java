@@ -180,6 +180,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         session.getExecutionContext(),
                         WebSQLProcessor.this,
                         sqlQuery);
+
                     try (DBCStatement dbStat = DBUtils.makeStatement(
                         source,
                         session,
@@ -188,6 +189,22 @@ public class WebSQLProcessor implements WebSessionProvider {
                         webDataFilter.getOffset(),
                         webDataFilter.getLimit()))
                     {
+                        // Set query timeout
+                        int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
+                            .getDouble(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
+                        if (queryTimeout <= 0) {
+                            queryTimeout = CommonUtils.toInt(
+                                getWebSession().getApplication().getAppConfiguration()
+                                    .getResourceQuota(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT));
+                        }
+                        if (queryTimeout > 0) {
+                            try {
+                                dbStat.setStatementTimeout(queryTimeout);
+                            } catch (Throwable e) {
+                                log.debug("Can't set statement timeout:" + e.getMessage());
+                            }
+                        }
+
                         boolean hasResultSet = dbStat.executeStatement();
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {

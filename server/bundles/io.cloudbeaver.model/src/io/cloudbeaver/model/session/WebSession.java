@@ -160,6 +160,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return id;
     }
 
+    public WebApplication getApplication() {
+        return application;
+    }
+
     @Override
     public boolean isApplicationSession() {
         return false;

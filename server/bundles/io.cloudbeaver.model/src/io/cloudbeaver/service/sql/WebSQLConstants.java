@@ -24,6 +24,7 @@ public class WebSQLConstants {
     public static final String QUOTA_PROP_ROW_LIMIT = "sqlResultSetRowsLimit";
     public static final String QUOTA_PROP_MEMORY_LIMIT = "sqlResultSetMemoryLimit";
     public static final String QUOTA_PROP_QUERY_LIMIT = "sqlMaxRunningQueries";
+    public static final String QUOTA_PROP_SQL_QUERY_TIMEOUT = "sqlQueryTimeout";
     public static final String QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH = "sqlTextPreviewMaxLength";
     public static final String QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH = "sqlBinaryPreviewMaxLength";
     public static final String QUOTA_PROP_RM_FILE_SIZE_LIMIT = "resourceManagerFileSizeLimit";
