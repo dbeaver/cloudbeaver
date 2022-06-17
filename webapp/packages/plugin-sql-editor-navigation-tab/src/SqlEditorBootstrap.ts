@@ -53,7 +53,6 @@ export class SqlEditorBootstrap extends Bootstrap {
         title: 'SQL',
         order: 2,
         onClick: this.openSQLEditor.bind(this),
-        isDisabled: () => this.isSQLEntryDisabled(),
       }
     );
 
@@ -150,16 +149,6 @@ export class SqlEditorBootstrap extends Bootstrap {
   }
 
   load(): void { }
-
-  private isSQLEntryDisabled() {
-    const activeView = this.viewService.activeView;
-    if (activeView) {
-      return !ExtensionUtils
-        .from(activeView.extensions)
-        .has(isConnectionProvider);
-    }
-    return !this.connectionSchemaManagerService.currentConnectionId;
-  }
 
   private openSQLEditor() {
     let connectionId: string | undefined;
