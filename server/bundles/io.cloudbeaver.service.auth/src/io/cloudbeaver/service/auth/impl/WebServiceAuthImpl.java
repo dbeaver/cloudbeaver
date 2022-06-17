@@ -146,7 +146,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     userId = curUser.getUserId();
                     if (authProviderExternal != null) {
                         // We may need to associate new credentials with active user
-                        if (linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalAuthProviderCredentialsWithActiveUser()) {
+                        if (linkWithActiveUser &&
+                            CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser()
+                        ) {
                             securityController.setUserCredentials(userId, authProvider.getId(), userCredentials);
                         }
                     }

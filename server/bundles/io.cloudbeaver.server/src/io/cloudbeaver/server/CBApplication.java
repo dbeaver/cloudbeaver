@@ -778,7 +778,7 @@ public class CBApplication extends BaseWebApplication {
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
                     JSONUtils.field(json, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
-                    JSONUtils.field(json, "linkExternalAuthProviderCredentialsWithActiveUser", appConfig.isLinkExternalAuthProviderCredentialsWithActiveUser());
+                    JSONUtils.field(json, "linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
                     JSONUtils.field(json, "forwardProxy", appConfig.isEnabledForwardProxy());
                     JSONUtils.field(json, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
