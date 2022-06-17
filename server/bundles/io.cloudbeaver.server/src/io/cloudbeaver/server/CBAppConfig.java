@@ -49,6 +49,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
     private boolean forwardProxy;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
+    private boolean linkExternalAuthProviderCredentialsWithActiveUser;
 
     private boolean redirectOnFederatedAuth;
 
@@ -81,6 +82,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
         this.resourceQuotas = new LinkedHashMap<>();
         this.enableReverseProxyAuth = false;
         this.forwardProxy = false;
+        this.linkExternalAuthProviderCredentialsWithActiveUser = true;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -101,6 +103,7 @@ public class CBAppConfig extends BaseWebAppConfiguration {
         this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
         this.forwardProxy = src.forwardProxy;
+        this.linkExternalAuthProviderCredentialsWithActiveUser = src.linkExternalAuthProviderCredentialsWithActiveUser;
     }
 
 
@@ -305,6 +308,11 @@ public class CBAppConfig extends BaseWebAppConfiguration {
             return authConfiguration.remove(id) != null;
         }
     }
+
+    public boolean isLinkExternalAuthProviderCredentialsWithActiveUser() {
+        return linkExternalAuthProviderCredentialsWithActiveUser;
+    }
+
 
     ////////////////////////////////////////////
     // Reverse proxy auth
