@@ -105,7 +105,7 @@ public class CBApplication extends BaseWebApplication {
     private File homeDirectory;
 
     // Configurations
-    private final Map<String, Object> productConfiguration = new HashMap<>();
+    protected final Map<String, Object> productConfiguration = new HashMap<>();
     private final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
@@ -490,7 +490,6 @@ public class CBApplication extends BaseWebApplication {
             homeFolder = ".";
         }
         homeDirectory = new File(homeFolder);
-        String productConfigPath = null;
 
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Gson gson = getGson();
@@ -528,14 +527,7 @@ public class CBApplication extends BaseWebApplication {
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
-            productConfigPath = WebAppUtils.getRelativePath(
-                JSONUtils.getString(
-                    serverConfig,
-                    CBConstants.PARAM_PRODUCT_CONFIGURATION,
-                    CBConstants.DEFAULT_PRODUCT_CONFIGURATION
-                ),
-                homeFolder
-            );
+            readProductConfiguration(serverConfig, gson, homeFolder);
 
             String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
             if (!CommonUtils.isEmpty(staticContentsFile)) {
@@ -567,6 +559,19 @@ public class CBApplication extends BaseWebApplication {
             appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
         }
 
+        patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder) throws DBException {
+        String productConfigPath = WebAppUtils.getRelativePath(
+            JSONUtils.getString(
+                serverConfig,
+                CBConstants.PARAM_PRODUCT_CONFIGURATION,
+                CBConstants.DEFAULT_PRODUCT_CONFIGURATION
+            ),
+            homeFolder
+        );
+
         if (!CommonUtils.isEmpty(productConfigPath)) {
             File productConfigFile = new File(productConfigPath);
             if (!productConfigFile.exists()) {
@@ -582,18 +587,15 @@ public class CBApplication extends BaseWebApplication {
         }
 
         // Add product config from runtime
-        {
-            File rtConfig = getRuntimeProductConfigFilePath().toFile();
-            if (rtConfig.exists()) {
-                log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
-                try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
-                    productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
-                } catch (Exception e) {
-                    throw new DBException("Error reading product runtime configuration", e);
-                }
+        File rtConfig = getRuntimeProductConfigFilePath().toFile();
+        if (rtConfig.exists()) {
+            log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
+            try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+            } catch (Exception e) {
+                throw new DBException("Error reading product runtime configuration", e);
             }
         }
-        patchConfigurationWithProperties(productConfiguration);
     }
 
     protected Map<String, Object> readConfiguration(File configFile) throws DBException {
