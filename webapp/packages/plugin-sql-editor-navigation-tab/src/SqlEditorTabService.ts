@@ -136,8 +136,9 @@ export class SqlEditorTabService extends Bootstrap {
     const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
 
     const nodeId = objectSchema?.id ?? objectCatalog?.id;
+    const connection = this.connectionInfoResource.getConnectionForNode(nodeId ?? '');
 
-    if (!nodeId) {
+    if (!nodeId || connection?.connected === false) {
       return;
     }
 
