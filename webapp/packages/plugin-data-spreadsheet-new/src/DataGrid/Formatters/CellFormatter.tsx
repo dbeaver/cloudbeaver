@@ -27,9 +27,10 @@ interface Props extends FormatterProps<IResultSetRowKey> {
 
 const styles = css`
   formatter-wrapper {
-    flex: 1;
+    height: 100%;
     display: flex;
     overflow: hidden;
+    box-sizing: border-box;
   }
   formatter-container {
     flex: 1;
@@ -37,6 +38,9 @@ const styles = css`
   }
   menu-container {
     width: 20px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 `;
 
