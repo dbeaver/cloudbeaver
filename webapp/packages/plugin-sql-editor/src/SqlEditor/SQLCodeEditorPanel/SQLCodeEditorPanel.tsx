@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNode, NavNodeManagerService } from '@cloudbeaver/core-app';
+import { useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
@@ -95,6 +96,18 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   useEffect(() => {
     sqlCodeEditorController?.focus();
   }, [sqlCodeEditorController]);
+
+  useExecutor({
+    executor: data.onFormat,
+    handlers: [function formatEditor([segment, value]) {
+      const editor = sqlCodeEditorController?.getEditor();
+      editor?.replaceRange(
+        value,
+        { line: segment.from, ch: segment.fromPosition },
+        { line: segment.to, ch: segment.toPosition }
+      );
+    }],
+  });
 
   return styled(styles)(
     <box ref={dndBox.setRef}>
