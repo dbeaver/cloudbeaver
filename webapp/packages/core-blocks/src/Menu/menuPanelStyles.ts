@@ -117,6 +117,7 @@ export const menuPanelStyles = css`
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      & menu-item-icon,
       & menu-item-content {
         width: 24px;
         height: 24px;
