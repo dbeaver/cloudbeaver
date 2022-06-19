@@ -17,11 +17,14 @@
 
 package io.cloudbeaver.test.platform;
 
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.nio.file.Path;
 
 public class PlatformTest {
 
@@ -36,8 +39,17 @@ public class PlatformTest {
     @Test
     public void testPlatformPresence() {
         try {
-            String infoDetails = DBWorkbench.getPlatform().getApplication().getInfoDetails(new VoidProgressMonitor());
-            System.out.println("DBeaver application: " + infoDetails);
+            System.out.println("Start CBApplication");
+            CBApplication testApp = new CBApplication();
+            testApp.start(null);
+
+            System.out.println("APP:: " + GeneralUtils.getProductTitle());
+            //CBPlatform.setApplication(testApp);
+
+            Path defaultWorkingFolder = DBWorkbench.getPlatform().getApplication().getDefaultWorkingFolder();
+            System.out.println("DBeaver application: " + defaultWorkingFolder);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
