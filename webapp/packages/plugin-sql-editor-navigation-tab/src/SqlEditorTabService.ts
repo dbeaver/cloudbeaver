@@ -131,11 +131,17 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private getNavNode() {
+  private getNavNode(tab: ITab<ISqlEditorTabState>) {
     const objectCatalog = this.connectionSchemaManagerService.currentObjectCatalog;
     const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
+    const connectionId = this.getConnectionId(tab);
 
-    const nodeId = objectSchema?.id ?? objectCatalog?.id;
+    let nodeId = objectSchema?.id ?? objectCatalog?.id;
+
+    if (!nodeId && connectionId) {
+      nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
+    }
+
     const connection = this.connectionInfoResource.getConnectionForNode(nodeId ?? '');
 
     if (!nodeId || connection?.connected === false) {
