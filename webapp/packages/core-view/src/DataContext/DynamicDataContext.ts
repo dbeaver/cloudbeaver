@@ -33,8 +33,8 @@ export class DynamicDataContext implements IDataContext {
   set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
     const dynamicContext = this.contexts.get(context);
 
-    if (dynamicContext && this.get(context) === value) {
-      return dynamicContext;
+    if (this.tryGet(context) === value) {
+      return dynamicContext ?? ( () => {});
     }
 
     const deleteCallback = this.fallback.set(context, value);

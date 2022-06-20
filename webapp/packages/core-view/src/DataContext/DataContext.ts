@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -25,6 +25,8 @@ export class DataContext implements IDataContext {
     this.fallback = fallback;
 
     makeObservable<this, 'map'>(this, {
+      set: action,
+      delete: action,
       map: observable.shallow,
       fallback: observable.ref,
     });
