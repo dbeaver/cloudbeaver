@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -22,11 +23,14 @@ export function useDynamicDataContext(
     dynamic: new DynamicDataContext(context || new DataContext()),
   }));
 
-  if (context) {
-    state.dynamic.setFallBack(context);
-  }
+  untracked(() => {
+    if (context) {
+      state.dynamic.setFallBack(context);
+    }
 
-  state.dynamic.flush();
+    state.dynamic.flush();
+  });
+
   capture(state.dynamic);
 
   useEffect(() => () => state.dynamic.flush(), []);
