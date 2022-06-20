@@ -40,16 +40,18 @@ export class ObjectViewerBootstrap extends Bootstrap {
     data: IConnectionExecutorData,
     contexts: IExecutionContextProvider<IConnectionExecutorData>
   ) {
-    const tabs = Array.from(this.navigationTabsService.findTabs(
-      isObjectViewerTab(tab => data.connections.includes(tab.handlerState.connectionId ?? ''))
-    ));
+    if (data.state === 'before') {
+      const tabs = Array.from(this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => data.connections.includes(tab.handlerState.connectionId ?? ''))
+      ));
 
-    for (const tab of tabs) {
-      const canClose = await this.dataViewerTabService.canClose(tab);
+      for (const tab of tabs) {
+        const canClose = await this.dataViewerTabService.canClose(tab);
 
-      if (!canClose) {
-        ExecutorInterrupter.interrupt(contexts);
-        return;
+        if (!canClose) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
       }
     }
   }
