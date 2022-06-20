@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 import { ISqlEditorTabState, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
@@ -36,7 +37,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     state: null as null | ISqlEditorTabState,
     setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
       if (contextInfo) {
-        this.state = sqlEditorService.getState(0, undefined, undefined, undefined, contextInfo);
+        this.state = sqlEditorService.getState(uuid(), 0, undefined, undefined, undefined, contextInfo);
       } else {
         this.state = null;
       }

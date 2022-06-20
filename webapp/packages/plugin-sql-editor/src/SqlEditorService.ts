@@ -36,6 +36,7 @@ export class SqlEditorService {
   }
 
   getState(
+    editorId: string,
     order: number,
     name?: string,
     source?: string,
@@ -43,6 +44,7 @@ export class SqlEditorService {
     contextInfo?: IConnectionExecutionContextInfo,
   ): ISqlEditorTabState {
     return {
+      editorId,
       name,
       source,
       query: query ?? '',

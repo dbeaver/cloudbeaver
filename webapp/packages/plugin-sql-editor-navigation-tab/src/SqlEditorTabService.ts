@@ -102,6 +102,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   createNewEditor(
+    editorId: string,
     name?: string,
     source?: string,
     query?: string,
@@ -110,8 +111,9 @@ export class SqlEditorTabService extends Bootstrap {
     const order = this.getFreeEditorId();
 
     return {
+      id: editorId,
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(order, name, source, query, undefined),
+      handlerState: this.sqlEditorService.getState(editorId, order, name, source, query, undefined),
     };
   }
 
@@ -195,6 +197,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
     if (typeof tab.handlerState.query !== 'string'
+        || typeof tab.handlerState.editorId !== 'string'
         || typeof tab.handlerState.order !== 'number'
         || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
@@ -340,7 +343,7 @@ export function isSQLEditorTab(
     const predicate = tab;
     return (tab: ITab): tab is ITab<ISqlEditorTabState> => {
       const sqlEditorTab = tab.handlerId === sqlEditorTabHandlerKey;
-      if (!predicate || !sqlEditorTab) {
+      if (!sqlEditorTab) {
         return sqlEditorTab;
       }
       return predicate(tab);

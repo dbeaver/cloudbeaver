@@ -44,11 +44,15 @@ export interface IExecutionPlanTab {
 }
 
 export interface ISqlEditorTabState {
+  editorId: string;
+
   name?: string;
   source?: string;
   order: number;
+
   query: string;
   executionContext?: IConnectionExecutionContextInfo;
+
   currentTabId?: string;
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];

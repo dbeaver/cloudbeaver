@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import { uuid } from '@cloudbeaver/core-utils';
 import { ISqlEditorTabState, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
@@ -106,7 +107,10 @@ export class SqlEditorNavigatorService {
         }
 
         if (!tab) {
+          const editorId = uuid();
+
           const tabOptions = this.sqlEditorTabService.createNewEditor(
+            editorId,
             data.name,
             data.source,
             data.query,
