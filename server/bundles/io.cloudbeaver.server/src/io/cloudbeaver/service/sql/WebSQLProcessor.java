@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import org.jkiss.code.NotNull;
@@ -67,12 +68,13 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private AtomicInteger contextId = new AtomicInteger();
 
-    WebSQLProcessor(@NotNull  WebSession webSession, @NotNull WebConnectionInfo connection) {
+    WebSQLProcessor(@NotNull WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
 
         syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
+        syntaxManager.init(
+            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
 
         ruleManager = new SQLRuleManager(syntaxManager);
         ruleManager.loadRules(connection.getDataSource(), false);
@@ -160,6 +162,13 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
+        getWebSession().addSessionMessage(
+            new WebServerMessage(
+                WebServerMessage.MessageType.INFO,
+                "Execute SQL query (" + sql + ")"
+            )
+        );
+
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
             if (dataFilter.hasFilters()) {
@@ -237,6 +246,16 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
+
+        getWebSession().addSessionMessage(
+            new WebServerMessage(
+                WebServerMessage.MessageType.INFO,
+                "Read data from "
+                    + executionContext.getDataSource().getName()
+                    + " - " + dataContainer.getName()
+            )
+        );
+
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
@@ -293,10 +312,21 @@ public class WebSQLProcessor implements WebSessionProvider {
         List<WebSQLQueryResults> queryResults = new ArrayList<>();
 
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+
+        getWebSession().addSessionMessage(
+            new WebServerMessage(
+                WebServerMessage.MessageType.INFO,
+                "Update data in "
+                    + executionContext.getDataSource().getName()
+                    + " - "
+                    + resultsInfo.getDataContainer().getName()
+
+            )
+        );
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
             DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
             boolean revertToAutoCommit = false;
-            if (txnManager  != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
+            if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
                 txnManager.setAutoCommit(monitor, false);
                 revertToAutoCommit = true;
             }
@@ -371,6 +401,16 @@ public class WebSQLProcessor implements WebSessionProvider {
                 batch.generatePersistActions(session, actions, options);
             }
         }
+
+        getWebSession().addSessionMessage(
+            new WebServerMessage(
+                WebServerMessage.MessageType.INFO,
+                "Generate SQL script for "
+                    + executionContext.getDataSource().getName()
+                    + " - "
+                    + dataManipulator.getName()
+            )
+        );
 
         return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false);
     }
@@ -563,11 +603,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (!(realCellValue instanceof DBDValue)) {
             try {
                 realCellValue = updateAttribute.getValueHandler().getValueFromObject(
-                        session,
-                        updateAttribute,
-                        cellRawValue,
-                        false,
-                        true);
+                    session,
+                    updateAttribute,
+                    cellRawValue,
+                    false,
+                    true);
             } catch (DBCException e) {
                 //checks if this function is used only for script generation
                 if (justGenerateScript) {
@@ -624,11 +664,12 @@ public class WebSQLProcessor implements WebSessionProvider {
 
 
     public String readLobValue(
-            @NotNull DBRProgressMonitor monitor,
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String resultsId,
-            @NotNull Integer lobColumnIndex,
-            @Nullable WebSQLResultsRow row) throws DBException {
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @Nullable WebSQLResultsRow row
+    ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
@@ -636,6 +677,17 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBSDataContainer dataContainer = resultsInfo.getDataContainer();
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         String tableName = rowIdentifier.getEntity().getName();
+
+        getWebSession().addSessionMessage(
+            new WebServerMessage(
+                WebServerMessage.MessageType.INFO,
+                "Read LOB value from "
+                    + executionContext.getDataSource().getName()
+                    + " - "
+                    + tableName
+            )
+        );
+
         WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, dataContainer, lobColumnIndex);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
@@ -648,17 +700,17 @@ public class WebSQLProcessor implements WebSessionProvider {
                 boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                 if (isDocumentValue) {
                     rowValues[i] =
-                            makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                        makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
                 } else {
                     Object inputCellValue = row.getData().get(keyAttribute.getOrdinalPosition());
 
                     rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
-                            session,
-                            keyAttribute,
-                            convertInputCellValue(session, keyAttribute,
-                                    inputCellValue, false),
-                            false,
-                            true);
+                        session,
+                        keyAttribute,
+                        convertInputCellValue(session, keyAttribute,
+                            inputCellValue, false),
+                        false,
+                        true);
                 }
                 final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
                 constraint.setOperator(DBCLogicalOperator.EQUALS);
@@ -667,8 +719,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
             dataFilter.addConstraints(constraints);
             DBCStatistics statistics = dataContainer.readData(
-                    executionSource, session, dataReceiver, dataFilter,
-                    0, 1, DBSDataContainer.FLAG_NONE, 1);
+                executionSource, session, dataReceiver, dataFilter,
+                0, 1, DBSDataContainer.FLAG_NONE, 1);
             try {
                 return dataReceiver.createLobFile(session);
             } catch (Exception e) {

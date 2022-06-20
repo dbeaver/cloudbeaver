@@ -38,7 +38,10 @@ import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.*;
+import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLScriptElement;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
@@ -266,7 +269,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
             sqlContext.setDefaults(catalogName, schemaName);
         } catch (DBCException e) {
-            throw new DBWebException("Error changing context defaul schema/catalog", e);
+            throw new DBWebException("Error changing context default schema/catalog", e);
         }
     }
 
@@ -385,27 +388,27 @@ public class WebServiceSQL implements DBWServiceSQL {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                try {
-                    monitor.beginTask("Read data", 1);
-                    monitor.subTask("Extra data from " + nodePath);
+            try {
+                monitor.beginTask("Read data", 1);
+                monitor.subTask("Extra data from " + nodePath);
 
-                    DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
-                        monitor, nodePath, DBSDataContainer.class);
+                DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
+                    monitor, nodePath, DBSDataContainer.class);
 
-                    WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
-                        contextInfo,
-                        monitor,
-                        dataContainer,
-                        resultId,
-                        filter != null ? filter : new WebSQLDataFilter(),
-                        dataFormat);
-                    this.result = executeResults.getStatusMessage();
-                    this.extendedResults = executeResults;
-                } catch (Throwable e) {
-                    throw new InvocationTargetException(e);
-                } finally {
-                    monitor.done();
-                }
+                WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
+                    contextInfo,
+                    monitor,
+                    dataContainer,
+                    resultId,
+                    filter != null ? filter : new WebSQLDataFilter(),
+                    dataFormat);
+                this.result = executeResults.getStatusMessage();
+                this.extendedResults = executeResults;
+            } catch (Throwable e) {
+                throw new InvocationTargetException(e);
+            } finally {
+                monitor.done();
+            }
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
