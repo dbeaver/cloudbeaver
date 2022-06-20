@@ -17,18 +17,16 @@ import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
-type ConnectionHandlerState = 'before' | 'after';
-
-export interface IConnectionHandlerData {
+export interface IConnectionExecutorData {
   connectionId: string;
-  state: ConnectionHandlerState;
+  state: 'before' | 'after';
 }
 
 @injectable()
 export class ConnectionsManagerService {
   readonly connectionExecutor: IExecutor<string | null>;
-  readonly onDisconnect: IExecutor<IConnectionHandlerData>;
-  readonly onDelete: IExecutor<IConnectionHandlerData>;
+  readonly onDisconnect: IExecutor<IConnectionExecutorData>;
+  readonly onDelete: IExecutor<IConnectionExecutorData>;
 
   private disconnecting: boolean;
 
@@ -45,6 +43,7 @@ export class ConnectionsManagerService {
     this.onDelete = new Executor();
 
     this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
+    this.onDelete.before(this.onDisconnect);
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
@@ -97,21 +96,21 @@ export class ConnectionsManagerService {
       return;
     }
 
-    const contexts = await this.onDelete.execute({
-      connectionId: id,
-      state: 'before',
-    });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
       message: `You're going to delete "${connection.name}" connection. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
     if (result === DialogueStateResult.Rejected) {
+      return;
+    }
+
+    const contexts = await this.onDelete.execute({
+      connectionId: id,
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 

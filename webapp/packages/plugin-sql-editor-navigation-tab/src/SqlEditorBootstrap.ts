@@ -12,7 +12,7 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { ConnectionsManagerService, IConnectionHandlerData, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, IConnectionExecutorData, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -52,8 +52,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
   register(): void {
     this.authenticationService.onLogout.addHandler(this.logoutHandler.bind(this));
-    this.connectionsManagerService.onDisconnect.addHandler(this.connectionHandler.bind(this));
-    this.connectionsManagerService.onDelete.addHandler(this.connectionHandler.bind(this));
+    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
 
     this.mainMenuService.registerRootItem(
       {
@@ -208,9 +207,9 @@ export class SqlEditorBootstrap extends Bootstrap {
     }
   }
 
-  private async connectionHandler(
-    data: IConnectionHandlerData,
-    contexts: IExecutionContextProvider<IConnectionHandlerData>
+  private async disconnectHandler(
+    data: IConnectionExecutorData,
+    contexts: IExecutionContextProvider<IConnectionExecutorData>
   ) {
     if (data.state === 'before') {
       for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
@@ -218,9 +217,9 @@ export class SqlEditorBootstrap extends Bootstrap {
           continue;
         }
 
-        const canPerformAction = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
+        const canDisconnect = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
 
-        if (!canPerformAction) {
+        if (!canDisconnect) {
           ExecutorInterrupter.interrupt(contexts);
           return;
         }
