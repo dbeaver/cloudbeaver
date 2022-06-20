@@ -19,11 +19,11 @@ import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
-export type LogoutState = 'before' | 'after';
+export type LogoutEventType = 'before' | 'after';
 
 @injectable()
 export class AuthenticationService extends Bootstrap {
-  readonly onLogout: Executor<LogoutState>;
+  readonly onLogout: Executor<LogoutEventType>;
 
   configureAuthProvider: (() => void) | null;
   configureIdentityProvider: (() => void) | null;

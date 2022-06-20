@@ -19,7 +19,6 @@ import { ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
-import type { LogoutState } from '@cloudbeaver/plugin-authentication';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -191,19 +190,6 @@ export class SqlEditorBootstrap extends Bootstrap {
       }
     }
   };
-
-  private async logoutHandler(data: LogoutState, contexts: IExecutionContextProvider<LogoutState>) {
-    if (data === 'before') {
-      for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
-        const canLogout = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
-
-        if (!canLogout) {
-          ExecutorInterrupter.interrupt(contexts);
-          return;
-        }
-      }
-    }
-  }
 
   private async disconnectHandler(
     data: IConnectionExecutorData,
