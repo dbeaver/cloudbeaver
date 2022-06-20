@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, KeyBindingService, MenuService, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
@@ -22,12 +22,14 @@ import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/K
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
 
 @injectable()
-export class SqlEditorMenuService {
+export class MenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
     private readonly menuService: MenuService
-  ) { }
+  ) {
+    super();
+  }
 
   register(): void {
     this.actionService.addHandler({
@@ -122,4 +124,6 @@ export class SqlEditorMenuService {
         break;
     }
   }
+
+  load(): void | Promise<void> { }
 }

@@ -12,15 +12,16 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { isConnectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, IConnectionHandlerData, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
-import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { AuthenticationService, LogoutState } from '@cloudbeaver/plugin-authentication';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
@@ -41,12 +42,19 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sessionActionService: SessionActionService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly sqlEditorTabService: SqlEditorTabService
+    private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly authenticationService: AuthenticationService,
+    private readonly sqlResultTabsService: SqlResultTabsService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
   }
 
   register(): void {
+    this.authenticationService.onLogout.addHandler(this.logoutHandler.bind(this));
+    this.connectionsManagerService.onDisconnect.addHandler(this.connectionHandler.bind(this));
+    this.connectionsManagerService.onDelete.addHandler(this.connectionHandler.bind(this));
+
     this.mainMenuService.registerRootItem(
       {
         id: 'sql-editor',
@@ -186,4 +194,37 @@ export class SqlEditorBootstrap extends Bootstrap {
       }
     }
   };
+
+  private async logoutHandler(data: LogoutState, contexts: IExecutionContextProvider<LogoutState>) {
+    if (data === 'before') {
+      for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
+        const canLogout = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
+
+        if (!canLogout) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+      }
+    }
+  }
+
+  private async connectionHandler(
+    data: IConnectionHandlerData,
+    contexts: IExecutionContextProvider<IConnectionHandlerData>
+  ) {
+    if (data.state === 'before') {
+      for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
+        if (tab.handlerState.executionContext?.connectionId !== data.connectionId) {
+          continue;
+        }
+
+        const canPerformAction = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
+
+        if (!canPerformAction) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+      }
+    }
+  }
 }
