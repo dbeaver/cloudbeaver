@@ -12,15 +12,15 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { ConnectionsManagerService, IConnectionExecutorData, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
-import { ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, LocalStorageSqlDataSource, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
@@ -42,15 +42,11 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sessionActionService: SessionActionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly sqlResultTabsService: SqlResultTabsService,
-    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
   }
 
   register(): void {
-    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
-
     this.mainMenuService.registerRootItem(
       {
         id: 'sql-editor',
@@ -199,24 +195,4 @@ export class SqlEditorBootstrap extends Bootstrap {
       }
     }
   };
-
-  private async disconnectHandler(
-    data: IConnectionExecutorData,
-    contexts: IExecutionContextProvider<IConnectionExecutorData>
-  ) {
-    if (data.state === 'before') {
-      for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
-        if (!data.connections.includes(tab.handlerState.executionContext?.connectionId ?? '')) {
-          continue;
-        }
-
-        const canDisconnect = await this.sqlResultTabsService.canCloseResultTabs(tab.handlerState);
-
-        if (!canDisconnect) {
-          ExecutorInterrupter.interrupt(contexts);
-          return;
-        }
-      }
-    }
-  }
 }

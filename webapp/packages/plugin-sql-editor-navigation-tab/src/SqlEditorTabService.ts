@@ -28,10 +28,12 @@ import {
   ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
+  ConnectionsManagerService,
+  IConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -58,7 +60,8 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
 
@@ -89,6 +92,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   register(): void {
+    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
@@ -344,6 +348,28 @@ export class SqlEditorTabService extends Bootstrap {
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
       return false;
+    }
+  }
+
+  private async disconnectHandler(
+    data: IConnectionExecutorData,
+    contexts: IExecutionContextProvider<IConnectionExecutorData>
+  ) {
+    if (data.state === 'before') {
+      for (const tab of this.sqlEditorTabs) {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+        if (!data.connections.includes(dataSource?.executionContext?.connectionId ?? '')) {
+          continue;
+        }
+
+        const canDisconnect = await this.handleCanTabClose(tab);
+
+        if (!canDisconnect) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+      }
     }
   }
 
