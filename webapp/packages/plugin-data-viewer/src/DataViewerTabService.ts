@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, INodeNavigationData, ITab } from '@cloudbeaver/core-app';
+import { NavNodeManagerService, INodeNavigationData, ITab, NavigationTabsService } from '@cloudbeaver/core-app';
+import { ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
+import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
 
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
@@ -27,6 +28,8 @@ export class DataViewerTabService {
     private readonly objectViewerTabService: ObjectViewerTabService,
     private readonly dbObjectPageService: DBObjectPageService,
     private readonly notificationService: NotificationService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly navigationTabsService: NavigationTabsService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -35,30 +38,37 @@ export class DataViewerTabService {
       getTabComponent: () => DataViewerTab,
       getPanelComponent: () => DataViewerPanel,
       onRestore: this.handleTabRestore.bind(this),
-      canClose: this.canClose.bind(this),
+      canClose: this.handleTabCanClose.bind(this),
       onClose: this.handleTabClose.bind(this),
     });
+  }
+
+  register() {
+    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
   }
 
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
-  async canClose(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
-    const model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
+  private async disconnectHandler(
+    data: IConnectionExecutorData,
+    contexts: IExecutionContextProvider<IConnectionExecutorData>
+  ) {
+    if (data.state === 'before') {
+      const tabs = Array.from(this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => data.connections.includes(tab.handlerState.connectionId ?? ''))
+      ));
 
-    if (model) {
-      let canClose = false;
-      try {
-        await model.requestDataAction(() => {
-          canClose = true;
-        });
-      } catch { }
+      for (const tab of tabs) {
+        const canClose = await this.handleTabCanClose(tab);
 
-      return canClose;
+        if (!canClose) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+      }
     }
-
-    return true;
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
@@ -84,6 +94,23 @@ export class DataViewerTabService {
   }
 
   private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
+    return true;
+  }
+
+  private async handleTabCanClose(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
+    const model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
+
+    if (model) {
+      let canClose = false;
+      try {
+        await model.requestDataAction(() => {
+          canClose = true;
+        });
+      } catch { }
+
+      return canClose;
+    }
+
     return true;
   }
 
