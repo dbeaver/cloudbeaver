@@ -19,6 +19,7 @@ import {
 
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlQueryResultService } from './SqlQueryResultService';
 
 interface IQueryExecutionOptions {
@@ -49,6 +50,7 @@ export class SqlQueryService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService,
     private readonly dataViewerService: DataViewerService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.statisticsMap = new Map();
 
@@ -66,7 +68,8 @@ export class SqlQueryService {
     query: string,
     inNewTab: boolean
   ): Promise<void> {
-    const contextInfo = editorState.executionContext;
+    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+    const contextInfo = dataSource?.executionContext;
     const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
     if (!contextInfo || !executionContext) {
@@ -143,7 +146,8 @@ export class SqlQueryService {
     queries: string[],
     options?: IQueryExecutionOptions
   ): Promise<void> {
-    const contextInfo = editorState.executionContext;
+    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+    const contextInfo = dataSource?.executionContext;
     const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
     if (!contextInfo || !executionContext) {

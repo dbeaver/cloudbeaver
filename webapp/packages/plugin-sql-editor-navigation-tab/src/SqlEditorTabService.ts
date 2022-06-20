@@ -33,7 +33,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName } from '@cloudbeaver/plugin-sql-editor';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorTab } from './SqlEditorTab';
@@ -57,7 +57,8 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
-    private readonly navNodeManagerService: NavNodeManagerService
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     super();
 
@@ -96,7 +97,8 @@ export class SqlEditorTabService extends Bootstrap {
   load(): void { }
 
   getName(tabState: ISqlEditorTabState): string {
-    const connection = this.connectionInfoResource.get(tabState.executionContext?.connectionId || '');
+    const dataSource = this.sqlDataSourceService.get(tabState.editorId);
+    const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId || '');
 
     return getSqlEditorName(tabState, connection);
   }
@@ -106,10 +108,12 @@ export class SqlEditorTabService extends Bootstrap {
     dataSourceKey: string,
     name?: string,
     source?: string,
-    query?: string,
+    script?: string,
   ): ITabOptions<ISqlEditorTabState> | null {
 
     const order = this.getFreeEditorId();
+
+    this.sqlDataSourceService.create(editorId, dataSourceKey, script);
 
     return {
       id: editorId,
@@ -120,23 +124,28 @@ export class SqlEditorTabService extends Bootstrap {
         order,
         name,
         source,
-        query,
-        undefined
       ),
     };
   }
 
   resetConnectionInfo(state: ISqlEditorTabState): void {
-    state.executionContext = undefined;
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+    dataSource?.setExecutionContext(undefined);
   }
 
   private async handleConnectionDelete(key: ResourceKey<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
-      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+      isSQLEditorTab(tab => {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+        return !!dataSource?.executionContext;
+      })
     );
 
     for (const tab of tabs) {
-      if (ResourceKeyUtils.includes(key, tab.handlerState.executionContext?.connectionId)) {
+      const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+      if (ResourceKeyUtils.includes(key, dataSource?.executionContext?.connectionId)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
@@ -168,31 +177,41 @@ export class SqlEditorTabService extends Bootstrap {
 
   private async handleExecutionContextUpdate(key: ResourceKey<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
-      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+      isSQLEditorTab(tab => {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+        return !!dataSource?.executionContext;
+      })
     );
 
     for (const tab of tabs) {
-      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.id);
+      const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId)!;
+      const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext!.id);
 
       if (!executionContext?.context) {
-        if (!this.connectionInfoResource.has(tab.handlerState.executionContext?.connectionId || '')) {
+        if (!this.connectionInfoResource.has(dataSource.executionContext?.connectionId || '')) {
           this.resetConnectionInfo(tab.handlerState);
         }
       } else {
-        tab.handlerState.executionContext = { ...executionContext.context };
+        dataSource.setExecutionContext({ ...executionContext.context });
       }
     }
   }
 
   private async handleExecutionContextDelete(key: ResourceKey<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
-      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+      isSQLEditorTab(tab => {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+        return !!dataSource?.executionContext;
+      })
     );
 
     for (const tab of tabs) {
+      const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId)!;
       if (
-        ResourceKeyUtils.includes(key, tab.handlerState.executionContext!.id)
-        && !this.connectionInfoResource.has(tab.handlerState.executionContext!.connectionId)
+        ResourceKeyUtils.includes(key, dataSource.executionContext!.id)
+        && !this.connectionInfoResource.has(dataSource.executionContext!.connectionId)
       ) {
         this.resetConnectionInfo(tab.handlerState);
       }
@@ -205,32 +224,33 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
-    if (typeof tab.handlerState.query !== 'string'
-        || typeof tab.handlerState.editorId !== 'string'
-        || typeof tab.handlerState.order !== 'number'
-        || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.id)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
-        || !Array.isArray(tab.handlerState.modeState)
-        || !Array.isArray(tab.handlerState.tabs)
-        || !Array.isArray(tab.handlerState.executionPlanTabs)
-        || !Array.isArray(tab.handlerState.resultGroups)
-        || !Array.isArray(tab.handlerState.resultTabs)
-        || !Array.isArray(tab.handlerState.statisticsTabs)
+    if (
+      typeof tab.handlerState.editorId !== 'string'
+      || typeof tab.handlerState.editorId !== 'string'
+      || typeof tab.handlerState.order !== 'number'
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
+      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
+      || !Array.isArray(tab.handlerState.modeState)
+      || !Array.isArray(tab.handlerState.tabs)
+      || !Array.isArray(tab.handlerState.executionPlanTabs)
+      || !Array.isArray(tab.handlerState.resultGroups)
+      || !Array.isArray(tab.handlerState.resultTabs)
+      || !Array.isArray(tab.handlerState.statisticsTabs)
     ) {
       return false;
     }
 
-    if (tab.handlerState.executionContext) {
+    const dataSource = this.sqlDataSourceService.create(
+      tab.handlerState.editorId,
+      tab.handlerState.datasourceKey
+    );
+
+    if (dataSource.executionContext) {
       await this.connectionInfoResource.load(CachedMapAllKey);
 
-      if (!this.connectionInfoResource.has(tab.handlerState.executionContext.connectionId)) {
+      if (!this.connectionInfoResource.has(dataSource.executionContext.connectionId)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
@@ -247,16 +267,19 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private getConnectionId(tab: ITab<ISqlEditorTabState>) {
-    return tab.handlerState.executionContext?.connectionId;
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    return dataSource?.executionContext?.connectionId;
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
-    const context = this.connectionExecutionContextResource.get(tab.handlerState.executionContext?.id ?? '');
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
     return context?.defaultCatalog;
   }
 
   private getObjectSchemaId(tab: ITab<ISqlEditorTabState>) {
-    const context = this.connectionExecutionContextResource.get(tab.handlerState.executionContext?.id ?? '');
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
     return context?.defaultSchema;
   }
 
@@ -270,22 +293,25 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {
-    if (!tab.handlerState.executionContext) {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    if (!dataSource?.executionContext) {
       return false;
     }
 
-    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
+    const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext.id);
 
     if (!executionContext) {
       return false;
     }
 
     try {
-      await executionContext.update(
+      const context = await executionContext.update(
         containerId,
-        tab.handlerState.executionContext.defaultSchema,
+        dataSource.executionContext.defaultSchema,
       );
-      tab.handlerState.executionContext.defaultCatalog = containerId;
+
+      dataSource.setExecutionContext({ ...context });
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
@@ -294,22 +320,25 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async setObjectSchemaId(containerId: string, tab: ITab<ISqlEditorTabState>) {
-    if (!tab.handlerState.executionContext) {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    if (!dataSource?.executionContext) {
       return false;
     }
 
-    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
+    const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext.id);
 
     if (!executionContext) {
       return false;
     }
 
     try {
-      await executionContext.update(
-        tab.handlerState.executionContext.defaultCatalog,
+      const context = await executionContext.update(
+        dataSource.executionContext.defaultCatalog,
         containerId
       );
-      tab.handlerState.executionContext.defaultSchema = containerId;
+
+      dataSource.setExecutionContext({ ...context });
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
@@ -327,8 +356,10 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    if (editorTab.handlerState.executionContext) {
-      await this.sqlEditorService.destroyContext(editorTab.handlerState.executionContext);
+    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+
+    if (dataSource?.executionContext) {
+      await this.sqlEditorService.destroyContext(dataSource.executionContext);
     }
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);

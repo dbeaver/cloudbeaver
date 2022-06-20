@@ -17,6 +17,7 @@ import { download, generateFileName, getTextFileReadingProcess } from '@cloudbea
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
 import { ScriptImportDialog } from './ScriptImportDialog';
 
@@ -32,6 +33,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
+  const sqlDataSourceService = useService(SqlDataSourceService);
 
   return useObservableRef(() => ({
     async tryReadScript(file: File, prevScript: string) {
@@ -95,7 +97,8 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
         type: 'application/sql',
       });
 
-      const connection = this.connectionInfoResource.get(this.state.executionContext?.connectionId ?? '');
+      const dataSource = sqlDataSourceService.get(this.state.editorId);
+      const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId ?? '');
       const name = getSqlEditorName(this.state, connection);
 
       download(blob, generateFileName(name, '.sql'));

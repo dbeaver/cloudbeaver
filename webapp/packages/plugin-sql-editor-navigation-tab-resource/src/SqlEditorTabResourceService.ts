@@ -19,7 +19,7 @@ import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { debounce, throttle } from '@cloudbeaver/core-utils';
 import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { IQueryChangeData, ISqlEditorTabState, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { IQueryChangeData, ISqlEditorTabState, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 const SYNC_DELAY = 5 * 1000;
@@ -49,6 +49,7 @@ export class SqlEditorTabResourceService {
     private readonly localStorageSaveService: LocalStorageSaveService,
     private readonly userInfoResource: UserInfoResource,
     private readonly commonDialogService: CommonDialogService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.state = new Map();
 
@@ -164,8 +165,14 @@ export class SqlEditorTabResourceService {
     tab: ITab<ISqlEditorTabState>,
     contexts: IExecutionContextProvider<any>
   ) {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    if (!dataSource) {
+      return;
+    }
+
     try {
-      await this.updateResource(tab, tab.handlerState.query);
+      await this.updateResource(tab, dataSource.script);
     } catch {
       const result = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'plugin_resource_manager_save_script_error_confirmation_title',

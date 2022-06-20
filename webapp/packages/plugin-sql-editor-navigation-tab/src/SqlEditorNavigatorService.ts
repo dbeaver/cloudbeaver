@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
-import { ISqlEditorTabState, MemorySqlDataSource, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
+import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
@@ -57,7 +57,8 @@ export class SqlEditorNavigatorService {
     private readonly notificationService: NotificationService,
     private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly sqlResultTabsService: SqlResultTabsService,
-    navigationService: NavigationService
+    navigationService: NavigationService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.navigator = new Executor<SQLCreateAction | SQLEditorAction>(
       null,
@@ -101,10 +102,14 @@ export class SqlEditorNavigatorService {
 
       if (data.type === SQLEditorNavigationAction.create) {
         if (data.source === SQL_EDITOR_SOURCE_ACTION) {
-          tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => (
-            tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION
-            && tab.handlerState.executionContext?.connectionId === data.connectionId
-          )));
+          tab = this.navigationTabsService.findTab(isSQLEditorTab(tab => {
+            const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+            return (
+              tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION
+              && dataSource?.executionContext?.connectionId === data.connectionId
+            );
+          }));
         }
 
         if (!tab) {

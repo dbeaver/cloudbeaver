@@ -16,7 +16,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
-import { ISqlEditorTabState, MemorySqlDataSource, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
 
@@ -29,30 +29,41 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     ConnectionExecutionContextResource,
     CachedMapAllKey
   );
+  const sqlDataSourceService = useService(SqlDataSourceService);
   const sqlEditorService = useService(SqlEditorService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(contextId);
 
   const state = useObservableRef(() => ({
+    get dataSource() {
+      if (!this.state) {
+        return undefined;
+      }
+
+      return sqlDataSourceService.get(this.state.editorId);
+    },
     state: null as null | ISqlEditorTabState,
     setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
       if (contextInfo) {
+        const editorId = uuid();
+
+        sqlDataSourceService.create(editorId, MemorySqlDataSource.key, '', contextInfo);
+
         this.state = sqlEditorService.getState(
-          uuid(),
+          editorId,
           MemorySqlDataSource.key,
           0,
           undefined,
           undefined,
-          undefined,
-          contextInfo
         );
+
       } else {
         this.state = null;
       }
     },
   }), { state: observable }, false);
 
-  if (context?.context?.id !== state.state?.executionContext?.id) {
+  if (context?.context?.id !== state.dataSource?.executionContext?.id) {
     state.setState(context?.context);
   }
 
