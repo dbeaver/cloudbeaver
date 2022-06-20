@@ -49,7 +49,6 @@ export * from './TableViewer/IDataPresentationActions';
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 
-export * from './DataViewerTabService';
 export * from './ContainerDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
