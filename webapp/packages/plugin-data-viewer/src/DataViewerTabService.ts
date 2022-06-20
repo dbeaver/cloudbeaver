@@ -61,9 +61,9 @@ export class DataViewerTabService {
       ));
 
       for (const tab of tabs) {
-        const canClose = await this.handleTabCanClose(tab);
+        const canDisconnect = await this.handleTabCanClose(tab);
 
-        if (!canClose) {
+        if (!canDisconnect) {
           ExecutorInterrupter.interrupt(contexts);
           return;
         }
