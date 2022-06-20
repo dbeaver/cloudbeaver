@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable, observable } from 'mobx';
+
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -21,8 +23,8 @@ type ISqlDataSourceFactory = (
 interface ISqlDataSourceOptions {
   key: string;
   getDataSource: ISqlDataSourceFactory;
-  onDestroy?: (editorId: string)=> void;
-  canDestroy?: (editorId: string)=> Promise<void>;
+  onDestroy?: (editorId: string)=> Promise<void> | void;
+  canDestroy?: (editorId: string)=> Promise<boolean> | boolean;
 }
 
 interface ISqlDataSourceProvider {
@@ -42,6 +44,12 @@ export class SqlDataSourceService {
     this.register({
       key: MemorySqlDataSource.key,
       getDataSource: (editorId, script, executionContext) => new MemorySqlDataSource(script, executionContext),
+    });
+
+    makeObservable<this, 'providers'>(this, {
+      providers: observable.shallow,
+      create: action,
+      destroy: action,
     });
   }
 
@@ -69,9 +77,24 @@ export class SqlDataSourceService {
         provider,
         dataSource: provider.getDataSource(editorId, script, executionContext),
       };
+
+      this.providers.set(editorId, activeProvider);
     }
 
     return activeProvider.dataSource;
+  }
+
+  async canDestroy(editorId: string): Promise<boolean> {
+    const activeProvider = this.providers.get(editorId);
+
+    return (await activeProvider?.provider.canDestroy?.(editorId)) ?? true;
+  }
+
+  async destroy(editorId: string): Promise<void> {
+    const activeProvider = this.providers.get(editorId);
+
+    await activeProvider?.provider.onDestroy?.(editorId);
+    this.providers.delete(editorId);
   }
 
   register(dataSourceOptions: ISqlDataSourceOptions) {

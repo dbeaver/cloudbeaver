@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
 import type { ISqlDataSource } from './ISqlDataSource';
@@ -19,6 +21,11 @@ export class MemorySqlDataSource implements ISqlDataSource {
   constructor(script = '', executionContext?: IConnectionExecutionContextInfo) {
     this.script = script;
     this.executionContext = executionContext;
+
+    makeObservable(this, {
+      script: observable,
+      executionContext: observable,
+    });
   }
 
   setScript(script: string): void {

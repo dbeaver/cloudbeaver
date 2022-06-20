@@ -239,6 +239,7 @@ export class SqlEditorTabService extends Bootstrap {
       || !Array.isArray(tab.handlerState.resultTabs)
       || !Array.isArray(tab.handlerState.statisticsTabs)
     ) {
+      await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
       return false;
     }
 
@@ -347,12 +348,18 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    if (await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState)) {
+    const canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+
+    if (canCloseTabs) {
       const contexts = await this.onCanClose.execute(editorTab);
-      return !ExecutorInterrupter.isInterrupted(contexts);
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return false;
+      }
     }
 
-    return false;
+    const canDestroyDatasource = await this.sqlDataSourceService.canDestroy(editorTab.handlerState.editorId);
+
+    return canDestroyDatasource;
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
@@ -361,6 +368,8 @@ export class SqlEditorTabService extends Bootstrap {
     if (dataSource?.executionContext) {
       await this.sqlEditorService.destroyContext(dataSource.executionContext);
     }
+
+    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
   }

@@ -20,7 +20,7 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
@@ -132,7 +132,10 @@ export class SqlEditorBootstrap extends Bootstrap {
           case ACTION_SQL_EDITOR_OPEN: {
             const connection = context.get(DATA_CONTEXT_CONNECTION);
 
-            this.sqlEditorNavigatorService.openNewEditor({ connectionId: connection.id });
+            this.sqlEditorNavigatorService.openNewEditor({
+              dataSourceKey: LocalStorageSqlDataSource.key,
+              connectionId: connection.id,
+            });
             break;
           }
         }
@@ -168,7 +171,12 @@ export class SqlEditorBootstrap extends Bootstrap {
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
 
-    this.sqlEditorNavigatorService.openNewEditor({ connectionId, catalogId, schemaId });
+    this.sqlEditorNavigatorService.openNewEditor({
+      dataSourceKey: LocalStorageSqlDataSource.key,
+      connectionId,
+      catalogId,
+      schemaId,
+    });
   }
 
   private readonly handleAction: IExecutorHandler<ISessionAction | null> = (data, contexts) => {
@@ -177,6 +185,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     if (isSessionActionOpenSQLEditor(data)) {
       try {
         this.sqlEditorNavigatorService.openNewEditor({
+          dataSourceKey: LocalStorageSqlDataSource.key,
           name: data['editor-name'],
           connectionId: data['connection-id'],
           source: SQL_EDITOR_SOURCE_ACTION,

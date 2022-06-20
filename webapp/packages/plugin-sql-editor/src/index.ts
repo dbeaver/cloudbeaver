@@ -1,4 +1,7 @@
 import { sqlEditorPluginManifest } from './manifest';
+export * from './SqlDataSource/LocalStorage/ILocalStorageSqlDataSourceState';
+export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSource';
+export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
 export * from './SqlDataSource/ISqlDataSource';
 export * from './SqlDataSource/SqlDataSourceService';
 export * from './SqlDataSource/MemorySqlDataSource';

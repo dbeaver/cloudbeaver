@@ -26,7 +26,7 @@ export class SqlEditorService {
   readonly onQueryChange: Executor<IQueryChangeData>;
 
   constructor(
-    private readonly gql: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly notificationService: NotificationService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
@@ -63,7 +63,7 @@ export class SqlEditorService {
     connectionId: string,
     script: string
   ): Promise<SqlScriptInfoFragment> {
-    const result = await this.gql.sdk.parseSQLScript({
+    const result = await this.graphQLService.sdk.parseSQLScript({
       connectionId,
       script,
     });
@@ -76,7 +76,7 @@ export class SqlEditorService {
     script: string,
     position: number,
   ) {
-    const result = await this.gql.sdk.parseSQLQuery({
+    const result = await this.graphQLService.sdk.parseSQLQuery({
       connectionId,
       script,
       position,
@@ -93,7 +93,7 @@ export class SqlEditorService {
     maxResults?: number,
     simple?: boolean,
   ): Promise<SQLProposal[]> {
-    const { proposals } = await this.gql.sdk.querySqlCompletionProposals({
+    const { proposals } = await this.graphQLService.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
       query,
@@ -179,6 +179,14 @@ export class SqlEditorService {
     dataSource.setExecutionContext({ ...context.context });
 
     return context;
+  }
+
+  async canDestroy(state: ISqlEditorTabState): Promise<boolean> {
+    return await this.sqlDataSourceService.canDestroy(state.editorId);
+  }
+
+  async destroy(state: ISqlEditorTabState): Promise<void> {
+    await this.sqlDataSourceService.destroy(state.editorId);
   }
 
   async initContext(
