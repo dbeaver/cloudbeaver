@@ -11,7 +11,7 @@ import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderServi
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
@@ -19,8 +19,12 @@ import { openCenteredPopup } from '@cloudbeaver/core-utils';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
+export type LogoutState = 'before' | 'after';
+
 @injectable()
 export class AuthenticationService extends Bootstrap {
+  readonly onLogout: Executor<LogoutState>;
+
   configureAuthProvider: (() => void) | null;
   configureIdentityProvider: (() => void) | null;
 
@@ -40,6 +44,9 @@ export class AuthenticationService extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
+
+    this.onLogout = new Executor();
+
     this.authPromise = null;
     this.configureAuthProvider = null;
     this.configureIdentityProvider = null;
@@ -58,6 +65,12 @@ export class AuthenticationService extends Bootstrap {
   }
 
   async logout(): Promise<void> {
+    const contexts = await this.onLogout.execute('before');
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     if (this.authInfoService.userAuthConfigurations.length > 0) {
       const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
 
@@ -72,6 +85,8 @@ export class AuthenticationService extends Bootstrap {
       if (!this.administrationScreenService.isConfigurationMode) {
         this.screenService.navigateToRoot();
       }
+
+      await this.onLogout.execute('after');
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t logout');
     }
