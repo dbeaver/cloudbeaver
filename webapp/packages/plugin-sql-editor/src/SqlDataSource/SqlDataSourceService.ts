@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { ISqlDataSource } from './ISqlDataSource';
 import { MemorySqlDataSource } from './MemorySqlDataSource';
 
-type ISqlDataSourceFabric = (
+type ISqlDataSourceFactory = (
   editorId: string,
   script?: string,
   executionContext?: IConnectionExecutionContextInfo,
@@ -20,7 +20,7 @@ type ISqlDataSourceFabric = (
 
 interface ISqlDataSourceOptions {
   key: string;
-  fabric: ISqlDataSourceFabric;
+  getDataSource: ISqlDataSourceFactory;
   onDestroy?: (editorId: string)=> void;
   canDestroy?: (editorId: string)=> Promise<void>;
 }
@@ -41,7 +41,7 @@ export class SqlDataSourceService {
 
     this.register({
       key: MemorySqlDataSource.key,
-      fabric: (editorId, script, executionContext) => new MemorySqlDataSource(script, executionContext),
+      getDataSource: (editorId, script, executionContext) => new MemorySqlDataSource(script, executionContext),
     });
   }
 
@@ -67,7 +67,7 @@ export class SqlDataSourceService {
       activeProvider?.provider.onDestroy?.(editorId);
       activeProvider = {
         provider,
-        dataSource: provider.fabric(editorId, script, executionContext),
+        dataSource: provider.getDataSource(editorId, script, executionContext),
       };
     }
 
