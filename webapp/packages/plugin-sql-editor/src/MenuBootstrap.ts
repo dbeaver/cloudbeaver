@@ -125,5 +125,5 @@ export class MenuBootstrap extends Bootstrap {
     }
   }
 
-  load(): void { }
+  load(): void | Promise<void> { }
 }

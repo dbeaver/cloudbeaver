@@ -221,7 +221,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         contextDefaults != null && contextDefaults.supportsSchemaChange()
                         && (
                             contextDefaults.getDefaultCatalog().getName().equals(node.getName())
-                            || catalog.equals(node.getName())
+                            || node.getName().equals(catalog)
                         )
                     ) {
                         try {
