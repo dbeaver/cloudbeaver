@@ -6,12 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
 import type { ISqlDataSource } from './ISqlDataSource';
 import { MemorySqlDataSource } from './MemorySqlDataSource';
 
-type ISqlDataSourceFabric = (editorId: string) => ISqlDataSource;
+type ISqlDataSourceFabric = (
+  editorId: string,
+  script?: string,
+  executionContext?: IConnectionExecutionContextInfo,
+) => ISqlDataSource;
 
 interface ISqlDataSourceOptions {
   key: string;
@@ -36,7 +41,7 @@ export class SqlDataSourceService {
 
     this.register({
       key: MemorySqlDataSource.key,
-      fabric: () => new MemorySqlDataSource(),
+      fabric: (editorId, script, executionContext) => new MemorySqlDataSource(script, executionContext),
     });
   }
 
@@ -44,7 +49,12 @@ export class SqlDataSourceService {
     return this.providers.get(editorId)?.dataSource;
   }
 
-  create(editorId: string, key: string): ISqlDataSource {
+  create(
+    editorId: string,
+    key: string,
+    script?: string,
+    executionContext?: IConnectionExecutionContextInfo,
+  ): ISqlDataSource {
     const provider = this.dataSourceProviders.get(key);
 
     if (!provider) {
@@ -57,7 +67,7 @@ export class SqlDataSourceService {
       activeProvider?.provider.onDestroy?.(editorId);
       activeProvider = {
         provider,
-        dataSource: provider.fabric(editorId),
+        dataSource: provider.fabric(editorId, script, executionContext),
       };
     }
 
