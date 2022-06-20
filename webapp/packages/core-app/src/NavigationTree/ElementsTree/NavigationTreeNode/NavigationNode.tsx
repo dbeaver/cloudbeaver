@@ -49,6 +49,10 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const context = useDataContext();
   const dndData = useDNDData(context, {
     onDragStart: async () => {
+      if (!selected) {
+        handleSelect(false);
+      }
+
       // strange way to preload alias while dragging
       await navNodeManagerService.getNodeDatabaseAlias(node.id);
     },
