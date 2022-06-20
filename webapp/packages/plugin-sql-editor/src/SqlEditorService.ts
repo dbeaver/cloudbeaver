@@ -37,6 +37,7 @@ export class SqlEditorService {
 
   getState(
     editorId: string,
+    datasourceKey: string,
     order: number,
     name?: string,
     source?: string,
@@ -45,6 +46,7 @@ export class SqlEditorService {
   ): ISqlEditorTabState {
     return {
       editorId,
+      datasourceKey,
       name,
       source,
       query: query ?? '',

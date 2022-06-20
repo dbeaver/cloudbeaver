@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
-import { ISqlEditorTabState, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
+import { ISqlEditorTabState, MemorySqlDataSource, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
@@ -28,6 +28,7 @@ export interface SQLEditorActionContext {
 }
 
 export interface ISQLEditorOptions {
+  dataSourceKey?: string;
   name?: string;
   connectionId?: string;
   catalogId?: string;
@@ -111,6 +112,7 @@ export class SqlEditorNavigatorService {
 
           const tabOptions = this.sqlEditorTabService.createNewEditor(
             editorId,
+            data.dataSourceKey ?? MemorySqlDataSource.key,
             data.name,
             data.source,
             data.query,

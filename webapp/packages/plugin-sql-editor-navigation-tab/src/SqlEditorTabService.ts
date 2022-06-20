@@ -103,6 +103,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   createNewEditor(
     editorId: string,
+    dataSourceKey: string,
     name?: string,
     source?: string,
     query?: string,
@@ -113,7 +114,15 @@ export class SqlEditorTabService extends Bootstrap {
     return {
       id: editorId,
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(editorId, order, name, source, query, undefined),
+      handlerState: this.sqlEditorService.getState(
+        editorId,
+        dataSourceKey,
+        order,
+        name,
+        source,
+        query,
+        undefined
+      ),
     };
   }
 

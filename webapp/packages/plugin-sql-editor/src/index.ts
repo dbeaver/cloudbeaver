@@ -1,4 +1,7 @@
 import { sqlEditorPluginManifest } from './manifest';
+export * from './SqlDataSource/ISqlDataSource';
+export * from './SqlDataSource/SqlDataSourceService';
+export * from './SqlDataSource/MemorySqlDataSource';
 export * from './SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
 export * from './SqlEditor/ISQLEditorData';
 export * from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';

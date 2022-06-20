@@ -45,6 +45,7 @@ export interface IExecutionPlanTab {
 
 export interface ISqlEditorTabState {
   editorId: string;
+  datasourceKey: string;
 
   name?: string;
   source?: string;
