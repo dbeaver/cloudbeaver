@@ -12,13 +12,14 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
 export interface IConnectionExecutorData {
-  connectionId: string;
+  connections: string[];
   state: 'before' | 'after';
 }
 
@@ -34,7 +35,8 @@ export class ConnectionsManagerService {
     readonly connectionInfo: ConnectionInfoResource,
     readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly authenticationService: AuthenticationService,
   ) {
     this.disconnecting = false;
 
@@ -44,6 +46,12 @@ export class ConnectionsManagerService {
 
     this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
     this.onDelete.before(this.onDisconnect);
+    this.authenticationService.onLogout.before(this.onDisconnect, state => ({
+      connections: this.connectionInfo.values
+        .filter(connection => connection.connected)
+        .map(connection => connection.id),
+      state,
+    }));
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
@@ -106,7 +114,7 @@ export class ConnectionsManagerService {
     }
 
     const contexts = await this.onDelete.execute({
-      connectionId: id,
+      connections: [id],
       state: 'before',
     });
 
@@ -117,7 +125,7 @@ export class ConnectionsManagerService {
     await this.connectionInfo.deleteConnection(id);
 
     this.onDelete.execute({
-      connectionId: id,
+      connections: [id],
       state: 'after',
     });
   }
@@ -167,7 +175,7 @@ export class ConnectionsManagerService {
       return;
     }
     const contexts = await this.onDisconnect.execute({
-      connectionId: connection.id,
+      connections: [connection.id],
       state: 'before',
     });
 
@@ -182,7 +190,7 @@ export class ConnectionsManagerService {
 
       notification.close();
       this.onDisconnect.execute({
-        connectionId: connection.id,
+        connections: [connection.id],
         state: 'after',
       });
     } catch (exception: any) {

@@ -19,7 +19,7 @@ import { ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
-import { AuthenticationService, LogoutState } from '@cloudbeaver/plugin-authentication';
+import type { LogoutState } from '@cloudbeaver/plugin-authentication';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -43,7 +43,6 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sessionActionService: SessionActionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly authenticationService: AuthenticationService,
     private readonly sqlResultTabsService: SqlResultTabsService,
     private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
@@ -51,7 +50,6 @@ export class SqlEditorBootstrap extends Bootstrap {
   }
 
   register(): void {
-    this.authenticationService.onLogout.addHandler(this.logoutHandler.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
 
     this.mainMenuService.registerRootItem(
@@ -213,7 +211,7 @@ export class SqlEditorBootstrap extends Bootstrap {
   ) {
     if (data.state === 'before') {
       for (const tab of this.sqlEditorTabService.sqlEditorTabs) {
-        if (tab.handlerState.executionContext?.connectionId !== data.connectionId) {
+        if (!data.connections.includes(tab.handlerState.executionContext?.connectionId ?? '')) {
           continue;
         }
 
