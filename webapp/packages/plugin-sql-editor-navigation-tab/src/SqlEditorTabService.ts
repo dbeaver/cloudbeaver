@@ -19,7 +19,6 @@ import {
   ITabOptions,
   objectNavNodeProvider,
   NodeManagerUtils,
-  ConnectionSchemaManagerService,
   NavNodeManagerService
 } from '@cloudbeaver/core-app';
 import {
@@ -29,12 +28,14 @@ import {
   connectionProvider,
   connectionSetter,
   ConnectionsManagerService,
+  ContainerResource,
+  ICatalogData,
   IConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -58,10 +59,10 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly containerResource: ContainerResource
   ) {
     super();
 
@@ -155,14 +156,35 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private getNavNode() {
-    const objectCatalog = this.connectionSchemaManagerService.currentObjectCatalog;
-    const objectSchema = this.connectionSchemaManagerService.currentObjectSchema;
+  private getNavNode(tab: ITab<ISqlEditorTabState>) {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
-    const nodeId = objectSchema?.id ?? objectCatalog?.id;
-    const connection = this.connectionInfoResource.getConnectionForNode(nodeId ?? '');
+    if (!dataSource?.executionContext) {
+      return;
+    }
 
-    if (!nodeId || connection?.connected === false) {
+    const { connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
+
+    let catalogData: ICatalogData | undefined;
+    let schema: NavNodeInfoFragment | undefined;
+
+    if (defaultCatalog) {
+      catalogData = this.containerResource.getCatalogData(connectionId, defaultCatalog);
+    }
+
+    if (catalogData && defaultSchema) {
+      schema = catalogData.schemaList.find(schema => schema.name === defaultSchema);
+    }
+
+    let nodeId = schema?.id ?? catalogData?.catalog.id;
+
+    if (!nodeId) {
+      nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
+    }
+
+    const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
+
+    if (connection?.connected === false) {
       return;
     }
 
