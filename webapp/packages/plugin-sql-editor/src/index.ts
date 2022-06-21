@@ -1,4 +1,14 @@
 import { sqlEditorPluginManifest } from './manifest';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
+export * from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';
+export * from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT';
+export * from './actions/ACTION_SQL_EDITOR_EXECUTE';
+export * from './actions/ACTION_SQL_EDITOR_FORMAT';
+export * from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN';
 export * from './SqlDataSource/LocalStorage/ILocalStorageSqlDataSourceState';
 export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSource';
 export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
