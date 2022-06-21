@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap, throttle } from '@cloudbeaver/core-utils';
@@ -101,6 +102,7 @@ export interface IElementsTree {
 }
 
 export function useElementsTree(options: IOptions): IElementsTree {
+  const notificationService = useService(NotificationService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
@@ -162,7 +164,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
 
-    getNestedChildren(nodeId: string): string [] {
+    getNestedChildren(nodeId: string): string[] {
       const nestedChildren: string[] = [];
       const prevChildren = elementsTree.getNodeChildren(nodeId);
       nestedChildren.push(...prevChildren);
@@ -357,7 +359,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
     async show(nodeId: string, path: string[]): Promise<void> {
-      const preloaded = await navTreeResource.preloadNodeParents(path);
+      const preloaded = await navTreeResource.preloadNodeParents(path, nodeId);
+
+      if (!preloaded) {
+        notificationService.logError({
+          title: 'app_navigationTree_node_not_found',
+          message: nodeId,
+        });
+      }
 
       if (preloaded) {
         runInAction(() => {
@@ -366,12 +375,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
             state.expanded = true;
           }
 
-          const node = navNodeInfoResource.get(nodeId);
+          const node = navNodeInfoResource.get(nodeId)!;
 
-          if (node) {
-            this.select(node, false, false);
-            this.actions.execute({ type: 'show', nodeId });
-          }
+          this.select(node, false, false);
+          this.actions.execute({ type: 'show', nodeId });
         });
       }
 

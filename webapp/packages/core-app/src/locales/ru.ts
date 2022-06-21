@@ -30,6 +30,7 @@ export default [
   ['app_navigationTree_settings_folders_description', 'Позволяет открыть любой узел как начальный'],
 
   ['app_navigationTree_node_empty', 'Пусто'],
+  ['app_navigationTree_node_not_found', 'Не удалось найти элемент'],
   ['app_navigationTree_connection_view', 'Отображение'],
   ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],
   ['app_navigationTree_connection_view_option_advanced', 'Продвинутое'],

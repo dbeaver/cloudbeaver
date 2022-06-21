@@ -25,6 +25,7 @@ export default [
   ['app_navigationTree_node_empty', 'Empty'],
   ['app_navigationTree_openNodeTab', '打开'],
   ['app_navigationTree_connection_view', '连接视图'],
+  ['app_navigationTree_node_not_found', "Can't find the node"],
   ['app_navigationTree_connection_view_option_simple', '简单'],
   ['app_navigationTree_connection_view_option_advanced', '完善'],
   ['app_navigationTree_connection_view_option_custom', '自定义'],
