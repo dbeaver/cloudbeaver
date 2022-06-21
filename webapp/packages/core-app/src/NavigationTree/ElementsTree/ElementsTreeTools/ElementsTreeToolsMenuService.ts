@@ -60,7 +60,7 @@ export class ElementsTreeToolsMenuService {
         return action.info;
       },
       isHidden: (context, action) => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (action === ACTION_LINK_OBJECT && tree) {
           const navNode = this.connectionSchemaManagerService.activeNavNode;
