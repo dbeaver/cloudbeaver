@@ -29,6 +29,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   constructor(state: ILocalStorageSqlDataSourceState) {
     super();
     this.state = state;
+    this.outdated = false;
 
     makeObservable(this, {
       script: computed,

@@ -58,13 +58,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.loaded = false;
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loading'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
       _script: observable,
       lastAction: observable,
       loading: observable,
+      loaded: observable,
       setScript: action,
       setNodeInfo: action,
     });

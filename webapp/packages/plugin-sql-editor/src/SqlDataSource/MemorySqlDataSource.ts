@@ -30,6 +30,7 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     super();
     this._script = script;
     this._executionContext = executionContext;
+    this.outdated = false;
 
     makeObservable<this, '_script' | '_executionContext'>(this, {
       _script: observable,
