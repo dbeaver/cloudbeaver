@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-
 export interface IResultTab {
   tabId: string;
   // when query return several results they all have one groupId

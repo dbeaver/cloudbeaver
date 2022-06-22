@@ -6,33 +6,44 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-import type { ISqlDataSource } from './ISqlDataSource';
+import { BaseSqlDataSource } from './BaseSqlDataSource';
 
-export class MemorySqlDataSource implements ISqlDataSource {
+export class MemorySqlDataSource extends BaseSqlDataSource {
   static key = 'memory';
 
-  script: string;
-  executionContext?: IConnectionExecutionContextInfo;
+  get script(): string {
+    return this._script;
+  }
+
+  get executionContext(): IConnectionExecutionContextInfo | undefined {
+    return this._executionContext;
+  }
+
+  private _script: string;
+  private _executionContext?: IConnectionExecutionContextInfo;
 
   constructor(script = '', executionContext?: IConnectionExecutionContextInfo) {
-    this.script = script;
-    this.executionContext = executionContext;
+    super();
+    this._script = script;
+    this._executionContext = executionContext;
 
-    makeObservable(this, {
-      script: observable,
-      executionContext: observable,
+    makeObservable<this, '_script' | '_executionContext'>(this, {
+      _script: observable,
+      _executionContext: observable,
+      script: computed,
+      executionContext: computed,
     });
   }
 
   setScript(script: string): void {
-    this.script = script;
+    this._script = script;
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
-    this.executionContext = executionContext;
+    this._executionContext = executionContext;
   }
 }

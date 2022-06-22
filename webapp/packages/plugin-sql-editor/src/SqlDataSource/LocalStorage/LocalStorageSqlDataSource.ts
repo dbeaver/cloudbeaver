@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-import type { ISqlDataSource } from '../ISqlDataSource';
+import { BaseSqlDataSource } from '../BaseSqlDataSource';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 
-export class LocalStorageSqlDataSource implements ISqlDataSource {
+export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   static key = 'local-storage';
 
   get script(): string {
@@ -25,7 +27,13 @@ export class LocalStorageSqlDataSource implements ISqlDataSource {
   private readonly state: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {
+    super();
     this.state = state;
+
+    makeObservable(this, {
+      script: computed,
+      executionContext: computed,
+    });
   }
 
   setScript(script: string): void {

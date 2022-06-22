@@ -6,12 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { ILoadableState } from '@cloudbeaver/core-blocks';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-export interface ISqlDataSource {
+export interface ISqlDataSource extends ILoadableState {
   readonly script: string;
   readonly executionContext?: IConnectionExecutionContextInfo;
+  readonly message?: string;
 
+  isOutdated(): boolean;
+  markOutdated(): void;
+  markUpdated(): void;
   setScript(script: string): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
+  load(): Promise<void> | void;
+  dispose(): Promise<void> | void;
 }
