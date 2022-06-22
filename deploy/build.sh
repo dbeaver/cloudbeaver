@@ -63,7 +63,7 @@ cd ../
 cd ../cloudbeaver/webapp
 
 yarn
-yarn link "react-data-grid"
+#yarn link "react-data-grid"
 lerna run bootstrap
 lerna run build --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
 if [[ "$?" -ne 0 ]] ; then
