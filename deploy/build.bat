@@ -30,7 +30,7 @@ cd cloudbeaver\deploy
 echo Build cloudbeaver server
 
 cd ..\server\product\aggregate
-call mvn clean package -Dheadless-platform
+call mvn clean verify -Dheadless-platform
 
 cd ..\..\..\deploy
 
