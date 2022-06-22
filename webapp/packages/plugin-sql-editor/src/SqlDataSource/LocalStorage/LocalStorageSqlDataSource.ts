@@ -39,6 +39,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
 
   setScript(script: string): void {
     this.state.script = script;
+    super.setScript(script);
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {

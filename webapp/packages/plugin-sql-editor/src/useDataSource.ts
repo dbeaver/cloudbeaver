@@ -14,7 +14,6 @@ import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
 
 
 export function useDataSource(dataSource?: ISqlDataSource) {
-
   const refObj = useObservableRef(() => ({
     async load(refresh?: boolean) {
       if (!this.dataSource || this.dataSource.isLoading()) {

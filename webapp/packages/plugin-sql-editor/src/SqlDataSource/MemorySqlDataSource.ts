@@ -42,6 +42,7 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
 
   setScript(script: string): void {
     this._script = script;
+    super.setScript(script);
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {

@@ -8,11 +8,13 @@
 
 import type { ILoadableState } from '@cloudbeaver/core-blocks';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
 export interface ISqlDataSource extends ILoadableState {
   readonly script: string;
   readonly executionContext?: IConnectionExecutionContextInfo;
   readonly message?: string;
+  readonly onSetScript: ISyncExecutor<string>;
 
   isOutdated(): boolean;
   markOutdated(): void;

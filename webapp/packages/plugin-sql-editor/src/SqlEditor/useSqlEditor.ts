@@ -9,7 +9,7 @@
 import { observable, computed, autorun, IReactionDisposer, action, untracked } from 'mobx';
 import { useEffect } from 'react';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -317,8 +317,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
     setQuery(query: string): void {
       this.sqlEditorService.setQuery(query, this.state);
-      this.parser.setScript(query);
-      this.onUpdate.execute();
     },
 
     updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
@@ -448,6 +446,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   });
 
   data.init();
+
+  useExecutor({
+    executor: data.dataSource?.onSetScript,
+    handlers: [function setScript(script) {
+      data.parser.setScript(script);
+      data.onUpdate.execute();
+    }],
+  });
 
   useEffect(() => () => data.destruct(), []);
 

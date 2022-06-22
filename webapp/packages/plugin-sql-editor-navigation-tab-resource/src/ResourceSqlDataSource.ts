@@ -98,6 +98,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     const previous = this._script;
 
     this._script = script;
+    super.setScript(script);
     this.saved = false;
 
     if (previous !== script) {
@@ -127,6 +128,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       this._script = await this.actions.read(this.nodeInfo.nodeId);
       this.markUpdated();
       this.loaded = true;
+      super.setScript(this.script);
     } catch (exception: any) {
       this.exception = exception;
     } finally {

@@ -9,6 +9,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ISqlDataSource } from './ISqlDataSource';
 
@@ -17,12 +18,14 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   exception?: Error | Error[] | null | undefined;
   message?: string;
+  readonly onSetScript: ISyncExecutor<string>;
 
   protected outdated: boolean;
   constructor() {
     this.exception = undefined;
     this.message = undefined;
     this.outdated = true;
+    this.onSetScript = new SyncExecutor();
 
     makeObservable<this, 'outdated'>(this, {
       exception: observable.ref,
@@ -31,7 +34,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  abstract setScript(script: string): void;
+  setScript(script: string): void {
+    this.onSetScript.execute(script);
+  }
+
   abstract setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void;
 
   isOutdated(): boolean {

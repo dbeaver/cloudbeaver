@@ -87,6 +87,7 @@ export class PluginBootstrap extends Bootstrap {
               const node = await this.navNodeInfoResource.load(nodeId);
 
               if (tab && isSQLEditorTab(tab)) {
+                const previousDataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
                 const dataSource = this.sqlDataSourceService.create(
                   tab.handlerState,
                   ResourceSqlDataSource.key,
@@ -99,6 +100,10 @@ export class PluginBootstrap extends Bootstrap {
                   nodeId,
                   parents,
                 });
+
+                if (previousDataSource) {
+                  dataSource.setExecutionContext(previousDataSource.executionContext);
+                }
               }
 
               this.sqlEditorService.setName(node.name ?? scriptName, state);
@@ -162,6 +167,8 @@ export class PluginBootstrap extends Bootstrap {
         const context = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
         if (context.tab && isSQLEditorTab(context.tab)) {
+          const previousDataSource = this.sqlDataSourceService.get(context.tab.handlerState.editorId);
+
           const dataSource = this.sqlDataSourceService.create(
             context.tab.handlerState,
             ResourceSqlDataSource.key,
@@ -174,6 +181,10 @@ export class PluginBootstrap extends Bootstrap {
             nodeId,
             parents,
           });
+
+          if (previousDataSource) {
+            dataSource.setExecutionContext(previousDataSource.executionContext);
+          }
         }
       }
     } catch (exception) {
