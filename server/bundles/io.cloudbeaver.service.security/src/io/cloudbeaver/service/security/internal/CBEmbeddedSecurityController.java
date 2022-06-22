@@ -871,12 +871,11 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                     userIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
                 }
 
-                Map<String, Object> authData = Map.of(authProviderId, userIdentifyingCredentials);
                 var authAttemptId = createNewAuthAttempt(
                     SMAuthStatus.IN_PROGRESS,
                     authProviderId,
                     authProviderConfigurationId,
-                    authData,
+                    userIdentifyingCredentials,
                     appSessionId,
                     sessionType,
                     sessionParameters
@@ -886,7 +885,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                     //async auth
                     var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
                     var redirectUrl = authProviderFederated.getRedirectLink(authProviderConfigurationId, Map.of());
-                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, authData);
+                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, userIdentifyingCredentials);
                 }
                 txn.commit();
                 return finishAuthentication(authAttemptId);
@@ -921,7 +920,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
-                        "VALUES(?,?,?,?,?)")) {
+                        "VALUES(?,?,?,?)")) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, authProviderId);
                     dbStat.setString(3, authProviderConfigurationId);
@@ -941,16 +940,35 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                                  @NotNull SMAuthStatus authStatus,
                                  @NotNull Map<String, Object> authInfo,
                                  @Nullable String error) throws DBException {
-        try (Connection dbCon = database.openConnection()) {
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_AUTH_INFO SET AUTH_STATUS=?,AUTH_STATE=? WHERE AUTH_ID=?")) {
+                "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=? WHERE AUTH_ID=?")) {
                 dbStat.setString(1, authStatus.toString());
-                dbStat.setString(2, gson.toJson(authId));
+                if (error != null) {
+                    dbStat.setString(2, error);
+                } else {
+                    dbStat.setNull(2, Types.VARCHAR);
+                }
                 dbStat.setString(3, authId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
                 }
             }
+
+            for (Map.Entry<String, Object> entry : authInfo.entrySet()) {
+                String providerId = entry.getKey();
+                Object authData = entry.getValue();
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "MERGE INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_STATE) "
+                        + "KEY(AUTH_ID,AUTH_PROVIDER_ID) VALUES(?,?,?)")) {
+                    dbStat.setString(1, authId);
+                    dbStat.setString(2, providerId);
+                    dbStat.setString(4, gson.toJson(authData));
+                    dbStat.execute();
+                }
+            }
+            txn.commit();
         } catch (SQLException e) {
             throw new DBCException("Error reading session state", e);
         }
@@ -965,6 +983,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
             )) {
+                dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (!dbResult.next()) {
                         throw new SMException("Auth attempt not found");
@@ -980,6 +999,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE FROM CB_AUTH_ATTEMPT_INFO "
                     + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
             )) {
+                dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String authProviderId = dbResult.getString(1);
@@ -1074,6 +1094,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 );
                 var token = generateAuthToken(smSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
+                txn.commit();
                 return SMAuthInfo.success(authId, token, new SMAuthPermissions(userId, smSessionId, permissions), authInfo.getAuthData());
             }
         } catch (SQLException e) {
