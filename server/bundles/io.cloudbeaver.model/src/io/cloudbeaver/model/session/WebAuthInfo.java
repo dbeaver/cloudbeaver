@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
@@ -46,6 +47,8 @@ public class WebAuthInfo implements SMSessionPrincipal {
     private final OffsetDateTime loginTime;
     private final DBWUserIdentity userIdentity;
     private String message;
+    private String redirectLink;
+    private final WebAsyncTaskInfo taskInfo;
 
     private transient Map<String, Object> userCredentials;
 
@@ -55,14 +58,29 @@ public class WebAuthInfo implements SMSessionPrincipal {
         @NotNull AuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull SMSession authSession,
-        @NotNull OffsetDateTime loginTime)
-    {
+        @NotNull OffsetDateTime loginTime) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
         this.userIdentity = userIdentity;
         this.authSession = authSession;
         this.loginTime = loginTime;
+        this.taskInfo = null;
+    }
+
+    public WebAuthInfo(@NotNull WebSession session,
+                       @NotNull WebAsyncTaskInfo taskInfo,
+                       @NotNull String redirectLink
+    ) {
+        this.session = session;
+        this.taskInfo = taskInfo;
+        this.redirectLink = redirectLink;
+
+        this.user = null;
+        this.authProvider = null;
+        this.userIdentity = null;
+        this.authSession = null;
+        this.loginTime = null;
     }
 
     @Property

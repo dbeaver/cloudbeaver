@@ -16,8 +16,12 @@
  */
 package io.cloudbeaver.service.security.internal;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -43,6 +47,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -63,6 +68,9 @@ public class CBEmbeddedSecurityController implements SMAdminController {
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
+    private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
+    }.getType();
+    private static final Gson gson = new GsonBuilder().create();
 
 
     private final CBDatabase database;
@@ -831,7 +839,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 var token = generateAuthToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(null, smSessionId, permissions));
+                return SMAuthInfo.success(UUID.randomUUID().toString(), token, new SMAuthPermissions(null, smSessionId, permissions), Map.of());
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -844,24 +852,255 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public SMAuthInfo authenticate(
+        @NotNull String appSessionId,
+        @NotNull Map<String, Object> sessionParameters,
+        @NotNull SMSessionType sessionType,
+        @NotNull String authProviderId,
+        @Nullable String authProviderConfigurationId,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
+        var authProgressMonitor = new VoidProgressMonitor();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = findOrCreateExternalUserByCredentials(authProviderId,
-                    sessionParameters,
-                    userCredentials,
-                    new VoidProgressMonitor());
-                if (userId == null) {
-                    throw new SMException("Invalid user credentials");
+                Map<String, Object> userIdentifyingCredentials = userCredentials;
+                AuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                var authProviderInstance = authProviderDescriptor.getInstance();
+                if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
+                    var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
+                    userIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
                 }
-                var smSessionId = createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(smSessionId, userId, dbCon);
-                var permissions = getUserPermissions(userId);
+
+                Map<String, Object> authData = Map.of(authProviderId, userIdentifyingCredentials);
+                var authAttemptId = createNewAuthAttempt(
+                    SMAuthStatus.IN_PROGRESS,
+                    authProviderId,
+                    authProviderConfigurationId,
+                    authData,
+                    appSessionId,
+                    sessionType,
+                    sessionParameters
+                );
+
+                if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                    //async auth
+                    var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
+                    var redirectUrl = authProviderFederated.getRedirectLink(authProviderConfigurationId, Map.of());
+                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, authData);
+                }
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(userId, smSessionId, permissions));
+                return finishAuthentication(authAttemptId);
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
+        }
+    }
+
+    private String createNewAuthAttempt(
+        SMAuthStatus status,
+        String authProviderId,
+        String authProviderConfigurationId,
+        Map<String, Object> authData,
+        String appSessionId,
+        SMSessionType sessionType,
+        Map<String, Object> sessionParameters
+    ) throws DBException {
+        String authAttemptId = UUID.randomUUID().toString();
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE) " +
+                        "VALUES(?,?,?,?,?)")) {
+                    dbStat.setString(1, authAttemptId);
+                    dbStat.setString(2, status.toString());
+                    dbStat.setString(3, appSessionId);
+                    dbStat.setString(4, sessionType.getSessionType());
+                    dbStat.setString(5, gson.toJson(sessionParameters));
+                    dbStat.execute();
+                }
+
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
+                        "VALUES(?,?,?,?,?)")) {
+                    dbStat.setString(1, authAttemptId);
+                    dbStat.setString(2, authProviderId);
+                    dbStat.setString(3, authProviderConfigurationId);
+                    dbStat.setString(4, gson.toJson(authData));
+                    dbStat.execute();
+                }
+                txn.commit();
+            }
+            return authAttemptId;
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateAuthStatus(@NotNull String authId,
+                                 @NotNull SMAuthStatus authStatus,
+                                 @NotNull Map<String, Object> authInfo,
+                                 @Nullable String error) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "UPDATE CB_AUTH_INFO SET AUTH_STATUS=?,AUTH_STATE=? WHERE AUTH_ID=?")) {
+                dbStat.setString(1, authStatus.toString());
+                dbStat.setString(2, gson.toJson(authId));
+                dbStat.setString(3, authId);
+                if (dbStat.executeUpdate() <= 0) {
+                    throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading session state", e);
+        }
+    }
+
+    @Override
+    public SMAuthInfo getAuthStatus(@NotNull String authId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            SMAuthStatus smAuthStatus;
+            String authError;
+            String smSessionId;
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+            )) {
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        throw new SMException("Auth attempt not found");
+                    }
+                    smAuthStatus = SMAuthStatus.valueOf(dbResult.getString(1));
+                    authError = dbResult.getString(2);
+                    smSessionId = dbResult.getString(3);
+                }
+            }
+            Map<String, Object> authData = new LinkedHashMap<>();
+            String redirectUrl = null;
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE FROM CB_AUTH_ATTEMPT_INFO "
+                    + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
+            )) {
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String authProviderId = dbResult.getString(1);
+                        String authProviderConfiguration = dbResult.getString(2);
+                        Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
+                        if (authProviderConfiguration != null) {
+                            var authProviderInstance = getAuthProvider(authProviderId).getInstance();
+                            if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                                redirectUrl = ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of());
+                            }
+                        }
+                        authData.put(authProviderId, authProviderData);
+                    }
+                }
+            }
+
+            if (smAuthStatus != SMAuthStatus.SUCCESS) {
+                switch (smAuthStatus) {
+                    case IN_PROGRESS:
+                        return SMAuthInfo.inProgress(authId, redirectUrl, authData);
+                    case ERROR:
+                        return SMAuthInfo.error(authId, authError);
+                    default:
+                        throw new SMException("Unknown auth status:" + smAuthStatus);
+                }
+            }
+
+            String smToken = findTokenBySmSession(smSessionId);
+            return SMAuthInfo.success(authId, smToken, getTokenPermissions(smToken), authData);
+
+        } catch (SQLException e) {
+            throw new DBException("Error while read auth info", e);
+        }
+    }
+
+    private String findTokenBySmSession(String smSessionId) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?");
+        ) {
+            dbStat.setString(1, smSessionId);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Token not found");
+                }
+                return dbResult.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+    }
+
+    @Override
+    public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
+        SMAuthInfo authInfo = getAuthStatus(authId);
+        if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+            throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
+        }
+        Set<String> authProviderIds = authInfo.getAuthData().keySet();
+        if (authProviderIds.isEmpty()) {
+            throw new SMException("Authorization providers are not defined");
+        }
+        String userId = null;
+        var finishAuthMonitor = new VoidProgressMonitor();
+        AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
+        for (String authProviderId : authProviderIds) {
+            var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                authProviderId,
+                authAttemptSessionInfo.getSessionParams(),
+                userCredentials,
+                finishAuthMonitor
+            );
+            if (userId == null) {
+                userId = userIdFromCreds;
+            } else if (!userId.equals(userIdFromCreds)) {
+                throw new SMException("Authorization attempt contains different users");
+            }
+        }
+
+
+        if (userId == null) {
+            return SMAuthInfo.error(authId, "Invalid user credentials");
+        }
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                var smSessionId = createSessionIfNotExist(
+                    authAttemptSessionInfo.getAppSessionId(),
+                    userId,
+                    authAttemptSessionInfo.getSessionParams(),
+                    authAttemptSessionInfo.getSessionType(),
+                    dbCon
+                );
+                var token = generateAuthToken(smSessionId, userId, dbCon);
+                var permissions = getUserPermissions(userId);
+                return SMAuthInfo.success(authId, token, new SMAuthPermissions(userId, smSessionId, permissions), authInfo.getAuthData());
+            }
+        } catch (SQLException e) {
+            throw new SMException("Error during token generation", e);
+        }
+    }
+
+    private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+            )) {
+                dbStat.setString(1, authId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        throw new SMException("Auth attempt not found");
+                    }
+                    String appSessionId = dbResult.getString(1);
+                    SMSessionType sessionType = new SMSessionType(dbResult.getString(2));
+                    Map<String, Object> sessionParams = gson.fromJson(
+                        dbResult.getString(3), MAP_STRING_OBJECT_TYPE
+                    );
+                    return new AuthAttemptSessionInfo(appSessionId, sessionType, sessionParams);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error while read auth info", e);
         }
     }
 

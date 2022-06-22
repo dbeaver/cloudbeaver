@@ -16,39 +16,29 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionAuthJob;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
-import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebUserInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.SMAuthInfo;
-import org.jkiss.dbeaver.model.auth.SMAuthProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
-import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.time.OffsetDateTime;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,202 +53,39 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     public WebAuthInfo authLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
+        @Nullable String providerConfigurationId,
         @NotNull Map<String, Object> authParameters,
-        boolean linkWithActiveUser) throws DBWebException {
-        SMController securityController = webSession.getSecurityController();
-
+        boolean linkWithActiveUser
+    ) throws DBWebException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
-        if (authProvider == null) {
-            throw new DBWebException("Invalid auth provider '" + providerId + "'");
-        }
-
-        boolean configMode = CBApplication.getInstance().isConfigurationMode();
-
-        // Check enabled auth providers
-        boolean providerEnabled = isProviderEnabled(providerId, authProvider);
-        boolean resetUserStateOnError = webSession.getUser() == null;
-
+        SMController securityController = webSession.getSecurityController();
         try {
-            Map<String, Object> providerConfig = Collections.emptyMap();
-            SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
-            SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
-                (SMAuthProviderExternal<?>) authProviderInstance : null;
-            Map<String, Object> userCredentials;
+            var smAuthInfo = securityController.authenticate(
+                webSession.getSessionId(),
+                webSession.getSessionParameters(),
+                WebSession.CB_SESSION_TYPE,
+                providerId,
+                providerConfigurationId,
+                authParameters
+            );
 
-            if (authProviderExternal != null) {
-                userCredentials = authProviderExternal.authExternalUser(webSession.getProgressMonitor(), providerConfig, authParameters);
+            if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
+                //run async auth process
+                WebAsyncTaskInfo taskInfo = webSession.createAndRunAsyncTask("Authentication", new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser));
+                return new WebAuthInfo(webSession, taskInfo, smAuthInfo.getRedirectUrl());
             } else {
-                // User credentials are the same as auth parameters
-                userCredentials = authParameters;
+                //run it sync
+                var job = new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser);
+                job.run(webSession.getProgressMonitor());
+                //TODO return list
+                return ((List<WebAuthInfo>) job.getExtendedResults()).stream().findFirst().orElseThrow();
             }
-
-            if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-                // 1. Admin can authorize in any providers
-                // 2. When it authorizes in non-local provider for the first time we force linkUser flag
-                if (!providerEnabled && webSession.getUser() != null) {
-                    linkWithActiveUser = true;
-                }
-            } else if (!providerEnabled) {
-                if (!isAdminAuthTry(webSession, authProvider, userCredentials)) {
-                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
-                }
-            }
-
-            WebUser user = null;
-            String userId;
-            SMSession authSession;
-            if (configMode) {
-                if (webSession.getUser() != null) {
-                    // Already logged in - remove auth token
-                    webSession.removeAuthInfo(providerId);
-                    webSession.resetAuthToken();
-                }
-                if (authProviderExternal != null) {
-                    userId = authProviderExternal.validateLocalAuth(
-                        webSession.getProgressMonitor(),
-                        securityController,
-                        providerConfig,
-                        userCredentials,
-                        webSession.getUserId());
-                } else {
-                    userId = CONFIG_TEMP_ADMIN_USER_ID;
-                }
-            } else {
-                WebUser curUser = webSession.getUser();
-                if (curUser == null) {
-                    try {
-                        SMAuthInfo smAuthInfo = securityController.authenticate(webSession.getSessionId(), webSession.getSessionParameters(), WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
-                        userId = smAuthInfo.getAuthPermissions().getUserId();
-                        if (userId == null) {
-                            throw new SMException("Anonymous authentication restricted");
-                        }
-                        webSession.updateSMAuthInfo(smAuthInfo);
-                        curUser = webSession.getUser();
-                        securityController = webSession.getSecurityController();
-                    } catch (SMException e) {
-                        log.debug("Error during user authentication", e);
-                        throw e;
-                    }
-                } else { // user already logged in
-                    userId = curUser.getUserId();
-                    if (authProviderExternal != null) {
-                        // We may need to associate new credentials with active user
-                        if (linkWithActiveUser) {
-                            securityController.setUserCredentials(userId, authProvider.getId(), userCredentials);
-                        }
-                    }
-                }
-
-                if (linkWithActiveUser && curUser != null && !curUser.getUserId().equals(userId)) {
-                    log.debug("Attempt to authorize user '" + userId + "' while user '" + curUser.getUserId() + "' already authorized");
-                    throw new DBCException("You cannot authorize with different users credentials");
-                }
-
-                user = curUser;
-            }
-            if (user == null) {
-                user = new WebUser(new SMUser(userId));
-            }
-            if (!configMode && !webSession.isAuthorizedInSecurityManager()) {
-                throw new DBCException("No authorization in the security manager");
-            }
-
-            DBWUserIdentity userIdentity = null;
-
-            if (authProviderExternal != null) {
-                try {
-                    userIdentity =
-                        authProviderExternal.getUserIdentity(
-                            webSession.getProgressMonitor(),
-                            providerConfig,
-                            userCredentials);
-                } catch (DBException e) {
-                    log.debug("Error reading auth display name from provider " + providerId, e);
-                }
-            }
-            if (userIdentity == null) {
-                userIdentity = new DBWUserIdentity(userId, userId);
-            }
-            if (CommonUtils.isEmpty(user.getDisplayName())) {
-                user.setDisplayName(userIdentity.getDisplayName());
-            }
-
-            authSession = authProviderInstance.openSession(
-                webSession.getProgressMonitor(),
-                webSession,
-                providerConfig,
-                userCredentials);
-
-            if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
-                throw new DBWebException("Access denied (no permissions)");
-            }
-            if (!configMode && !securityController.getUserById(userId).isEnabled()) {
-                throw new DBWebException("User account is locked");
-            }
-
-            WebAuthInfo authInfo = new WebAuthInfo(
-                webSession,
-                user,
-                authProvider,
-                userIdentity,
-                authSession,
-                OffsetDateTime.now());
-            authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
-            if (configMode) {
-                authInfo.setUserCredentials(userCredentials);
-            }
-
-            webSession.addAuthInfo(authInfo);
-
-            return authInfo;
-        } catch (DBException e) {
-            if (resetUserStateOnError) {
-                webSession.resetUserState();
-            }
+        } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }
-    }
 
-    private boolean isProviderEnabled(@NotNull String providerId, AuthProviderDescriptor authProvider) {
-        boolean providerEnabled = true;
-        CBAppConfig appConfiguration = CBApplication.getInstance().getAppConfiguration();
-        String[] enabledAuthProviders = appConfiguration.getEnabledAuthProviders();
-        if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
-            providerEnabled = false;
-        } else {
-            if (!ArrayUtils.isEmpty(authProvider.getRequiredFeatures())) {
-                for (String rf : authProvider.getRequiredFeatures()) {
-                    if (!appConfiguration.isFeatureEnabled(rf)) {
-                        providerEnabled = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return providerEnabled;
-    }
-
-    private boolean isAdminAuthTry(@NotNull WebSession session, @NotNull AuthProviderDescriptor authProvider, @NotNull Map<String, Object> userCredentials) {
-        SMController securityController = session.getSecurityController();
-        boolean isAdmin = false;
-
-        try {
-            SMAuthInfo authInfo = securityController.authenticate(
-                session.getSessionId(),
-                session.getSessionParameters(),
-                WebSession.CB_SESSION_TYPE,
-                authProvider.getId(),
-                userCredentials);
-
-            isAdmin = authInfo.getAuthPermissions().getPermissions().contains(DBWConstants.PERMISSION_ADMIN);
-        } catch (DBException e) {
-            log.error(e);
-        }
-
-        return isAdmin;
     }
 
     @Override

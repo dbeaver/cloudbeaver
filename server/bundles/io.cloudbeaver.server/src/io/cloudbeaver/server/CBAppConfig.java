@@ -22,6 +22,7 @@ import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -39,7 +40,7 @@ import java.util.Map;
 /**
  * Application configuration
  */
-public class CBAppConfig extends BaseWebAppConfiguration {
+public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfiguration {
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
     private boolean supportsCustomConnections;
@@ -186,7 +187,22 @@ public class CBAppConfig extends BaseWebAppConfiguration {
     }
 
     public boolean isAuthProviderEnabled(String id) {
-        return ArrayUtils.contains(getEnabledAuthProviders(), id);
+        var authProviderDescriptor = AuthProviderRegistry.getInstance().getAuthProvider(id);
+        if (authProviderDescriptor == null) {
+            return false;
+        }
+
+        if (!ArrayUtils.contains(getEnabledAuthProviders(), id)) {
+            return false;
+        }
+        if (!ArrayUtils.isEmpty(authProviderDescriptor.getRequiredFeatures())) {
+            for (String rf : authProviderDescriptor.getRequiredFeatures()) {
+                if (!isFeatureEnabled(rf)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public String getDefaultAuthProvider() {

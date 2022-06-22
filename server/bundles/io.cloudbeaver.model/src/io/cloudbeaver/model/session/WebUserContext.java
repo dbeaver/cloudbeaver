@@ -59,7 +59,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * refresh context state based on new token from security manager
      *
      * @param smAuthInfo - auth info from security manager
-     * @throws DBException - if user already authorized and new token
+     * @throws DBException - if user already authorized and new token come from another user
      */
     public void refresh(SMAuthInfo smAuthInfo) throws DBException {
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
@@ -67,7 +67,7 @@ public class WebUserContext implements SMCredentialsProvider {
         if (isNonAnonymousUserAuthorized && !Objects.equals(getUserId(), tokenInfo.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smCredentials = new SMCredentials(smAuthInfo.getAuthToken(), tokenInfo.getUserId());
+        this.smCredentials = new SMCredentials(smAuthInfo.getSmAuthToken(), tokenInfo.getUserId());
         this.userPermissions = tokenInfo.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);

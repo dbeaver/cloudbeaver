@@ -14,29 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.app;
 
-import org.jkiss.code.NotNull;
+package io.cloudbeaver.auth;
 
-import java.util.Map;
+public interface CBAuthConstants {
+    String CB_AUTH_ID_COOKIE_NAME = "cb-auth-id";
+    
+    String CB_AUTH_ID_REQUEST_PARAM = "authId";
 
-/**
- * Application configuration
- */
-public interface WebAppConfiguration {
-    String getAnonymousUserRole();
-
-    boolean isAnonymousAccessEnabled();
-
-    <T> T getResourceQuota(String quotaId);
-
-    String getDefaultUserRole();
-
-    <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
-
-    Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create);
-
-    boolean isResourceManagerEnabled();
-
-    boolean isFeaturesEnabled(String[] requiredFeatures);
 }

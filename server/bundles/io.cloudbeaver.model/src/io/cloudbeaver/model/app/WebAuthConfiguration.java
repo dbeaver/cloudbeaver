@@ -16,27 +16,13 @@
  */
 package io.cloudbeaver.model.app;
 
-import org.jkiss.code.NotNull;
-
-import java.util.Map;
+import io.cloudbeaver.auth.provider.AuthProviderConfig;
 
 /**
  * Application configuration
  */
-public interface WebAppConfiguration {
-    String getAnonymousUserRole();
+public interface WebAuthConfiguration {
+    boolean isAuthProviderEnabled(String authProviderId);
 
-    boolean isAnonymousAccessEnabled();
-
-    <T> T getResourceQuota(String quotaId);
-
-    String getDefaultUserRole();
-
-    <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
-
-    Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create);
-
-    boolean isResourceManagerEnabled();
-
-    boolean isFeaturesEnabled(String[] requiredFeatures);
+    AuthProviderConfig getAuthProviderConfigurations(String configId);
 }

@@ -63,26 +63,30 @@ type AuthProviderInfo {
 }
 
 type UserAuthToken {
-    # Auth provider used for autgorization
+    # Auth provider used for authorization
     authProvider: ID!
 
     # Auth provider configuration ID
     authConfiguration: ID
 
     # Authorization time
-    loginTime: DateTime!
+    loginTime: DateTime
 
     # User identity (aka user name) specific to auth provider
-    userId: String!
+    userId: String
 
     # User display name specific to auth provider
-    displayName: String!
+    displayName: String
 
     # Optional login message
     message: String
 
     # Auth origin
-    origin: ObjectOrigin!
+    origin: ObjectOrigin
+
+    redirectLink: String
+
+    taskInfo: AsyncTaskInfo
 }
 
 type UserInfo {
