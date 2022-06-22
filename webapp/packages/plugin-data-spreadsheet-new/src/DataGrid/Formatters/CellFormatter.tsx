@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
-import type { FormatterProps } from 'react-data-grid';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';

@@ -7,13 +7,14 @@
  */
 
 import { createContext } from 'react';
-import type { Column } from 'react-data-grid';
+
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type {
   IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey, IResultSetValue, DatabaseEditChangeType,
   ResultSetDataAction, ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction, ResultSetConstraintAction
 } from '@cloudbeaver/plugin-data-viewer';
+import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
 declare module 'react-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {

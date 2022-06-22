@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import DataGrid from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
@@ -19,6 +18,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
+import DataGrid from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';

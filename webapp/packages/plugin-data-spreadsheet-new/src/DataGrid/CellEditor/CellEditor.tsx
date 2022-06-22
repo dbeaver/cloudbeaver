@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
-import type { EditorProps } from 'react-data-grid';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
@@ -16,6 +15,7 @@ import styled, { css } from 'reshadow';
 import { InlineEditor } from '@cloudbeaver/core-app';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { EditorProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';

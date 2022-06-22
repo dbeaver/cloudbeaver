@@ -8,8 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import DataGrid from 'react-data-grid';
-import type { DataGridHandle, Position } from 'react-data-grid';
 import styled from 'reshadow';
 
 import { TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -23,6 +21,8 @@ import {
   DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps,
   IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction
 } from '@cloudbeaver/plugin-data-viewer';
+import type { DataGridHandle, Position } from '@cloudbeaver/plugin-react-data-grid';
+import DataGrid from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -149,7 +149,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     selectCell(pos: Position, scroll = false): void {
       if (
         dataGridRef.current?.selectedCell.idx !== pos.idx
-        || dataGridRef.current?.selectedCell.rowIdx !== pos.rowIdx
+        || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx
         || scroll
       ) {
         dataGridRef.current?.selectCell(pos);

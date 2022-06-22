@@ -8,12 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { getComputed, StaticImage } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
