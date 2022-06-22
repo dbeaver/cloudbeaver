@@ -1,7 +1,6 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
@@ -58,8 +57,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         }
 
         File dataFile = taskInfo.getDataFile();
-        session.addSessionMessage(
-            new WebServerMessage(WebServerMessage.MessageType.INFO, "Download data ..."));
+        session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", processor.getContentType());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         response.setHeader("Content-Length", String.valueOf(dataFile.length()));

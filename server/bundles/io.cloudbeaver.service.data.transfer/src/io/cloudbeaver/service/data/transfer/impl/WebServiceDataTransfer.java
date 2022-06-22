@@ -18,7 +18,6 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
@@ -144,10 +143,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer,
                                                           @Nullable WebSQLResultsInfo resultsInfo) {
-        sqlProcessor.getWebSession().addSessionMessage(
-            new WebServerMessage(WebServerMessage.MessageType.INFO,
-                "Export data from " + dataContainer.getName())
-        );
+        sqlProcessor.getWebSession().addInfoMessage("Export data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override

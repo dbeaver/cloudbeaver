@@ -22,7 +22,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
@@ -319,12 +318,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public boolean setUserConfigurationParameter(@NotNull WebSession webSession, @NotNull String name, @Nullable String value) throws DBWebException {
-        webSession.addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Set user parameter - " + name
-            )
-        );
+        webSession.addInfoMessage("Set user parameter - " + name);
         try {
             webSession.getSecurityController().setUserParameter(
                 webSession.getUser().getUserId(),

@@ -18,7 +18,6 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import org.jkiss.code.NotNull;
@@ -162,13 +161,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
-        getWebSession().addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Execute SQL query (" + sql + ")"
-            )
-        );
-
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
             if (dataFilter.hasFilters()) {
@@ -246,16 +238,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
-
-        getWebSession().addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Read data from "
-                    + executionContext.getDataSource().getName()
-                    + " - " + dataContainer.getName()
-            )
-        );
-
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
@@ -312,17 +294,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         List<WebSQLQueryResults> queryResults = new ArrayList<>();
 
         DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-
-        getWebSession().addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Update data in "
-                    + executionContext.getDataSource().getName()
-                    + " - "
-                    + resultsInfo.getDataContainer().getName()
-
-            )
-        );
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
             DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
             boolean revertToAutoCommit = false;
@@ -401,16 +372,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                 batch.generatePersistActions(session, actions, options);
             }
         }
-
-        getWebSession().addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Generate SQL script for "
-                    + executionContext.getDataSource().getName()
-                    + " - "
-                    + dataManipulator.getName()
-            )
-        );
 
         return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false);
     }
@@ -677,17 +638,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBSDataContainer dataContainer = resultsInfo.getDataContainer();
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         String tableName = rowIdentifier.getEntity().getName();
-
-        getWebSession().addSessionMessage(
-            new WebServerMessage(
-                WebServerMessage.MessageType.INFO,
-                "Read LOB value from "
-                    + executionContext.getDataSource().getName()
-                    + " - "
-                    + tableName
-            )
-        );
-
         WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, dataContainer, lobColumnIndex);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);

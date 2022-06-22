@@ -1,7 +1,6 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -70,8 +69,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
             }
 
             File dataFile = new File(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER, valuePath);
-            session.addSessionMessage(
-                new WebServerMessage(WebServerMessage.MessageType.INFO, "Download LOB file ..."));
+            session.addInfoMessage("Download LOB file ...");
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
             response.setHeader("Content-Length", String.valueOf(dataFile.length()));

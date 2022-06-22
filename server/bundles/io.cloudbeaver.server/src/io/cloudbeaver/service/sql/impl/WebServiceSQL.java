@@ -388,27 +388,27 @@ public class WebServiceSQL implements DBWServiceSQL {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-            try {
-                monitor.beginTask("Read data", 1);
-                monitor.subTask("Extra data from " + nodePath);
+                try {
+                    monitor.beginTask("Read data", 1);
+                    monitor.subTask("Extra data from " + nodePath);
 
-                DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
-                    monitor, nodePath, DBSDataContainer.class);
+                    DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
+                        monitor, nodePath, DBSDataContainer.class);
 
-                WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
-                    contextInfo,
-                    monitor,
-                    dataContainer,
-                    resultId,
-                    filter != null ? filter : new WebSQLDataFilter(),
-                    dataFormat);
-                this.result = executeResults.getStatusMessage();
-                this.extendedResults = executeResults;
-            } catch (Throwable e) {
-                throw new InvocationTargetException(e);
-            } finally {
-                monitor.done();
-            }
+                    WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
+                        contextInfo,
+                        monitor,
+                        dataContainer,
+                        resultId,
+                        filter != null ? filter : new WebSQLDataFilter(),
+                        dataFormat);
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
