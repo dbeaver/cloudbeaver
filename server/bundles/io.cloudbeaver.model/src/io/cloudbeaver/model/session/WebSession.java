@@ -676,6 +676,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
+    public void addInfoMessage(String message) {
+        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
+    }
+
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
         synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();

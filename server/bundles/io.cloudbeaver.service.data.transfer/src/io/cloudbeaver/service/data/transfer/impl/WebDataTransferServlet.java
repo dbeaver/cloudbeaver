@@ -57,7 +57,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         }
 
         File dataFile = taskInfo.getDataFile();
-
+        session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", processor.getContentType());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         response.setHeader("Content-Length", String.valueOf(dataFile.length()));
