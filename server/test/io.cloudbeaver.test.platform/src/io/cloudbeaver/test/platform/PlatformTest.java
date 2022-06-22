@@ -42,17 +42,19 @@ import java.util.Map;
 
 public class PlatformTest {
 
-    private static Thread thread;
-    private static CBApplication testApp;
-    private static HttpClient client;
-    Path scriptsPath;
-    String gqlApiUrl = "http://localhost:8978/api/gql";
-    String statusUrl = "http://localhost:8978/status";
+    public static final String GQL_TEMPLATE_CREATE_CONNECTION = "createConnection.json";
+    public static final String GQL_TEMPLATE_DELETE_CONNECTION = "deleteConnection.json";
+    public static final String GQL_TEMPLATE_USER_CONNECTIONS = "userConnections.json";
+    public static final String GQL_API_URL = "http://localhost:18978/api/gql";
+    public static final String SERVER_STATUS_URL = "http://localhost:18978/status";
+
     private static boolean setUpIsDone = false;
     private static boolean testFinished = false;
-    private static final String createConnection = "createConnection.json";
-    private static final String deleteConnection = "deleteConnection.json";
-    private static final String userConnections = "userConnections.json";
+
+    private static CBApplication testApp;
+    private static HttpClient client;
+    private static Path scriptsPath;
+    private static Thread thread;
 
     @Before
     public void setUp() throws Exception {
@@ -70,7 +72,7 @@ public class PlatformTest {
             long startTime = System.currentTimeMillis();
             long endTime = 0;
             while (true) {
-                setUpIsDone = getServerStatus(client) == 200;
+                setUpIsDone = getServerStatus(client);
                 endTime = System.currentTimeMillis() - startTime;
                 if (setUpIsDone || endTime > 300000) {
                     break;
@@ -79,6 +81,8 @@ public class PlatformTest {
             if (!setUpIsDone) {
                 throw new Exception("Server is not running");
             }
+            scriptsPath = Path.of(testApp.getHomeDirectory().toString(), "/workspace/gql_scripts")
+                .toAbsolutePath();
         }
     }
 
@@ -106,7 +110,6 @@ public class PlatformTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        scriptsPath = Path.of(testApp.getHomeDirectory().toString(), "/workspace/gql_scripts").toAbsolutePath();
         List<Map<String, Object>> connections = getUserConnections(client);
         Map<String, Object> addedConnection = createConnection(client);
         if (!getUserConnections(client).contains(addedConnection)) {
@@ -122,65 +125,69 @@ public class PlatformTest {
     }
 
 
-    private int getServerStatus(HttpClient client) throws Exception {
+    private boolean getServerStatus(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(statusUrl))
+            .uri(URI.create(SERVER_STATUS_URL))
             .GET()
             .build();
-
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode();
+            return response.statusCode() == 200;
         } catch (Exception e) {
-            return 404;
+            return false;
         }
     }
 
     private Map<String, Object> doPost(String input, HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(gqlApiUrl))
+            .uri(URI.create(GQL_API_URL))
             .POST(HttpRequest.BodyPublishers.ofString(input))
             .headers("Content-Type", "application/json")
             .build();
-
 
         HttpResponse<String> response = client.send(request,
             HttpResponse.BodyHandlers.ofString());
 
         return new GsonBuilder().create().fromJson(
             response.body(),
-            new TypeToken<Map<String, Object>>(){}.getType()
+            new TypeToken<Map<String, Object>>() {
+            }.getType()
         );
     }
 
     private List<Map<String, Object>> getUserConnections(HttpClient client) throws Exception {
-        String input = Files.readString(new File(String.valueOf(scriptsPath), userConnections).toPath());
+        String input = readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS);
         Map<String, Object> map = doPost(input, client);
-        Map<String, Object> data =  JSONUtils.getObjectOrNull(map,"data");
+        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
-            return JSONUtils.getObjectList(data,"userConnections");
+            return JSONUtils.getObjectList(data, "userConnections");
         }
         return Collections.emptyList();
     }
 
     private Map<String, Object> createConnection(HttpClient client) throws Exception {
-        String input = Files.readString(new File(String.valueOf(scriptsPath), createConnection).toPath());
+        String input = readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION);
         Map<String, Object> map = doPost(input, client);
-        Map<String, Object> data =  JSONUtils.getObjectOrNull(map,"data");
+        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
-            return JSONUtils.getObjectOrNull(data,"createConnection");
+            return JSONUtils.getObjectOrNull(data, "createConnection");
         }
         return Collections.emptyMap();
     }
 
     private boolean deleteConnection(HttpClient client, String connectionId) throws Exception {
-        String input = Files.readString(new File(String.valueOf(scriptsPath), deleteConnection).toPath())
-            .replace("createdConnectionId", connectionId);
+        String input = readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION)
+            .replace("${connectionId}", connectionId);
         Map<String, Object> map = doPost(input, client);
-        Map<String, Object> data =  JSONUtils.getObjectOrNull(map,"data");
+        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getBoolean(data, "deleteConnection");
         }
         return false;
+    }
+
+    private String readScriptTemplate(String templateName) throws Exception {
+        Path templatePath = new File(String.valueOf(scriptsPath), templateName).toPath();
+        return Files.readString(templatePath);
     }
 }
