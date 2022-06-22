@@ -38,6 +38,7 @@ import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloud
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
+import { isSQLEditorTab } from './isSQLEditorTab';
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
@@ -118,18 +119,20 @@ export class SqlEditorTabService extends Bootstrap {
 
     const order = this.getFreeEditorId();
 
-    this.sqlDataSourceService.create(editorId, dataSourceKey, script);
+    const handlerState = this.sqlEditorService.getState(
+      editorId,
+      dataSourceKey,
+      order,
+      name,
+      source,
+    );
+
+    this.sqlDataSourceService.create(handlerState, dataSourceKey, script);
 
     return {
       id: editorId,
       handlerId: sqlEditorTabHandlerKey,
-      handlerState: this.sqlEditorService.getState(
-        editorId,
-        dataSourceKey,
-        order,
-        name,
-        source,
-      ),
+      handlerState,
     };
   }
 
@@ -270,7 +273,7 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const dataSource = this.sqlDataSourceService.create(
-      tab.handlerState.editorId,
+      tab.handlerState,
       tab.handlerState.datasourceKey
     );
 
@@ -427,24 +430,4 @@ function findMinimalFree(array: number[], base: number): number {
   return array
     .sort((a, b) => b - a)
     .reduceRight((prev, cur) => (prev === cur ? prev + 1 : prev), base);
-}
-
-export function isSQLEditorTab(tab: ITab): tab is ITab<ISqlEditorTabState>;
-export function isSQLEditorTab(
-  predicate: (tab: ITab<ISqlEditorTabState>) => boolean
-): (tab: ITab) => tab is ITab<ISqlEditorTabState>;
-export function isSQLEditorTab(
-  tab: ITab | ((tab: ITab<ISqlEditorTabState>) => boolean)
-): boolean | ((tab: ITab) => tab is ITab<ISqlEditorTabState>) {
-  if (typeof tab === 'function') {
-    const predicate = tab;
-    return (tab: ITab): tab is ITab<ISqlEditorTabState> => {
-      const sqlEditorTab = tab.handlerId === sqlEditorTabHandlerKey;
-      if (!sqlEditorTab) {
-        return sqlEditorTab;
-      }
-      return predicate(tab);
-    };
-  }
-  return tab.handlerId === sqlEditorTabHandlerKey;
 }

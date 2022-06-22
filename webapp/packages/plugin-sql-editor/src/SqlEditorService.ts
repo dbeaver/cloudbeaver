@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -43,7 +45,7 @@ export class SqlEditorService {
     name?: string,
     source?: string,
   ): ISqlEditorTabState {
-    return {
+    return observable({
       editorId,
       datasourceKey,
       name,
@@ -56,7 +58,7 @@ export class SqlEditorService {
       statisticsTabs: [],
       currentModeId: '',
       modeState: [],
-    };
+    });
   }
 
   async parseSQLScript(
@@ -150,6 +152,7 @@ export class SqlEditorService {
       if (previousContext) {
         await this.destroyContext(previousContext);
       }
+
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor connection');

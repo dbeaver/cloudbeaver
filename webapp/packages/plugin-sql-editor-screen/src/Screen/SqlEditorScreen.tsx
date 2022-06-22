@@ -47,7 +47,6 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
       if (contextInfo) {
         const editorId = uuid();
 
-        sqlDataSourceService.create(editorId, MemorySqlDataSource.key, '', contextInfo);
 
         this.state = sqlEditorService.getState(
           editorId,
@@ -56,6 +55,8 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
           undefined,
           undefined,
         );
+
+        sqlDataSourceService.create(this.state, MemorySqlDataSource.key, '', contextInfo);
 
       } else {
         this.state = null;

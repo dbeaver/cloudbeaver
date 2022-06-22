@@ -88,7 +88,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     get readonly(): boolean {
-      return this.executingScript || this.readonlyState;
+      return (
+        this.executingScript
+        || this.readonlyState
+        || !!this.dataSource?.isOutdated()
+      );
     },
 
     get isLineScriptEmpty(): boolean {
@@ -100,7 +104,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     get isDisabled(): boolean {
-      if (!this.dataSource?.executionContext) {
+      if (
+        !this.dataSource?.executionContext
+        || !this.dataSource.isLoaded()
+      ) {
         return true;
       }
 

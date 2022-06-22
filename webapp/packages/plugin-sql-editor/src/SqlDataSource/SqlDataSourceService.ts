@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import type { ISqlDataSource } from './ISqlDataSource';
 import { MemorySqlDataSource } from './MemorySqlDataSource';
 
@@ -23,8 +25,8 @@ type ISqlDataSourceFactory = (
 interface ISqlDataSourceOptions {
   key: string;
   getDataSource: ISqlDataSourceFactory;
-  onDestroy?: (editorId: string)=> Promise<void> | void;
-  canDestroy?: (editorId: string)=> Promise<boolean> | boolean;
+  onDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
+  canDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<boolean> | boolean;
 }
 
 interface ISqlDataSourceProvider {
@@ -34,12 +36,19 @@ interface ISqlDataSourceProvider {
 
 @injectable()
 export class SqlDataSourceService {
+  get dataSources(): [string, ISqlDataSource][] {
+    return Array.from(this.providers.entries())
+      .map(([editorId, provider]) => [editorId, provider.dataSource]);
+  }
+
+  readonly onCreate: ISyncExecutor<[string, string]>;
   private readonly dataSourceProviders: Map<string, ISqlDataSourceOptions>;
   private readonly providers: Map<string, ISqlDataSourceProvider>;
 
   constructor() {
     this.dataSourceProviders = new Map();
     this.providers = new Map();
+    this.onCreate  = new SyncExecutor();
 
     this.register({
       key: MemorySqlDataSource.key,
@@ -47,6 +56,7 @@ export class SqlDataSourceService {
     });
 
     makeObservable<this, 'providers'>(this, {
+      dataSources: computed,
       providers: observable.shallow,
       create: action,
       destroy: action,
@@ -58,11 +68,12 @@ export class SqlDataSourceService {
   }
 
   create(
-    editorId: string,
+    state: ISqlEditorTabState,
     key: string,
     script?: string,
     executionContext?: IConnectionExecutionContextInfo,
   ): ISqlDataSource {
+    const editorId = state.editorId;
     const provider = this.dataSourceProviders.get(key);
 
     if (!provider) {
@@ -72,13 +83,18 @@ export class SqlDataSourceService {
     let activeProvider = this.providers.get(editorId);
 
     if (activeProvider?.provider.key !== key) {
-      activeProvider?.provider.onDestroy?.(editorId);
+      if (activeProvider) {
+        this.destroyProvider(editorId, activeProvider);
+      }
+
       activeProvider = {
         provider,
         dataSource: provider.getDataSource(editorId, script, executionContext),
       };
 
       this.providers.set(editorId, activeProvider);
+      state.datasourceKey = key;
+      this.onCreate.execute([editorId, key]);
     }
 
     return activeProvider.dataSource;
@@ -87,13 +103,16 @@ export class SqlDataSourceService {
   async canDestroy(editorId: string): Promise<boolean> {
     const activeProvider = this.providers.get(editorId);
 
-    return (await activeProvider?.provider.canDestroy?.(editorId)) ?? true;
+    return (await activeProvider?.provider.canDestroy?.(activeProvider.dataSource, editorId)) ?? true;
   }
 
   async destroy(editorId: string): Promise<void> {
     const activeProvider = this.providers.get(editorId);
 
-    await activeProvider?.provider.onDestroy?.(editorId);
+    if (activeProvider) {
+      await this.destroyProvider(editorId, activeProvider);
+    }
+
     this.providers.delete(editorId);
   }
 
@@ -103,5 +122,10 @@ export class SqlDataSourceService {
     }
 
     this.dataSourceProviders.set(dataSourceOptions.key, dataSourceOptions);
+  }
+
+  private async destroyProvider(editorId: string, provider: ISqlDataSourceProvider): Promise<void> {
+    await provider.provider.onDestroy?.(provider.dataSource, editorId);
+    await provider.dataSource.dispose();
   }
 }

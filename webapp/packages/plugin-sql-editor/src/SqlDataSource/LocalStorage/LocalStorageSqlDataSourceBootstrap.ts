@@ -63,7 +63,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
         script,
         executionContext,
       )),
-      onDestroy: editorId => this.deleteState(editorId),
+      onDestroy: (_, editorId) => this.deleteState(editorId),
     });
   }
 

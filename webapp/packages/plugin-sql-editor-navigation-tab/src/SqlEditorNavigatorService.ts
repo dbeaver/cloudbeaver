@@ -14,8 +14,9 @@ import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
+import { isSQLEditorTab } from './isSQLEditorTab';
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
-import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
+import { SqlEditorTabService } from './SqlEditorTabService';
 
 enum SQLEditorNavigationAction {
   create,
