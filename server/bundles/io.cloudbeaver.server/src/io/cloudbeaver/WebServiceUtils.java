@@ -363,4 +363,11 @@ public class WebServiceUtils extends WebCommonUtils {
         WebActionParameters.saveToSession(webSession, actionParameters);
     }
 
+    public static String getConnectionContainerInfo(DBPDataSourceContainer container) {
+        if (container == null) {
+            return null;
+        }
+        return container.getName() + " [" + container.getId() + "]";
+    }
+
 }

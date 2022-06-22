@@ -289,6 +289,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
+        webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
@@ -301,6 +302,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
 
+        webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         return connectionInfo;
     }
 
@@ -315,6 +317,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
+        webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
 
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
@@ -336,6 +339,8 @@ public class WebServiceCore implements DBWServiceCore {
         if (connectionInfo.getDataSourceContainer().getProject() != webSession.getSingletonProject()) {
             throw new DBWebException("Global connection '" + connectionInfo.getName() + "' configuration cannot be deleted");
         }
+        webSession.addInfoMessage("Delete connection - " +
+            WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()));
         closeAndDeleteConnection(webSession, connectionId, true);
         return true;
     }
