@@ -12,6 +12,8 @@ import styled, { css } from 'reshadow';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
+import type { IElementsTree } from '../useElementsTree';
 import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS';
 
 const MENU_STYLES = css`
@@ -74,11 +76,14 @@ const style = css`
 `;
 
 interface Props {
+  tree: IElementsTree;
   className?: string;
 }
 
-export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsMenu({ className }) {
+export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsMenu({ tree, className }) {
   const menu = useMenu({ menu: MENU_ELEMENTS_TREE_TOOLS });
+
+  menu.context.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
 
   return styled(style)(
     <menu-wrapper className={className}>

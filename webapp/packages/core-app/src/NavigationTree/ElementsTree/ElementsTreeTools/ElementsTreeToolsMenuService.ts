@@ -31,12 +31,18 @@ export class ElementsTreeToolsMenuService {
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
-  ) {}
+  ) { }
 
   register() {
     this.actionService.addHandler({
       id: 'tree-tools-menu-base-handler',
       isActionApplicable(context, action) {
+        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+
+        if (!tree) {
+          return false;
+        }
+
         return [ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL].includes(action);
       },
       getActionInfo: (context, action) => {
