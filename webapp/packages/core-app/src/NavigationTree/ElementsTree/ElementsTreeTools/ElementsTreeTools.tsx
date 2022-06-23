@@ -81,7 +81,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
     <tools>
       <actions>
         <fill />
-        <ElementsTreeToolsMenu tree={tree} />
+        <ElementsTreeToolsMenu />
         {tree.settings?.configurable && (
           <IconButton
             name='/icons/settings_cog_sm.svg'
