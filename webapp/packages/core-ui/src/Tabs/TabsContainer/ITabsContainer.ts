@@ -59,4 +59,5 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
     valueGetter?: MetadataValueGetter<string, T>
   ) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
+  getIdList: (props?: TProps) => string[];
 }
