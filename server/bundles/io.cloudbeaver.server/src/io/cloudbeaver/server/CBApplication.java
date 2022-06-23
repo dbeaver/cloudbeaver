@@ -824,6 +824,7 @@ public class CBApplication extends BaseWebApplication {
             appConfigProperties.put("adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
             appConfigProperties.put("enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
             appConfigProperties.put("forwardProxy", appConfig.isEnabledForwardProxy());
+            appConfigProperties.put("linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
             appConfigProperties.put(CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
             Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
