@@ -359,7 +359,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     ///////////////////////////////////////////
     // Credentials
 
-    private static SMAuthCredentialsProfile getCredentialProfileByParameters(SMAuthProviderDescriptor authProvider, Set<String> keySet) {
+    private static SMAuthCredentialsProfile getCredentialProfileByParameters(AuthProviderDescriptor authProvider, Set<String> keySet) {
         List<SMAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
         if (credentialProfiles.size() > 1) {
             for (SMAuthCredentialsProfile profile : credentialProfiles) {
@@ -1216,6 +1216,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
         return new SMAuthPermissions(userId, sessionId, permissions);
+    }
+
+    @Override
+    public SMAuthProviderDescriptor[] getAvailableAuthProviders() {
+        return AuthProviderRegistry.getInstance().getAuthProviders().stream()
+            .filter(ap -> !ap.isTrusted())
+            .map(AuthProviderDescriptor::createDescriptorBean).toArray(SMAuthProviderDescriptor[]::new);
     }
 
     @Override
