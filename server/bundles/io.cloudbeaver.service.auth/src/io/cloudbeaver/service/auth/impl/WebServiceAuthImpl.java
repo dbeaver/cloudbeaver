@@ -320,6 +320,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public boolean setUserConfigurationParameter(@NotNull WebSession webSession, @NotNull String name, @Nullable String value) throws DBWebException {
+        webSession.addInfoMessage("Set user parameter - " + name);
         try {
             webSession.getSecurityController().setUserParameter(
                 webSession.getUser().getUserId(),

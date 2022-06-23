@@ -24,6 +24,7 @@ export default [
   ['app_navigationTree_settings_folders_title', 'Folders'],
   ['app_navigationTree_settings_folders_description', 'Open any node as tree root node'],
   ['app_navigationTree_node_empty', 'Empty'],
+  ['app_navigationTree_node_not_found', "Can't find the node"],
   ['app_navigationTree_connection_view', 'Vista di connessione'],
   ['app_navigationTree_connection_view_option_simple', 'Semplice'],
   ['app_navigationTree_connection_view_option_advanced', 'Avanzato'],

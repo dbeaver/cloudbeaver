@@ -160,6 +160,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return id;
     }
 
+    public WebApplication getApplication() {
+        return application;
+    }
+
     @Override
     public boolean isApplicationSession() {
         return false;
@@ -670,6 +674,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
+    }
+
+    public void addInfoMessage(String message) {
+        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {

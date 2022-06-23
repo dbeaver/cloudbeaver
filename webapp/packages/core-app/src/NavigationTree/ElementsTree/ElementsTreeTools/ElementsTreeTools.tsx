@@ -11,18 +11,14 @@ import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconButton } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
-import { ConnectionSchemaManagerService } from '../../../TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
-import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL';
-import { KEY_BINDING_LINK_OBJECT } from '../KEY_BINDING_LINK_OBJECT';
 import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
+import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 
@@ -73,8 +69,6 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   children,
 }) {
   const translate = useTranslate();
-  const navNodeInfoResource  = useService(NavNodeInfoResource);
-  const connectionSchemaManagerService = useService(ConnectionSchemaManagerService);
   const [opened, setOpen] = useState(false);
   const styles = useStyles(toolsStyles, style);
 
@@ -83,39 +77,11 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
     context?.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
   });
 
-  const activeNavNode = connectionSchemaManagerService.activeNavNode;
-  const nodeInTree = activeNavNode?.path.includes(tree.baseRoot) && navNodeInfoResource.has(activeNavNode.nodeId);
-
-  function showObject() {
-    if (activeNavNode && nodeInTree) {
-      tree.show(
-        activeNavNode.nodeId,
-        activeNavNode.path
-      );
-    }
-  }
-
   return styled(styles)(
     <tools>
       <actions>
         <fill />
-        {activeNavNode && nodeInTree && (
-          <IconButton
-            name='/icons/link_editor_sm.svg'
-            title={translate('app_navigationTree_action_link_with_editor') + ` (${KEY_BINDING_LINK_OBJECT.label})`}
-            style={toolsStyles}
-            img
-            onMouseDown={showObject}
-          />
-        )}
-        <IconButton
-          name='/icons/collapse_sm.svg'
-          title={translate('app_navigationTree_action_collapse_all') + ` (${KEY_BINDING_COLLAPSE_ALL.label})`}
-          style={toolsStyles}
-          img
-          onClick={tree.collapse}
-          {...use({ primary: true })}
-        />
+        <ElementsTreeToolsMenu tree={tree} />
         {tree.settings?.configurable && (
           <IconButton
             name='/icons/settings_cog_sm.svg'

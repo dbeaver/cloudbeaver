@@ -9,12 +9,13 @@
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useEffect } from 'react';
-import { CalculatedColumn, Cell, CellRendererProps } from 'react-data-grid';
+
 
 import { getComputed, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
 import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
+import { CalculatedColumn, Cell, CellRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';

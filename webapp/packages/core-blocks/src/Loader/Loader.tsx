@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
@@ -24,7 +24,7 @@ import { loaderStyles, overlayStyles } from './loaderStyles';
 export interface ILoadableState {
   isLoading: () => boolean;
   isLoaded: () => boolean;
-  exception?: Error[] | Error | null;
+  readonly exception?: Error[] | Error | null;
   reload?: () => void;
 }
 
@@ -85,6 +85,7 @@ export const Loader = observer<Props>(function Loader({
   const context = useContext(LoaderContext);
   const [loaderId] = useState(() => uuid());
   const [contextState] = useState<ILoaderContext>(() => ({ state: observable(new Set<string>()) }));
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   let exception: Error | null = null;
   let reload: (() => void) | undefined;
@@ -94,29 +95,32 @@ export const Loader = observer<Props>(function Loader({
     state = Array.isArray(state) ? state : [state];
 
     for (const element of state) {
-      if ('loading' in element) {
-        loading = element.loading;
-        loaded = !loading;
-      } else {
+      if (
+        'isLoaded' in element
+        && 'isLoading' in element
+      ) {
         loaded = element.isLoaded();
         loading = element.isLoading();
+      } else {
+        loading = element.loading;
+        loaded = !loading;
+      }
 
-        if ('exception' in element && element.exception) {
-          if (Array.isArray(element.exception)) {
-            const error = element.exception.find(Boolean);
+      if ('exception' in element && element.exception) {
+        if (Array.isArray(element.exception)) {
+          const error = element.exception.find(Boolean);
 
-            if (!error) {
-              continue;
-            }
-
-            exception = error;
-          } else {
-            exception = element.exception;
+          if (!error) {
+            continue;
           }
 
-          if ('reload' in element) {
-            reload = element.reload;
-          }
+          exception = error;
+        } else {
+          exception = element.exception;
+        }
+
+        if ('reload' in element) {
+          reload = element.reload;
         }
       }
     }
@@ -158,9 +162,20 @@ export const Loader = observer<Props>(function Loader({
     }
   }, []);
 
+  useEffect(() => {
+    if (loaderRef.current) {
+      loaderRef.current.classList.add('animate');
+    }
+  });
+
   if (exception && !loading) {
     return styled(style)(
-      <ExceptionMessage exception={exception} inline={inline || inlineException} onRetry={reload} />
+      <ExceptionMessage
+        exception={exception}
+        inline={inline || inlineException}
+        className={className}
+        onRetry={reload}
+      />
     );
   }
 
@@ -204,7 +219,7 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && children}
-        <loader className={className} {...use({ small, fullSize, inline })}>
+        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline })}>
           <icon><StaticImage icon={spinnerURL} /></icon>
           {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
           {onCancel && (

@@ -7,15 +7,16 @@
  */
 
 import { computed, observable } from 'mobx';
-import type { Column } from 'react-data-grid';
+
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { TextTools, uuid } from '@cloudbeaver/core-utils';
+import { TextTools } from '@cloudbeaver/core-utils';
 import {
   IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey,
   ResultSetConstraintAction, ResultSetDataAction, ResultSetDataKeysUtils,
   ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction
 } from '@cloudbeaver/plugin-data-viewer';
+import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';

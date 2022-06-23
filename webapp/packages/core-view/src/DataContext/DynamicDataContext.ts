@@ -9,15 +9,15 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import type { DataContextGetter } from './DataContextGetter';
-import type { IDataContext } from './IDataContext';
+import type { DeleteVersionedContextCallback, IDataContext } from './IDataContext';
 
 export class DynamicDataContext implements IDataContext {
   fallback: IDataContext;
-  contexts: Array<DataContextGetter<any>>;
+  contexts: Map<DataContextGetter<any>, DeleteVersionedContextCallback>;
 
   constructor(fallback: IDataContext) {
     this.fallback = fallback;
-    this.contexts = [];
+    this.contexts = new Map();
 
     makeObservable(this, {
       fallback: observable.ref,
@@ -30,16 +30,21 @@ export class DynamicDataContext implements IDataContext {
     this.fallback = fallback;
   }
 
-  set<T>(context: DataContextGetter<T>, value: T): this {
-    if (!this.contexts.includes(context)){
-      this.contexts.push(context);
+  set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
+    const dynamicContext = this.contexts.get(context);
+
+    if (this.tryGet(context) === value) {
+      return dynamicContext ?? (() => {});
     }
-    this.fallback.set(context, value);
-    return this;
+
+    const deleteCallback = this.fallback.set(context, value);
+    this.contexts.set(context, deleteCallback);
+    return deleteCallback;
   }
 
-  delete(context: DataContextGetter<any>): this {
-    this.fallback.delete(context);
+  delete(context: DataContextGetter<any>, version?: number): this {
+    this.fallback.delete(context, version);
+    this.contexts.delete(context);
     return this;
   }
 
@@ -60,9 +65,9 @@ export class DynamicDataContext implements IDataContext {
   }
 
   flush(): void {
-    for (const context of this.contexts) {
-      this.delete(context);
+    for (const deleteCallback of this.contexts.values()) {
+      deleteCallback();
     }
-    this.contexts = [];
+    this.contexts.clear();
   }
 }

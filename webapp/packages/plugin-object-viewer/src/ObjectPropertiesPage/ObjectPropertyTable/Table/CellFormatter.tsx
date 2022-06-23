@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 import styled, { css, use } from 'reshadow';
 
 import { DATA_CONTEXT_NAV_NODE, DBObject, MENU_NAV_TREE, NavNode, NavNodeManagerService, useNode } from '@cloudbeaver/core-app';
@@ -18,6 +17,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import { TableContext } from './TableContext';

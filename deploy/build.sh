@@ -18,7 +18,7 @@ mkdir ./cloudbeaver/web
 echo "Pull cloudbeaver platform"
 
 cd ../..
-[ ! -d react-data-grid ] && git clone https://github.com/dbeaver/react-data-grid.git
+#[ ! -d react-data-grid ] && git clone https://github.com/dbeaver/react-data-grid.git
 
 echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone https://github.com/dbeaver/dbeaver.git
@@ -52,17 +52,18 @@ mv drivers cloudbeaver
 
 echo "Build static content"
 
-cd ../../react-data-grid
+cd ../
 
-npm i
-npm run build
-npm run build:types
-yarn link
+#cd ../react-data-grid
+#npm i
+#npm run build
+#npm run build:types
+#yarn link
 
 cd ../cloudbeaver/webapp
 
 yarn
-yarn link "react-data-grid"
+#yarn link "react-data-grid"
 lerna run bootstrap
 lerna run build --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
 if [[ "$?" -ne 0 ]] ; then

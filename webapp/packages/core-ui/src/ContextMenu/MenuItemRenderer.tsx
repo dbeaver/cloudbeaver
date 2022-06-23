@@ -11,13 +11,11 @@ import React, { useCallback } from 'react';
 import { MenuItem, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
+import { MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
 import { ComponentStyle, joinStyles, useStyles } from '@cloudbeaver/core-theming';
 import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem } from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';
-import { MenuItemElement } from './MenuItemElement';
-import { MenuPanel } from './MenuPanel';
-import { menuPanelStyles } from './menuPanelStyles';
 import { SubMenuElement } from './SubMenuElement';
 
 
@@ -25,12 +23,13 @@ export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<
   item: IMenuItem;
   menuData: IMenuData;
   menu: MenuStateReturn; // from reakit useMenuState
+  rtl?: boolean;
   onItemClose?: () => void;
   style?: ComponentStyle;
 }
 
 export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({
-  item, menuData, menu, onItemClose, style,
+  item, rtl, menuData, menu, onItemClose, style,
 }) {
   const styles = useStyles(menuPanelStyles, style);
   const onClick = useCallback(() => {
@@ -49,7 +48,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         id={item.id}
         aria-label={item.menu.label}
         itemRenderer={MenuItemRenderer}
-        menuPanel={MenuPanel}
+        rtl={rtl}
         menuData={menuData}
         subMenu={item}
         style={style}

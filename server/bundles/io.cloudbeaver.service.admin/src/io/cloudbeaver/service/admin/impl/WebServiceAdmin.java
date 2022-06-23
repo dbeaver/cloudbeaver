@@ -126,6 +126,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
+        webSession.addInfoMessage("Create new user - " + userName);
+
         try {
             var securityController = webSession.getAdminSecurityController();
             securityController.createUser(userName, Map.of());
@@ -141,6 +143,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(userName, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot delete yourself");
         }
+        webSession.addInfoMessage("Delete user - " + userName);
         try {
             webSession.getAdminSecurityController().deleteUser(userName);
             return true;
@@ -155,6 +158,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (roleId.isEmpty()) {
             throw new DBWebException("Empty role ID");
         }
+        webSession.addInfoMessage("Create new role - " + roleId);
         try {
             webSession.getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
             SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
@@ -170,6 +174,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (roleId.isEmpty()) {
             throw new DBWebException("Empty role ID");
         }
+
+        webSession.addInfoMessage("Update role - " + roleId);
+
         try {
             webSession.getAdminSecurityController().updateRole(roleId, roleName, description);
             SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
@@ -182,6 +189,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
+            webSession.addInfoMessage("Delete role - " + roleId);
+
             var adminSecurityController = webSession.getAdminSecurityController();
             SMRole[] userRoles = adminSecurityController.getUserRoles(webSession.getUser().getUserId());
             if (Arrays.stream(userRoles).anyMatch(DBRole -> DBRole.getRoleId().equals(roleId))) {
@@ -250,6 +259,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
+        webSession.addInfoMessage("Set permissions to subject - " + roleID);
+
         try {
             webSession.getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
             return true;
@@ -264,6 +275,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
+        webSession.addInfoMessage("Set credentials for user - " + userID);
+
         // Check userId credential.
         // FIXME: It is actually a hack. All crdentials must be passed from client
         if (LocalAuthProvider.PROVIDER_ID.equals(providerId)) {
@@ -286,6 +299,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(userID, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot edit your own permissions");
         }
+        webSession.addInfoMessage("Enable user - " + userID);
         try {
             webSession.getAdminSecurityController().enableUser(userID, enabled);
             return true;
@@ -322,10 +336,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
+
+        webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry registry = WebServiceUtils.getGlobalDataSourceRegistry();
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
         registry.addDataSource(dataSource);
         registry.flushConfig();
+        webSession.addInfoMessage(
+            "New connection was created - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
+        );
 
         return new WebConnectionInfo(webSession, dataSource);
     }
@@ -369,6 +388,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
+        webSession.addInfoMessage(
+            "Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
+        );
         WebServiceUtils.updateConnectionFromConfig(dataSource, config);
         dataSource.persistConfiguration();
         // Update local datasource as well. We use it for connection tests
@@ -387,6 +409,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
+
+        webSession.addInfoMessage(
+            "Delete connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
+        );
         WebServiceUtils.getGlobalDataSourceRegistry().removeDataSource(dataSource);
         WebServiceUtils.getGlobalDataSourceRegistry().flushConfig();
 
@@ -447,6 +473,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
         }
+        webSession.addInfoMessage("Save configuration for auth provider - " + providerId);
 
         AuthProviderConfig providerConfig = new AuthProviderConfig();
         providerConfig.setProvider(providerId);
@@ -466,6 +493,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
+        webSession.addInfoMessage("Delete configuration for auth provider - " + id);
+
         if (CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id)) {
             try {
                 CBApplication.getInstance().flushConfiguration();

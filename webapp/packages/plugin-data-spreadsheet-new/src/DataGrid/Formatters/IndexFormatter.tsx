@@ -7,9 +7,10 @@
  */
 
 import { useContext } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+
 
 import { CellContext } from '../CellRenderer/CellContext';
 

@@ -10,7 +10,7 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { MENU_TAB } from '@cloudbeaver/core-ui';
 import { ActionService, ACTION_OPEN_IN_TAB, DATA_CONTEXT_MENU, IDataContextProvider, KeyBindingService, KEY_BINDING_OPEN_IN_TAB, MenuService, IAction } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService';
@@ -22,7 +22,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly keyBindingService: KeyBindingService,
     private readonly sqlEditorScreenService: SqlEditorScreenService,
     private readonly notificationService: NotificationService,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     super();
   }
@@ -34,7 +35,16 @@ export class PluginBootstrap extends Bootstrap {
         action === ACTION_OPEN_IN_TAB
         && contexts.has(DATA_CONTEXT_SQL_EDITOR_STATE)
       ),
-      isDisabled: (context, action) => context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE)?.executionContext === undefined,
+      isDisabled: (context, action) => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return false;
+        }
+
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
+        return dataSource?.executionContext === undefined;
+      },
       handler: this.openTab.bind(this),
     });
 
@@ -60,8 +70,9 @@ export class PluginBootstrap extends Bootstrap {
 
   private openTab(contexts: IDataContextProvider, action: IAction) {
     const context = contexts.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+    const dataSource = this.sqlDataSourceService.get(context.editorId);
 
-    if (!context.executionContext) {
+    if (!dataSource?.executionContext) {
       this.notificationService.logError({
         title: 'sql_editor_screen_no_context_title',
         message: 'sql_editor_screen_no_context_message',
@@ -70,7 +81,7 @@ export class PluginBootstrap extends Bootstrap {
     }
 
     const url = this.sqlEditorScreenService.createURL({
-      contextId: context.executionContext.id,
+      contextId: dataSource.executionContext.id,
     });
 
     window.open(url, '_blank')?.focus();

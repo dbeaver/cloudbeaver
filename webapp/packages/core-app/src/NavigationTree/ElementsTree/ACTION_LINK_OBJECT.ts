@@ -11,4 +11,5 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_LINK_OBJECT = createAction('link-object', {
   label: 'link-object',
+  icon: '/icons/link_editor_sm.svg',
 });

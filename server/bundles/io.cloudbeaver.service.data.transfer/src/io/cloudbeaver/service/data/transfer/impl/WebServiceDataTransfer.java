@@ -143,6 +143,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer,
                                                           @Nullable WebSQLResultsInfo resultsInfo) {
+        sqlProcessor.getWebSession().addInfoMessage("Export data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override

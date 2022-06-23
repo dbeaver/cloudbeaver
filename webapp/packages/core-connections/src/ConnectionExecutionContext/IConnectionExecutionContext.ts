@@ -22,5 +22,5 @@ export interface IConnectionExecutionContext {
   ) => ITask<T>;
   cancel: () => Promise<void>;
   destroy: () => Promise<void>;
-  update: (defaultCatalog?: string, defaultSchema?: string) => Promise<void>;
+  update: (defaultCatalog?: string, defaultSchema?: string) => Promise<IConnectionExecutionContextInfo>;
 }

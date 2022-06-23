@@ -43,7 +43,7 @@ export class ObjectViewerTabService {
     private readonly dbObjectPageService: DBObjectPageService,
     private readonly notificationService: NotificationService,
     private readonly navigationTabsService: NavigationTabsService,
-    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -72,9 +72,9 @@ export class ObjectViewerTabService {
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
-    this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
-    this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
-    this.connectionInfo.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
+    this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
+    this.connectionInfoResource.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
+    this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
 
@@ -219,7 +219,7 @@ export class ObjectViewerTabService {
   private async removeTabs(key: ResourceKey<string>) {
     const tabs: string[] = [];
 
-    await this.connectionInfo.load(CachedMapAllKey);
+    await this.connectionInfoResource.load(CachedMapAllKey);
 
     ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
@@ -228,7 +228,7 @@ export class ObjectViewerTabService {
 
       if (tab) {
         if (tab.handlerState.connectionId) {
-          const connection = this.connectionInfo.get(tab.handlerState.connectionId);
+          const connection = this.connectionInfoResource.get(tab.handlerState.connectionId);
 
           if (connection && !connection.connected) {
             return;
@@ -242,7 +242,15 @@ export class ObjectViewerTabService {
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private getNavNode(context: ITab<IObjectViewerTabState>): IDataContextActiveNode {
+  private getNavNode(context: ITab<IObjectViewerTabState>) {
+    if (context.handlerState.connectionId) {
+      const connection = this.connectionInfoResource.get(context.handlerState.connectionId);
+
+      if (!connection?.connected) {
+        return;
+      }
+    }
+
     return {
       nodeId: context.handlerState.objectId,
       path: context.handlerState.parents,
@@ -308,8 +316,8 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       if (tab.handlerState.connectionId) {
-        await this.connectionInfo.load(CachedMapAllKey);
-        if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
+        await this.connectionInfoResource.load(CachedMapAllKey);
+        if (!this.connectionInfoResource.has(tab.handlerState.connectionId)) {
           return false;
         }
       }

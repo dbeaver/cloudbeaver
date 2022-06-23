@@ -8,11 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
-import type { FormatterProps } from 'react-data-grid';
+
 
 import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
 import { clsx, isValidUrl } from '@cloudbeaver/core-utils';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';

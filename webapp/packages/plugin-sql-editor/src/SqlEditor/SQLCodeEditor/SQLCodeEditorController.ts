@@ -34,6 +34,8 @@ const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
   autofocus: true,
 };
 
+const ignoredFunctions = ['left', 'right'];
+
 @injectable()
 export class SQLCodeEditorController {
   private dialect?: SqlDialectInfo;
@@ -59,7 +61,12 @@ export class SQLCodeEditorController {
       builtin[key.toLowerCase()] = true;
     }
 
+    //! LEFT and RIGHT duplicated here
     for (const key of this.dialect.functions) {
+      if (ignoredFunctions.includes(key.toLowerCase())) {
+        continue;
+      }
+
       builtin[key.toLowerCase()] = true;
     }
 

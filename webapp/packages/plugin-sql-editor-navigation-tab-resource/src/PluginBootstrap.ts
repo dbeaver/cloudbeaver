@@ -10,14 +10,14 @@ import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNod
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionExpireService } from '@cloudbeaver/core-root';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
-import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
+import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
@@ -38,29 +38,37 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly sessionExpireService: SessionExpireService
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     super();
   }
 
   register(): void | Promise<void> {
-    this.sqlEditorTabResourceService.start();
-
-    this.sessionExpireService.onSessionExpire.addHandler(this.sqlEditorTabResourceService.stop);
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
 
     this.actionService.addHandler({
       id: 'scripts-base-handler',
-      isActionApplicable: (context, action) => {
+      isActionApplicable: (context, action): boolean => {
         if (action === ACTION_SAVE) {
-          return !this.sqlEditorTabResourceService.state.has(this.navigationTabsService.currentTab?.id ?? '') && context.has(DATA_CONTEXT_SQL_EDITOR_STATE);
+          const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+          if (!state) {
+            return false;
+          }
+
+          return !(this.sqlDataSourceService.get(state.editorId) instanceof ResourceSqlDataSource);
         }
 
         return false;
       },
       handler: async (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
         const tab = this.navigationTabsService.currentTab;
+
+        if (!dataSource) {
+          return;
+        }
 
         if (action === ACTION_SAVE) {
           const name = getSqlEditorName(state);
@@ -73,13 +81,29 @@ export class PluginBootstrap extends Bootstrap {
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
-              const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, state.query);
+              const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, dataSource.script);
 
               await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
               const node = await this.navNodeInfoResource.load(nodeId);
 
-              if (tab) {
-                this.sqlEditorTabResourceService.linkTab(tab.id, node.id);
+              if (tab && isSQLEditorTab(tab)) {
+                const previousDataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+                const dataSource = this.sqlDataSourceService.create(
+                  tab.handlerState,
+                  ResourceSqlDataSource.key,
+                ) as ResourceSqlDataSource;
+
+                const nodeId = node.id;
+                const parents = NodeManagerUtils.parentsFromPath(nodeId);
+
+                dataSource.setNodeInfo({
+                  nodeId,
+                  parents,
+                });
+
+                if (previousDataSource) {
+                  dataSource.setExecutionContext(previousDataSource.executionContext);
+                }
               }
 
               this.sqlEditorService.setName(node.name ?? scriptName, state);
@@ -130,22 +154,37 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const tabId = this.sqlEditorTabResourceService.getResourceTab(node.id);
+      const tab = this.sqlEditorTabResourceService.getResourceTab(node.id);
 
-      if (tabId) {
-        this.navigationTabsService.selectTab(tabId);
+      if (tab) {
+        this.navigationTabsService.selectTab(tab.id);
       } else {
-        const value = await this.navResourceNodeService.read(node.id);
-
         const contextProvider = await this.sqlEditorNavigatorService.openNewEditor({
           name: node.name ?? 'Unknown script',
-          query: value,
+          dataSourceKey: ResourceSqlDataSource.key,
         });
 
         const context = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
-        if (context.tab) {
-          this.sqlEditorTabResourceService.linkTab(context.tab.id, node.id);
+        if (context.tab && isSQLEditorTab(context.tab)) {
+          const previousDataSource = this.sqlDataSourceService.get(context.tab.handlerState.editorId);
+
+          const dataSource = this.sqlDataSourceService.create(
+            context.tab.handlerState,
+            ResourceSqlDataSource.key,
+          ) as ResourceSqlDataSource;
+
+          const nodeId = node.id;
+          const parents = NodeManagerUtils.parentsFromPath(nodeId);
+
+          dataSource.setNodeInfo({
+            nodeId,
+            parents,
+          });
+
+          if (previousDataSource) {
+            dataSource.setExecutionContext(previousDataSource.executionContext);
+          }
         }
       }
     } catch (exception) {

@@ -7,10 +7,11 @@
  */
 
 import { createContext } from 'react';
-import type { DataGridHandle } from 'react-data-grid';
+
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
+import type { DataGridHandle } from '@cloudbeaver/plugin-react-data-grid';
 
 export interface IColumnResizeInfo {
   column: number;
@@ -18,7 +19,7 @@ export interface IColumnResizeInfo {
 }
 
 export interface IDataGridContext {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   actions: IDataTableActions;
   resultIndex: number;
   columnResize: IExecutor<IColumnResizeInfo>;

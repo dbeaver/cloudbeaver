@@ -15,6 +15,12 @@ export const loaderStyles = css`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
+
+    &:global(.animate) {
+      opacity: 1;
+    }
   }
 
   icon {
@@ -66,6 +72,7 @@ export const loaderStyles = css`
       height: 24px;
     }
     & message {
+      display: block;
       padding: 0 16px;
     }
     & actions {
