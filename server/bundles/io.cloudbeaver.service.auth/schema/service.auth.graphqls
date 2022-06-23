@@ -62,6 +62,14 @@ type AuthProviderInfo {
     requiredFeatures: [String!]!
 }
 
+type AuthInfo {
+    redirectLink: String
+
+    taskInfo: AsyncTaskInfo
+
+    userTokens: [UserAuthToken!]
+}
+
 type UserAuthToken {
     # Auth provider used for authorization
     authProvider: ID!
@@ -70,23 +78,20 @@ type UserAuthToken {
     authConfiguration: ID
 
     # Authorization time
-    loginTime: DateTime
+    loginTime: DateTime!
 
     # User identity (aka user name) specific to auth provider
-    userId: String
+    userId: String!
 
     # User display name specific to auth provider
-    displayName: String
+    displayName: String!
 
     # Optional login message
     message: String
 
     # Auth origin
-    origin: ObjectOrigin
+    origin: ObjectOrigin!
 
-    redirectLink: String
-
-    taskInfo: AsyncTaskInfo
 }
 
 type UserInfo {
@@ -110,7 +115,10 @@ type UserInfo {
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, configuration: ID, credentials: Object!, linkUser: Boolean): UserAuthToken!
+    authLogin(provider: ID!, configuration: ID, credentials: Object!, linkUser: Boolean): AuthInfo!
+
+    #User tokens from authorization task, null if task not finished or finished with error
+    authTaskResults(taskId: ID!):[UserAuthToken!]
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID, configuration: ID): Boolean

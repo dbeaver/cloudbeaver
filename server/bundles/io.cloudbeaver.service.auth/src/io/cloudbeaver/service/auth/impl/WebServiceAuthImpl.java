@@ -28,6 +28,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
+import io.cloudbeaver.service.auth.WebAuthStatus;
 import io.cloudbeaver.service.auth.WebUserInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -51,7 +52,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     public static final String CONFIG_TEMP_ADMIN_USER_ID = "temp_config_admin";
 
     @Override
-    public WebAuthInfo authLogin(
+    public WebAuthStatus authLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -76,18 +77,27 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
                 //run async auth process
                 WebAsyncTaskInfo taskInfo = webSession.createAndRunAsyncTask("Authentication", new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser));
-                return new WebAuthInfo(webSession, taskInfo, smAuthInfo.getRedirectUrl());
+                return new WebAuthStatus(taskInfo, smAuthInfo.getRedirectUrl());
             } else {
                 //run it sync
                 var job = new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser);
                 job.run(webSession.getProgressMonitor());
-                //TODO return list
-                return ((List<WebAuthInfo>) job.getExtendedResults()).stream().findFirst().orElseThrow();
+                return new WebAuthStatus(((List<WebAuthInfo>) job.getExtendedResults()));
             }
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }
 
+    }
+
+    @Override
+    public WebAuthInfo[] getAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskInfo = webSession.asyncTaskStatus(taskId, true);
+        List<WebAuthInfo> result = (List<WebAuthInfo>) taskInfo.getExtendedResult();
+        if (result == null) {
+            return null;
+        }
+        return result.toArray(WebAuthInfo[]::new);
     }
 
     @Override

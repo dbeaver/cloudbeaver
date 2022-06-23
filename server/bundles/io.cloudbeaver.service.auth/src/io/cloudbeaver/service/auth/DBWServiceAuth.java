@@ -33,15 +33,18 @@ import java.util.Map;
  */
 public interface DBWServiceAuth extends DBWService {
 
-    @WebAction(requirePermissions = {} )
-    WebAuthInfo authLogin(
+    @WebAction(requirePermissions = {})
+    WebAuthStatus authLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @NotNull Map<String, Object> credentials,
         boolean linkWithActiveUser) throws DBWebException;
 
-    @WebAction(requirePermissions = {} )
+    @WebAction(requirePermissions = {})
+    WebAuthInfo[] getAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction(requirePermissions = {})
     void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;
 
     @WebAction(requirePermissions = {})
