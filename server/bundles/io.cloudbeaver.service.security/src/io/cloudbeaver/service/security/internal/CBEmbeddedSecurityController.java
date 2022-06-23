@@ -884,7 +884,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
                     var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
-                    var redirectUrl = authProviderFederated.getRedirectLink(authProviderConfigurationId, Map.of());
+                    var redirectUrl = buildRedirectLink(
+                        authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
+                        authAttemptId);
                     return SMAuthInfo.inProgress(authAttemptId, redirectUrl, userIdentifyingCredentials);
                 }
                 txn.commit();
@@ -1008,7 +1010,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         if (authProviderConfiguration != null) {
                             var authProviderInstance = getAuthProvider(authProviderId).getInstance();
                             if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
-                                redirectUrl = ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of());
+                                redirectUrl = buildRedirectLink(
+                                    ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
+                                    authId
+                                );
                             }
                         }
                         authData.put(authProviderId, authProviderData);
@@ -1438,6 +1443,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBCException("Auth provider not found: " + authProviderId);
         }
         return authProvider;
+    }
+
+    private String buildRedirectLink(String originalLink, String authId) {
+        return originalLink + "?authId=" + authId;
     }
 
 }
