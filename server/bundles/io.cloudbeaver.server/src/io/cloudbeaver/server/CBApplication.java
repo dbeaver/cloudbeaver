@@ -599,30 +599,39 @@ public class CBApplication extends BaseWebApplication {
     }
 
     protected Map<String, Object> readConfiguration(File configFile) throws DBException {
-        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-            Map<String, Object> configProps = JSONUtils.parseMap(getGson(), reader);
-            patchConfigurationWithProperties(configProps); // patch original properties
-            readAdditionalConfiguration(configProps);
-            Map<String, Object> serverConfig = getServerConfigProps(configProps);
+        Map<String, Object> configProps = new LinkedHashMap<>();
+        if (configFile.exists()) {
+            log.debug("Read configuration [" + configFile.getAbsolutePath() + "]");
+            try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+                configProps.putAll(JSONUtils.parseMap(getGson(), reader));
+                patchConfigurationWithProperties(configProps); // patch original properties
 
-            String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
-            if (!CommonUtils.isEmpty(externalPropertiesFile)) {
-                Properties props = new Properties();
-                try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
-                    props.load(is);
-                } catch (IOException e) {
-                    log.error("Error loading external properties from " + externalPropertiesFile, e);
-                }
-                for (String propName : props.stringPropertyNames()) {
-                    this.externalProperties.put(propName, props.getProperty(propName));
-                }
+            } catch (IOException e) {
+                throw new DBException("Error parsing server configuration", e);
             }
-
-            patchConfigurationWithProperties(configProps); // patch again because properties can be changed
-            return configProps;
-        } catch (IOException e) {
-            throw new DBException("Error parsing server configuration", e);
         }
+
+        readAdditionalConfiguration(configProps);
+        if (configProps.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, Object> serverConfig = getServerConfigProps(configProps);
+        String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
+        if (!CommonUtils.isEmpty(externalPropertiesFile)) {
+            Properties props = new Properties();
+            try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
+                props.load(is);
+            } catch (IOException e) {
+                log.error("Error loading external properties from " + externalPropertiesFile, e);
+            }
+            for (String propName : props.stringPropertyNames()) {
+                this.externalProperties.put(propName, props.getProperty(propName));
+            }
+        }
+
+        patchConfigurationWithProperties(configProps); // patch again because properties can be changed
+        return configProps;
     }
 
     private Gson getGson() {
@@ -736,11 +745,7 @@ public class CBApplication extends BaseWebApplication {
 
     private Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
-        if (runtimeConfigFile.exists()) {
-            log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
-            return readConfiguration(runtimeConfigFile);
-        }
-        return Map.of();
+        return readConfiguration(runtimeConfigFile);
     }
 
     protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
