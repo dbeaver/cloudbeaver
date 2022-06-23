@@ -821,7 +821,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (providerId == null) {
             clearAuthTokens();
         } else {
-            removeAuthInfo(getAuthInfo(providerId));
+            WebAuthInfo authInfo = getAuthInfo(providerId);
+            if (authInfo != null) {
+                removeAuthInfo(authInfo);
+            }
         }
         if (authTokens.isEmpty()) {
             resetUserState();
