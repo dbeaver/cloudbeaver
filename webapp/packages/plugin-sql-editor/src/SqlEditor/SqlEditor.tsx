@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
@@ -15,7 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { CaptureViewContext, useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
@@ -108,6 +108,7 @@ const tabStyles = css`
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
+  const captureViewContext = useContext(CaptureViewContext);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const tools = useTools(state);
@@ -192,7 +193,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             )}
           </actions>
           <tools onMouseDown={preventFocus}>
-            <SqlEditorActionsMenu state={state} />
+            <SqlEditorActionsMenu state={state} context={captureViewContext} />
             <button
               disabled={data.isDisabled || data.isScriptEmpty}
               title={translate('sql_editor_sql_format_button_tooltip')}
