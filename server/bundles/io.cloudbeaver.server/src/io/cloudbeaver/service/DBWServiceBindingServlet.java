@@ -18,11 +18,12 @@ package io.cloudbeaver.service;
 
 import io.cloudbeaver.server.CBApplication;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.jkiss.dbeaver.DBException;
 
 /**
  * Servlet service
  */
 public interface DBWServiceBindingServlet extends DBWServiceBinding {
 
-    void addServlets(CBApplication application, ServletContextHandler servletContextHandler);
+    void addServlets(CBApplication application, ServletContextHandler servletContextHandler) throws DBException;
 }

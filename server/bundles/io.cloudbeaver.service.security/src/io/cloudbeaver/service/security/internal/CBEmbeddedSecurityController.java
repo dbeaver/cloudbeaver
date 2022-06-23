@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBEmbeddedSecurityController implements SMAdminController {
+public class CBEmbeddedSecurityController implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
