@@ -26,6 +26,7 @@ import io.cloudbeaver.model.session.WebSessionAuthJob;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebUserInfo;
 import org.jkiss.code.NotNull;
@@ -71,6 +72,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 authParameters
             );
 
+            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
             if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
                 //run async auth process
                 WebAsyncTaskInfo taskInfo = webSession.createAndRunAsyncTask("Authentication", new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser));
