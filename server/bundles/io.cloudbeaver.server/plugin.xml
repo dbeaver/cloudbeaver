@@ -40,5 +40,8 @@
     <extension point="org.jkiss.dbeaver.dataSourceHandler">
         <handler id="db.access.check" class="io.cloudbeaver.model.WebDatasourceAccessCheckHandler"/>
     </extension>
+    <extension point="io.cloudbeaver.valueSerializer">
+        <serializer type="geometry" class="io.cloudbeaver.server.data.WebGeometryValueSerializer"/>
+    </extension>
 
 </plugin>
