@@ -193,7 +193,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             )}
           </actions>
           <tools onMouseDown={preventFocus}>
-            <SqlEditorActionsMenu state={state} context={captureViewContext} />
+            <SqlEditorActionsMenu state={state} />
             <button
               disabled={data.isDisabled || data.isScriptEmpty}
               title={translate('sql_editor_sql_format_button_tooltip')}

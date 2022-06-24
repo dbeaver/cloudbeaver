@@ -76,11 +76,14 @@ const style = css`
 `;
 
 interface Props {
+  tree: IElementsTree;
   className?: string;
 }
 
-export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsMenu({ className }) {
+export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsMenu({ tree, className }) {
   const menu = useMenu({ menu: MENU_ELEMENTS_TREE_TOOLS });
+
+  menu.context.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
 
   return styled(style)(
     <menu-wrapper className={className}>
