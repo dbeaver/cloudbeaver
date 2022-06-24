@@ -136,6 +136,10 @@ extend type Query {
     updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
     deleteConnectionConfiguration( id: ID! ): Boolean
 
+    # Folders
+
+    createFolderConfiguration(parentNodePath: ID, newName: String! ): NavigatorNodeInfo
+
     # Permissions
 
     getConnectionSubjectAccess(connectionId: ID): [AdminConnectionGrantInfo!]!

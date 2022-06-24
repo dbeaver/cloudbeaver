@@ -29,13 +29,16 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -369,5 +372,17 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         return container.getName() + " [" + container.getId() + "]";
     }
+
+    public static DBPDataSourceFolder createFolder(DBNLocalFolder parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
+        DBPDataSourceFolder folder = registry.addFolder(parentFolder == null ? null : parentFolder.getFolder(), newName);
+        return folder;
+    }
+
+    public static void updateConfigAndRefreshDatabases(WebSession session) {
+        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+        DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
+    }
+
+
 
 }
