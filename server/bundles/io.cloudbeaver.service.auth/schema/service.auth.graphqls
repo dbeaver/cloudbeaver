@@ -115,7 +115,7 @@ type UserInfo {
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, configuration: ID, credentials: Object!, linkUser: Boolean): AuthInfo!
+    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean): AuthInfo!
 
     #User tokens from authorization task, null if task not finished or finished with error
     authTaskResults(taskId: ID!):[UserAuthToken!]

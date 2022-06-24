@@ -56,11 +56,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
-        @NotNull Map<String, Object> authParameters,
+        @Nullable Map<String, Object> authParameters,
         boolean linkWithActiveUser
     ) throws DBWebException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
+        }
+        if (authParameters == null) {
+            authParameters = Map.of();
         }
         SMController securityController = webSession.getSecurityController();
         try {

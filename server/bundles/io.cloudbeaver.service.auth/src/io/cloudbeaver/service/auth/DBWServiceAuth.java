@@ -38,7 +38,7 @@ public interface DBWServiceAuth extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
-        @NotNull Map<String, Object> credentials,
+        @Nullable Map<String, Object> credentials,
         boolean linkWithActiveUser) throws DBWebException;
 
     @WebAction(requirePermissions = {})
