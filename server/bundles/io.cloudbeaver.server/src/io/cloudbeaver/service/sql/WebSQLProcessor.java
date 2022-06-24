@@ -479,7 +479,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
                                 addedValues.get(i), withoutExecution);
                             insertAttributes.put(allAttributes[i], realCellValue);
-                            finalRow[i] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
+                            finalRow[i] = realCellValue;
                         }
                     }
 
