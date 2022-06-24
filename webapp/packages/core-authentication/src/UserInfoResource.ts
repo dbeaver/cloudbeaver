@@ -91,14 +91,17 @@ UserInfoIncludes
     { credentials, configurationId, linkUser }: ILoginOptions
   ): Promise<AuthInfo> {
     return await this.performUpdate(undefined, [], async () => {
+      let processedCredentials: Record<string, any> | undefined;
+
       if (credentials) {
-        credentials = await this.authProviderService.processCredentials(provider, credentials);
+        const processed = await this.authProviderService.processCredentials(provider, credentials);
+        processedCredentials = processed.credentials;
       }
 
       const { authInfo } = await this.graphQLService.sdk.authLogin({
         provider,
         configuration: configurationId,
-        credentials,
+        credentials: processedCredentials,
         linkUser,
         customIncludeOriginDetails: true,
       });
