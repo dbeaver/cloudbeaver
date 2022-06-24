@@ -46,7 +46,7 @@ import java.util.Map;
 
 public class WebSessionAuthJob extends WebAsyncTaskProcessor<SMAuthInfo> {
     private static final Log log = Log.getLog(WebSessionAuthJob.class);
-    private static final int MAX_ATTEMPT = 10;
+    private static final int MAX_ATTEMPT = 20;
     @NotNull
     private final WebSession webSession;
     @NotNull
@@ -131,7 +131,7 @@ public class WebSessionAuthJob extends WebAsyncTaskProcessor<SMAuthInfo> {
                     if (!providerEnabled && webSession.getUser() != null) {
                         linkWithActiveUser = true;
                     }
-                } else if (!providerEnabled || !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+                } else if (!providerEnabled && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
                     throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
 

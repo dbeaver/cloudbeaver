@@ -8,18 +8,18 @@ import java.util.List;
 
 public class WebAuthStatus {
     private final WebAsyncTaskInfo taskInfo;
-    private final String redirectUrl;
+    private final String redirectLink;
     private final List<WebAuthInfo> userTokens;
 
     public WebAuthStatus(WebAsyncTaskInfo taskInfo, String redirectUrl) {
         this.taskInfo = taskInfo;
-        this.redirectUrl = redirectUrl;
+        this.redirectLink = redirectUrl;
         this.userTokens = null;
     }
 
     public WebAuthStatus(List<WebAuthInfo> userTokens) {
         this.taskInfo = null;
-        this.redirectUrl = null;
+        this.redirectLink = null;
         this.userTokens = userTokens;
     }
 
@@ -29,8 +29,8 @@ public class WebAuthStatus {
     }
 
     @Property
-    public String getRedirectUrl() {
-        return redirectUrl;
+    public String getRedirectLink() {
+        return redirectLink;
     }
 
     @Property

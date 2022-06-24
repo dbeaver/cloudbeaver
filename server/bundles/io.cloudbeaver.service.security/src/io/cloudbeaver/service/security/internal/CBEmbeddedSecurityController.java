@@ -942,17 +942,34 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                                  @NotNull SMAuthStatus authStatus,
                                  @NotNull Map<String, Object> authInfo,
                                  @Nullable String error) throws DBException {
+        var existAuthInfo = getAuthStatus(authId);
+        if (existAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+            throw new SMException("Authorization already finished and cannot be updated");
+        }
+        updateAuthStatus(authId, authStatus, authInfo, null, null);
+    }
+
+    private void updateAuthStatus(@NotNull String authId,
+                                  @NotNull SMAuthStatus authStatus,
+                                  @NotNull Map<String, Object> authInfo,
+                                  @Nullable String error,
+                                  @Nullable String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
              JDBCTransaction txn = new JDBCTransaction(dbCon)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=? WHERE AUTH_ID=?")) {
+                "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
                 dbStat.setString(1, authStatus.toString());
                 if (error != null) {
                     dbStat.setString(2, error);
                 } else {
                     dbStat.setNull(2, Types.VARCHAR);
                 }
-                dbStat.setString(3, authId);
+                if (smSessionId != null) {
+                    dbStat.setString(3, smSessionId);
+                } else {
+                    dbStat.setNull(3, Types.VARCHAR);
+                }
+                dbStat.setString(4, authId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
                 }
@@ -966,7 +983,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         + "KEY(AUTH_ID,AUTH_PROVIDER_ID) VALUES(?,?,?)")) {
                     dbStat.setString(1, authId);
                     dbStat.setString(2, providerId);
-                    dbStat.setString(4, gson.toJson(authData));
+                    dbStat.setString(3, gson.toJson(authData));
                     dbStat.execute();
                 }
             }
@@ -1077,17 +1094,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 userCredentials,
                 finishAuthMonitor
             );
-            if (userId == null) {
-                userId = userIdFromCreds;
-            } else if (!userId.equals(userIdFromCreds)) {
-                throw new SMException("Authorization attempt contains different users");
+            
+            if (userIdFromCreds == null) {
+                var error = "Invalid user credentials";
+                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                return SMAuthInfo.error(authId, error);
             }
+            userId = userIdFromCreds;
         }
 
-
-        if (userId == null) {
-            return SMAuthInfo.error(authId, "Invalid user credentials");
-        }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var smSessionId = createSessionIfNotExist(
@@ -1100,10 +1115,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 var token = generateAuthToken(smSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
+                updateAuthStatus(authId, SMAuthStatus.SUCCESS, authInfo.getAuthData(), null, smSessionId);
                 return SMAuthInfo.success(authId, token, new SMAuthPermissions(userId, smSessionId, permissions), authInfo.getAuthData());
             }
         } catch (SQLException e) {
-            throw new SMException("Error during token generation", e);
+            var error = "Error during token generation";
+            updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+            throw new SMException(error, e);
         }
     }
 
