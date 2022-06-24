@@ -142,7 +142,7 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Async tasks
 
-    @WebAction(requirePermissions = {})
+    @WebAction
     WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, Boolean removeOnFinish) throws DBWebException;
 
     @WebAction

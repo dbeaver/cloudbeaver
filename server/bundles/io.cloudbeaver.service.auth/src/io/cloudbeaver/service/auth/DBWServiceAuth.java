@@ -19,7 +19,6 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.DBWService;
@@ -42,7 +41,7 @@ public interface DBWServiceAuth extends DBWService {
         boolean linkWithActiveUser) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    WebAuthInfo[] getAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+    WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;

@@ -29,64 +29,45 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
-import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-public class WebSessionAuthJob extends WebAsyncTaskProcessor<SMAuthInfo> {
-    private static final Log log = Log.getLog(WebSessionAuthJob.class);
-    private static final int MAX_ATTEMPT = 20;
+public class WebSessionAuthProcessor {
+    private static final Log log = Log.getLog(WebSessionAuthProcessor.class);
     @NotNull
     private final WebSession webSession;
     @NotNull
-    private SMAuthInfo smAuthInfo;
-    @NotNull
-    private final SMController smController;
-    private boolean linkWithActiveUser;
-    private int attemptCounter = 0;
+    private final SMAuthInfo smAuthInfo;
 
-    public WebSessionAuthJob(@NotNull WebSession webSession, @NotNull SMAuthInfo smAuthInfo, boolean linkWithActiveUser) {
+    private boolean linkWithActiveUser;
+
+    public WebSessionAuthProcessor(@NotNull WebSession webSession, @NotNull SMAuthInfo smAuthInfo, boolean linkWithActiveUser) {
         this.webSession = webSession;
-        this.smController = webSession.getSecurityController();
         this.smAuthInfo = smAuthInfo;
         this.linkWithActiveUser = linkWithActiveUser;
     }
 
-    @Override
-    public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+    public List<WebAuthInfo> authenticateSession() throws DBException {
         boolean resetUserStateOnError = webSession.getUser() == null;
         try {
-            while (attemptCounter < MAX_ATTEMPT && smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
-                attemptCounter++;
-                smAuthInfo = smController.getAuthStatus(smAuthInfo.getAuthAttemptId());
-                if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
-                    Thread.sleep(1000);
-                } else {
-                    break;
-                }
-            }
-
             var authStatus = smAuthInfo.getAuthStatus();
 
             switch (authStatus) {
                 case SUCCESS:
-                    finishWebSessionAuthorization(smAuthInfo);
-                    break;
+                    return finishWebSessionAuthorization(smAuthInfo);
                 case ERROR:
                     throw new DBException("Authentication failed: " + smAuthInfo.getError());
                 case IN_PROGRESS:
-                    throw new DBException("Authorization didn't complete within the expected period");
+                    throw new DBException("Authorization didn't complete");
                 default:
                     throw new DBException("Unexpected authorization status: " + authStatus);
             }
@@ -94,12 +75,12 @@ public class WebSessionAuthJob extends WebAsyncTaskProcessor<SMAuthInfo> {
             if (resetUserStateOnError) {
                 webSession.resetUserState();
             }
-            throw new InvocationTargetException(e);
+            throw new DBException("Failed authenticate session", e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void finishWebSessionAuthorization(SMAuthInfo authInfo) throws DBException {
+    private List<WebAuthInfo> finishWebSessionAuthorization(SMAuthInfo authInfo) throws DBException {
         boolean configMode = WebAppUtils.getWebApplication().isConfigurationMode();
         boolean resetUserStateOnError = webSession.getUser() == null;
 
@@ -203,7 +184,7 @@ public class WebSessionAuthJob extends WebAsyncTaskProcessor<SMAuthInfo> {
                 webSession.addAuthInfo(webAuthInfo);
                 newAuthInfos.add(webAuthInfo);
             }
-            this.extendedResults = newAuthInfos;
+            return newAuthInfos;
         } catch (DBException e) {
             if (resetUserStateOnError) {
                 webSession.resetUserState();

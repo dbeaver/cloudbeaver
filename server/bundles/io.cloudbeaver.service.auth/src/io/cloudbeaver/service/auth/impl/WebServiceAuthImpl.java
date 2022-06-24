@@ -18,11 +18,10 @@ package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.session.WebSessionAuthJob;
+import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
@@ -34,6 +33,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -79,13 +79,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
             if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
                 //run async auth process
-                WebAsyncTaskInfo taskInfo = webSession.createAndRunAsyncTask("Authentication", new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser));
-                return new WebAuthStatus(taskInfo, smAuthInfo.getRedirectUrl());
+                return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
             } else {
                 //run it sync
-                var job = new WebSessionAuthJob(webSession, smAuthInfo, linkWithActiveUser);
-                job.run(webSession.getProgressMonitor());
-                return new WebAuthStatus(((List<WebAuthInfo>) job.getExtendedResults()));
+                var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
+                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
@@ -94,13 +92,23 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthInfo[] getAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
-        WebAsyncTaskInfo taskInfo = webSession.asyncTaskStatus(taskId, true);
-        List<WebAuthInfo> result = (List<WebAuthInfo>) taskInfo.getExtendedResult();
-        if (result == null) {
-            return null;
+    public WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException {
+        try {
+            SMAuthInfo smAuthInfo = webSession.getSecurityController().getAuthStatus(authId);
+            switch (smAuthInfo.getAuthStatus()) {
+                case SUCCESS:
+                    List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser).authenticateSession();
+                    return new WebAuthStatus(smAuthInfo.getAuthStatus(), newInfos);
+                case IN_PROGRESS:
+                    return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
+                case ERROR:
+                    throw new DBWebException(smAuthInfo.getError());
+                default:
+                    throw new DBWebException("Unknown auth status:" + smAuthInfo.getAuthStatus());
+            }
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
         }
-        return result.toArray(WebAuthInfo[]::new);
     }
 
     @Override

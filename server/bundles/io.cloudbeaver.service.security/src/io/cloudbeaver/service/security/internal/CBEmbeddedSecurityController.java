@@ -1094,7 +1094,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 userCredentials,
                 finishAuthMonitor
             );
-            
+
             if (userIdFromCreds == null) {
                 var error = "Invalid user credentials";
                 updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
@@ -1148,10 +1148,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId,
-                                                         @NotNull Map<String, Object> sessionParameters,
-                                                         @NotNull Map<String, Object> userCredentials,
-                                                         @NotNull DBRProgressMonitor progressMonitor) throws DBException {
+    private String findOrCreateExternalUserByCredentials(
+        @NotNull String authProviderId,
+        @NotNull Map<String, Object> sessionParameters,
+        @NotNull Map<String, Object> userCredentials,
+        @NotNull DBRProgressMonitor progressMonitor
+    ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);

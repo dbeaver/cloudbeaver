@@ -1,31 +1,34 @@
 package io.cloudbeaver.service.auth;
 
-import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.List;
 
 public class WebAuthStatus {
-    private final WebAsyncTaskInfo taskInfo;
+    private final String authId;
     private final String redirectLink;
+    private final SMAuthStatus authStatus;
     private final List<WebAuthInfo> userTokens;
 
-    public WebAuthStatus(WebAsyncTaskInfo taskInfo, String redirectUrl) {
-        this.taskInfo = taskInfo;
+    public WebAuthStatus(String authId, String redirectUrl, SMAuthStatus authStatus) {
+        this.authId = authId;
         this.redirectLink = redirectUrl;
+        this.authStatus = authStatus;
         this.userTokens = null;
     }
 
-    public WebAuthStatus(List<WebAuthInfo> userTokens) {
-        this.taskInfo = null;
+    public WebAuthStatus(SMAuthStatus authStatus, List<WebAuthInfo> userTokens) {
+        this.authStatus = authStatus;
+        this.authId = null;
         this.redirectLink = null;
         this.userTokens = userTokens;
     }
 
     @Property
-    public WebAsyncTaskInfo getTaskInfo() {
-        return taskInfo;
+    public String getAuthId() {
+        return authId;
     }
 
     @Property
