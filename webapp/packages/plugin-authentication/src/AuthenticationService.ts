@@ -15,7 +15,7 @@ import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/co
 import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
-import { openCenteredPopup } from '@cloudbeaver/core-utils';
+import { WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
@@ -42,6 +42,7 @@ export class AuthenticationService extends Bootstrap {
     private readonly sessionDataResource: SessionDataResource,
     private readonly authInfoService: AuthInfoService,
     private readonly serverConfigResource: ServerConfigResource,
+    private readonly windowsService: WindowsService
   ) {
     super();
 
@@ -97,7 +98,13 @@ export class AuthenticationService extends Bootstrap {
       .find(configuration => configuration.id === configurationId);
 
     if (userAuthConfiguration?.signOutLink) {
-      const popup = openCenteredPopup(userAuthConfiguration.signOutLink, `${userAuthConfiguration.id}-sign-out`, 600, 700, undefined);
+      const id = `${userAuthConfiguration.id}-sign-out`;
+      const popup = this.windowsService.open(id, {
+        url: userAuthConfiguration.signOutLink,
+        target: id,
+        width: 600,
+        height: 700,
+      });
 
       if (popup) {
         popup.blur();
@@ -135,7 +142,11 @@ export class AuthenticationService extends Bootstrap {
         const configurableProvider = providers.find(provider => provider.configurable);
 
         if (configurableProvider?.configurations?.length === 1) {
-          const user = await this.authInfoService.sso(configurableProvider.id, configurableProvider.configurations[0]);
+          const configuration = configurableProvider.configurations[0];
+          const user = await this.authInfoService.login(configurableProvider.id, {
+            configurationId: configuration.id,
+            linkUser: link,
+          });
 
           if (user) {
             this.authDialogService.closeLoginForm(this.authPromise);

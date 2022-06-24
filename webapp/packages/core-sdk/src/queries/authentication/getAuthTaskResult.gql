@@ -1,0 +1,10 @@
+query getAuthTaskResult(
+    $taskId: ID!
+    $customIncludeOriginDetails: Boolean!
+) {
+    tokens: authTaskResults(
+        taskId: $taskId
+    ) {
+      ...AuthToken
+    }
+}

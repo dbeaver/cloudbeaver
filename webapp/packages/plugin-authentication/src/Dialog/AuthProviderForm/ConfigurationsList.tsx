@@ -84,7 +84,9 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
   });
 
   async function auth({ provider, configuration }: IProviderConfiguration) {
-    const user = await authInfoService.sso(provider.id, configuration);
+    const user = await authInfoService.login(provider.id, {
+      configurationId: configuration.id,
+    });
 
     if (user) {
       onClose?.();

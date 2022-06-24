@@ -11,13 +11,19 @@ import { computed, makeObservable, runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ObjectOrigin, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { AuthInfo, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ObjectOrigin, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
+
+export interface ILoginOptions {
+  credentials?: IAuthCredentials;
+  configurationId?: string;
+  linkUser?: boolean;
+}
 
 @injectable()
 export class UserInfoResource extends CachedDataResource<
@@ -80,27 +86,58 @@ UserInfoIncludes
     );
   }
 
-  async login(provider: string, credentials: IAuthCredentials, link?: boolean): Promise<UserInfo | null> {
-    await this.performUpdate(undefined, [], async () => {
-      const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
+  async login(
+    provider: string,
+    { credentials, configurationId, linkUser }: ILoginOptions
+  ): Promise<AuthInfo> {
+    return await this.performUpdate(undefined, [], async () => {
+      if (credentials) {
+        credentials = await this.authProviderService.processCredentials(provider, credentials);
+      }
 
-      const { authToken } = await this.graphQLService.sdk.authLogin({
+      const { authInfo } = await this.graphQLService.sdk.authLogin({
         provider,
-        credentials: processedCredentials.credentials,
-        linkUser: link,
+        configuration: configurationId,
+        credentials,
+        linkUser,
         customIncludeOriginDetails: true,
       });
 
-      this.resetIncludes();
-      if (this.data === null || link) {
-        this.setData(await this.loader());
-      } else {
-        this.data.authTokens.push(authToken as UserAuthToken);
+      if (authInfo.userTokens) {
+        this.resetIncludes();
+
+        if (this.data === null || linkUser) {
+          this.setData(await this.loader());
+        } else {
+          this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
+        }
+
+        this.sessionResource.markOutdated();
+      }
+
+      return authInfo as AuthInfo;
+    });
+  }
+
+  async finishFederatedAuthentication(taskId: string): Promise<void> {
+    return await this.performUpdate(undefined, [], async () => {
+      const { tokens } = await this.graphQLService.sdk.getAuthTaskResult({
+        taskId,
+        customIncludeOriginDetails: true,
+      });
+
+      if (tokens) {
+        this.resetIncludes();
+
+        if (this.data === null) {
+          this.setData(await this.loader());
+        } else {
+          this.data.authTokens.push(...tokens as UserAuthToken[]);
+        }
+
+        this.sessionResource.markOutdated();
       }
     });
-    this.sessionResource.markOutdated();
-
-    return this.data;
   }
 
   async logout(): Promise<void> {

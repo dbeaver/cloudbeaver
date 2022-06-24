@@ -118,7 +118,7 @@ extend type Query {
     authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean): AuthInfo!
 
     #User tokens from authorization task, null if task not finished or finished with error
-    authTaskResults(taskId: ID!):[UserAuthToken!]
+    authTaskResults(taskId: ID!): [UserAuthToken!]
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID, configuration: ID): Boolean

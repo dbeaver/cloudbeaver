@@ -120,7 +120,10 @@ export function useAuthDialogState(providerId: string | null): IState {
 
       this.authenticating = true;
       try {
-        await authInfoService.login(this.activeProvider.id, this.credentials, link);
+        await authInfoService.login(this.activeProvider.id, {
+          credentials: this.credentials,
+          linkUser: link,
+        });
       } catch (exception: any) {
         if (this.destroyed) {
           notificationService.logException(exception, 'Login failed');
