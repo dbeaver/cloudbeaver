@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { AsyncTaskInfoService, AuthInfo, AuthProviderConfiguration, UserInfo } from '@cloudbeaver/core-sdk';
+import { AuthInfo, AuthProviderConfiguration, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
 import { WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthProvidersResource } from './AuthProvidersResource';
@@ -51,17 +51,16 @@ export class AuthInfoService {
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
-    private readonly windowsService: WindowsService,
-    private readonly asyncTaskInfoService: AsyncTaskInfoService
+    private readonly windowsService: WindowsService
   ) {
   }
 
-  async login(providerId: string, options: ILoginOptions): Promise<AuthInfo | null> {
+  async login(providerId: string, options: ILoginOptions): Promise<UserInfo | null> {
     const authInfo = await this.userInfoResource.login(providerId, options);
 
     await this.federatedAuthentication(providerId, options, authInfo);
 
-    return authInfo;
+    return this.userInfoResource.data;
   }
 
   async logout(): Promise<void> {
@@ -71,7 +70,7 @@ export class AuthInfoService {
   private async federatedAuthentication(
     providerId: string,
     options: ILoginOptions,
-    { redirectLink, taskInfo }: AuthInfo
+    { redirectLink, authId, authStatus }: AuthInfo
   ): Promise<void> {
     let id = providerId;
 
@@ -96,10 +95,8 @@ export class AuthInfoService {
       }
     }
 
-    if (taskInfo) {
-      const asyncTask = this.asyncTaskInfoService.create(() => Promise.resolve(taskInfo));
-      const info = await this.asyncTaskInfoService.run(asyncTask);
-      await this.userInfoResource.finishFederatedAuthentication(info.id);
+    if (authId && authStatus === AuthStatus.InProgress) {
+      await this.userInfoResource.finishFederatedAuthentication(authId, options.linkUser);
     }
   }
 }

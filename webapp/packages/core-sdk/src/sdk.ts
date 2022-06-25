@@ -109,8 +109,9 @@ export interface AuthCredentialInfo {
 }
 
 export interface AuthInfo {
+  authId?: Maybe<Scalars['String']>;
+  authStatus?: Maybe<AuthStatus>;
   redirectLink?: Maybe<Scalars['String']>;
-  taskInfo?: Maybe<AsyncTaskInfo>;
   userTokens?: Maybe<Array<UserAuthToken>>;
 }
 
@@ -142,6 +143,12 @@ export interface AuthProviderInfo {
   id: Scalars['ID'];
   label: Scalars['String'];
   requiredFeatures: Array<Scalars['String']>;
+}
+
+export enum AuthStatus {
+  Error = 'ERROR',
+  InProgress = 'IN_PROGRESS',
+  Success = 'SUCCESS'
 }
 
 export interface ConnectionConfig {
@@ -746,7 +753,7 @@ export interface Query {
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: Array<DatabaseAuthModel>;
   authProviders: Array<AuthProviderInfo>;
-  authTaskResults?: Maybe<Array<UserAuthToken>>;
+  authUpdateStatus: AuthInfo;
   configureServer: Scalars['Boolean'];
   connectionInfo: ConnectionInfo;
   /** @deprecated Field no longer supported */
@@ -841,8 +848,9 @@ export interface QueryAuthLogoutArgs {
 }
 
 
-export interface QueryAuthTaskResultsArgs {
-  taskId: Scalars['ID'];
+export interface QueryAuthUpdateStatusArgs {
+  authId: Scalars['ID'];
+  linkUser?: InputMaybe<Scalars['Boolean']>;
 }
 
 
@@ -1506,7 +1514,7 @@ export type AuthLoginQueryVariables = Exact<{
 }>;
 
 
-export type AuthLoginQuery = { authInfo: { redirectLink?: string; taskInfo?: { id: string; name?: string; running: boolean; status?: string; taskResult?: any; error?: { message?: string; errorCode?: string; errorType?: string; stackTrace?: string } }; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
+export type AuthLoginQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus?: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
 
 export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1548,13 +1556,14 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAuthProvidersQuery = { providers: Array<{ id: string; label: string; icon?: string; description?: string; defaultProvider: boolean; configurable: boolean; requiredFeatures: Array<string>; configurations?: Array<{ id: string; displayName: string; iconURL?: string; description?: string; signInLink?: string; signOutLink?: string; metadataLink?: string }>; credentialProfiles: Array<{ id?: string; label?: string; description?: string; credentialParameters: Array<{ id: string; displayName: string; description?: string; admin: boolean; user: boolean; identifying: boolean; possibleValues?: Array<string>; encryption?: AuthCredentialEncryption }> }> }> };
 
-export type GetAuthTaskResultQueryVariables = Exact<{
-  taskId: Scalars['ID'];
+export type GetAuthStatusQueryVariables = Exact<{
+  authId: Scalars['ID'];
+  linkUser?: InputMaybe<Scalars['Boolean']>;
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 
-export type GetAuthTaskResultQuery = { tokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> };
+export type GetAuthStatusQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus?: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
 
 export type GetUserProfilePropertiesQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2731,16 +2740,14 @@ export const AuthLoginDocument = `
     linkUser: $linkUser
   ) {
     redirectLink
-    taskInfo {
-      ...AsyncTaskInfo
-    }
+    authId
+    authStatus
     userTokens {
       ...AuthToken
     }
   }
 }
-    ${AsyncTaskInfoFragmentDoc}
-${AuthTokenFragmentDoc}`;
+    ${AuthTokenFragmentDoc}`;
 export const AuthLogoutDocument = `
     query authLogout {
   authLogout
@@ -2826,10 +2833,15 @@ export const GetAuthProvidersDocument = `
   }
 }
     `;
-export const GetAuthTaskResultDocument = `
-    query getAuthTaskResult($taskId: ID!, $customIncludeOriginDetails: Boolean!) {
-  tokens: authTaskResults(taskId: $taskId) {
-    ...AuthToken
+export const GetAuthStatusDocument = `
+    query getAuthStatus($authId: ID!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
+  authInfo: authUpdateStatus(authId: $authId, linkUser: $linkUser) {
+    redirectLink
+    authId
+    authStatus
+    userTokens {
+      ...AuthToken
+    }
   }
 }
     ${AuthTokenFragmentDoc}`;
@@ -3851,8 +3863,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthProviders(variables?: GetAuthProvidersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthProvidersQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviders', 'query');
     },
-    getAuthTaskResult(variables: GetAuthTaskResultQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthTaskResultQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<GetAuthTaskResultQuery>(GetAuthTaskResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthTaskResult', 'query');
+    getAuthStatus(variables: GetAuthStatusQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthStatusQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetAuthStatusQuery>(GetAuthStatusDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthStatus', 'query');
     },
     getUserProfileProperties(variables?: GetUserProfilePropertiesQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUserProfilePropertiesQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetUserProfilePropertiesQuery>(GetUserProfilePropertiesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserProfileProperties', 'query');

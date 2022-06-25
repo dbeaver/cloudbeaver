@@ -12,9 +12,8 @@ query authLogin(
     linkUser: $linkUser
   ) {
     redirectLink
-    taskInfo {
-      ...AsyncTaskInfo
-    }
+    authId
+    authStatus
     userTokens {
       ...AuthToken
     }
