@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Cloudbeaver Provided Sample" uid="io.cloudbeaver.provided.sample.product" id="io.cloudbeaver.provided.sample.product" application="io.cloudbeaver.server.standalone" version="22.1.0.qualifier" useFeatures="true" includeLaunchers="false">
+<product name="Cloudbeaver Provided Sample" uid="io.cloudbeaver.provided.sample.product" id="io.cloudbeaver.provided.sample.product" application="io.cloudbeaver.server.standalone" version="22.1.1.qualifier" useFeatures="true" includeLaunchers="false">
 
    <configIni use="default">
    </configIni>

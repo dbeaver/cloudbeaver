@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
+import { SqlDataSourceService, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -26,28 +28,29 @@ export class SqlEditorService {
   readonly onQueryChange: Executor<IQueryChangeData>;
 
   constructor(
-    private readonly gql: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly notificationService: NotificationService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
-    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.onQueryChange = new Executor();
   }
 
   getState(
+    editorId: string,
+    datasourceKey: string,
     order: number,
     name?: string,
     source?: string,
-    query?: string,
-    contextInfo?: IConnectionExecutionContextInfo,
   ): ISqlEditorTabState {
-    return {
+    return observable({
+      editorId,
+      datasourceKey,
       name,
       source,
-      query: query ?? '',
       order,
-      executionContext: contextInfo ? { ...contextInfo } : undefined,
       tabs: [],
       resultGroups: [],
       resultTabs: [],
@@ -55,14 +58,14 @@ export class SqlEditorService {
       statisticsTabs: [],
       currentModeId: '',
       modeState: [],
-    };
+    });
   }
 
   async parseSQLScript(
     connectionId: string,
     script: string
   ): Promise<SqlScriptInfoFragment> {
-    const result = await this.gql.sdk.parseSQLScript({
+    const result = await this.graphQLService.sdk.parseSQLScript({
       connectionId,
       script,
     });
@@ -75,7 +78,7 @@ export class SqlEditorService {
     script: string,
     position: number,
   ) {
-    const result = await this.gql.sdk.parseSQLQuery({
+    const result = await this.graphQLService.sdk.parseSQLQuery({
       connectionId,
       script,
       position,
@@ -92,7 +95,7 @@ export class SqlEditorService {
     maxResults?: number,
     simple?: boolean,
   ): Promise<SQLProposal[]> {
-    const { proposals } = await this.gql.sdk.querySqlCompletionProposals({
+    const { proposals } = await this.graphQLService.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
       query,
@@ -109,18 +112,24 @@ export class SqlEditorService {
   }
 
   setQuery(query: string, state: ISqlEditorTabState) {
-    const prevQuery = state.query;
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    state.query = query;
-    this.onQueryChange.execute({ prevQuery, query, state });
+    if (dataSource) {
+      const prevQuery = dataSource.script;
+
+      dataSource.setScript(query);
+      this.onQueryChange.execute({ prevQuery, query, state });
+    }
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {
-    if (state.executionContext) {
-      await this.destroyContext(state.executionContext);
-    }
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    state.executionContext = undefined;
+    if (dataSource?.executionContext) {
+      await this.destroyContext(dataSource.executionContext);
+
+      dataSource.setExecutionContext(undefined);
+    }
   }
 
   async setConnection(
@@ -131,17 +140,19 @@ export class SqlEditorService {
   ): Promise<boolean> {
     try {
       const executionContext = await this.initContext(connectionId, catalogId, schemaId);
+      const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-      if (!executionContext?.context) {
+      if (!executionContext?.context || !dataSource) {
         return false;
       }
 
-      const previousContext = state.executionContext;
-      state.executionContext = { ...executionContext.context };
+      const previousContext = dataSource.executionContext;
+      dataSource.setExecutionContext({ ...executionContext.context });
 
       if (previousContext) {
         await this.destroyContext(previousContext);
       }
+
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
@@ -150,15 +161,17 @@ export class SqlEditorService {
   }
 
   async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
-    if (!state.executionContext) {
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+    if (!dataSource?.executionContext) {
       console.error('executeEditorQuery executionContext is not provided');
       return;
     }
 
     const context = await this.initContext(
-      state.executionContext.connectionId,
-      state.executionContext.defaultCatalog,
-      state.executionContext.defaultSchema
+      dataSource.executionContext.connectionId,
+      dataSource.executionContext.defaultCatalog,
+      dataSource.executionContext.defaultSchema
     );
 
     if (!context?.context) {
@@ -166,9 +179,17 @@ export class SqlEditorService {
       return;
     }
 
-    state.executionContext = { ...context.context };
+    dataSource.setExecutionContext({ ...context.context });
 
     return context;
+  }
+
+  async canDestroy(state: ISqlEditorTabState): Promise<boolean> {
+    return await this.sqlDataSourceService.canDestroy(state.editorId);
+  }
+
+  async destroy(state: ISqlEditorTabState): Promise<void> {
+    await this.sqlDataSourceService.destroy(state.editorId);
   }
 
   async initContext(

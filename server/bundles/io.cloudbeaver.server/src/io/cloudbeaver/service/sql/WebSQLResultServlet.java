@@ -69,6 +69,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
             }
 
             File dataFile = new File(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER, valuePath);
+            session.addInfoMessage("Download LOB file ...");
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
             response.setHeader("Content-Length", String.valueOf(dataFile.length()));

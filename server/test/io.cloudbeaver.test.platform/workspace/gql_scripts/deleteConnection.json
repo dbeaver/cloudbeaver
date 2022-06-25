@@ -1,0 +1,5 @@
+{"query": "mutation deleteConnection($id: ID!) {deleteConnection(id: $id)}",
+"variables": {
+	"id" : "${connectionId}"
+}, 
+"operationName":"deleteConnection"}

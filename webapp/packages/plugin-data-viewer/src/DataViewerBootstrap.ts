@@ -12,12 +12,13 @@ import { DataViewerTabService } from './DataViewerTabService';
 
 @injectable()
 export class DataViewerBootstrap extends Bootstrap {
-  constructor(private dataViewerTabService: DataViewerTabService) {
+  constructor(private readonly dataViewerTabService: DataViewerTabService) {
     super();
   }
 
   register(): void | Promise<void> {
     this.dataViewerTabService.registerTabHandler();
+    this.dataViewerTabService.register();
   }
 
   load(): void { }

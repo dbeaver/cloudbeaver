@@ -12,16 +12,18 @@ export const cellMenuStyles = css`
     IconOrImage {
       composes: theme-text-primary from global;
     }
-    :global(.rdg-cell):not(:global(.rdg-cell-selected)):not(:hover) cell-menu {
+    :global(.rdg-cell):not(:global([aria-selected=true])):not(:hover) cell-menu {
       display: none;
     }
     cell-menu {
       flex: 0 0 auto;
-      padding-left: 8px;
+      height: var(--rdg-row-height);
+      position: absolute;
+      top: 0px;
+      right: 0px;
     }
     MenuTrigger {
-      padding: 0;
-      height: 16px;
+      height: 100%;
 
       &:before {
         display: none;

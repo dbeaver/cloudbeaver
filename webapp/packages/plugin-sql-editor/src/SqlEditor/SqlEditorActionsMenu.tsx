@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { MenuBar } from '@cloudbeaver/core-ui';
-import { useMenu } from '@cloudbeaver/core-view';
+import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -19,11 +19,12 @@ import { SQL_EDITOR_ACTIONS_MENU_STYLES } from './SQL_EDITOR_ACTIONS_MENU_STYLES
 
 interface Props {
   state: ISqlEditorTabState;
+  context?: IDataContext;
   style?: ComponentStyle;
 }
 
-export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, style }) {
-  const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU });
+export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, context, style }) {
+  const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU, context });
   menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
 
   return (

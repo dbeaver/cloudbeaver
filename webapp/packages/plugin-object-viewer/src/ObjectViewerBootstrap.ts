@@ -14,8 +14,8 @@ import { ObjectViewerTabService } from './ObjectViewerTabService';
 @injectable()
 export class ObjectViewerBootstrap extends Bootstrap {
   constructor(
-    private objectViewerTabService: ObjectViewerTabService,
-    private objectPropertiesPageService: ObjectPropertiesPageService
+    private readonly objectViewerTabService: ObjectViewerTabService,
+    private readonly objectPropertiesPageService: ObjectPropertiesPageService,
   ) {
     super();
   }
@@ -25,5 +25,5 @@ export class ObjectViewerBootstrap extends Bootstrap {
     this.objectPropertiesPageService.registerDBObjectPage();
   }
 
-  load(): void {}
+  load(): void { }
 }

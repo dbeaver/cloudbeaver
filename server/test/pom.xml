@@ -21,6 +21,22 @@
         <plugins>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <dependency-resolution>
+                        <extraRequirements>
+                            <requirement>
+                                <type>eclipse-plugin</type>
+                                <id>ch.qos.logback.slf4j</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
+                        </extraRequirements>
+                    </dependency-resolution>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
@@ -29,9 +45,10 @@
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <application>org.jkiss.dbeaver.headless.application</application>
-                    <product>org.jkiss.dbeaver.headless.product</product>
+                    <application>io.cloudbeaver.product.ce.application</application>
+                    <product>o.cloudbeaver.product.ce.product</product>
                     <testRuntime>default</testRuntime>
+                    <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
 <!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=n,address=localhost:5006,suspend=y</argLine>-->
                 </configuration>
             </plugin>

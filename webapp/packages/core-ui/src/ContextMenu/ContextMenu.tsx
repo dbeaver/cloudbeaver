@@ -7,18 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { ButtonHTMLAttributes, useCallback, useEffect } from 'react';
-import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
+import { ButtonHTMLAttributes, useRef } from 'react';
+import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
-import { IMenuData, MenuService } from '@cloudbeaver/core-view';
+import { IMenuData, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MenuItemRenderer } from './MenuItemRenderer';
-import { MenuPanel } from './MenuPanel';
-import { menuPanelStyles } from './menuPanelStyles';
 
 interface IMenuProps extends React.PropsWithChildren {
   loading: boolean;
@@ -39,7 +37,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'c
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>>(function ContextMenu({
+export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(function ContextMenu({
   menu: menuData,
   disclosure,
   children,
@@ -59,80 +57,63 @@ export const ContextMenu = observer<IContextMenuProps, ButtonHTMLAttributes<any>
   const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
   const lazy = getComputed(() => !menuData.available || hidden);
 
-  const propsRef = useObjectRef({ onVisibleSwitch, visible });
-  const menu = useMenuState({ modal, placement, visible, rtl });
+  const menu = useRef<IMenuState>();
   const styles = useStyles(menuPanelStyles, style);
 
-  const handleItemClose = useCallback(() => {
-    menu.hide();
-  }, [menu]);
+  const handlers = useObjectRef(() => ({
+    handleItemClose() {
+      menu.current?.hide();
+    },
+    hasBindings() {
+      return this.menuData.items.some(
+        item => item instanceof MenuActionItem && item.action.binding !== null
+      );
+    },
+    handleVisibleSwitch(visible: boolean) {
+      this.onVisibleSwitch?.(visible);
 
-  useEffect(() => {
-    propsRef.onVisibleSwitch?.(menu.visible);
-
-    if (menu.visible) {
-      handler?.handler?.(menuData.context);
-    }
-  }, [menu.visible]);
+      if (visible) {
+        this.handler?.handler?.(this.menuData.context);
+      }
+    },
+  }), { menuData, handler, onVisibleSwitch }, ['handleItemClose', 'hasBindings', 'handleVisibleSwitch']);
 
   if (lazy) {
     return null;
   }
 
-  // TODO: fix type error
   const renderingChildren: React.ReactNode  = typeof children === 'function'
-    ? (children as any)({ loading, disabled })
+    ? children({ loading, disabled })
     : children;
 
-  if (React.isValidElement(renderingChildren) && disclosure) {
-    return styled(styles)(
-      <>
-        <MenuButton ref={ref} {...menu} {...props} {...renderingChildren.props} disabled={disabled}>
-          {disclosureProps => React.cloneElement(renderingChildren, { ...disclosureProps, ...renderingChildren.props })}
-        </MenuButton>
-        <MenuPanel
-          menuData={menuData}
-          menu={menu}
-          style={style}
-          rtl={rtl}
-        >
-          {item => (
-            <MenuItemRenderer
-              key={item.id}
-              item={item}
-              menuData={menuData}
-              menu={menu}
-              style={style}
-              onItemClose={handleItemClose}
-            />
-          )}
-        </MenuPanel>
-      </>
-    );
-  }
-
   return styled(styles)(
-    <>
-      <MenuButton {...menu} {...props} disabled={disabled}>
-        <box>{renderingChildren}</box>
-      </MenuButton>
-      <MenuPanel
-        menuData={menuData}
-        menu={menu}
-        style={style}
-        rtl={rtl}
-      >
-        {item => (
-          <MenuItemRenderer
-            key={item.id}
-            item={item}
-            menuData={menuData}
-            menu={menu}
-            style={style}
-            onItemClose={handleItemClose}
-          />
-        )}
-      </MenuPanel>
-    </>
+    <Menu
+      ref={ref}
+      label={menuData.menu.label}
+      items={() => menuData.items.map(item => menu.current && (
+        <MenuItemRenderer
+          key={item.id}
+          item={item}
+          menuData={menuData}
+          rtl={rtl}
+          menu={menu.current}
+          style={style}
+          onItemClose={handlers.handleItemClose}
+        />
+      ))}
+      rtl={rtl}
+      menuRef={menu}
+      modal={modal}
+      visible={visible}
+      placement={placement}
+      disabled={disabled}
+      disclosure={disclosure}
+      style={style}
+      getHasBindings={handlers.hasBindings}
+      onVisibleSwitch={handlers.handleVisibleSwitch}
+      {...props}
+    >
+      {renderingChildren}
+    </Menu>
   );
 }, { forwardRef: true });
