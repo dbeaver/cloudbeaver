@@ -40,4 +40,9 @@ public class WebAuthStatus {
     public List<WebAuthInfo> getUserTokens() {
         return userTokens;
     }
+
+    @Property
+    public SMAuthStatus getAuthStatus() {
+        return authStatus;
+    }
 }

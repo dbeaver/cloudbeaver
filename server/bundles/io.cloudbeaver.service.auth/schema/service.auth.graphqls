@@ -73,7 +73,7 @@ type AuthInfo {
 
     authId: String
 
-    authStatus: AuthStatus
+    authStatus: AuthStatus!
 
     userTokens: [UserAuthToken!]
 }

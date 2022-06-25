@@ -48,7 +48,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             })
             .dataFetcher("authUpdateStatus", env -> getService(env).authUpdateStatus(
                 getWebSession(env),
-                env.getArgument("taskId"),
+                env.getArgument("authId"),
                 CommonUtils.toBoolean(env.getArgument("linkUser"))
             ))
             .dataFetcher("activeUser", env -> getService(env).activeUser(getWebSession(env, false)))
