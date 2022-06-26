@@ -26,7 +26,7 @@ type NewRole = RoleInfo & { [NEW_ROLE_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class RolesResource extends CachedMapResource<string, RoleInfo> {
-  constructor(private graphQLService: GraphQLService) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
   }
 
@@ -51,6 +51,8 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
 
     this.updateRoles(newRole);
 
+    await this.setSubjectPermissions(newRole.roleId, roleInfo.rolePermissions);
+
     return this.get(roleInfo.roleId)!;
   }
 
@@ -58,6 +60,7 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
     const { role } = await this.graphQLService.sdk.updateRole(roleInfo);
 
     this.updateRoles(role);
+    await this.setSubjectPermissions(role.roleId, roleInfo.rolePermissions);
 
     return this.get(roleInfo.roleId)!;
   }
@@ -81,6 +84,17 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
   async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {
     const { grantInfo } = await this.graphQLService.sdk.getSubjectConnectionAccess({ subjectId });
     return grantInfo;
+  }
+
+  async setSubjectPermissions(roleId: string, permissions: string[]): Promise<void> {
+    await this.performUpdate(roleId, [], async () => {
+      const {
+        permissions: newPermissions,
+      } = await this.graphQLService.sdk.setSubjectPermissions({ roleId, permissions });
+
+      // TODO: update permissions for role instead
+      await this.loader(roleId);
+    });
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, RoleInfo>> {

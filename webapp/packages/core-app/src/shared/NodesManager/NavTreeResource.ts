@@ -12,7 +12,7 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { EPermission, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -59,7 +59,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly sessionDataResource: SessionDataResource,
     private readonly connectionInfo: ConnectionInfoResource,
     private readonly userInfoResource: UserInfoResource,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super();
 

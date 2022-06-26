@@ -12,7 +12,7 @@ import { useCallback } from 'react';
 import { useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { PermissionsResource, usePermission } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource, usePermission } from '@cloudbeaver/core-root';
 
 import { Administration } from '../../Administration/Administration';
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
@@ -22,7 +22,7 @@ import { WizardStepper } from './WizardStepper';
 import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
-  useDataResource(ConfigurationWizardScreen, PermissionsResource, undefined);
+  useDataResource(ConfigurationWizardScreen, SessionPermissionsResource, undefined);
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
 

@@ -50,8 +50,8 @@ export class RoleFormState implements IRoleFormState {
   readonly submittingTask: IExecutor<IRoleFormSubmitData>;
 
   private stateInfo: IRoleFormStateInfo | null;
-  private loadRoleTask: IExecutor<IRoleFormState>;
-  private formStateTask: IExecutor<IRoleFormState>;
+  private readonly loadRoleTask: IExecutor<IRoleFormState>;
+  private readonly formStateTask: IExecutor<IRoleFormState>;
 
   constructor(
     service: RoleFormService,
@@ -60,6 +60,7 @@ export class RoleFormState implements IRoleFormState {
     this.resource = resource;
     this.config = {
       roleId: '',
+      rolePermissions: [],
     };
 
     this.stateInfo = null;

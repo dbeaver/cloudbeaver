@@ -8,14 +8,14 @@
 
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
+import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class TemplateConnectionsResource extends CachedDataResource<Connection[], void> {
+export class TemplateConnectionsResource extends CachedDataResource<Connection[]> {
   constructor(
-    private graphQLService: GraphQLService,
-    permissionsResource: PermissionsResource,
+    private readonly graphQLService: GraphQLService,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super([]);
 

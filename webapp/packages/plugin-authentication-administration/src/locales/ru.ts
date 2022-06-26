@@ -63,6 +63,7 @@ export default [
   ['administration_roles_role_id', 'ID Роли'],
   ['administration_roles_role_name', 'Название роли'],
   ['administration_roles_role_description', 'Описание'],
+  ['administration_roles_role_permissions', 'Разрешения'],
   ['administration_roles_role_create_error', 'Не удалось создать роль'],
   ['administration_roles_role_save_error', 'Не удалось обновить роль'],
   ['administration_roles_role_list_update_success', 'Список ролей обновлен'],

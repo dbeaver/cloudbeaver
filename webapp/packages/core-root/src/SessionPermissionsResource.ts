@@ -13,7 +13,7 @@ import { GraphQLService, CachedDataResource, CachedResource } from '@cloudbeaver
 import { SessionDataResource } from './SessionDataResource';
 
 @injectable()
-export class PermissionsResource extends CachedDataResource<Set<string>> {
+export class SessionPermissionsResource extends CachedDataResource<Set<string>> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource

@@ -10,13 +10,16 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { PermissionsResource } from '@cloudbeaver/core-administration';
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Group,
-  InputField, SubmittingForm, Textarea,
+  BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group,
+  GroupTitle,
+  InputField, SubmittingForm, Textarea, useMapResource,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
 
@@ -33,6 +36,7 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
   const formRef = useRef<HTMLFormElement>(null);
 
   const translate = useTranslate();
+  const permissionsResource = useMapResource(RoleOptions, PermissionsResource, CachedMapAllKey);
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const edit = state.mode === 'edit';
 
@@ -71,6 +75,27 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
           >
             {translate('administration_roles_role_description')}
           </Textarea>
+        </Group>
+        <Group small gap>
+          <GroupTitle>{translate('administration_roles_role_permissions')}</GroupTitle>
+          {permissionsResource.resource.values.map(permission => {
+            const label = `${permission.label ?? permission.id}`;
+            const tooltip = `${label}${permission.description ? '\n' + permission.description : ''}`;
+            return (
+              <FieldCheckbox
+                key={permission.id}
+                id={permission.id}
+                value={permission.id}
+                title={tooltip}
+                name='rolePermissions'
+                state={state.config}
+                readOnly={state.readonly}
+                disabled={state.disabled}
+              >
+                {label}
+              </FieldCheckbox>
+            );
+          })}
         </Group>
       </ColoredContainer>
     </SubmittingForm>

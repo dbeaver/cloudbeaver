@@ -10,7 +10,7 @@ import { action, observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { PermissionsService, EPermission, PermissionsResource, SessionExpireService } from '@cloudbeaver/core-root';
+import { PermissionsService, EPermission, SessionPermissionsResource, SessionExpireService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -35,7 +35,7 @@ export class LogViewerService {
     private coreSettingsService: CoreSettingsService,
     private notificationService: NotificationService,
     private permissionsService: PermissionsService,
-    private permissionsResource: PermissionsResource,
+    private permissionsResource: SessionPermissionsResource,
     private sessionExpireService: SessionExpireService
   ) {
     makeObservable<LogViewerService, 'log' | 'addNewEntries'>(this, {

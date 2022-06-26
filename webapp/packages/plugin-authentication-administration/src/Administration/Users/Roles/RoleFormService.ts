@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormFillConfigData, IRoleFormProps, IRoleFormState, IRoleFormSubmitData } from './IRoleFormProps';
 import { RoleFormBaseActions } from './RoleFormBaseActions';
@@ -93,7 +93,7 @@ export class RoleFormService {
     },
   });
 
-  private showSubmittingStatusMessage: IExecutorHandler<IRoleFormSubmitData> = (data, contexts) => {
+  private readonly showSubmittingStatusMessage: IExecutorHandler<IRoleFormSubmitData> = (data, contexts) => {
     const status = contexts.getContext(this.configurationStatusContext);
 
     if (!status.saved) {
@@ -116,7 +116,7 @@ export class RoleFormService {
     }
   };
 
-  private ensureValidation: IExecutorHandler<IRoleFormSubmitData> = (data, contexts) => {
+  private readonly ensureValidation: IExecutorHandler<IRoleFormSubmitData> = (data, contexts) => {
     const validation = contexts.getContext(this.configurationValidationContext);
 
     if (!validation.valid) {
