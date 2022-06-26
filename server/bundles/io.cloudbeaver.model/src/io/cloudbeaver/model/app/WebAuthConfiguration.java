@@ -16,13 +16,23 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+
+import java.util.List;
 
 /**
- * Application configuration
+ * Application authentication configuration
  */
 public interface WebAuthConfiguration {
+
+    String getDefaultAuthProvider();
+
+    String[] getEnabledAuthProviders();
+
     boolean isAuthProviderEnabled(String authProviderId);
 
-    AuthProviderConfig getAuthProviderConfigurations(String configId);
+    List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
+
+    SMAuthProviderCustomConfiguration getAuthProviderConfiguration(String configId);
+
 }

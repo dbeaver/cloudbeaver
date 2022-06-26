@@ -18,8 +18,8 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -28,13 +28,16 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,14 +59,18 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
 
     private String[] enabledDrivers;
     private String[] disabledDrivers;
-    private String defaultAuthProvider;
     private String[] enabledFeatures;
-    private String[] enabledAuthProviders;
     private DataSourceNavigatorSettings defaultNavigatorSettings;
 
-    private final Map<String, AuthProviderConfig> authConfiguration;
-
     private final Map<String, Object> resourceQuotas;
+
+    private String defaultAuthProvider;
+    private String[] enabledAuthProviders;
+
+    private final List<SMAuthProviderCustomConfiguration> authConfigurations;
+    // Legacy auth configs, left for backward compatibility
+    @Expose(serialize = false)
+    private final Map<String, SMAuthProviderCustomConfiguration> authConfiguration;
 
     public CBAppConfig() {
         super();
@@ -80,6 +87,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.enabledAuthProviders = null;
         this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
         this.authConfiguration = new LinkedHashMap<>();
+        this.authConfigurations = new ArrayList<>();
         this.resourceQuotas = new LinkedHashMap<>();
         this.enableReverseProxyAuth = false;
         this.forwardProxy = false;
@@ -101,6 +109,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.enabledAuthProviders = src.enabledAuthProviders;
         this.defaultNavigatorSettings = src.defaultNavigatorSettings;
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
+        this.authConfigurations = new ArrayList<>(src.authConfigurations);
         this.resourceQuotas = new LinkedHashMap<>(src.resourceQuotas);
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
         this.forwardProxy = src.forwardProxy;
@@ -189,6 +198,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.enabledFeatures = enabledFeatures;
     }
 
+    @Override
     public boolean isAuthProviderEnabled(String id) {
         var authProviderDescriptor = AuthProviderRegistry.getInstance().getAuthProvider(id);
         if (authProviderDescriptor == null) {
@@ -208,6 +218,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         return true;
     }
 
+    @Override
     public String getDefaultAuthProvider() {
         return defaultAuthProvider;
     }
@@ -216,6 +227,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.defaultAuthProvider = defaultAuthProvider;
     }
 
+    @Override
     public String[] getEnabledAuthProviders() {
         if (enabledAuthProviders == null) {
             // No config - enable all providers (+backward compatibility)
@@ -292,36 +304,47 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
     ////////////////////////////////////////////
     // Auth provider configs
 
-    @NotNull
-    public Map<String, AuthProviderConfig> getAuthProviderConfigurations() {
-        synchronized (authConfiguration) {
-            return new LinkedHashMap<>(authConfiguration);
-        }
+    @Override
+    public List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations() {
+        return authConfigurations;
     }
 
+    @Override
     @Nullable
-    public AuthProviderConfig getAuthProviderConfigurations(@NotNull String id) {
-        synchronized (authConfiguration) {
-            return authConfiguration.get(id);
+    public SMAuthProviderCustomConfiguration getAuthProviderConfiguration(@NotNull String id) {
+        synchronized (authConfigurations) {
+            return authConfigurations.stream().filter(c -> c.getId().equals(id)).findAny().orElse(null);
         }
     }
 
-    public void setAuthProviderConfiguration(@NotNull String id, @NotNull AuthProviderConfig config) {
-        synchronized (authConfiguration) {
-            authConfiguration.put(id, config);
+    public void addAuthProviderConfiguration(@NotNull SMAuthProviderCustomConfiguration config) {
+        synchronized (authConfigurations) {
+            authConfigurations.removeIf(c -> c.getId().equals(config.getId()));
+            authConfigurations.add(config);
         }
     }
 
-    public void setAuthProvidersConfiguration(@NotNull Map<String, AuthProviderConfig> authProviders) {
-        synchronized (authConfiguration) {
-            authConfiguration.clear();
-            authConfiguration.putAll(authProviders);
+    public void setAuthProvidersConfigurations(List<SMAuthProviderCustomConfiguration> authProviders) {
+        synchronized (authConfigurations) {
+            authConfigurations.clear();
+            authConfigurations.addAll(authProviders);
         }
     }
 
     public boolean deleteAuthProviderConfiguration(@NotNull String id) {
-        synchronized (authConfiguration) {
-            return authConfiguration.remove(id) != null;
+        synchronized (authConfigurations) {
+            return authConfigurations.removeIf(c -> c.getId().equals(id));
+        }
+    }
+
+    public void loadLegacyCustomConfigs() {
+        // Convert legacy map of configs into list
+        if (!authConfiguration.isEmpty()) {
+            for (Map.Entry<String, SMAuthProviderCustomConfiguration> entry : authConfiguration.entrySet()) {
+                entry.getValue().setId(entry.getKey());
+                authConfigurations.add(entry.getValue());
+            }
+            authConfiguration.clear();
         }
     }
 

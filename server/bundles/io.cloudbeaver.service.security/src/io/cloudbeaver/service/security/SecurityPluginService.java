@@ -61,7 +61,7 @@ public class SecurityPluginService implements IPluginService {
         gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
         DB_INSTANCE = new CBDatabase(application, databaseConfiguration);
-        CONTROLLER_INSTANCE = new CBEmbeddedSecurityController(DB_INSTANCE);
+        CONTROLLER_INSTANCE = new CBEmbeddedSecurityController(application, DB_INSTANCE);
         //FIXME circular dependency
         DB_INSTANCE.setAdminSecurityController(CONTROLLER_INSTANCE);
 

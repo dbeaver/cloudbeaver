@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -45,6 +44,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -552,12 +552,15 @@ public class CBApplication extends BaseWebApplication {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.setPlugins(mergedPlugins);
 
-            Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthProviderConfigurations().entrySet().stream(),
-                    appConfiguration.getAuthProviderConfigurations().entrySet().stream()
+            // Backward compatibility: load configs map
+            appConfiguration.loadLegacyCustomConfigs();
+
+            List<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+                    prevConfig.getAuthCustomConfigurations().stream(),
+                    appConfiguration.getAuthCustomConfigurations().stream()
                 )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
+                .collect(Collectors.toList());
+            appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
         }
 
         patchConfigurationWithProperties(productConfiguration);
@@ -883,8 +886,8 @@ public class CBApplication extends BaseWebApplication {
             if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                 appConfigProperties.put("plugins", appConfig.getPlugins());
             }
-            if (!CommonUtils.isEmpty(appConfig.getAuthProviderConfigurations())) {
-                appConfigProperties.put("authConfiguration", appConfig.getAuthProviderConfigurations());
+            if (!CommonUtils.isEmpty(appConfig.getAuthCustomConfigurations())) {
+                appConfigProperties.put("authConfigurations", appConfig.getAuthCustomConfigurations());
             }
         }
         return rootConfig;

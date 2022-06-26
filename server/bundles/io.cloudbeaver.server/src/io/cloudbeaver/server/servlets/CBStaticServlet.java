@@ -2,7 +2,6 @@ package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
@@ -18,6 +17,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -31,7 +31,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
@@ -79,15 +78,13 @@ public class CBStaticServlet extends DefaultServlet {
             String authProviderId = authProviders[0];
             AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
             if (authProvider != null && authProvider.isConfigurable()) {
-                String configId = null;
-                AuthProviderConfig activeAuthConfig = null;
-                for (Map.Entry<String, AuthProviderConfig> cfg : appConfig.getAuthProviderConfigurations().entrySet()) {
-                    if (!cfg.getValue().isDisabled() && cfg.getValue().getProvider().equals(authProviderId)) {
+                SMAuthProviderCustomConfiguration activeAuthConfig = null;
+                for (SMAuthProviderCustomConfiguration cfg : appConfig.getAuthCustomConfigurations()) {
+                    if (!cfg.isDisabled() && cfg.getProvider().equals(authProviderId)) {
                         if (activeAuthConfig != null) {
                             return false;
                         }
-                        configId = cfg.getKey();
-                        activeAuthConfig = cfg.getValue();
+                        activeAuthConfig = cfg;
                     }
                 }
                 if (activeAuthConfig == null) {
@@ -99,9 +96,11 @@ public class CBStaticServlet extends DefaultServlet {
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
                     if (authProviderInstance instanceof SMWAuthProviderFederated) {
-                        WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
+                        WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
+                            request, response, false);
                         if (webSession.getUser() == null) {
-                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
+                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(
+                                activeAuthConfig.getId(), Collections.emptyMap());
                             //ignore current routing if non-root page is open
                             if (!signInLink.endsWith("#")) {
                                 signInLink += "#";

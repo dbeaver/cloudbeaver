@@ -19,7 +19,6 @@ package io.cloudbeaver.service.admin.impl;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -48,6 +47,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -447,13 +447,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
-        for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
-            if (providerId != null && !providerId.equals(cfg.getValue().getProvider())) {
+        for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
+            if (providerId != null && !providerId.equals(cfg.getProvider())) {
                 continue;
             }
-            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(cfg.getValue().getProvider());
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
-                result.add(new WebAuthProviderConfiguration(authProvider, cfg.getKey(), cfg.getValue()));
+                result.add(new WebAuthProviderConfiguration(authProvider, cfg));
             }
         }
         return result;
@@ -475,20 +475,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         webSession.addInfoMessage("Save configuration for auth provider - " + providerId);
 
-        AuthProviderConfig providerConfig = new AuthProviderConfig();
+        SMAuthProviderCustomConfiguration providerConfig = new SMAuthProviderCustomConfiguration(id);
         providerConfig.setProvider(providerId);
         providerConfig.setDisplayName(displayName);
         providerConfig.setDisabled(disabled);
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
         providerConfig.setParameters(parameters);
-        CBApplication.getInstance().getAppConfiguration().setAuthProviderConfiguration(id, providerConfig);
+        CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
         try {
             CBApplication.getInstance().flushConfiguration();
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }
-        return new WebAuthProviderConfiguration(authProvider, id, providerConfig);
+        return new WebAuthProviderConfiguration(authProvider, providerConfig);
     }
 
     @Override

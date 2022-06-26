@@ -23,6 +23,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -72,10 +73,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-
+    private final WebApplication application;
     private final CBDatabase database;
 
-    public CBEmbeddedSecurityController(CBDatabase database) {
+    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
+        this.application = application;
         this.database = database;
     }
 
@@ -1247,8 +1249,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public SMAuthProviderDescriptor[] getAvailableAuthProviders() {
+        WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
         return AuthProviderRegistry.getInstance().getAuthProviders().stream()
-            .filter(ap -> !ap.isTrusted())
+            .filter(ap -> !ap.isTrusted() && appConfiguration.isAuthProviderEnabled(ap.getId()))
             .map(AuthProviderDescriptor::createDescriptorBean).toArray(SMAuthProviderDescriptor[]::new);
     }
 
