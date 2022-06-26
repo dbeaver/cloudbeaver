@@ -1259,7 +1259,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         // Attach custom configs to providers
         for (SMAuthProviderDescriptor provider : providers) {
             for (SMAuthProviderCustomConfiguration cc : appConfiguration.getAuthCustomConfigurations()) {
-                if (cc.getProvider().equals(provider.getId())) {
+                if (!cc.isDisabled() && cc.getProvider().equals(provider.getId())) {
+                    cc = new SMAuthProviderCustomConfiguration(cc);
+                    // Do not pass secure parameters
+                    cc.setParameters(Map.of());
                     provider.addCustomConfiguration(cc);
                 }
             }
