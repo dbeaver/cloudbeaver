@@ -787,7 +787,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             return false;
         } catch (SQLException e) {
-            throw new DBCException("Error reading session state", e);
+            throw new DBCException("Error reading session persistence state", e);
         }
     }
 
@@ -955,7 +955,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                                   @Nullable String error,
                                   @Nullable String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
-             JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+            JDBCTransaction txn = new JDBCTransaction(dbCon)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
                 dbStat.setString(1, authStatus.toString());
@@ -977,19 +977,26 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             for (Map.Entry<String, Object> entry : authInfo.entrySet()) {
                 String providerId = entry.getKey();
-                Object authData = entry.getValue();
+                String authJson = gson.toJson(entry.getValue());
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "MERGE INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_STATE) "
-                        + "KEY(AUTH_ID,AUTH_PROVIDER_ID) VALUES(?,?,?)")) {
-                    dbStat.setString(1, authId);
-                    dbStat.setString(2, providerId);
-                    dbStat.setString(3, gson.toJson(authData));
-                    dbStat.execute();
+                    "UPDATE CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?")) {
+                    dbStat.setString(1, authJson);
+                    dbStat.setString(2, authId);
+                    dbStat.setString(3, providerId);
+                    if (dbStat.executeUpdate() <= 0) {
+                        try (PreparedStatement dbStatIns = dbCon.prepareStatement(
+                            "INSERT INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_STATE) VALUES(?,?,?)")) {
+                            dbStatIns.setString(1, authId);
+                            dbStatIns.setString(2, providerId);
+                            dbStatIns.setString(3, authJson);
+                            dbStatIns.execute();
+                        }
+                    }
                 }
             }
             txn.commit();
         } catch (SQLException e) {
-            throw new DBCException("Error reading session state", e);
+            throw new DBCException("Error updating auth status", e);
         }
     }
 
@@ -1005,7 +1012,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (!dbResult.next()) {
-                        throw new SMException("Auth attempt not found");
+                        throw new SMException("Auth attempt " + authId + " not found");
                     }
                     smAuthStatus = SMAuthStatus.valueOf(dbResult.getString(1));
                     authError = dbResult.getString(2);
@@ -1445,7 +1452,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error reading session state", e);
+            throw new DBCException("Error initializing security manager meta info", e);
         }
     }
 
