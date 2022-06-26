@@ -75,7 +75,7 @@ public class WebSessionAuthProcessor {
             if (resetUserStateOnError) {
                 webSession.resetUserState();
             }
-            throw new DBException("Failed authenticate session", e);
+            throw new DBException(e.getMessage(), e);
         }
     }
 
