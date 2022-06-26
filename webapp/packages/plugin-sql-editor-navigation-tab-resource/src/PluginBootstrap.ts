@@ -10,6 +10,7 @@ import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNod
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
@@ -50,9 +51,10 @@ export class PluginBootstrap extends Bootstrap {
       id: 'scripts-base-handler',
       isActionApplicable: (context, action): boolean => {
         if (action === ACTION_SAVE) {
+          const tabId = context.tryGet(DATA_CONTEXT_TAB_ID);
           const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-          if (!state) {
+          if (!state || !tabId) {
             return false;
           }
 
@@ -62,9 +64,11 @@ export class PluginBootstrap extends Bootstrap {
         return false;
       },
       handler: async (context, action) => {
+        const tabId = context.get(DATA_CONTEXT_TAB_ID);
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+
         const dataSource = this.sqlDataSourceService.get(state.editorId);
-        const tab = this.navigationTabsService.currentTab;
+        const tab = this.navigationTabsService.getTab(tabId);
 
         if (!dataSource) {
           return;

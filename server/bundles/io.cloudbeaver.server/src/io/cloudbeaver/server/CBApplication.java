@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
@@ -782,6 +783,9 @@ public class CBApplication extends BaseWebApplication {
 
     private void writeRuntimeConfig(Map<String, Object> configurationProperties) throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
+        if (runtimeConfigFile.exists()) {
+            ContentUtils.makeFileBackup(runtimeConfigFile.toPath());
+        }
 
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
