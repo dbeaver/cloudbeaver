@@ -252,10 +252,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return userContext.getSecurityController();
     }
 
-    @Nullable
-    public synchronized SMAdminController getAdminSecurityController() {
+    @NotNull
+    public synchronized SMAdminController getAdminSecurityController() throws DBException {
         if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            return null;
+            throw new DBException("Admin permissions required");
         }
         return userContext.getAdminSecurityController();
     }

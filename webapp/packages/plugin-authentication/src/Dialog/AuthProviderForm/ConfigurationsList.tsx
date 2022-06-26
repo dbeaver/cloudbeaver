@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { AuthInfoService, AuthProvider, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
 import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -56,6 +57,7 @@ interface Props {
 export const ConfigurationsList = observer<Props>(function ConfigurationsList({ providers, onClose, className }) {
   const authInfoService = useService(AuthInfoService);
   const authenticationService = useService(AuthenticationService);
+  const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const style = useStyles(styles);
 
@@ -84,10 +86,16 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
   });
 
   async function auth({ provider, configuration }: IProviderConfiguration) {
-    const user = await authInfoService.sso(provider.id, configuration);
+    try {
+      const user = await authInfoService.login(provider.id, {
+        configurationId: configuration.id,
+      });
 
-    if (user) {
-      onClose?.();
+      if (user) {
+        onClose?.();
+      }
+    } catch (exception: any) {
+      notificationService.logException(exception, 'Federated authentication error');
     }
   }
 

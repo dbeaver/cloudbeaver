@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebApplication;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
@@ -39,6 +42,14 @@ public class WebAppUtils {
 
     public static WebApplication getWebApplication() {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
+    }
+
+    public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
+        var smController = getWebApplication().getSecurityController(new NoAuthCredentialsProvider());
+        if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
+            throw new DBException("The current application cannot be used for authorization");
+        }
+        return (SMAuthenticationManager) smController;
     }
 
     @SuppressWarnings("unchecked")

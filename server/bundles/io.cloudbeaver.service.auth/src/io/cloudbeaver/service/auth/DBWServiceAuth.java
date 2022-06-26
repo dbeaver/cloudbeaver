@@ -19,7 +19,6 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.DBWService;
@@ -33,14 +32,18 @@ import java.util.Map;
  */
 public interface DBWServiceAuth extends DBWService {
 
-    @WebAction(requirePermissions = {} )
-    WebAuthInfo authLogin(
+    @WebAction(requirePermissions = {})
+    WebAuthStatus authLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
-        @NotNull Map<String, Object> credentials,
+        @Nullable String providerConfigurationId,
+        @Nullable Map<String, Object> credentials,
         boolean linkWithActiveUser) throws DBWebException;
 
-    @WebAction(requirePermissions = {} )
+    @WebAction(requirePermissions = {})
+    WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;
+
+    @WebAction(requirePermissions = {})
     void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;
 
     @WebAction(requirePermissions = {})

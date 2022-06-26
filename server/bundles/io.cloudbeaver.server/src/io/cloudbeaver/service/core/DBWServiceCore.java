@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;

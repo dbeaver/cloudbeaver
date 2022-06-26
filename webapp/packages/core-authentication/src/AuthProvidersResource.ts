@@ -53,6 +53,16 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     });
   }
 
+  getConfiguration(providerId: string, configurationId: string): AuthProviderConfiguration | undefined  {
+    const provider = this.get(providerId);
+
+    if (provider) {
+      return provider.configurations?.find(configuration => configuration.id === configurationId);
+    }
+
+    return undefined;
+  }
+
   getEnabledProviders(): AuthProvider[] {
     return this.get(resourceKeyList(this.serverConfigResource.enabledAuthProviders)) as AuthProvider[];
   }

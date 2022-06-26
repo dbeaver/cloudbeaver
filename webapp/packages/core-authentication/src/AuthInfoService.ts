@@ -7,19 +7,11 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionResource } from '@cloudbeaver/core-root';
-import type { AuthProviderConfiguration, UserInfo } from '@cloudbeaver/core-sdk';
-import { openCenteredPopup } from '@cloudbeaver/core-utils';
+import { AuthInfo, AuthProviderConfiguration, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
+import { WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthProvidersResource } from './AuthProvidersResource';
-import type { IAuthCredentials } from './IAuthCredentials';
-import { UserInfoResource } from './UserInfoResource';
-
-interface IActiveSSOAuthentication {
-  configuration: AuthProviderConfiguration;
-  window: Window;
-  promise: Promise<UserInfo | null>;
-}
+import { type ILoginOptions, UserInfoResource } from './UserInfoResource';
 
 @injectable()
 export class AuthInfoService {
@@ -56,74 +48,55 @@ export class AuthInfoService {
     return result;
   }
 
-  private readonly activeSSO: Map<string, IActiveSSOAuthentication>;
-
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
-    private readonly sessionResource: SessionResource
+    private readonly windowsService: WindowsService
   ) {
-    this.activeSSO = new Map();
   }
 
-  async login(provider: string, credentials: IAuthCredentials, link?: boolean): Promise<UserInfo | null> {
-    return this.userInfoResource.login(provider, credentials, link);
-  }
+  async login(providerId: string, options: ILoginOptions): Promise<UserInfo | null> {
+    const authInfo = await this.userInfoResource.login(providerId, options);
 
-  async sso(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    return this.ssoAuth(providerId, configuration);
+    await this.federatedAuthentication(providerId, options, authInfo);
+
+    return this.userInfoResource.data;
   }
 
   async logout(): Promise<void> {
     await this.userInfoResource.logout();
   }
 
-  private async ssoAuth(providerId: string, configuration: AuthProviderConfiguration): Promise<UserInfo | null> {
-    const active = this.activeSSO.get(configuration.id);
+  private async federatedAuthentication(
+    providerId: string,
+    options: ILoginOptions,
+    { redirectLink, authId, authStatus }: AuthInfo
+  ): Promise<void> {
+    let id = providerId;
 
-    if (active) {
-      active.window.focus();
-      return active.promise;
-    }
+    if (options.configurationId) {
+      const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
 
-    const popup = openCenteredPopup(configuration.signInLink, configuration.id, 600, 700, undefined);
-
-    if (popup) {
-      popup.focus();
-
-      const task = async () => {
-        await this.waitWindowsClose(popup);
-
-        this.sessionResource.markOutdated();
-        const user = await this.userInfoResource.load(undefined, []);
-
-        return user;
-      };
-
-      const active: IActiveSSOAuthentication = {
-        configuration,
-        promise: task(),
-        window: popup,
-      };
-
-      this.activeSSO.set(configuration.id, active);
-      try {
-        return await active.promise;
-      } finally {
-        this.activeSSO.delete(configuration.id);
+      if (configuration) {
+        id = configuration.id;
       }
     }
 
-    return Promise.resolve(null);
-  }
+    if (redirectLink) {
+      const window = this.windowsService.open(id, {
+        url: redirectLink,
+        target: id,
+        width: 600,
+        height: 700,
+      });
 
-  private async waitWindowsClose(window: Window): Promise<void> {
-    return new Promise(resolve => {
-      setInterval(() => {
-        if (window.closed) {
-          resolve();
-        }
-      }, 100);
-    });
+      if (window) {
+        window.focus();
+      }
+    }
+
+    if (authId && authStatus === AuthStatus.InProgress) {
+      await this.userInfoResource.finishFederatedAuthentication(authId, options.linkUser);
+    }
   }
 }

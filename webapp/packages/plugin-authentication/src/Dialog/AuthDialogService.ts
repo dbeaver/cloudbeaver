@@ -18,8 +18,8 @@ export class AuthDialogService {
   ) { }
 
   showLoginForm(
-    persistent = false, 
-    providerId: string | null = null, 
+    persistent = false,
+    providerId: string | null = null,
     link?: boolean
   ): Promise<DialogueStateResult | null> {
     return this.commonDialogService.open(AuthDialog, { providerId, link }, { persistent });

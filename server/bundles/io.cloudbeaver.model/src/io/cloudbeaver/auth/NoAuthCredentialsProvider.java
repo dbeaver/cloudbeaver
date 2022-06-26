@@ -14,29 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.app;
 
-import org.jkiss.code.NotNull;
+package io.cloudbeaver.auth;
 
-import java.util.Map;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
-/**
- * Application configuration
- */
-public interface WebAppConfiguration {
-    String getAnonymousUserRole();
-
-    boolean isAnonymousAccessEnabled();
-
-    <T> T getResourceQuota(String quotaId);
-
-    String getDefaultUserRole();
-
-    <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
-
-    Map<String, Object> getPluginConfig(@NotNull String pluginId, boolean create);
-
-    boolean isResourceManagerEnabled();
-
-    boolean isFeaturesEnabled(String[] requiredFeatures);
+public class NoAuthCredentialsProvider implements SMCredentialsProvider {
+    @Nullable
+    @Override
+    public SMCredentials getActiveUserCredentials() {
+        return null;
+    }
 }

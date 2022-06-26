@@ -55,8 +55,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
         @NotNull AuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull SMSession authSession,
-        @NotNull OffsetDateTime loginTime)
-    {
+        @NotNull OffsetDateTime loginTime) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
