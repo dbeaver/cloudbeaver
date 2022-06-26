@@ -11,5 +11,6 @@ import type { RoleInfo } from '@cloudbeaver/core-authentication';
 export function roleContext(): RoleInfo {
   return {
     roleId: '',
+    rolePermissions: [],
   };
 }

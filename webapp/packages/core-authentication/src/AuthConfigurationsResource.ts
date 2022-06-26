@@ -10,7 +10,7 @@ import { runInAction } from 'mobx';
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   AdminAuthProviderConfiguration, AuthProviderConfiguration,
   CachedMapAllKey,
@@ -29,7 +29,7 @@ export class AuthConfigurationsResource
   extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super([]);
 

@@ -1,0 +1,3 @@
+query setSubjectPermissions($roleId: ID!, $permissions: [ID!]! ) {
+  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions)
+}

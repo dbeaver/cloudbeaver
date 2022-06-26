@@ -6,16 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  AdministrationLocaleService,
-  AdministrationSettingsService,
-  AdministrationTopAppBarService,
-  AdministrationScreenService,
-  AdministrationItemService,
-  ConfigurationWizardService,
-  WizardTopAppBarService,
-  AdministrationScreenServiceBootstrap
-} from '@cloudbeaver/core-administration';
+import { coreAdministrationManifest } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
   MainMenuService,
@@ -74,15 +65,7 @@ export const coreManifests: PluginManifest[] = [
 
     providers: [
       RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
-      AdministrationLocaleService,
-      AdministrationSettingsService,
-      AdministrationTopAppBarService,
-      AdministrationScreenService,
-      AdministrationScreenServiceBootstrap,
-      AdministrationItemService,
       AdministrationTopAppBarBootstrapService,
-      ConfigurationWizardService,
-      WizardTopAppBarService,
       ProductSettingsService,
       ProductManagerService,
       PluginManagerService,
@@ -127,6 +110,7 @@ export const coreManifests: PluginManifest[] = [
       ToolsPanelService,
     ],
   },
+  coreAdministrationManifest,
   coreSDKManifest,
   coreAuthenticationManifest,
   coreUIManifest,

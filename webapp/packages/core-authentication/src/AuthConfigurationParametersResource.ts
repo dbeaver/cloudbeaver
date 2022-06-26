@@ -8,7 +8,7 @@
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
@@ -24,7 +24,7 @@ export class AuthConfigurationParametersResource
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionDataResource: SessionDataResource,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super();
 

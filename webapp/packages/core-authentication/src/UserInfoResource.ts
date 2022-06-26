@@ -154,7 +154,7 @@ UserInfoIncludes
             reject(exception);
             clearInterval(interval);
           }
-        }, 300);
+        }, 1000);
       });
     });
   }

@@ -11,7 +11,7 @@ import { action, makeObservable } from 'mobx';
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import type { DatabaseConnection, IConnectionsResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ConnectionConfig,
@@ -39,7 +39,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   constructor(
     private graphQLService: GraphQLService,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
     sessionDataResource: SessionDataResource
   ) {
     super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);

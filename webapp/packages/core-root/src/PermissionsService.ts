@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { PermissionsResource } from './PermissionsResource';
+import { SessionPermissionsResource } from './SessionPermissionsResource';
 
 export enum EPermission {
   public = 'public'
@@ -17,7 +17,7 @@ export enum EPermission {
 @injectable()
 export class PermissionsService {
   constructor(
-    private permissions: PermissionsResource
+    private readonly permissions: SessionPermissionsResource
   ) {
   }
 

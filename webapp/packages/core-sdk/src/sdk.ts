@@ -61,7 +61,7 @@ export interface AdminRoleInfo {
   grantedUsers: Array<Scalars['ID']>;
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
-  rolePermissions: Array<Maybe<Scalars['ID']>>;
+  rolePermissions: Array<Scalars['ID']>;
 }
 
 export enum AdminSubjectType {
@@ -110,7 +110,7 @@ export interface AuthCredentialInfo {
 
 export interface AuthInfo {
   authId?: Maybe<Scalars['String']>;
-  authStatus?: Maybe<AuthStatus>;
+  authStatus: AuthStatus;
   redirectLink?: Maybe<Scalars['String']>;
   userTokens?: Maybe<Array<UserAuthToken>>;
 }
@@ -779,10 +779,10 @@ export interface Query {
   listAuthProviderConfigurationParameters: Array<ObjectPropertyInfo>;
   listAuthProviderConfigurations: Array<AdminAuthProviderConfiguration>;
   listFeatureSets: Array<WebFeatureSet>;
-  listPermissions: Array<Maybe<AdminPermissionInfo>>;
-  listRoles: Array<Maybe<AdminRoleInfo>>;
+  listPermissions: Array<AdminPermissionInfo>;
+  listRoles: Array<AdminRoleInfo>;
   listUserProfileProperties: Array<ObjectPropertyInfo>;
-  listUsers: Array<Maybe<AdminUserInfo>>;
+  listUsers: Array<AdminUserInfo>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
   navNodeChildren: Array<NavigatorNodeInfo>;
@@ -1451,6 +1451,19 @@ export interface WebServiceConfig {
   name: Scalars['String'];
 }
 
+export type GetPermissionsListQueryVariables = Exact<{ [key: string]: never }>;
+
+
+export type GetPermissionsListQuery = { permissions: Array<{ id: string; label?: string; description?: string; category?: string }> };
+
+export type SetSubjectPermissionsQueryVariables = Exact<{
+  roleId: Scalars['ID'];
+  permissions: Array<Scalars['ID']> | Scalars['ID'];
+}>;
+
+
+export type SetSubjectPermissionsQuery = { permissions?: boolean };
+
 export type AsyncTaskCancelMutationVariables = Exact<{
   taskId: Scalars['String'];
 }>;
@@ -1465,7 +1478,7 @@ export type CreateRoleQueryVariables = Exact<{
 }>;
 
 
-export type CreateRoleQuery = { role: { roleId: string; roleName?: string; description?: string } };
+export type CreateRoleQuery = { role: { roleId: string; roleName?: string; description?: string; rolePermissions: Array<string> } };
 
 export type DeleteRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1486,7 +1499,7 @@ export type GetRolesListQueryVariables = Exact<{
 }>;
 
 
-export type GetRolesListQuery = { roles: Array<{ roleId: string; roleName?: string; description?: string }> };
+export type GetRolesListQuery = { roles: Array<{ roleId: string; roleName?: string; description?: string; rolePermissions: Array<string> }> };
 
 export type UpdateRoleQueryVariables = Exact<{
   roleId: Scalars['ID'];
@@ -1495,7 +1508,7 @@ export type UpdateRoleQueryVariables = Exact<{
 }>;
 
 
-export type UpdateRoleQuery = { role: { roleId: string; roleName?: string; description?: string } };
+export type UpdateRoleQuery = { role: { roleId: string; roleName?: string; description?: string; rolePermissions: Array<string> } };
 
 export type AuthChangeLocalPasswordQueryVariables = Exact<{
   oldPassword: Scalars['String'];
@@ -1514,7 +1527,7 @@ export type AuthLoginQueryVariables = Exact<{
 }>;
 
 
-export type AuthLoginQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus?: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
+export type AuthLoginQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
 
 export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1563,7 +1576,7 @@ export type GetAuthStatusQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthStatusQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus?: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
+export type GetAuthStatusQuery = { authInfo: { redirectLink?: string; authId?: string; authStatus: AuthStatus; userTokens?: Array<{ authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } }> } };
 
 export type GetUserProfilePropertiesQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1621,13 +1634,6 @@ export type EnableUserQueryVariables = Exact<{
 
 
 export type EnableUserQuery = { enableUser?: boolean };
-
-export type GetPermissionsListQueryVariables = Exact<{
-  roleId?: InputMaybe<Scalars['ID']>;
-}>;
-
-
-export type GetPermissionsListQuery = { permissions: Array<{ id: string; label?: string; description?: string; provider: string; category?: string }> };
 
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['ID']>;
@@ -2014,7 +2020,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean; supportsSchemaChange: boolean; catalogList: Array<{ catalog: { id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> }>; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> } };
 
-export type AdminRoleInfoFragment = { roleId: string; roleName?: string; description?: string };
+export type AdminRoleInfoFragment = { roleId: string; roleName?: string; description?: string; rolePermissions: Array<string> };
 
 export type AdminUserInfoFragment = { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; enabled: boolean; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
 
@@ -2403,6 +2409,7 @@ export const AdminRoleInfoFragmentDoc = `
   roleId
   roleName
   description
+  rolePermissions
 }
     `;
 export const ObjectOriginInfoFragmentDoc = `
@@ -2680,6 +2687,21 @@ export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
   features
 }
     `;
+export const GetPermissionsListDocument = `
+    query getPermissionsList {
+  permissions: listPermissions {
+    id
+    label
+    description
+    category
+  }
+}
+    `;
+export const SetSubjectPermissionsDocument = `
+    query setSubjectPermissions($roleId: ID!, $permissions: [ID!]!) {
+  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions)
+}
+    `;
 export const AsyncTaskCancelDocument = `
     mutation asyncTaskCancel($taskId: String!) {
   result: asyncTaskCancel(id: $taskId)
@@ -2902,17 +2924,6 @@ export const DeleteUserMetaParameterDocument = `
 export const EnableUserDocument = `
     query enableUser($userId: ID!, $enabled: Boolean!) {
   enableUser(userId: $userId, enabled: $enabled)
-}
-    `;
-export const GetPermissionsListDocument = `
-    query getPermissionsList($roleId: ID) {
-  permissions: listPermissions {
-    id
-    label
-    description
-    provider
-    category
-  }
 }
     `;
 export const GetUserGrantedConnectionsDocument = `
@@ -3821,6 +3832,12 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetPermissionsListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList', 'query');
+    },
+    setSubjectPermissions(variables: SetSubjectPermissionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<SetSubjectPermissionsQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<SetSubjectPermissionsQuery>(SetSubjectPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setSubjectPermissions', 'query');
+    },
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<AsyncTaskCancelMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncTaskCancel', 'mutation');
     },
@@ -3886,9 +3903,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     enableUser(variables: EnableUserQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<EnableUserQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'enableUser', 'query');
-    },
-    getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetPermissionsListQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList', 'query');
     },
     getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetUserGrantedConnectionsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserGrantedConnections', 'query');

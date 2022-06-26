@@ -2,7 +2,7 @@ export * from './ConnectionNavigatorViewSettings';
 export * from './FeaturesResource';
 export * from './NetworkError';
 export * from './NetworkStateService';
-export * from './PermissionsResource';
+export * from './SessionPermissionsResource';
 export * from './PermissionsService';
 export * from './ServerConfigResource';
 export * from './SessionService';

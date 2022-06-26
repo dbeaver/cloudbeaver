@@ -9,7 +9,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import { EPermission, SessionPermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -32,7 +32,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly graphQLService: GraphQLService,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super();
     permissionsResource.require(this, EPermission.public);
