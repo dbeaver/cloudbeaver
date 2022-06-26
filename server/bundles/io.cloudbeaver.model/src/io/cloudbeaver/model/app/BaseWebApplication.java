@@ -77,7 +77,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
             }
         }
         Path path = Path.of(configPath).toAbsolutePath();
-        log.debug("Loading configuration from " + path);
 
         // Configure logging
         Path logbackConfigPath = null;
@@ -97,6 +96,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         Log.setLogHandler(new SLF4JLogHandler());
 
         // Load config file
+        log.debug("Loading configuration from " + path);
         try {
             loadConfiguration(configPath);
         } catch (Exception e) {
