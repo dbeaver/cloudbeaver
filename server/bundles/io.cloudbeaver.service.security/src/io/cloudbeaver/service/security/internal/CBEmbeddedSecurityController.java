@@ -1248,7 +1248,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public SMAuthProviderDescriptor[] getAvailableAuthProviders() {
+    public SMAuthProviderDescriptor[] getAvailableAuthProviders() throws DBException {
+        if (!(application.getAppConfiguration() instanceof WebAuthConfiguration)) {
+            throw new DBException("Web application doesn't support external authentication");
+        }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
         SMAuthProviderDescriptor[] providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap -> !ap.isTrusted() && appConfiguration.isAuthProviderEnabled(ap.getId()))
