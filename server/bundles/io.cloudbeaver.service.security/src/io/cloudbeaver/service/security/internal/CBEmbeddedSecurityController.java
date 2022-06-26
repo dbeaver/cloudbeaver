@@ -1250,9 +1250,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public SMAuthProviderDescriptor[] getAvailableAuthProviders() {
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
-        return AuthProviderRegistry.getInstance().getAuthProviders().stream()
+        SMAuthProviderDescriptor[] providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap -> !ap.isTrusted() && appConfiguration.isAuthProviderEnabled(ap.getId()))
             .map(AuthProviderDescriptor::createDescriptorBean).toArray(SMAuthProviderDescriptor[]::new);
+        // Attach custom configs to providers
+        for (SMAuthProviderDescriptor provider : providers) {
+            for (SMAuthProviderCustomConfiguration cc : appConfiguration.getAuthCustomConfigurations()) {
+                if (cc.getProvider().equals(provider.getId())) {
+                    provider.addCustomConfiguration(cc);
+                }
+            }
+        }
+        return providers;
     }
 
     @Override
