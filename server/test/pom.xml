@@ -46,10 +46,10 @@
                         <include>**/*Test.java</include>
                     </includes>
                     <application>io.cloudbeaver.product.ce.application</application>
-                    <product>o.cloudbeaver.product.ce.product</product>
+                    <product>io.cloudbeaver.product.ce.product</product>
                     <testRuntime>default</testRuntime>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
-<!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=n,address=localhost:5006,suspend=y</argLine>-->
+<!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>-->
                 </configuration>
             </plugin>
         </plugins>
