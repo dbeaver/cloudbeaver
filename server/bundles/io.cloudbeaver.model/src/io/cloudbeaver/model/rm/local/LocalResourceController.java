@@ -39,7 +39,6 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +55,6 @@ public class LocalResourceController implements RMController {
     private static final String PROJECT_PREFIX_USER = "u_";
     public static final String DEFAULT_CHANGE_ID = "0";
 
-    private final List<RMEventListener> listeners = new CopyOnWriteArrayList<>();
     private final SMCredentialsProvider credentialsProvider;
 
     private final Path rootPath;
@@ -131,7 +129,7 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void createProject(@NotNull RMProject project) throws DBException {
+    public RMProject createProject(@NotNull String id, @NotNull String name, @NotNull String description) throws DBException {
         throw new DBCFeatureNotSupportedException();
     }
 
@@ -219,7 +217,7 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
-        fireEvent(
+        RMEventManager.fireEvent(
             new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                 makeProjectFromId(projectId),
                 rmResourcePath
@@ -285,26 +283,6 @@ public class LocalResourceController implements RMController {
         if (!resourcePath.matches(FILE_REGEX)) {
             String illegalCharacters = resourcePath.replaceAll(FILE_REGEX, " ").strip();
             throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
-        }
-    }
-
-    @Override
-    public void addRMEventListener(RMEventListener listener) {
-        this.listeners.add(listener);
-    }
-
-    @Override
-    public void removeRMEventListener(RMEventListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    private void fireEvent(RMEvent event) {
-        for (var listener : listeners) {
-            try {
-                listener.handleRMEvent(event);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
         }
     }
 
