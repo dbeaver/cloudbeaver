@@ -21,7 +21,7 @@ const MENU_STYLES = css`
     composes: theme-background-surface theme-text-on-surface theme-typography--body2 from global;
     display: flex;
     box-sizing: border-box;
-    height: 24px;
+    height: 28px;
   }
 
   menu-bar-item {

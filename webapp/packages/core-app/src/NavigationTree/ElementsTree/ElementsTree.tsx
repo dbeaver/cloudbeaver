@@ -99,7 +99,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const ref = useObjectRef({ settings, getChildren, loadChildren });
 
   const root = folderExplorer.state.folder;
-  const fullPath = folderExplorer.state.fullPath;
 
   function exitFolders(path: string[]) {
     path = path.filter(nodeId => ref.getChildren(nodeId) !== undefined);
