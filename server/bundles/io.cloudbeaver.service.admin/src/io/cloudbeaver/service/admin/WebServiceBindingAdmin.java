@@ -32,7 +32,7 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplication> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 

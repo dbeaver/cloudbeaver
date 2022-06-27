@@ -14,24 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.app;
+package io.cloudbeaver.service;
 
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-
-import java.util.List;
+import io.cloudbeaver.model.app.WebApplication;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.jkiss.dbeaver.DBException;
 
 /**
- * Application authentication configuration
+ * Servlet service
  */
-public interface WebAuthConfiguration {
+public interface DBWServiceBindingServlet<APPLICATION extends WebApplication> extends DBWServiceBinding {
 
-    String getDefaultAuthProvider();
-
-    String[] getEnabledAuthProviders();
-
-    boolean isAuthProviderEnabled(String authProviderId);
-
-    List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
-
-    SMAuthProviderCustomConfiguration getAuthProviderConfiguration(String configId);
+    void addServlets(APPLICATION application, ServletContextHandler servletContextHandler) throws DBException;
 }

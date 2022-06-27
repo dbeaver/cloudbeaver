@@ -14,16 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service;
 
-import io.cloudbeaver.server.CBApplication;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.jkiss.dbeaver.DBException;
+package io.cloudbeaver.model.app;
 
-/**
- * Servlet service
- */
-public interface DBWServiceBindingServlet extends DBWServiceBinding {
-
-    void addServlets(CBApplication application, ServletContextHandler servletContextHandler) throws DBException;
+public interface WebAuthApplication extends WebApplication {
+    WebAuthConfiguration getAuthConfiguration();
 }

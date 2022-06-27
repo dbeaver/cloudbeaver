@@ -45,7 +45,7 @@ public class WebAppUtils {
     }
 
     public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
-        var smController = getWebApplication().getSecurityController(new NoAuthCredentialsProvider());
+        var smController = application.getSecurityController(new NoAuthCredentialsProvider());
         if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
             throw new DBException("The current application cannot be used for authorization");
         }

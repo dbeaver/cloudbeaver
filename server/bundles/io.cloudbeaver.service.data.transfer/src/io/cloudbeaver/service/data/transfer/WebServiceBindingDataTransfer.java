@@ -30,7 +30,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 /**
  * Web service implementation
  */
-public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServiceDataTransfer> implements DBWServiceBindingServlet {
+public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServiceDataTransfer> implements DBWServiceBindingServlet<CBApplication> {
 
     public WebServiceBindingDataTransfer() {
         super(DBWServiceDataTransfer.class, new WebServiceDataTransfer(), "schema/service.data.transfer.graphqls");
