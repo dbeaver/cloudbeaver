@@ -47,5 +47,11 @@ public interface WebApplication extends DBPApplication {
 
     String getServerURL();
 
-    String getServicesURI();
+    default String getServicesURI() {
+        return "/";
+    }
+
+    default String getRootURI() {
+        return "";
+    }
 }
