@@ -90,7 +90,6 @@ public class PlatformTest {
     public void tearDown() throws Exception {
         if (testFinished) {
             testApp.stop();
-            thread.interrupt();
         }
     }
 
@@ -142,7 +141,7 @@ public class PlatformTest {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(GQL_API_URL))
             .POST(HttpRequest.BodyPublishers.ofString(input))
-            .headers("Content-Type", "application/json")
+            .header("Content-Type", "application/json")
             .build();
 
         HttpResponse<String> response = client.send(request,
