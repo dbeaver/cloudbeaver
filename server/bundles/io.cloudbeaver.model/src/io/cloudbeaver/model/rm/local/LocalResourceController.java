@@ -143,6 +143,21 @@ public class LocalResourceController implements RMController {
         return makeProjectFromId(projectId);
     }
 
+    @Override
+    public String getProjectsDataSources(@NotNull String projectId) throws DBException {
+        throw new DBCFeatureNotSupportedException();
+    }
+
+    @Override
+    public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
+        throw new DBCFeatureNotSupportedException();
+    }
+
+    @Override
+    public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
+        throw new DBCFeatureNotSupportedException();
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(
