@@ -45,4 +45,8 @@ public class AdminPermissionInfo {
         return permission.getCategory();
     }
 
+    public String getProvider() {
+        return permission.getService().getLabel();
+    }
+
 }
