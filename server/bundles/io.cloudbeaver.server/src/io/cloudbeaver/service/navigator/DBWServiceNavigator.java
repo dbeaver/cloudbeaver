@@ -16,12 +16,13 @@
  */
 package io.cloudbeaver.service.navigator;
 
-import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.List;
 
@@ -57,5 +58,11 @@ public interface DBWServiceNavigator extends DBWService {
 
     @WebAction
     int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
+
+    @WebAction
+    WebNavigatorNodeInfo createFolder(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;
+
+    @WebAction
+    boolean deleteFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
 }
