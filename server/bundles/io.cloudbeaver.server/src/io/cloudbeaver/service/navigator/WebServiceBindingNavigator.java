@@ -70,7 +70,7 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
             .dataFetcher("navCreateFolder", env -> getService(env).createFolder(
                 getWebSession(env),
                 env.getArgument("parentNodePath"),
-                env.getArgument("newName")
+                env.getArgument("nodeName")
             ))
             .dataFetcher("navDeleteFolder", env -> getService(env).deleteFolder(
                 getWebSession(env),

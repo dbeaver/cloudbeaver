@@ -37,16 +37,13 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.navigator.*;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.user.SMRole;
@@ -422,39 +419,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             log.error(e);
         }
         return true;
-    }
-    ////////////////////////////////////////////////////////////////////
-    // Folders
-
-    @Override
-    public WebNavigatorNodeInfo createFolderConfiguration(@NotNull WebSession webSession, @Nullable String parentPath, @NotNull String folderName) throws DBWebException {
-        webSession.addInfoMessage("Create new folder");
-        DBRProgressMonitor monitor = webSession.getProgressMonitor();
-        DBPDataSourceRegistry registry = WebServiceUtils.getGlobalDataSourceRegistry();
-        DBNLocalFolder parentNode = null;
-        if (parentPath != null) {
-            try {
-                parentNode = (DBNLocalFolder) webSession.getNavigatorModel().getNodeByPath(monitor, parentPath);
-            } catch (DBException e) {
-                throw new DBWebException(e.getMessage(), e);
-            }
-        }
-        DBPDataSourceFolder folder = WebServiceUtils.createFolder(parentNode, folderName, registry);
-        registry.flushConfig();
-
-        DBNProject projectNode = webSession.getNavigatorModel().getRoot().getProjectNode(webSession.getSingletonProject());
-        WebServiceUtils.updateConfigAndRefreshDatabases(webSession);
-        return new WebNavigatorNodeInfo(webSession, new DBNLocalFolder(projectNode.getDatabases(), folder));
-    }
-
-    @Override
-    public WebConnectionInfo renameFolderConfiguration(@NotNull WebSession webSession, @NotNull String folderPath, @NotNull String newName) throws DBWebException {
-        return null;
-    }
-
-    @Override
-    public boolean deleteFolderConfiguration(@NotNull WebSession webSession, @NotNull String folderPath) throws DBWebException {
-        return false;
     }
 
     ////////////////////////////////////////////////////////////////////

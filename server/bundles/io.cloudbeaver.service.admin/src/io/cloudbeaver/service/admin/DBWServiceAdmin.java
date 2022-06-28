@@ -23,7 +23,6 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -95,17 +94,6 @@ public interface DBWServiceAdmin extends DBWService {
     WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
-
-    ////////////////////////////////////////////////////////////////////
-    // Folders
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebNavigatorNodeInfo createFolderConfiguration(@NotNull WebSession webSession, @Nullable String parentPath, @NotNull String folderName) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo renameFolderConfiguration(@NotNull WebSession webSession, @NotNull String folderPath, @NotNull String newName) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteFolderConfiguration(@NotNull WebSession webSession, @NotNull String folderPath) throws DBWebException;
-
 
     ////////////////////////////////////////////////////////////////////
     // Features

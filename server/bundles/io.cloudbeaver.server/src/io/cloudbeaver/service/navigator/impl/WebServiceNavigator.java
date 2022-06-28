@@ -390,24 +390,21 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     // Folders
     public WebNavigatorNodeInfo createFolder(
         @NotNull WebSession session,
-        @Nullable String parentPath,
+        @NotNull String parentPath,
         @NotNull String folderName
     ) throws DBWebException {
         DBRProgressMonitor monitor = session.getProgressMonitor();
         session.addInfoMessage("Create new folder");
-        DBNLocalFolder parentNode = null;
-        if (parentPath != null) {
-            try {
-                parentNode = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(monitor, parentPath);
-            } catch (DBException e) {
-                throw new DBWebException(e.getMessage(), e);
-            }
+        try {
+            DBNLocalFolder parentNode = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+            DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+            DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+            return new WebNavigatorNodeInfo(session, new DBNLocalFolder(projectNode.getDatabases(), newFolder));
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
         }
-        DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
-        DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
-        WebServiceUtils.updateConfigAndRefreshDatabases(session);
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
-        return new WebNavigatorNodeInfo(session, new DBNLocalFolder(projectNode.getDatabases(), newFolder));
     }
 
     public boolean deleteFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {

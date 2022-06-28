@@ -133,6 +133,9 @@ public class WebServiceUtils extends WebCommonUtils {
         newDataSource.setSavePassword(true);
         newDataSource.setName(config.getName());
         newDataSource.setDescription(config.getDescription());
+        if (config.getFolder() != null) {
+            newDataSource.setFolder(registry.getFolder(config.getFolder()));
+        }
         ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         // Set default navigator settings

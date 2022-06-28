@@ -131,7 +131,7 @@ extend type Mutation {
     navDeleteNodes( nodePaths: [ID!]! ): Int
 
     # Creates folder
-    navCreateFolder(parentNodePath: ID, newName: String! ): NavigatorNodeInfo
+    navCreateFolder(parentNodePath: ID!, nodeName: String! ): NavigatorNodeInfo
 
     navDeleteFolder( nodePath: ID! ): Boolean
 
