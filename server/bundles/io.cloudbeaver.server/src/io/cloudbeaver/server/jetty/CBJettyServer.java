@@ -75,9 +75,11 @@ public class CBJettyServer {
                 servletContextHandler.addEventListener(new CBServerContextListener());
 
                 // Add extensions from services
+                
+                CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
                     try {
-                        wsd.addServlets(application, servletContextHandler);
+                        wsd.addServlets(application, servletContext);
                     } catch (DBException e) {
                         log.error(e.getMessage(), e);
                     }

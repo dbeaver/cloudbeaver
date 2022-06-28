@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.cloudbeaver.service;
 
-import io.cloudbeaver.model.app.WebApplication;
 import org.jkiss.dbeaver.DBException;
 
-/**
- * Servlet service
- */
-public interface DBWServiceBindingServlet<APPLICATION extends WebApplication> extends DBWServiceBinding {
+import javax.servlet.http.HttpServlet;
 
-    void addServlets(APPLICATION application, DBWServletContext servletContext) throws DBException;
+public interface DBWServletContext {
+    void addServlet(String servletId, HttpServlet servlet, String mapping) throws DBException;
 }
