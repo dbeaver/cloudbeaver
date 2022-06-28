@@ -50,7 +50,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         this.webSession = webSession;
         this.hostNames = hostNames;
         CBPlatform platform = CBPlatform.getInstance();
-        this.tempRegistry = new DataSourceRegistry(platform, platform.getWorkspace().getActiveProject());
+        this.tempRegistry = new DataSourceRegistry(platform.getWorkspace().getActiveProject());
 
         this.availableDrivers.addAll(CBPlatform.getInstance().getApplicableDrivers());
     }
