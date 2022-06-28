@@ -325,6 +325,9 @@ public class WebServiceCore implements DBWServiceCore {
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
+        if (config.getFolder() != null) {
+            dataSource.setFolder(sessionRegistry.getFolder(config.getFolder()));
+        }
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 

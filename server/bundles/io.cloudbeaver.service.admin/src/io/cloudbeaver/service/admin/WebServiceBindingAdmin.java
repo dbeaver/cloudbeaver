@@ -90,6 +90,12 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("deleteConnectionConfiguration",
             env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")))
 
+        .dataFetcher("createFolderConfiguration",
+            env -> getService(env).createFolderConfiguration(getWebSession(env),
+                env.getArgument("parentNodePath"),
+                env.getArgument("newName")
+            ))
+
         .dataFetcher("getConnectionSubjectAccess",
             env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")))
         .dataFetcher("setConnectionSubjectAccess",

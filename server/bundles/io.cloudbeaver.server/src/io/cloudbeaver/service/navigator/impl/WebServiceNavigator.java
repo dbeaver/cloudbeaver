@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -29,8 +30,10 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -383,5 +386,46 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
         return executionContext;
     }
+
+    // Folders
+    public WebNavigatorNodeInfo createFolder(
+        @NotNull WebSession session,
+        @Nullable String parentPath,
+        @NotNull String folderName
+    ) throws DBWebException {
+        DBRProgressMonitor monitor = session.getProgressMonitor();
+        session.addInfoMessage("Create new folder");
+        DBNLocalFolder parentNode = null;
+        if (parentPath != null) {
+            try {
+                parentNode = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+            } catch (DBException e) {
+                throw new DBWebException(e.getMessage(), e);
+            }
+        }
+        DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+        DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
+        WebServiceUtils.updateConfigAndRefreshDatabases(session);
+        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+        return new WebNavigatorNodeInfo(session, new DBNLocalFolder(projectNode.getDatabases(), newFolder));
+    }
+
+    public boolean deleteFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {
+        try {
+            DBNLocalFolder node = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(session.getProgressMonitor(), folderPath);
+        if (node.getOwnerProject() != session.getSingletonProject()) {
+            throw new DBWebException("Global folder '" + node.getName() + "' cannot be deleted");
+        }
+        session.addInfoMessage("Delete folder");
+        DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+        sessionRegistry.removeFolder(node.getFolder(), false);
+        WebServiceUtils.updateConfigAndRefreshDatabases(session);
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
+        }
+        return true;
+    }
+
+
 
 }
