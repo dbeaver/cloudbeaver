@@ -56,10 +56,7 @@ import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -254,7 +251,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
+    public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
@@ -263,7 +260,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
         try {
             webSession.getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
-            return true;
+            Set<String> subjectPermissions = webSession.getAdminSecurityController().getSubjectPermissions(roleID);
+            webSession.refreshUserData();
+            return listPermissions(webSession).stream()
+                .filter(p -> subjectPermissions.contains(p.getId()))
+                .collect(Collectors.toList());
         } catch (Exception e) {
             throw new DBWebException("Error setting role permissions", e);
         }
