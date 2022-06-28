@@ -19,13 +19,13 @@ package io.cloudbeaver.service.data.transfer;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
+import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.jkiss.dbeaver.DBException;
 
 /**
  * Web service implementation
@@ -61,9 +61,11 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
     }
 
     @Override
-    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
-        servletContextHandler.addServlet(
-            new ServletHolder("dataTransfer", new WebDataTransferServlet(application, getServiceImpl())),
-            application.getServicesURI() + "data/*");
+    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        servletContext.addServlet(
+            "dataTransfer",
+            new WebDataTransferServlet(application, getServiceImpl()),
+            application.getServicesURI() + "data/*"
+        );
     }
 }

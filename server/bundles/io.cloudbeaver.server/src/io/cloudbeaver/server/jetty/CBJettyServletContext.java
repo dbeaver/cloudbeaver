@@ -14,15 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service;
 
-import io.cloudbeaver.model.app.WebApplication;
+package io.cloudbeaver.server.jetty;
+
+import io.cloudbeaver.service.DBWServletContext;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.jkiss.dbeaver.DBException;
 
-/**
- * Servlet service
- */
-public interface DBWServiceBindingServlet<APPLICATION extends WebApplication> extends DBWServiceBinding {
+import javax.servlet.http.HttpServlet;
 
-    void addServlets(APPLICATION application, DBWServletContext servletContext) throws DBException;
+public class CBJettyServletContext implements DBWServletContext {
+    private final ServletContextHandler contextHandler;
+
+    public CBJettyServletContext(ServletContextHandler contextHandler) {
+        this.contextHandler = contextHandler;
+    }
+
+    @Override
+    public void addServlet(String servletId, HttpServlet servlet, String mapping) throws DBException {
+        contextHandler.addServlet(new ServletHolder(servletId, servlet), mapping);
+    }
 }
