@@ -38,6 +38,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.utils.IOUtils;
@@ -269,8 +270,8 @@ public class GraphQLEndpoint extends HttpServlet {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
 
-        WebServiceUtils.addResponseCookie(
-                request, response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
+        WebAppUtils.addResponseCookie(
+            request, response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     private static class WebInstrumentation extends SimpleInstrumentation {

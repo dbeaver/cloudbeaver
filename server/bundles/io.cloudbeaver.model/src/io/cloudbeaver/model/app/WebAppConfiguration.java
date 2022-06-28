@@ -39,4 +39,6 @@ public interface WebAppConfiguration {
     boolean isResourceManagerEnabled();
 
     boolean isFeaturesEnabled(String[] requiredFeatures);
+
+    boolean isFeatureEnabled(String id);
 }

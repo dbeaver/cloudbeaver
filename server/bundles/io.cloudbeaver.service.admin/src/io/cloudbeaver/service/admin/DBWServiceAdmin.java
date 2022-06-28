@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWFeatureSet;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;

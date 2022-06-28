@@ -21,6 +21,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -77,7 +79,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseWebApplication {
+public class CBApplication extends BaseWebApplication implements WebAuthApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -174,6 +176,19 @@ public class CBApplication extends BaseWebApplication {
 
     public CBAppConfig getAppConfiguration() {
         return appConfiguration;
+    }
+
+    @Override
+    public WebAuthConfiguration getAuthConfiguration() {
+        return appConfiguration;
+    }
+
+    @Override
+    public String getAuthServiceURL() {
+        return Stream.of(getServerURL(), getRootURI(), getServicesURI())
+            .map(WebAppUtils::removeSideSlashes)
+            .filter(CommonUtils::isNotEmpty)
+            .collect(Collectors.joining("/"));
     }
 
     public Map<String, Object> getProductConfiguration() {
