@@ -14,24 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.cloudbeaver.model.app;
 
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+public interface WebAuthApplication extends WebApplication {
+    WebAuthConfiguration getAuthConfiguration();
 
-import java.util.List;
-
-/**
- * Application authentication configuration
- */
-public interface WebAuthConfiguration {
-
-    String getDefaultAuthProvider();
-
-    String[] getEnabledAuthProviders();
-
-    boolean isAuthProviderEnabled(String authProviderId);
-
-    List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
-
-    SMAuthProviderCustomConfiguration getAuthProviderConfiguration(String configId);
+    String getAuthServiceURL();
 }

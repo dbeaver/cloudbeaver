@@ -48,9 +48,6 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -292,65 +289,6 @@ public class WebServiceUtils extends WebCommonUtils {
         if (CBApplication.getInstance().isConfigurationMode()) {
             throw new DBWebException("Server is in configuration mode");
         }
-    }
-
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
-        addResponseCookie(request, response, cookieName, cookieValue, maxSessionIdleTime, null);
-    }
-
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
-        Cookie sessionCookie = new Cookie(cookieName, cookieValue);
-        if (maxSessionIdleTime > 0) {
-            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
-        }
-
-        String path = CBApplication.getInstance().getRootURI();
-
-        if (sameSite != null) {
-            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
-                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
-            } else {
-                sessionCookie.setSecure(true);
-                path = path.concat("; SameSite=" + sameSite);
-            }
-        }
-
-        sessionCookie.setPath(path);
-        response.addCookie(sessionCookie);
-    }
-
-    public static String getRequestCookie(HttpServletRequest request, String cookieName) {
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
-
-    @NotNull
-    public static String removeSideSlashes(String action) {
-        if (CommonUtils.isEmpty(action)) {
-            return action;
-        }
-        while (action.startsWith("/")) action = action.substring(1);
-        while (action.endsWith("/")) action = action.substring(0, action.length() - 1);
-        return action;
-    }
-
-    @NotNull
-    public static StringBuilder getApiPrefix(String serviceId) {
-        CBApplication application = CBApplication.getInstance();
-        StringBuilder apiPrefix = new StringBuilder();
-        apiPrefix.append(removeSideSlashes(application.getServerURL()));
-        apiPrefix.append("/");
-        String rootURI = removeSideSlashes(application.getRootURI());
-        if (!CommonUtils.isEmpty(rootURI)) {
-            apiPrefix.append(rootURI).append("/");
-        }
-        apiPrefix.append(removeSideSlashes(application.getServicesURI()));
-        apiPrefix.append("/").append(serviceId).append("/");
-        return apiPrefix;
     }
 
     public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource, boolean addEditorName) {

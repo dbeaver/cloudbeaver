@@ -46,4 +46,12 @@ public interface WebApplication extends DBPApplication {
     RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider);
 
     String getServerURL();
+
+    default String getServicesURI() {
+        return "/";
+    }
+
+    default String getRootURI() {
+        return "";
+    }
 }
