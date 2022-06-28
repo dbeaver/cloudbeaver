@@ -390,13 +390,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     // Folders
     public WebNavigatorNodeInfo createFolder(
         @NotNull WebSession session,
-        @NotNull String parentPath,
+        @Nullable String parentPath,
         @NotNull String folderName
     ) throws DBWebException {
         DBRProgressMonitor monitor = session.getProgressMonitor();
         session.addInfoMessage("Create new folder");
+        DBNLocalFolder parentNode = null;
         try {
-            DBNLocalFolder parentNode = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+            if (parentPath != null) {
+                parentNode = (DBNLocalFolder) session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+            }
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebServiceUtils.updateConfigAndRefreshDatabases(session);

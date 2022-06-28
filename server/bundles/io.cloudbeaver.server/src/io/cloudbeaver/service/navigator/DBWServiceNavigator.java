@@ -60,7 +60,7 @@ public interface DBWServiceNavigator extends DBWService {
     int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
 
     @WebAction
-    WebNavigatorNodeInfo createFolder(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;
+    WebNavigatorNodeInfo createFolder(@NotNull WebSession session, @Nullable String nodePath, @NotNull String newName) throws DBWebException;
 
     @WebAction
     boolean deleteFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
