@@ -81,7 +81,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             }
             List<DBNResourceManagerProject> projectNodes = new ArrayList<>();
             resourceController = ((WebSession) session).getRmController();
-            resourceController.addRMEventListener(this);
+            RMEventManager.addEventListener(this);
             for (RMProject project : resourceController.listAccessibleProjects()) {
                 projectNodes.add(new DBNResourceManagerProject(this, project));
             }
