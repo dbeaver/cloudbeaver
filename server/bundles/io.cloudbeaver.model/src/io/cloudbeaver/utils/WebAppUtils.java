@@ -18,6 +18,7 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -101,20 +102,20 @@ public class WebAppUtils {
     }
 
     @NotNull
-    public static StringBuilder getApiPrefix(String serviceId) {
+    public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
         WebApplication application = getWebApplication();
-        StringBuilder apiPrefix = new StringBuilder();
-        apiPrefix.append(removeSideSlashes(application.getServerURL()));
-        apiPrefix.append("/");
-        String rootURI = removeSideSlashes(application.getRootURI());
-        if (!CommonUtils.isEmpty(rootURI)) {
-            apiPrefix.append(rootURI).append("/");
+        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
+            throw new DBException("The current application doesn't contain authorization configuration");
         }
-        apiPrefix.append(removeSideSlashes(application.getServicesURI()));
-        if (apiPrefix.charAt(apiPrefix.length() - 1) != '/') {
-            apiPrefix.append("/");
-        }
-        apiPrefix.append(serviceId).append("/");
+        WebAuthApplication webAuthApplication = (WebAuthApplication) application;
+        return getAuthApiPrefix(webAuthApplication, serviceId);
+    }
+
+    @NotNull
+    public static StringBuilder getAuthApiPrefix(WebAuthApplication webAuthApplication, String serviceId) {
+        String authUrl = removeSideSlashes(webAuthApplication.getAuthServiceURL());
+        StringBuilder apiPrefix = new StringBuilder(authUrl);
+        apiPrefix.append("/").append(serviceId).append("/");
         return apiPrefix;
     }
 

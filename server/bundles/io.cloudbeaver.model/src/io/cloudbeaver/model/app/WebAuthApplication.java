@@ -19,4 +19,6 @@ package io.cloudbeaver.model.app;
 
 public interface WebAuthApplication extends WebApplication {
     WebAuthConfiguration getAuthConfiguration();
+
+    String getAuthServiceURL();
 }

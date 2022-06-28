@@ -183,6 +183,14 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return appConfiguration;
     }
 
+    @Override
+    public String getAuthServiceURL() {
+        return Stream.of(getServerURL(), getRootURI(), getServicesURI())
+            .map(WebAppUtils::removeSideSlashes)
+            .filter(CommonUtils::isNotEmpty)
+            .collect(Collectors.joining("/"));
+    }
+
     public Map<String, Object> getProductConfiguration() {
         return productConfiguration;
     }
