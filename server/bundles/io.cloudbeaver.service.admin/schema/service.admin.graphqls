@@ -118,7 +118,7 @@ extend type Query {
     grantUserRole(userId: ID!, roleId: ID!): Boolean
     revokeUserRole(userId: ID!, roleId: ID!): Boolean
 
-    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): [AdminPermissionInfo]!
+    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 
