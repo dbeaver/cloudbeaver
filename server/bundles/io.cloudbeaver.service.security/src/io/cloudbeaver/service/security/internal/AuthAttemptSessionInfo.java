@@ -17,31 +17,52 @@
 
 package io.cloudbeaver.service.security.internal;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.security.SMSessionType;
 
 import java.util.Map;
 
 public class AuthAttemptSessionInfo {
+    @NotNull
     private final String appSessionId;
+    @Nullable
+    private final String smSessionId;
 
+    @NotNull
     private final SMSessionType sessionType;
+    @NotNull
     private final Map<String, Object> sessionParams;
 
-    public AuthAttemptSessionInfo(String appSessionId, SMSessionType sessionType, Map<String, Object> sessionParams) {
+    public AuthAttemptSessionInfo(
+        @NotNull String appSessionId,
+        @Nullable String smSessionId,
+        @NotNull SMSessionType sessionType,
+        @NotNull Map<String, Object> sessionParams
+    ) {
         this.appSessionId = appSessionId;
+        this.smSessionId = smSessionId;
         this.sessionType = sessionType;
         this.sessionParams = sessionParams;
     }
 
+    @NotNull
     public String getAppSessionId() {
         return appSessionId;
     }
 
+    @NotNull
     public SMSessionType getSessionType() {
         return sessionType;
     }
 
+    @NotNull
     public Map<String, Object> getSessionParams() {
         return sessionParams;
+    }
+
+    @Nullable
+    public String getSmSessionId() {
+        return smSessionId;
     }
 }

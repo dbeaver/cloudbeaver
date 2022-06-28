@@ -793,7 +793,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private String createSessionIfNotExist(
+    private String createSmSession(
         @NotNull String appSessionId,
         @Nullable String userId,
         @NotNull Map<String, Object> parameters,
@@ -837,7 +837,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var smSessionId = createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
+                var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
                 var token = generateAuthToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
@@ -856,6 +856,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public SMAuthInfo authenticate(
         @NotNull String appSessionId,
+        @Nullable String previousSmSessionId,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull SMSessionType sessionType,
         @NotNull String authProviderId,
@@ -879,6 +880,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     authProviderConfigurationId,
                     userIdentifyingCredentials,
                     appSessionId,
+                    previousSmSessionId,
                     sessionType,
                     sessionParameters
                 );
@@ -905,6 +907,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String authProviderConfigurationId,
         Map<String, Object> authData,
         String appSessionId,
+        String prevSessionId,
         SMSessionType sessionType,
         Map<String, Object> sessionParameters
     ) throws DBException {
@@ -912,13 +915,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE) " +
-                        "VALUES(?,?,?,?,?)")) {
+                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
+                        "VALUES(?,?,?,?,?,?)")) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, status.toString());
                     dbStat.setString(3, appSessionId);
                     dbStat.setString(4, sessionType.getSessionType());
                     dbStat.setString(5, gson.toJson(sessionParameters));
+                    if (prevSessionId != null && isSmSessionNotExpired(prevSessionId)) {
+                        dbStat.setString(6, prevSessionId);
+                    } else {
+                        dbStat.setNull(6, Types.VARCHAR);
+                    }
                     dbStat.execute();
                 }
 
@@ -937,6 +945,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    private boolean isSmSessionNotExpired(String prevSessionId) {
+        //TODO: implement after we start tracking user logout
+        return true;
     }
 
     @Override
@@ -1101,7 +1114,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 authProviderId,
                 authAttemptSessionInfo.getSessionParams(),
                 userCredentials,
-                finishAuthMonitor
+                finishAuthMonitor,
+                authAttemptSessionInfo.getSmSessionId() == null
             );
 
             if (userIdFromCreds == null) {
@@ -1114,13 +1128,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var smSessionId = createSessionIfNotExist(
-                    authAttemptSessionInfo.getAppSessionId(),
-                    userId,
-                    authAttemptSessionInfo.getSessionParams(),
-                    authAttemptSessionInfo.getSessionType(),
-                    dbCon
-                );
+                String smSessionId;
+                if (authAttemptSessionInfo.getSmSessionId() == null) {
+                    smSessionId = createSmSession(
+                        authAttemptSessionInfo.getAppSessionId(),
+                        userId,
+                        authAttemptSessionInfo.getSessionParams(),
+                        authAttemptSessionInfo.getSessionType(),
+                        dbCon
+                    );
+                } else {
+                    smSessionId = authAttemptSessionInfo.getSmSessionId();
+                }
                 var token = generateAuthToken(smSessionId, userId, dbCon);
                 var permissions = getUserPermissions(userId);
                 txn.commit();
@@ -1137,7 +1156,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1149,7 +1168,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     Map<String, Object> sessionParams = gson.fromJson(
                         dbResult.getString(3), MAP_STRING_OBJECT_TYPE
                     );
-                    return new AuthAttemptSessionInfo(appSessionId, sessionType, sessionParams);
+                    String smSessionId = dbResult.getString(4);
+
+                    return new AuthAttemptSessionInfo(appSessionId, smSessionId, sessionType, sessionParams);
                 }
             }
         } catch (SQLException e) {
@@ -1161,7 +1182,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String authProviderId,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
-        @NotNull DBRProgressMonitor progressMonitor
+        @NotNull DBRProgressMonitor progressMonitor,
+        boolean newUserAuthenticationTry
     ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -1172,7 +1194,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (DBException e) {
             return null;
         }
-        if (userId == null) {
+        if (userId == null && newUserAuthenticationTry) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
@@ -1187,6 +1209,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
+        } else {
+            userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
             if (WebAppUtils.getWebApplication().isMultiNode()) {

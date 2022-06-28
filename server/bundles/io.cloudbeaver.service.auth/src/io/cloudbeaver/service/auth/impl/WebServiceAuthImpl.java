@@ -66,9 +66,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authParameters = Map.of();
         }
         SMController securityController = webSession.getSecurityController();
+        String currentSmSessionId = webSession.getUserContext().getSmSessionId();
         try {
             var smAuthInfo = securityController.authenticate(
                 webSession.getSessionId(),
+                currentSmSessionId,
                 webSession.getSessionParameters(),
                 WebSession.CB_SESSION_TYPE,
                 providerId,
