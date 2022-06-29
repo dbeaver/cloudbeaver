@@ -18,7 +18,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
@@ -35,12 +35,16 @@ const SSH_STYLES = css`
   }
 `;
 
-export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSH({
+interface Props extends IConnectionFormProps {
+  handlerState: NetworkHandlerConfigInput;
+}
+
+export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
   state: formState,
+  handlerState,
 }) {
   const {
     info,
-    config,
     readonly,
     disabled: formDisabled,
   } = formState;
@@ -48,14 +52,13 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const initialConfig = info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
-  const state = config.networkHandlersConfig!.find(state => state.id === SSH_TUNNEL_ID)!;
 
   const resource = useMapResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
-      if (Object.keys(state).length === 0) {
+      if (Object.keys(handlerState).length === 0) {
         for (const property of handler.properties) {
           if (!property.features.includes('password')) {
-            state.properties[property.id!] = property.value;
+            handlerState.properties[property.id!] = property.value;
           }
         }
       }
@@ -64,19 +67,19 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
 
   const testConnection = async () => {
     setLoading(true);
-    await resource.resource.test(state);
+    await resource.resource.test(handlerState);
     setLoading(false);
   };
 
   const styles = useStyles(SSH_STYLES, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const disabled = formDisabled || loading;
-  const enabled = state.enabled || false;
-  const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
-  const passwordFilled = (initialConfig?.password === null && state.password !== '') || !!state.password?.length;
-  const testAvailable = keyAuth ? !!state.key?.length : passwordFilled;
+  const enabled = handlerState.enabled || false;
+  const keyAuth = handlerState.authType === NetworkHandlerAuthType.PublicKey;
+  const passwordFilled = (initialConfig?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
+  const testAvailable = keyAuth ? !!handlerState.key?.length : passwordFilled;
   const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
-  const passwordSaved = initialConfig?.password === '' && initialConfig.authType === state.authType;
+  const passwordSaved = initialConfig?.password === '' && initialConfig.authType === handlerState.authType;
   const keySaved = initialConfig?.key === '';
 
   const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
@@ -93,12 +96,12 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
     const key = await process.promise;
 
     if (key) {
-      state.key = key;
+      handlerState.key = key;
     }
   };
 
   const authTypeChangeHandler = useCallback(() => {
-    state.password = '';
+    handlerState.password = '';
   }, []);
 
   return styled(styles)(
@@ -107,7 +110,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
         <Group form gap keepSize large>
           <Switch
             name="enabled"
-            state={state}
+            state={handlerState}
             mod={['primary']}
             disabled={disabled || readonly}
           >
@@ -115,7 +118,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
           </Switch>
           <Combobox
             name="authType"
-            state={state}
+            state={handlerState}
             items={authTypes}
             keySelector={value => value.key}
             valueSelector={value => value.label}
@@ -129,7 +132,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="text"
               name="host"
-              state={state.properties}
+              state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
@@ -141,7 +144,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="number"
               name="port"
-              state={state.properties}
+              state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
@@ -155,11 +158,11 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="text"
               name="userName"
-              state={state}
+              state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
-              required={state.savePassword}
+              required={handlerState.savePassword}
               tiny
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
@@ -168,11 +171,11 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               type="password"
               name="password"
               autoComplete='new-password'
-              state={state}
+              state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
               mod='surface'
-              required={!keyAuth && state.savePassword}
+              required={!keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
             >
@@ -182,7 +185,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               <>
                 <Textarea
                   name='key'
-                  state={state}
+                  state={handlerState}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   description={keySaved ? translate('ui_processing_saved') : undefined}
@@ -213,7 +216,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <FieldCheckbox
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
-              state={state}
+              state={handlerState}
               disabled={disabled || !enabled || readonly}
             >
               {translate('connections_connection_edit_save_credentials')}
@@ -228,7 +231,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                 <InputField
                   type='number'
                   name='aliveInterval'
-                  state={state.properties}
+                  state={handlerState.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={aliveIntervalLabel}
@@ -240,7 +243,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
                 <InputField
                   type='number'
                   name='sshConnectTimeout'
-                  state={state.properties}
+                  state={handlerState.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={connectTimeoutLabel}

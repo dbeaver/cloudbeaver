@@ -136,7 +136,7 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
 
   useEffect(() => {
     state.loadConnectionInfo();
-  }, []);
+  }, [state]);
 
   if (state.initError) {
     return styled(styles)(

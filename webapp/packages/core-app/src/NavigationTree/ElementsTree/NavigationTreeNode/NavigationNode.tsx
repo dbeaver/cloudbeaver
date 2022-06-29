@@ -8,14 +8,16 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { TreeNode } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { DNDPreview, useDNDData } from '@cloudbeaver/core-ui';
-import { useDataContext } from '@cloudbeaver/core-view';
+import { useDNDData } from '@cloudbeaver/core-ui';
+import {  useDataContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
 import { DATA_CONTEXT_NAV_NODES } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODES';
+import { getNodesFromContext } from '../../../shared/NodesManager/getNodesFromContext';
 import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
+import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
@@ -26,6 +28,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   component,
   path,
   expanded: expandedExternal,
+  className,
 }) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const {
@@ -40,23 +43,29 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     showInFilter,
     expanded,
     leaf,
-    handleClick,
-    handleExpand,
-    handleOpen,
-    handleSelect,
+    click,
+    expand,
+    open,
+    select,
     getSelected,
   } = useNavigationNode(node, path);
   const context = useDataContext();
   const dndData = useDNDData(context, {
     onDragStart: async () => {
       if (!selected) {
-        handleSelect(false);
+        select(false);
       }
 
       // strange way to preload alias while dragging
       await navNodeManagerService.getNodeDatabaseAlias(node.id);
     },
   });
+  const dndBox = useNavTreeDropBox(node, {
+    expanded,
+    expand,
+  });
+
+
   context.set(DATA_CONTEXT_NAV_NODE, node);
   context.set(DATA_CONTEXT_NAV_NODES, getSelected);
 
@@ -72,8 +81,20 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     dndData.setTargetRef(refObj);
   }
 
+  let dndNodes: string[] = [];
+  let hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
+  hasNodes = useStateDelay(hasNodes, 100);
+
+  if (dndBox.state.context && hasNodes) {
+    dndNodes = getNodesFromContext(dndBox.state.context)
+      .map(node => node.id);
+
+    expandedExternal = true;
+  }
+
   return (
     <TreeNode
+      ref={dndBox.setRef}
       group={group}
       loading={loading}
       disabled={disabled}
@@ -83,14 +104,26 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       showInFilter={showInFilter}
       externalExpanded={expandedExternal}
       leaf={leaf}
-      onExpand={handleExpand}
-      onClick={handleClick}
-      onOpen={handleOpen}
-      onSelect={handleSelect}
+      className={className}
+      onExpand={expand}
+      onClick={click}
+      onOpen={open}
+      onSelect={select}
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
-      <Control ref={setRef} dragging={dndData.state.isDragging} node={node} />
-      {(expanded || expandedExternal) && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
+      <Control
+        ref={setRef}
+        dndElement={dndData.state.isDragging}
+        node={node}
+      />
+      {(expanded || expandedExternal) && (
+        <NavigationNodeNested
+          nodeId={node.id}
+          path={path}
+          dndNodes={dndNodes}
+          component={component}
+        />
+      )}
     </TreeNode>
   );
 });

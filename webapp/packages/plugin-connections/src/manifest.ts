@@ -16,6 +16,7 @@ import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/Conn
 import { ConnectionSSHTabService } from './ConnectionForm/SSH/ConnectionSSHTabService';
 import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap';
 import { LocaleService } from './LocaleService';
+import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
 
 export const connectionPlugin: PluginManifest = {
@@ -33,5 +34,6 @@ export const connectionPlugin: PluginManifest = {
     ConnectionDriverPropertiesTabService,
     ConnectionSSHTabService,
     ConnectionOriginInfoTabService,
+    ConnectionFoldersBootstrap,
   ],
 };

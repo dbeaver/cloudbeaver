@@ -120,7 +120,6 @@ extend type Query {
     # contextId currently not using
     navGetStructContainers( connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
-
 }
 
 extend type Mutation {

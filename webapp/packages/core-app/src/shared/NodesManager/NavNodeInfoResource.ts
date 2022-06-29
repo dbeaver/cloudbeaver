@@ -9,6 +9,7 @@
 import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionPermissionsResource, EPermission } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -35,8 +36,12 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
 @injectable()
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   protected metadata: MetadataMap<string, INodeMetadata>;
-  constructor(private readonly graphQLService: GraphQLService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    permissionsResource: SessionPermissionsResource,
+  ) {
     super();
+    permissionsResource.require(this, EPermission.public);
 
     makeObservable(this, {
       setDetails: action,

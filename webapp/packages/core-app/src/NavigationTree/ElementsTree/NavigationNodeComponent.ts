@@ -13,13 +13,17 @@ import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 export type NavTreeNodeComponent = React.FC<{
   nodeId: string;
   path: string[];
+  dragging?: boolean;
   expanded?: boolean;
+  className?: string;
 }>;
 
 export type NavTreeControlProps = {
   node: NavNode;
-  dragging?: boolean;
+  dndElement?: boolean;
+  dndPlaceholder?: boolean;
   expanded?: boolean;
+  className?: string;
   ref?: React.Ref<HTMLDivElement> | undefined;
 };
 
@@ -29,11 +33,15 @@ export type NavigationNodeComponent = React.FC<{
   node: NavNode;
   component: NavTreeNodeComponent;
   path: string[];
+  dragging?: boolean;
   expanded?: boolean;
+  className?: string;
 }>;
 
 export type NavigationNodeRendererComponent = React.FC<{
   nodeId: string;
   component: NavTreeNodeComponent;
   expanded?: boolean;
+  dragging?: boolean;
+  className?: string;
 }>;

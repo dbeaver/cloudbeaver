@@ -92,8 +92,14 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
         permissions: newPermissions,
       } = await this.graphQLService.sdk.setSubjectPermissions({ roleId, permissions });
 
+      const role = this.get(roleId);
+
+      if (role) {
+        role.rolePermissions = newPermissions.map(permission => permission.id);
+      } else {
       // TODO: update permissions for role instead
-      await this.loader(roleId);
+        await this.loader(roleId);
+      }
     });
   }
 

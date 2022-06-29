@@ -34,10 +34,10 @@ interface INavigationNode {
   expanded: boolean;
   leaf: boolean;
   empty: boolean;
-  handleExpand: () => Promise<void>;
-  handleOpen: (leaf: boolean) => Promise<void>;
-  handleClick: (leaf: boolean) => Promise<void>;
-  handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
+  expand: () => Promise<void>;
+  open: (leaf: boolean) => Promise<void>;
+  click: (leaf: boolean) => Promise<void>;
+  select: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
   getSelected: () => NavNode[];
 }
 
@@ -110,10 +110,10 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     loading,
     expanded,
     leaf,
-    handleExpand,
-    handleClick,
-    handleOpen,
-    handleSelect,
+    expand: handleExpand,
+    click: handleClick,
+    open: handleOpen,
+    select: handleSelect,
     getSelected,
   };
 }

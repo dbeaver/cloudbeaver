@@ -41,13 +41,14 @@ export class TaskScheduler<TIdentifier> {
   private readonly isBlocked: BlockedExecution<TIdentifier> | null;
 
   constructor(isBlocked: BlockedExecution<TIdentifier> | null = null) {
+    this.queue = [];
+    this.isBlocked = isBlocked;
+
     makeObservable<TaskScheduler<TIdentifier>, 'queue'>(this, {
+      executing: computed,
       activeList: computed,
       queue: observable.shallow,
     });
-
-    this.queue = [];
-    this.isBlocked = isBlocked;
   }
 
   isExecuting(id: TIdentifier): boolean {
