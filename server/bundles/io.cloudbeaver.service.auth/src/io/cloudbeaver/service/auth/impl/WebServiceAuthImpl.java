@@ -96,6 +96,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException {
         try {
+            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
             SMAuthInfo smAuthInfo = webSession.getSecurityController().getAuthStatus(authId);
             switch (smAuthInfo.getAuthStatus()) {
                 case SUCCESS:
