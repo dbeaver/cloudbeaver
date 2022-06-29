@@ -24,7 +24,6 @@
         <module>io.cloudbeaver.service.security</module>
 
         <module>io.cloudbeaver.resources.drivers.base</module>
-        <module>io.cloudbeaver.connect.provider.sample</module>
 
         <module>io.cloudbeaver.product.ce</module>
     </modules>

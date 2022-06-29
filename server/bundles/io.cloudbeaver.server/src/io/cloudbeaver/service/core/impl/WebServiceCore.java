@@ -47,7 +47,6 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -473,7 +472,7 @@ public class WebServiceCore implements DBWServiceCore {
                     WebServiceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
-                    tunnel.initializeHandler(monitor, DBWorkbench.getPlatform(), configuration, connectionConfig);
+                    tunnel.initializeHandler(monitor, configuration, connectionConfig);
                     monitor.worked(1);
                     // Get info
                     Object implementation = tunnel.getImplementation();
