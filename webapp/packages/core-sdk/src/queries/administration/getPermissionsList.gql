@@ -1,10 +1,5 @@
 query getPermissionsList {
   permissions: listPermissions {
-    id
-    label
-    description
-
-    #provider
-    category
+    ...AdminPermissionInfo
   } 
 }

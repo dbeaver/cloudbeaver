@@ -804,7 +804,7 @@ export interface Query {
   setConnectionSubjectAccess?: Maybe<Scalars['Boolean']>;
   setDefaultNavigatorSettings: Scalars['Boolean'];
   setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
-  setSubjectPermissions?: Maybe<Scalars['Boolean']>;
+  setSubjectPermissions: Array<AdminPermissionInfo>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   setUserMetaParameterValues: Scalars['Boolean'];
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
@@ -1462,7 +1462,7 @@ export type SetSubjectPermissionsQueryVariables = Exact<{
 }>;
 
 
-export type SetSubjectPermissionsQuery = { permissions?: boolean };
+export type SetSubjectPermissionsQuery = { permissions: Array<{ id: string; label?: string; description?: string; category?: string }> };
 
 export type AsyncTaskCancelMutationVariables = Exact<{
   taskId: Scalars['String'];
@@ -2020,6 +2020,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean; supportsSchemaChange: boolean; catalogList: Array<{ catalog: { id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> }>; schemaList: Array<{ id: string; name?: string; hasChildren?: boolean; nodeType?: string; icon?: string; folder?: boolean; inline?: boolean; navigable?: boolean; features?: Array<string>; object?: { features?: Array<string> }; nodeDetails?: Array<{ id?: string; category?: string; dataType?: string; description?: string; displayName?: string; length: ObjectPropertyLength; features: Array<string>; value?: any; order: number }> }> } };
 
+export type AdminPermissionInfoFragment = { id: string; label?: string; description?: string; category?: string };
+
 export type AdminRoleInfoFragment = { roleId: string; roleName?: string; description?: string; rolePermissions: Array<string> };
 
 export type AdminUserInfoFragment = { userId: string; grantedRoles: Array<string>; linkedAuthProviders: Array<string>; metaParameters?: any; enabled: boolean; origins: Array<{ type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
@@ -2404,6 +2406,14 @@ export type SqlGenerateEntityQueryQueryVariables = Exact<{
 
 export type SqlGenerateEntityQueryQuery = { sqlGenerateEntityQuery: string };
 
+export const AdminPermissionInfoFragmentDoc = `
+    fragment AdminPermissionInfo on AdminPermissionInfo {
+  id
+  label
+  description
+  category
+}
+    `;
 export const AdminRoleInfoFragmentDoc = `
     fragment AdminRoleInfo on AdminRoleInfo {
   roleId
@@ -2690,18 +2700,17 @@ export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
 export const GetPermissionsListDocument = `
     query getPermissionsList {
   permissions: listPermissions {
-    id
-    label
-    description
-    category
+    ...AdminPermissionInfo
   }
 }
-    `;
+    ${AdminPermissionInfoFragmentDoc}`;
 export const SetSubjectPermissionsDocument = `
     query setSubjectPermissions($roleId: ID!, $permissions: [ID!]!) {
-  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions)
+  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions) {
+    ...AdminPermissionInfo
+  }
 }
-    `;
+    ${AdminPermissionInfoFragmentDoc}`;
 export const AsyncTaskCancelDocument = `
     mutation asyncTaskCancel($taskId: String!) {
   result: asyncTaskCancel(id: $taskId)
