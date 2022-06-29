@@ -793,7 +793,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private String createSessionIfNotExist(
+    private String createSmSession(
         @NotNull String appSessionId,
         @Nullable String userId,
         @NotNull Map<String, Object> parameters,
@@ -837,7 +837,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var smSessionId = createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
+                var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
                 var token = generateAuthToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
@@ -856,6 +856,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public SMAuthInfo authenticate(
         @NotNull String appSessionId,
+        @Nullable String previousSmSessionId,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull SMSessionType sessionType,
         @NotNull String authProviderId,
@@ -879,6 +880,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     authProviderConfigurationId,
                     userIdentifyingCredentials,
                     appSessionId,
+                    previousSmSessionId,
                     sessionType,
                     sessionParameters
                 );
@@ -905,6 +907,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String authProviderConfigurationId,
         Map<String, Object> authData,
         String appSessionId,
+        String prevSessionId,
         SMSessionType sessionType,
         Map<String, Object> sessionParameters
     ) throws DBException {
@@ -912,13 +915,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE) " +
-                        "VALUES(?,?,?,?,?)")) {
+                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
+                        "VALUES(?,?,?,?,?,?)")) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, status.toString());
                     dbStat.setString(3, appSessionId);
                     dbStat.setString(4, sessionType.getSessionType());
                     dbStat.setString(5, gson.toJson(sessionParameters));
+                    if (prevSessionId != null && isSmSessionNotExpired(prevSessionId)) {
+                        dbStat.setString(6, prevSessionId);
+                    } else {
+                        dbStat.setNull(6, Types.VARCHAR);
+                    }
                     dbStat.execute();
                 }
 
@@ -939,6 +947,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    private boolean isSmSessionNotExpired(String prevSessionId) {
+        //TODO: implement after we start tracking user logout
+        return true;
+    }
+
     @Override
     public void updateAuthStatus(@NotNull String authId,
                                  @NotNull SMAuthStatus authStatus,
@@ -948,7 +961,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (existAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization already finished and cannot be updated");
         }
-        updateAuthStatus(authId, authStatus, authInfo, null, null);
+        var authSessionInfo = readAuthAttemptSessionInfo(authId);
+        updateAuthStatus(authId, authStatus, authInfo, null, authSessionInfo.getSmSessionId());
     }
 
     private void updateAuthStatus(@NotNull String authId,
@@ -1095,13 +1109,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String userId = null;
         var finishAuthMonitor = new VoidProgressMonitor();
         AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
+        boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
+
         for (String authProviderId : authProviderIds) {
             var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
                 authProviderId,
                 authAttemptSessionInfo.getSessionParams(),
                 userCredentials,
-                finishAuthMonitor
+                finishAuthMonitor,
+                isMainAuthSession
             );
 
             if (userIdFromCreds == null) {
@@ -1112,32 +1129,45 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCreds;
         }
 
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var smSessionId = createSessionIfNotExist(
-                    authAttemptSessionInfo.getAppSessionId(),
-                    userId,
-                    authAttemptSessionInfo.getSessionParams(),
-                    authAttemptSessionInfo.getSessionType(),
-                    dbCon
-                );
-                var token = generateAuthToken(smSessionId, userId, dbCon);
-                var permissions = getUserPermissions(userId);
-                txn.commit();
-                updateAuthStatus(authId, SMAuthStatus.SUCCESS, authInfo.getAuthData(), null, smSessionId);
-                return SMAuthInfo.success(authId, token, new SMAuthPermissions(userId, smSessionId, permissions), authInfo.getAuthData());
+        String token;
+        SMAuthPermissions permissions;
+        if (!isMainAuthSession) {
+            //this is an additional authorization and we should to return the original permissions and  userId
+            token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
+            permissions = getTokenPermissions(token);
+        } else {
+            try (Connection dbCon = database.openConnection()) {
+                try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                    String smSessionId;
+                    if (authAttemptSessionInfo.getSmSessionId() == null) {
+                        smSessionId = createSmSession(
+                            authAttemptSessionInfo.getAppSessionId(),
+                            userId,
+                            authAttemptSessionInfo.getSessionParams(),
+                            authAttemptSessionInfo.getSessionType(),
+                            dbCon
+                        );
+                    } else {
+                        smSessionId = authAttemptSessionInfo.getSmSessionId();
+                    }
+                    token = generateAuthToken(smSessionId, userId, dbCon);
+                    permissions = new SMAuthPermissions(userId, smSessionId, getUserPermissions(userId));
+                    txn.commit();
+                }
+            } catch (SQLException e) {
+                var error = "Error during token generation";
+                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                throw new SMException(error, e);
             }
-        } catch (SQLException e) {
-            var error = "Error during token generation";
-            updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
-            throw new SMException(error, e);
         }
+        updateAuthStatus(authId, SMAuthStatus.SUCCESS, authInfo.getAuthData(), null, permissions.getSessionId());
+        return SMAuthInfo.success(authId, token, permissions, authInfo.getAuthData());
     }
 
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1149,7 +1179,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     Map<String, Object> sessionParams = gson.fromJson(
                         dbResult.getString(3), MAP_STRING_OBJECT_TYPE
                     );
-                    return new AuthAttemptSessionInfo(appSessionId, sessionType, sessionParams);
+                    String smSessionId = dbResult.getString(4);
+
+                    return new AuthAttemptSessionInfo(appSessionId, smSessionId, sessionType, sessionParams);
                 }
             }
         } catch (SQLException e) {
@@ -1161,7 +1193,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String authProviderId,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
-        @NotNull DBRProgressMonitor progressMonitor
+        @NotNull DBRProgressMonitor progressMonitor,
+        boolean newUserAuthenticationTry
     ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -1172,7 +1205,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (DBException e) {
             return null;
         }
-        if (userId == null) {
+        if (userId == null && newUserAuthenticationTry) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
@@ -1187,6 +1220,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
+        } else {
+            userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
             if (WebAppUtils.getWebApplication().isMultiNode()) {
