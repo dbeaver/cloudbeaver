@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
@@ -27,6 +28,7 @@ import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import io.cloudbeaver.utils.WebFolderUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -35,6 +37,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
@@ -101,6 +104,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private boolean cacheExpired;
 
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
+    private final Map<String, WebFolderInfo> folders = new HashMap<>();
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
@@ -337,9 +341,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         try {
             this.refreshConnections();
+            this.refreshFolders();
         } catch (Exception e) {
             addSessionError(e);
-            log.error("Error getting connection list", e);
+            log.error("Error getting connection and folders list", e);
         }
     }
 
@@ -359,6 +364,26 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             connections.clear();
             for (WebConnectionInfo connectionInfo : connList) {
                 connections.put(connectionInfo.getId(), connectionInfo);
+            }
+        }
+    }
+
+    public void refreshFolders() {
+
+        // Add all provided datasources to the session
+        List<WebFolderInfo> folderList = new ArrayList<>();
+        DBPDataSourceRegistry registry = sessionProject.getDataSourceRegistry();
+
+        for (DBPDataSourceFolder ds : registry.getAllFolders()) {
+            WebFolderInfo folderInfo = new WebFolderInfo(this, ds);
+            folderList.add(folderInfo);
+        }
+
+        // Add all provided datasources to the session
+        synchronized (folders) {
+            folders.clear();
+            for (WebFolderInfo folderInfo : folderList) {
+                folders.put(folderInfo.getId(), folderInfo);
             }
         }
     }
@@ -410,6 +435,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         synchronized (this.connections) {
             conCopy = new HashMap<>(this.connections);
             this.connections.clear();
+        }
+        synchronized (this.folders) {
+            this.folders.clear();
         }
 
         for (WebConnectionInfo connectionInfo : conCopy.values()) {
@@ -547,6 +575,47 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         synchronized (connections) {
             connections.remove(connectionInfo.getId());
         }
+    }
+
+    @Association
+    public List<WebFolderInfo> getFolders() {
+        synchronized (folders) {
+            return new ArrayList<>(folders.values());
+        }
+    }
+
+    public void addFolder(WebFolderInfo folderInfo) {
+        synchronized (folders) {
+            folders.put(folderInfo.getId(), folderInfo);
+        }
+    }
+
+    public void removeFolder(WebFolderInfo folderInfo) {
+        DBPDataSourceRegistry sessionRegistry = getSingletonProject().getDataSourceRegistry();
+        sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
+        synchronized (folders) {
+            folders.remove(folderInfo.getId());
+        }
+    }
+
+    @NotNull
+    public WebFolderInfo getWebFolderInfo(String folderPath) throws DBWebException {
+        WebFolderInfo folderInfo;
+        synchronized (folders) {
+            folderInfo = folders.get(folderPath);
+        }
+        if (folderInfo == null) {
+            DBPDataSourceFolder folder = WebFolderUtils.getLocalOrGlobalLocalFolder(application, this, folderPath);
+            if (folder != null) {
+                folderInfo = new WebFolderInfo(this, folder);
+                synchronized (folders) {
+                    folders.put(folderPath, folderInfo);
+                }
+            } else {
+                throw new DBWebException("Folder '" + folderPath + "' not found");
+            }
+        }
+        return folderInfo;
     }
 
     public void close() {

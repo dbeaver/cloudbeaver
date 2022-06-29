@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -141,6 +142,17 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    public List<WebFolderInfo> getUserFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
+        if (id != null) {
+            WebFolderInfo folderInfo = getFolderState(webSession, id);
+            if (folderInfo != null) {
+                return Collections.singletonList(folderInfo);
+            }
+        }
+        return webSession.getFolders();
+    }
+
+    @Override
     public String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException {
         if (CBApplication.getInstance().isConfigurationMode()) {
             return new String[] {
@@ -224,6 +236,11 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException {
         return webSession.getWebConnectionInfo(connectionId);
+    }
+
+    @Override
+    public WebFolderInfo getFolderState(WebSession webSession, String folderId) throws DBWebException {
+        return webSession.getWebFolderInfo(folderId);
     }
 
     @Override
@@ -530,6 +547,60 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         return connectionInfo;
+    }
+
+    // Folders
+    @Override
+    public WebFolderInfo createFolder(
+        @NotNull WebSession session,
+        @Nullable String parentPath,
+        @NotNull String folderName
+    ) throws DBWebException {
+        DBRProgressMonitor monitor = session.getProgressMonitor();
+        session.addInfoMessage("Create new folder");
+        WebFolderInfo parentNode = null;
+        try {
+            if (parentPath != null) {
+                parentNode = session.getWebFolderInfo(parentPath);
+            }
+            DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+            DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
+            WebFolderInfo folderInfo = new WebFolderInfo(session, newFolder);
+            session.addFolder(folderInfo);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+
+            return folderInfo;
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public WebFolderInfo renameFolder(
+        @NotNull WebSession session,
+        @NotNull String folderPath,
+        @NotNull String newName
+    ) throws DBWebException {
+        WebFolderInfo folderInfo = session.getWebFolderInfo(folderPath);
+        folderInfo.getDataSourceFolder().setName(newName);
+        return folderInfo;
+    }
+
+    @Override
+    public boolean deleteFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {
+        try {
+            WebFolderInfo folderInfo = session.getWebFolderInfo(folderPath);
+            DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
+            if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
+                throw new DBWebException("Global folder '" + folderInfo.getNodePath() + "' cannot be deleted");
+            }
+            session.addInfoMessage("Delete folder");
+            session.removeFolder(folderInfo);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
+        }
+        return true;
     }
 
     @Override

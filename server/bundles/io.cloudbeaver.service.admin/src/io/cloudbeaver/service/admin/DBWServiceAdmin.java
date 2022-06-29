@@ -22,6 +22,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
@@ -97,6 +98,16 @@ public interface DBWServiceAdmin extends DBWService {
     WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+
+    ////////////////////////////////////////////////////////////////////
+    // Folders
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebFolderInfo createGlobalFolder(@NotNull WebSession webSession, @Nullable String parentPath, @NotNull String folderName) throws DBWebException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebFolderInfo renameGlobalFolder(@NotNull WebSession webSession, @NotNull String folderPath, @NotNull String newName) throws DBWebException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteGlobalFolder(@NotNull WebSession webSession, @NotNull String folderPath) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features

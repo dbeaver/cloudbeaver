@@ -120,6 +120,7 @@ extend type Query {
     # contextId currently not using
     navGetStructContainers( connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
+
 }
 
 extend type Mutation {
@@ -130,9 +131,7 @@ extend type Mutation {
     # Deletes nodes with specified IDs and returns number of deleted nodes
     navDeleteNodes( nodePaths: [ID!]! ): Int
 
-    # Creates folder
-    navCreateFolder(parentNodePath: ID, nodeName: String! ): NavigatorNodeInfo
-
-    navDeleteFolder( nodePath: ID! ): Boolean
+    # Moves nodes with specified IDs to the connection folder
+    navMoveNodesToFolder(nodePaths: [ID!]!, folderPath: String): Boolean
 
 }
