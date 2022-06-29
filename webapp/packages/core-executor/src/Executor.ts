@@ -151,10 +151,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     }
 
     const data = this.initialDataGetter();
-    
+
     this.scheduler.schedule(data, async () => {
       const context = new ExecutionContext(data);
-      
+
       try {
         await handler(data, context);
       } finally {
