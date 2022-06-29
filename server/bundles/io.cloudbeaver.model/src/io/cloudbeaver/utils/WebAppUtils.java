@@ -145,11 +145,12 @@ public class WebAppUtils {
     }
 
     public static String getRequestCookie(HttpServletRequest request, String cookieName) {
+        String value = null;
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
+                value = cookie.getValue();
             }
         }
-        return null;
+        return value;
     }
 }
