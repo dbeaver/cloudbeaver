@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
@@ -28,7 +27,6 @@ import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import io.cloudbeaver.utils.WebFolderUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -37,7 +35,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
@@ -342,7 +339,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.refreshConnections();
         } catch (Exception e) {
             addSessionError(e);
-            log.error("Error getting connection and folders list", e);
+            log.error("Error getting connection list", e);
         }
     }
 
@@ -554,15 +551,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
 
-    @NotNull
-    public WebFolderInfo getWebFolderInfo(String folderPath) throws DBWebException {
-        DBPDataSourceFolder folder = WebFolderUtils.getLocalOrGlobalLocalFolder(application, this, folderPath);
-        if (folder != null) {
-            return new WebFolderInfo(this, folder);
-        } else {
-            throw new DBWebException("Folder '" + folderPath + "' not found");
-        }
-    }
 
     public void close() {
         try {

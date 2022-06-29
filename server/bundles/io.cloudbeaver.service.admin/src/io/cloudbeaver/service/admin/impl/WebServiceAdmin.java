@@ -38,6 +38,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
+import io.cloudbeaver.utils.WebFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -435,7 +436,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         WebFolderInfo parentNode = null;
         if (parentPath != null) {
             try {
-                parentNode = webSession.getWebFolderInfo(parentPath);
+                parentNode = WebFolderUtils.getWebFolderInfo(webSession, parentPath);
             } catch (DBException e) {
                 throw new DBWebException(e.getMessage(), e);
             }

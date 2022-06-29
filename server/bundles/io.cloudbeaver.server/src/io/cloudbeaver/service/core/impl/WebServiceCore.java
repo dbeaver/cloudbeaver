@@ -28,6 +28,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import io.cloudbeaver.utils.WebFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -244,7 +245,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebFolderInfo getFolderState(WebSession webSession, String folderId) throws DBWebException {
-        return webSession.getWebFolderInfo(folderId);
+        return WebFolderUtils.getWebFolderInfo(webSession, folderId);
     }
 
     @Override
@@ -565,7 +566,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebFolderInfo parentNode = null;
         try {
             if (parentPath != null) {
-                parentNode = session.getWebFolderInfo(parentPath);
+                parentNode = WebFolderUtils.getWebFolderInfo(session, parentPath);
             }
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
@@ -584,7 +585,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String folderPath,
         @NotNull String newName
     ) throws DBWebException {
-        WebFolderInfo folderInfo = session.getWebFolderInfo(folderPath);
+        WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(session, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
         return folderInfo;
     }
@@ -592,7 +593,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean deleteFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {
         try {
-            WebFolderInfo folderInfo = session.getWebFolderInfo(folderPath);
+            WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(session, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
             if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
                 throw new DBWebException("Global folder '" + folderInfo.getNodePath() + "' cannot be deleted");

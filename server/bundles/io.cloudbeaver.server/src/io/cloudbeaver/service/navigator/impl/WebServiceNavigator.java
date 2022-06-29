@@ -26,6 +26,7 @@ import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.utils.WebFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -356,7 +357,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     public boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
-            WebFolderInfo folderPath = session.getWebFolderInfo(folderNodePath);
+            WebFolderInfo folderPath = WebFolderUtils.getWebFolderInfo(session, folderNodePath);
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {

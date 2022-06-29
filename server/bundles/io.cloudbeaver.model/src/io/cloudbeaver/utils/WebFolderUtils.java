@@ -18,30 +18,33 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.code.Nullable;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.utils.CommonUtils;
 
 public class WebFolderUtils {
 
-    @Nullable
-    public static DBPDataSourceFolder getLocalOrGlobalLocalFolder(WebApplication application, WebSession webSession, String folderPath) throws DBWebException {
-        DBPDataSourceFolder folder = null;
-        if (!CommonUtils.isEmpty(folderPath)) {
-            folder = webSession.getSingletonProject().getDataSourceRegistry().getFolder(folderPath);
-            if (folder == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || application.isConfigurationMode())) {
-                // If called for new connection in admin mode then this connection may absent in session registry yet
-                folder = WebDataSourceUtils.getGlobalDataSourceRegistry().getFolder(folderPath);
-            }
-        }
-        return folder;
-    }
 
     public static String makeLocalFolderItemPath(DBPDataSourceFolder folder) {
         return DBNNode.NodePathType.folder.getPrefix() +
             folder.getDataSourceRegistry().getProject().getName() + "/" + folder.getFolderPath();
+    }
+
+    public static WebFolderInfo getWebFolderInfo(WebSession session, String folderPath) throws DBWebException {
+        DBPDataSourceFolder folder = null;
+        if (!CommonUtils.isEmpty(folderPath)) {
+            folder = session.getSingletonProject().getDataSourceRegistry().getFolder(folderPath);
+            if (folder == null && (session.hasPermission(DBWConstants.PERMISSION_ADMIN) || session.getApplication().isConfigurationMode())) {
+                folder = WebDataSourceUtils.getGlobalDataSourceRegistry().getFolder(folderPath);
+            }
+        }
+        if (folder != null) {
+            return new WebFolderInfo(session, folder);
+        } else {
+            throw new DBWebException("Folder '" + folderPath + "' not found");
+        }
     }
 }
