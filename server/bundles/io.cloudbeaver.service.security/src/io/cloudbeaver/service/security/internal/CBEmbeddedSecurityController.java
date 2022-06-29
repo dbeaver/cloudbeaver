@@ -1288,12 +1288,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBException("Web application doesn't support external authentication");
         }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
-        List<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
+        Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
         List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
                 !ap.isTrusted() &&
-                appConfiguration.isAuthProviderEnabled(ap.getId()) &&
-                (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
+                    appConfiguration.isAuthProviderEnabled(ap.getId()) &&
+                    (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
             .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
 
         if (!CommonUtils.isEmpty(customConfigurations)) {
@@ -1312,7 +1312,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return providers.toArray(new SMAuthProviderDescriptor[0]);
     }
 
-    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, List<SMAuthProviderCustomConfiguration> customConfigurations) {
+    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
         for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
             if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
                 return true;

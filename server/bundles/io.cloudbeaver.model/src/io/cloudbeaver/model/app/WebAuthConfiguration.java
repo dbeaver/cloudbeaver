@@ -18,7 +18,7 @@ package io.cloudbeaver.model.app;
 
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Application authentication configuration
@@ -31,7 +31,7 @@ public interface WebAuthConfiguration {
 
     boolean isAuthProviderEnabled(String authProviderId);
 
-    List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
+    Set<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
 
     SMAuthProviderCustomConfiguration getAuthProviderConfiguration(String configId);
 }
