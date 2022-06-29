@@ -18,6 +18,7 @@
 package io.cloudbeaver.auth;
 
 public interface CBAuthConstants {
+    String CB_SESSION_COOKIE_NAME = "cb-session-id";
     String CB_AUTH_ID_COOKIE_NAME = "cb-auth-id";
     
     String CB_AUTH_ID_REQUEST_PARAM = "authId";

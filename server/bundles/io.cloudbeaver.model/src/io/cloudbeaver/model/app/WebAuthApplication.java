@@ -17,8 +17,17 @@
 
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.auth.SMFederatedAuthHandler;
+
+import java.util.Collections;
+import java.util.List;
+
 public interface WebAuthApplication extends WebApplication {
     WebAuthConfiguration getAuthConfiguration();
 
     String getAuthServiceURL();
+
+    default List<SMFederatedAuthHandler> getFederatedAuthHandlers() {
+        return Collections.emptyList();
+    }
 }
