@@ -10,13 +10,13 @@ import {
   Connection, ConnectionInfoResource, ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutor, Executor, IExecutionContextProvider, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNodeInfo, NavNode } from './EntityTypes';
@@ -85,9 +85,21 @@ export interface INodeNavigationData {
   folderId?: string;
 }
 
+export enum ENodeMoveType {
+  CanDrop,
+  Drop
+}
+
+export interface INodeMoveData {
+  type: ENodeMoveType;
+  targetNode: NavNode;
+  moveContexts: IDataContextProvider;
+}
+
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
+  readonly onMove: ISyncExecutor<INodeMoveData>;
 
   constructor(
     private readonly permissionsService: PermissionsService,
@@ -95,11 +107,11 @@ export class NavNodeManagerService extends Bootstrap {
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly notificationService: NotificationService,
     private readonly serverService: ServerService,
     navigationService: NavigationService
   ) {
     super();
+    this.onMove = new SyncExecutor();
     this.navigator = new Executor(
       {
         type: NavigationType.open,

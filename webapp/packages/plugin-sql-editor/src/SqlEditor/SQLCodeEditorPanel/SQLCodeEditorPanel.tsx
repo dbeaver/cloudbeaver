@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNode, NavNodeManagerService } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorModeProps } from '../../SqlEditorModeService';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
@@ -45,7 +44,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
     onDrop: async (context, mouse) => {
-      const nodes = getNodes(context);
+      const nodes = getNodesFromContext(context);
       const editor = sqlCodeEditorController?.getEditor();
 
       if (editor && mouse) {
@@ -76,22 +75,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       }
     },
   });
-
-  function getNodes(context: IDataContextProvider): NavNode[] {
-    const node = context.get(DATA_CONTEXT_NAV_NODE);
-    const getNodes = context.get(DATA_CONTEXT_NAV_NODES);
-    let nodes = getNodes();
-
-    if (nodes.length < 2) {
-      nodes = [];
-    }
-
-    if (!nodes.includes(node)) {
-      nodes.push(node);
-    }
-
-    return nodes;
-  }
 
   useEffect(() => {
     sqlCodeEditorController?.focus();

@@ -12,16 +12,19 @@ import styled from 'reshadow';
 
 import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNode } from './NavigationNode';
+import { NavigationNodeRenderer } from './NavigationNodeRenderer';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({
   nodeId,
   path,
   expanded,
+  dragging,
+  className,
 }) {
   const context = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -31,7 +34,15 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
       const CustomRenderer = renderer(nodeId);
 
       if (CustomRenderer) {
-        return <CustomRenderer nodeId={nodeId} expanded={expanded} component={NavigationNodeElement} />;
+        return (
+          <CustomRenderer
+            nodeId={nodeId}
+            expanded={expanded}
+            dragging={dragging}
+            className={className}
+            component={NavigationNodeElement}
+          />
+        );
       }
     }
   }
@@ -39,9 +50,22 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(<TreeNodeNestedMessage>Node not found</TreeNodeNestedMessage>);
+    return styled(TREE_NODE_STYLES)(
+      <TreeNodeNestedMessage>
+        <Translate token='app_navigationTree_node_not_found' />
+      </TreeNodeNestedMessage>
+    );
   }
 
   // TODO: after node update reference can be lost and NavigationNode skip update
-  return <NavigationNode node={node} path={path} expanded={expanded} component={NavigationNodeElement} />;
+  return (
+    <NavigationNodeRenderer
+      node={node}
+      path={path}
+      expanded={expanded}
+      dragging={dragging}
+      className={className}
+      component={NavigationNodeElement}
+    />
+  );
 });

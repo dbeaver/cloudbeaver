@@ -8,16 +8,18 @@
 
 import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
-import { FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
+import { FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
+import { getNodesFromContext } from '../../shared/NodesManager/getNodesFromContext';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
+import { useNavTreeDropBox } from '../useNavTreeDropBox';
 import { IElementsTreeContext, ElementsTreeContext } from './ElementsTreeContext';
 import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
@@ -46,10 +48,24 @@ const styles = css`
   tree-box {
     flex: 1;
     overflow: auto;
+    display: flex;
   }
 
   FolderExplorerPath {
     padding: 0 12px 8px 12px;
+  }
+
+  drop-outside {
+    composes: theme-border-color-background from global;
+    border: dashed 2px;
+    border-radius: 3px;
+    margin: 12px;
+    box-sizing: border-box;
+    position: relative;
+
+    &:not([|showDropOutside]) {
+      display: none;
+    }
   }
 `;
 
@@ -134,6 +150,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
+  const rootNode = useMapResource(ElementsTree, navNodeInfoResource, root);
+
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
@@ -159,6 +177,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     navNodeInfoResource,
     navNodeFilterCompare
   ), [navTreeResource, navNodeInfoResource, navNodeFilterCompare]);
+
+  const dndBox = useNavTreeDropBox(rootNode.data);
 
   const tree = useElementsTree({
     baseRoot,
@@ -234,8 +254,17 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     }
   });
 
-  const hasChildren = (children.data?.length || 0) > 0;
+  let showDropOutside = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop);
+  showDropOutside = useStateDelay(showDropOutside, 100);
+  const isOverCurrent = useStateDelay(dndBox.state.isOverCurrent, 100);
 
+  let dndNodes: string[] | undefined;
+  if (dndBox.state.context && showDropOutside && isOverCurrent) {
+    dndNodes = getNodesFromContext(dndBox.state.context)
+      .map(node => node.id);
+  }
+
+  const hasChildren = (children.data?.length || 0) > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
 
   return styled(useStyles(styles, style))(
@@ -254,6 +283,14 @@ export const ElementsTree = observer<Props>(function ElementsTree({
               <FolderExplorer state={folderExplorer}>
                 <tree>
                   {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
+                  <drop-outside ref={dndBox.setRef} {...use({ showDropOutside })}>
+                    <NavigationNodeNested
+                      component={NavigationNodeElement}
+                      path={folderExplorer.state.path}
+                      dndNodes={dndNodes}
+                      root
+                    />
+                  </drop-outside>
                   <NavigationNodeNested
                     nodeId={root}
                     component={NavigationNodeElement}
