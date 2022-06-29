@@ -20,13 +20,13 @@ package io.cloudbeaver.server.data;
 import io.cloudbeaver.service.sql.DBWValueSerializer;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.utils.CommonUtils;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKTReader;
 
 import java.util.Map;
 
@@ -38,14 +38,18 @@ public class WebGeometryValueSerializer implements DBWValueSerializer<DBGeometry
         DBSTypedObject attribute,
         @NotNull Map<String, Object> webValue
     ) throws DBCException {
-        try {
-            Geometry rawValue = new WKTReader().read((String) webValue.get(WebSQLConstants.ATTR_TEXT));
-            return new DBGeometry(
-                rawValue,
-                CommonUtils.toInt(webValue.get(WebSQLConstants.ATTR_SRID)),
-                (Map<String, Object>) webValue.get(WebSQLConstants.ATTR_PROPERTIES));
-        } catch (Exception e) {
-            throw new DBCException("Error parsing geometry value from string", e);
+        if (attribute instanceof DBDAttributeBinding) {
+            Object tempValue = ((DBDAttributeBinding) attribute).getValueHandler().getValueFromObject(
+                session,
+                attribute,
+                webValue.get(WebSQLConstants.ATTR_TEXT), false, true);
+            if (tempValue instanceof DBGeometry) {
+                return (DBGeometry) tempValue;
+            }
         }
+        return new DBGeometry(
+            webValue.get(WebSQLConstants.ATTR_TEXT),
+            CommonUtils.toInt(webValue.get(WebSQLConstants.ATTR_SRID)),
+            JSONUtils.getObject(webValue, WebSQLConstants.ATTR_PROPERTIES));
     }
 }
