@@ -25,6 +25,8 @@ import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.utils.CommonUtils;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 
 import java.util.Map;
 
@@ -36,9 +38,14 @@ public class WebGeometryValueSerializer implements DBWValueSerializer<DBGeometry
         DBSTypedObject attribute,
         @NotNull Map<String, Object> webValue
     ) throws DBCException {
-        return new DBGeometry(
-            webValue.get(WebSQLConstants.ATTR_TEXT),
-            CommonUtils.toInt(webValue.get(WebSQLConstants.ATTR_SRID)),
-            (Map<String, Object>) webValue.get(WebSQLConstants.ATTR_PROPERTIES));
+        try {
+            Geometry rawValue = new WKTReader().read((String) webValue.get(WebSQLConstants.ATTR_TEXT));
+            return new DBGeometry(
+                rawValue,
+                CommonUtils.toInt(webValue.get(WebSQLConstants.ATTR_SRID)),
+                (Map<String, Object>) webValue.get(WebSQLConstants.ATTR_PROPERTIES));
+        } catch (Exception e) {
+            throw new DBCException("Error parsing geometry value from string", e);
+        }
     }
 }
