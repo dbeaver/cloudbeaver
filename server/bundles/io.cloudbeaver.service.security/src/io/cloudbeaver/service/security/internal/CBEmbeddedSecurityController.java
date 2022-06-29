@@ -1253,21 +1253,37 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBException("Web application doesn't support external authentication");
         }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
-        SMAuthProviderDescriptor[] providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
-            .filter(ap -> !ap.isTrusted() && appConfiguration.isAuthProviderEnabled(ap.getId()))
-            .map(AuthProviderDescriptor::createDescriptorBean).toArray(SMAuthProviderDescriptor[]::new);
-        // Attach custom configs to providers
-        for (SMAuthProviderDescriptor provider : providers) {
-            for (SMAuthProviderCustomConfiguration cc : appConfiguration.getAuthCustomConfigurations()) {
-                if (!cc.isDisabled() && cc.getProvider().equals(provider.getId())) {
-                    cc = new SMAuthProviderCustomConfiguration(cc);
-                    // Do not pass secure parameters
-                    cc.setParameters(Map.of());
-                    provider.addCustomConfiguration(cc);
+        List<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
+        List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
+            .filter(ap ->
+                !ap.isTrusted() &&
+                appConfiguration.isAuthProviderEnabled(ap.getId()) &&
+                (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
+            .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
+
+        if (!CommonUtils.isEmpty(customConfigurations)) {
+            // Attach custom configs to providers
+            for (SMAuthProviderDescriptor provider : providers) {
+                for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
+                    if (!cc.isDisabled() && cc.getProvider().equals(provider.getId())) {
+                        cc = new SMAuthProviderCustomConfiguration(cc);
+                        // Do not pass secure parameters
+                        cc.setParameters(Map.of());
+                        provider.addCustomConfiguration(cc);
+                    }
                 }
             }
         }
-        return providers;
+        return providers.toArray(new SMAuthProviderDescriptor[0]);
+    }
+
+    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, List<SMAuthProviderCustomConfiguration> customConfigurations) {
+        for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
+            if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
