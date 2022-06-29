@@ -1205,7 +1205,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String userId = findUserByCredentials(authProviderId, userCredentials);
         String userIdFromCredentials;
         if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
-            throw new SMException("Credentials are not with current user");
+            throw new SMException("Credentials belong to another user");
         }
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
