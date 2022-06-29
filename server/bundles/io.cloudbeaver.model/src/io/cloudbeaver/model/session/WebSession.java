@@ -228,6 +228,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return allMetaParams;
     }
 
+    public synchronized WebUserContext getUserContext() {
+        return userContext;
+    }
+
     public synchronized String getUserId() {
         return userContext.getUserId();
     }
