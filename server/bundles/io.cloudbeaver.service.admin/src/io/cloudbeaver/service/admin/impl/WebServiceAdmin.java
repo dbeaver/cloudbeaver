@@ -253,15 +253,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
+        if (CommonUtils.equalObjects(roleID, CBConstants.DEFAULT_ADMIN_ROLE)) {
+            throw new DBWebException("Cannot change permissions for role '" + roleID + "'");
+        }
+        webSession.addInfoMessage("Set permissions to subject - " + roleID);
         try {
-            var adminSecurityController = webSession.getAdminSecurityController();
-            boolean changesOwnRole =  Arrays.stream(adminSecurityController.getUserRoles(grantor.getUserId()))
-                .map(SMRole::getRoleId)
-                .anyMatch(roleID::equals);
-            if (changesOwnRole) {
-                throw new DBWebException("You cannot edit your own permissions");
-            }
-            webSession.addInfoMessage("Set permissions to subject - " + roleID);
             webSession.getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
             Set<String> subjectPermissions = webSession.getAdminSecurityController().getSubjectPermissions(roleID);
             webSession.refreshUserData();
