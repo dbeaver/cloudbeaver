@@ -17,53 +17,80 @@ import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
 
 interface Props {
-  nodeId: string;
+  nodeId?: string;
   component: NavTreeNodeComponent;
   path: string[];
+  dndNodes?: string[];
   root?: boolean;
+  className?: string;
 }
 
 export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
   nodeId,
   component,
   path,
+  dndNodes,
   root,
+  className,
 }) {
   const treeContext = useContext(ElementsTreeContext);
   const translate = useTranslate();
 
-  const nextPath = useMemo(() => [...path, nodeId], [path, nodeId]);
-  const children = getComputed(
-    () => treeContext?.tree.getNodeChildren(nodeId) || []
-  );
-
-  const state = getComputed(
-    () => treeContext?.tree.getNodeState(nodeId)
-  );
-
   const NavigationNode = component;
+  const nextPath = useMemo(() => [...path, nodeId ?? ''], [path, nodeId]);
+  const children: string[] = [...(dndNodes || [])];
+  let empty = true;
 
-  if (root) {
-    const rootFolder = getComputed(() => treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root);
+  if (nodeId !== undefined) {
+    children.push(...getComputed(
+      () => treeContext?.tree.getNodeChildren(nodeId) || []
+    ));
 
-    if (rootFolder) {
-      return styled(TREE_NODE_STYLES)(
-        <NavigationNode nodeId={nodeId} path={path} expanded />
-      );
+    const state = getComputed(
+      () => treeContext?.tree.getNodeState(nodeId)
+    );
+
+    if (root) {
+      const rootFolder = getComputed(() => (
+        treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root
+      ));
+
+      if (rootFolder) {
+        return styled(TREE_NODE_STYLES)(
+          <NavigationNode nodeId={nodeId} path={path} expanded />
+        );
+      }
     }
+
+    empty = getComputed(() => (
+      children.length === 0 && (
+        !treeContext?.tree.filtering
+        || !!state?.showInFilter
+      )
+    ));
+  } else {
+    empty = children.length === 0;
   }
 
-  const empty = getComputed(() => (
-    children.length === 0 && (
-      !treeContext?.tree.filtering
-      || state?.showInFilter
-    )
-  ));
-
   return styled(TREE_NODE_STYLES)(
-    <TreeNodeNested root={root}>
-      {children.map(child => <NavigationNode key={child} nodeId={child} path={nextPath} />)}
-      {empty && <TreeNodeNestedMessage>{translate('app_navigationTree_node_empty')}</TreeNodeNestedMessage>}
+    <TreeNodeNested root={root} className={className}>
+      {children.map(child => (
+        <NavigationNode
+          key={child}
+          nodeId={child}
+          path={nextPath}
+          dragging={dndNodes?.includes(child)}
+          expanded={dndNodes?.includes(child) === true ? false : undefined}
+        />
+      ))}
+      {empty && (
+        <TreeNodeNestedMessage>{translate(
+          nodeId === undefined
+            ? 'app_navigationTree_node_drop_placeholder'
+            : 'app_navigationTree_node_empty'
+        )}
+        </TreeNodeNestedMessage>
+      )}
     </TreeNodeNested>
   );
 });

@@ -56,7 +56,8 @@ const styles = css`
 
 export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(function NavigationNodeControl({
   node,
-  dragging,
+  dndElement,
+  dndPlaceholder,
 }, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
   const treeContext = useContext(ElementsTreeContext);
@@ -94,7 +95,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
   }
 
   return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging })}>
+    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
       <TreeNodeExpand filterActive={treeContext?.tree.filtering} />
       <TreeNodeIcon icon={icon}>
         <ConnectionMark connected={connected} />
@@ -102,7 +103,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       <TreeNodeName title={node.name}>
         {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
       </TreeNodeName>
-      {!editing && (
+      {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
           <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
         </portal>

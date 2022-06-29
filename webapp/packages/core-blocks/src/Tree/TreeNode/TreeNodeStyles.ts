@@ -80,6 +80,10 @@ export const TREE_NODE_STYLES = css`
       }
     }
 
+    NavigationNode[dragging] {
+      opacity: 0.5!important;
+    }
+
     TreeNodeIcon {
       box-sizing: border-box;
       flex-shrink: 0;

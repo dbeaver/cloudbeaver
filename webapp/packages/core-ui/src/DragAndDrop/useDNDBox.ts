@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { useDrop } from 'react-dnd';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -17,6 +17,7 @@ import type { DNDAcceptType } from './DNDAcceptType';
 
 interface IState {
   isOver: boolean;
+  isOverCurrent: boolean;
   canDrop: boolean;
   context: IDataContextProvider | null;
 }
@@ -33,7 +34,7 @@ interface IOptions {
   canDrop?: (context: IDataContextProvider) => boolean;
 }
 
-interface IDNDBox {
+export interface IDNDBox {
   state: IState;
   setRef: (element: React.ReactElement | Element | null) => void;
 }
@@ -46,10 +47,12 @@ export function useDNDBox(options: IOptions): IDNDBox {
 
   const state = useObservableRef<IState>(() => ({
     isOver: false,
+    isOverCurrent: false,
     canDrop: false,
     context: null,
   }), {
     isOver: observable.ref,
+    isOverCurrent: observable.ref,
     canDrop: observable.ref,
     context: observable.ref,
   }, false);
@@ -64,9 +67,12 @@ export function useDNDBox(options: IOptions): IDNDBox {
     },
     canDrop: context => (options.canDrop?.(context) ?? true),
     collect: monitor => {
-      state.isOver = monitor.isOver();
-      state.canDrop = monitor.canDrop();
-      state.context = monitor.getItem();
+      runInAction(() => {
+        state.isOver = monitor.isOver();
+        state.isOverCurrent = monitor.isOver({ shallow: true });
+        state.canDrop = monitor.canDrop();
+        state.context = monitor.getItem();
+      });
     },
   }), [options]);
 

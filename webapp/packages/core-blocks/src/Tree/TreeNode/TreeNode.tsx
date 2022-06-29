@@ -101,11 +101,11 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
     indeterminateSelected,
     expanded,
     showInFilter,
-    externalExpanded: externalExpanded || false,
+    externalExpanded,
     leaf,
   });
 
-  const elementExpanded = getComputed(() => nodeContext.expanded || nodeContext.externalExpanded);
+  const elementExpanded = getComputed(() => nodeContext.externalExpanded ?? nodeContext.expanded);
 
   return styled(TREE_NODE_STYLES)(
     <node {...use({ expanded: elementExpanded })} ref={ref} className={className}>

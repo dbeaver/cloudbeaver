@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
