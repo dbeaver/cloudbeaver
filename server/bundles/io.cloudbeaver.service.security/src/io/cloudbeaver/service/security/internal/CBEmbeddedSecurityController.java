@@ -1220,7 +1220,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
-        } else {
+        } else if (userId == null) {
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
