@@ -38,7 +38,10 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
@@ -149,7 +152,8 @@ public class WebServiceCore implements DBWServiceCore {
                 return Collections.singletonList(folderInfo);
             }
         }
-        return webSession.getFolders();
+        return webSession.getSingletonProject().getDataSourceRegistry().getAllFolders().stream()
+            .map(f -> new WebFolderInfo(webSession, f)).collect(Collectors.toList());
     }
 
     @Override
@@ -566,7 +570,6 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebFolderInfo folderInfo = new WebFolderInfo(session, newFolder);
-            session.addFolder(folderInfo);
             WebServiceUtils.updateConfigAndRefreshDatabases(session);
 
             return folderInfo;
@@ -595,7 +598,8 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBWebException("Global folder '" + folderInfo.getNodePath() + "' cannot be deleted");
             }
             session.addInfoMessage("Delete folder");
-            session.removeFolder(folderInfo);
+            DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+            sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
             WebServiceUtils.updateConfigAndRefreshDatabases(session);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
