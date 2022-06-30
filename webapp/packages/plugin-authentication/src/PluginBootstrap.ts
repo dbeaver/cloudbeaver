@@ -40,7 +40,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'authentication_login',
                 tooltip: 'authentication_login',
               },
-              { onSelect: () => this.authDialogService.showLoginForm(false, null, true) }
+              { onSelect: () => this.authDialogService.showLoginForm(false, { providerId: null, link: true }) }
             ),
           ];
         }

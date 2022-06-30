@@ -18,15 +18,9 @@ import { uuid } from '@cloudbeaver/core-utils';
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { StaticImage } from '../StaticImage';
+import type { ILoadableState } from './ILoadableState';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
-
-export interface ILoadableState {
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
-  readonly exception?: Error[] | Error | null;
-  reload?: () => void;
-}
 
 type LoaderState = ILoadableState | {
   loading: boolean;
@@ -41,6 +35,8 @@ interface Props {
   message?: string;
   /** hides message */
   hideMessage?: boolean;
+  /** hides error message */
+  hideException?: boolean;
   /** render loader as overlay with white spinner */
   overlay?: boolean;
   /** loader with white spinner */
@@ -69,6 +65,7 @@ export const Loader = observer<Props>(function Loader({
   overlay,
   message,
   hideMessage,
+  hideException,
   secondary,
   small,
   inline,
@@ -101,6 +98,16 @@ export const Loader = observer<Props>(function Loader({
       ) {
         loaded = element.isLoaded();
         loading = element.isLoading();
+
+        if (loading) {
+          if (element.cancel) {
+            onCancel = element.cancel;
+          }
+
+          if (element.isCancelled) {
+            cancelDisabled = element.isCancelled();
+          }
+        }
       } else {
         loading = element.loading;
         loaded = !loading;
@@ -168,7 +175,7 @@ export const Loader = observer<Props>(function Loader({
     }
   });
 
-  if (exception && !loading) {
+  if (exception && !loading && !hideException) {
     return styled(style)(
       <ExceptionMessage
         exception={exception}

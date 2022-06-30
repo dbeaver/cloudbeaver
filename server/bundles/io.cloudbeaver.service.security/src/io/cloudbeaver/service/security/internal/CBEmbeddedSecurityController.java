@@ -1067,13 +1067,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         return SMAuthInfo.inProgress(authId, redirectUrl, authData);
                     case ERROR:
                         return SMAuthInfo.error(authId, authError);
+                    case EXPIRED:
+                        return SMAuthInfo.expired(authId);
                     default:
                         throw new SMException("Unknown auth status:" + smAuthStatus);
                 }
             }
 
             String smToken = findTokenBySmSession(smSessionId);
-            return SMAuthInfo.success(authId, smToken, getTokenPermissions(smToken), authData);
+            SMAuthPermissions authPermissions = getTokenPermissions(smToken);
+            var successAuthStatus = SMAuthInfo.success(authId, smToken, authPermissions, authData);
+            updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
+            return successAuthStatus;
 
         } catch (SQLException e) {
             throw new DBException("Error while read auth info", e);

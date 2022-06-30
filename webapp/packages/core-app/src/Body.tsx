@@ -32,6 +32,12 @@ const bodyStyles = css`
     }
   `;
 
+const loaderStyle = css`
+    ExceptionMessage {
+      padding: 24px;
+    }
+  `;
+
 export const Body = observer(function Body() {
   useAppLoadingScreen();
   const themeService = useService(ThemeService);
@@ -53,7 +59,7 @@ export const Body = observer(function Body() {
   return styled(style)(
     <DNDProvider>
       <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={permissionsService}>{() => styled(style)(
+        <Loader state={permissionsService} style={loaderStyle}>{() => styled(style)(
           <>
             {Screen && <Screen {...screenService.routerService.params} />}
           </>

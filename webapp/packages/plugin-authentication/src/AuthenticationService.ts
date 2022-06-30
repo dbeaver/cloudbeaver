@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
@@ -18,6 +20,7 @@ import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
+import type { IAuthOptions } from './IAuthOptions';
 
 export type LogoutEventType = 'before' | 'after';
 
@@ -125,12 +128,17 @@ export class AuthenticationService extends Bootstrap {
     }
   }
 
-  private async auth(persistent: boolean, provider: string | null = null, link?: boolean) {
+  private async auth(persistent: boolean, providerId: string | null = null, link?: boolean) {
     if (this.authPromise) {
       return this.authPromise;
     }
 
-    this.authPromise = this.authDialogService.showLoginForm(persistent, provider, link);
+    const loginFormOptions: IAuthOptions = observable({
+      providerId,
+      link,
+    });
+
+    this.authPromise = this.authDialogService.showLoginForm(persistent, loginFormOptions);
 
     if (this.serverConfigResource.redirectOnFederatedAuth) {
       await this.authProvidersResource.loadAll();
@@ -143,6 +151,10 @@ export class AuthenticationService extends Bootstrap {
 
         if (configurableProvider?.configurations?.length === 1) {
           const configuration = configurableProvider.configurations[0];
+
+          loginFormOptions.providerId = configurableProvider.id;
+          loginFormOptions.configurationId = configuration.id;
+
           const user = await this.authInfoService.login(configurableProvider.id, {
             configurationId: configuration.id,
             linkUser: link,
