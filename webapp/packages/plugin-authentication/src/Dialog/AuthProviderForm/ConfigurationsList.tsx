@@ -10,12 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AuthInfoService, AuthProvider, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { AuthInfoService, AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder, usePromiseState, Loader, Button } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import type { AuthProviderConfiguration } from '@cloudbeaver/core-sdk';
+import type { ITask } from '@cloudbeaver/core-executor';
+import { Translate, useTranslate } from '@cloudbeaver/core-localization';
+import type { AuthProviderInfo, UserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthenticationService } from '../../AuthenticationService';
@@ -25,6 +26,7 @@ const styles = css`
       display: flex;
       flex-direction: column;
       overflow: auto;
+      flex: 1;
     }
     Filter {
       margin: 0 24px 12px 24px;
@@ -41,7 +43,16 @@ const styles = css`
       width: 100%;
       height: 100%;
     }
+    center {
+      margin: auto;
+    }
 `;
+
+const loaderStyle = css`
+    ExceptionMessage {
+      padding: 24px;
+    }
+  `;
 
 interface IProviderConfiguration {
   provider: AuthProvider;
@@ -49,12 +60,22 @@ interface IProviderConfiguration {
 }
 
 interface Props {
+  activeProvider: AuthProviderInfo | null;
+  activeConfiguration: AuthProviderConfiguration | null;
   providers: AuthProvider[];
+  onAuthorize?: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
   onClose?: () => void;
   className?: string;
 }
 
-export const ConfigurationsList = observer<Props>(function ConfigurationsList({ providers, onClose, className }) {
+export const ConfigurationsList = observer<Props>(function ConfigurationsList({
+  activeProvider,
+  activeConfiguration,
+  providers,
+  onAuthorize,
+  onClose,
+  className,
+}) {
   const authInfoService = useService(AuthInfoService);
   const authenticationService = useService(AuthenticationService);
   const notificationService = useService(NotificationService);
@@ -62,6 +83,8 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
   const style = useStyles(styles);
 
   const [search, setSearch] = useState('');
+  const [authTask, setAuthTask] = useState<ITask<UserInfo | null> | null>(null);
+  const authTaskState = usePromiseState(authTask);
   const configurations = getComputed<IProviderConfiguration[]>(() => providers.map(
     provider => (
       (provider.configurations || [])
@@ -87,15 +110,23 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
 
   async function auth({ provider, configuration }: IProviderConfiguration) {
     try {
-      const user = await authInfoService.login(provider.id, {
+      onAuthorize?.(provider, configuration);
+      const authTask = authInfoService.login(provider.id, {
         configurationId: configuration.id,
       });
+      setAuthTask(authTask);
+
+      const user = await authTask;
 
       if (user) {
         onClose?.();
       }
+
+      setAuthTask(null);
     } catch (exception: any) {
       notificationService.logException(exception, 'Federated authentication error');
+    } finally {
+      onAuthorize?.(null, null);
     }
   }
 
@@ -114,6 +145,29 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
           </Link>
         )}
       </TextPlaceholder>
+    );
+  }
+
+  if (activeProvider && activeConfiguration) {
+    return styled(style)(
+      <container className={className}>
+        <Loader
+          state={authTaskState}
+          style={loaderStyle}
+          message="authentication_authorizing"
+          hideException
+        >
+          <center>
+            <Button
+              type="button"
+              mod={['unelevated']}
+              onClick={() => auth({ provider: activeProvider, configuration: activeConfiguration })}
+            >
+              <Translate token='authentication_login' />
+            </Button>
+          </center>
+        </Loader>
+      </container>
     );
   }
 
@@ -148,6 +202,13 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({ 
           );
         })}
       </list>
+      <Loader
+        state={authTaskState}
+        style={loaderStyle}
+        message="authentication_authorizing"
+        overlay
+        hideException
+      />
     </container>
   );
 });

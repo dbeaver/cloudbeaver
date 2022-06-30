@@ -12,7 +12,7 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedDataResource, CachedDataResourceContext, CachedDataResourceGetter, CachedDataResourceParam, CachedResourceData, CachedResourceIncludeArgs, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
-import type { ILoadableState } from './Loader/Loader';
+import type { ILoadableState } from './Loader/ILoadableState';
 import { useObjectRef } from './useObjectRef';
 
 interface KeyWithIncludes<TKey, TIncludes> {

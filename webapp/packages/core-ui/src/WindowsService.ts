@@ -60,6 +60,13 @@ export class WindowsService {
     return null;
   }
 
+  close(window: Window) {
+    const current = Array.from(this.windows.values())
+      .find(info => info.window === window);
+
+    current?.window.close();
+  }
+
   async waitWindowsClose(window: Window): Promise<void> {
     const current = Array.from(this.windows.values())
       .find(info => info.window === window);
@@ -81,6 +88,7 @@ export class WindowsService {
 
           if (this.windows.size === 0) {
             clearInterval(this.trackWindowClose);
+            this.trackWindowClose = undefined;
           }
         });
       }
