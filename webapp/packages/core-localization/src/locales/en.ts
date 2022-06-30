@@ -94,6 +94,4 @@ export const defaultENLocale = [
   ['app_root_quota_exceeded', 'Quota exceeded'],
   ['core_eventsLog_dbeaverErrorDetails', 'Error details'],
 
-  ['ui_no_connection', "No Connections."],
-  ['ui_connect_your_db', 'Use the top menu to setup connection to your database.']
 ];

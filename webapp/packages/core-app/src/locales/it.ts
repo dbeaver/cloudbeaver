@@ -47,4 +47,7 @@ export default [
   ['app_log_view_entry_timestamp', 'Timestamp'],
   ['app_log_view_entry_message', 'Messaggio'],
   ['app_log_view_entry_details', 'Dettagli'],
+
+  ['app_navigationTree_no_connections_placeholder', 'Nessuna Connessione.\nUsa il menù in altro per impostare una nuova connessione.'],
+
 ];

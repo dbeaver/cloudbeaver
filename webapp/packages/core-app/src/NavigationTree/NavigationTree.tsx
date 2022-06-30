@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -27,8 +28,6 @@ import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettings
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
-
-import { useTranslate } from '@cloudbeaver/core-localization';
 
 
 const navigationTreeStyles = css`
@@ -113,8 +112,7 @@ export const NavigationTree = observer(function NavigationTree() {
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>
-              {translate('ui_no_connection')}<br />
-              {translate('ui_connect_your_db')}
+              {translate('app_navigationTree_no_connections_placeholder')}
             </message>
           </center>
         )}

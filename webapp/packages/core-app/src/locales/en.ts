@@ -50,4 +50,6 @@ export default [
   ['app_log_view_entry_timestamp', 'Timestamp'],
   ['app_log_view_entry_message', 'Message'],
   ['app_log_view_entry_details', 'Details'],
+
+  ['app_navigationTree_no_connections_placeholder', 'No Connections.\nUse the top menu to setup connection to your database.'],
 ];

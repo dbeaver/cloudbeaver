@@ -69,8 +69,4 @@ export const defaultITLocale = [
   ['app_root_session_expired_message', 'La sessione è scaduta. Vuoi ricaricare?'],
   ['app_root_session_expired_reload', 'Ricarica'],
   ['core_eventsLog_dbeaverErrorDetails', 'Dettagli dell\'errore'],
-
-  ['ui_no_connection', 'Nessuna Connessione.'],
-  ['ui_connect_your_db', 'Usa il menù in altro per impostare una nuova connessione.'],
-
 ];
