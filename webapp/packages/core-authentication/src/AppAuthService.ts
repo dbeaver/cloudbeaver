@@ -26,8 +26,8 @@ export class AppAuthService extends Bootstrap {
   readonly auth: IExecutor<boolean>;
 
   constructor(
-    private serverService: ServerService,
-    private userInfoResource: UserInfoResource,
+    private readonly serverService: ServerService,
+    private readonly userInfoResource: UserInfoResource,
   ) {
     super();
     this.auth = new Executor();
