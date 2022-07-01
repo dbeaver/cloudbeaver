@@ -17,7 +17,6 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.utils.WebFolderUtils;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.meta.Property;
 
@@ -46,11 +45,6 @@ public class WebFolderInfo {
     @Property
     public String getDescription() {
         return dataSourceFolder.getDescription();
-    }
-
-    @Property
-    public String getNodePath() {
-        return WebFolderUtils.makeLocalFolderItemPath(dataSourceFolder);
     }
 
 }

@@ -100,13 +100,6 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setSubjectConnectionAccess",
             env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")))
 
-        .dataFetcher("createGlobalFolder",
-            env -> getService(env).createGlobalFolder(getWebSession(env), env.getArgument("parentFolderPath"), env.getArgument("folderName")))
-        .dataFetcher("renameGlobalFolder",
-            env -> getService(env).renameGlobalFolder(getWebSession(env), env.getArgument("folderPath"), env.getArgument("newName")))
-        .dataFetcher("deleteGlobalFolder",
-            env -> getService(env).deleteGlobalFolder(getWebSession(env), env.getArgument("folderPath")))
-
         .dataFetcher("listFeatureSets",
             env -> getService(env).listFeatureSets(getWebSession(env)))
 

@@ -140,9 +140,6 @@ public interface DBWServiceCore extends DBWService {
     // Folders
 
     @WebAction
-    WebFolderInfo getFolderState(WebSession webSession, String folderId) throws DBWebException;
-
-    @WebAction
     WebFolderInfo createFolder(@NotNull WebSession session, @Nullable String folderPath, @NotNull String newName) throws DBWebException;
 
     @WebAction
@@ -150,7 +147,6 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     boolean deleteFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
-
 
     ///////////////////////////////////////////
     // Navigator settings

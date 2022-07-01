@@ -367,7 +367,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-
     public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
         connections.removeIf(c -> !isDataSourceAccessible(c.getDataSourceContainer()));
     }
@@ -553,8 +552,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             connections.remove(connectionInfo.getId());
         }
     }
-
-
 
     public void close() {
         try {

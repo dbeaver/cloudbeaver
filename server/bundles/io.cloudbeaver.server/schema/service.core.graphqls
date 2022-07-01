@@ -323,7 +323,6 @@ type ConnectionInfo {
 type FolderInfo {
     id: ID!
     description: String
-    nodePath: String
 }
 
 type NetworkEndpointInfo {

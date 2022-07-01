@@ -22,7 +22,6 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -38,15 +37,16 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
-import io.cloudbeaver.utils.WebFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.user.SMRole;
@@ -393,7 +393,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             "Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
         );
         WebServiceUtils.updateConnectionFromConfig(dataSource, config);
-
         dataSource.persistConfiguration();
         // Update local datasource as well. We use it for connection tests
         // It may be null if this connection was just created
@@ -423,47 +422,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (DBException e) {
             log.error(e);
         }
-        return true;
-    }
-
-    ////////////////////////////////////////////////////////////////////
-    // Folders
-
-    @Override
-    public WebFolderInfo createGlobalFolder(@NotNull WebSession webSession, @Nullable String parentPath, @NotNull String folderName) throws DBWebException {
-        webSession.addInfoMessage("Create new folder");
-        DBPDataSourceRegistry registry = WebServiceUtils.getGlobalDataSourceRegistry();
-        WebFolderInfo parentNode = null;
-        if (parentPath != null) {
-            try {
-                parentNode = WebFolderUtils.getWebFolderInfo(webSession, parentPath);
-            } catch (DBException e) {
-                throw new DBWebException(e.getMessage(), e);
-            }
-        }
-        DBPDataSourceFolder folder = WebServiceUtils.createFolder(parentNode, folderName, registry);
-        registry.flushConfig();
-        WebFolderInfo newFolder = new WebFolderInfo(webSession, folder);
-        WebServiceUtils.updateConfigAndRefreshDatabases(webSession);
-        return newFolder;
-    }
-
-    @Override
-    public WebFolderInfo renameGlobalFolder(@NotNull WebSession webSession, @NotNull String folderPath, @NotNull String newName) throws DBWebException {
-        return null;
-    }
-
-    @Override
-    public boolean deleteGlobalFolder(@NotNull WebSession webSession, @NotNull String folderPath) throws DBWebException {
-        DBPDataSourceFolder folder = WebServiceUtils.getGlobalDataSourceRegistry().getFolder(folderPath);
-        if (folder == null) {
-            throw new DBWebException("Folder '" + folderPath + "' not found");
-        }
-
-        webSession.addInfoMessage("Delete folder - '" + folderPath + "'");
-        WebServiceUtils.getGlobalDataSourceRegistry().removeFolder(folder, false);
-        WebServiceUtils.getGlobalDataSourceRegistry().flushConfig();
-
         return true;
     }
 

@@ -20,18 +20,10 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.utils.CommonUtils;
 
 public class WebFolderUtils {
-
-
-    public static String makeLocalFolderItemPath(DBPDataSourceFolder folder) {
-        return DBNNode.NodePathType.folder.getPrefix() +
-            folder.getDataSourceRegistry().getProject().getName() + "/" + folder.getFolderPath();
-    }
 
     public static WebFolderInfo getWebFolderInfo(WebSession session, String folderPath) throws DBWebException {
         DBPDataSourceFolder folder = null;

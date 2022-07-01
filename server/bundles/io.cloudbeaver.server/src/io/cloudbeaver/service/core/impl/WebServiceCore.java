@@ -148,10 +148,8 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebFolderInfo> getUserFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
         if (id != null) {
-            WebFolderInfo folderInfo = getFolderState(webSession, id);
-            if (folderInfo != null) {
-                return Collections.singletonList(folderInfo);
-            }
+            WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(webSession, id);
+            return Collections.singletonList(folderInfo);
         }
         return webSession.getSingletonProject().getDataSourceRegistry().getAllFolders().stream()
             .map(f -> new WebFolderInfo(webSession, f)).collect(Collectors.toList());
@@ -243,10 +241,6 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession.getWebConnectionInfo(connectionId);
     }
 
-    @Override
-    public WebFolderInfo getFolderState(WebSession webSession, String folderId) throws DBWebException {
-        return WebFolderUtils.getWebFolderInfo(webSession, folderId);
-    }
 
     @Override
     public WebConnectionInfo initConnection(
@@ -571,7 +565,9 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebFolderInfo folderInfo = new WebFolderInfo(session, newFolder);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            if (parentPath == null)  {
+                WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            }
 
             return folderInfo;
         } catch (DBException e) {
@@ -595,13 +591,16 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(session, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
+            boolean rootFolder = folder.getParent() != null;
             if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
-                throw new DBWebException("Global folder '" + folderInfo.getNodePath() + "' cannot be deleted");
+                throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            if (rootFolder) {
+                WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            }
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
