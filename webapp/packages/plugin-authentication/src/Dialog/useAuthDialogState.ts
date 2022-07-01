@@ -91,7 +91,7 @@ export function useAuthDialogState(providerId: string | null, configurationId?: 
 
   const activeProviders = providers
     .filter(provider => {
-      if (provider.configurable || state.activeConfiguration) {
+      if (provider.configurable) {
         return false;
       }
 
@@ -180,7 +180,11 @@ export function useAuthDialogState(providerId: string | null, configurationId?: 
     const tabId = tabIds[0];
     state.setTabId(tabId);
 
-    const provider = activeProviders.find(provider => provider.id === tabId) || null;
+    const provider = (
+      activeProviders.find(provider => provider.id === tabId)
+      || providers.find(provider => provider.id === providerId)
+      || null
+    );
     const configuration = provider?.configurations?.find(
       configuration => configuration.id === configurationId
     ) ?? null;

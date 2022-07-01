@@ -154,15 +154,6 @@ export class AuthenticationService extends Bootstrap {
 
           loginFormOptions.providerId = configurableProvider.id;
           loginFormOptions.configurationId = configuration.id;
-
-          const user = await this.authInfoService.login(configurableProvider.id, {
-            configurationId: configuration.id,
-            linkUser: link,
-          });
-
-          if (user) {
-            this.authDialogService.closeLoginForm(this.authPromise);
-          }
         }
       }
     }
