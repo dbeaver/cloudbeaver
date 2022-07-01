@@ -22,7 +22,6 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 
 import java.util.List;
 
@@ -60,12 +59,5 @@ public interface DBWServiceNavigator extends DBWService {
     int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
 
     @WebAction
-    boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath, @Nullable String projectId) throws DBWebException;
-
-    @WebAction
-    WebNavigatorNodeInfo createFolder(@NotNull WebSession session, @Nullable String nodePath, @NotNull String newName) throws DBWebException;
-
-    @WebAction
-    boolean deleteFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
-
+    boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderPath) throws DBWebException;
 }

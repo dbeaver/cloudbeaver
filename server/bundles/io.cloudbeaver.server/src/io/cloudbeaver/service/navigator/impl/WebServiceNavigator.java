@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
@@ -350,6 +349,28 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
             return nodes.size();
 
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+        }
+    }
+
+    @Override
+    public boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = session.getProgressMonitor();
+            WebConnectionFolderInfo folderPath = WebConnectionFolderUtils.getFolderInfo(session, folderNodePath);
+            for (String path : nodePaths) {
+                DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
+                if (node == null) {
+                    throw new DBWebException("Navigator node '"  + path + "' not found");
+                }
+                if (node instanceof DBNDataSource) {
+                    ((DBNDataSource) node).moveToFolder(null, folderPath.getDataSourceFolder());
+                } else {
+                    throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
+                }
+            }
+            return true;
         } catch (DBException e) {
             throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
         }

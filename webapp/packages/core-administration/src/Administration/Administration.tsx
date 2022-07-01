@@ -32,7 +32,7 @@ const tabsStyles = css`
 
 const administrationStyles = css`
     SlideElement {
-      composes: theme-background-background theme-text-on-background from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
     container {
       composes: theme-background-secondary theme-text-on-secondary from global;

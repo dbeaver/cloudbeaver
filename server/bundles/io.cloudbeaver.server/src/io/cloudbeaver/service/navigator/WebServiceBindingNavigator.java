@@ -67,21 +67,11 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 getWebSession(env),
                 env.getArgument("nodePaths")
             ))
-            .dataFetcher("navCreateFolder", env -> getService(env).createFolder(
-                getWebSession(env),
-                env.getArgument("parentNodePath"),
-                env.getArgument("nodeName")
-            ))
-            .dataFetcher("navDeleteFolder", env -> getService(env).deleteFolder(
-                getWebSession(env),
-                env.getArgument("nodePath")
-            ))
             .dataFetcher("navMoveNodesToFolder", env -> getService(env).moveNodesToFolder(
                 getWebSession(env),
                 env.getArgument("nodePaths"),
-                env.getArgument("folderNodePath"),
-                env.getArgument("projectId")
-                ));
+                env.getArgument("folderPath")
+            ));
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")
             .dataFetcher("properties", env -> {
