@@ -25,7 +25,7 @@ export class SessionActionService {
     readonly session: SessionResource
   ) {
     this.actionToProcess = session.processAction();
-    this.onAction = new Executor();
+    this.onAction = new Executor<ISessionAction | null>(undefined, (a, b) => a === b);
     this.onAction
       .setInitialDataGetter(() => this.actionToProcess)
       .addPostHandler((data, contexts) => {

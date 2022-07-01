@@ -26,7 +26,7 @@ export class ProjectsResource extends CachedDataResource<Project[]> {
   ) {
     super([]);
 
-    this.userInfoResource.userChange.addPostHandler(() => {
+    this.userInfoResource.onUserChange.addPostHandler(() => {
       this.loaded = false;
       this.markOutdated();
     });

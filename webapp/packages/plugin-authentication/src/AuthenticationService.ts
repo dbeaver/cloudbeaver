@@ -13,14 +13,15 @@ import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderServi
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
+import { isAutoLoginSessionAction } from './isAutoLoginSessionAction';
 
 export type LogoutEventType = 'before' | 'after';
 
@@ -45,7 +46,8 @@ export class AuthenticationService extends Bootstrap {
     private readonly sessionDataResource: SessionDataResource,
     private readonly authInfoService: AuthInfoService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly windowsService: WindowsService
+    private readonly windowsService: WindowsService,
+    private readonly sessionActionService: SessionActionService
   ) {
     super();
 
@@ -178,6 +180,8 @@ export class AuthenticationService extends Bootstrap {
     // this.sessionDataResource.beforeLoad.addHandler(
     //   ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
     // );
+
+    this.sessionActionService.onAction.addHandler(this.authSessionAction.bind(this));
     this.sessionDataResource.onDataUpdate.addPostHandler(() => { this.requireAuthentication(); });
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
@@ -193,6 +197,22 @@ export class AuthenticationService extends Bootstrap {
   }
 
   load(): void { }
+
+  private async authSessionAction(
+    data: ISessionAction | null,
+    contexts: IExecutionContextProvider<ISessionAction | null>
+  ) {
+    const action = contexts.getContext(sessionActionContext);
+
+    if (isAutoLoginSessionAction(data)) {
+      const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], true);
+
+      if (user && this.authPromise) {
+        this.authDialogService.closeLoginForm(this.authPromise);
+      }
+      action.process();
+    }
+  }
 
   private readonly requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
     if (data.type === AUTH_PROVIDER_LOCAL_ID) {

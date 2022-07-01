@@ -32,7 +32,7 @@ void,
 void,
 UserInfoIncludes
 > {
-  readonly userChange: ISyncExecutor<string>;
+  readonly onUserChange: ISyncExecutor<string>;
 
   get parametersAvailable() {
     return this.data !== null;
@@ -45,7 +45,7 @@ UserInfoIncludes
   ) {
     super(null, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
-    this.userChange = new SyncExecutor();
+    this.onUserChange = new SyncExecutor();
 
     this.sync(sessionResource, () => {}, () => {});
 
@@ -241,7 +241,7 @@ UserInfoIncludes
     const currentUserId = this.getId();
 
     if (prevUserId !== currentUserId) {
-      this.userChange.execute(currentUserId);
+      this.onUserChange.execute(currentUserId);
     }
   }
 
