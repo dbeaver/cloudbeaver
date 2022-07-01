@@ -1,4 +1,4 @@
-package io.cloudbeaver.service.rm;
+package io.cloudbeaver.model.rm;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPObjectWithDetails;

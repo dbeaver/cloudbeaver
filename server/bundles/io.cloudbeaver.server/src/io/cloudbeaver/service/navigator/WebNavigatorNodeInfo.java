@@ -19,6 +19,7 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
@@ -97,7 +98,9 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public boolean isFolder() {
-        return node instanceof DBNContainer && !(node instanceof DBNDataSource);
+        return (node instanceof DBNContainer && !(node instanceof DBNDataSource))
+            || (node instanceof DBNResourceManagerResource
+            && ((DBNResourceManagerResource) node).getResource().isFolder());
     }
 
     @Property

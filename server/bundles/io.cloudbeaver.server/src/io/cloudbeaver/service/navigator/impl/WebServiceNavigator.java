@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
@@ -387,6 +388,37 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         return executionContext;
     }
 
+    @Override
+    public boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath, @Nullable String projectId) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = session.getProgressMonitor();
+            DBNNode folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
+            if (folderNode == null) {
+                throw new DBWebException("Navigator node '"  + folderNodePath + "' not found");
+            }
+            for (String path : nodePaths) {
+                DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
+                if (node == null) {
+                    throw new DBWebException("Navigator node '"  + path + "' not found");
+                }
+                if (node instanceof DBNDataSource && folderNode instanceof DBNLocalFolder) {
+                    ((DBNDataSource) node).moveToFolder(null, ((DBNLocalFolder) folderNode).getFolder());
+                } else if (node instanceof DBNResourceManagerResource && folderNode instanceof DBNResourceManagerResource) {
+                    String resourcePath = ((DBNResourceManagerResource) node).getResource().getName();
+                    String folderPath = ((DBNResourceManagerResource) folderNode).getResource().getName();
+                    if (projectId == null) {
+                        throw new DBWebException("Project id is null");
+                    }
+                    session.getRmController().moveResource(projectId, resourcePath, folderPath);
+                } else {
+                    throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
+                }
+            }
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+        }
+    }
     // Folders
     public WebNavigatorNodeInfo createFolder(
         @NotNull WebSession session,

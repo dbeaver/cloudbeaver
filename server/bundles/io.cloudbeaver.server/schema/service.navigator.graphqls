@@ -135,4 +135,5 @@ extend type Mutation {
 
     navDeleteFolder( nodePath: ID! ): Boolean
 
+    navMoveNodesToFolder( nodePaths: [ID!]!, folderNodePath: String!, projectId: String ): String
 }
