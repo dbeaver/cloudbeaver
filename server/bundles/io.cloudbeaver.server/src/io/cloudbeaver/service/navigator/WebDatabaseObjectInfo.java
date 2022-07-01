@@ -49,7 +49,7 @@ public class WebDatabaseObjectInfo {
     public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
     public static final String OBJECT_FEATURE_DATA_SOURCE_TEMPORARY = "dataSourceTemporary";
     public static final String OBJECT_FEATURE_ENTITY = "entity";
-    public static final String OBJECT_FEATURE_ERD_ENTITY = "erdEntity";
+    public static final String OBJECT_FEATURE_RELATIONAL_ENTITY = "relationalEntity";
     public static final String OBJECT_FEATURE_ENTITY_CONTAINER = "entityContainer";
     public static final String OBJECT_FEATURE_OBJECT_CONTAINER = "objectContainer";
     public static final String OBJECT_FEATURE_SCHEMA = "schema";
@@ -190,7 +190,7 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSEntity) {
             features.add(OBJECT_FEATURE_ENTITY);
             if (isDiagramSupported) {
-                features.add(OBJECT_FEATURE_ERD_ENTITY);
+                features.add(OBJECT_FEATURE_RELATIONAL_ENTITY);
             }
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
