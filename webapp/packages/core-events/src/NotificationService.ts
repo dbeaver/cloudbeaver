@@ -39,7 +39,7 @@ export class NotificationService {
   }
 
   constructor(
-    private settings: EventsSettingsService
+    private readonly settings: EventsSettingsService
   ) {
     this.notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
     this.closeTask = new Executor();
@@ -147,7 +147,12 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
+  logException(
+    exception: Error | GQLError | undefined | null,
+    title?: string,
+    message?: string,
+    silent?: boolean
+  ): void {
     const errorDetails = getErrorDetails(exception);
 
     if (!silent) {

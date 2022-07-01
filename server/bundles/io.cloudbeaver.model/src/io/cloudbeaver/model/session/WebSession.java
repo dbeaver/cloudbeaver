@@ -58,7 +58,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.ProjectMetadata;
+import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -111,7 +111,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private ProjectMetadata sessionProject;
+    private VirtualProjectImpl sessionProject;
     private final SessionContextImpl sessionAuthContext;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
@@ -313,7 +313,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.sessionProject = null;
         }
 
-        this.sessionProject = new ProjectMetadata(
+        this.sessionProject = new VirtualProjectImpl(
             platform.getWorkspace(),
             projectName,
             projectPath,

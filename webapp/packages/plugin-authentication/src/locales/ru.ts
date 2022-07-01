@@ -3,6 +3,7 @@ export default [
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
   ['authentication_authenticate', 'Аутентифицироваться'],
+  ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
   ['authentication_configure', 'Пожалуйста настройте способы аутентификации'],

@@ -3,6 +3,7 @@ export default [
   ['authentication_login', 'Login'],
   ['authentication_logout', 'Logout'],
   ['authentication_authenticate', 'Authenticate'],
+  ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', 'Federated'],
   ['authentication_select_provider', 'Select available provider'],
   ['authentication_configure', 'Please configure authentication methods'],

@@ -35,7 +35,7 @@ export class Task<TValue> implements ITask<TValue> {
 
   private resolve!: (value: TValue) => void;
   private reject!: (reason?: any) => void;
-  private innerPromise: Promise<TValue>;
+  private readonly innerPromise: Promise<TValue>;
   private sourcePromise: Promise<TValue> | null;
 
   get [Symbol.toStringTag](): string {
@@ -44,7 +44,7 @@ export class Task<TValue> implements ITask<TValue> {
 
   constructor(
     readonly task: () => Promise<TValue>,
-    private externalCancel?: () => Promise<void> | void
+    private readonly externalCancel?: () => Promise<void> | void
   ) {
     this.innerPromise = new Promise((resolve, reject) => {
       this.reject = reject;
@@ -66,17 +66,24 @@ export class Task<TValue> implements ITask<TValue> {
     onfulfilled?: ((value: TValue) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
   ): ITask<TResult1 | TResult2> {
+    let cancel = this.cancel.bind(this);
+
     return new Task(async () => {
-      try {
-        const value = await this.innerPromise;
-        return await onfulfilled?.(value) as TResult1;
-      } catch (e: any) {
-        if (onrejected) {
-          return await onrejected(e);
-        }
-        throw e;
+      const value = await this.innerPromise;
+
+      const task = onfulfilled?.(value);
+
+      if (task instanceof Task) {
+        cancel = async () => {
+          await task.cancel();
+          await this.cancel();
+        };
       }
-    }, () => this.cancel()).run();
+
+      return await task as TResult1;
+    }, () => cancel())
+      .run()
+      .catch(onrejected);
   }
 
   catch<TResult = never>(
@@ -127,7 +134,7 @@ export class Task<TValue> implements ITask<TValue> {
     return this;
   }
 
-  cancel(): Promise<void> | void {
+  async cancel(): Promise<void> {
     if (this.cancelled) {
       return;
     }
@@ -140,11 +147,11 @@ export class Task<TValue> implements ITask<TValue> {
     }
 
     if (this.externalCancel) {
-      return this.externalCancel();
+      await this.externalCancel();
     }
 
     if (this.sourcePromise instanceof Task) {
-      return this.sourcePromise.cancel();
+      await this.sourcePromise.cancel();
     }
   }
 }

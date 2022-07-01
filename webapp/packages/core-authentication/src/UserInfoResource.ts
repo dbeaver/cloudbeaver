@@ -9,7 +9,7 @@
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
+import { SyncExecutor, ISyncExecutor, ITask, AutoRunningTask, whileTask } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ObjectOrigin, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
@@ -121,41 +121,51 @@ UserInfoIncludes
     });
   }
 
-  async finishFederatedAuthentication(authId: string, link?: boolean): Promise<void> {
-    return await this.performUpdate(undefined, [], async () => {
-      await new Promise<void>((resolve, reject) => {
-        const interval = setInterval(async () => {
-          try {
+  finishFederatedAuthentication(authId: string, link?: boolean): ITask<UserInfo | null> {
+    let activeTask: ITask<AuthInfo> | undefined;
+
+    return new AutoRunningTask<UserInfo | null>(() => this.performUpdate(
+      undefined,
+      [],
+      async () => {
+        activeTask = whileTask<AuthInfo>(
+          authInfo => {
+            if (authInfo.authStatus === AuthStatus.Success) {
+              return true;
+            } else if (authInfo.authStatus === AuthStatus.Error) {
+              throw new Error('Authentication error');
+            }
+
+            return false;
+          },
+          async () => {
             const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
               authId,
               linkUser: link,
               customIncludeOriginDetails: true,
             });
+            return authInfo as AuthInfo;
+          },
+          1000
+        );
 
-            if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-              if (this.data === null) {
-                this.resetIncludes();
-                this.setData(await this.loader());
-              } else {
-                this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
-              }
+        const authInfo = await activeTask;
 
-              this.sessionResource.markOutdated();
-            }
-
-            if (authInfo.authStatus === AuthStatus.Success) {
-              resolve();
-              clearInterval(interval);
-            } else if (authInfo.authStatus === AuthStatus.Error) {
-              reject(new Error('Authentication error'));
-              clearInterval(interval);
-            }
-          } catch (exception: any) {
-            reject(exception);
-            clearInterval(interval);
+        if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
+          if (this.data === null) {
+            this.resetIncludes();
+            this.setData(await this.loader());
+          } else {
+            this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
           }
-        }, 1000);
-      });
+
+          this.sessionResource.markOutdated();
+        }
+
+        return this.data;
+      }
+    ), () => {
+      activeTask?.cancel();
     });
   }
 
