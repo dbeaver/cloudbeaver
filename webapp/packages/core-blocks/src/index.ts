@@ -17,6 +17,7 @@ export * from './layout/BASE_LAYOUT_GRID_STYLES';
 export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
+export * from './Loader/ILoadableState';
 
 export * from './Marks/ConnectionMark';
 
@@ -164,6 +165,7 @@ export * from './useMapResource';
 export * from './useMouse';
 export * from './useObjectRef';
 export * from './useObservableRef';
+export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useAppLoadingScreen';

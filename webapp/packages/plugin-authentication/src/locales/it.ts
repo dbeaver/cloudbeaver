@@ -3,6 +3,7 @@ export default [
   ['authentication_login', 'Login'],
   ['authentication_logout', 'Logout'],
   ['authentication_authenticate', 'Autentica'],
+  ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', 'Federated'],
   ['authentication_request_token', 'Autenticazione addizionale richiesta'],
   ['authentication_user_name', 'Nome utente'],

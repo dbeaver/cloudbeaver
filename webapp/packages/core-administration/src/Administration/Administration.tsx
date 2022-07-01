@@ -31,6 +31,9 @@ const tabsStyles = css`
   `;
 
 const administrationStyles = css`
+    SlideElement {
+      composes: theme-background-background theme-text-on-background from global;
+    }
     container {
       composes: theme-background-secondary theme-text-on-secondary from global;
       display: flex;

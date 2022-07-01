@@ -2,6 +2,7 @@ package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
@@ -16,6 +17,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -29,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
@@ -99,14 +101,28 @@ public class CBStaticServlet extends DefaultServlet {
                         WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
                             request, response, false);
                         if (webSession.getUser() == null) {
-                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(
-                                activeAuthConfig.getId(), Collections.emptyMap());
+                            var securityController = webSession.getSecurityController();
+                            SMAuthInfo authInfo = securityController.authenticate(
+                                webSession.getSessionId(),
+                                null,
+                                webSession.getSessionParameters(),
+                                WebSession.CB_SESSION_TYPE,
+                                authProvider.getId(),
+                                activeAuthConfig.getId(),
+                                Map.of()
+                            );
+                            String signInLink = authInfo.getRedirectUrl();
                             //ignore current routing if non-root page is open
                             if (!signInLink.endsWith("#")) {
                                 signInLink += "#";
                             }
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
+                                Map<String, Object> authActionParams = Map.of(
+                                    "action", "auto-login",
+                                    "auth-id", authInfo.getAuthAttemptId()
+                                );
+                                WebActionParameters.saveToSession(webSession, authActionParams);
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);
                                 response.sendRedirect(signInLink);
                                 return true;
