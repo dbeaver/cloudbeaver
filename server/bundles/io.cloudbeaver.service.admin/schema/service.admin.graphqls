@@ -136,11 +136,6 @@ extend type Query {
     updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
     deleteConnectionConfiguration( id: ID! ): Boolean
 
-    # Folders
-
-    createGlobalFolder( parentFolderPath: ID, folderName: String! ): FolderInfo!
-    deleteGlobalFolder( folderPath: ID! ): Boolean!
-
     # Permissions
 
     getConnectionSubjectAccess(connectionId: ID): [AdminConnectionGrantInfo!]!
