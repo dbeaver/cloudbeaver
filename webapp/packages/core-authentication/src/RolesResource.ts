@@ -18,6 +18,7 @@ import {
   AdminConnectionGrantInfo,
   CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const NEW_ROLE_SYMBOL = Symbol('new-role');
 
@@ -60,6 +61,7 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
     const { role } = await this.graphQLService.sdk.updateRole(roleInfo);
 
     this.updateRoles(role);
+
     await this.setSubjectPermissions(role.roleId, roleInfo.rolePermissions);
 
     return this.get(roleInfo.roleId)!;
@@ -87,20 +89,22 @@ export class RolesResource extends CachedMapResource<string, RoleInfo> {
   }
 
   async setSubjectPermissions(roleId: string, permissions: string[]): Promise<void> {
-    await this.performUpdate(roleId, [], async () => {
-      const {
-        permissions: newPermissions,
-      } = await this.graphQLService.sdk.setSubjectPermissions({ roleId, permissions });
+    const role = this.get(roleId);
 
-      const role = this.get(roleId);
+    if (role && isArraysEqual(role.rolePermissions, permissions)) {
+      return;
+    }
 
-      if (role) {
-        role.rolePermissions = newPermissions.map(permission => permission.id);
-      } else {
+    const {
+      permissions: newPermissions,
+    } = await this.graphQLService.sdk.setSubjectPermissions({ roleId, permissions });
+
+    if (role) {
+      role.rolePermissions = newPermissions.map(permission => permission.id);
+    } else {
       // TODO: update permissions for role instead
-        await this.loader(roleId);
-      }
-    });
+      await this.loader(roleId);
+    }
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, RoleInfo>> {
