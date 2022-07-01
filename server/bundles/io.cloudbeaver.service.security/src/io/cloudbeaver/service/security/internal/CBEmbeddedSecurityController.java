@@ -1111,6 +1111,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
         boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
 
+        String token = null;
+        SMAuthPermissions permissions = null;
+        if (!isMainAuthSession) {
+            //this is an additional authorization and we should to return the original permissions and  userId
+            token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
+            permissions = getTokenPermissions(token);
+        }
+
         for (String authProviderId : authProviderIds) {
             var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
@@ -1118,6 +1126,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 authAttemptSessionInfo.getSessionParams(),
                 userCredentials,
                 finishAuthMonitor,
+                permissions == null ? null : permissions.getUserId(),
                 isMainAuthSession
             );
 
@@ -1129,13 +1138,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCreds;
         }
 
-        String token;
-        SMAuthPermissions permissions;
-        if (!isMainAuthSession) {
-            //this is an additional authorization and we should to return the original permissions and  userId
-            token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
-            permissions = getTokenPermissions(token);
-        } else {
+        if (token == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                     String smSessionId;
@@ -1194,12 +1197,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
         @NotNull DBRProgressMonitor progressMonitor,
+        @Nullable String activeUserId,
         boolean newUserAuthenticationTry
     ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);
         String userIdFromCredentials;
+        if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
+            throw new SMException("Credentials are not with current user");
+        }
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
         } catch (DBException e) {
@@ -1220,7 +1227,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
-        } else {
+        } else if (userId == null) {
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
@@ -1288,12 +1295,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBException("Web application doesn't support external authentication");
         }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
-        List<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
+        Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
         List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
                 !ap.isTrusted() &&
-                appConfiguration.isAuthProviderEnabled(ap.getId()) &&
-                (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
+                    appConfiguration.isAuthProviderEnabled(ap.getId()) &&
+                    (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
             .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
 
         if (!CommonUtils.isEmpty(customConfigurations)) {
@@ -1312,7 +1319,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return providers.toArray(new SMAuthProviderDescriptor[0]);
     }
 
-    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, List<SMAuthProviderCustomConfiguration> customConfigurations) {
+    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
         for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
             if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
                 return true;

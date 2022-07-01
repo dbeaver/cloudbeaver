@@ -26,15 +26,12 @@ import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguration implements WebAuthConfiguration {
     private String defaultAuthProvider;
     private String[] enabledAuthProviders;
-    private final List<SMAuthProviderCustomConfiguration> authConfigurations;
+    private final Set<SMAuthProviderCustomConfiguration> authConfigurations;
     // Legacy auth configs, left for backward compatibility
     @Expose(serialize = false)
     private final Map<String, SMAuthProviderCustomConfiguration> authConfiguration;
@@ -43,7 +40,7 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
         super();
         this.defaultAuthProvider = LocalAuthProviderConstants.PROVIDER_ID;
         this.enabledAuthProviders = null;
-        this.authConfigurations = new ArrayList<>();
+        this.authConfigurations = new LinkedHashSet<>();
         this.authConfiguration = new LinkedHashMap<>();
     }
 
@@ -51,7 +48,7 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
         super(src);
         this.defaultAuthProvider = src.defaultAuthProvider;
         this.enabledAuthProviders = src.enabledAuthProviders;
-        this.authConfigurations = new ArrayList<>(src.authConfigurations);
+        this.authConfigurations = new LinkedHashSet<>(src.authConfigurations);
         this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
     }
 
@@ -102,7 +99,7 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
     ////////////////////////////////////////////
     // Auth provider configs
     @Override
-    public List<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations() {
+    public Set<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations() {
         return authConfigurations;
     }
 
@@ -121,7 +118,7 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
         }
     }
 
-    public void setAuthProvidersConfigurations(List<SMAuthProviderCustomConfiguration> authProviders) {
+    public void setAuthProvidersConfigurations(Collection<SMAuthProviderCustomConfiguration> authProviders) {
         synchronized (authConfigurations) {
             authConfigurations.clear();
             authConfigurations.addAll(authProviders);

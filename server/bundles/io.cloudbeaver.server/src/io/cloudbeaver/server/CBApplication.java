@@ -570,11 +570,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             // Backward compatibility: load configs map
             appConfiguration.loadLegacyCustomConfigs();
 
-            List<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+            Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
                     prevConfig.getAuthCustomConfigurations().stream(),
                     appConfiguration.getAuthCustomConfigurations().stream()
                 )
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
             appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
         }
 
