@@ -171,10 +171,6 @@ public class WebDatabaseObjectInfo {
 
     private static void getObjectFeatures(DBSObject object, List<String> features) {
         boolean isDiagramSupported = true;
-        if (object instanceof DBSDataType ||
-            object instanceof DBSDocumentContainer) {
-            isDiagramSupported = false;
-        }
         if (object instanceof DBPScriptObject) features.add(OBJECT_FEATURE_SCRIPT);
         if (object instanceof DBPScriptObjectExt) features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
         if (object instanceof DBSDataContainer) {
@@ -189,6 +185,10 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
         if (object instanceof DBSEntity) {
             features.add(OBJECT_FEATURE_ENTITY);
+            if (object instanceof DBSDataType
+                || object instanceof DBSDocumentContainer) {
+                isDiagramSupported = false;
+            }
             if (isDiagramSupported) {
                 features.add(OBJECT_FEATURE_RELATIONAL_ENTITY);
             }
