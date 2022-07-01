@@ -297,7 +297,7 @@ type ConnectionInfo {
     useUrl: Boolean!
     saveCredentials: Boolean!
 
-    folder: String
+    folder: ID
     nodePath: String
 
     connectTime: String
@@ -318,6 +318,11 @@ type ConnectionInfo {
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
+}
+
+type ConnectionFolderInfo {
+    id: ID!
+    description: String
 }
 
 type NetworkEndpointInfo {
@@ -427,6 +432,9 @@ input ConnectionConfig {
     # Direct user credentials
     userName: String #@deprecated
     userPassword: String #@deprecated
+
+    # Folder
+    folder: ID
 }
 
 ####################################################
@@ -452,6 +460,9 @@ extend type Query {
     userConnections( id: ID ): [ ConnectionInfo! ]!
     # List of template connections.
     templateConnections: [ ConnectionInfo! ]!
+
+    # List of connection folders
+    connectionFolders( path: ID ): [ ConnectionFolderInfo! ]!
 
     # Return connection state
     connectionState( id: ID! ): ConnectionInfo! @deprecated
@@ -486,6 +497,11 @@ extend type Mutation {
     deleteConnection( id: ID! ): Boolean!
 
     createConnectionFromTemplate( templateId: ID!, connectionName: String ): ConnectionInfo!
+
+    # Create new folder
+    createConnectionFolder(parentFolderPath: ID, folderName: String! ): ConnectionFolderInfo!
+
+    deleteConnectionFolder( folderPath: ID! ): Boolean!
 
     # Copies connection configuration from node
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig ): ConnectionInfo!
