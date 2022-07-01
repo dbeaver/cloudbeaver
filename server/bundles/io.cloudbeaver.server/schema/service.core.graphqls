@@ -320,7 +320,7 @@ type ConnectionInfo {
     supportedDataFormats: [ ResultDataFormat! ]!
 }
 
-type FolderInfo {
+type ConnectionFolderInfo {
     id: ID!
     description: String
 }
@@ -461,8 +461,8 @@ extend type Query {
     # List of template connections.
     templateConnections: [ ConnectionInfo! ]!
 
-    # List of user folders
-    userFolders( path: ID ): [ FolderInfo! ]!
+    # List of connection folders
+    connectionFolders( path: ID ): [ ConnectionFolderInfo! ]!
 
     # Return connection state
     connectionState( id: ID! ): ConnectionInfo! @deprecated
@@ -499,9 +499,9 @@ extend type Mutation {
     createConnectionFromTemplate( templateId: ID!, connectionName: String ): ConnectionInfo!
 
     # Create new folder
-    createFolder(parentFolderPath: ID, folderName: String! ): FolderInfo!
+    createConnectionFolder(parentFolderPath: ID, folderName: String! ): ConnectionFolderInfo!
 
-    deleteFolder( folderPath: ID! ): Boolean!
+    deleteConnectionFolder( folderPath: ID! ): Boolean!
 
     # Copies connection configuration from node
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig ): ConnectionInfo!

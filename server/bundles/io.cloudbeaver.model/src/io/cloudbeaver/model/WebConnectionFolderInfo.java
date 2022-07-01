@@ -20,11 +20,11 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.meta.Property;
 
-public class WebFolderInfo {
+public class WebConnectionFolderInfo {
     private final WebSession session;
     private final DBPDataSourceFolder dataSourceFolder;
 
-    public WebFolderInfo(WebSession session, DBPDataSourceFolder dataSourceFolder) {
+    public WebConnectionFolderInfo(WebSession session, DBPDataSourceFolder dataSourceFolder) {
         this.session = session;
         this.dataSourceFolder = dataSourceFolder;
     }

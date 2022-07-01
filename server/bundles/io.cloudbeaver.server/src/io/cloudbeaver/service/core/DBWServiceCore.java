@@ -51,7 +51,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    List<WebFolderInfo> getUserFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
+    List<WebConnectionFolderInfo> getConnectionFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
 
     @Deprecated
     @WebAction
@@ -140,13 +140,13 @@ public interface DBWServiceCore extends DBWService {
     // Folders
 
     @WebAction
-    WebFolderInfo createFolder(@NotNull WebSession session, @Nullable String folderPath, @NotNull String newName) throws DBWebException;
+    WebConnectionFolderInfo createConnectionFolder(@NotNull WebSession session, @Nullable String folderPath, @NotNull String newName) throws DBWebException;
 
     @WebAction
-    WebFolderInfo renameFolder(@NotNull WebSession session, @NotNull String folderPath, @NotNull String newName) throws DBWebException;
+    WebConnectionFolderInfo renameConnectionFolder(@NotNull WebSession session, @NotNull String folderPath, @NotNull String newName) throws DBWebException;
 
     @WebAction
-    boolean deleteFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
+    boolean deleteConnectionFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings

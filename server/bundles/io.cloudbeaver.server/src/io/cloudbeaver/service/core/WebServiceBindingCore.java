@@ -61,7 +61,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("userConnections", env -> getService(env).getUserConnections(getWebSession(env), env.getArgument("id")))
             .dataFetcher("templateConnections", env -> getService(env).getTemplateConnections(getWebSession(env)))
 
-            .dataFetcher("userFolders", env -> getService(env).getUserFolders(getWebSession(env), env.getArgument("path")))
+            .dataFetcher("connectionFolders", env -> getService(env).getConnectionFolders(getWebSession(env), env.getArgument("path")))
 
             .dataFetcher("sessionPermissions", env -> getService(env).getSessionPermissions(getWebSession(env)))
             .dataFetcher("sessionState", env -> getService(env).getSessionState(getWebSession(env)))
@@ -137,17 +137,17 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 env.getArgument("removeOnFinish")))
             .dataFetcher("asyncTaskCancel", env -> getService(env).cancelAsyncTask(getWebSession(env), env.getArgument("id")))
 
-            .dataFetcher("createFolder", env -> getService(env).createFolder(
+            .dataFetcher("createConnectionFolder", env -> getService(env).createConnectionFolder(
                 getWebSession(env),
                 env.getArgument("parentFolderPath"),
                 env.getArgument("folderName")
             ))
-            .dataFetcher("renameFolder", env -> getService(env).renameFolder(
+            .dataFetcher("renameConnectionFolder", env -> getService(env).renameConnectionFolder(
                 getWebSession(env),
                 env.getArgument("folderPath"),
                 env.getArgument("newName")
             ))
-            .dataFetcher("deleteFolder", env -> getService(env).deleteFolder(
+            .dataFetcher("deleteConnectionFolder", env -> getService(env).deleteConnectionFolder(
                 getWebSession(env),
                 env.getArgument("folderPath")
             ))

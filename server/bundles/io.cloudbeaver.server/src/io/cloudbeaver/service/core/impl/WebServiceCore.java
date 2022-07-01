@@ -28,7 +28,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import io.cloudbeaver.utils.WebFolderUtils;
+import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -146,13 +146,13 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebFolderInfo> getUserFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
+    public List<WebConnectionFolderInfo> getConnectionFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
         if (id != null) {
-            WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(webSession, id);
+            WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(webSession, id);
             return Collections.singletonList(folderInfo);
         }
         return webSession.getSingletonProject().getDataSourceRegistry().getAllFolders().stream()
-            .map(f -> new WebFolderInfo(webSession, f)).collect(Collectors.toList());
+            .map(f -> new WebConnectionFolderInfo(webSession, f)).collect(Collectors.toList());
     }
 
     @Override
@@ -550,21 +550,21 @@ public class WebServiceCore implements DBWServiceCore {
 
     // Folders
     @Override
-    public WebFolderInfo createFolder(
+    public WebConnectionFolderInfo createConnectionFolder(
         @NotNull WebSession session,
         @Nullable String parentPath,
         @NotNull String folderName
     ) throws DBWebException {
         DBRProgressMonitor monitor = session.getProgressMonitor();
         session.addInfoMessage("Create new folder");
-        WebFolderInfo parentNode = null;
+        WebConnectionFolderInfo parentNode = null;
         try {
             if (parentPath != null) {
-                parentNode = WebFolderUtils.getWebFolderInfo(session, parentPath);
+                parentNode = WebConnectionFolderUtils.getFolderInfo(session, parentPath);
             }
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
-            WebFolderInfo folderInfo = new WebFolderInfo(session, newFolder);
+            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             if (parentPath == null)  {
                 WebServiceUtils.updateConfigAndRefreshDatabases(session);
             }
@@ -576,20 +576,20 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebFolderInfo renameFolder(
+    public WebConnectionFolderInfo renameConnectionFolder(
         @NotNull WebSession session,
         @NotNull String folderPath,
         @NotNull String newName
     ) throws DBWebException {
-        WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(session, folderPath);
+        WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
         return folderInfo;
     }
 
     @Override
-    public boolean deleteFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {
+    public boolean deleteConnectionFolder(@NotNull WebSession session, @NotNull String folderPath) throws DBWebException {
         try {
-            WebFolderInfo folderInfo = WebFolderUtils.getWebFolderInfo(session, folderPath);
+            WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
             boolean rootFolder = folder.getParent() != null;
             if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {

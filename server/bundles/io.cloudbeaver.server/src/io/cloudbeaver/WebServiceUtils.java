@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.WebFolderInfo;
+import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
@@ -317,7 +317,7 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static DBPDataSourceFolder createFolder(WebFolderInfo parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
+    public static DBPDataSourceFolder createFolder(WebConnectionFolderInfo parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
         DBPDataSourceFolder folder = registry.addFolder(parentFolder == null ? null : parentFolder.getDataSourceFolder(), newName);
         return folder;
     }

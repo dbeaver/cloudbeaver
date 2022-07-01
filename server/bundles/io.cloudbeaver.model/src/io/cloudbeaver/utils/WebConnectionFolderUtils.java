@@ -18,14 +18,14 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebFolderInfo;
+import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.utils.CommonUtils;
 
-public class WebFolderUtils {
+public class WebConnectionFolderUtils {
 
-    public static WebFolderInfo getWebFolderInfo(WebSession session, String folderPath) throws DBWebException {
+    public static WebConnectionFolderInfo getFolderInfo(WebSession session, String folderPath) throws DBWebException {
         DBPDataSourceFolder folder = null;
         if (!CommonUtils.isEmpty(folderPath)) {
             folder = session.getSingletonProject().getDataSourceRegistry().getFolder(folderPath);
@@ -34,7 +34,7 @@ public class WebFolderUtils {
             }
         }
         if (folder != null) {
-            return new WebFolderInfo(session, folder);
+            return new WebConnectionFolderInfo(session, folder);
         } else {
             throw new DBWebException("Folder '" + folderPath + "' not found");
         }
