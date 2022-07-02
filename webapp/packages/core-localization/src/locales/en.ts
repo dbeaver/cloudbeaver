@@ -51,6 +51,8 @@ export const defaultENLocale = [
   ['ui_edit', 'Edit'],
   ['ui_open_in_tab', 'Open in tab'],
   ['ui_rename', 'Rename'],
+  ['ui_create', 'Create'],
+  ['ui_folder', 'Folder'],
   ['ui_rename_processing', 'Renaming...'],
   ['ui_interval', 'Interval'],
   ['ui_name', 'Name'],
