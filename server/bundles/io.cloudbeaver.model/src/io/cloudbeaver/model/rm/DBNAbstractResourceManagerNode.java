@@ -8,10 +8,10 @@ import org.jkiss.utils.ArrayUtils;
 
 import java.util.Queue;
 
-abstract class DBNAbstractResourceManagerNode extends DBNNode implements DBPObjectWithDetails {
+public abstract class DBNAbstractResourceManagerNode extends DBNNode implements DBPObjectWithDetails {
     protected DBNResourceManagerResource[] children;
 
-    DBNAbstractResourceManagerNode(DBNNode parentNode) {
+    public DBNAbstractResourceManagerNode(DBNNode parentNode) {
         super(parentNode);
     }
 

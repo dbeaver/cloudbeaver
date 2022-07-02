@@ -216,15 +216,15 @@ public class LocalResourceController implements RMController {
 
     @Override
     public String moveResource(@NotNull String projectId, @NotNull String oldResourcePath, @NotNull String newResourcePath) throws DBException {
-        validateResourcePath(newResourcePath);
         Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
-        Path newTargetPath = getTargetPath(projectId, newResourcePath);
+        Path newTargetPath = getTargetPath(projectId, newResourcePath).resolve(oldTargetPath.getFileName());
+        validateResourcePath(newTargetPath.toString());
         List<RMResource> rmResourcePath = makeResourcePath(projectId, oldTargetPath);
         try {
-            Files.move(oldTargetPath, newTargetPath.resolve(oldTargetPath.getFileName()));
+            Files.move(oldTargetPath, newTargetPath);
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }

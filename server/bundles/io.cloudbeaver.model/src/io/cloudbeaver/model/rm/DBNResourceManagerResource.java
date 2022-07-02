@@ -83,7 +83,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return children;
     }
 
-    private String getResourceFolder() {
+    public String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
         for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
