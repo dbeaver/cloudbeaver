@@ -67,6 +67,7 @@ export interface IElementsTreeOptions {
   isGroup?: (node: NavNode) => boolean;
   customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
   beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
+  customSelectReset?: ()=> Promise<void> | void;
 }
 
 interface IOptions extends IElementsTreeOptions {
@@ -96,8 +97,10 @@ export interface IElementsTree {
   isGroup?: (node: NavNode) => boolean;
   setFilter: (value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
+  resetSelection(): Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
   show: (nodeId: string, parents: string[]) => Promise<void>;
+  refresh: (nodeId: string) => Promise<void>;
   collapse: () => void;
 }
 
@@ -177,6 +180,22 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
 
       return nestedChildren;
+    },
+
+    async resetSelection() {
+      for (const [id, nodeState] of state) {
+        if (nodeState.selected) {
+          nodeState.selected = false;
+
+          if (options.onSelect) {
+            const node = navNodeInfoResource.get(id);
+
+            if (node) {
+              await options.onSelect(node, false);
+            }
+          }
+        }
+      }
     },
 
     async clearSelection(nodeId: string) {
@@ -358,6 +377,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
         state.showInFilter = false;
       }
     },
+    async refresh(nodeId: string): Promise<void> {
+      return navTreeResource.refreshTree(nodeId);
+    },
     async show(nodeId: string, path: string[]): Promise<void> {
       const preloaded = await navTreeResource.preloadNodeParents(path, nodeId);
 
@@ -439,6 +461,13 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
 
       await functionsRef.setSelection(node.id, !selected);
+    },
+    async resetSelection(): Promise<void> {
+      if (options.customSelectReset) {
+        await options.customSelectReset();
+        return;
+      }
+      await functionsRef.resetSelection();
     },
   }), {
     settings: observable.ref,

@@ -10,8 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
@@ -101,6 +102,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   isGroup,
   beforeSelect,
   customSelect,
+  customSelectReset,
   onExpand,
   onClick,
   onOpen,
@@ -194,6 +196,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     isGroup,
     onFilter,
     beforeSelect,
+    customSelectReset,
     customSelect,
     onExpand,
     onSelect,
@@ -242,6 +245,20 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     [navNodeInfoResource]
   );
 
+  function handleClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (EventContext.has(
+      event,
+      EventTreeNodeExpandFlag,
+      EventTreeNodeSelectFlag,
+      EventTreeNodeClickFlag,
+      EventStopPropagationFlag
+    )) {
+      return;
+    }
+
+    tree.resetSelection();
+  }
+
   const foldersTree = settings?.foldersTree; // mobx subscription
   const filter = settings?.filter;
 
@@ -281,7 +298,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
           <ElementsTreeContext.Provider value={context}>
             <box className={className}>
               <FolderExplorer state={folderExplorer}>
-                <tree>
+                <tree as="div" onClick={handleClick}>
                   {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
                   <drop-outside ref={dndBox.setRef} {...use({ showDropOutside })}>
                     <NavigationNodeNested

@@ -151,7 +151,7 @@ export class NavigationTreeService extends View<string> {
     };
   }
 
-  private unselectAll() {
+  unselectAll() {
     const list: string[] = [];
 
     for (const [id, metadata] of this.treeState) {

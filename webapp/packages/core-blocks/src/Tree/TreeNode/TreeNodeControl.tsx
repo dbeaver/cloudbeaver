@@ -11,6 +11,7 @@ import React, { useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
+import { EventTreeNodeClickFlag } from './EventTreeNodeClickFlag';
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import type { ITreeNodeState } from './ITreeNodeState';
@@ -98,6 +99,8 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNode
     if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
       return;
     }
+
+    EventContext.set(event, EventTreeNodeClickFlag);
 
     await context.click?.();
   }
