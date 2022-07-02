@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
+import { INodeNavigationData, NavigationTabsService, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
@@ -147,15 +148,25 @@ export class PluginBootstrap extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  private async navigationHandler(data: INodeNavigationData) {
+  private async navigationHandler(
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
+  ) {
     if (!this.resourceManagerService.enabled) {
       return;
     }
 
     try {
+      const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = await this.navNodeInfoResource.load(data.nodeId);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
+        return;
+      }
+
+      nodeInfo.markOpen();
+
+      if (data.type !== NavigationType.open) {
         return;
       }
 

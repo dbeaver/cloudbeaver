@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, INodeNavigationData, ITab, NavigationTabsService } from '@cloudbeaver/core-app';
+import { NavNodeManagerService, INodeNavigationData, ITab, NavigationTabsService, NavigationType } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -72,6 +72,10 @@ export class DataViewerTabService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
+    if (data.type !== NavigationType.open) {
+      return;
+    }
+
     try {
       const {
         nodeInfo,

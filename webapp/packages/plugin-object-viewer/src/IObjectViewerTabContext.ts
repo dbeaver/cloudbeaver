@@ -12,10 +12,13 @@ import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
 
 export interface IObjectViewerTabContext {
+  isSupported: boolean;
   tab: ITab<IObjectViewerTabState> | null;
   page?: ObjectPage<any>;
   tabInfo: ITabNavigationContext;
   nodeInfo: INodeNavigationContext;
+
+  initTab(): ITab<IObjectViewerTabState> | null;
   isPageActive: (page: ObjectPage<any>) => boolean;
   canSwitchPage: (page: ObjectPage<any>) => boolean;
   trySwitchPage: <T>(page: ObjectPage<T>, state?: T) => boolean;
