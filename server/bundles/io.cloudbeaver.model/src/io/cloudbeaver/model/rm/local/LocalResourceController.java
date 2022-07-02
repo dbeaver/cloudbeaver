@@ -50,9 +50,6 @@ public class LocalResourceController implements RMController {
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
 
-    private static final String PROJECT_PREFIX_GLOBAL = "g_";
-    private static final String PROJECT_PREFIX_SHARED = "s_";
-    private static final String PROJECT_PREFIX_USER = "u_";
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final SMCredentialsProvider credentialsProvider;
@@ -92,17 +89,17 @@ public class LocalResourceController implements RMController {
             List<RMProject> projects;
             if (Files.exists(sharedProjectsPath)) {
                 projects = Files.list(sharedProjectsPath)
-                    .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED, true))
+                    .map((Path path) -> makeProjectFromPath(path, RMProject.Type.SHARED, true))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             } else {
                 projects = new ArrayList<>();
             }
-            RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), PROJECT_PREFIX_GLOBAL, true);
+            RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), RMProject.Type.GLOBAL, true);
             if (globalProject != null) {
                 projects.add(globalProject);
             }
-            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), PROJECT_PREFIX_USER, false);
+            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), RMProject.Type.USER, false);
             if (userProject != null) {
                 projects.add(0, userProject);
             }
@@ -120,7 +117,7 @@ public class LocalResourceController implements RMController {
                 return new RMProject[0];
             }
             return Files.list(sharedProjectsPath)
-                .map((Path path) -> makeProjectFromPath(path, PROJECT_PREFIX_SHARED, false))
+                .map((Path path) -> makeProjectFromPath(path, RMProject.Type.SHARED, false))
                 .filter(Objects::nonNull)
                 .toArray(RMProject[]::new);
         } catch (IOException e) {
@@ -165,7 +162,9 @@ public class LocalResourceController implements RMController {
         @Nullable String folder,
         @Nullable String nameMask,
         boolean readProperties,
-        boolean readHistory) throws DBException {
+        boolean readHistory,
+        boolean recursive) throws DBException
+    {
         Path projectPath = getProjectPath(projectId);
         try {
             if (!Files.exists(projectPath)) {
@@ -179,16 +178,21 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
-            return Files.list(folderPath)
-                .filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
-                .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory))
-                .filter(Objects::nonNull)
-                .toArray(RMResource[]::new);
+            return readChildResources(folderPath, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
         } catch (IOException e) {
             throw new DBException("Error reading resources", e);
         }
+    }
+
+    @NotNull
+    private RMResource[] readChildResources(Path folderPath, boolean readProperties, boolean readHistory, boolean recursive) throws IOException {
+        return Files.list(folderPath)
+            .filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
+            .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory, recursive))
+            .filter(Objects::nonNull)
+            .toArray(RMResource[]::new);
     }
 
     @Override
@@ -226,7 +230,7 @@ public class LocalResourceController implements RMController {
         if (!Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
         }
-        List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath);
+        List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
         try {
             Files.delete(targetPath);
         } catch (IOException e) {
@@ -242,7 +246,7 @@ public class LocalResourceController implements RMController {
 
     @Override
     public RMResource[] getResourcePath(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
-        return makeResourcePath(projectId, getTargetPath(projectId, resourcePath)).toArray(RMResource[]::new);
+        return makeResourcePath(projectId, getTargetPath(projectId, resourcePath), false).toArray(RMResource[]::new);
     }
 
     @NotNull
@@ -326,10 +330,10 @@ public class LocalResourceController implements RMController {
     private RMProject makeProjectFromId(String projectId) throws DBException {
         var projectName = parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
-        return makeProjectFromPath(projectPath, projectName.getPrefix(), false);
+        return makeProjectFromPath(projectPath, projectName.getType(), false);
     }
 
-    private RMProject makeProjectFromPath(Path path, String prefix, boolean checkExistence) {
+    private RMProject makeProjectFromPath(Path path, RMProject.Type type, boolean checkExistence) {
         if (path == null) {
             return null;
         }
@@ -343,9 +347,10 @@ public class LocalResourceController implements RMController {
         }
 
         RMProject project = new RMProject();
-        project.setName(path.getFileName().toString());
-        project.setId(prefix + project.getName());
-        project.setShared(prefix.equals(PROJECT_PREFIX_SHARED) || prefix.equals(PROJECT_PREFIX_GLOBAL));
+        String projectName = path.getFileName().toString();
+        project.setName(projectName);
+        project.setId(type.getPrefix() + "_" + projectName);
+        project.setType(type);
         try {
             project.setCreateTime(
                 OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")));
@@ -359,15 +364,15 @@ public class LocalResourceController implements RMController {
 
     private Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);
-        String prefix = project.getPrefix();
+        RMProject.Type type = project.getType();
         String projectName = project.getName();
-        switch (prefix) {
-            case PROJECT_PREFIX_GLOBAL:
+        switch (type) {
+            case GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
                     throw new DBException("Invalid global project name '" + projectName + "'");
                 }
                 return getGlobalProjectPath();
-            case PROJECT_PREFIX_SHARED:
+            case SHARED:
                 return sharedProjectsPath.resolve(projectName);
             default:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
@@ -379,7 +384,7 @@ public class LocalResourceController implements RMController {
         }
     }
 
-    private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath) throws DBException {
+    private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath, boolean recursive) throws DBException {
         var projectPath = getProjectPath(projectId);
         var relativeResourcePath = projectPath.relativize(targetPath.toAbsolutePath());
         var resourcePath = projectPath;
@@ -388,13 +393,13 @@ public class LocalResourceController implements RMController {
 
         for (var resourceName : relativeResourcePath) {
             resourcePath = resourcePath.resolve(resourceName);
-            result.add(makeResourceFromPath(resourcePath, false, false));
+            result.add(makeResourceFromPath(resourcePath, false, false, recursive));
         }
 
         return result;
     }
 
-    private RMResource makeResourceFromPath(Path path, boolean readProperties, boolean readHistory) {
+    private RMResource makeResourceFromPath(Path path, boolean readProperties, boolean readHistory, boolean recursive) {
         if (path == null || !Files.exists(path)) {
             return null;
         }
@@ -417,6 +422,15 @@ public class LocalResourceController implements RMController {
             }
         } catch (IOException e) {
             log.error(e);
+        }
+
+        if (recursive && resource.isFolder()) {
+            try {
+                resource.setChildren(
+                    readChildResources(path, readProperties, readHistory, recursive));
+            } catch (IOException e) {
+                log.error(e);
+            }
         }
 
         return resource;
@@ -475,13 +489,21 @@ public class LocalResourceController implements RMController {
         public String getName() {
             return name;
         }
+
+        public RMProject.Type getType() {
+            switch (prefix) {
+                case RMProject.PREFIX_GLOBAL: return RMProject.Type.GLOBAL;
+                case RMProject.PREFIX_SHARED: return RMProject.Type.SHARED;
+                default: return RMProject.Type.USER;
+            }
+        }
     }
     public static RMProjectName parseProjectName(String projectId) {
         String prefix;
         String name;
         int divPos = projectId.indexOf("_");
         if (divPos < 0) {
-            prefix = PROJECT_PREFIX_USER;
+            prefix = RMProject.Type.USER.getPrefix();
             name = projectId;
         } else {
             prefix = projectId.substring(0, divPos + 1);
@@ -491,7 +513,7 @@ public class LocalResourceController implements RMController {
     }
 
     public static boolean isShared(String projectId) {
-        return PROJECT_PREFIX_SHARED.equals(parseProjectName(projectId).getPrefix());
+        return RMProject.Type.SHARED.getPrefix().equals(parseProjectName(projectId).getPrefix());
     }
 
 }
