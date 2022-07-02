@@ -17,7 +17,6 @@ import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { getNodesFromContext } from '../../shared/NodesManager/getNodesFromContext';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -66,6 +65,9 @@ const styles = css`
 
     &:not([|showDropOutside]) {
       display: none;
+    }
+    &[|active] {
+      border-color: var(--theme-positive) !important;
     }
   }
 `;
@@ -153,7 +155,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   }, [folderExplorer]);
 
   const rootNode = useMapResource(ElementsTree, navNodeInfoResource, root);
-
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
@@ -273,13 +274,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   let showDropOutside = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop);
   showDropOutside = useStateDelay(showDropOutside, 100);
-  const isOverCurrent = useStateDelay(dndBox.state.isOverCurrent, 100);
-
-  let dndNodes: string[] | undefined;
-  if (dndBox.state.context && showDropOutside && isOverCurrent) {
-    dndNodes = getNodesFromContext(dndBox.state.context)
-      .map(node => node.id);
-  }
+  const zoneActive = dndBox.state.context && showDropOutside && dndBox.state.isOverCurrent;
 
   const hasChildren = (children.data?.length || 0) > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
@@ -300,11 +295,10 @@ export const ElementsTree = observer<Props>(function ElementsTree({
               <FolderExplorer state={folderExplorer}>
                 <tree as="div" onClick={handleClick}>
                   {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                  <drop-outside ref={dndBox.setRef} {...use({ showDropOutside })}>
+                  <drop-outside ref={dndBox.setRef} {...use({ showDropOutside, active: zoneActive })}>
                     <NavigationNodeNested
                       component={NavigationNodeElement}
                       path={folderExplorer.state.path}
-                      dndNodes={dndNodes}
                       root
                     />
                   </drop-outside>

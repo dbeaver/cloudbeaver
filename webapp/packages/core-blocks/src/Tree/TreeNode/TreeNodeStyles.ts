@@ -32,10 +32,10 @@ export const TREE_NODE_STYLES = css`
 
       & TreeNodeControl {
         box-sizing: border-box;
-        height: 20px;
+        height: 24px;
         display: flex;
         align-items: center;
-        padding: 0px 5px;
+        padding: 2px 5px;
         user-select: none;
         white-space: nowrap;
         position: initial;
@@ -94,6 +94,8 @@ export const TREE_NODE_STYLES = css`
     TreeNodeName {
       box-sizing: border-box;
       padding-right: 16px;
+      display: flex;
+      align-items: center;
     }
 
     TreeNodeFilter {
@@ -110,7 +112,6 @@ export const TREE_NODE_STYLES = css`
 
     TreeNodeNested {
       box-sizing: border-box;
-      padding: 2px 0;
       padding-left: 24px;
       display: none;
 
@@ -131,7 +132,7 @@ export const TREE_NODE_STYLES = css`
 
     node TreeNodeControl[big] {
       height: 46px;
-      padding: 0 16px;
+      padding: 2 16px;
 
       & TreeNodeSelect {
         margin: 3px;

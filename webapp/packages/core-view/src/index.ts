@@ -3,6 +3,7 @@ export * from './Action/Actions/ACTION_DELETE';
 export * from './Action/Actions/ACTION_EXPORT';
 export * from './Action/Actions/ACTION_FILTER';
 export * from './Action/Actions/ACTION_LAYOUT';
+export * from './Action/Actions/ACTION_NEW_FOLDER';
 export * from './Action/Actions/ACTION_OPEN_IN_TAB';
 export * from './Action/Actions/ACTION_OPEN';
 export * from './Action/Actions/ACTION_REFRESH';

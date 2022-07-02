@@ -7,21 +7,27 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled, { use, css } from 'reshadow';
 
-import { getComputed, TreeNode, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useDNDData } from '@cloudbeaver/core-ui';
 import {  useDataContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODE';
 import { DATA_CONTEXT_NAV_NODES } from '../../../shared/NodesManager/DATA_CONTEXT_NAV_NODES';
-import { getNodesFromContext } from '../../../shared/NodesManager/getNodesFromContext';
 import { NavNodeManagerService } from '../../../shared/NodesManager/NavNodeManagerService';
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
+
+const style = css`
+  TreeNode[|hovered] ::before {
+    opacity: 0.16;
+  }
+`;
 
 export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,
@@ -81,18 +87,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     dndData.setTargetRef(refObj);
   }
 
-  let dndNodes: string[] = [];
-  let hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
-  hasNodes = useStateDelay(hasNodes, 100);
+  const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
 
-  if (dndBox.state.context && hasNodes) {
-    dndNodes = getNodesFromContext(dndBox.state.context)
-      .map(node => node.id);
-
-    expandedExternal = true;
-  }
-
-  return (
+  return styled(style)(
     <TreeNode
       ref={dndBox.setRef}
       group={group}
@@ -109,6 +106,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       onClick={click}
       onOpen={open}
       onSelect={select}
+      {...use({ hovered: hasNodes })}
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <Control
@@ -120,7 +118,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
         <NavigationNodeNested
           nodeId={node.id}
           path={path}
-          dndNodes={dndNodes}
           component={component}
         />
       )}

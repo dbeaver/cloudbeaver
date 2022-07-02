@@ -84,11 +84,12 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
         />
       ))}
       {empty && (
-        <TreeNodeNestedMessage>{translate(
-          nodeId === undefined
-            ? 'app_navigationTree_node_drop_placeholder'
-            : 'app_navigationTree_node_empty'
-        )}
+        <TreeNodeNestedMessage>
+          {translate(
+            nodeId === undefined
+              ? 'app_navigationTree_node_drop_placeholder'
+              : 'app_navigationTree_node_empty'
+          )}
         </TreeNodeNestedMessage>
       )}
     </TreeNodeNested>

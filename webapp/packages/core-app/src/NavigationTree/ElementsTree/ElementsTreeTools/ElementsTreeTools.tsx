@@ -116,7 +116,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
           disabled={loading}
           img
           onClick={() => tree.refresh(root)}
-          {...use({ spin: true, primary: true, loading })}
+          {...use({ primary: true, loading })}
         />
       </actions>
       {tree.settings && opened && (

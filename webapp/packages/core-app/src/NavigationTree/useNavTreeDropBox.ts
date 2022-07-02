@@ -6,6 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useEffect } from 'react';
+
+import { useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 
@@ -45,12 +48,15 @@ export function useNavTreeDropBox(targetNode: NavNode | undefined, nodeState?: I
         });
       }
     },
-    onHover() {
-      if (!nodeState?.expanded) {
-        nodeState?.expand();
-      }
-    },
   });
+
+  const hover = useStateDelay(dndBox.state.isOverCurrent && dndBox.state.canDrop, 600);
+
+  useEffect(() => {
+    if (dndBox.state.isOverCurrent && dndBox.state.canDrop && !nodeState?.expanded) {
+      nodeState?.expand();
+    }
+  }, [hover]);
 
   return dndBox;
 }

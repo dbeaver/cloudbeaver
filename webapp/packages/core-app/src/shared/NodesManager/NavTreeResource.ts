@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionFolderResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
@@ -59,6 +59,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly sessionDataResource: SessionDataResource,
     private readonly connectionInfo: ConnectionInfoResource,
     private readonly userInfoResource: UserInfoResource,
+    private readonly connectionFolderResource: ConnectionFolderResource,
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
@@ -184,6 +185,32 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         this.deleteInNode(resourceKeyList(parents), deletedIds);
       });
     });
+  }
+
+  async moveTo(key: ResourceKey<string>, target: string): Promise<void> {
+    await this.connectionFolderResource.load(CachedMapAllKey);
+    const folder = this.connectionFolderResource.fromNodeId(target);
+
+    const parents = Array.from(new Set(
+      ResourceKeyUtils
+        .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)
+        .filter<string>(Boolean as any)
+    ));
+
+    await this.performUpdate(resourceKeyList(parents), [], async () => {
+      this.markDataLoading(target);
+
+      try {
+        await this.graphQLService.sdk.navMoveTo({
+          nodePaths: ResourceKeyUtils.toArray(key),
+          folderPath: folder?.id,
+        });
+      } finally {
+        this.markDataLoaded(target);
+      }
+    });
+
+    this.markOutdated(resourceKeyList([target, ...parents]));
   }
 
   async changeName(node: NavNode, name: string): Promise<void> {

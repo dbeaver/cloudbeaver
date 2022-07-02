@@ -11,6 +11,7 @@ import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
+import { NAV_NODE_TYPE_FOLDER } from '../../shared/NodesManager/NAV_NODE_TYPE_FOLDER';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 
@@ -77,7 +78,11 @@ export function navigationTreeConnectionGroupFilter(
 
     for (const node of nodes) {
       const connection = connectionInfoResource.getConnectionForNode(node.id);
-      const manageable = !!connection?.features.includes(EConnectionFeature.manageable);
+      let manageable = !!connection?.features.includes(EConnectionFeature.manageable);
+
+      if (node.nodeType === NAV_NODE_TYPE_FOLDER) {
+        manageable = true;
+      }
 
       let nextGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unsorted;
 
