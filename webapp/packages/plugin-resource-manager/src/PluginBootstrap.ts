@@ -44,7 +44,7 @@ export class PluginBootstrap extends Bootstrap {
         type: 'checkbox',
         title: 'plugin_resource_manager_title',
         isHidden: () => !this.resourceManagerService.enabled,
-        isChecked: () => this.resourceManagerService.panelEnabled,
+        isChecked: () => this.resourceManagerService.active,
         onClick: this.resourceManagerService.togglePanel,
       }
     );
@@ -53,7 +53,7 @@ export class PluginBootstrap extends Bootstrap {
       key: 'resource-manager-tab',
       order: 0,
       name: 'plugin_resource_manager_title',
-      isHidden: () => !this.resourceManagerService.enabled || !this.resourceManagerService.panelEnabled,
+      isHidden: () => !this.resourceManagerService.active,
       onClose: this.resourceManagerService.togglePanel,
       panel: () => ResourceManager,
     });

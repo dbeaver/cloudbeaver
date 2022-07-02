@@ -115,7 +115,7 @@ export class PluginBootstrap extends Bootstrap {
               this.sqlEditorService.setName(node.name ?? scriptName, state);
               this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
 
-              if (!this.resourceManagerService.panelEnabled) {
+              if (!this.resourceManagerService.active) {
                 this.resourceManagerService.togglePanel();
               }
 
