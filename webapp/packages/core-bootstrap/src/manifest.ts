@@ -46,6 +46,7 @@ import { NotificationService, ExceptionsCatcherService, EventsSettingsService } 
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
+import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
@@ -110,6 +111,7 @@ export const coreManifests: PluginManifest[] = [
       ToolsPanelService,
     ],
   },
+  coreProjectsManifest,
   coreAdministrationManifest,
   coreSDKManifest,
   coreAuthenticationManifest,

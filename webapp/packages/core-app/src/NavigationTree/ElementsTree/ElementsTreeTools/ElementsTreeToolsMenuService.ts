@@ -76,11 +76,7 @@ export class ElementsTreeToolsMenuService {
 
         return false;
       },
-      handler: async (context, action) => {
-        if (action === ACTION_COLLAPSE_ALL || action === ACTION_LINK_OBJECT) {
-          this.elementsTreeActionHandler(context, action);
-        }
-      },
+      handler: this.elementsTreeActionHandler.bind(this),
     });
 
     this.menuService.addCreator({
