@@ -59,7 +59,13 @@ export function useDNDBox(options: IOptions): IDNDBox {
 
   const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(() => ({
     accept: options.type as string | string[],
-    drop: (item, monitor) => options.onDrop?.(item, monitor.getClientOffset()),
+    drop: (item, monitor) => {
+      if (monitor.didDrop()) {
+        return;
+      }
+
+      options.onDrop?.(item, monitor.getClientOffset());
+    },
     hover: (item, monitor) => {
       if (monitor.canDrop()) {
         options.onHover?.(item, monitor.getClientOffset());
