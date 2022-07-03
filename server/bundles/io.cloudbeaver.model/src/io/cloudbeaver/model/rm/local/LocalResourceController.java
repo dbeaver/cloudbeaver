@@ -23,15 +23,23 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
+import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
+import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
@@ -39,6 +47,7 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +67,8 @@ public class LocalResourceController implements RMController {
     private final Path userProjectsPath;
     private final Path sharedProjectsPath;
     private final String globalProjectName;
+
+    private final Map<String, VirtualProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         SMCredentialsProvider credentialsProvider,
@@ -80,6 +91,22 @@ public class LocalResourceController implements RMController {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
         String userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
         return userId == null ? null : this.userProjectsPath.resolve(userId);
+    }
+
+    private DBPProject getProjectMetadata(String projectId) throws DBException {
+        synchronized (projectRegistries) {
+            VirtualProjectImpl project = projectRegistries.get(projectId);
+            if (project == null) {
+                SessionContextImpl sessionContext = new SessionContextImpl(null);
+                project = new VirtualProjectImpl(
+                    DBWorkbench.getPlatform().getWorkspace(),
+                    projectId,
+                    getProjectPath(projectId),
+                    sessionContext);
+                projectRegistries.put(projectId, project);
+            }
+            return project;
+        }
     }
 
     @NotNull
@@ -148,7 +175,13 @@ public class LocalResourceController implements RMController {
 
     @Override
     public String getProjectsDataSources(@NotNull String projectId) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        DBPProject projectMetadata = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
+        Function<DBPDataSourceContainer, Boolean> dsC = dataSourceContainer -> true;
+        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, dsC);
+
+        return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
     @Override
