@@ -136,8 +136,14 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public RMProject getProject(@NotNull String projectId) throws DBException {
-        return makeProjectFromId(projectId);
+    public RMProject getProject(@NotNull String projectId, boolean readResources) throws DBException {
+        RMProject project = makeProjectFromId(projectId);
+        if (readResources) {
+            project.setChildren(
+                listResources(projectId, null, null, true, false, true)
+            );
+        }
+        return project;
     }
 
     @Override
@@ -406,6 +412,14 @@ public class LocalResourceController implements RMController {
         RMResource resource = new RMResource();
         resource.setName(path.getFileName().toString());
         resource.setFolder(Files.isDirectory(path));
+        if (!resource.isFolder()) {
+            try {
+                resource.setLastModified(
+                    Files.getLastModifiedTime(path).toMillis());
+            } catch (IOException e) {
+                log.debug("Error getting last modified time: " + e.getMessage());
+            }
+        }
         try {
             if (!resource.isFolder()) {
                 resource.setLength(Files.size(path));
@@ -506,14 +520,16 @@ public class LocalResourceController implements RMController {
             prefix = RMProject.Type.USER.getPrefix();
             name = projectId;
         } else {
-            prefix = projectId.substring(0, divPos + 1);
+            prefix = projectId.substring(0, divPos);
             name = projectId.substring(divPos + 1);
         }
         return new RMProjectName(prefix, name);
     }
 
     public static boolean isShared(String projectId) {
-        return RMProject.Type.SHARED.getPrefix().equals(parseProjectName(projectId).getPrefix());
+        RMProjectName rmProjectName = parseProjectName(projectId);
+        return RMProject.Type.SHARED.getPrefix().equals(rmProjectName.getPrefix()) ||
+            RMProject.Type.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
 }
