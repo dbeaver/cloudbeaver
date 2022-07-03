@@ -210,7 +210,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       }
     });
 
-    this.markOutdated(resourceKeyList([target, ...parents]));
+    this.markOutdated(resourceKeyList([...parents, target]));
   }
 
   async changeName(node: NavNode, name: string): Promise<void> {
