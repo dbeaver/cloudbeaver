@@ -154,7 +154,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  const rootNode = useMapResource(ElementsTree, navNodeInfoResource, root);
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
@@ -181,7 +180,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     navNodeFilterCompare
   ), [navTreeResource, navNodeInfoResource, navNodeFilterCompare]);
 
-  const dndBox = useNavTreeDropBox(rootNode.data);
+  const dndBox = useNavTreeDropBox(navNodeInfoResource.get(root));
 
   const tree = useElementsTree({
     baseRoot,
@@ -308,7 +307,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                     path={folderExplorer.state.path}
                     root
                   />
-                  {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
+                  {loaderAvailable && <Loader state={tree} overlay={hasChildren} />}
                 </tree>
               </FolderExplorer>
             </box>

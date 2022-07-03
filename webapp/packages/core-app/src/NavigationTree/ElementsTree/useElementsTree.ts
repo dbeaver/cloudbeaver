@@ -88,8 +88,10 @@ export interface IElementsTree {
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   userData: IElementsTreeUserState;
+
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
+  getExpanded: () => string[];
   getSelected: () => string[];
   isNodeSelected: (nodeId: string) => boolean;
   isNodeIndeterminateSelected: (nodeId: string) => boolean;
@@ -310,6 +312,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       return nodeState.expanded || nodeState.showInFilter;
     },
+    getExpanded(): string[] {
+      return Array.from(this.state).filter(([key, state]) => state.expanded).map(([key]) => key);
+    },
     getSelected(): string[] {
       return Array.from(this.state).filter(([key, state]) => state.selected).map(([key]) => key);
     },
@@ -378,7 +383,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
     async refresh(nodeId: string): Promise<void> {
-      return navTreeResource.refreshTree(nodeId);
+      try {
+        await navTreeResource.refreshTree(nodeId);
+      } catch (exception: any) {
+        notificationService.logException(exception, 'app_navigationTree_refresh_error');
+      }
     },
     async show(nodeId: string, path: string[]): Promise<void> {
       const preloaded = await navTreeResource.preloadNodeParents(path, nodeId);

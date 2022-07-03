@@ -36,14 +36,18 @@ export class ElementsTreeToolsMenuService {
   register() {
     this.actionService.addHandler({
       id: 'tree-tools-menu-base-handler',
-      isActionApplicable(context, action) {
+      isActionApplicable(context, action): boolean {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (!tree) {
           return false;
         }
 
-        return [ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL].includes(action);
+        if (action === ACTION_COLLAPSE_ALL) {
+          return tree.getExpanded().length > 0;
+        }
+
+        return [ACTION_LINK_OBJECT].includes(action);
       },
       getActionInfo: (context, action) => {
         switch (action) {
@@ -103,10 +107,19 @@ export class ElementsTreeToolsMenuService {
 
     this.actionService.addHandler({
       id: 'elements-tree-base',
-      isActionApplicable: (contexts, action) => (
-        contexts.has(DATA_CONTEXT_ELEMENTS_TREE)
-        && [ACTION_COLLAPSE_ALL, ACTION_LINK_OBJECT].includes(action)
-      ),
+      isActionApplicable: (contexts, action): boolean => {
+        const tree = contexts.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+
+        if (!tree) {
+          return false;
+        }
+
+        if (action === ACTION_COLLAPSE_ALL) {
+          return tree.getExpanded().length > 0;
+        }
+
+        return [ACTION_LINK_OBJECT].includes(action);
+      },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 

@@ -96,7 +96,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             try {
               await this.navNodeManagerService.refreshTree(node.id);
             } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to refresh node');
+              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }
             break;
           }

@@ -16,7 +16,7 @@ import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
@@ -41,7 +41,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     super();
   }
@@ -161,6 +162,25 @@ export class PluginBootstrap extends Bootstrap {
       const node = await this.navNodeInfoResource.load(data.nodeId);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
+        return;
+      }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
+
+      if (!resource) {
+        throw new Error('Resource not found');
+      }
+
+      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+      const size = Math.round(resource.length / 1000); // kilobyte
+
+      if (size > maxSize) {
+        this.notificationService.logInfo({
+          title: 'sql_editor_upload_script_max_size_title',
+          message: `Max size: ${maxSize}KB\nFile size: ${size}KB`,
+          persistent: true,
+        });
+
         return;
       }
 

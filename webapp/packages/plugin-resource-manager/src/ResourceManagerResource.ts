@@ -9,12 +9,20 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, GraphQLService, RmResource } from '@cloudbeaver/core-sdk';
 
+export type RmResourceInfo = RmResource;
+
 @injectable()
-export class ResourceManagerResource extends CachedMapResource<string, RmResource[]> {
+export class ResourceManagerResource extends CachedMapResource<string, RmResourceInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService
   ) {
     super();
+  }
+
+  getResource(projectId: string, resourcePath: string): RmResourceInfo | undefined {
+    const resources = this.get(projectId);
+
+    return resources?.find(resource => resource.name === resourcePath);
   }
 
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
@@ -50,7 +58,7 @@ export class ResourceManagerResource extends CachedMapResource<string, RmResourc
     });
   }
 
-  protected async loader(key: string): Promise<Map<string, RmResource[]>> {
+  protected async loader(key: string): Promise<Map<string, RmResourceInfo[]>> {
     const { resources } = await this.graphQLService.sdk.getResourceList({
       projectId: key,
     });

@@ -68,11 +68,12 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     providerId,
     configurationId,
     link = false,
+    accessRequest = false,
   },
   options,
   rejectDialog,
 }) {
-  const dialogData = useAuthDialogState(providerId, configurationId);
+  const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
   const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);

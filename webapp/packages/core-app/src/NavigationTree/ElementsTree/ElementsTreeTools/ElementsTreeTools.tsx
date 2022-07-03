@@ -118,7 +118,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
         <ElementsTreeToolsMenu tree={tree} />
         <IconButton
           name='/icons/refresh_sm.svg#root'
-          title={translate('app_navigationTree_refreshNode')}
+          title={translate('app_navigationTree_refresh')}
           style={toolsStyles}
           disabled={loading}
           img
