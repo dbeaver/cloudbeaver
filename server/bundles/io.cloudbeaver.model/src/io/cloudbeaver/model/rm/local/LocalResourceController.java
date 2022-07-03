@@ -322,6 +322,7 @@ public class LocalResourceController implements RMController {
             }
         }
         try {
+            while (resourcePath.startsWith("/")) resourcePath = resourcePath.substring(1);
             Path targetPath = projectPath.resolve(resourcePath).normalize();
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
