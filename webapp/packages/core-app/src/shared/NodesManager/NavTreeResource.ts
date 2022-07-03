@@ -194,7 +194,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     const parents = Array.from(new Set(
       ResourceKeyUtils
         .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)
-        .filter<string>(Boolean as any)
+        .filter<string>(((id: string | undefined) => id !== undefined) as any)
     ));
 
     await this.performUpdate(resourceKeyList(parents), [], async () => {
