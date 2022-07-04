@@ -68,6 +68,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       childrenLimit: computed,
       setDetails: action,
       setNavObject: action,
+      moveToNode: action,
       deleteInNode: action,
       unshiftToNode: action,
       pushToNode: action,
@@ -205,6 +206,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           nodePaths: ResourceKeyUtils.toArray(key),
           folderPath: folder?.id,
         });
+
+        this.moveToNode(key, target);
       } finally {
         this.markDataLoaded(target);
       }
@@ -229,8 +232,39 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.markOutdated(node.parentId);
   }
 
+  moveToNode(key: string, target: string): void;
+  moveToNode(key: ResourceKeyList<string>, target: string): void;
+  moveToNode(keyObject: ResourceKey<string>, target: string): void;
+  moveToNode(keyObject: ResourceKey<string>, target: string): void {
+    ResourceKeyUtils.forEach(keyObject, key => {
+      const parentId = this.navNodeInfoResource.getParent(key);
+
+      if (parentId !== undefined) {
+        const currentValue = this.data.get(parentId);
+
+        if (currentValue) {
+          const nodeInfo = this.navNodeInfoResource.get(parentId);
+          const children = currentValue.filter(value => value !== key);
+
+          if (nodeInfo) {
+            nodeInfo.hasChildren = children.length > 0;
+          }
+          this.data.set(parentId, children);
+        }
+      }
+
+      this.navNodeInfoResource.setParent(key, target);
+    });
+
+    this.pushToNode(target, ResourceKeyUtils.toArray(keyObject));
+    this.markUpdated(target);
+    this.markUpdated(keyObject);
+    this.onItemAdd.execute(keyObject);
+  }
+
   deleteInNode(key: string, value: string[]): void;
   deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
+  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void;
   deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
     const deletedKeys: string[] = [];
 
@@ -239,7 +273,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       const currentValue = this.data.get(key);
 
       if (currentValue) {
-        this.data.set(key, currentValue.filter(value => !values.includes(value)));
+        const children = currentValue.filter(value => !values.includes(value));
+        const nodeInfo = this.navNodeInfoResource.get(key);
+
+        if (nodeInfo) {
+          nodeInfo.hasChildren = children.length > 0;
+        }
+        this.data.set(key, children);
       }
 
       deletedKeys.push(...values);
@@ -256,8 +296,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
+      const nodeInfo = this.navNodeInfoResource.get(key);
 
       currentValue.unshift(...values);
+
+      if (nodeInfo) {
+        nodeInfo.hasChildren = currentValue.length > 0;
+      }
       this.data.set(key, currentValue);
     });
 
@@ -271,8 +316,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
+      const nodeInfo = this.navNodeInfoResource.get(key);
 
       currentValue.push(...values);
+
+      if (nodeInfo) {
+        nodeInfo.hasChildren = currentValue.length > 0;
+      }
       this.data.set(key, currentValue);
     });
 

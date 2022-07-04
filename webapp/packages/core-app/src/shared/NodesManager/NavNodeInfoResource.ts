@@ -95,6 +95,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     });
   }
 
+  getParent(key: string): string | undefined;
+  getParent(key: ResourceKeyList<string>): (string | undefined)[];
+  getParent(key: ResourceKey<string>): string | undefined | (string | undefined)[];
+  getParent(key: ResourceKey<string>): string | undefined | (string | undefined)[] {
+    return ResourceKeyUtils.map(key, key => this.get(key)?.parentId);
+  }
+
   setParent(key: string, parentId: string): void;
   setParent(key: ResourceKeyList<string>, parentId: string): void;
   setParent(key: ResourceKey<string>, parentId: string): void;
