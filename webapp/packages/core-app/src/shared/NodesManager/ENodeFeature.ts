@@ -9,6 +9,7 @@
 export enum ENodeFeature {
   'objectContainer' = 'objectContainer',
   'entityContainer' = 'entityContainer',
+  'relationalEntity' = 'relationalEntity',
   'entity' = 'entity',
   'container' = 'container',
   'dataContainer' = 'dataContainer',
