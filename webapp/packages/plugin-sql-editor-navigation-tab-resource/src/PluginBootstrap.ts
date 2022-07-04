@@ -160,11 +160,12 @@ export class PluginBootstrap extends Bootstrap {
     try {
       const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = await this.navNodeInfoResource.load(data.nodeId);
-      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
         return;
       }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
 
       if (!resource) {
         if (data.type === NavigationType.open) {
