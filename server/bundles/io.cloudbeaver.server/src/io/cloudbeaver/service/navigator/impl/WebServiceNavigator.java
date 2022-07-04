@@ -20,17 +20,16 @@ package io.cloudbeaver.service.navigator.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
-import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -175,6 +174,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBPRefreshableObject) dataSource).refreshObject(monitor);
                 }
                 ((DBNDataSource) node).cleanupNode();
+            } else if (node instanceof DBNLocalFolder) {
+                // Refresh can't be applied to the local folder node
+                return true;
             } else {
                 node.refreshNode(monitor, this);
             }
@@ -357,14 +359,28 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     public boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
-            WebConnectionFolderInfo folderPath = WebConnectionFolderUtils.getFolderInfo(session, folderNodePath);
+            DBNNode folderNode;
+            if (folderNodePath == null) {
+                folderNodePath = "";
+            }
+            folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 if (node instanceof DBNDataSource) {
-                    ((DBNDataSource) node).moveToFolder(null, folderPath.getDataSourceFolder());
+                    DBPDataSourceFolder folder;
+                    if (folderNode instanceof DBNRoot) {
+                        folder = null;
+                    } else if (folderNode instanceof DBNLocalFolder) {
+                        folder = ((DBNLocalFolder) folderNode).getFolder();
+                    } else {
+                        throw new DBWebException("Navigator node '" + folderNodePath + "' is not a folder node");
+                    }
+                    ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
+                    session.getSingletonProject().getDataSourceRegistry().updateDataSource(
+                        ((DBNDataSource) node).getDataSourceContainer());
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
