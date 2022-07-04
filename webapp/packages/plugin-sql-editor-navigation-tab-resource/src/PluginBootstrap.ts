@@ -160,15 +160,24 @@ export class PluginBootstrap extends Bootstrap {
     try {
       const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = await this.navNodeInfoResource.load(data.nodeId);
+      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
         return;
       }
 
-      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
-
       if (!resource) {
-        throw new Error('Resource not found');
+        if (data.type === NavigationType.open) {
+          throw new Error('Resource not found');
+        } else {
+          return;
+        }
+      }
+
+      nodeInfo.markOpen();
+
+      if (data.type !== NavigationType.open) {
+        return;
       }
 
       const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
@@ -181,12 +190,6 @@ export class PluginBootstrap extends Bootstrap {
           persistent: true,
         });
 
-        return;
-      }
-
-      nodeInfo.markOpen();
-
-      if (data.type !== NavigationType.open) {
         return;
       }
 
