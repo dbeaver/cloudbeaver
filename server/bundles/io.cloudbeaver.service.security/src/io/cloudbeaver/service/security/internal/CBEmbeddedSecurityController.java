@@ -962,7 +962,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new SMException("Authorization already finished and cannot be updated");
         }
         var authSessionInfo = readAuthAttemptSessionInfo(authId);
-        updateAuthStatus(authId, authStatus, authInfo, null, authSessionInfo.getSmSessionId());
+        updateAuthStatus(authId, authStatus, authInfo, error, authSessionInfo.getSmSessionId());
     }
 
     private void updateAuthStatus(@NotNull String authId,
