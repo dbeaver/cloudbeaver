@@ -1282,7 +1282,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 userId = dbResult.getString(1);
                 var expiredDate = dbResult.getTimestamp(2);
-                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                if (application.isMultiNode() && Timestamp.from(Instant.now()).after(expiredDate)) {
                     throw new SMException("Token expired");
                 }
                 sessionId = dbResult.getString(3);
