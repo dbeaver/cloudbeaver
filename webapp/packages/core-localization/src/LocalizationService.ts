@@ -10,6 +10,7 @@ import { action, observable, makeObservable, computed } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 import { ServerConfigResource, SessionResource } from '@cloudbeaver/core-root';
 import type { ServerLanguage } from '@cloudbeaver/core-sdk';
@@ -37,6 +38,10 @@ export const defaultThemeSettings: IDefaultSettings = {
 
 @injectable()
 export class LocalizationService extends Bootstrap {
+  get currentLanguage(): string {
+    return this.settings.language;
+  }
+
   get defaultLanguage(): string {
     return this.pluginSettings.getValue('defaultLanguage');
   }
@@ -46,6 +51,7 @@ export class LocalizationService extends Bootstrap {
   };
   readonly pluginSettings: PluginSettings<IDefaultSettings>;
 
+  readonly onChange: ISyncExecutor<string>;
   // observable.shallow - don't treat locales as observables
   private readonly localeMap: Map<string, Map<string, string>> = new Map();
 
@@ -60,6 +66,7 @@ export class LocalizationService extends Bootstrap {
   ) {
     super();
 
+    this.onChange = new SyncExecutor();
     this.pluginSettings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
     sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
 
@@ -110,12 +117,12 @@ export class LocalizationService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
+    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY);
   }
 
   async load(): Promise<void> {
     await this.serverConfigResource.load();
     this.setCurrentLocale(this.defaultLanguage);
-    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
     this.sessionResource.setDefaultLocale(this.settings.language);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
     await this.loadLocaleAsync(this.settings.language);
@@ -129,7 +136,9 @@ export class LocalizationService extends Bootstrap {
     if (key === this.settings.language) {
       return;
     }
+    this.sessionResource.setDefaultLocale(this.settings.language);
     await this.sessionResource.changeLanguage(key);
+    this.onChange.execute(key);
   }
 
   private async syncLanguage() {
