@@ -59,5 +59,5 @@ public interface DBWServiceNavigator extends DBWService {
     int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
 
     @WebAction
-    boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderPath) throws DBWebException;
+    boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, @NotNull String folderPath) throws DBWebException;
 }

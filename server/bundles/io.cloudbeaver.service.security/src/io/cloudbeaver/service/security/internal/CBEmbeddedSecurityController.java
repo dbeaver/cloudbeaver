@@ -1111,7 +1111,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (authProviderIds.isEmpty()) {
             throw new SMException("Authorization providers are not defined");
         }
-        String userId = null;
+
         var finishAuthMonitor = new VoidProgressMonitor();
         AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
         boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
@@ -1123,6 +1123,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
             permissions = getTokenPermissions(token);
         }
+        String activeUserId = permissions == null ? null : permissions.getUserId();
 
         for (String authProviderId : authProviderIds) {
             var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
@@ -1131,8 +1132,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 authAttemptSessionInfo.getSessionParams(),
                 userCredentials,
                 finishAuthMonitor,
-                permissions == null ? null : permissions.getUserId(),
-                isMainAuthSession
+                activeUserId,
+                activeUserId == null
             );
 
             if (userIdFromCreds == null) {
@@ -1140,7 +1141,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
                 return SMAuthInfo.error(authId, error);
             }
-            userId = userIdFromCreds;
+            if (activeUserId == null) {
+                activeUserId = userIdFromCreds;
+            }
         }
 
         if (token == null && permissions == null) {
@@ -1150,7 +1153,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     if (authAttemptSessionInfo.getSmSessionId() == null) {
                         smSessionId = createSmSession(
                             authAttemptSessionInfo.getAppSessionId(),
-                            userId,
+                            activeUserId,
                             authAttemptSessionInfo.getSessionParams(),
                             authAttemptSessionInfo.getSessionType(),
                             dbCon
@@ -1158,8 +1161,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     } else {
                         smSessionId = authAttemptSessionInfo.getSmSessionId();
                     }
-                    token = generateAuthToken(smSessionId, userId, dbCon);
-                    permissions = new SMAuthPermissions(userId, smSessionId, getUserPermissions(userId));
+                    token = generateAuthToken(smSessionId, activeUserId, dbCon);
+                    permissions = new SMAuthPermissions(activeUserId, smSessionId, getUserPermissions(activeUserId));
                     txn.commit();
                 }
             } catch (SQLException e) {
@@ -1203,7 +1206,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull Map<String, Object> userCredentials,
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
-        boolean newUserAuthenticationTry
+        boolean createNewUserIfNotExist
     ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -1217,7 +1220,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (DBException e) {
             return null;
         }
-        if (userId == null && newUserAuthenticationTry) {
+        if (userId == null && createNewUserIfNotExist) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
