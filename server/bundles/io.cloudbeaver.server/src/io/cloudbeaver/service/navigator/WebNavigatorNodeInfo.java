@@ -139,7 +139,8 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             isShared = !((DBNDatabaseNode) node).getDataSourceContainer().isManageable();
         } else if (node instanceof DBNLocalFolder) {
-            //isShared = ((DBNLocalFolder) node).getDataSourceRegistry().is
+            String projectName = ((DBNLocalFolder) node).getFolder().getDataSourceRegistry().getProject().getName();
+            isShared = !projectName.equals(session.getUserId());
         }
         if (isShared) {
             features.add("shared");
