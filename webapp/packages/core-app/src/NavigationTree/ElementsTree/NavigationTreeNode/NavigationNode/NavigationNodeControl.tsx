@@ -23,10 +23,19 @@ import type { NavTreeControlComponent, NavTreeControlProps } from '../../Navigat
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
+const nodeIconStyle = css`
+  TreeNodeIcon[|connected] StaticImage {
+    mask-image: url(/icons/connection-mark.svg);
+    mask-size: 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+  }
+`;
+
 const styles = css`
   TreeNodeControl {
+    transition: opacity 0.3s ease;
     opacity: 1;
-    transition: opacity 0.2s ease;
 
     &[|outdated] {
       opacity: 0.5;
@@ -94,10 +103,10 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
-  return styled(TREE_NODE_STYLES, styles)(
+  return styled(TREE_NODE_STYLES, nodeIconStyle, styles)(
     <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
       <TreeNodeExpand filterActive={treeContext?.tree.filtering} />
-      <TreeNodeIcon icon={icon}>
+      <TreeNodeIcon icon={icon} style={nodeIconStyle} {...use({ connected })}>
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
