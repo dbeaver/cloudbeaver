@@ -391,11 +391,13 @@ public class LocalResourceController implements RMController {
         project.setName(projectName);
         project.setId(type.getPrefix() + "_" + projectName);
         project.setType(type);
-        try {
-            project.setCreateTime(
-                OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")));
-        } catch (IOException e) {
-            log.error(e);
+        if (Files.exists(path)) {
+            try {
+                project.setCreateTime(
+                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")));
+            } catch (IOException e) {
+                log.error(e);
+            }
         }
 
         return project;
