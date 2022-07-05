@@ -148,7 +148,7 @@ public class WebNavigatorNodeInfo {
         if (isShared) {
             features.add("shared");
         }
-        if (isOwn){
+        if (isOwn) {
             features.add("own");
         }
 
