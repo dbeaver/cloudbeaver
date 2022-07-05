@@ -553,7 +553,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                     log.error("Error reading static contents from " + staticContentsFile, e);
                 }
             }
-            parseAdditionalServerConfiguration(serverConfig);
+            parseAdditionalConfiguration(configProps);
         } catch (IOException | DBException e) {
             throw new DBException("Error parsing server configuration", e);
         }
@@ -669,7 +669,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     }
 
-    protected void parseAdditionalServerConfiguration(Map<String, Object> serverConfig) throws DBException {
+    protected void parseAdditionalConfiguration(Map<String, Object> serverConfig) throws DBException {
 
     }
 
