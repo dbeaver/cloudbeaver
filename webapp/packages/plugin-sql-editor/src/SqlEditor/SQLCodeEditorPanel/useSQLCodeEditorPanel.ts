@@ -115,6 +115,8 @@ export function useSQLCodeEditorPanel(
 
       // TODO: probably should be moved to SQLCodeEditorController
       editor.on('changes', (cm, changes) => {
+        editor.scrollIntoView(editor.getCursor());
+
         const nextCursor = editor.getCursor('from');
 
         if (this.data.parser.isEndsWithDelimiter(getAbsolutePosition(cm, nextCursor))) {
