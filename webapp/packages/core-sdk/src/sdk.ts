@@ -488,7 +488,7 @@ export interface MutationNavDeleteNodesArgs {
 
 
 export interface MutationNavMoveNodesToFolderArgs {
-  folderPath?: InputMaybe<Scalars['String']>;
+  folderPath: Scalars['ID'];
   nodePaths: Array<Scalars['ID']>;
 }
 
@@ -2258,7 +2258,7 @@ export type NavDeleteNodesMutation = { navDeleteNodes?: number };
 
 export type NavMoveToMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
-  folderPath?: InputMaybe<Scalars['String']>;
+  folderPath: Scalars['ID'];
 }>;
 
 
@@ -3644,7 +3644,7 @@ export const NavDeleteNodesDocument = `
 }
     `;
 export const NavMoveToDocument = `
-    mutation navMoveTo($nodePaths: [ID!]!, $folderPath: String) {
+    mutation navMoveTo($nodePaths: [ID!]!, $folderPath: ID!) {
   navMoveNodesToFolder(nodePaths: $nodePaths, folderPath: $folderPath)
 }
     `;

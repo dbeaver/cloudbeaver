@@ -1,6 +1,6 @@
 mutation navMoveTo(
   $nodePaths: [ID!]!
-  $folderPath: String
+  $folderPath: ID!
   ) {
   navMoveNodesToFolder(nodePaths: $nodePaths, folderPath: $folderPath)
 }

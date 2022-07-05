@@ -7,6 +7,7 @@
  */
 
 import { observable, runInAction } from 'mobx';
+import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -31,10 +32,11 @@ interface IOptions {
   type?: DNDAcceptType;
   onHover?: (context: IDataContextProvider, pos: IMousePosition | null) => void;
   onDrop?: (context: IDataContextProvider, pos: IMousePosition | null) => void;
-  canDrop?: (context: IDataContextProvider) => boolean;
+  canDrop?: (context: IDataContextProvider, isOver: boolean) => boolean;
 }
 
 export interface IDNDBox {
+  ref: React.MutableRefObject<React.ReactElement | Element | null>;
   state: IState;
   setRef: (element: React.ReactElement | Element | null) => void;
 }
@@ -44,6 +46,8 @@ export function useDNDBox(options: IOptions): IDNDBox {
     type: DND_ELEMENT_TYPE,
     ...options,
   });
+
+  const ref = useRef<React.ReactElement | Element | null>(null);
 
   const state = useObservableRef<IState>(() => ({
     isOver: false,
@@ -60,7 +64,7 @@ export function useDNDBox(options: IOptions): IDNDBox {
   const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(() => ({
     accept: options.type as string | string[],
     drop: (item, monitor) => {
-      if (monitor.didDrop()) {
+      if (monitor.didDrop() || !monitor.isOver({ shallow: true })) {
         return;
       }
 
@@ -71,7 +75,7 @@ export function useDNDBox(options: IOptions): IDNDBox {
         options.onHover?.(item, monitor.getClientOffset());
       }
     },
-    canDrop: context => (options.canDrop?.(context) ?? true),
+    canDrop: (context, monitor) => (options.canDrop?.(context, monitor.isOver({ shallow: true })) ?? true),
     collect: monitor => {
       runInAction(() => {
         state.isOver = monitor.isOver();
@@ -83,9 +87,11 @@ export function useDNDBox(options: IOptions): IDNDBox {
   }), [options]);
 
   return useObjectRef(() => ({
+    ref,
     state,
     setRef(element: React.ReactElement | Element | null) {
       this.setTargetRef(element);
+      ref.current = element;
     },
   }), { setTargetRef }, ['setRef']);
 }

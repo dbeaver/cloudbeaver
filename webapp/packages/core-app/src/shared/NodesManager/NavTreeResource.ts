@@ -190,7 +190,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   async moveTo(key: ResourceKey<string>, target: string): Promise<void> {
     await this.connectionFolderResource.load(CachedMapAllKey);
-    const folder = this.connectionFolderResource.fromNodeId(target);
 
     const parents = Array.from(new Set(
       ResourceKeyUtils
@@ -204,7 +203,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       try {
         await this.graphQLService.sdk.navMoveTo({
           nodePaths: ResourceKeyUtils.toArray(key),
-          folderPath: folder?.id,
+          folderPath: target,
         });
 
         this.moveToNode(key, target);

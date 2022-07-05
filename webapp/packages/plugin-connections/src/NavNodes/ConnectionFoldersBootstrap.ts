@@ -8,14 +8,14 @@
 
 import { untracked } from 'mobx';
 
-import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ElementsTreeToolsMenuService, ENodeMoveType, getNodeName, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeMoveType, getNodeName, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
-import { ActionService, ACTION_DELETE, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_DELETE, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION';
 
@@ -25,14 +25,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   constructor(
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
-    private readonly keyBindingService: KeyBindingService,
     private readonly menuService: MenuService,
-    private readonly elementsTreeToolsMenuService: ElementsTreeToolsMenuService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionFolderResource: ConnectionFolderResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly navNodeInfoResource: NavNodeInfoResource
   ) {
     super();
   }
@@ -108,6 +107,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
                 ConnectionFolderResource.baseProject,
                 folder.id
               );
+              this.navTreeResource.delete(node.id);
             } catch (exception: any) {
               this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
             }
@@ -171,7 +171,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           selected.push(tree.root);
         }
 
-        const targetFolder = selected[0];
+        let targetFolder = selected[0];
+        const targetNode = this.navNodeInfoResource.get(targetFolder);
+
+        if (![NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode?.nodeType as any)) {
+          targetFolder = tree.baseRoot;
+        }
+
         const folder = this.connectionFolderResource.fromNodeId(targetFolder);
 
         const result = await this.commonDialogService.open(RenameDialog, {

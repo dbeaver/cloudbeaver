@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useMouse, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
@@ -30,6 +30,7 @@ import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElemen
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
+import { useDropOutside } from './useDropOutside';
 import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
 
 const styles = css`
@@ -42,7 +43,9 @@ const styles = css`
   tree {
     position: relative;
     box-sizing: border-box;
+    display: flex;
     flex: 1;
+    flex-direction: column;
   }
   
   tree-box {
@@ -62,6 +65,10 @@ const styles = css`
     margin: 12px;
     box-sizing: border-box;
     position: relative;
+
+    &[|bottom] {
+      order: 2;
+    }
 
     &:not([|showDropOutside]) {
       display: none;
@@ -181,6 +188,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   ), [navTreeResource, navNodeInfoResource, navNodeFilterCompare]);
 
   const dndBox = useNavTreeDropBox(navNodeInfoResource.get(root));
+  const dropOutside = useDropOutside(dndBox);
 
   const tree = useElementsTree({
     baseRoot,
@@ -271,10 +279,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     }
   });
 
-  let showDropOutside = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop);
-  showDropOutside = useStateDelay(showDropOutside, 100);
-  const zoneActive = dndBox.state.context && showDropOutside && dndBox.state.isOverCurrent;
-
   const hasChildren = (children.data?.length || 0) > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
 
@@ -292,9 +296,16 @@ export const ElementsTree = observer<Props>(function ElementsTree({
           <ElementsTreeContext.Provider value={context}>
             <box className={className}>
               <FolderExplorer state={folderExplorer}>
-                <tree as="div" onClick={handleClick}>
+                <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
                   {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                  <drop-outside ref={dndBox.setRef} {...use({ showDropOutside, active: zoneActive })}>
+                  <drop-outside
+                    ref={dndBox.setRef}
+                    {...use({
+                      showDropOutside: dropOutside.showDropOutside,
+                      active: dropOutside.zoneActive,
+                      bottom: dropOutside.bottom,
+                    })}
+                  >
                     <NavigationNodeNested
                       component={NavigationNodeElement}
                       path={folderExplorer.state.path}
@@ -302,6 +313,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                     />
                   </drop-outside>
                   <NavigationNodeNested
+                    ref={dropOutside.nestedRef}
                     nodeId={root}
                     component={NavigationNodeElement}
                     path={folderExplorer.state.path}
