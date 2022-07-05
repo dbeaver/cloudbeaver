@@ -136,20 +136,14 @@ public class WebNavigatorNodeInfo {
             features.add("container");
         }
         boolean isShared = false;
-        boolean isOwn = false;
         if (node instanceof DBNDatabaseNode) {
             isShared = !((DBNDatabaseNode) node).getDataSourceContainer().isManageable();
-            isOwn = !isShared;
         } else if (node instanceof DBNLocalFolder) {
             String projectName = ((DBNLocalFolder) node).getFolder().getDataSourceRegistry().getProject().getName();
             isShared = !projectName.equals(session.getUserId());
-            isOwn = !isShared;
         }
         if (isShared) {
             features.add("shared");
-        }
-        if (isOwn) {
-            features.add("own");
         }
 
         if (node instanceof DBNDatabaseNode) {
