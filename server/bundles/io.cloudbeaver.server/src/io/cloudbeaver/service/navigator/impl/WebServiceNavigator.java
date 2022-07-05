@@ -32,6 +32,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -364,16 +365,26 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
-                if (node instanceof DBNDataSource && folderNode instanceof DBNLocalFolder) {
-                    ((DBNDataSource) node).moveToFolder(null, ((DBNLocalFolder) folderNode).getFolder());
-                } else if (node instanceof DBNResourceManagerResource && folderNode instanceof DBNAbstractResourceManagerNode) {
-                    String resourcePath = ((DBNResourceManagerResource) node).getResourceFolder();
-                    String folderPath = "";
-                    if (folderNode instanceof DBNResourceManagerResource) {
-                        folderPath = ((DBNResourceManagerResource) folderNode).getResourceFolder();
+                if (node instanceof DBNDataSource) {
+                    DBPDataSourceFolder folder;
+                    if (folderNode instanceof DBNRoot) {
+                        folder = null;
+                    } else if (folderNode instanceof DBNLocalFolder) {
+                        folder = ((DBNLocalFolder) folderNode).getFolder();
+                    } else {
+                        throw new DBWebException("Navigator node '" + folderNodePath + "' is not a folder node");
                     }
+                    ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
+                    session.getSingletonProject().getDataSourceRegistry().updateDataSource(
+                        ((DBNDataSource) node).getDataSourceContainer());
+                } else if (node instanceof DBNResourceManagerResource) {
+                    boolean rmNode = folderNode instanceof DBNAbstractResourceManagerNode;
+                    if (!rmNode) {
+                        throw new DBWebException("Navigator node '" + folderNodePath + "' is not a resource manager node");
+                    }
+                    // Get project id from node
                     String projectId = null;
-                    DBNNode parentNode =  folderNode;
+                    DBNNode parentNode = folderNode;
                     while (parentNode != null && !(parentNode instanceof DBNResourceManagerProject)) {
                         parentNode = parentNode.getParentNode();
                     }
@@ -382,14 +393,21 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     } else {
                         projectId = parentNode.getName();
                     }
+                    // Get paths from nodes
+                    String folderPath = "";
+                    if (folderNode instanceof DBNResourceManagerResource) {
+                        folderPath = ((DBNResourceManagerResource) folderNode).getResourceFolder();
+                    }
+                    String resourcePath = ((DBNResourceManagerResource) node).getResourceFolder();
                     session.getRmController().moveResource(projectId, resourcePath, folderPath);
+                    node.getParentNode().refreshNode(session.getProgressMonitor(),this);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
             }
             return true;
         } catch (DBException e) {
-            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+            throw new DBWebException("Error moving navigator nodes "  + nodePaths, e);
         }
     }
 
