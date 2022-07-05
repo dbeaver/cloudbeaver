@@ -80,6 +80,7 @@ export class DataViewerTabService {
       const {
         nodeInfo,
         tabInfo,
+        initTab,
         trySwitchPage,
       } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
@@ -88,6 +89,8 @@ export class DataViewerTabService {
       if (!this.navNodeManagerService.isNodeHasData(node)) {
         return;
       }
+
+      initTab();
 
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);
