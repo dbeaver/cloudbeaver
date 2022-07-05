@@ -130,6 +130,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   ) {
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
+    const nodeIdList = nodes.map(node => node.id);
     const children = this.navTreeResource.get(targetNode.id);
 
     if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
@@ -144,7 +145,12 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         move.setCanMove(true);
       }
     } else {
-      await this.navTreeResource.moveTo(resourceKeyList(nodes.map(node => node.id)), targetNode.id);
+      await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
+      const connections = nodeIdList
+        .map(nodeId => this.connectionInfoResource.getConnectionForNode(nodeId)?.id)
+        .filter<string>(Boolean as any);
+
+      this.connectionInfoResource.markOutdated(resourceKeyList(connections));
     }
   }
 

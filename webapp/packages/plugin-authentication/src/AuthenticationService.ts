@@ -188,7 +188,7 @@ export class AuthenticationService extends Bootstrap {
         return;
       }
 
-      await this.auth(false, { providerId: null, link: true });
+      await this.auth(false, { providerId: null, link: true, accessRequest: true });
     });
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }

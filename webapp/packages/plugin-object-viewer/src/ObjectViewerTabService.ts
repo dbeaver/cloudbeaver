@@ -126,7 +126,7 @@ export class ObjectViewerTabService {
         return tabInfo.tab;
       }
 
-      return null;
+      return tabInfo.tab;
     };
 
     const getPage = () => {

@@ -31,17 +31,17 @@ export class TabNavigationContext implements ITabNavigationContext {
     return this._handlerPriority;
   }
 
-  get tab(): ITab<any> | null {
+  get tab(): ITab | null {
     return this._tab;
   }
 
   private _isNewlyCreated = false;
-  private _handlerPriority = 0;
+  private readonly _handlerPriority = 0;
   private _tab: ITab | null = null;
 
   constructor(
-    private navigationTabsService: NavigationTabsService,
-    private userInfoResource: UserInfoResource
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly userInfoResource: UserInfoResource
   ) { }
 
   openNewTab<T = any>(options: ITabOptions<T>): ITab<T> {
