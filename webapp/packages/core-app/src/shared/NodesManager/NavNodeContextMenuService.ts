@@ -156,15 +156,15 @@ export class NavNodeContextMenuService extends Bootstrap {
       getItems: (context, items) => [
         ...items,
         ACTION_OPEN,
-        ACTION_DELETE,
         ACTION_RENAME,
+        ACTION_DELETE,
         ACTION_REFRESH,
       ],
 
       orderItems: (context, items) => {
         const actionsManage = menuExtractActions(items, [
-          ACTION_DELETE,
           ACTION_RENAME,
+          ACTION_DELETE,
         ]);
 
         const actionsRefresh = menuExtractActions(items, [
