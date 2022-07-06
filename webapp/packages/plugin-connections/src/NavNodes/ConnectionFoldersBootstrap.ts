@@ -8,7 +8,7 @@
 
 import { untracked } from 'mobx';
 
-import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeMoveType, getNodeName, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
@@ -75,7 +75,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           untracked(() => { this.connectionFolderResource.load(CachedMapAllKey); });
           const folder = this.connectionFolderResource.fromNodeId(node.id);
 
-          return folder !== undefined;
+          return folder !== undefined && !node.features?.includes(ENodeFeature.shared);
         }
 
         return false;
