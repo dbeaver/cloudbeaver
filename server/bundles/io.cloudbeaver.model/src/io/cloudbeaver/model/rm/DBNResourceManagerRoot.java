@@ -15,7 +15,7 @@
  * from DBeaver Corp.
  */
 
-package io.cloudbeaver.service.rm;
+package io.cloudbeaver.model.rm;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
@@ -38,7 +38,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     private DBNResourceManagerProject[] projects;
     private RMController resourceController;
 
-    DBNResourceManagerRoot(DBNProject parentNode) {
+    public DBNResourceManagerRoot(DBNProject parentNode) {
         super(parentNode);
     }
 

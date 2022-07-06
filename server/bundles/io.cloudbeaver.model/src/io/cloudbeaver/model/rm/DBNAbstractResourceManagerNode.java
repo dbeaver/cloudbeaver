@@ -1,4 +1,4 @@
-package io.cloudbeaver.service.rm;
+package io.cloudbeaver.model.rm;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPObjectWithDetails;
@@ -8,10 +8,10 @@ import org.jkiss.utils.ArrayUtils;
 
 import java.util.Queue;
 
-abstract class DBNAbstractResourceManagerNode extends DBNNode implements DBPObjectWithDetails {
+public abstract class DBNAbstractResourceManagerNode extends DBNNode implements DBPObjectWithDetails {
     protected DBNResourceManagerResource[] children;
 
-    DBNAbstractResourceManagerNode(DBNNode parentNode) {
+    public DBNAbstractResourceManagerNode(DBNNode parentNode) {
         super(parentNode);
     }
 
