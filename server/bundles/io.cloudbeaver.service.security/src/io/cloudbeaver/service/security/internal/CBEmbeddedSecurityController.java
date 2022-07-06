@@ -894,7 +894,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     return SMAuthInfo.inProgress(authAttemptId, redirectUrl, userIdentifyingCredentials);
                 }
                 txn.commit();
-                return finishAuthentication(authAttemptId);
+                return finishAuthentication(authAttemptId, true);
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -1103,6 +1103,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
+        return finishAuthentication(authId, false);
+    }
+
+    private SMAuthInfo finishAuthentication(@NotNull String authId, boolean forceExpireAuthAfterSuccess) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
         if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
@@ -1171,7 +1175,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 throw new SMException(error, e);
             }
         }
-        updateAuthStatus(authId, SMAuthStatus.SUCCESS, authInfo.getAuthData(), null, permissions.getSessionId());
+        var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
+        updateAuthStatus(authId, authStatus, authInfo.getAuthData(), null, permissions.getSessionId());
         return SMAuthInfo.success(authId, token, permissions, authInfo.getAuthData());
     }
 
