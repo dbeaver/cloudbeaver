@@ -57,6 +57,7 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceFolder;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -332,6 +333,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 if (!ds.isTemplate() && isDataSourceAccessible(ds)) {
                     DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
                     dsCopy.setTemporary(true);
+                    DataSourceFolder folder = dsCopy.getFolder();
+                    if (folder != null) {
+                        folder.setTemporary(true);
+                    }
                     dataSourceRegistry.addDataSource(dsCopy);
                 }
             }
