@@ -224,7 +224,7 @@ public class LocalResourceController implements RMController {
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
-        Path newTargetPath = getTargetPath(projectId, newResourcePath).resolve(oldTargetPath.getFileName());
+        Path newTargetPath = getTargetPath(projectId, newResourcePath);
         validateResourcePath(newTargetPath.toString());
         try {
             Files.move(oldTargetPath, newTargetPath);

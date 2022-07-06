@@ -19,6 +19,7 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
@@ -40,6 +41,12 @@ import java.util.List;
  * Web connection info
  */
 public class WebNavigatorNodeInfo {
+    public static final String NODE_FEATURE_ITEM = "item";
+    public static final String NODE_FEATURE_LEAF = "leaf";
+    public static final String NODE_FEATURE_CONTAINER = "container";
+    public static final String NODE_FEATURE_SHARED = "shared";
+    public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
+    public static final String NODE_FEATURE_CAN_RENAME = "canRename";
     private final WebSession session;
     private final DBNNode node;
 
@@ -128,15 +135,15 @@ public class WebNavigatorNodeInfo {
     public String[] getFeatures() {
         List<String> features = new ArrayList<>();
         if (node instanceof DBNDatabaseItem) {
-            features.add("item");
+            features.add(NODE_FEATURE_ITEM);
             DBSObject object = ((DBNDatabaseItem) node).getObject();
             if (object instanceof DBSEntity || object instanceof DBSProcedure) {
-                features.add("leaf");
+                features.add(NODE_FEATURE_LEAF);
             }
 
         }
         if (node instanceof DBNContainer) {
-            features.add("container");
+            features.add(NODE_FEATURE_CONTAINER);
         }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode) {
@@ -146,7 +153,7 @@ public class WebNavigatorNodeInfo {
             isShared = !projectName.equals(session.getUserId());
         }
         if (isShared) {
-            features.add("shared");
+            features.add(NODE_FEATURE_SHARED);
         }
 
         if (node instanceof DBNDatabaseNode) {
@@ -155,14 +162,16 @@ public class WebNavigatorNodeInfo {
                 DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                     object.getClass(), DBEObjectMaker.class);
                 if (objectManager != null && objectManager.canDeleteObject(object)) {
-                    features.add("canDelete");
+                    features.add(NODE_FEATURE_CAN_DELETE);
                 }
                 if (objectManager instanceof DBEObjectRenamer && ((DBEObjectRenamer) objectManager).canRenameObject(object)) {
                     if (!object.getDataSource().getContainer().getNavigatorSettings().isShowOnlyEntities()) {
-                        features.add("canRename");
+                        features.add(NODE_FEATURE_CAN_RENAME);
                     }
                 }
             }
+        } else if (node instanceof DBNLocalFolder || node instanceof DBNAbstractResourceManagerNode) {
+            features.add(NODE_FEATURE_CAN_RENAME);
         }
 
         return features.toArray(new String[0]);

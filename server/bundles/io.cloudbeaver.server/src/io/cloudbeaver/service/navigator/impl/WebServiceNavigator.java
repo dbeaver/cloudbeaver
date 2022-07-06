@@ -386,29 +386,20 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     session.getSingletonProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
                 } else if (node instanceof DBNResourceManagerResource) {
-                    boolean rmNode = folderNode instanceof DBNAbstractResourceManagerNode;
-                    if (!rmNode) {
+                    boolean rmNewNode = folderNode instanceof DBNAbstractResourceManagerNode;
+                    DBNResourceManagerResource rmOldNode = (DBNResourceManagerResource) node;
+                    if (!rmNewNode) {
                         throw new DBWebException("Navigator node '" + folderNodePath + "' is not a resource manager node");
                     }
                     // Get project id from node
-                    String projectId = null;
-                    DBNNode parentNode = folderNode;
-                    while (parentNode != null && !(parentNode instanceof DBNResourceManagerProject)) {
-                        parentNode = parentNode.getParentNode();
-                    }
-                    if (parentNode == null) {
-                        throw new DBWebException("Project id is null");
-                    } else {
-                        projectId = parentNode.getName();
-                    }
+                    String projectId = rmOldNode.getResourceProject().getId();
                     // Get paths from nodes
-                    String folderPath = "";
+                    String newPath = rmOldNode.getResource().getName();
                     if (folderNode instanceof DBNResourceManagerResource) {
-                        folderPath = ((DBNResourceManagerResource) folderNode).getResourceFolder();
+                        newPath = ((DBNResourceManagerResource) folderNode).getResourceFolder() + "/" + newPath;
                     }
-                    String resourcePath = ((DBNResourceManagerResource) node).getResourceFolder();
-                    session.getRmController().moveResource(projectId, resourcePath, folderPath);
-                    node.getParentNode().refreshNode(session.getProgressMonitor(),this);
+                    String resourcePath = rmOldNode.getResourceFolder();
+                    session.getRmController().moveResource(projectId, resourcePath, newPath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
