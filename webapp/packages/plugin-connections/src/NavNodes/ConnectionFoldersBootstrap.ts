@@ -135,6 +135,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
       if (
         [NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType)
+        && !targetNode.features?.includes(ENodeFeature.shared)
         && nodes.every(node => (
           node.nodeType === NAV_NODE_TYPE_CONNECTION
           && this.connectionInfoResource.getConnectionForNode(node.id)?.features.includes(EConnectionFeature.manageable)
