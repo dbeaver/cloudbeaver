@@ -46,7 +46,7 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public RMResource[] listResources(WebSession webSession, @NotNull String projectId, @Nullable String folder, @Nullable String nameMask, boolean readProperties, boolean readHistory) throws DBException {
         try {
-            return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory);
+            return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory, false);
         } catch (DBException e) {
             throw new DBWebException("Error reading list of resources", e);
         }
