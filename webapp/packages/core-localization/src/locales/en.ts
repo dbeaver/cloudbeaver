@@ -45,6 +45,7 @@ export const defaultENLocale = [
   ['ui_clipboard_access_denied_title', 'Clipboard access denied'],
   ['ui_clipboard_access_denied_message', 'You need to give access to clipboard to use some of the app features'],
   ['ui_reveal_password', 'Show or hide password'],
+  ['ui_capslock_on', 'Caps Lock is on'],
   ['ui_page_not_found', 'Page is not found'],
   ['ui_revoke', 'Revoke'],
   ['ui_grant', 'Grant'],

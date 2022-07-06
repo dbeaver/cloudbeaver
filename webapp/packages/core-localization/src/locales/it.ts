@@ -45,6 +45,7 @@ export const defaultITLocale = [
   ['ui_clipboard_access_denied_title', 'Accesso negato agli appunti'],
   ['ui_clipboard_access_denied_message', 'Devi autorizzare l\'accesso agli appunti per utilizzare alcune feature dell\'app'],
   ['ui_reveal_password', 'Mostra o nascondi la password'],
+  ['ui_capslock_on', 'Caps Lock is on'],
   ['ui_page_not_found', 'Pagina non trovata'],
   ['ui_revoke', 'Revoke'],
   ['ui_grant', 'Grant'],

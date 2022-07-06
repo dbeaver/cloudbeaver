@@ -158,7 +158,7 @@ export const Switch: SwitchType = observer(function Switch({
         </switch-control>
         <field-label as="label" htmlFor={id || value || name}>{children}</field-label>
       </switch-body>
-      <field-description>{description}</field-description>
+      {description && <field-description>{description}</field-description>}
     </field>
   );
 });

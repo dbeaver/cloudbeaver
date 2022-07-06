@@ -43,6 +43,7 @@ export const defaultRULocale = [
   ['ui_clipboard_access_denied_title', 'Доступ к буферу обмена запрещен'],
   ['ui_clipboard_access_denied_message', 'Чтобы использовать некоторые функции приложения, необходим доступ к буферу обмена'],
   ['ui_reveal_password', 'Показать или скрыть пароль'],
+  ['ui_capslock_on', 'Caps Lock включен'],
   ['ui_page_not_found', 'Страница не найдена'],
   ['ui_revoke', 'Запретить'],
   ['ui_grant', 'Разрешить'],

@@ -45,6 +45,7 @@ export const defaultZHLocale = [
   ['ui_clipboard_access_denied_title', '剪贴板访问被拒绝'],
   ['ui_clipboard_access_denied_message', '您需要授予对剪贴板的访问权限才能使用某些应用功能'],
   ['ui_reveal_password', '展示或隐藏密码'],
+  ['ui_capslock_on', 'Caps Lock is on'],
   ['ui_page_not_found', '找不到页面'],
   ['ui_revoke', '撤销'],
   ['ui_grant', '授予'],

@@ -33,7 +33,9 @@ export const baseFormControlStyles = css`
 
     field-description {
       composes: theme-typography--caption from global;
+      box-sizing: border-box;
       padding-top: 4px;
+      min-height: 24px;
     }
 
     input, textarea {
