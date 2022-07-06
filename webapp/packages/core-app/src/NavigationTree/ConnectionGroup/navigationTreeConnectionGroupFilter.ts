@@ -26,21 +26,20 @@ function isDefined<T>(val: T | undefined | null): val is T {
 
 function sortManageable(): (nodeA: NavNode, nodeB: NavNode) => number {
   return (nodeA: NavNode, nodeB: NavNode): number => {
-    const nodeAConnection = nodeA.objectFeatures.includes(EObjectFeature.dataSource);
-    const nodeBConnection = nodeB.objectFeatures.includes(EObjectFeature.dataSource);
-
-    if (!nodeAConnection || !nodeBConnection) {
-      if (nodeAConnection === nodeBConnection) {
-        return 0;
-      }
-      return nodeAConnection ? 1 : -1;
-    }
 
     const nodeAShared = nodeA.features?.includes(ENodeFeature.shared);
     const nodeBShared = nodeB.features?.includes(ENodeFeature.shared);
 
     if (nodeAShared === nodeBShared) {
-      return 0;
+      const nodeAConnection = nodeA.objectFeatures.includes(EObjectFeature.dataSource);
+      const nodeBConnection = nodeB.objectFeatures.includes(EObjectFeature.dataSource);
+
+      if (!nodeAConnection || !nodeBConnection) {
+        if (nodeAConnection === nodeBConnection) {
+          return 0;
+        }
+        return nodeAConnection ? 1 : -1;
+      }
     }
 
     return nodeBShared ? -1 : 1;
