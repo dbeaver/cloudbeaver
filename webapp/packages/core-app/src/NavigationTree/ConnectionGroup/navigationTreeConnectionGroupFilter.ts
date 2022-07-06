@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { ENodeFeature } from '../../shared/NodesManager/ENodeFeature';
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { NAV_NODE_TYPE_FOLDER } from '../../shared/NodesManager/NAV_NODE_TYPE_FOLDER';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 
@@ -25,7 +24,7 @@ function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
 }
 
-function sortManageable(connectionInfoResource: ConnectionInfoResource): (nodeA: NavNode, nodeB: NavNode) => number {
+function sortManageable(): (nodeA: NavNode, nodeB: NavNode) => number {
   return (nodeA: NavNode, nodeB: NavNode): number => {
     const nodeAConnection = nodeA.objectFeatures.includes(EObjectFeature.dataSource);
     const nodeBConnection = nodeB.objectFeatures.includes(EObjectFeature.dataSource);
@@ -37,29 +36,18 @@ function sortManageable(connectionInfoResource: ConnectionInfoResource): (nodeA:
       return nodeAConnection ? 1 : -1;
     }
 
-    const connectionA = connectionInfoResource.getConnectionForNode(nodeA.id);
-    const connectionB = connectionInfoResource.getConnectionForNode(nodeB.id);
+    const nodeAShared = nodeA.features?.includes(ENodeFeature.shared);
+    const nodeBShared = nodeB.features?.includes(ENodeFeature.shared);
 
-    if (!connectionA || !connectionB) {
-      if (connectionA === connectionB) {
-        return 0;
-      }
-      return connectionA ? 1 : -1;
-    }
-
-    const nodeAManageable = connectionA.features.includes(EConnectionFeature.manageable);
-    const nodeBManageable = connectionB.features.includes(EConnectionFeature.manageable);
-
-    if (nodeAManageable === nodeBManageable) {
+    if (nodeAShared === nodeBShared) {
       return 0;
     }
 
-    return nodeBManageable ? 1 : -1;
+    return nodeBShared ? -1 : 1;
   };
 }
 
 export function navigationTreeConnectionGroupFilter(
-  connectionInfoResource: ConnectionInfoResource,
   resource: NavNodeInfoResource
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[]) => {
@@ -70,26 +58,18 @@ export function navigationTreeConnectionGroupFilter(
     const nodes = resource
       .get(resourceKeyList(children))
       .filter(isDefined)
-      .sort(sortManageable(connectionInfoResource));
+      .sort(sortManageable());
 
     let groupedChildren: string[] = [];
     let lastGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unsorted;
     let groups = 0;
 
     for (const node of nodes) {
-      const connection = connectionInfoResource.getConnectionForNode(node.id);
-      let manageable = !!connection?.features.includes(EConnectionFeature.manageable);
-
-      if (node.nodeType === NAV_NODE_TYPE_FOLDER) {
-        manageable = true;
-      }
-
+      const manageable = !node.features?.includes(ENodeFeature.shared);
       let nextGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unsorted;
 
       if (manageable) {
         nextGroup = NAVIGATION_TREE_CONNECTION_GROUPS.manageable;
-      } else if (connection) {
-        nextGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unmanageable;
       }
 
       if (nextGroup !== lastGroup) {

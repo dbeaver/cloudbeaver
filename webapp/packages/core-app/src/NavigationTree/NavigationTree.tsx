@@ -11,7 +11,6 @@ import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -73,7 +72,6 @@ const elementsTreeStyles = css`
 export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const connectionInfoResource = useService(ConnectionInfoResource);
   const navNodeViewService = useService(NavNodeViewService);
 
   const root = ROOT_NODE_PATH;
@@ -81,9 +79,8 @@ export const NavigationTree = observer(function NavigationTree() {
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
-    connectionInfoResource,
     navNodeInfoResource
-  ), [connectionInfoResource, navNodeInfoResource]);
+  ), [navNodeInfoResource]);
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
