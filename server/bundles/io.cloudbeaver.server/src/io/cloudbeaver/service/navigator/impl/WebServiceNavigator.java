@@ -20,6 +20,9 @@ package io.cloudbeaver.service.navigator.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
+import io.cloudbeaver.model.rm.DBNResourceManagerProject;
+import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
@@ -382,13 +385,28 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
                     session.getSingletonProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
+                } else if (node instanceof DBNResourceManagerResource) {
+                    boolean rmNewNode = folderNode instanceof DBNAbstractResourceManagerNode;
+                    DBNResourceManagerResource rmOldNode = (DBNResourceManagerResource) node;
+                    if (!rmNewNode) {
+                        throw new DBWebException("Navigator node '" + folderNodePath + "' is not a resource manager node");
+                    }
+                    // Get project id from node
+                    String projectId = rmOldNode.getResourceProject().getId();
+                    // Get paths from nodes
+                    String newPath = rmOldNode.getResource().getName();
+                    if (folderNode instanceof DBNResourceManagerResource) {
+                        newPath = ((DBNResourceManagerResource) folderNode).getResourceFolder() + "/" + newPath;
+                    }
+                    String resourcePath = rmOldNode.getResourceFolder();
+                    session.getRmController().moveResource(projectId, resourcePath, newPath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
             }
             return true;
         } catch (DBException e) {
-            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+            throw new DBWebException("Error moving navigator nodes "  + nodePaths, e);
         }
     }
 
@@ -424,5 +442,4 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
         return executionContext;
     }
-
 }

@@ -15,7 +15,7 @@
  * from DBeaver Corp.
  */
 
-package io.cloudbeaver.service.rm;
+package io.cloudbeaver.model.rm;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return children;
     }
 
-    private String getResourceFolder() {
+    public String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
         for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
@@ -96,7 +97,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return folder.length() == 0 ? null : folder.toString();
     }
 
-    private RMProject getResourceProject() throws DBException {
+    public RMProject getResourceProject() throws DBException {
         for (DBNNode parent = getParentNode(); parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerProject) {
                 return ((DBNResourceManagerProject) parent).getProject();
@@ -124,7 +125,34 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         this.children = null;
         return this;
     }
+    @Override
+    public boolean supportsRename() {
+        return true;
+    }
 
+    @Override
+    public void rename(DBRProgressMonitor monitor, String newName) throws DBException {
+        try {
+            if (newName.indexOf('.') == -1) {
+                String resourceName = resource.getName();
+                int indexOfExt = resourceName.indexOf('.');
+                if (indexOfExt > 0) {
+                    String ext = resourceName.substring(indexOfExt);
+                    if (!CommonUtils.isEmpty(ext)) {
+                        newName += "." + ext;
+                    }
+                }
+            }
+            if (!newName.equals(resource.getName())) {
+                String oldPath = getResourceFolder();
+                resource.setName(newName);
+                getResourceController().moveResource(getResourceProject().getId(), oldPath, getResourceFolder());
+
+            }
+        } catch (Exception e) {
+            throw new DBException("Can't rename resource", e);
+        }
+    }
     @Override
     public String toString() {
         return getNodeName();
