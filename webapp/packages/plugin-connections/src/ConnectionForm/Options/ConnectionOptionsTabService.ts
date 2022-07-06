@@ -149,6 +149,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.serverName = state.info.serverName;
     state.config.databaseName = state.info.databaseName;
     state.config.url = state.info.url;
+    state.config.folder = state.info.folder;
+
 
     state.config.authModelId = state.info.authModel;
     state.config.saveCredentials = state.info.saveCredentials;
@@ -203,6 +205,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.description = state.config.description;
     tempConfig.template = state.config.template;
     tempConfig.driverId = state.config.driverId;
+    tempConfig.folder = state.config.folder;
 
     if (isJDBCConnection(driver, state.info)) {
       tempConfig.url = state.config.url;

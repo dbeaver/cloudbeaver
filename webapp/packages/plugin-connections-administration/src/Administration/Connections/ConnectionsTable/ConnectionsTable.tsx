@@ -52,6 +52,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
         <TableColumnHeader min />
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
         <TableColumnHeader />
       </TableHeader>
       <TableBody>

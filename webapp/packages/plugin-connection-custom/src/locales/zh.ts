@@ -11,6 +11,7 @@ export default [
   ['customConnection_custom_database', '数据库'],
   ['customConnection_custom_server', '服务器'],
   ['customConnection_url_JDBC', 'JDBC URL'],
+  ['customConnection_folder', 'Folder'],
   ['customConnection_userName', '用户名称'],
   ['customConnection_Password', '密码'],
   ['customConnection_test', '测试连接'],

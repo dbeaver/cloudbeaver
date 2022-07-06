@@ -230,6 +230,19 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   {translate('connections_connection_template')}
                 </FieldCheckbox>
               )}
+              {admin && (
+                <InputField
+                  type="text"
+                  name="folder"
+                  state={config}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  autoComplete={`section-${config.driverId || 'driver'} section-folder`}
+                  mod='surface'
+                >
+                  {translate('customConnection_folder')}
+                </InputField>
+              )}
               <Textarea
                 name="description"
                 rows={3}

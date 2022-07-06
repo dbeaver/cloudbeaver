@@ -29,6 +29,7 @@ export default [
   ['connections_connection_edit_search', 'Поиск'],
   ['connections_connection_edit_search_hosts', 'Названия хостов'],
   ['connections_connection_address', 'Адрес'],
+  ['connections_connection_folder', 'Папка'],
   ['connections_connection_name', 'Название подключения'],
   ['connections_connection_access_user_or_role_name', 'Имя пользователя или роли'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или роли'],
