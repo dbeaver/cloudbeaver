@@ -9,6 +9,7 @@
 import { untracked } from 'mobx';
 
 import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
@@ -23,6 +24,7 @@ import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION';
 export class ConnectionFoldersBootstrap extends Bootstrap {
 
   constructor(
+    private readonly userInfoResource: UserInfoResource,
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -41,10 +43,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
-      isActionApplicable(context, action) {
+      isActionApplicable: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (tree?.baseRoot !== ROOT_NODE_PATH) {
+        if (tree?.baseRoot !== ROOT_NODE_PATH || !this.userInfoResource.data) {
           return false;
         }
 
