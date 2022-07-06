@@ -87,7 +87,7 @@ export const NavigationNodeNested = observer(forwardRef<HTMLDivElement, Props>(f
         <TreeNodeNestedMessage>
           {translate(
             nodeId === undefined
-              ? 'app_navigationTree_node_drop_placeholder'
+              ? 'app_navigationTree_connection_group_user'
               : 'app_navigationTree_node_empty'
           )}
         </TreeNodeNestedMessage>

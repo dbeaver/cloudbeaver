@@ -23,7 +23,6 @@ export default [
   ['app_navigationTree_settings_folders_title', 'Folders'],
   ['app_navigationTree_settings_folders_description', 'Open any node as tree root node'],
   ['app_navigationTree_node_empty', 'Empty'],
-  ['app_navigationTree_node_drop_placeholder', 'Drop node here'],
   ['app_navigationTree_openNodeTab', '打开'],
   ['app_navigationTree_connection_view', '连接视图'],
   ['app_navigationTree_node_not_found', 'Node not found'],

@@ -90,11 +90,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
               return;
             }
 
-            const nodeName = getNodeName(node);
-
             const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
               title: 'ui_data_delete_confirmation',
-              message: `You're going to delete "${nodeName}". Are you sure?`,
+              message: `You're going to delete "${node.name}". Are you sure?`,
               confirmActionText: 'ui_delete',
             });
 
@@ -108,8 +106,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
                 folder.id
               );
               this.navTreeResource.delete(node.id);
+              this.navTreeResource.markOutdated(node.parentId);
             } catch (exception: any) {
-              this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
+              this.notificationService.logException(exception, `Failed to delete "${node.name}"`);
             }
             break;
           }
@@ -172,10 +171,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         }
 
         let targetFolder = selected[0];
-        const targetNode = this.navNodeInfoResource.get(targetFolder);
+        let targetNode = this.navNodeInfoResource.get(targetFolder);
 
         if (![NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode?.nodeType as any)) {
           targetFolder = tree.baseRoot;
+          targetNode = this.navNodeInfoResource.get(targetFolder);
         }
 
         const folder = this.connectionFolderResource.fromNodeId(targetFolder);
@@ -203,7 +203,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
             await this.connectionFolderResource.create(result, folder?.id);
-            await tree.refresh(targetFolder);
+            if (targetNode) {
+              this.navTreeResource.markOutdated(targetNode.parentId);
+            }
+            this.navTreeResource.markOutdated(targetFolder);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
