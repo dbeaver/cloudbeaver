@@ -137,7 +137,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
                 String resourceName = resource.getName();
                 int indexOfExt = resourceName.indexOf('.');
                 if (indexOfExt > 0) {
-                    String ext = resourceName.substring(indexOfExt);
+                    String ext = resourceName.substring(indexOfExt + 1);
                     if (!CommonUtils.isEmpty(ext)) {
                         newName += "." + ext;
                     }
