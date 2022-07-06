@@ -7,20 +7,24 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, GraphQLService, RmResource } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, GraphQLService, ResourceKey, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
 
 export type RmResourceInfo = RmResource;
+export interface IResourceManagerParams {
+  projectId: string;
+  folder?: string;
+}
 
 @injectable()
-export class ResourceManagerResource extends CachedMapResource<string, RmResourceInfo[]> {
+export class ResourceManagerResource extends CachedMapResource<IResourceManagerParams, RmResourceInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService
   ) {
     super();
   }
 
-  getResource(projectId: string, resourcePath: string): RmResourceInfo | undefined {
-    const resources = this.get(projectId);
+  getResource(key: IResourceManagerParams, resourcePath: string): RmResourceInfo | undefined {
+    const resources = this.get(key);
 
     return resources?.find(resource => resource.name === resourcePath);
   }
@@ -58,12 +62,33 @@ export class ResourceManagerResource extends CachedMapResource<string, RmResourc
     });
   }
 
-  protected async loader(key: string): Promise<Map<string, RmResourceInfo[]>> {
-    const { resources } = await this.graphQLService.sdk.getResourceList({
-      projectId: key,
+  protected getKeyRef(key: IResourceManagerParams): IResourceManagerParams {
+    if (this.keys.includes(key)) {
+      return key;
+    }
+
+    const ref = this.keys.find(k => k.projectId === key.projectId && k.folder === key.folder);
+
+    if (ref) {
+      return ref;
+    }
+
+    return key;
+  }
+
+  protected async loader(
+    key: ResourceKey<IResourceManagerParams>
+  ): Promise<Map<IResourceManagerParams, RmResourceInfo[]>> {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const { projectId, folder } = key;
+      const { resources } = await this.graphQLService.sdk.getResourceList({
+        projectId,
+        folder,
+      });
+
+      this.dataSet(key, resources);
     });
 
-    this.dataSet(key, resources);
     return this.data;
   }
 }

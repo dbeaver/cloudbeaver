@@ -245,6 +245,10 @@ export abstract class CachedResource<
     return metadata;
   }
 
+  deleteMetadata(param: TParam): void {
+    this.metadata.delete(param as any as TKey);
+  }
+
   getException(param: TParam): Error | null {
     param = this.transformParam(param);
     return this.getMetadata(param).exception;

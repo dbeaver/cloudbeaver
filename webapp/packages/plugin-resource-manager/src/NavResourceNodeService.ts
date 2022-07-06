@@ -15,7 +15,9 @@ import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
 interface IResourceData {
   projectId: string;
+  folder?: string;
   resourcePath: string;
+  name: string;
 }
 
 export const PROJECT_NODE_TYPE = 'rm.project';
@@ -31,8 +33,13 @@ export class NavResourceNodeService {
 
   async loadResourceInfo(nodeId: string): Promise<RmResourceInfo | undefined> {
     const data = this.getResourceData(nodeId);
-    await this.resourceManagerResource.load(data.projectId);
-    return this.resourceManagerResource.getResource(data.projectId, data.resourcePath);
+
+    const key = {
+      projectId: data.projectId,
+      folder: data.folder,
+    };
+    await this.resourceManagerResource.load(key);
+    return this.resourceManagerResource.getResource(key, data.name);
   }
 
   async saveScript(folderNodeId: string, name: string, script: string) {
@@ -66,10 +73,19 @@ export class NavResourceNodeService {
     const parts = nodeId.replace('//', '\\').split('/');
     const projectId = parts[1];
     const resourcePath = parts.slice(2).join('/');
+    const name = parts[parts.length - 1];
+
+    let folder: string | undefined = undefined;
+    const folders = parts.slice(2, parts.length - 1);
+    if (folders.length > 0) {
+      folder = folders.join('/');
+    }
 
     return {
       projectId,
+      folder,
       resourcePath,
+      name,
     };
   }
 }

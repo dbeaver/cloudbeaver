@@ -46,6 +46,7 @@ export interface ResourceKeyUtils {
   every: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   map: MapFnc;
   toArray: <TKey>(key: ResourceKey<TKey>) => TKey[];
+  mapKey: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
   mapArray: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
   includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
   exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKeyList<TKey>;
@@ -132,6 +133,14 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
       return key.list;
     } else {
       return [key];
+    }
+  },
+
+  mapKey<TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKey<TValue> {
+    if (isResourceKeyList(key)) {
+      return resourceKeyList(key.list.map(selector), key.mark);
+    } else {
+      return selector(key, -1);
     }
   },
 
