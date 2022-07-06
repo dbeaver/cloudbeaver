@@ -81,6 +81,7 @@ export * from './Table/getSelectedItems';
 export * from './Expand/Expandable';
 export * from './Expand/EXPANDABLE_FORM_STYLES';
 
+export * from './Tree/TreeNode/EventTreeNodeClickFlag';
 export * from './Tree/TreeNode/EventTreeNodeExpandFlag';
 export * from './Tree/TreeNode/EventTreeNodeSelectFlag';
 export * from './Tree/TreeNode/TreeNode';

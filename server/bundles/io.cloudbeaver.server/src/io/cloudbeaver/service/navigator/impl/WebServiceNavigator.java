@@ -177,6 +177,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBPRefreshableObject) dataSource).refreshObject(monitor);
                 }
                 ((DBNDataSource) node).cleanupNode();
+            } else if (node instanceof DBNLocalFolder) {
+                // Refresh can't be applied to the local folder node
+                return true;
             } else {
                 node.refreshNode(monitor, this);
             }
@@ -356,10 +359,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, String folderNodePath) throws DBWebException {
+    public boolean moveNodesToFolder(
+        @NotNull WebSession session,
+        @NotNull List<String> nodePaths,
+        @NotNull String folderNodePath
+    ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
-            DBNNode folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
+            DBNNode folderNode;
+            folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {

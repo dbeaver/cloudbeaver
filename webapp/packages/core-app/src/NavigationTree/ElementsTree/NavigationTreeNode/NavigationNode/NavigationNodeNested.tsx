@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useMemo } from 'react';
+import { forwardRef, useContext, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { getComputed, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
@@ -25,14 +25,14 @@ interface Props {
   className?: string;
 }
 
-export const NavigationNodeNested = observer<Props>(function NavigationNodeNested({
+export const NavigationNodeNested = observer(forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({
   nodeId,
   component,
   path,
   dndNodes,
   root,
   className,
-}) {
+}, ref) {
   const treeContext = useContext(ElementsTreeContext);
   const translate = useTranslate();
 
@@ -73,7 +73,7 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
   }
 
   return styled(TREE_NODE_STYLES)(
-    <TreeNodeNested root={root} className={className}>
+    <TreeNodeNested ref={ref} root={root} className={className}>
       {children.map(child => (
         <NavigationNode
           key={child}
@@ -84,13 +84,14 @@ export const NavigationNodeNested = observer<Props>(function NavigationNodeNeste
         />
       ))}
       {empty && (
-        <TreeNodeNestedMessage>{translate(
-          nodeId === undefined
-            ? 'app_navigationTree_node_drop_placeholder'
-            : 'app_navigationTree_node_empty'
-        )}
+        <TreeNodeNestedMessage>
+          {translate(
+            nodeId === undefined
+              ? 'app_navigationTree_node_drop_placeholder'
+              : 'app_navigationTree_node_empty'
+          )}
         </TreeNodeNestedMessage>
       )}
     </TreeNodeNested>
   );
-});
+}));

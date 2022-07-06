@@ -15,7 +15,6 @@ import './styles/main/app-loading-screen.pure.css';
 import './styles/main/elevation.pure.scss';
 import './styles/main/typography.pure.scss';
 import './styles/main/color.pure.scss';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -25,7 +24,6 @@ import { themes } from './themes';
 import { defaultThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
-const THEME_KEY = 'appTheme';
 const COMMON_STYLES: any[] = [];
 const THEME_SETTINGS_KEY = 'themeSettings';
 
@@ -74,18 +72,11 @@ export class ThemeService extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly settingsService: SettingsService,
-    private readonly themeSettingsService: ThemeSettingsService,
-    private readonly userInfoResource: UserInfoResource
+    private readonly themeSettingsService: ThemeSettingsService
   ) {
     super();
 
     this.onThemeChange = new SyncExecutor();
-    this.userInfoResource.onDataUpdate.addHandler(() => {
-      const theme = this.userInfoResource.getConfigurationParameter(THEME_KEY);
-      if (theme && theme !== this.currentThemeId) {
-        this.tryChangeTheme(theme);
-      }
-    });
 
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
       themes: computed,
@@ -99,13 +90,12 @@ export class ThemeService extends Bootstrap {
 
   register(): void {
     this.loadAllThemes();
+    this.setCurrentThemeId(this.defaultThemeId);
+    this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
   }
 
   async load(): Promise<void> {
-    this.setCurrentThemeId(this.defaultThemeId);
-    this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
-    await this.userInfoResource.load(undefined, ['includeConfigurationParameters']);
-    await this.tryChangeTheme(this.userInfoResource.getConfigurationParameter(THEME_KEY) || this.currentThemeId);
+    await this.tryChangeTheme(this.currentThemeId);
   }
 
   getThemeStyles(themeId: string): ClassCollection[] {
@@ -120,9 +110,6 @@ export class ThemeService extends Bootstrap {
 
   async changeTheme(themeId: string): Promise<void> {
     await this.tryChangeTheme(themeId);
-    if (this.userInfoResource.parametersAvailable) {
-      await this.userInfoResource.setConfigurationParameter(THEME_KEY, themeId);
-    }
   }
 
   private async tryChangeTheme(themeId: string): Promise<void> {

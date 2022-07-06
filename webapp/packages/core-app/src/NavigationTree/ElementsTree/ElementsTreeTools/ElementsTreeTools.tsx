@@ -10,11 +10,12 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton } from '@cloudbeaver/core-blocks';
+import { IconButton, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
+import { NavTreeResource } from '../../../shared/NodesManager/NavTreeResource';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
@@ -32,6 +33,13 @@ const toolsStyles = css`
       position: sticky;
       top: 0;
       z-index: 1;
+
+      &:hover [|settings] {
+        display: block;
+      }
+      & [|settings] {
+        display: none;
+      }
     }
     actions {
       display: flex;
@@ -55,6 +63,18 @@ const toolsStyles = css`
       &[|opened] Icon, &[|opened] StaticImage {
         transform: rotate(180deg);
       }
+
+      &[|loading] Icon, &[|loading] StaticImage {
+        animation: rotating 1.5s linear infinite;
+      }
+    }
+    @keyframes rotating {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
   `;
 
@@ -68,20 +88,22 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   style,
   children,
 }) {
+  const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
   const styles = useStyles(toolsStyles, style);
+  const rootNode = useMapResource(ElementsTreeTools, NavTreeResource, root);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
     context?.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
   });
 
+  const loading = rootNode.isLoading();
+
   return styled(styles)(
     <tools>
       <actions>
-        <fill />
-        <ElementsTreeToolsMenu tree={tree} />
         {tree.settings?.configurable && (
           <IconButton
             name='/icons/settings_cog_sm.svg'
@@ -89,9 +111,20 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             style={toolsStyles}
             img
             onClick={() => setOpen(!opened)}
-            {...use({ opened, primary: true })}
+            {...use({ opened, primary: true, settings: true })}
           />
         )}
+        <fill />
+        <ElementsTreeToolsMenu tree={tree} />
+        <IconButton
+          name='/icons/refresh_sm.svg#root'
+          title={translate('app_navigationTree_refresh')}
+          style={toolsStyles}
+          disabled={loading}
+          img
+          onClick={() => tree.refresh(root)}
+          {...use({ primary: true, loading })}
+        />
       </actions>
       {tree.settings && opened && (
         <NavigationTreeSettings root={tree.baseRoot} settings={tree.settings} style={style} />

@@ -65,6 +65,10 @@ const MENU_STYLES = css`
     margin: 0;
     border: 0 !important;
     border-right: 1px solid !important;
+
+    &:first-child, &:last-child {
+      display: none;
+    }
   }
 `;
 

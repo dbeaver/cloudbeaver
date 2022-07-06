@@ -78,7 +78,7 @@ export const NavigationTree = observer(function NavigationTree() {
 
   const root = ROOT_NODE_PATH;
   const isEnabled = usePermission(EPermission.public);
-  const { handleOpen, handleSelect } = useNavigationTree();
+  const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
     connectionInfoResource,
@@ -114,6 +114,7 @@ export const NavigationTree = observer(function NavigationTree() {
           </center>
         )}
         customSelect={handleSelect}
+        customSelectReset={handleSelectReset}
         settings={settings}
         style={elementsTreeStyles}
         getChildren={navTreeService.getChildren}

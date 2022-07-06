@@ -1,0 +1,8 @@
+mutation createConnectionFolder(
+  $parentFolderPath: ID
+  $folderName: String!
+) {
+  folder: createConnectionFolder(parentFolderPath: $parentFolderPath, folderName: $folderName) {
+    ...ConnectionFolderInfo
+  }
+}

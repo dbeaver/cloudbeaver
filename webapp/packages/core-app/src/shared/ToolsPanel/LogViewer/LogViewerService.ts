@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable, makeObservable } from 'mobx';
+import { action, observable, makeObservable, computed } from 'mobx';
 
+import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission, SessionPermissionsResource, SessionExpireService } from '@cloudbeaver/core-root';
@@ -17,12 +18,20 @@ import { uuid } from '@cloudbeaver/core-utils';
 import { CoreSettingsService } from '../../../CoreSettingsService';
 import type { ILogEntry } from './ILogEntry';
 
+const logViewerSettingsKey = 'log-viewer';
+
+interface ISettings {
+  active: boolean;
+}
+
 @injectable()
 export class LogViewerService {
-  _isActive = false;
+  get settings() {
+    return this.userDataService.getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
+  }
 
   get isActive(): boolean {
-    return this._isActive;
+    return this.settings.active;
   }
 
   private log: ILogEntry[] = [];
@@ -31,15 +40,17 @@ export class LogViewerService {
   private maxFailedRequests = 0;
 
   constructor(
-    private graphQLService: GraphQLService,
-    private coreSettingsService: CoreSettingsService,
-    private notificationService: NotificationService,
-    private permissionsService: PermissionsService,
-    private permissionsResource: SessionPermissionsResource,
-    private sessionExpireService: SessionExpireService
+    private readonly userDataService: UserDataService,
+    private readonly graphQLService: GraphQLService,
+    private readonly coreSettingsService: CoreSettingsService,
+    private readonly notificationService: NotificationService,
+    private readonly permissionsService: PermissionsService,
+    private readonly permissionsResource: SessionPermissionsResource,
+    private readonly sessionExpireService: SessionExpireService
   ) {
+
     makeObservable<LogViewerService, 'log' | 'addNewEntries'>(this, {
-      _isActive: observable,
+      settings: computed,
       log: observable,
       clearLog: action,
       addNewEntries: action,
@@ -49,7 +60,7 @@ export class LogViewerService {
   }
 
   toggle(): void {
-    if (this._isActive) {
+    if (this.isActive) {
       this.stopLog();
     } else {
       this.startLog();
@@ -61,14 +72,14 @@ export class LogViewerService {
   }
 
   async startLog(): Promise<void> {
-    if (this._isActive) {
+    if (this.isActive) {
       return;
     }
     if (!this.isLogViewerAvailable()) {
       throw new Error('Access denied');
     }
     this.failedRequestsCount = 0;
-    this._isActive = true;
+    this.settings.active = true;
     const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout');
     this.maxFailedRequests = this.coreSettingsService.settings.getValue('app.logViewer.maxFailedRequests');
 
@@ -81,7 +92,7 @@ export class LogViewerService {
       clearTimeout(this.timeoutTaskId);
       this.timeoutTaskId = null;
     }
-    this._isActive = false;
+    this.settings.active = false;
   }
 
   clearLog(): void {
@@ -113,7 +124,7 @@ export class LogViewerService {
     this.timeoutTaskId = setTimeout(async () => {
       await this.updateLog();
 
-      if (this._isActive) {
+      if (this.isActive) {
         this.runInterval(refreshInterval);
       }
     }, refreshInterval);
@@ -136,7 +147,7 @@ export class LogViewerService {
   }
 
   private stopIfHasNoPermission() {
-    if (this._isActive && !this.isLogViewerAvailable()) {
+    if (this.isActive && !this.isLogViewerAvailable()) {
       this.stopLog();
     }
   }
@@ -144,4 +155,10 @@ export class LogViewerService {
   private isLogViewerAvailable() {
     return this.permissionsService.has(EPermission.public);
   }
+}
+
+function getLogViewerDefaultSettings(): ISettings {
+  return {
+    active: false,
+  };
 }

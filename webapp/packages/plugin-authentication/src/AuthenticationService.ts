@@ -66,8 +66,8 @@ export class AuthenticationService extends Bootstrap {
     this.configureIdentityProvider = action;
   }
 
-  async authUser(provider: string | null = null, link?: boolean): Promise<void> {
-    await this.auth(false, provider, link);
+  async authUser(providerId: string | null = null, link?: boolean): Promise<void> {
+    await this.auth(false, { providerId, link });
   }
 
   async logout(): Promise<void> {
@@ -130,17 +130,14 @@ export class AuthenticationService extends Bootstrap {
     }
   }
 
-  private async auth(persistent: boolean, providerId: string | null = null, link?: boolean) {
+  private async auth(persistent: boolean, options: IAuthOptions) {
     if (this.authPromise) {
       return this.authPromise;
     }
 
-    const loginFormOptions: IAuthOptions = observable({
-      providerId,
-      link,
-    });
+    options = observable(options);
 
-    this.authPromise = this.authDialogService.showLoginForm(persistent, loginFormOptions);
+    this.authPromise = this.authDialogService.showLoginForm(persistent, options);
 
     if (this.serverConfigResource.redirectOnFederatedAuth) {
       await this.authProvidersResource.loadAll();
@@ -154,8 +151,8 @@ export class AuthenticationService extends Bootstrap {
         if (configurableProvider?.configurations?.length === 1) {
           const configuration = configurableProvider.configurations[0];
 
-          loginFormOptions.providerId = configurableProvider.id;
-          loginFormOptions.configurationId = configuration.id;
+          options.providerId = configurableProvider.id;
+          options.configurationId = configuration.id;
         }
       }
     }
@@ -173,7 +170,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.auth(true, null, true);
+    await this.auth(true, { accessRequest: true, providerId: null, link: true });
   }
 
   register(): void {
@@ -191,7 +188,7 @@ export class AuthenticationService extends Bootstrap {
         return;
       }
 
-      await this.auth(false, null, true);
+      await this.auth(false, { providerId: null, link: true, accessRequest: true });
     });
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
@@ -229,7 +226,7 @@ export class AuthenticationService extends Bootstrap {
     }
 
     if (!this.userInfoResource.hasToken(data.type, data.subType)) {
-      await this.auth(false, data.subType ?? data.type);
+      await this.auth(false, { providerId: data.subType ?? data.type });
     }
 
     if (this.userInfoResource.hasToken(data.type, data.subType)) {

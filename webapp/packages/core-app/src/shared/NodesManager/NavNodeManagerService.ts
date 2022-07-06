@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import {
   Connection, ConnectionInfoResource, ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
@@ -27,6 +29,7 @@ import { NodeManagerUtils } from './NodeManagerUtils';
 
 export enum NavigationType {
   open,
+  canOpen
 }
 
 export interface NavNodeKey {
@@ -74,6 +77,9 @@ export interface INodeNavigationContext {
   folderId: string;
   name?: string;
   icon?: string;
+  canOpen: boolean;
+
+  markOpen(): void;
   getParents: () => string[];
   loadParents: (parents: string[]) => Promise<void>;
 }
@@ -96,8 +102,15 @@ export interface INodeMoveData {
   moveContexts: IDataContextProvider;
 }
 
+export interface INavNodeCache {
+  canOpen: boolean;
+}
+
+
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
+  readonly syncNodeInfoCache: Map<string, INavNodeCache>;
+
   readonly navigator: IExecutor<INodeNavigationData>;
   readonly onMove: ISyncExecutor<INodeMoveData>;
 
@@ -111,6 +124,7 @@ export class NavNodeManagerService extends Bootstrap {
     navigationService: NavigationService
   ) {
     super();
+    this.syncNodeInfoCache = new Map();
     this.onMove = new SyncExecutor();
     this.navigator = new Executor(
       {
@@ -118,15 +132,45 @@ export class NavNodeManagerService extends Bootstrap {
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
       },
-      (active, current) => active.nodeId === current.nodeId
+      (active, current) => active.nodeId === current.nodeId && active.type === current.type
     )
       .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
+
+    makeObservable(this, {
+      syncNodeInfoCache: observable,
+    });
   }
 
   register(): void { }
 
   load(): void { }
+
+  getNavNodeCache(nodeId: string): INavNodeCache {
+    return this.syncNodeInfoCache.get(nodeId) || { canOpen: false };
+  }
+
+  async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
+    const contexts = await this.navigator.execute({
+      type: NavigationType.canOpen,
+      nodeId,
+      parentId,
+      folderId,
+    });
+
+    const data = await contexts.getContext(this.navigationNavNodeContext);
+
+    let cache = this.syncNodeInfoCache.get(nodeId);
+
+    if (!cache) {
+      cache = observable({ canOpen: data.canOpen });
+      this.syncNodeInfoCache.set(nodeId, cache);
+    }
+
+    cache.canOpen = data.canOpen;
+
+    return data.canOpen;
+  }
 
   async navToNode(nodeId: string, parentId: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
@@ -264,6 +308,7 @@ export class NavNodeManagerService extends Bootstrap {
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
+    let canOpen = false;
 
     await this.connectionInfo.load(CachedMapAllKey);
 
@@ -290,6 +335,10 @@ export class NavNodeManagerService extends Bootstrap {
         folderId = data.folderId;
       }
     }
+
+    const markOpen = () => {
+      canOpen = true;
+    };
 
     const getParents = () => {
       const parents: string[] = [];
@@ -319,6 +368,10 @@ export class NavNodeManagerService extends Bootstrap {
     };
 
     return {
+      get canOpen() {
+        return canOpen;
+      },
+
       type: data.type,
       connection,
       nodeId,
@@ -326,6 +379,8 @@ export class NavNodeManagerService extends Bootstrap {
       folderId,
       name,
       icon,
+
+      markOpen,
       getParents,
       loadParents,
     };
@@ -336,6 +391,10 @@ export class NavNodeManagerService extends Bootstrap {
     contexts: IExecutionContextProvider<INodeNavigationData>
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void> {
+    if (data.type !== NavigationType.open) {
+      return;
+    }
+
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {

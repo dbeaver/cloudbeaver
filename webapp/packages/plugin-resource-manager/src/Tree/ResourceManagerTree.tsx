@@ -13,10 +13,10 @@ import { ElementsTree, NavigationTreeService, NavigationNodeControl } from '@clo
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { ProjectsResource } from '../ProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 const styles = css`

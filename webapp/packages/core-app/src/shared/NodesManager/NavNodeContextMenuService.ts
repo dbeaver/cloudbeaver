@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { untracked } from 'mobx';
+
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -70,8 +72,15 @@ export class NavNodeContextMenuService extends Bootstrap {
           return !!node.features?.includes(ENodeFeature.canDelete);
         }
 
+        if (action === ACTION_OPEN) {
+          untracked(() => {
+            this.navNodeManagerService.canOpen(node.id, node.parentId); // trigger info
+          });
+
+          return this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
+        }
+
         return [
-          ACTION_OPEN,
           ACTION_REFRESH,
         ].includes(action);
       },
@@ -87,7 +96,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             try {
               await this.navNodeManagerService.refreshTree(node.id);
             } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to refresh node');
+              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }
             break;
           }

@@ -54,5 +54,9 @@ export const MENU_BAR_DEFAULT_STYLES = css`
       height: 100%;
       margin: 0;
       border: 1px solid !important;
+
+      &:first-child, &:last-child {
+        display: none;
+      }
     }
   `;

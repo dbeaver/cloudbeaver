@@ -49,6 +49,8 @@ export const defaultRULocale = [
   ['ui_edit', 'Редактировать'],
   ['ui_open_in_tab', 'Открыть во вкладке'],
   ['ui_rename', 'Переименовать'],
+  ['ui_create', 'Создать'],
+  ['ui_folder', 'Папка'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
   ['ui_interval', 'Интервал'],

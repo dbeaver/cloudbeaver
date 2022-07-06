@@ -181,14 +181,16 @@ UserInfoIncludes
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
+    if (!this.data) {
+      return null;
+    }
+
     await this.graphQLService.sdk.setUserConfigurationParameter({
       name: key,
       value,
     });
 
-    if (this.data) {
-      this.data.configurationParameters[key] = value;
-    }
+    this.data.configurationParameters[key] = value;
 
     return this.data;
   }

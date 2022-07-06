@@ -43,7 +43,7 @@ interface IState {
   setActiveConfiguration: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
 }
 
-export function useAuthDialogState(providerId: string | null, configurationId?: string): IData {
+export function useAuthDialogState(accessRequest: boolean, providerId: string | null, configurationId?: string): IData {
   const authProvidersResource = useMapResource(useAuthDialogState, AuthProvidersResource, CachedMapAllKey);
   const administrationScreenService = useService(AdministrationScreenService);
   const authInfoService = useService(AuthInfoService);
@@ -91,6 +91,10 @@ export function useAuthDialogState(providerId: string | null, configurationId?: 
 
   const activeProviders = providers
     .filter(provider => {
+      if (provider.id === primaryId && adminPageActive && accessRequest) {
+        return true;
+      }
+
       if (provider.configurable) {
         return false;
       }
@@ -103,10 +107,6 @@ export function useAuthDialogState(providerId: string | null, configurationId?: 
 
       if (active) {
         return true;
-      }
-
-      if (provider.id === primaryId) {
-        return adminPageActive;
       }
 
       return false;

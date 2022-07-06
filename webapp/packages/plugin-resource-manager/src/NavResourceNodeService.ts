@@ -10,7 +10,7 @@ import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { createPath } from '@cloudbeaver/core-utils';
 
-import { ResourceManagerResource } from './ResourceManagerResource';
+import { ResourceManagerResource, RmResourceInfo } from './ResourceManagerResource';
 import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
 interface IResourceData {
@@ -28,6 +28,12 @@ export class NavResourceNodeService {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
+
+  async loadResourceInfo(nodeId: string): Promise<RmResourceInfo | undefined> {
+    const data = this.getResourceData(nodeId);
+    await this.resourceManagerResource.load(data.projectId);
+    return this.resourceManagerResource.getResource(data.projectId, data.resourcePath);
+  }
 
   async saveScript(folderNodeId: string, name: string, script: string) {
     const resourceData = this.getResourceData(folderNodeId);

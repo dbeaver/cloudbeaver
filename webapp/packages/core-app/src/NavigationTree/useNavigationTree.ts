@@ -16,9 +16,10 @@ interface INavigationTree {
   navigationTreeService: NavigationTreeService;
   handleOpen: (node: NavNode, folder: boolean) => Promise<void>;
   handleSelect: (node: NavNode, state: boolean) => void;
+  handleSelectReset: () => void;
 }
 
-const bindActions: Array<keyof INavigationTree> = ['handleOpen', 'handleSelect'];
+const bindActions: Array<keyof INavigationTree> = ['handleOpen', 'handleSelect', 'handleSelectReset'];
 
 export function useNavigationTree(): INavigationTree {
   const navigationTreeService = useService(NavigationTreeService);
@@ -32,6 +33,9 @@ export function useNavigationTree(): INavigationTree {
     },
     handleSelect(node: NavNode, state: boolean) {
       return this.navigationTreeService.selectNode(node.id, state);
+    },
+    handleSelectReset() {
+      this.navigationTreeService.unselectAll();
     },
   }), { navigationTreeService }, bindActions);
 }

@@ -7,7 +7,7 @@
  */
 
 import {
-  NavNodeManagerService, INodeNavigationData
+  NavNodeManagerService, INodeNavigationData, NavigationType
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -43,12 +43,18 @@ export class ObjectPropertiesPageService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
+    if (data.type !== NavigationType.open) {
+      return;
+    }
+
     if (!this.page) { // TODO: it will be never true, because navHandler registers after page creation
       return;
     }
 
     try {
       const tabContext = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
+
+      tabContext.initTab();
       tabContext.trySwitchPage(this.page);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');

@@ -159,6 +159,7 @@ export interface ConnectionConfig {
   databaseName?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
   driverId?: InputMaybe<Scalars['ID']>;
+  folder?: InputMaybe<Scalars['ID']>;
   host?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   networkHandlersConfig?: InputMaybe<Array<NetworkHandlerConfigInput>>;
@@ -175,6 +176,11 @@ export interface ConnectionConfig {
   userPassword?: InputMaybe<Scalars['String']>;
 }
 
+export interface ConnectionFolderInfo {
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+}
+
 export interface ConnectionInfo {
   authModel?: Maybe<Scalars['ID']>;
   authNeeded: Scalars['Boolean'];
@@ -187,7 +193,7 @@ export interface ConnectionInfo {
   description?: Maybe<Scalars['String']>;
   driverId: Scalars['ID'];
   features: Array<Scalars['String']>;
-  folder?: Maybe<Scalars['String']>;
+  folder?: Maybe<Scalars['ID']>;
   host?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -339,10 +345,13 @@ export interface Mutation {
   closeSession?: Maybe<Scalars['Boolean']>;
   copyConnectionFromNode: ConnectionInfo;
   createConnection: ConnectionInfo;
+  createConnectionFolder: ConnectionFolderInfo;
   createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
+  deleteConnectionFolder: Scalars['Boolean'];
   initConnection: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
+  navMoveNodesToFolder?: Maybe<Scalars['Boolean']>;
   navRenameNode?: Maybe<Scalars['String']>;
   /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
@@ -443,6 +452,12 @@ export interface MutationCreateConnectionArgs {
 }
 
 
+export interface MutationCreateConnectionFolderArgs {
+  folderName: Scalars['String'];
+  parentFolderPath?: InputMaybe<Scalars['ID']>;
+}
+
+
 export interface MutationCreateConnectionFromTemplateArgs {
   connectionName?: InputMaybe<Scalars['String']>;
   templateId: Scalars['ID'];
@@ -451,6 +466,11 @@ export interface MutationCreateConnectionFromTemplateArgs {
 
 export interface MutationDeleteConnectionArgs {
   id: Scalars['ID'];
+}
+
+
+export interface MutationDeleteConnectionFolderArgs {
+  folderPath: Scalars['ID'];
 }
 
 
@@ -463,6 +483,12 @@ export interface MutationInitConnectionArgs {
 
 
 export interface MutationNavDeleteNodesArgs {
+  nodePaths: Array<Scalars['ID']>;
+}
+
+
+export interface MutationNavMoveNodesToFolderArgs {
+  folderPath: Scalars['ID'];
   nodePaths: Array<Scalars['ID']>;
 }
 
@@ -755,6 +781,7 @@ export interface Query {
   authProviders: Array<AuthProviderInfo>;
   authUpdateStatus: AuthInfo;
   configureServer: Scalars['Boolean'];
+  connectionFolders: Array<ConnectionFolderInfo>;
   connectionInfo: ConnectionInfo;
   /** @deprecated Field no longer supported */
   connectionState: ConnectionInfo;
@@ -856,6 +883,11 @@ export interface QueryAuthUpdateStatusArgs {
 
 export interface QueryConfigureServerArgs {
   configuration: ServerConfigInput;
+}
+
+
+export interface QueryConnectionFoldersArgs {
+  path?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -1822,6 +1854,14 @@ export type CreateConnectionMutationVariables = Exact<{
 
 export type CreateConnectionMutation = { connection: { id: string; name: string; description?: string; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; folder?: string; nodePath?: string; host?: string; port?: string; serverName?: string; databaseName?: string; url?: string; properties?: any; providerProperties: any; features: Array<string>; supportedDataFormats: Array<ResultDataFormat>; authNeeded: boolean; authModel?: string; origin?: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }; authProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }>; networkHandlersConfig: Array<{ id: string; enabled: boolean; authType: NetworkHandlerAuthType; userName?: string; password?: string; key?: string; savePassword: boolean; properties?: any }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } } };
 
+export type CreateConnectionFolderMutationVariables = Exact<{
+  parentFolderPath?: InputMaybe<Scalars['ID']>;
+  folderName: Scalars['String'];
+}>;
+
+
+export type CreateConnectionFolderMutation = { folder: { id: string; description?: string } };
+
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
   config?: InputMaybe<ConnectionConfig>;
@@ -1852,6 +1892,13 @@ export type DeleteConnectionMutationVariables = Exact<{
 
 
 export type DeleteConnectionMutation = { deleteConnection: boolean };
+
+export type DeleteConnectionFolderMutationVariables = Exact<{
+  folderPath: Scalars['ID'];
+}>;
+
+
+export type DeleteConnectionFolderMutation = { deleteConnectionFolder: boolean };
 
 export type DriverListQueryVariables = Exact<{
   driverId?: InputMaybe<Scalars['ID']>;
@@ -1902,6 +1949,13 @@ export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 
 
 export type GetAuthModelsQuery = { models: Array<{ id: string; displayName: string; description?: string; icon?: string; requiresLocalConfiguration?: boolean; properties: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }> };
+
+export type GetConnectionFoldersQueryVariables = Exact<{
+  project?: InputMaybe<Scalars['ID']>;
+}>;
+
+
+export type GetConnectionFoldersQuery = { folders: Array<{ id: string; description?: string }> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{
   includeOrigin: Scalars['Boolean'];
@@ -2033,6 +2087,8 @@ export type AsyncTaskInfoFragment = { id: string; name?: string; running: boolea
 export type AuthProviderConfigurationParametersFragment = { id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number };
 
 export type AuthTokenFragment = { authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } };
+
+export type ConnectionFolderInfoFragment = { id: string; description?: string };
 
 export type DatabaseConnectionFragment = { id: string; name: string; description?: string; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; folder?: string; nodePath?: string; host?: string; port?: string; serverName?: string; databaseName?: string; url?: string; properties?: any; providerProperties: any; features: Array<string>; supportedDataFormats: Array<ResultDataFormat>; authNeeded: boolean; authModel?: string; origin?: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }; authProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }>; networkHandlersConfig: Array<{ id: string; enabled: boolean; authType: NetworkHandlerAuthType; userName?: string; password?: string; key?: string; savePassword: boolean; properties?: any }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } };
 
@@ -2199,6 +2255,14 @@ export type NavDeleteNodesMutationVariables = Exact<{
 
 
 export type NavDeleteNodesMutation = { navDeleteNodes?: number };
+
+export type NavMoveToMutationVariables = Exact<{
+  nodePaths: Array<Scalars['ID']> | Scalars['ID'];
+  folderPath: Scalars['ID'];
+}>;
+
+
+export type NavMoveToMutation = { navMoveNodesToFolder?: boolean };
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
@@ -2496,6 +2560,12 @@ export const AuthTokenFragmentDoc = `
   }
 }
     ${ObjectOriginInfoFragmentDoc}`;
+export const ConnectionFolderInfoFragmentDoc = `
+    fragment ConnectionFolderInfo on ConnectionFolderInfo {
+  id
+  description
+}
+    `;
 export const UserConnectionAuthPropertiesFragmentDoc = `
     fragment UserConnectionAuthProperties on ObjectPropertyInfo {
   id
@@ -3089,6 +3159,16 @@ export const CreateConnectionDocument = `
   }
 }
     ${DatabaseConnectionFragmentDoc}`;
+export const CreateConnectionFolderDocument = `
+    mutation createConnectionFolder($parentFolderPath: ID, $folderName: String!) {
+  folder: createConnectionFolder(
+    parentFolderPath: $parentFolderPath
+    folderName: $folderName
+  ) {
+    ...ConnectionFolderInfo
+  }
+}
+    ${ConnectionFolderInfoFragmentDoc}`;
 export const CreateConnectionFromNodeDocument = `
     mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: copyConnectionFromNode(nodePath: $nodePath, config: $config) {
@@ -3109,6 +3189,11 @@ export const CreateConnectionFromTemplateDocument = `
 export const DeleteConnectionDocument = `
     mutation deleteConnection($id: ID!) {
   deleteConnection(id: $id)
+}
+    `;
+export const DeleteConnectionFolderDocument = `
+    mutation deleteConnectionFolder($folderPath: ID!) {
+  deleteConnectionFolder(folderPath: $folderPath)
 }
     `;
 export const DriverListDocument = `
@@ -3174,6 +3259,13 @@ export const GetAuthModelsDocument = `
   }
 }
     `;
+export const GetConnectionFoldersDocument = `
+    query getConnectionFolders($project: ID) {
+  folders: connectionFolders(path: $project) {
+    ...ConnectionFolderInfo
+  }
+}
+    ${ConnectionFolderInfoFragmentDoc}`;
 export const GetTemplateConnectionsDocument = `
     query getTemplateConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connections: templateConnections {
@@ -3549,6 +3641,11 @@ export const GetNavNodeFullNameDocument = `
 export const NavDeleteNodesDocument = `
     mutation navDeleteNodes($nodePaths: [ID!]!) {
   navDeleteNodes(nodePaths: $nodePaths)
+}
+    `;
+export const NavMoveToDocument = `
+    mutation navMoveTo($nodePaths: [ID!]!, $folderPath: ID!) {
+  navMoveNodesToFolder(nodePaths: $nodePaths, folderPath: $folderPath)
 }
     `;
 export const NavNodeChildrenDocument = `
@@ -3976,6 +4073,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createConnection(variables: CreateConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnection', 'mutation');
     },
+    createConnectionFolder(variables: CreateConnectionFolderMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionFolderMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionFolderMutation>(CreateConnectionFolderDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFolder', 'mutation');
+    },
     createConnectionFromNode(variables: CreateConnectionFromNodeMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateConnectionFromNodeMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFromNode', 'mutation');
     },
@@ -3984,6 +4084,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteConnection(variables: DeleteConnectionMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteConnectionMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnection', 'mutation');
+    },
+    deleteConnectionFolder(variables: DeleteConnectionFolderMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteConnectionFolderMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<DeleteConnectionFolderMutation>(DeleteConnectionFolderDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnectionFolder', 'mutation');
     },
     driverList(variables: DriverListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DriverListQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<DriverListQuery>(DriverListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'driverList', 'query');
@@ -4002,6 +4105,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAuthModels(variables?: GetAuthModelsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetAuthModelsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthModels', 'query');
+    },
+    getConnectionFolders(variables?: GetConnectionFoldersQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetConnectionFoldersQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetConnectionFoldersQuery>(GetConnectionFoldersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getConnectionFolders', 'query');
     },
     getTemplateConnections(variables: GetTemplateConnectionsQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTemplateConnections', 'query');
@@ -4089,6 +4195,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navDeleteNodes(variables: NavDeleteNodesMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavDeleteNodesMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navDeleteNodes', 'mutation');
+    },
+    navMoveTo(variables: NavMoveToMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavMoveToMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<NavMoveToMutation>(NavMoveToDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navMoveTo', 'mutation');
     },
     navNodeChildren(variables: NavNodeChildrenQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavNodeChildrenQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navNodeChildren', 'query');

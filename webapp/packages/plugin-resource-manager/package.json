@@ -28,6 +28,7 @@
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-notifications": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",
+    "@cloudbeaver/core-projects": "~0.1.0",
     "@cloudbeaver/core-product": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-routing": "~0.1.0",

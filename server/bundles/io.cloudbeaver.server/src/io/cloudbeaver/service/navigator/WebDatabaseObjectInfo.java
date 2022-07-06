@@ -49,6 +49,7 @@ public class WebDatabaseObjectInfo {
     public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
     public static final String OBJECT_FEATURE_DATA_SOURCE_TEMPORARY = "dataSourceTemporary";
     public static final String OBJECT_FEATURE_ENTITY = "entity";
+    public static final String OBJECT_FEATURE_RELATIONAL_ENTITY = "relationalEntity";
     public static final String OBJECT_FEATURE_ENTITY_CONTAINER = "entityContainer";
     public static final String OBJECT_FEATURE_OBJECT_CONTAINER = "objectContainer";
     public static final String OBJECT_FEATURE_SCHEMA = "schema";
@@ -182,12 +183,15 @@ public class WebDatabaseObjectInfo {
             }
         }
         if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
-        if (object instanceof DBSEntity &&
-            !(object instanceof DBSDataType) &&
-            !(object instanceof DBSDocumentContainer) &&
-            isDiagramSupported
-        ) {
+        if (object instanceof DBSEntity) {
             features.add(OBJECT_FEATURE_ENTITY);
+            if (object instanceof DBSDataType
+                || object instanceof DBSDocumentContainer) {
+                isDiagramSupported = false;
+            }
+            if (isDiagramSupported) {
+                features.add(OBJECT_FEATURE_RELATIONAL_ENTITY);
+            }
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
         if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);

@@ -7,16 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, getComputed, Loader, useFolderExplorer, useMapResource, useMouse, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { getNodesFromContext } from '../../shared/NodesManager/getNodesFromContext';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../../shared/NodesManager/NavTreeResource';
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -30,6 +30,7 @@ import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElemen
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
+import { useDropOutside } from './useDropOutside';
 import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
 
 const styles = css`
@@ -42,7 +43,9 @@ const styles = css`
   tree {
     position: relative;
     box-sizing: border-box;
+    display: flex;
     flex: 1;
+    flex-direction: column;
   }
   
   tree-box {
@@ -63,8 +66,15 @@ const styles = css`
     box-sizing: border-box;
     position: relative;
 
+    &[|bottom] {
+      order: 2;
+    }
+
     &:not([|showDropOutside]) {
       display: none;
+    }
+    &[|active] {
+      border-color: var(--theme-positive) !important;
     }
   }
 `;
@@ -101,6 +111,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   isGroup,
   beforeSelect,
   customSelect,
+  customSelectReset,
   onExpand,
   onClick,
   onOpen,
@@ -150,8 +161,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  const rootNode = useMapResource(ElementsTree, navNodeInfoResource, root);
-
   const children = useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
@@ -178,7 +187,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     navNodeFilterCompare
   ), [navTreeResource, navNodeInfoResource, navNodeFilterCompare]);
 
-  const dndBox = useNavTreeDropBox(rootNode.data);
+  const dndBox = useNavTreeDropBox(navNodeInfoResource.get(root));
+  const dropOutside = useDropOutside(dndBox);
 
   const tree = useElementsTree({
     baseRoot,
@@ -194,6 +204,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     isGroup,
     onFilter,
     beforeSelect,
+    customSelectReset,
     customSelect,
     onExpand,
     onSelect,
@@ -242,6 +253,20 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     [navNodeInfoResource]
   );
 
+  function handleClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (EventContext.has(
+      event,
+      EventTreeNodeExpandFlag,
+      EventTreeNodeSelectFlag,
+      EventTreeNodeClickFlag,
+      EventStopPropagationFlag
+    )) {
+      return;
+    }
+
+    tree.resetSelection();
+  }
+
   const foldersTree = settings?.foldersTree; // mobx subscription
   const filter = settings?.filter;
 
@@ -253,16 +278,6 @@ export const ElementsTree = observer<Props>(function ElementsTree({
       tree.setFilter('');
     }
   });
-
-  let showDropOutside = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop);
-  showDropOutside = useStateDelay(showDropOutside, 100);
-  const isOverCurrent = useStateDelay(dndBox.state.isOverCurrent, 100);
-
-  let dndNodes: string[] | undefined;
-  if (dndBox.state.context && showDropOutside && isOverCurrent) {
-    dndNodes = getNodesFromContext(dndBox.state.context)
-      .map(node => node.id);
-  }
 
   const hasChildren = (children.data?.length || 0) > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
@@ -281,23 +296,30 @@ export const ElementsTree = observer<Props>(function ElementsTree({
           <ElementsTreeContext.Provider value={context}>
             <box className={className}>
               <FolderExplorer state={folderExplorer}>
-                <tree>
+                <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
                   {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                  <drop-outside ref={dndBox.setRef} {...use({ showDropOutside })}>
+                  <drop-outside
+                    ref={dndBox.setRef}
+                    {...use({
+                      showDropOutside: dropOutside.showDropOutside,
+                      active: dropOutside.zoneActive,
+                      bottom: dropOutside.bottom,
+                    })}
+                  >
                     <NavigationNodeNested
                       component={NavigationNodeElement}
                       path={folderExplorer.state.path}
-                      dndNodes={dndNodes}
                       root
                     />
                   </drop-outside>
                   <NavigationNodeNested
+                    ref={dropOutside.nestedRef}
                     nodeId={root}
                     component={NavigationNodeElement}
                     path={folderExplorer.state.path}
                     root
                   />
-                  {loaderAvailable && <Loader state={[children, tree]} overlay={hasChildren} />}
+                  {loaderAvailable && <Loader state={tree} overlay={hasChildren} />}
                 </tree>
               </FolderExplorer>
             </box>

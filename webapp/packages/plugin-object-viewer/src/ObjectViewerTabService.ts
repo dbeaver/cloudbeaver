@@ -17,8 +17,8 @@ import {
   objectSchemaProvider,
   NavNodeManagerService,
   objectNavNodeProvider,
-  IDataContextActiveNode,
-  NodeManagerUtils
+  NodeManagerUtils,
+  NavigationType
 } from '@cloudbeaver/core-app';
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -98,24 +98,37 @@ export class ObjectViewerTabService {
       tab.handlerState.tabIcon = nodeInfo.icon;
       tab.handlerState.tabTitle = nodeInfo.name;
       tabInfo.registerTab(tab);
-    } else if (NodeManagerUtils.isDatabaseObject(data.nodeId)) {
-      tabInfo.openNewTab<IObjectViewerTabState>({
-        handlerId: objectViewerTabHandlerKey,
-        handlerState: {
-          connectionId: nodeInfo.connection?.id,
-          objectId: nodeInfo.nodeId,
-          parentId: nodeInfo.parentId,
-          parents: nodeInfo.getParents(),
-          folderId: nodeInfo.folderId,
-          pageId: '',
-          childrenError: false,
-          error: false,
-          pagesState: {},
-          tabIcon: nodeInfo.icon,
-          tabTitle: nodeInfo.name,
-        },
-      });
     }
+
+    function isSupported(): boolean {
+      return NodeManagerUtils.isDatabaseObject(data.nodeId);
+    }
+
+    const initTab = (): ITab<IObjectViewerTabState> | null => {
+      if (!tabInfo.tab && isSupported()) {
+        tabInfo.openNewTab<IObjectViewerTabState>({
+          handlerId: objectViewerTabHandlerKey,
+          handlerState: {
+            connectionId: nodeInfo.connection?.id,
+            objectId: nodeInfo.nodeId,
+            parentId: nodeInfo.parentId,
+            parents: nodeInfo.getParents(),
+            folderId: nodeInfo.folderId,
+            pageId: '',
+            childrenError: false,
+            error: false,
+            pagesState: {},
+            tabIcon: nodeInfo.icon,
+            tabTitle: nodeInfo.name,
+          },
+        });
+
+        return tabInfo.tab;
+      }
+
+      return tabInfo.tab;
+    };
+
     const getPage = () => {
       if (!tabInfo.tab) {
         return;
@@ -165,6 +178,9 @@ export class ObjectViewerTabService {
     const isPageActive = (page: ObjectPage) => page === getPage();
 
     return {
+      get isSupported() {
+        return isSupported();
+      },
       get tab() {
         return tabInfo.tab;
       },
@@ -173,6 +189,8 @@ export class ObjectViewerTabService {
       },
       tabInfo,
       nodeInfo,
+
+      initTab,
       isPageActive,
       trySwitchPage,
       canSwitchPage,
@@ -342,7 +360,17 @@ export class ObjectViewerTabService {
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const { tab, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
+      const { isSupported, nodeInfo, initTab } = await contexts.getContext(this.objectViewerTabContext);
+
+      if (isSupported) {
+        nodeInfo.markOpen();
+      }
+
+      if (data.type !== NavigationType.open) {
+        return;
+      }
+
+      const tab = initTab();
 
       if (tab) {
         runInAction(() => {
@@ -366,6 +394,10 @@ export class ObjectViewerTabService {
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   ) {
+    if (data.type !== NavigationType.open) {
+      return;
+    }
+
     if (!contexts.hasContext(this.objectViewerTabContext)) {
       return;
     }

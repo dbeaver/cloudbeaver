@@ -565,9 +565,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
-            if (parentPath == null)  {
-                WebServiceUtils.updateConfigAndRefreshDatabases(session);
-            }
+            WebServiceUtils.updateConfigAndRefreshDatabases(session);
 
             return folderInfo;
         } catch (DBException e) {
@@ -583,6 +581,7 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
+        WebServiceUtils.updateConfigAndRefreshDatabases(session);
         return folderInfo;
     }
 
@@ -591,16 +590,13 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
-            boolean rootFolder = folder.getParent() != null;
             if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
                 throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
-            if (rootFolder) {
-                WebServiceUtils.updateConfigAndRefreshDatabases(session);
-            }
+            WebServiceUtils.updateConfigAndRefreshDatabases(session);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }

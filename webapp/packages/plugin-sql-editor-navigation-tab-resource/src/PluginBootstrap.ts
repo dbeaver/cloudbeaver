@@ -6,15 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { INodeNavigationData, NavigationTabsService, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
+import { INodeNavigationData, NavigationTabsService, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, ProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
@@ -39,7 +41,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     super();
   }
@@ -113,7 +116,7 @@ export class PluginBootstrap extends Bootstrap {
               this.sqlEditorService.setName(node.name ?? scriptName, state);
               this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
 
-              if (!this.resourceManagerService.panelEnabled) {
+              if (!this.resourceManagerService.active) {
                 this.resourceManagerService.togglePanel();
               }
 
@@ -146,15 +149,48 @@ export class PluginBootstrap extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  private async navigationHandler(data: INodeNavigationData) {
+  private async navigationHandler(
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
+  ) {
     if (!this.resourceManagerService.enabled) {
       return;
     }
 
     try {
+      const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = await this.navNodeInfoResource.load(data.nodeId);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
+        return;
+      }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
+
+      if (!resource) {
+        if (data.type === NavigationType.open) {
+          throw new Error('Resource not found');
+        } else {
+          return;
+        }
+      }
+
+      nodeInfo.markOpen();
+
+      if (data.type !== NavigationType.open) {
+        return;
+      }
+
+      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+      const size = Math.round(resource.length / 1000); // kilobyte
+
+      if (size > maxSize) {
+        this.notificationService.logInfo({
+          title: 'sql_editor_upload_script_max_size_title',
+          message: `Max size: ${maxSize}KB\nFile size: ${size}KB`,
+          persistent: true,
+        });
+
         return;
       }
 

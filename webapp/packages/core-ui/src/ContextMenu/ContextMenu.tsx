@@ -13,6 +13,7 @@ import styled from 'reshadow';
 
 import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
 
@@ -49,6 +50,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(functi
   rtl,
   ...props
 }, ref) {
+  const translate = useTranslate();
   const menuService = useService(MenuService);
 
   const handler = getComputed(() => menuService.getHandler(menuData.context));
@@ -89,7 +91,8 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(functi
   return styled(styles)(
     <Menu
       ref={ref}
-      label={menuData.menu.label}
+      label={translate(menuData.menu.label)}
+      title={translate(menuData.menu.tooltip)}
       items={() => menuData.items.map(item => menu.current && (
         <MenuItemRenderer
           key={item.id}
