@@ -113,7 +113,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     if (name !== 'name') {
       optionsHook.updateNameTemplate(driver);
     }
-  }, []);
+  }, [driver]);
 
   const { data: applicableAuthModels } = useMapResource(
     Options,
