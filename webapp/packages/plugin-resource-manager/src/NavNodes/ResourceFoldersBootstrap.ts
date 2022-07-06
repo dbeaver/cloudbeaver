@@ -79,6 +79,8 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       move.setCanMove(true);
     } else {
       await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
+      await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH);
+
       const parents: IResourceManagerParams[] = Array.from(new Set<IResourceManagerParams>([
         { projectId: data.projectId, folder: data.folder },
         ...nodes.map(node => {

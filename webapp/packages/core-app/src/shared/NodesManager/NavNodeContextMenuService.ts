@@ -45,7 +45,7 @@ export class NavNodeContextMenuService extends Bootstrap {
   register(): void {
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
-      isActionApplicable: (context, action) => {
+      isActionApplicable: (context, action): boolean => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
         if (!node) {
