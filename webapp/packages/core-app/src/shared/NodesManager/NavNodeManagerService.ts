@@ -12,7 +12,7 @@ import {
   Connection, ConnectionInfoResource, ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { IExecutor, Executor, IExecutionContextProvider, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
@@ -24,6 +24,7 @@ import { ENodeFeature } from './ENodeFeature';
 import type { NavNodeInfo, NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
+import { navNodeMoveContext } from './navNodeMoveContext';
 import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
@@ -104,6 +105,7 @@ export interface INodeMoveData {
 
 export interface INavNodeCache {
   canOpen: boolean;
+  canMove: boolean;
 }
 
 
@@ -112,7 +114,7 @@ export class NavNodeManagerService extends Bootstrap {
   readonly syncNodeInfoCache: Map<string, INavNodeCache>;
 
   readonly navigator: IExecutor<INodeNavigationData>;
-  readonly onMove: ISyncExecutor<INodeMoveData>;
+  readonly onMove: IExecutor<INodeMoveData>;
 
   constructor(
     private readonly permissionsService: PermissionsService,
@@ -125,7 +127,7 @@ export class NavNodeManagerService extends Bootstrap {
   ) {
     super();
     this.syncNodeInfoCache = new Map();
-    this.onMove = new SyncExecutor();
+    this.onMove = new Executor();
     this.navigator = new Executor(
       {
         type: NavigationType.open,
@@ -147,7 +149,28 @@ export class NavNodeManagerService extends Bootstrap {
   load(): void { }
 
   getNavNodeCache(nodeId: string): INavNodeCache {
-    return this.syncNodeInfoCache.get(nodeId) || { canOpen: false };
+    return this.syncNodeInfoCache.get(nodeId) || { canOpen: false, canMove: false };
+  }
+
+  async canMove(targetNode: NavNode, moveContexts: IDataContextProvider): Promise<boolean> {
+    const contexts = await this.onMove.execute({
+      type: ENodeMoveType.CanDrop,
+      targetNode,
+      moveContexts,
+    });
+
+    const move = contexts.getContext(navNodeMoveContext);
+
+    let cache = this.syncNodeInfoCache.get(targetNode.id);
+
+    if (!cache) {
+      cache = observable<INavNodeCache>({ canOpen: false, canMove: move.canMove });
+      this.syncNodeInfoCache.set(targetNode.id, cache);
+    }
+
+    cache.canMove = move.canMove;
+
+    return move.canMove;
   }
 
   async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
@@ -163,7 +186,7 @@ export class NavNodeManagerService extends Bootstrap {
     let cache = this.syncNodeInfoCache.get(nodeId);
 
     if (!cache) {
-      cache = observable({ canOpen: data.canOpen });
+      cache = observable<INavNodeCache>({ canOpen: data.canOpen, canMove: false });
       this.syncNodeInfoCache.set(nodeId, cache);
     }
 

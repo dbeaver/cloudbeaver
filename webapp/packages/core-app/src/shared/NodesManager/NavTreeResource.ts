@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionFolderResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
@@ -59,7 +59,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly sessionDataResource: SessionDataResource,
     private readonly connectionInfo: ConnectionInfoResource,
     private readonly userInfoResource: UserInfoResource,
-    private readonly connectionFolderResource: ConnectionFolderResource,
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
@@ -189,8 +188,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   async moveTo(key: ResourceKey<string>, target: string): Promise<void> {
-    await this.connectionFolderResource.load(CachedMapAllKey);
-
     const parents = Array.from(new Set(
       ResourceKeyUtils
         .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)

@@ -14,7 +14,6 @@ import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeManagerService, ENodeMoveType } from '../shared/NodesManager/NavNodeManagerService';
-import { navNodeMoveContext } from '../shared/NodesManager/navNodeMoveContext';
 
 interface INodeState {
   expanded: boolean;
@@ -29,15 +28,12 @@ export function useNavTreeDropBox(targetNode: NavNode | undefined, nodeState?: I
         return false;
       }
 
-      const contexts = navNodeManagerService.onMove.execute({
-        type: ENodeMoveType.CanDrop,
+      navNodeManagerService.canMove(
         targetNode,
         moveContexts,
-      });
+      );
 
-      const move = contexts.getContext(navNodeMoveContext);
-
-      return move.canMove;
+      return navNodeManagerService.getNavNodeCache(targetNode.id).canMove;
     },
     onDrop(moveContexts) {
       if (targetNode) {

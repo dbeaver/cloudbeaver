@@ -9,7 +9,7 @@
 import { untracked } from 'mobx';
 
 import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
-import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, EConnectionFeature } from '@cloudbeaver/core-connections';
+import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -132,18 +132,22 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     const nodeIdList = nodes.map(node => node.id);
     const children = this.navTreeResource.get(targetNode.id);
 
-    if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
-      if (
-        [NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType)
+    const supported = (
+      [NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)
         && !targetNode.features?.includes(ENodeFeature.shared)
         && nodes.every(node => (
           node.nodeType === NAV_NODE_TYPE_CONNECTION
-          && this.connectionInfoResource.getConnectionForNode(node.id)?.features.includes(EConnectionFeature.manageable)
+          && !node.features?.includes(ENodeFeature.shared)
           && !children?.includes(node.id)
         ))
-      ) {
-        move.setCanMove(true);
-      }
+    );
+
+    if (!supported) {
+      return;
+    }
+
+    if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
+      move.setCanMove(true);
     } else {
       await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
       const connections = nodeIdList

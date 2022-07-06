@@ -69,7 +69,7 @@ export class NavResourceNodeService {
     await this.resourceManagerResource.writeResource(resourceData.projectId, resourceData.resourcePath, value);
   }
 
-  private getResourceData(nodeId: string): IResourceData {
+  getResourceData(nodeId: string): IResourceData {
     const parts = nodeId.replace('//', '\\').split('/');
     const projectId = parts[1];
     const resourcePath = parts.slice(2).join('/');
