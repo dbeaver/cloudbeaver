@@ -134,7 +134,7 @@ export class NavNodeManagerService extends Bootstrap {
       },
       (active, current) => active.nodeId === current.nodeId && active.type === current.type
     )
-      .before(navigationService.navigationTask)
+      .before(navigationService.navigationTask, undefined, data => data.type === NavigationType.open)
       .addHandler(this.navigateHandler.bind(this));
 
     makeObservable(this, {

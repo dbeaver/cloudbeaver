@@ -9,7 +9,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { IExecutorHandler } from './IExecutorHandler';
-import type { ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
+import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
 export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>>
 implements IExecutorHandlersCollection<T, TResult> {
@@ -58,19 +58,29 @@ implements IExecutorHandlersCollection<T, TResult> {
     return this.links.get(link);
   }
 
-  before<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>): this {
+  before<TNext>(
+    executor: IExecutorHandlersCollection<TNext, TResult>,
+    map?: ExecutorDataMap<T, TNext>,
+    filter?: ExecutorDataFilter<T>
+  ): this {
     this.chain.push({
       executor,
       map,
+      filter,
       type: 'before',
     });
     return this;
   }
 
-  next<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>): this {
+  next<TNext>(
+    executor: IExecutorHandlersCollection<TNext, TResult>,
+    map?: ExecutorDataMap<T, TNext>,
+    filter?: ExecutorDataFilter<T>
+  ): this {
     this.chain.push({
       executor,
       map,
+      filter,
       type: 'next',
     });
     return this;

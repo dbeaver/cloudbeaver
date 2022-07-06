@@ -99,6 +99,10 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
         return;
       }
 
+      if (link.filter && !link.filter(data, context)) {
+        continue;
+      }
+
       const mappedData = link.map ? link.map(data, context) : data;
       const chainedContext = new ExecutionContext(mappedData, context);
 

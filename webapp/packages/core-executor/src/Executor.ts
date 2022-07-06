@@ -112,6 +112,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
         return;
       }
 
+      if (link.filter && !link.filter(data, context)) {
+        continue;
+      }
+
       const mappedData = link.map ? link.map(data, context) : data;
       const chainedContext = new ExecutionContext(mappedData, context);
 
