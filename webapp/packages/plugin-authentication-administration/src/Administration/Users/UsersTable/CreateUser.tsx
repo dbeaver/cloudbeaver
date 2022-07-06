@@ -22,7 +22,7 @@ const styles = css`
     user-create {
       display: flex;
       flex-direction: column;
-      height: 540px;
+      height: 600px;
       overflow: hidden;
     }
 
