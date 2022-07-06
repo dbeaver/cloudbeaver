@@ -333,10 +333,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 if (!ds.isTemplate() && isDataSourceAccessible(ds)) {
                     DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
                     dsCopy.setTemporary(true);
-                    DataSourceFolder folder = dsCopy.getFolder();
-                    if (folder != null) {
-                        folder.setTemporary(true);
-                    }
                     dataSourceRegistry.addDataSource(dsCopy);
                 }
             }

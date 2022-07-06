@@ -33,10 +33,12 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Web connection info
@@ -152,7 +154,8 @@ public class WebNavigatorNodeInfo {
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
             String projectName = folder.getDataSourceRegistry().getProject().getName();
-            isShared = !projectName.equals(session.getUserId()) || folder.isTemporary();
+            Set<DBPDataSourceFolder> tempFolders = ((DataSourceRegistry) folder.getDataSourceRegistry()).getTemporaryFolders();
+            isShared = !projectName.equals(session.getUserId()) || tempFolders.contains(folder);
         }
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
