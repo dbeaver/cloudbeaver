@@ -32,10 +32,13 @@ import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
+import org.jkiss.dbeaver.registry.DataSourceFolder;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Web connection info
@@ -149,8 +152,10 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             isShared = !((DBNDatabaseNode) node).getDataSourceContainer().isManageable();
         } else if (node instanceof DBNLocalFolder) {
-            String projectName = ((DBNLocalFolder) node).getFolder().getDataSourceRegistry().getProject().getName();
-            isShared = !projectName.equals(session.getUserId());
+            DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
+            String projectName = folder.getDataSourceRegistry().getProject().getName();
+            Set<DBPDataSourceFolder> tempFolders = ((DataSourceRegistry) folder.getDataSourceRegistry()).getTemporaryFolders();
+            isShared = !projectName.equals(session.getUserId()) || tempFolders.contains(folder);
         }
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
@@ -171,7 +176,9 @@ public class WebNavigatorNodeInfo {
                 }
             }
         } else if (node instanceof DBNLocalFolder || node instanceof DBNAbstractResourceManagerNode) {
-            features.add(NODE_FEATURE_CAN_RENAME);
+            if (!isShared) {
+                features.add(NODE_FEATURE_CAN_RENAME);
+            }
         }
 
         return features.toArray(new String[0]);

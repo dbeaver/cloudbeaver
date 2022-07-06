@@ -283,6 +283,9 @@ public class WebServiceUtils extends WebCommonUtils {
         setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
+        if (config.getFolder() != null) {
+            dataSource.setFolder(dataSource.getRegistry().getFolder(config.getFolder()));
+        }
         saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
     }
 
