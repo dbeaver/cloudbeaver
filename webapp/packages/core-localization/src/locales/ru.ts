@@ -52,6 +52,7 @@ export const defaultRULocale = [
   ['ui_rename', 'Переименовать'],
   ['ui_create', 'Создать'],
   ['ui_folder', 'Папка'],
+  ['ui_folder_new', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
   ['ui_interval', 'Интервал'],

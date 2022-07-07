@@ -10,6 +10,7 @@ export default [
   ['plugin_resource_manager_update_script_success', 'Script successfully updated'],
   ['plugin_resource_manager_open_script_error', 'Failed to open the script'],
   ['plugin_resource_manager_save_script_error', 'Error occurred while trying to save the script'],
+  ['plugin_resource_manager_folder_move_failed', 'Failed to move to folder'],
   ['plugin_resource_manager_update_script_error', 'Failed to update the script'],
   ['plugin_resource_manager_sync_script_error', "Failed to sync editor's query"],
   ['plugin_resource_manager_delete_script_error', 'Error occurred while trying to delete the script'],
