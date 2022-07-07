@@ -124,6 +124,16 @@ export class ConnectionFormState implements IConnectionFormState {
     this.resource.onItemAdd
       .addHandler(this.syncInfo);
 
+    this.submittingTask.addPostHandler(async (data, contexts) => {
+      const status = contexts.getContext(service.connectionStatusContext);
+      if (data.submitType !== 'submit' || !status.saved) {
+        return;
+      }
+
+      this.reset();
+      await this.load();
+    });
+
     this.loadConnectionTask
       .before(service.configureTask)
       .addPostHandler(this.loadInfo)
