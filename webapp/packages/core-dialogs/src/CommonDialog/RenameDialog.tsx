@@ -29,6 +29,15 @@ const style = css`
   }
 `;
 
+interface IRenameDialogState {
+  value: string;
+  message: string | undefined;
+  valid: boolean;
+  payload: RenameDialogPayload;
+  validate: () => void;
+  setMessage: (message: string) => void;
+}
+
 export interface RenameDialogPayload {
   value: string;
   objectName?: string;
@@ -39,7 +48,7 @@ export interface RenameDialogPayload {
   confirmActionText?: string;
   create?: boolean;
   title?: string;
-  validation?: (name: string) => Promise<boolean> | boolean;
+  validation?: (name: string, setMessage: (message: string) => void) => Promise<boolean> | boolean;
 }
 
 export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observer(function RenameDialog({
@@ -64,15 +73,24 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     title += ` ${translate(objectName)}`;
   }
 
-  const state = useObservableRef(() => ({
+  const state = useObservableRef<IRenameDialogState>(() => ({
     value,
+    message: undefined,
     valid: true,
     validate: throttleAsync(async () => {
-      state.valid = (await state.payload.validation?.(state.value)) ?? true;
+      state.message = undefined;
+      state.valid = (await state.payload.validation?.(
+        state.value,
+        state.setMessage.bind(state)
+      )) ?? true;
     }, 300),
+    setMessage(message) {
+      this.message = message;
+    },
   }), {
     value: observable.ref,
     valid: observable.ref,
+    message: observable.ref,
   }, {
     payload,
   });
@@ -81,7 +99,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     state.validate();
   }, [value]);
 
-  const errorMessage = state.valid ? ' ' : translate('ui_rename_taken_or_invalid');
+  const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper

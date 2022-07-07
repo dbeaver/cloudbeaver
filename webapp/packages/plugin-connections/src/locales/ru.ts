@@ -5,4 +5,5 @@ export default [
   ['connections_public_connection_edit_reconnect_title', 'Подключение обновлено'],
   ['connections_public_connection_edit_reconnect_message', 'Подключение было обновлено. Вы хотите переподключиться?'],
   ['connections_public_connection_edit_reconnect_failed', 'Не удалось переподключиться'],
+  ['connections_public_connection_folder_delete_confirmation', 'Вы удаляете "{args.name}". Подключения не будут удалены. Вы уверены?'],
 ];
