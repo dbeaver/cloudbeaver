@@ -15,6 +15,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { ActionService, ACTION_DELETE, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 
@@ -24,6 +25,7 @@ import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION';
 export class ConnectionFoldersBootstrap extends Bootstrap {
 
   constructor(
+    private readonly localizationService: LocalizationService,
     private readonly userInfoResource: UserInfoResource,
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
@@ -94,7 +96,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
             const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
               title: 'ui_data_delete_confirmation',
-              message: `You're going to delete "${node.name}". Are you sure?`,
+              message: this.localizationService.translate('connections_public_connection_folder_delete_confirmation', undefined, { name: node.name }),
               confirmActionText: 'ui_delete',
             });
 
@@ -193,10 +195,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           subTitle: folder?.id,
           // icon: node.icon,
           create: true,
-          validation: name => {
+          validation: (name, setMessage) => {
             const trimmed = name.trim();
 
             if (trimmed.length === 0 || !name.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+              setMessage('connections_connection_folder_validation');
               return false;
             }
 
