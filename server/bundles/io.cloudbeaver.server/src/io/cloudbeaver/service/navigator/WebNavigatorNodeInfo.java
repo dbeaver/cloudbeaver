@@ -19,7 +19,6 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
@@ -175,8 +174,14 @@ public class WebNavigatorNodeInfo {
                     }
                 }
             }
-        } else if (node instanceof DBNLocalFolder || node instanceof DBNAbstractResourceManagerNode) {
-            if (!isShared) {
+        } else if (isShared) {
+            return features.toArray(new String[0]);
+        } else if (node instanceof DBNLocalFolder) {
+            features.add(NODE_FEATURE_CAN_RENAME);
+            features.add(NODE_FEATURE_CAN_DELETE);
+        } else if (node instanceof DBNResourceManagerResource) {
+            features.add(NODE_FEATURE_CAN_DELETE);
+            if (!isFolder()) {
                 features.add(NODE_FEATURE_CAN_RENAME);
             }
         }
