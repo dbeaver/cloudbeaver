@@ -353,6 +353,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         throw new DBWebException("Delete shared connection folder from navigator tree is not supported");
                     }
                     nodes.put(node, null);
+                } else if (node instanceof DBNResourceManagerResource) {
+                    nodes.put(node, null);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a database node");
                 }
@@ -368,6 +370,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     commandContext.saveChanges(session.getProgressMonitor(), options);
                 } else if (ne.getKey() instanceof DBNLocalFolder) {
                     sessionRegistry.removeFolder(((DBNLocalFolder) ne.getKey()).getFolder(), false);
+                } else if (ne.getKey() instanceof DBNResourceManagerResource) {
+                    DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) ne.getKey());
+                    String projectId = rmResource.getResourceProject().getId();
+                    String resourcePath = rmResource.getResourceFolder();
+                    session.getRmController().deleteResource(projectId, resourcePath, true);
                 }
             }
             if (containsFolderNodes) {
