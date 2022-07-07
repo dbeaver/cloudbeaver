@@ -1,3 +1,4 @@
+export { manifest as coreLocalizationManifest } from './manifest';
 export * from './LocalizationService';
 export * from './useTranslate';
 export * from './Locale';

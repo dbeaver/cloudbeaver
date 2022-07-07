@@ -18,6 +18,7 @@ import './styles/main/color.pure.scss';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
@@ -70,6 +71,7 @@ export class ThemeService extends Bootstrap {
   };
 
   constructor(
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
     private readonly settingsService: SettingsService,
     private readonly themeSettingsService: ThemeSettingsService
@@ -90,11 +92,12 @@ export class ThemeService extends Bootstrap {
 
   register(): void {
     this.loadAllThemes();
-    this.setCurrentThemeId(this.defaultThemeId);
-    this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
   }
 
   async load(): Promise<void> {
+    await this.serverConfigResource.load();
+    this.setCurrentThemeId(this.defaultThemeId); // set default app theme
+    this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY); // load user state theme
     await this.tryChangeTheme(this.currentThemeId);
   }
 
