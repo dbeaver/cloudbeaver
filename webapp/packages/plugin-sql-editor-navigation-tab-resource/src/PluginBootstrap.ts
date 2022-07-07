@@ -88,7 +88,15 @@ export class PluginBootstrap extends Bootstrap {
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
-              const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, dataSource.script);
+              const resourceData = this.navResourceNodeService.getResourceData(folder);
+
+              if (!resourceData) {
+                this.notificationService.logError({ title: 'ui_error', message: 'plugin_resource_manager_save_script_error' });
+                return;
+              }
+
+              const nodeId = await this.navResourceNodeService.saveScript(resourceData, scriptName, dataSource.script);
+
 
               await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
               const node = await this.navNodeInfoResource.load(nodeId);
@@ -165,7 +173,13 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const resource = await this.navResourceNodeService.loadResourceInfo(node.id);
+      const resourceData = this.navResourceNodeService.getResourceData(node.id);
+
+      if (!resourceData) {
+        return;
+      }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(resourceData);
 
       if (!resource) {
         if (data.type === NavigationType.open) {
