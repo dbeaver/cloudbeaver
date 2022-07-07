@@ -44,12 +44,12 @@ export class NavResourceNodeService {
 
   async saveScript(folderNodeId: string, name: string, script: string) {
     const resourceData = this.getResourceData(folderNodeId);
-    const resourcePath = createPath([resourceData.resourcePath, name]);
+    const resourcePath = createPath(resourceData.resourcePath, name);
     await this.resourceManagerResource.createResource(resourceData.projectId, resourcePath, false);
     await this.resourceManagerResource.writeResource(resourceData.projectId, resourcePath, script);
     await this.navTreeResource.refreshTree(folderNodeId);
 
-    return createPath([RESOURCES_NODE_PATH, resourceData.projectId, resourcePath]);
+    return createPath(RESOURCES_NODE_PATH, resourceData.projectId, resourcePath);
   }
 
   async delete(nodeId: string) {

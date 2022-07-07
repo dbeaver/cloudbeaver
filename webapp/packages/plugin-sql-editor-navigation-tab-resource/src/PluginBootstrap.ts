@@ -87,7 +87,7 @@ export class PluginBootstrap extends Bootstrap {
             try {
               await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath([RESOURCES_NODE_PATH, this.projectsResource.userProject?.name]);
+              const folder = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
               const nodeId = await this.navResourceNodeService.saveScript(folder, scriptName, dataSource.script);
 
               await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
