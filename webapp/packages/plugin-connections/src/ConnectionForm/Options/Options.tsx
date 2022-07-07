@@ -109,11 +109,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const driver = driverMap.data;
 
-  const handleFormChange = useCallback((value?: unknown, name?: string) => {
+  function handleFormChange(value?: unknown, name?: string) {
     if (name !== 'name') {
       optionsHook.updateNameTemplate(driver);
     }
-  }, [driver]);
+
+    if (config.template) {
+      config.folder = undefined;
+    }
+  }
 
   const { data: applicableAuthModels } = useMapResource(
     Options,
@@ -230,7 +234,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   {translate('connections_connection_template')}
                 </FieldCheckbox>
               )}
-              {admin && (
+              {admin && !config.template && (
                 <InputField
                   type="text"
                   name="folder"
