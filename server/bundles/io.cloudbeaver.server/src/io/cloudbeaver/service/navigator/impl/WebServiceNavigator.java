@@ -18,10 +18,10 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
-import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -323,8 +324,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     public int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
-
-            Map<DBNDatabaseNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
+            DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+            boolean containsFolderNodes = false;
+            Map<DBNNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {
@@ -337,19 +339,33 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     if (objectDeleter == null || !objectDeleter.canDeleteObject(object)) {
                         throw new DBException("Object " + object + " delete is not supported");
                     }
-                    nodes.put((DBNDatabaseNode) node, objectDeleter);
+                    nodes.put(node, objectDeleter);
+                } else if (node instanceof DBNLocalFolder) {
+                    containsFolderNodes = true;
+                    DBPDataSourceFolder folder = ((DBNLocalFolder) node).getFolder();
+                    if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
+                        throw new DBWebException("Folder node'" + path + "' cannot be deleted");
+                    }
+                    nodes.put(node, null);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a database node");
                 }
             }
 
             Map<String, Object> options = new LinkedHashMap<>();
-            for (Map.Entry<DBNDatabaseNode, DBEObjectMaker> ne : nodes.entrySet()) {
-                DBSObject object = ne.getKey().getObject();
-                DBCExecutionContext executionContext = getCommandExecutionContext(object);
-                DBECommandContext commandContext = new WebCommandContext(executionContext, false);
-                ne.getValue().deleteObject(commandContext, object, options);
-                commandContext.saveChanges(session.getProgressMonitor(), options);
+            for (Map.Entry<DBNNode, DBEObjectMaker> ne : nodes.entrySet()) {
+                if (ne.getKey() instanceof DBNDatabaseNode) {
+                    DBSObject object = ((DBNDatabaseNode) ne.getKey()).getObject();
+                    DBCExecutionContext executionContext = getCommandExecutionContext(object);
+                    DBECommandContext commandContext = new WebCommandContext(executionContext, false);
+                    ne.getValue().deleteObject(commandContext, object, options);
+                    commandContext.saveChanges(session.getProgressMonitor(), options);
+                } else if (ne.getKey() instanceof DBNLocalFolder) {
+                    sessionRegistry.removeFolder(((DBNLocalFolder) ne.getKey()).getFolder(), false);
+                }
+            }
+            if (containsFolderNodes) {
+                WebServiceUtils.updateConfigAndRefreshDatabases(session);
             }
             return nodes.size();
 
