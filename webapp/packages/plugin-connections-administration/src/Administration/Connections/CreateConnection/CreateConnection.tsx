@@ -27,7 +27,7 @@ const styles = css`
     connection-create {
       display: flex;
       flex-direction: column;
-      height: 700px;
+      height: 800px;
       overflow: hidden;
     }
 
