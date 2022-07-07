@@ -8,7 +8,7 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
-import { DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { CONNECTION_FOLDER_NAME_VALIDATION, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -114,6 +114,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if (!state.config.name?.length) {
       validation.error("Field 'name' can't be empty");
     }
+
+    if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+      validation.error('connections_connection_folder_validation');
+    }
   }
 
   private fillConfig(
@@ -205,7 +209,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.description = state.config.description;
     tempConfig.template = state.config.template;
     tempConfig.driverId = state.config.driverId;
-    tempConfig.folder = state.config.folder;
+
+    if (!state.config.template) {
+      tempConfig.folder = state.config.folder;
+    }
 
     if (isJDBCConnection(driver, state.info)) {
       tempConfig.url = state.config.url;
@@ -273,6 +280,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       !isValuesEqual(config.name, data.info.name, '')
       || !isValuesEqual(config.description, data.info.description, '')
       || !isValuesEqual(config.template, data.info.template, true)
+      || !isValuesEqual(config.folder, data.info.folder, undefined)
       || !isValuesEqual(config.driverId, data.info.driverId, '')
       || (config.url !== undefined && !isValuesEqual(config.url, data.info.url, ''))
       || (config.host !== undefined && !isValuesEqual(config.host, data.info.host, ''))

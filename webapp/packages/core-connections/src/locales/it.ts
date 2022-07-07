@@ -32,6 +32,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Indirizzo'],
   ['connections_connection_folder', 'Folder'],
+  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
   ['connections_connection_name', 'Nome della connessione'],
   ['connections_connection_access_user_or_role_name', 'Nome dell\'Utente o del ruolo'],
   ['connections_connection_access_revoke', 'Revoca'],
