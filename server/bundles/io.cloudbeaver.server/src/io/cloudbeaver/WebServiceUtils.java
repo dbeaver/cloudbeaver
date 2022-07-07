@@ -285,7 +285,10 @@ public class WebServiceUtils extends WebCommonUtils {
         dataSource.setDescription(config.getDescription());
         if (config.getFolder() != null) {
             dataSource.setFolder(dataSource.getRegistry().getFolder(config.getFolder()));
+        } else {
+            dataSource.setFolder(null);
         }
+        getGlobalDataSourceRegistry().getAllFolders().clear();
         saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
     }
 
