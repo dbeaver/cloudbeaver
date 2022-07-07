@@ -193,7 +193,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           value: 'Folder',
           title: 'core_view_action_new_folder',
           subTitle: folder?.id,
-          // icon: node.icon,
+          icon: '/icons/folder.svg#root',
           create: true,
           validation: (name, setMessage) => {
             const trimmed = name.trim();

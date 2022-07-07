@@ -11,5 +11,5 @@ import { createAction } from '../createAction';
 export const ACTION_NEW_FOLDER = createAction('create-folder', {
   label: 'core_view_action_new_folder',
   tooltip: 'core_view_action_new_folder',
-  icon: '/icons/add_sm.svg#root',
+  icon: '/icons/folder_sm.svg#root',
 });
