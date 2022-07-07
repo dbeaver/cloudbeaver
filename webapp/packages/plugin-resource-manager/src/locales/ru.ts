@@ -10,6 +10,7 @@ export default [
   ['plugin_resource_manager_update_script_success', 'Скрипт успешно обновлен'],
   ['plugin_resource_manager_open_script_error', 'Не удалось открыть скрипт'],
   ['plugin_resource_manager_save_script_error', 'Возникла ошибка при попытки сохранить скрипт'],
+  ['plugin_resource_manager_folder_move_failed', 'Ошибка перемещения в папку'],
   ['plugin_resource_manager_update_script_error', 'Не удалось обновить скрипт'],
   ['plugin_resource_manager_sync_script_error', 'Не удалось синхронизировать данные редактора'],
   ['plugin_resource_manager_delete_script_error', 'Возникла ошибка при удалении скрипта'],
