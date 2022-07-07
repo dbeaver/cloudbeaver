@@ -117,12 +117,12 @@ export class LocalizationService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
-    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY);
   }
 
   async load(): Promise<void> {
     await this.serverConfigResource.load();
-    this.setCurrentLocale(this.defaultLanguage);
+    this.setCurrentLocale(this.defaultLanguage); // set default app locale
+    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // load user state locale
     this.sessionResource.setDefaultLocale(this.settings.language);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
     await this.loadLocaleAsync(this.settings.language);

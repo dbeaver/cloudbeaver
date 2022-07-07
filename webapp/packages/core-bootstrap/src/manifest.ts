@@ -43,15 +43,15 @@ import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
-import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
+import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
-import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
-import { ThemeService, ThemeSettingsService } from '@cloudbeaver/core-theming';
+import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
@@ -65,7 +65,6 @@ export const coreManifests: PluginManifest[] = [
     depends: [],
 
     providers: [
-      RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
       AdministrationTopAppBarBootstrapService,
       ProductSettingsService,
       ProductManagerService,
@@ -80,13 +79,10 @@ export const coreManifests: PluginManifest[] = [
       ConnectionSchemaManagerService,
       BlocksLocaleService,
       AppLocaleService,
-      ScreenService,
       AppScreenService,
       ContextMenuService,
       ExceptionsCatcherService,
       EventsSettingsService,
-      LocalStorageSaveService,
-      LocalizationService,
       LogViewerBootstrap,
       LogViewerService,
       MainMenuService,
@@ -105,12 +101,13 @@ export const coreManifests: PluginManifest[] = [
       NavTreeResource,
       DBObjectResource,
       NotificationService,
-      SettingsService,
-      ThemeSettingsService,
-      ThemeService,
       ToolsPanelService,
     ],
   },
+  coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
+  coreThemingManifest,
+  coreLocalizationManifest,
+  coreSettingsManifest,
   coreProjectsManifest,
   coreAdministrationManifest,
   coreSDKManifest,
