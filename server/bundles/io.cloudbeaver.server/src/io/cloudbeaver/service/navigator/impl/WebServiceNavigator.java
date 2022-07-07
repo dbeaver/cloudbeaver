@@ -28,6 +28,7 @@ import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -306,6 +307,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
 
             if (node.supportsRename()) {
+                if (node instanceof DBNLocalFolder) {
+                    WebConnectionFolderUtils.validateConnectionFolder(newName);
+                }
                 node.rename(session.getProgressMonitor(), newName);
                 return node.getName();
             }

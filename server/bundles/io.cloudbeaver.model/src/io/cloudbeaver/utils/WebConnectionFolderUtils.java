@@ -25,6 +25,9 @@ import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionFolderUtils {
 
+
+    public static final String FOLDER_NAME_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
+
     public static WebConnectionFolderInfo getFolderInfo(WebSession session, String folderPath) throws DBWebException {
         DBPDataSourceFolder folder = null;
         if (!CommonUtils.isEmpty(folderPath)) {
@@ -37,6 +40,16 @@ public class WebConnectionFolderUtils {
             return new WebConnectionFolderInfo(session, folder);
         } else {
             throw new DBWebException("Folder '" + folderPath + "' not found");
+        }
+    }
+
+    public static void validateConnectionFolder(String folderName) throws DBWebException {
+        if (folderName.startsWith(".")) {
+            throw new DBWebException("Folder name '" + folderName + "' can't start with dot");
+        }
+        if (!folderName.matches(FOLDER_NAME_REGEX)) {
+            String illegalCharacters = folderName.replaceAll(FOLDER_NAME_REGEX, " ").strip();
+            throw new DBWebException("Folder name '" + folderName + "' contains illegal characters: " + illegalCharacters);
         }
     }
 }
