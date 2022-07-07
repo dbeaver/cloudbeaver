@@ -28,6 +28,9 @@ export default [
   ['app_navigationTree_settings_state_description', 'Восстанавливает открытые узлы после обновления страницы'],
   ['app_navigationTree_settings_folders_title', 'Папки'],
   ['app_navigationTree_settings_folders_description', 'Позволяет открыть любой узел как начальный'],
+  ['app_navigationTree_node_delete_confirmation', 'Вы собираетесь удалить "{args.name}". Вы уверены?'],
+  ['app_navigationTree_node_delete_error', 'Ошибка удаления "{args.name}'],
+  ['app_navigationTree_node_rename_error', 'Ошибка переименования ноды'],
 
   ['app_navigationTree_node_empty', 'Пусто'],
   ['app_navigationTree_node_not_found', 'Элемент не найден'],

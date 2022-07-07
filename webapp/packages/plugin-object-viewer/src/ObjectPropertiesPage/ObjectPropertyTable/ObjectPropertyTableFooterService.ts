@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CoreSettingsService, ENodeFeature, getNodeName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { CoreSettingsService, ENodeFeature, getNodeDisplayName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -24,7 +24,7 @@ interface IObjectPropertyTableFooterContext {
 @injectable()
 export class ObjectPropertyTableFooterService {
   static objectPropertyContextType = 'objectProperty';
-  private objectPropertyTableFooterToken = 'objectPropertyTableFooter';
+  private readonly objectPropertyTableFooterToken = 'objectPropertyTableFooter';
 
   constructor(
     private readonly contextMenuService: ContextMenuService,
@@ -58,7 +58,7 @@ export class ObjectPropertyTableFooterService {
       onClick: async context => {
         const nodes = this.getSelectedNodes(context.data.tableState.selectedList)
           .filter(node => node.features?.includes(ENodeFeature.canDelete));
-        const nodeNames = nodes.map(getNodeName);
+        const nodeNames = nodes.map(getNodeDisplayName);
 
         const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
