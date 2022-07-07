@@ -1,6 +1,7 @@
 package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
-
+    private static final String AUTO_LOGIN_ACTION = "auto-login";
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
@@ -57,19 +58,26 @@ public class CBStaticServlet extends DefaultServlet {
             }
         }
         String uri = request.getPathInfo();
-
-        if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth() &&
-            (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html")) &&
-            request.getParameterMap().isEmpty()) {
-            if (processSessionStart(request, response)) {
-                return;
+        try {
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
+                request, response, false);
+            WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
+            if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
+                && (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html"))
+                && request.getParameterMap().isEmpty()
+                && (webActionParameters == null || !webActionParameters.getParameters().containsValue(AUTO_LOGIN_ACTION))
+            ) {
+                if (processSessionStart(request, response, webSession)) {
+                    return;
+                }
             }
+        } catch (DBWebException e) {
+            log.error("Error reading websession", e);
         }
-
         super.doGet(request, response);
     }
 
-    private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response) {
+    private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response, WebSession webSession) {
         CBApplication application = CBApplication.getInstance();
         if (application.isConfigurationMode()) {
             return false;
@@ -98,8 +106,6 @@ public class CBStaticServlet extends DefaultServlet {
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
                     if (authProviderInstance instanceof SMWAuthProviderFederated) {
-                        WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
-                            request, response, false);
                         if (webSession.getUser() == null) {
                             var securityController = webSession.getSecurityController();
                             SMAuthInfo authInfo = securityController.authenticate(
@@ -119,7 +125,7 @@ public class CBStaticServlet extends DefaultServlet {
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
                                 Map<String, Object> authActionParams = Map.of(
-                                    "action", "auto-login",
+                                    "action", AUTO_LOGIN_ACTION,
                                     "auth-id", authInfo.getAuthAttemptId()
                                 );
                                 WebActionParameters.saveToSession(webSession, authActionParams);

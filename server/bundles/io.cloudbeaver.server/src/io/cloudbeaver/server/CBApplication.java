@@ -852,6 +852,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             appConfigProperties.put("enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
             appConfigProperties.put("forwardProxy", appConfig.isEnabledForwardProxy());
             appConfigProperties.put("linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
+            appConfigProperties.put("redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
             appConfigProperties.put(CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
             Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
