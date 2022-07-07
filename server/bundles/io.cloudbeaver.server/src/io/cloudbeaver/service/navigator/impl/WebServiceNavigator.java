@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -325,6 +326,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
             DBPDataSourceRegistry sessionRegistry = session.getSingletonProject().getDataSourceRegistry();
+            Set<DBPDataSourceFolder> tempFolders = ((DataSourceRegistry) sessionRegistry).getTemporaryFolders();
             boolean containsFolderNodes = false;
             Map<DBNNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
             for (String path : nodePaths) {
@@ -343,8 +345,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 } else if (node instanceof DBNLocalFolder) {
                     containsFolderNodes = true;
                     DBPDataSourceFolder folder = ((DBNLocalFolder) node).getFolder();
-                    if (folder.getDataSourceRegistry().getProject() != session.getSingletonProject()) {
-                        throw new DBWebException("Folder node'" + path + "' cannot be deleted");
+                    if (tempFolders.contains(folder)) {
+                        throw new DBWebException("Delete shared connection folder from navigator tree is not supported");
                     }
                     nodes.put(node, null);
                 } else {
