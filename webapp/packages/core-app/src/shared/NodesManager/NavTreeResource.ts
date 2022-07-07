@@ -419,8 +419,9 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
       if (!connectionInfo.connected) {
         closedConnections.push(connectionInfo.nodePath);
+        const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
 
-        const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
+        const folder = /* connectionInfo.folder || */ node?.parentId ?? ROOT_NODE_PATH;
 
         if (!outdatedFolders.includes(folder)) {
           outdatedFolders.push(folder);
@@ -455,7 +456,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key);
       }
 
-      const folder = /* connectionInfo.folder || */ ROOT_NODE_PATH;
+      const node = this.navNodeInfoResource.get(nodePath);
+      const folder = /* connectionInfo.folder || */ node?.parentId ?? ROOT_NODE_PATH;
 
       if (nodePath) {
         this.deleteInNode(folder, [nodePath]);
@@ -467,7 +469,9 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     if (!connection.nodePath) {
       return;
     }
-    const folder = /* connection.folder || */ ROOT_NODE_PATH;
+
+    const node = this.navNodeInfoResource.get(connection.nodePath);
+    const folder = /* connection.folder || */ node?.parentId ?? ROOT_NODE_PATH;
 
     const children = this.get(folder);
 
