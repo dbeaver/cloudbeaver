@@ -210,7 +210,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.template = state.config.template;
     tempConfig.driverId = state.config.driverId;
 
-    if (!state.config.template) {
+    if (!state.config.template && state.config.folder) {
       tempConfig.folder = state.config.folder;
     }
 
