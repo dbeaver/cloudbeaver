@@ -192,7 +192,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
 
     try {
-      await this.navResourceNodeService.write(nodeId, value);
+      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
+
+      if (!resourceData) {
+        return;
+      }
+
+      await this.navResourceNodeService.write(resourceData, value);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;
@@ -201,7 +207,15 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async read(nodeId: string): Promise<string> {
     try {
-      return await this.navResourceNodeService.read(nodeId);
+      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
+
+      if (!resourceData) {
+        throw new Error('Can\'t find resource');
+      }
+
+      const data = await this.navResourceNodeService.read(resourceData);
+
+      return data;
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
       throw exception;
