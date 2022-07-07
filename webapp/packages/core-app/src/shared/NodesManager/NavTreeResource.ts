@@ -282,7 +282,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.delete(resourceKeyList(deletedKeys));
-    this.markUpdated(keyObject);
+    this.markOutdated(keyObject);
     this.onItemAdd.execute(keyObject);
   }
 
