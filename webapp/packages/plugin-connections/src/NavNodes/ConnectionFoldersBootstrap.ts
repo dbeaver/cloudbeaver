@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { untracked } from 'mobx';
 
-import { DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_NAV_NODE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_ELEMENTS_TREE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
-import { ActionService, ACTION_DELETE, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
+import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION';
 
@@ -41,6 +40,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
+    this.navNodeInfoResource.onItemAdd.addHandler(this.syncWithNavTree.bind(this));
+    this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
 
     this.actionService.addHandler({
@@ -59,67 +60,17 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
-      getItems: (context, items) => [
-        ...items,
-        ACTION_NEW_FOLDER,
-      ],
-    });
-
-
-    this.actionService.addHandler({
-      id: 'nav-node-folder-handler',
-      isActionApplicable: (context, action): boolean => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-
-        if (!node) {
-          return false;
+      getItems: (context, items) => {
+        if (!items.includes(ACTION_NEW_FOLDER)) {
+          return [
+            ...items,
+            ACTION_NEW_FOLDER,
+          ];
         }
 
-        if (action === ACTION_DELETE) {
-          untracked(() => { this.connectionFolderResource.load(CachedMapAllKey); });
-          const folder = this.connectionFolderResource.fromNodeId(node.id);
-
-          return folder !== undefined && !node.features?.includes(ENodeFeature.shared);
-        }
-
-        return false;
-      },
-      handler: async (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        switch (action) {
-          case ACTION_DELETE: {
-            const folder = this.connectionFolderResource.fromNodeId(node.id);
-            if (!folder) {
-              return;
-            }
-
-            const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
-              title: 'ui_data_delete_confirmation',
-              message: this.localizationService.translate('connections_public_connection_folder_delete_confirmation', undefined, { name: node.name }),
-              confirmActionText: 'ui_delete',
-            });
-
-            if (result === DialogueStateResult.Rejected) {
-              return;
-            }
-
-            try {
-              await this.connectionFolderResource.deleteFolder(
-                ConnectionFolderResource.baseProject,
-                folder.id
-              );
-              this.navTreeResource.delete(node.id);
-              this.navTreeResource.markOutdated(node.parentId);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, `Failed to delete "${node.name}"`);
-            }
-            break;
-          }
-        }
+        return items;
       },
     });
-
   }
   load(): void | Promise<void> { }
 
@@ -153,12 +104,16 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
       move.setCanMove(true);
     } else {
-      await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
-      const connections = nodeIdList
-        .map(nodeId => this.connectionInfoResource.getConnectionForNode(nodeId)?.id)
-        .filter<string>(Boolean as any);
+      try {
+        await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
+        const connections = nodeIdList
+          .map(nodeId => this.connectionInfoResource.getConnectionForNode(nodeId)?.id)
+          .filter<string>(Boolean as any);
 
-      this.connectionInfoResource.markOutdated(resourceKeyList(connections));
+        this.connectionInfoResource.markOutdated(resourceKeyList(connections));
+      } catch (exception: any) {
+        this.notificationService.logException(exception, 'connections_public_connection_folder_move_failed');
+      }
     }
   }
 
@@ -190,7 +145,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         const folder = this.connectionFolderResource.fromNodeId(targetFolder);
 
         const result = await this.commonDialogService.open(RenameDialog, {
-          value: 'Folder',
+          value: this.localizationService.translate('ui_folder_new'),
           title: 'core_view_action_new_folder',
           subTitle: folder?.id,
           icon: '/icons/folder.svg#root',
@@ -224,6 +179,17 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         break;
       }
+    }
+  }
+
+  private async syncWithNavTree(key: ResourceKey<string>) {
+    const isFolder = ResourceKeyUtils.some(
+      key,
+      nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined
+    );
+
+    if (isFolder) {
+      this.connectionFolderResource.markOutdated();
     }
   }
 }
