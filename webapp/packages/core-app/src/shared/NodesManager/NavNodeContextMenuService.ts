@@ -11,6 +11,7 @@ import { untracked } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { CoreSettingsService } from '../../CoreSettingsService';
@@ -19,7 +20,7 @@ import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import type { INodeActions } from './INodeActions';
-import { getNodeName } from './NavNodeInfoResource';
+import { getNodeDisplayName } from './NavNodeInfoResource';
 import { NavNodeManagerService } from './NavNodeManagerService';
 import { NavTreeResource } from './NavTreeResource';
 
@@ -37,7 +38,8 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly coreSettingsService: CoreSettingsService
+    private readonly coreSettingsService: CoreSettingsService,
+    private readonly localizationService: LocalizationService
   ) {
     super();
   }
@@ -86,6 +88,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const name = getNodeDisplayName(node);
 
         switch (action) {
           case ACTION_OPEN: {
@@ -106,7 +109,6 @@ export class NavNodeContextMenuService extends Bootstrap {
             if (actions?.rename) {
               actions.rename();
             } else {
-              const name = node.name || '';
               const result = await this.commonDialogService.open(RenameDialog, {
                 value: name,
                 subTitle: name,
@@ -120,7 +122,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                   try {
                     await this.navTreeResource.changeName(node, result);
                   } catch (exception: any) {
-                    this.notificationService.logException(exception, 'Error occurred while renaming');
+                    this.notificationService.logException(exception, 'app_navigationTree_node_rename_error');
                   }
                 }
               }
@@ -128,11 +130,9 @@ export class NavNodeContextMenuService extends Bootstrap {
             break;
           }
           case ACTION_DELETE: {
-            const nodeName = getNodeName(node);
-
             const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
               title: 'ui_data_delete_confirmation',
-              message: `You're going to delete "${nodeName}". Are you sure?`,
+              message: this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name }),
               confirmActionText: 'ui_delete',
             });
 
@@ -143,7 +143,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             try {
               await this.navTreeResource.deleteNode(node.id);
             } catch (exception: any) {
-              this.notificationService.logException(exception, `Failed to delete "${nodeName}"`);
+              this.notificationService.logException(exception, this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }));
             }
             break;
           }
