@@ -40,15 +40,13 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Resource manager API
@@ -227,11 +225,12 @@ public class LocalResourceController implements RMController {
 
     @NotNull
     private RMResource[] readChildResources(Path folderPath, boolean readProperties, boolean readHistory, boolean recursive) throws IOException {
-        return Files.list(folderPath)
-            .filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
-            .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory, recursive))
-            .filter(Objects::nonNull)
-            .toArray(RMResource[]::new);
+        try (Stream<Path> files = Files.list(folderPath)) {
+            return files.filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
+                .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory, recursive))
+                .filter(Objects::nonNull)
+                .toArray(RMResource[]::new);
+        }
     }
 
     @Override
