@@ -129,11 +129,11 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     return this.data;
   }
 
-  navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string): NavNode {
+  navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string, requestPath?: string): NavNode {
     return {
       ...node,
       objectFeatures: node.object?.features || [],
-      parentId: parentId || this.get(node.id)?.parentId || ROOT_NODE_PATH,
+      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? ROOT_NODE_PATH,
     };
   }
 

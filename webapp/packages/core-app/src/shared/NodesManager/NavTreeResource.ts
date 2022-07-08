@@ -512,7 +512,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           ...data.map(data => data.parentPath),
           ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
         ]), [
-          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
+          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(
+            data.navNodeInfo,
+            undefined,
+            data.parentPath
+          )).flat(),
           ...data.map(
             data => data.navNodeChildren.map(
               node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
@@ -537,7 +541,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           data.parentPath,
           ...data.navNodeChildren.map(node => node.id),
         ]), [
-          this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
+          this.navNodeInfoResource.navNodeInfoToNavNode(
+            data.navNodeInfo,
+            undefined,
+            data.parentPath
+          ),
           ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
         ]
       );
