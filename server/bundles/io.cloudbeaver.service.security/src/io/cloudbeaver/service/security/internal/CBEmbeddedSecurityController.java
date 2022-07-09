@@ -1377,113 +1377,41 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     ///////////////////////////////////////////
     // Access management
-
-    @NotNull
-    @Override
-    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBException {
-        if (subjectIds.length == 0) {
-            return new SMDataSourceGrant[0];
-        }
-        List<String> allSubjects = new ArrayList<>();
-        Collections.addAll(allSubjects, subjectIds);
-
-        try (Connection dbCon = database.openConnection()) {
-            {
-                StringBuilder sql = new StringBuilder("SELECT ROLE_ID FROM CB_USER_ROLE WHERE USER_ID IN (");
-                appendStringParameters(sql, subjectIds);
-                sql.append(")");
-
-                try (Statement dbStat = dbCon.createStatement()) {
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        while (dbResult.next()) {
-                            allSubjects.add(dbResult.getString(1));
-                        }
-                    }
-                }
-            }
-            {
-                StringBuilder sql = new StringBuilder("SELECT DA.DATASOURCE_ID,DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA,\n" +
-                    "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.SUBJECT_ID IN (");
-                appendStringParameters(sql, allSubjects.toArray(new String[0]));
-                sql.append(")");
-
-                if (allSubjects.isEmpty()) {
-                    return new SMDataSourceGrant[0];
-                }
-                try (Statement dbStat = dbCon.createStatement()) {
-                    List<SMDataSourceGrant> result = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        while (dbResult.next()) {
-                            result.add(new SMDataSourceGrant(
-                                dbResult.getString(1),
-                                dbResult.getString(2),
-                                SMSubjectType.fromCode(dbResult.getString(3))));
-                        }
-                    }
-                    return result.toArray(new SMDataSourceGrant[0]);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error reading datasource access", e);
-        }
-    }
-
-    @Override
-    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull List<String> connectionIds, String grantorId) throws DBCException {
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(dbCon,
-                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
-                if (!CommonUtils.isEmpty(connectionIds)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
-                        dbStat.setString(1, subjectId);
-                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(3, grantorId);
-                        for (String connectionId : connectionIds) {
-                            dbStat.setString(4, connectionId);
-                            dbStat.execute();
-                        }
-                    }
-                }
-                txn.commit();
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error granting datasource access", e);
-        }
-    }
-
     @Override
     public void setObjectPermissions(
-        @NotNull String objectId,
+        @NotNull Set<String> objectIds,
         @NotNull SMObjectType objectType,
         @NotNull Set<String> subjectIds,
         @NotNull Set<String> permissions,
         @NotNull String grantor
     ) throws DBException {
-        if (CommonUtils.isEmpty(subjectIds)) {
+        if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
             return;
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_ID=? AND OBJECT_TYPE=?")
-                    .append("AND SUBJECT_ID IN (");
+                var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, subjectIds.toArray(String[]::new));
+                sqlBuilder.append(") AND OBJECT_TYPE=? ")
+                    .append("AND OBJECT_ID IN (");
+                appendStringParameters(sqlBuilder, objectIds.toArray(String[]::new));
                 sqlBuilder.append(")");
-                JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectId, objectType.getObjectType());
+                JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.getObjectType());
                 if (!CommonUtils.isEmpty(permissions)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
                         "INSERT INTO CB_OBJECT_PERMISSIONS(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
                             + "VALUES(?,?,?,?,?,?)")) {
-                        dbStat.setString(1, objectId);
-                        dbStat.setString(2, objectType.getObjectType());
-                        dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(4, grantor);
-                        for (String subjectId : subjectIds) {
-                            dbStat.setString(5, subjectId);
-                            for (String permission : permissions) {
-                                dbStat.setString(6, permission);
-                                dbStat.execute();
+                        for (String objectId : objectIds) {
+                            dbStat.setString(1, objectId);
+                            dbStat.setString(2, objectType.getObjectType());
+                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                            dbStat.setString(4, grantor);
+                            for (String subjectId : subjectIds) {
+                                dbStat.setString(5, subjectId);
+                                for (String permission : permissions) {
+                                    dbStat.setString(6, permission);
+                                    dbStat.execute();
+                                }
                             }
                         }
                     }
@@ -1491,13 +1419,27 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error granting datasource access", e);
+            throw new DBCException("Error granting object permissions", e);
+        }
+    }
+
+    @Override
+    public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+                objectType.getObjectType(),
+                objectId
+            );
+
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting object permissions", e);
         }
     }
 
     @NotNull
     @Override
-    public List<SMObjectPermissions> getAvailableObjectsPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
+    public List<SMObjectPermissions> getAllAvailableObjectsPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
         Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
             {
@@ -1571,91 +1513,71 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public List<SMObjectPermissionsGrant> getGrantedObjectPermissions(
+    public List<SMObjectPermissionsGrant> getObjectPermissionGrants(
         @NotNull String objectId,
         @NotNull SMObjectType smObjectType
     ) throws DBException {
         var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
-                        "FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n" +
-                        "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?")) {
-                    dbStat.setString(1, smObjectType.getObjectType());
-                    dbStat.setString(2, objectId);
-                    List<SMDataSourceGrant> result = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery()) {
-                        while (dbResult.next()) {
-                            String subjectId = dbResult.getString(1);
-                            SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
-                            String permission = dbResult.getString(3);
-                            grantedPermissionsBySubjectId.computeIfAbsent(
-                                subjectId,
-                                key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
-                            ).addPermission(permission);
-                        }
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
+                    "FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n" +
+                    "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?")) {
+                dbStat.setString(1, smObjectType.getObjectType());
+                dbStat.setString(2, objectId);
+                List<SMDataSourceGrant> result = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String subjectId = dbResult.getString(1);
+                        SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
+                        String permission = dbResult.getString(3);
+                        grantedPermissionsBySubjectId.computeIfAbsent(
+                            subjectId,
+                            key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
+                        ).addPermission(permission);
                     }
-                    return grantedPermissionsBySubjectId.values().stream()
-                        .map(SMObjectPermissionsGrant.Builder::build)
-                        .collect(Collectors.toList());
                 }
+                return grantedPermissionsBySubjectId.values().stream()
+                    .map(SMObjectPermissionsGrant.Builder::build)
+                    .collect(Collectors.toList());
             }
+
         } catch (SQLException e) {
             throw new DBCException("Error reading granted object permissions ", e);
         }
     }
 
-    @NotNull
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBException {
+    public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
+        var allLinkedSubjects = getAllLinkedSubjects(subjectId);
+        var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "SELECT DA.SUBJECT_ID,S.SUBJECT_TYPE\n" +
-                        "FROM CB_DATASOURCE_ACCESS DA,CB_AUTH_SUBJECT S\n" +
-                        "WHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.DATASOURCE_ID=?")) {
-                    dbStat.setString(1, connectionId);
-                    List<SMDataSourceGrant> result = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery()) {
-                        while (dbResult.next()) {
-                            result.add(new SMDataSourceGrant(
-                                connectionId,
-                                dbResult.getString(1),
-                                SMSubjectType.fromCode(dbResult.getString(2))));
-                        }
+            var sqlBuilder = new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,OP.PERMISSION\n")
+                .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
+                .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
+            appendStringParameters(sqlBuilder, allLinkedSubjects.toArray(String[]::new));
+            sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
+            try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                dbStat.setString(1, smObjectType.getObjectType());
+                List<SMDataSourceGrant> result = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String objectId = dbResult.getString(1);
+                        SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
+                        String permission = dbResult.getString(3);
+                        grantedPermissionsBySubjectId.computeIfAbsent(
+                            subjectId,
+                            key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
+                        ).addPermission(permission);
                     }
-                    return result.toArray(new SMDataSourceGrant[0]);
                 }
+                return grantedPermissionsBySubjectId.values().stream()
+                    .map(SMObjectPermissionsGrant.Builder::build)
+                    .collect(Collectors.toList());
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error reading datasource access", e);
-        }
-    }
 
-    @Override
-    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBException {
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                // Delete all permissions
-                JDBCUtils.executeStatement(dbCon,
-                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE DATASOURCE_ID=?", connectionId);
-                if (!ArrayUtils.isEmpty(subjects)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_DATASOURCE_ACCESS(DATASOURCE_ID,GRANT_TIME,GRANTED_BY,SUBJECT_ID) VALUES(?,?,?,?)")) {
-                        dbStat.setString(1, connectionId);
-                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(3, grantorId);
-                        for (String subject : subjects) {
-                            dbStat.setString(4, subject);
-                            dbStat.execute();
-                        }
-                    }
-                }
-                txn.commit();
-            }
         } catch (SQLException e) {
-            throw new DBCException("Error granting datasource access", e);
+            throw new DBCException("Error reading granted object permissions ", e);
         }
     }
 

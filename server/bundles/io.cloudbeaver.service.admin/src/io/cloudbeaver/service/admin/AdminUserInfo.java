@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
+import io.cloudbeaver.service.security.CBDataSourceObject;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -80,7 +81,15 @@ public class AdminUserInfo {
 
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
-        return session.getSecurityController().getSubjectConnectionAccess(new String[]{getUserId()});
+        return session.getAdminSecurityController()
+            .getSubjectObjectPermissionGrants(getUserId(), CBDataSourceObject.INSTANCE)
+            .stream()
+            .map(objectPermission -> new SMDataSourceGrant(
+                objectPermission.getObjectPermissions().getObjectId(),
+                getUserId(),
+                objectPermission.getSubjectType()
+            ))
+            .toArray(SMDataSourceGrant[]::new);
     }
 
     @Property

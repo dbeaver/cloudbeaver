@@ -27,6 +27,7 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
+import io.cloudbeaver.service.security.CBDataSourceObject;
 import io.cloudbeaver.service.security.SecurityPluginService;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
@@ -48,7 +49,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -57,7 +57,6 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -195,7 +194,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return productConfiguration;
     }
 
-    public SMController getSecurityController() {
+    public SMAdminController getSecurityController() {
         return securityController;
     }
 
@@ -779,14 +778,17 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
-            SMController securityController = getSecurityController();
+            var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                SMDataSourceGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
-                if (ArrayUtils.isEmpty(grants)) {
-                    securityController.setConnectionSubjectAccess(
-                        ds.getId(),
-                        new String[]{anonymousRoleId},
-                        adminName);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousRoleId, ds.getId(), CBDataSourceObject.INSTANCE);
+                if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
+                    securityController.setObjectPermissions(
+                        Set.of(ds.getId()),
+                        CBDataSourceObject.INSTANCE,
+                        Set.of(anonymousRoleId),
+                        Set.of("access"),
+                        adminName
+                    );
                 }
             }
         } catch (Exception e) {

@@ -37,6 +37,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
+import io.cloudbeaver.service.security.CBDataSourceObject;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -421,7 +422,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         WebServiceUtils.getGlobalDataSourceRegistry().flushConfig();
 
         try {
-            webSession.getSecurityController().setConnectionSubjectAccess(id, null, null);
+            webSession.getAdminSecurityController()
+                .deleteAllObjectPermissions(id, CBDataSourceObject.INSTANCE);
         } catch (DBException e) {
             log.error(e);
         }
@@ -609,7 +611,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
-            return webSession.getSecurityController().getConnectionSubjectAccess(connectionId);
+            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, CBDataSourceObject.INSTANCE)
+                .stream()
+                .map(objectPermissionGrant -> new SMDataSourceGrant(
+                    objectPermissionGrant.getObjectPermissions().getObjectId(),
+                    objectPermissionGrant.getSubjectId(),
+                    objectPermissionGrant.getSubjectType()
+                ))
+                .toArray(SMDataSourceGrant[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -626,7 +635,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
-            webSession.getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
+            webSession.getAdminSecurityController()
+                .setObjectPermissions(Set.of(connectionId), CBDataSourceObject.INSTANCE, new HashSet<>(subjects), Set.of("access"), grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
@@ -636,7 +646,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
-            return webSession.getSecurityController().getSubjectConnectionAccess(new String[]{subjectId});
+            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, CBDataSourceObject.INSTANCE)
+                .stream()
+                .map(objectPermissionsGrant ->
+                    new SMDataSourceGrant(
+                        objectPermissionsGrant.getObjectPermissions().getObjectId(),
+                        objectPermissionsGrant.getSubjectId(),
+                        objectPermissionsGrant.getSubjectType()
+                    ))
+                .toArray(SMDataSourceGrant[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -654,7 +672,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            webSession.getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
+            webSession.getAdminSecurityController()
+                .setObjectPermissions(
+                    new HashSet<>(connections),
+                    CBDataSourceObject.INSTANCE,
+                    Set.of(subjectId),
+                    Set.of("access"),
+                    grantor.getUserId())
+            ;
         } catch (DBException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }
