@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DATA_CONTEXT_ELEMENTS_TREE, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { untracked } from 'mobx';
+
+import { DATA_CONTEXT_ELEMENTS_TREE, ENodeMoveType, getNodesFromContext, IElementsTree, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -54,13 +56,21 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       id: 'tree-tools-menu-resource-folders-handler',
       isActionApplicable: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
-        const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
-
-        if (tree?.baseRoot !== projectPath || !this.userInfoResource.data) {
+        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
           return false;
         }
 
         return [ACTION_NEW_FOLDER].includes(action);
+      },
+      isDisabled: (context, action) => {
+        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+
+        if (!tree) {
+          return true;
+        }
+
+        untracked(async () => await this.projectsResource.load());
+        return this.getTargetNode(tree) === undefined;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -144,24 +154,17 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     if (tree === undefined) {
       return;
     }
+    await this.projectsResource.load();
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        const selected = tree.getSelected();
+        const targetNode = this.getTargetNode(tree);
 
-        if (selected.length === 0) {
-          selected.push(tree.root);
+        if (!targetNode) {
+          return;
         }
 
-        let targetFolder = selected[0];
-        let targetNode = this.navNodeInfoResource.get(targetFolder);
-
-        if (![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(targetNode?.nodeType as any)) {
-          targetFolder = tree.baseRoot;
-          targetNode = this.navNodeInfoResource.get(targetFolder);
-        }
-
-        const folderData = this.navResourceNodeService.getResourceData(targetFolder);
+        const folderData = this.navResourceNodeService.getResourceData(targetNode.id);
 
         if (!folderData) {
           return;
@@ -205,9 +208,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
               true
             );
 
-            if (targetNode) {
-              this.navTreeResource.refreshTree(targetNode.parentId);
-            }
+            this.navTreeResource.refreshTree(targetNode.parentId);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -227,5 +228,28 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     if (isFolder) {
       this.resourceManagerResource.markOutdated();
     }
+  }
+
+  private getTargetNode(tree: IElementsTree): NavNode | undefined {
+    const selected = tree.getSelected();
+
+    if (selected.length === 0) {
+      selected.push(tree.root);
+    }
+
+    let targetFolder = selected[0];
+    let targetNode = this.navNodeInfoResource.get(targetFolder);
+
+    if (![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(targetNode?.nodeType as any)) {
+      targetFolder = tree.baseRoot;
+      targetNode = this.navNodeInfoResource.get(targetFolder);
+    }
+
+    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
+    if (!targetNode?.id.startsWith(projectPath)) {
+      targetNode = undefined;
+    }
+
+    return targetNode;
   }
 }

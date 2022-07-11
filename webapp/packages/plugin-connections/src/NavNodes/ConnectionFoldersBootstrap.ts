@@ -7,7 +7,7 @@
  */
 
 
-import { DATA_CONTEXT_ELEMENTS_TREE, ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_ELEMENTS_TREE, ENodeFeature, ENodeMoveType, getNodesFromContext, IElementsTree, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -54,6 +54,21 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         }
 
         return [ACTION_NEW_FOLDER].includes(action);
+      },
+      isDisabled: (context, action) => {
+        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+
+        if (!tree) {
+          return true;
+        }
+
+        if (action === ACTION_NEW_FOLDER) {
+          const targetNode = this.getTargetNode(tree);
+
+          return targetNode === undefined;
+        }
+
+        return false;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -127,22 +142,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_NEW_FOLDER: {
         await this.connectionFolderResource.load(CachedMapAllKey);
+        const targetNode = this.getTargetNode(tree);
 
-        const selected = tree.getSelected();
-
-        if (selected.length === 0) {
-          selected.push(tree.root);
+        if (!targetNode) {
+          return;
         }
 
-        let targetFolder = selected[0];
-        let targetNode = this.navNodeInfoResource.get(targetFolder);
-
-        if (![NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode?.nodeType as any)) {
-          targetFolder = tree.baseRoot;
-          targetNode = this.navNodeInfoResource.get(targetFolder);
-        }
-
-        const folder = this.connectionFolderResource.fromNodeId(targetFolder);
+        const folder = this.connectionFolderResource.fromNodeId(targetNode.id);
 
         const result = await this.commonDialogService.open(RenameDialog, {
           value: this.localizationService.translate('ui_folder_new'),
@@ -168,10 +174,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
             await this.connectionFolderResource.create(result, folder?.id);
-            if (targetNode) {
-              this.navTreeResource.markOutdated(targetNode.parentId);
-            }
-            this.navTreeResource.markOutdated(targetFolder);
+            this.navTreeResource.markOutdated(targetNode.parentId);
+            this.navTreeResource.markOutdated(targetNode.id);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -191,5 +195,27 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     if (isFolder) {
       this.connectionFolderResource.markOutdated();
     }
+  }
+
+  private getTargetNode(tree: IElementsTree): NavNode | undefined {
+    const selected = tree.getSelected();
+
+    if (selected.length === 0) {
+      selected.push(tree.root);
+    }
+
+    let targetFolder = selected[0];
+    let targetNode = this.navNodeInfoResource.get(targetFolder);
+
+    if (![NAV_NODE_TYPE_ROOT, NAV_NODE_TYPE_FOLDER].includes(targetNode?.nodeType as any)) {
+      targetFolder = targetNode?.parentId ?? tree.baseRoot;
+      targetNode = this.navNodeInfoResource.get(targetFolder);
+    }
+
+    if (targetNode?.features?.includes(ENodeFeature.shared)) {
+      targetNode = undefined;
+    }
+
+    return targetNode;
   }
 }
