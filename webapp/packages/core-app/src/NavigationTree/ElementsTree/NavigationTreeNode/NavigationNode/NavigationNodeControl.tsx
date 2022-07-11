@@ -61,6 +61,10 @@ const styles = css`
     margin-right: 16px !important;
     visibility: hidden;
   }
+  name-box {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(function NavigationNodeControl({
@@ -110,7 +114,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
-        {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
+        {editing ? (
+          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+        ) : (
+          <name-box>{node.name}</name-box>
+        )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
