@@ -7,13 +7,13 @@
  */
 
 
-import { DATA_CONTEXT_ELEMENTS_TREE, ENodeFeature, ENodeMoveType, getNodesFromContext, IElementsTree, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
+import { DATA_CONTEXT_ELEMENTS_TREE, ENodeFeature, ENodeMoveType, getNodesFromContext, IElementsTree, INodeMoveData, MENU_ELEMENTS_TREE_TOOLS, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, nodeDeleteContext, ROOT_NODE_PATH } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
@@ -43,6 +43,45 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.navNodeInfoResource.onItemAdd.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
+
+    this.navTreeResource.beforeNodeDelete.addHandler(async (data, contexts) => {
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return;
+      }
+
+      const deleteContext = contexts.getContext(nodeDeleteContext);
+
+      if (deleteContext.confirmed) {
+        return;
+      }
+      await this.connectionFolderResource.load(CachedMapAllKey);
+
+      const nodes = ResourceKeyUtils
+        .filter(
+          data,
+          nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined
+        )
+        .map(nodeId => this.navNodeInfoResource.get(nodeId))
+        .filter<NavNode>(Boolean as any)
+        .map(node => node.name)
+        .join();
+
+      if (!nodes) {
+        return;
+      }
+
+      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+        title: 'ui_data_delete_confirmation',
+        message: this.localizationService.translate('connections_public_connection_folder_delete_confirmation', undefined, { name: nodes }),
+        confirmActionText: 'ui_delete',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
+        ExecutorInterrupter.interrupt(contexts);
+      } else {
+        deleteContext.confirm();
+      }
+    });
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',

@@ -11,7 +11,9 @@ import { untracked } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { CoreSettingsService } from '../../CoreSettingsService';
@@ -20,9 +22,10 @@ import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNode } from './EntityTypes';
 import type { INodeActions } from './INodeActions';
-import { getNodeDisplayName } from './NavNodeInfoResource';
+import { getNodeDisplayName, NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavNodeManagerService } from './NavNodeManagerService';
 import { NavTreeResource } from './NavTreeResource';
+import { nodeDeleteContext } from './nodeDeleteContext';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -39,12 +42,41 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly coreSettingsService: CoreSettingsService,
-    private readonly localizationService: LocalizationService
+    private readonly localizationService: LocalizationService,
+    private readonly navNodeInfoResource: NavNodeInfoResource
   ) {
     super();
   }
 
   register(): void {
+    this.navTreeResource.beforeNodeDelete.addPostHandler(async (data, contexts) => {
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return;
+      }
+
+      const deleteContext = contexts.getContext(nodeDeleteContext);
+
+      if (deleteContext.confirmed) {
+        return;
+      }
+
+      const nodes = ResourceKeyUtils
+        .mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
+        .filter<NavNode>(Boolean as any)
+        .map(node => node.name)
+        .join();
+
+      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+        title: 'ui_data_delete_confirmation',
+        message: this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name: nodes }),
+        confirmActionText: 'ui_delete',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
+        ExecutorInterrupter.interrupt(contexts);
+      }
+    });
+
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
       isActionApplicable: (context, action): boolean => {
@@ -130,16 +162,6 @@ export class NavNodeContextMenuService extends Bootstrap {
             break;
           }
           case ACTION_DELETE: {
-            const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
-              title: 'ui_data_delete_confirmation',
-              message: this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name }),
-              confirmActionText: 'ui_delete',
-            });
-
-            if (result === DialogueStateResult.Rejected) {
-              return;
-            }
-
             try {
               await this.navTreeResource.deleteNode(node.id);
             } catch (exception: any) {

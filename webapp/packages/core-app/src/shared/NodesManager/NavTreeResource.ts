@@ -11,7 +11,7 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -45,6 +45,7 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
 
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
+  readonly beforeNodeDelete: IExecutor<ResourceKey<string>>;
   readonly onNodeRefresh: IExecutor<string>;
   protected metadata: MetadataMap<string, INodeMetadata>;
 
@@ -62,6 +63,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
+
+    this.beforeNodeDelete = new Executor();
 
     makeObservable<this, 'setNavObject' | 'connectionRemoveHandler'>(this, {
       childrenLimit: computed,
@@ -164,6 +167,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   async deleteNode(key: ResourceKey<string>): Promise<void> {
+    const contexts = await this.beforeNodeDelete.execute(key);
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     const nodePaths = isResourceKeyList(key) ? key.list : [key];
 
     await this.performUpdate(key, [], async () => {

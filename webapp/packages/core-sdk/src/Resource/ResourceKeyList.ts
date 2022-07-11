@@ -46,6 +46,7 @@ export interface ResourceKeyUtils {
   every: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   map: MapFnc;
   toArray: <TKey>(key: ResourceKey<TKey>) => TKey[];
+  filter: <TKey>(key: ResourceKey<TKey>, filter: (key: TKey) => boolean) => TKey[];
   mapKey: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
   mapArray: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
   includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
@@ -134,6 +135,9 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     } else {
       return [key];
     }
+  },
+  filter<TKey>(key: ResourceKey<TKey>, filter: (key: TKey) => boolean): TKey[] {
+    return this.toArray(key).filter(filter);
   },
 
   mapKey<TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKey<TValue> {
