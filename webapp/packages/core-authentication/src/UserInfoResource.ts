@@ -90,35 +90,33 @@ UserInfoIncludes
     provider: string,
     { credentials, configurationId, linkUser }: ILoginOptions
   ): Promise<AuthInfo> {
-    return await this.performUpdate(undefined, [], async () => {
-      let processedCredentials: Record<string, any> | undefined;
+    let processedCredentials: Record<string, any> | undefined;
 
-      if (credentials) {
-        const processed = await this.authProviderService.processCredentials(provider, credentials);
-        processedCredentials = processed.credentials;
-      }
+    if (credentials) {
+      const processed = await this.authProviderService.processCredentials(provider, credentials);
+      processedCredentials = processed.credentials;
+    }
 
-      const { authInfo } = await this.graphQLService.sdk.authLogin({
-        provider,
-        configuration: configurationId,
-        credentials: processedCredentials,
-        linkUser,
-        customIncludeOriginDetails: true,
-      });
-
-      if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-        if (this.data === null || linkUser) {
-          this.resetIncludes();
-          this.setData(await this.loader());
-        } else {
-          this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
-        }
-
-        this.sessionResource.markOutdated();
-      }
-
-      return authInfo as AuthInfo;
+    const { authInfo } = await this.graphQLService.sdk.authLogin({
+      provider,
+      configuration: configurationId,
+      credentials: processedCredentials,
+      linkUser,
+      customIncludeOriginDetails: true,
     });
+
+    if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
+      if (this.data === null || linkUser) {
+        this.resetIncludes();
+        this.setData(await this.loader());
+      } else {
+        this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
+      }
+
+      this.sessionResource.markOutdated();
+    }
+
+    return authInfo as AuthInfo;
   }
 
   finishFederatedAuthentication(authId: string, link?: boolean): ITask<UserInfo | null> {
@@ -170,13 +168,11 @@ UserInfoIncludes
   }
 
   async logout(): Promise<void> {
-    await this.performUpdate(undefined, [], async () => {
-      if (this.data) {
-        await this.graphQLService.sdk.authLogout();
-        this.setData(null);
-        this.resetIncludes();
-      }
-    });
+    if (this.data) {
+      await this.graphQLService.sdk.authLogout();
+      this.setData(null);
+      this.resetIncludes();
+    }
     this.sessionResource.markOutdated();
   }
 
