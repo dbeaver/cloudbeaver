@@ -16,6 +16,7 @@
     "clean-dist": "rimraf lib/*"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.4",
     "@types/react": "~18.0.12",
     "@types/react-dom": "~18.0.5",
     "@typescript-eslint/eslint-plugin": "~5.27.1",

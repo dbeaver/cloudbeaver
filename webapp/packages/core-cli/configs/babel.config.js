@@ -20,12 +20,18 @@ module.exports = {
     setPublicClassFields: true, // defines properties in extending classes via Object.defineProperty
     setSpreadProperties: true
   },
+  env: {
+    test: {
+      plugins: ["@babel/plugin-transform-modules-commonjs"]
+    }
+  },
   presets: [
     [
       "@babel/preset-env",
       {
         modules: false,
         targets: {
+          node: 'current',
           browsers: [
             "defaults",
             "not IE 11",
