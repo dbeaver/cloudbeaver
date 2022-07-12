@@ -8,6 +8,7 @@ module.exports = {
   // collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/types.ts'],
   // coverageReporters: ['json'],
   // restoreMocks: true,
+  passWithNoTests: true,
   testEnvironment: 'jsdom',
   setupFiles: ['../tests/setup.ts'],
   transform: {"\\.[jt]sx?$": ['babel-jest', { configFile: require.resolve('./babel.config.js') }]}
