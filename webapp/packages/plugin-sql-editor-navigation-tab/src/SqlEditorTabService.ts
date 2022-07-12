@@ -102,13 +102,6 @@ export class SqlEditorTabService extends Bootstrap {
 
   load(): void { }
 
-  getName(tabState: ISqlEditorTabState): string {
-    const dataSource = this.sqlDataSourceService.get(tabState.editorId);
-    const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId || '');
-
-    return getSqlEditorName(tabState, connection);
-  }
-
   createNewEditor(
     editorId: string,
     dataSourceKey: string,
@@ -123,11 +116,10 @@ export class SqlEditorTabService extends Bootstrap {
       editorId,
       dataSourceKey,
       order,
-      name,
       source,
     );
 
-    this.sqlDataSourceService.create(handlerState, dataSourceKey, script);
+    this.sqlDataSourceService.create(handlerState, dataSourceKey, { name, script });
 
     return {
       id: editorId,
@@ -258,7 +250,6 @@ export class SqlEditorTabService extends Bootstrap {
       || typeof tab.handlerState.editorId !== 'string'
       || typeof tab.handlerState.order !== 'number'
       || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.name)
       || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
       || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
       || !Array.isArray(tab.handlerState.modeState)

@@ -10,5 +10,6 @@ import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connecti
 
 export interface ILocalStorageSqlDataSourceState {
   script: string;
+  name?: string;
   executionContext?: IConnectionExecutionContextInfo;
 }

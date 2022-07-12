@@ -8,12 +8,15 @@
 
 import { observable } from 'mobx';
 
-import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { SqlDataSourceService, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
+
+import { getSqlEditorName } from './getSqlEditorName';
+import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -33,6 +36,7 @@ export class SqlEditorService {
     private readonly notificationService: NotificationService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.onQueryChange = new Executor();
@@ -42,13 +46,11 @@ export class SqlEditorService {
     editorId: string,
     datasourceKey: string,
     order: number,
-    name?: string,
     source?: string,
   ): ISqlEditorTabState {
     return observable({
       editorId,
       datasourceKey,
-      name,
       source,
       order,
       tabs: [],
@@ -107,8 +109,19 @@ export class SqlEditorService {
     return proposals as SQLProposal[];
   }
 
+  getName(tabState: ISqlEditorTabState): string {
+    const dataSource = this.sqlDataSourceService.get(tabState.editorId);
+    const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId || '');
+
+    return getSqlEditorName(tabState, dataSource, connection);
+  }
+
   setName(name: string, state: ISqlEditorTabState) {
-    state.name = name;
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+    if (dataSource && dataSource.features.includes(ESqlDataSourceFeatures.setName)) {
+      dataSource.setName(name);
+    }
   }
 
   setQuery(query: string, state: ISqlEditorTabState) {

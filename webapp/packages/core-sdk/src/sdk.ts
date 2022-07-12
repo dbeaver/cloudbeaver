@@ -2331,6 +2331,15 @@ export type GetResourceListQueryVariables = Exact<{
 
 export type GetResourceListQuery = { resources: Array<{ name: string; folder: boolean; length: number }> };
 
+export type MoveResourceMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  oldPath: Scalars['String'];
+  newPath: Scalars['String'];
+}>;
+
+
+export type MoveResourceMutation = { rmMoveResource: string };
+
 export type ReadResourceQueryVariables = Exact<{
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
@@ -3717,6 +3726,15 @@ export const GetResourceListDocument = `
   }
 }
     `;
+export const MoveResourceDocument = `
+    mutation moveResource($projectId: String!, $oldPath: String!, $newPath: String!) {
+  rmMoveResource(
+    projectId: $projectId
+    oldResourcePath: $oldPath
+    newResourcePath: $newPath
+  )
+}
+    `;
 export const ReadResourceDocument = `
     query readResource($projectId: String!, $resourcePath: String!) {
   value: rmReadResourceAsString(
@@ -4222,6 +4240,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getResourceList(variables: GetResourceListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetResourceListQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetResourceListQuery>(GetResourceListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResourceList', 'query');
+    },
+    moveResource(variables: MoveResourceMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<MoveResourceMutation> {
+      return withWrapper(wrappedRequestHeaders => client.request<MoveResourceMutation>(MoveResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'moveResource', 'mutation');
     },
     readResource(variables: ReadResourceQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<ReadResourceQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<ReadResourceQuery>(ReadResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readResource', 'query');

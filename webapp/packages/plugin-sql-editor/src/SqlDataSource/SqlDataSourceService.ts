@@ -16,13 +16,18 @@ import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import type { ISqlDataSource } from './ISqlDataSource';
 import { MemorySqlDataSource } from './MemorySqlDataSource';
 
+export interface ISqlDataSourceOptions {
+  name?: string;
+  script?: string;
+  executionContext?: IConnectionExecutionContextInfo;
+}
+
 type ISqlDataSourceFactory = (
   editorId: string,
-  script?: string,
-  executionContext?: IConnectionExecutionContextInfo,
+  options?: ISqlDataSourceOptions
 ) => ISqlDataSource;
 
-interface ISqlDataSourceOptions {
+interface ISqlDataSourceFabric {
   key: string;
   getDataSource: ISqlDataSourceFactory;
   onDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
@@ -30,7 +35,7 @@ interface ISqlDataSourceOptions {
 }
 
 interface ISqlDataSourceProvider {
-  provider: ISqlDataSourceOptions;
+  provider: ISqlDataSourceFabric;
   dataSource: ISqlDataSource;
 }
 
@@ -42,7 +47,7 @@ export class SqlDataSourceService {
   }
 
   readonly onCreate: ISyncExecutor<[string, string]>;
-  private readonly dataSourceProviders: Map<string, ISqlDataSourceOptions>;
+  private readonly dataSourceProviders: Map<string, ISqlDataSourceFabric>;
   private readonly providers: Map<string, ISqlDataSourceProvider>;
 
   constructor() {
@@ -52,7 +57,11 @@ export class SqlDataSourceService {
 
     this.register({
       key: MemorySqlDataSource.key,
-      getDataSource: (editorId, script, executionContext) => new MemorySqlDataSource(script, executionContext),
+      getDataSource: (editorId, options) => new MemorySqlDataSource(
+        options?.name,
+        options?.script,
+        options?.executionContext
+      ),
     });
 
     makeObservable<this, 'providers'>(this, {
@@ -70,8 +79,7 @@ export class SqlDataSourceService {
   create(
     state: ISqlEditorTabState,
     key: string,
-    script?: string,
-    executionContext?: IConnectionExecutionContextInfo,
+    options?: ISqlDataSourceOptions
   ): ISqlDataSource {
     const editorId = state.editorId;
     const provider = this.dataSourceProviders.get(key);
@@ -89,7 +97,7 @@ export class SqlDataSourceService {
 
       activeProvider = {
         provider,
-        dataSource: provider.getDataSource(editorId, script, executionContext),
+        dataSource: provider.getDataSource(editorId, options),
       };
 
       this.providers.set(editorId, activeProvider);
@@ -116,7 +124,7 @@ export class SqlDataSourceService {
     this.providers.delete(editorId);
   }
 
-  register(dataSourceOptions: ISqlDataSourceOptions) {
+  register(dataSourceOptions: ISqlDataSourceFabric) {
     if (this.dataSourceProviders.has(dataSourceOptions.key)) {
       throw new Error(`SQL Data Source with key (${dataSourceOptions.key}) already registered`);
     }

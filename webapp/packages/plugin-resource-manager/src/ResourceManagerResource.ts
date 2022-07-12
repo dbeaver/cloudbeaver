@@ -23,10 +23,30 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     super();
   }
 
+  getFolder(resourcePath: string): string {
+    const parts = resourcePath.split('/');
+    return parts.slice(0, parts.length - 1).join('/');
+  }
+
   getResource(key: IResourceManagerParams, resourcePath: string): RmResourceInfo | undefined {
     const resources = this.get(key);
 
     return resources?.find(resource => resource.name === resourcePath);
+  }
+
+  async move(projectId: string, oldPath: string, newPath: string): Promise<void> {
+    await this.graphQLService.sdk.moveResource({
+      projectId,
+      newPath,
+      oldPath,
+    });
+
+    // const oldFolder = this.getFolder(oldPath);
+    // const newFolder = this.getFolder(newPath);
+
+    // const oldResource = this.getResource({ projectId, folder: oldFolder }, oldPath);
+
+    // this.set();
   }
 
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
@@ -35,6 +55,8 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       resourcePath,
       isFolder: folder,
     });
+
+    await this.load({ projectId, folder:folder ? resourcePath : this.getFolder(resourcePath) });
   }
 
   async writeResource(projectId: string, resourcePath: string, data: string) {
@@ -60,6 +82,8 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       resourcePath,
       recursive: false,
     });
+
+    // await this.load({ projectId, folder: folder ? resourcePath : this.getFolder(resourcePath) });
   }
 
   protected getKeyRef(key: IResourceManagerParams): IResourceManagerParams {

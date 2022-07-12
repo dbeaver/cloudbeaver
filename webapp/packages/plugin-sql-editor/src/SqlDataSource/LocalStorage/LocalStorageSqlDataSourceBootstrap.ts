@@ -8,11 +8,10 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
-import { SqlDataSourceService } from '../SqlDataSourceService';
+import { ISqlDataSourceOptions, SqlDataSourceService } from '../SqlDataSourceService';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource';
 
@@ -41,6 +40,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
         for (const [key, value] of Array.from(map.entries())) {
           if (
             typeof value.script !== 'string'
+            || !['string', 'undefined', 'object'].includes(typeof value.name)
             || !['undefined', 'object'].includes(typeof value.executionContext)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.connectionId)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.id)
@@ -58,10 +58,9 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.sqlDataSourceService.register({
       key: LocalStorageSqlDataSource.key,
-      getDataSource: (editorId, script, executionContext) => new LocalStorageSqlDataSource(this.createState(
+      getDataSource: (editorId, options) => new LocalStorageSqlDataSource(this.createState(
         editorId,
-        script,
-        executionContext,
+        options
       )),
       onDestroy: (_, editorId) => this.deleteState(editorId),
     });
@@ -71,15 +70,15 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
 
   private createState(
     editorId: string,
-    script?: string,
-    executionContext?: IConnectionExecutionContextInfo
+    options?: ISqlDataSourceOptions
   ): ILocalStorageSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
     if (!state) {
       state = observable<ILocalStorageSqlDataSourceState>({
-        script: script ?? '',
-        executionContext,
+        name: options?.name,
+        script: options?.script ?? '',
+        executionContext: options?.executionContext,
       });
 
       this.dataSourceStateState.set(editorId, state);

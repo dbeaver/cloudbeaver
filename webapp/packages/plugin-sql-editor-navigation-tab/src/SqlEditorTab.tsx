@@ -34,7 +34,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
   const connection = connectionInfo.get(dataSource?.executionContext?.connectionId || '');
-  const name = getSqlEditorName(tab.handlerState, connection);
+  const name = getSqlEditorName(tab.handlerState, dataSource, connection);
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;

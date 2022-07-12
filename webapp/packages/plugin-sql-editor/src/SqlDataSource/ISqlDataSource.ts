@@ -10,15 +10,21 @@ import type { ILoadableState } from '@cloudbeaver/core-blocks';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
+import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
+
 export interface ISqlDataSource extends ILoadableState {
+  readonly name: string | null;
   readonly script: string;
   readonly executionContext?: IConnectionExecutionContextInfo;
   readonly message?: string;
   readonly onSetScript: ISyncExecutor<string>;
+  readonly features: ESqlDataSourceFeatures[];
 
   isOutdated(): boolean;
   markOutdated(): void;
   markUpdated(): void;
+  canRename(name: string | null): boolean;
+  setName(name: string | null): void;
   setScript(script: string): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
   load(): Promise<void> | void;

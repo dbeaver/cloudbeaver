@@ -53,10 +53,9 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
           MemorySqlDataSource.key,
           0,
           undefined,
-          undefined,
         );
 
-        sqlDataSourceService.create(this.state, MemorySqlDataSource.key, '', contextInfo);
+        sqlDataSourceService.create(this.state, MemorySqlDataSource.key, { script: '', executionContext:contextInfo });
 
       } else {
         this.state = null;

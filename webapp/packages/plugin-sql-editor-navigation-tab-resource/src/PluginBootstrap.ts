@@ -78,7 +78,7 @@ export class PluginBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_SAVE) {
-          const name = getSqlEditorName(state);
+          const name = getSqlEditorName(state, dataSource);
           const result = await this.commonDialogService.open(SaveScriptDialog, {
             defaultScriptName: name,
           });

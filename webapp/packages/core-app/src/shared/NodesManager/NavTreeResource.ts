@@ -43,10 +43,22 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
   withDetails: boolean;
 }
 
+export interface INavNodeMoveData {
+  key: ResourceKey<string>;
+  target: string;
+}
+
+export interface INavNodeRenameData {
+  nodeId: string;
+  newNodeId: string;
+}
+
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
   readonly beforeNodeDelete: IExecutor<ResourceKey<string>>;
   readonly onNodeRefresh: IExecutor<string>;
+  readonly onNodeRename: IExecutor<INavNodeRenameData>;
+  readonly onNodeMove: IExecutor<INavNodeMoveData>;
   protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
@@ -65,6 +77,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     super();
 
     this.beforeNodeDelete = new Executor();
+    this.onNodeRename = new Executor();
+    this.onNodeMove = new Executor();
 
     makeObservable<this, 'setNavObject' | 'connectionRemoveHandler'>(this, {
       childrenLimit: computed,
@@ -219,22 +233,33 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.markOutdated(resourceKeyList([...parents, target]));
+    await this.onNodeMove.execute({ key, target });
   }
 
-  async changeName(node: NavNode, name: string): Promise<void> {
-    await this.performUpdate(node.parentId, [], async () => {
+  async changeName(node: NavNode, name: string): Promise<string> {
+    const newNodeId = await this.performUpdate(node.parentId, [], async () => {
       this.markDataLoading(node.id);
       try {
         await this.graphQLService.sdk.navRenameNode({
           nodePath: node.id,
           newName: name,
         });
+
+        const parts = node.id.split('/');
+        parts.splice(parts.length - 1, 1, name);
+
+        return parts.join('/');
       } finally {
         this.markDataLoaded(node.id);
       }
     });
 
     this.markOutdated(node.parentId);
+    await this.onNodeRename.execute({
+      nodeId: node.id,
+      newNodeId,
+    });
+    return newNodeId;
   }
 
   moveToNode(key: string, target: string): void;
