@@ -4,8 +4,9 @@ module.exports = {
   transformIgnorePatterns: [
     "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"
   ],
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/types.ts'],
-  coverageReporters: ['json'],
+  // collectCoverage: true,
+  // collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/types.ts'],
+  // coverageReporters: ['json'],
   // restoreMocks: true,
   testEnvironment: 'jsdom',
   setupFiles: ['../tests/setup.ts'],
