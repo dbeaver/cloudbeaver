@@ -117,7 +117,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       return false;
     }
 
-    return !!this.actions && !!this.nodeInfo && !this.isOutdated() && this.saved && name.trim().length > 0;
+    name = name.trim();
+
+    return (
+      !!this.actions
+      && !!this.nodeInfo
+      && this.saved
+      && name.length > 0
+    );
   }
 
   setScript(script: string): void {
@@ -143,8 +150,17 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   async rename(name: string | null) {
     await this.write();
 
-    if (!this.actions || !this.nodeInfo || !this.saved || !name?.trim()) {
+    if (
+      !this.actions
+      || !this.nodeInfo
+      || !this.saved
+      || !name?.trim()
+    ) {
       return;
+    }
+
+    if (!name.toLowerCase().endsWith('.sql')) {
+      name += '.sql';
     }
 
     this.lastAction = this.rename.bind(this, name);

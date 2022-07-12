@@ -130,18 +130,18 @@ export class SqlEditorBootstrap extends Bootstrap {
             const connection = this.connectionInfoResource.get(dataSource.executionContext?.connectionId ?? '');
 
             const name = getSqlEditorName(state, dataSource, connection);
+            const regexp = /^(.*?)(\.\w+)$/ig.exec(name);
 
             const result = await this.commonDialogService.open(RenameDialog, {
-              value: name,
+              value: regexp?.[1] ?? name,
               objectName: name,
               icon: '/icons/sql_script_m.svg',
               validation: name => (
                 !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
                   tab.handlerState.order !== state.order
-                && this.sqlEditorService.getName(tab.handlerState) === name.trim()
-                )
+                  && this.sqlEditorService.getName(tab.handlerState) === name.trim()
+                ))
                 && dataSource.canRename(name)
-                )
               ),
             });
 
