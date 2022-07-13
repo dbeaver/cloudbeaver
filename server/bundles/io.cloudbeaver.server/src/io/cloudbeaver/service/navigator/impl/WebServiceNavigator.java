@@ -311,7 +311,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (node instanceof DBNLocalFolder) {
                     WebConnectionFolderUtils.validateConnectionFolder(newName);
                     List<String> siblings = Arrays.stream(
-                        ((DBNLocalFolder)node).getLogicalParent().getChildren(session.getProgressMonitor()))
+                        ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
                         .filter(n -> n instanceof DBNLocalFolder)
                         .map(DBNNode::getName).collect(Collectors.toList());
                     if (siblings.contains(newName)) {
