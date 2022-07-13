@@ -50,15 +50,13 @@ import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceFolder;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
@@ -113,6 +111,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private VirtualProjectImpl sessionProject;
+    private final List<DBPProject> sessionProjects = new ArrayList<>();
     private final SessionContextImpl sessionAuthContext;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
@@ -121,6 +120,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     public static Path getUserProjectsFolder() {
         return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBWConstants.USER_PROJECTS_FOLDER);
+    }
+
+    @NotNull
+    public static Path getSharedProjectsFolder() {
+        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBWConstants.SHARED_PROJECTS_FOLDER);
     }
 
     public WebSession(HttpSession httpSession,
@@ -135,8 +139,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.application = application;
         this.sessionHandlers = sessionHandlers;
         this.userContext = new WebUserContext(application);
-
-        initNavigatorModel();
     }
 
     @NotNull
@@ -290,7 +292,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private void initNavigatorModel() {
         DBPPlatform platform = DBWorkbench.getPlatform();
         DBPProject globalProject = platform.getWorkspace().getActiveProject();
-
+        sessionProjects.clear();
         String projectName;
         Path projectPath;
         WebUser user = userContext.getUser();
@@ -319,24 +321,36 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             projectName,
             projectPath,
             sessionAuthContext);
-        if (user == null) {
-            sessionProject.setInMemory(true);
-        }
-        this.navigatorModel = new DBNModel(platform, this.sessionProject);
-        this.navigatorModel.initialize();
-
-        DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
-        ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
-        {
-            // Copy global datasources.
-            for (DBPDataSourceContainer ds : globalProject.getDataSourceRegistry().getDataSources()) {
-                if (!ds.isTemplate() && isDataSourceAccessible(ds)) {
-                    DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
-                    dsCopy.setTemporary(true);
-                    dataSourceRegistry.addDataSource(dsCopy);
+        try {
+            RMController controller = application.getResourceController(this);
+            RMProject[] rmProjects =  controller.listAccessibleProjects();
+            for (RMProject project : rmProjects) {
+                if (project.getType().equals(RMProject.Type.GLOBAL)) {
+                    projectPath = globalProject.getAbsolutePath();
+                } else if (project.getType().equals(RMProject.Type.SHARED)) {
+                    projectPath = getSharedProjectsFolder().resolve(project.getName());
+                } else {
+                    projectPath = getUserProjectsFolder().resolve(project.getName());
                 }
+                VirtualProjectImpl sessionProject = new VirtualProjectImpl(
+                    platform.getWorkspace(),
+                    project.getId(),
+                    projectPath,
+                    sessionAuthContext);
+                if (user == null) {
+                    sessionProject.setInMemory(true);
+                }
+                sessionProjects.add(sessionProject);
+                sessionProject.setConfigurationManager(application.getConfigurationManager(sessionProject, this));
+                DBPDataSourceRegistry sessionProjectDataSourceRegistry = sessionProject.getDataSourceRegistry();
+                controller.getProjectsDataSources(project.getId());
             }
+        } catch (DBException e) {
+            return;
         }
+        this.navigatorModel = new DBNModel(platform, this.sessionProjects);
+        this.navigatorModel.setModelAuthContext(getSessionContext());
+        this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
 
@@ -352,11 +366,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
-        DBPDataSourceRegistry registry = sessionProject.getDataSourceRegistry();
+        for (DBPProject project : sessionProjects) {
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
-        for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-            connList.add(connectionInfo);
+            for (DBPDataSourceContainer ds : registry.getDataSources()) {
+                WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
+                connList.add(connectionInfo);
+            }
         }
 
         // Add all provided datasources to the session

@@ -54,6 +54,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -73,11 +74,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
             DBNModel navigatorModel = session.getNavigatorModel();
             if (isRootPath) {
-                DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getSingletonProject());
-                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, projectNode.getDatabases(), true);
+                DBNRoot projectNodes = navigatorModel.getRoot();
+                nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, projectNodes, true);
                 if (SHOW_EXTRA_NODES) {
                     // Inject extra nodes. Disabled because we use different root path for extra nodes
-                    List<DBNNode> extraNodes = projectNode.getExtraNodes();
+                    List<DBNNode> extraNodes = projectNodes.getExtraNodes();
                     if (!extraNodes.isEmpty()) {
                         nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
                     }
@@ -89,6 +90,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 }
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
+                }
+                if (parentNode instanceof DBNProject) {
+                    parentNode = ((DBNProject) parentNode).getDatabases();
                 }
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, false);
             }
@@ -309,6 +313,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
                     WebConnectionFolderUtils.validateConnectionFolder(newName);
+                    List<String> siblings =Arrays.stream(node.getParentNode().getChildren(session.getProgressMonitor()))
+                        .map(DBNNode::getName).collect(Collectors.toList());
+                    if (siblings.contains(newName)) {
+                        throw new DBWebException("New node name is used there");
+                    }
                 }
                 node.rename(session.getProgressMonitor(), newName);
                 return node.getName();

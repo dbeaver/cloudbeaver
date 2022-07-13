@@ -26,11 +26,13 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -108,6 +110,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     protected abstract void loadConfiguration(String configPath) throws DBException;
+
+    @Override
+    public DataSourceConfigurationManager getConfigurationManager(@NotNull DBPProject project, @NotNull SMCredentialsProvider credentialsProvider) {
+        return null;
+    }
 
     @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
