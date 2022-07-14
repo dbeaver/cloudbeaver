@@ -82,13 +82,27 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
 
         .dataFetcher("createConnectionConfiguration",
-            env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).createConnectionConfiguration(
+                getWebSession(env),
+                new WebConnectionConfig(env.getArgument("config")),
+                env.getArgument("projectId")))
         .dataFetcher("copyConnectionConfiguration",
-            env -> getService(env).copyConnectionConfiguration(getWebSession(env), env.getArgument("nodePath"), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).copyConnectionConfiguration(
+                getWebSession(env),
+                env.getArgument("nodePath"),
+                new WebConnectionConfig(env.getArgument("config")),
+                env.getArgument("projectId")))
         .dataFetcher("updateConnectionConfiguration",
-            env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).updateConnectionConfiguration(
+                getWebSession(env),
+                env.getArgument("id"),
+                new WebConnectionConfig(env.getArgument("config")),
+                env.getArgument("projectId")))
         .dataFetcher("deleteConnectionConfiguration",
-            env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")))
+            env -> getService(env).deleteConnectionConfiguration(
+                getWebSession(env),
+                env.getArgument("id"),
+                env.getArgument("projectId")))
 
         .dataFetcher("getConnectionSubjectAccess",
             env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")))

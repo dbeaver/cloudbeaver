@@ -76,6 +76,11 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    public String getProjectId() {
+        return node.getOwnerProject().getId();
+    }
+
+    @Property
     public String getFullName() {
         String nodeName;
         if (node instanceof DBNDatabaseNode && !(node instanceof DBNDataSource)) {
@@ -149,7 +154,7 @@ public class WebNavigatorNodeInfo {
         }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode) {
-            isShared = !((DBNDatabaseNode) node).getDataSourceContainer().isManageable();
+            isShared = !((DBNDatabaseNode) node).getOwnerProject().getName().equals(session.getUserId());
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
             String projectName = folder.getDataSourceRegistry().getProject().getName();

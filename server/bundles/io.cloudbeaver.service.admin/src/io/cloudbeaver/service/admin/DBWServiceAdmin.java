@@ -90,13 +90,27 @@ public interface DBWServiceAdmin extends DBWService {
     List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo createConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull WebConnectionConfig config,
+        @Nullable String projectId) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo copyConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @NotNull WebConnectionConfig config,
+        @Nullable String projectId) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo updateConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull String id,
+        @NotNull WebConnectionConfig config,
+        @Nullable String projectId) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+    boolean deleteConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull String id,
+        @Nullable String projectId) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features

@@ -99,6 +99,7 @@ public class LocalResourceController implements RMController {
                 project = new VirtualProjectImpl(
                     DBWorkbench.getPlatform().getWorkspace(),
                     projectId,
+                    parseProjectName(projectId).getName(),
                     getProjectPath(projectId),
                     sessionContext);
                 projectRegistries.put(projectId, project);
@@ -184,7 +185,9 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        DBPProject projectMetadata = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), ((DataSourceRegistry) registry).getConfigurationManager(), null);
     }
 
     @Override

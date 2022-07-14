@@ -41,36 +41,47 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 env.getArgument("parentPath"),
                 env.getArgument("offset"),
                 env.getArgument("limit"),
-                env.getArgument("onlyFolders")))
-        .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
+                env.getArgument("onlyFolders"),
+                env.getArgument("projectId")
+            ))
+            .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                env.getArgument("nodePath"),
+                env.getArgument("projectId")
+            ))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                env.getArgument("nodePath"),
+                env.getArgument("projectId")
+            ))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
-                env.getArgument("nodePath")
+                env.getArgument("nodePath"),
+                env.getArgument("projectId")
             ))
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
                 getWebConnection(env),
                 env.getArgument("contextId"),
-                env.getArgument("catalog")
+                env.getArgument("catalog"),
+                env.getArgument("projectId")
             ));
         model.getMutationType()
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),
                 env.getArgument("nodePath"),
-                env.getArgument("newName")
+                env.getArgument("newName"),
+                env.getArgument("projectId")
             ))
             .dataFetcher("navDeleteNodes", env -> getService(env).deleteNodes(
                 getWebSession(env),
-                env.getArgument("nodePaths")
+                env.getArgument("nodePaths"),
+                env.getArgument("projectId")
             ))
             .dataFetcher("navMoveNodesToFolder", env -> getService(env).moveNodesToFolder(
                 getWebSession(env),
                 env.getArgument("nodePaths"),
-                env.getArgument("folderPath")
+                env.getArgument("folderPath"),
+                env.getArgument("projectId")
             ));
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")

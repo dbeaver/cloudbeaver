@@ -68,6 +68,8 @@ type NavigatorNodeInfo {
     nodeType: String
     # Can this property have child nodes?
     hasChildren: Boolean
+    # Project id of the node
+    projectId: String
 
     # Associated object. Maybe null for non-database objects
     object: DatabaseObjectInfo

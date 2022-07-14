@@ -37,8 +37,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -57,6 +57,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
@@ -110,7 +111,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private VirtualProjectImpl sessionProject;
+    private VirtualProjectImpl defaultProject;
     private final List<DBPProject> sessionProjects = new ArrayList<>();
     private final SessionContextImpl sessionAuthContext;
     private final WebApplication application;
@@ -144,7 +145,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
-        return sessionProject;
+        return defaultProject;
     }
 
     @Override
@@ -175,12 +176,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     @Override
     public DBPProject getSingletonProject() {
-        return sessionProject;
+        return defaultProject;
     }
 
     @NotNull
     public SMSessionContext getSessionContext() {
-        return sessionProject.getSessionContext();
+        return defaultProject.getSessionContext();
     }
 
     @Property
@@ -290,20 +291,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     private void initNavigatorModel() {
-        DBPPlatform platform = DBWorkbench.getPlatform();
-        DBPProject globalProject = platform.getWorkspace().getActiveProject();
-        sessionProjects.clear();
-        String projectName;
-        Path projectPath;
-        WebUser user = userContext.getUser();
-        if (user != null) {
-            projectName = CommonUtils.escapeFileName(user.getUserId());
-            projectPath = getUserProjectsFolder().resolve(projectName);
-        } else {
-            projectName = CommonUtils.escapeFileName(getSessionId());
-            // For anonymous sessions use path of global project
-            projectPath = globalProject.getAbsolutePath();
-        }
 
         // Cleanup current data
         if (this.navigatorModel != null) {
@@ -311,45 +298,21 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.navigatorModel = null;
         }
 
-        if (this.sessionProject != null) {
-            this.sessionProject.dispose();
-            this.sessionProject = null;
+        if (!this.sessionProjects.isEmpty()) {
+            for (DBPProject project : sessionProjects) {
+                if (project.equals(DBWorkbench.getPlatform().getWorkspace().getActiveProject())) {
+                    continue;
+                }
+                ((BaseProjectImpl) project).dispose();
+            }
+            this.defaultProject = null;
+            this.sessionProjects.clear();
         }
 
-        this.sessionProject = new VirtualProjectImpl(
-            platform.getWorkspace(),
-            projectName,
-            projectPath,
-            sessionAuthContext);
-        try {
-            RMController controller = application.getResourceController(this);
-            RMProject[] rmProjects =  controller.listAccessibleProjects();
-            for (RMProject project : rmProjects) {
-                if (project.getType().equals(RMProject.Type.GLOBAL)) {
-                    projectPath = globalProject.getAbsolutePath();
-                } else if (project.getType().equals(RMProject.Type.SHARED)) {
-                    projectPath = getSharedProjectsFolder().resolve(project.getName());
-                } else {
-                    projectPath = getUserProjectsFolder().resolve(project.getName());
-                }
-                VirtualProjectImpl sessionProject = new VirtualProjectImpl(
-                    platform.getWorkspace(),
-                    project.getId(),
-                    projectPath,
-                    sessionAuthContext);
-                if (user == null) {
-                    sessionProject.setInMemory(true);
-                }
-                sessionProjects.add(sessionProject);
-                sessionProject.setConfigurationManager(application.getConfigurationManager(sessionProject, this));
-                DBPDataSourceRegistry sessionProjectDataSourceRegistry = sessionProject.getDataSourceRegistry();
-                controller.getProjectsDataSources(project.getId());
-            }
-        } catch (DBException e) {
-            return;
-        }
-        this.navigatorModel = new DBNModel(platform, this.sessionProjects);
-        this.navigatorModel.setModelAuthContext(getSessionContext());
+        createProjects();
+
+        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.sessionProjects);
+        this.navigatorModel.setModelAuthContext(sessionAuthContext);
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
@@ -359,6 +322,63 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         } catch (Exception e) {
             addSessionError(e);
             log.error("Error getting connection list", e);
+        }
+    }
+
+    private void createProjects() {
+        DBPWorkspace globalWorkspace = DBWorkbench.getPlatform().getWorkspace();
+        String projectName;
+        Path projectPath;
+        WebUser user = userContext.getUser();
+        if (user != null) {
+            projectName = CommonUtils.escapeFileName(user.getUserId());
+            projectPath = getUserProjectsFolder().resolve(projectName);
+        } else {
+            projectName = CommonUtils.escapeFileName(getSessionId());
+            // For anonymous sessions use path of global project
+            projectPath = globalWorkspace.getActiveProject().getAbsolutePath();
+        }
+        if (application.isMultiNode() && application.getAppConfiguration().isResourceManagerEnabled()) {
+            try {
+                RMController controller = application.getResourceController(this);
+                RMProject[] rmProjects =  controller.listAccessibleProjects();
+                for (RMProject project : rmProjects) {
+                     if (project.getType().equals(RMProject.Type.SHARED)) {
+                        projectPath = getSharedProjectsFolder().resolve(project.getName());
+                    } else if (project.getType().equals(RMProject.Type.USER)) {
+                        projectPath = getUserProjectsFolder().resolve(project.getName());
+                    }
+                    VirtualProjectImpl sessionProject = new VirtualProjectImpl(
+                        globalWorkspace,
+                        project.getId(),
+                        project.getName(),
+                        projectPath,
+                        sessionAuthContext);
+                    if (!project.isShared()) {
+                        this.defaultProject = sessionProject;
+                    }
+                    if (user == null) {
+                        sessionProject.setInMemory(true);
+                    }
+                    sessionProjects.add(sessionProject);
+                    sessionProject.setConfigurationManager(application.getConfigurationManager(sessionProject, this));
+                }
+            } catch (DBException e) {
+                addSessionError(e);
+                log.error("Error getting accessible projects list", e);
+            }
+        } else {
+            this.defaultProject = new VirtualProjectImpl(
+                globalWorkspace,
+                RMProject.Type.USER.getPrefix() + "_" + projectName,
+                projectName,
+                projectPath,
+                sessionAuthContext);
+            if (user == null) {
+                defaultProject.setInMemory(true);
+            }
+            sessionProjects.add(this.defaultProject);
+            sessionProjects.add(globalWorkspace.getActiveProject());
         }
     }
 
@@ -581,9 +601,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.sessionAuthContext.close();
         this.userContext.setUser(null);
 
-        if (this.sessionProject != null) {
-            this.sessionProject.dispose();
-            this.sessionProject = null;
+        if (this.defaultProject != null) {
+            this.defaultProject.dispose();
+            this.defaultProject = null;
         }
     }
 
@@ -943,6 +963,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @Override
     public SMCredentials getActiveUserCredentials() {
         return userContext.getActiveUserCredentials();
+    }
+
+    public DBPProject getProjectFromId(@Nullable String projectId) {
+        if (projectId == null) {
+            return defaultProject;
+        }
+        for (DBPProject project : sessionProjects) {
+            if (project.getId().equals(projectId)) {
+                return project;
+            }
+        }
+        return null;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

@@ -108,24 +108,34 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+        @NotNull WebConnectionConfig connectionConfig,
+        @Nullable String projectId) throws DBWebException;
 
     @WebAction
     WebConnectionInfo updateConnection(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+        @NotNull WebConnectionConfig connectionConfig,
+        @Nullable String projectId) throws DBWebException;
 
     @WebAction
-    boolean deleteConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException;
+    boolean deleteConnection(
+        @NotNull WebSession webSession,
+        @NotNull String connectionId,
+        @Nullable String projectId) throws DBWebException;
 
     @WebAction
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
         @NotNull String templateId,
-        @Nullable String connectionName) throws DBWebException;
+        @Nullable String connectionName,
+        @Nullable String projectId) throws DBWebException;
 
     @WebAction()
-    WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo copyConnectionFromNode(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @NotNull WebConnectionConfig config,
+        @Nullable String projectId) throws DBWebException;
 
     @WebAction
     WebConnectionInfo testConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
@@ -134,7 +144,7 @@ public interface DBWServiceCore extends DBWService {
     WebNetworkEndpointInfo testNetworkHandler(@NotNull WebSession webSession, @NotNull WebNetworkHandlerConfigInput nhConfig) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo closeConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException;
+    WebConnectionInfo closeConnection(@NotNull WebSession webSession, @NotNull String connectionId, @Nullable String projectId) throws DBWebException;
 
     ///////////////////////////////////////////
     // Folders
