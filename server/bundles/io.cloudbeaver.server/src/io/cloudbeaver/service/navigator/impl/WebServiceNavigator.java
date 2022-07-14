@@ -313,10 +313,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
                     WebConnectionFolderUtils.validateConnectionFolder(newName);
-                    List<String> siblings =Arrays.stream(node.getParentNode().getChildren(session.getProgressMonitor()))
+                    List<String> siblings = Arrays.stream(
+                        ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
+                        .filter(n -> n instanceof DBNLocalFolder)
                         .map(DBNNode::getName).collect(Collectors.toList());
                     if (siblings.contains(newName)) {
-                        throw new DBWebException("New node name is used there");
+                        throw new DBWebException("Name " + newName + " is unavailable or invalid");
                     }
                 }
                 node.rename(session.getProgressMonitor(), newName);
