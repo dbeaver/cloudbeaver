@@ -1220,6 +1220,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
         } catch (DBException e) {
+            log.debug("Local auth validation error", e);
             return null;
         }
         if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
