@@ -1222,6 +1222,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (DBException e) {
             return null;
         }
+        if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
+            log.debug("User '" + activeUserId + "' is authenticated in '"
+                + authProviderId + "' auth provider with credentials of user '"
+                + userIdFromCredentials + "'");
+        }
         if (userId == null && createNewUserIfNotExist) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
