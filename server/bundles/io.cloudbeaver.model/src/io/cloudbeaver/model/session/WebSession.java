@@ -58,6 +58,7 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
@@ -357,9 +358,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                     if (!project.isShared()) {
                         this.defaultProject = sessionProject;
                     }
-                    if (user == null) {
-                        sessionProject.setInMemory(true);
-                    }
                     sessionProjects.add(sessionProject);
                     sessionProject.setConfigurationManager(application.getConfigurationManager(sessionProject, this));
                 }
@@ -374,11 +372,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 projectName,
                 projectPath,
                 sessionAuthContext);
-            if (user == null) {
-                defaultProject.setInMemory(true);
-            }
             sessionProjects.add(this.defaultProject);
             sessionProjects.add(globalWorkspace.getActiveProject());
+        }
+        for (DBPProject project : sessionProjects) {
+            if (user == null) {
+                ((BaseProjectImpl) project).setInMemory(true);
+            }
+            DBPDataSourceRegistry dataSourceRegistry = project.getDataSourceRegistry();
+            ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         }
     }
 
