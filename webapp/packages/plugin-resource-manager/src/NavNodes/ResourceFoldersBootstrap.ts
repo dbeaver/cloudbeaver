@@ -104,7 +104,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
     const children = this.navTreeResource.get(targetNode.id);
-
     const data = this.navResourceNodeService.getResourceData(targetNode.id);
 
     if (!data) {
@@ -112,9 +111,9 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     }
 
     await this.projectsResource.load();
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
+    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.id);
 
-    if (!(this.projectsResource.userProject?.name === data.key.projectId)) {
+    if (!(this.projectsResource.userProject?.id === data.key.projectId)) {
       return;
     }
 
@@ -245,7 +244,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       targetNode = this.navNodeInfoResource.get(targetFolder);
     }
 
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.name);
+    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.id);
     if (!targetNode?.id.startsWith(projectPath)) {
       targetNode = undefined;
     }
