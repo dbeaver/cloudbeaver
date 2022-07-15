@@ -344,9 +344,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 RMController controller = application.getResourceController(this);
                 RMProject[] rmProjects =  controller.listAccessibleProjects();
                 for (RMProject project : rmProjects) {
-                     if (project.getType().equals(RMProject.Type.SHARED)) {
+                    if (CommonUtils.equalObjects(project.getType(), RMProject.Type.GLOBAL)) {
+                        projectPath = globalWorkspace.getActiveProject().getAbsolutePath();
+                    } else if (CommonUtils.equalObjects(project.getType(), RMProject.Type.SHARED)) {
                         projectPath = getSharedProjectsFolder().resolve(project.getName());
-                    } else if (project.getType().equals(RMProject.Type.USER)) {
+                    } else {
                         projectPath = getUserProjectsFolder().resolve(project.getName());
                     }
                     VirtualProjectImpl sessionProject = new VirtualProjectImpl(
@@ -355,7 +357,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                         project.getName(),
                         projectPath,
                         sessionAuthContext);
-                    if (!project.isShared()) {
+                    if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
                         this.defaultProject = sessionProject;
                     }
                     sessionProjects.add(sessionProject);
