@@ -23,7 +23,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -33,18 +33,19 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -176,20 +177,34 @@ public class LocalResourceController implements RMController {
         DBPProject projectMetadata = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        Function<DBPDataSourceContainer, Boolean> dsC = dataSourceContainer -> true;
-        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, dsC);
+        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
 
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        final DBPProject project = getProjectMetadata(projectId);
+        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+        final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
+        registry.loadDataSources(List.of(storage), true, false);
+        registry.saveDataSources();
     }
 
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        final DBPProject project = getProjectMetadata(projectId);
+        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+
+        for (String dataSourceId : dataSourceIds) {
+            final DataSourceDescriptor dataSource = registry.getDataSource(dataSourceId);
+
+            if (dataSource != null) {
+                registry.removeDataSource(dataSource);
+            } else {
+                log.warn("Could not find datasource " + dataSourceId + " for deletion");
+            }
+        }
     }
 
     @NotNull
