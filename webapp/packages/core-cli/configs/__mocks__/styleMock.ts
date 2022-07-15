@@ -6,11 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import 'reflect-metadata';
-import crypto from 'crypto';
-
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    getRandomValues: arr => crypto.randomBytes(arr.length),
-  },
-});
+export default {};

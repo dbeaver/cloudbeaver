@@ -12,22 +12,22 @@ class HtmlInjectWebpackPlugin {
   constructor(options) {
     this.options = options;
   }
-  apply (compiler) {
-    compiler.hooks.compilation.tap('HtmlInjectWebpackPlugin', (compilation) => {
+  apply(compiler) {
+    compiler.hooks.compilation.tap('HtmlInjectWebpackPlugin', compilation => {
       HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync(
         'HtmlInjectWebpackPlugin',
         (data, cb) => {
-          if(this.options.head) {
-            data.headTags.push(...this.options.head)
+          if (this.options.head) {
+            data.headTags.push(...this.options.head);
           }
-          if(this.options.body) {
-            data.bodyTags.push(...this.options.body)
+          if (this.options.body) {
+            data.bodyTags.push(...this.options.body);
           }
-          cb(null, data)
+          cb(null, data);
         }
-      )
-    })
+      );
+    });
   }
 }
 
-module.exports = HtmlInjectWebpackPlugin
+module.exports = HtmlInjectWebpackPlugin;

@@ -1,6 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "packages/*/src"
+    "packages/*/src",
+    "packages/*/tests",
+    "packages/*/bin",
+    "packages/*/mocks",
+    "packages/*/configs"
   ],
 }
