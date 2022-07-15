@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useImperativeHandle, useMemo } from 'react';
+import { forwardRef, useImperativeHandle, useMemo } from 'react';
 
 import { useController } from '@cloudbeaver/core-di';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
@@ -15,7 +15,7 @@ import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 import type { ISQLCodeEditorProps } from './ISQLCodeEditorProps';
 import { SQLCodeEditorController } from './SQLCodeEditorController';
 
-export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorController>(function SQLCodeEditor(props, ref) {
+export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorController>(forwardRef(function SQLCodeEditor(props, ref) {
   const controller = useController(SQLCodeEditorController);
   controller.setDialect(props.dialect);
   controller.setReadonly(props.readonly || false);
@@ -39,4 +39,4 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
       value={props.value || ''}
     />
   );
-}, { forwardRef: true });
+}));

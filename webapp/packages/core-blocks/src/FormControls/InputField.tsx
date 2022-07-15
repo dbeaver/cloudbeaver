@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useState } from 'react';
+import { forwardRef, useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -94,7 +94,7 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(function InputField({
+export const InputField: InputFieldType = observer(forwardRef(function InputField({
   name,
   style,
   value: valueControlled,
@@ -215,4 +215,4 @@ export const InputField: InputFieldType = observer(function InputField({
       )}
     </field>
   );
-}, { forwardRef: true });
+}));

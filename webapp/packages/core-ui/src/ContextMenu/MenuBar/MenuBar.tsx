@@ -7,12 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
 import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
-import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuService, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';
 import { MenuBarItem } from './MenuBarItem';
@@ -27,7 +27,7 @@ interface IMenuBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'styl
   style?: ComponentStyle;
 }
 
-export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar({
+export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(forwardRef(function MenuBar({
   menu,
   nestedMenuSettings,
   style,
@@ -53,7 +53,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(function MenuBar(
       ))}
     </menu-bar>
   );
-}, { forwardRef: true });
+}));
 
 interface IMenuBarElementProps {
   item: IMenuItem;

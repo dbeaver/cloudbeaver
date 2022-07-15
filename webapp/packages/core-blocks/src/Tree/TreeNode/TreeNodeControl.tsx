@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useContext } from 'react';
+import React, { forwardRef, useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -30,7 +30,7 @@ interface Props extends ITreeNodeState {
   children?: React.ReactNode;
 }
 
-export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNodeControl({
+export const TreeNodeControl = observer<Props, HTMLDivElement>(forwardRef(function TreeNodeControl({
   title,
   group,
   disabled,
@@ -131,4 +131,4 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(function TreeNode
       {children}
     </div>
   );
-}, { forwardRef: true });
+}));

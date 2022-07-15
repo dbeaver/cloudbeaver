@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
@@ -44,7 +44,7 @@ export interface IEditorRef {
 
 const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'];
 
-export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
+export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(forwardRef(function CellEditor({
   row,
   column,
   onClose,
@@ -153,4 +153,4 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
       ), dataGridContext.getEditorPortal()!) as any}
     </box>
   );
-}, { forwardRef: true });
+}));

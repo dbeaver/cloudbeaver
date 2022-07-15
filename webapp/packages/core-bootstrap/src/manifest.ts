@@ -44,8 +44,8 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
-import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
+import { corePluginManifest } from '@cloudbeaver/core-plugin';
+import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
@@ -66,9 +66,6 @@ export const coreManifests: PluginManifest[] = [
 
     providers: [
       AdministrationTopAppBarBootstrapService,
-      ProductSettingsService,
-      ProductManagerService,
-      PluginManagerService,
       CoreSettingsService,
       QuotasService,
       CommonDialogService,
@@ -118,4 +115,6 @@ export const coreManifests: PluginManifest[] = [
   coreVersionUpdateManifest,
   coreRootManifest,
   coreConnectionsManifest,
+  corePluginManifest,
+  coreProductManifest,
 ];

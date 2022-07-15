@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
@@ -34,7 +34,7 @@ interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const Menu = observer<IMenuProps, HTMLButtonElement>(function Menu({
+export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function Menu({
   label,
   items,
   menuRef,
@@ -104,4 +104,4 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(function Menu({
       </MenuPanel>
     </MenuStateContext.Provider>
   );
-}, { forwardRef: true });
+}));

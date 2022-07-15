@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
 import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -26,7 +26,7 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
   style?: ComponentStyle;
 }
 
-export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(function SubMenuElement(
+export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(forwardRef(function SubMenuElement(
   {
     menuData,
     subMenu,
@@ -106,4 +106,4 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       />
     </Menu>
   );
-}, { forwardRef: true });
+}));
