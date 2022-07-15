@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
+import React, { ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import {
   MenuButton, Menu, MenuItem, MenuStateReturn, useMenuState,
   MenuItemCheckbox, MenuItemRadio, MenuInitialState
@@ -251,38 +251,39 @@ interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, '
   style?: ComponentStyle;
 }
 
-export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(function MenuInnerTrigger(
-  props,
-  ref
-) {
-  const { menuItem, style, onItemClose, ...rest } = props;
-  const menu = useMenuState();
+export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(forwardRef(
+  function MenuInnerTrigger(
+    props,
+    ref
+  ) {
+    const { menuItem, style, onItemClose, ...rest } = props;
+    const menu = useMenuState();
 
-  const handleItemClose = useCallback(() => {
-    menu.hide();
-    onItemClose?.();
-  }, [menu.hide, onItemClose]);
+    const handleItemClose = useCallback(() => {
+      menu.hide();
+      onItemClose?.();
+    }, [menu.hide, onItemClose]);
 
-  const handleMouseEnter = useCallback(() => {
-    menuItem.onMouseEnter?.();
-  }, [menuItem.onMouseEnter]);
+    const handleMouseEnter = useCallback(() => {
+      menuItem.onMouseEnter?.();
+    }, [menuItem.onMouseEnter]);
 
-  return styled(useStyles(menuPanelStyles, style))(
-    <>
-      <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
-        <MenuButton ref={ref} {...menu} {...rest}>
-          <box>
-            <MenuPanelItem menuItem={menuItem} style={style} />
-          </box>
-        </MenuButton>
-      </menu-panel-button-wrapper>
-      <MenuPanel
-        panel={menuItem.panel!}
-        menu={menu}
-        style={style}
-        panelAvailable={menuItem.isPanelAvailable}
-        onItemClose={handleItemClose}
-      />
-    </>
-  );
-}, { forwardRef: true });
+    return styled(useStyles(menuPanelStyles, style))(
+      <>
+        <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
+          <MenuButton ref={ref} {...menu} {...rest}>
+            <box>
+              <MenuPanelItem menuItem={menuItem} style={style} />
+            </box>
+          </MenuButton>
+        </menu-panel-button-wrapper>
+        <MenuPanel
+          panel={menuItem.panel!}
+          menu={menu}
+          style={style}
+          panelAvailable={menuItem.isPanelAvailable}
+          onItemClose={handleItemClose}
+        />
+      </>
+    );
+  }));

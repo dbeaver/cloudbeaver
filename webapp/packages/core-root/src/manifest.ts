@@ -8,8 +8,6 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { CookiesService } from './CookiesService';
-import { CookiesSettingsService } from './CookiesSettingsService';
 import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
 import { PermissionsService } from './PermissionsService';
@@ -46,7 +44,5 @@ export const manifest: PluginManifest = {
     SessionService,
     SessionSettingsService,
     WindowEventsService,
-    CookiesSettingsService,
-    CookiesService,
   ],
 };

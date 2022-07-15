@@ -13,7 +13,7 @@ import { PluginSettings } from './PluginSettings';
 
 @injectable()
 export class PluginManagerService {
-  constructor(private productManagerService: ProductManagerService) { }
+  constructor(private readonly productManagerService: ProductManagerService) { }
 
   getPluginSettings<T>(scope: string, defaults: T) {
     return new PluginSettings(this.productManagerService.settings, scope, defaults);

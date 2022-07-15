@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import type { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Button } from 'reakit/Button';
 import styled, { css, use } from 'reshadow';
 
@@ -57,7 +57,9 @@ interface IProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
 }
 
-export const TopNavButton = observer<IProps, HTMLButtonElement>(function TopNavButton({ title, icon, secondary, menu, loading, style, ...props }, ref) {
+export const TopNavButton = observer<IProps, HTMLButtonElement>(forwardRef(function TopNavButton({
+  title, icon, secondary, menu, loading, style, ...props
+}, ref) {
   const translate = useTranslate();
   const styles = useStyles(style, topMenuStyles, elementStyle);
 
@@ -76,4 +78,4 @@ export const TopNavButton = observer<IProps, HTMLButtonElement>(function TopNavB
       </box>
     </Button>
   );
-}, { forwardRef: true });
+}));

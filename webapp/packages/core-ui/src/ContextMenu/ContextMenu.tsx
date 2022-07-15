@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { ButtonHTMLAttributes, useRef } from 'react';
+import { ButtonHTMLAttributes, forwardRef, useRef } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
@@ -38,7 +38,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'c
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(function ContextMenu({
+export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwardRef(function ContextMenu({
   menu: menuData,
   disclosure,
   children,
@@ -119,4 +119,4 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(functi
       {renderingChildren}
     </Menu>
   );
-}, { forwardRef: true });
+}));

@@ -8,6 +8,7 @@
 
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { forwardRef } from 'react';
 import styled, { use } from 'reshadow';
 
 import { getComputed } from '../../getComputed';
@@ -30,7 +31,7 @@ interface IInnerTreeNodeContext extends ITreeNodeContext {
   inProgress: number;
 }
 
-export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode({
+export const TreeNode = observer<Props, HTMLDivElement | null>(forwardRef(function TreeNode({
   group = false,
   loading = false,
   selected = false,
@@ -114,4 +115,4 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(function TreeNode
       </TreeNodeContext.Provider>
     </node>
   );
-}, { forwardRef: true });
+}));

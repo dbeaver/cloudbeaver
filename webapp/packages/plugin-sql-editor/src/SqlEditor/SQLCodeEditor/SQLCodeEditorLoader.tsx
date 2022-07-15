@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { forwardRef } from 'react';
 
 import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 
@@ -18,10 +19,10 @@ const loader = createComplexLoader(async function loader() {
   return { SQLCodeEditor };
 });
 
-export const SQLCodeEditorLoader = observer<ISQLCodeEditorProps, SQLCodeEditorController>(function SQLCodeEditorLoader(props, ref) {
+export const SQLCodeEditorLoader = observer<ISQLCodeEditorProps, SQLCodeEditorController>(forwardRef(function SQLCodeEditorLoader(props, ref) {
   return (
     <ComplexLoader loader={loader} placeholder={<Loader />}>
       {({ SQLCodeEditor }) => <SQLCodeEditor {...props} ref={ref} />}
     </ComplexLoader>
   );
-}, { forwardRef: true });
+}));

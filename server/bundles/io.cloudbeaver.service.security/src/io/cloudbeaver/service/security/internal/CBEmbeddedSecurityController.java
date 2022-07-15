@@ -1217,13 +1217,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);
         String userIdFromCredentials;
-        if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
-            throw new SMException("Credentials belong to another user");
-        }
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
         } catch (DBException e) {
+            log.debug("Local auth validation error", e);
             return null;
+        }
+        if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
+            log.debug("User '" + activeUserId + "' is authenticated in '"
+                + authProviderId + "' auth provider with credentials of user '"
+                + userIdFromCredentials + "'");
         }
         if (userId == null && createNewUserIfNotExist) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
