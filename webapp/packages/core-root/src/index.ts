@@ -15,5 +15,4 @@ export * from './SessionSettingsService';
 export * from './SessionExpireService';
 export * from './usePermission';
 export * from './WindowEventsService';
-export * from './CookiesService';
 export { manifest as coreRootManifest } from './manifest';

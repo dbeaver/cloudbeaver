@@ -8,23 +8,33 @@
 
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 
 @injectable()
-export class ConnectionAuthService {
+export class ConnectionAuthService extends Dependency {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly notificationService: NotificationService,
+    private readonly authenticationService: AuthenticationService,
   ) {
+    super();
+
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
+    this.authenticationService.onLogout.before(connectionsManagerService.onDisconnect, state => ({
+      connections: connectionInfoResource.values
+        .filter(connection => connection.connected)
+        .map(connection => connection.id),
+      state,
+    }));
   }
 
   private async connectionDialog(connectionId: string | null, context: IExecutionContextProvider<string | null>) {

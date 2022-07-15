@@ -7,9 +7,10 @@
  */
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { CookiesService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SessionExpireService, SessionResource, CookiesService } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { getCookies } from '@cloudbeaver/core-utils';
 
 import { SessionExpireWarningDialog } from '../SessionExpireWarningDialog/SessionExpireWarningDialog';

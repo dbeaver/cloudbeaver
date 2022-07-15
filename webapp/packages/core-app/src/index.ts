@@ -86,3 +86,4 @@ export * from './TopNavBar/Logo';
 // Interfaces
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NodesManager/EntityTypes';
+export * from './manifest';

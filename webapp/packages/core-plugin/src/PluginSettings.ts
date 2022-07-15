@@ -10,9 +10,9 @@ import type { ISettingsSource } from '@cloudbeaver/core-settings';
 
 export class PluginSettings<T> implements ISettingsSource {
   constructor(
-    private source: ISettingsSource,
-    private scope: string,
-    private defaults: T
+    private readonly source: ISettingsSource,
+    private readonly scope: string,
+    private readonly defaults: T
   ) {
   }
 

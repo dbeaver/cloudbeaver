@@ -16,7 +16,7 @@ import { ProductSettingsService } from './ProductSettingsService';
 export class ProductManagerService {
   readonly settings: ProductSettingsService;
 
-  constructor(private readonly serverService: ServerService) { 
+  constructor(private readonly serverService: ServerService) {
     this.settings = new ProductSettingsService(this.serverService.settings);
   }
 

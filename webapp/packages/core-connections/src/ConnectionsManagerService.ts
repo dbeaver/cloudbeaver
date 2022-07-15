@@ -12,7 +12,6 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
@@ -36,7 +35,6 @@ export class ConnectionsManagerService {
     readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly authenticationService: AuthenticationService,
   ) {
     this.disconnecting = false;
 
@@ -46,12 +44,6 @@ export class ConnectionsManagerService {
 
     this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
     this.onDelete.before(this.onDisconnect);
-    this.authenticationService.onLogout.before(this.onDisconnect, state => ({
-      connections: this.connectionInfo.values
-        .filter(connection => connection.connected)
-        .map(connection => connection.id),
-      state,
-    }));
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
