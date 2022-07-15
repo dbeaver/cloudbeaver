@@ -12,7 +12,7 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { AuthenticationService } from '@cloudbeaver/plugin-authentication';
+import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 
