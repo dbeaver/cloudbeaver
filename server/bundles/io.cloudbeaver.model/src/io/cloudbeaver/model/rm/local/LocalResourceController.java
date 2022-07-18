@@ -185,9 +185,7 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
-        DBPProject projectMetadata = getProjectMetadata(projectId);
-        DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
-        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), ((DataSourceRegistry) registry).getConfigurationManager(), null);
+        throw new DBCFeatureNotSupportedException();
     }
 
     @Override

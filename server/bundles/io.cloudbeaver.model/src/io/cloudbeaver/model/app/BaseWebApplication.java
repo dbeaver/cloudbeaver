@@ -19,6 +19,7 @@ package io.cloudbeaver.model.app;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.RMControllerInvocationHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -31,9 +32,11 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
-import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
+import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
@@ -112,8 +115,18 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     protected abstract void loadConfiguration(String configPath) throws DBException;
 
     @Override
-    public DataSourceConfigurationManager getConfigurationManager(@NotNull DBPProject project, @NotNull SMCredentialsProvider credentialsProvider) {
-        return null;
+    public VirtualProjectImpl createProjectImpl(
+        @NotNull String projectId,
+        @NotNull String projectName,
+        @NotNull Path projectPath,
+        @NotNull SMCredentialsProvider credentialsProvider
+    ) {
+        return new VirtualProjectImpl(
+            DBWorkbench.getPlatform().getWorkspace(),
+            RMProject.Type.USER.getPrefix() + "_" + projectName,
+            projectName,
+            projectPath,
+            ((WebSession) credentialsProvider).getSessionAuthContext());
     }
 
     @Override

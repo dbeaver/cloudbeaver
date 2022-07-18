@@ -342,8 +342,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public WebConnectionInfo createConnectionConfiguration(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId
+        @Nullable String projectId,
+        @NotNull WebConnectionConfig config
     ) throws DBWebException {
 
         webSession.addInfoMessage("Create new connection");
@@ -361,9 +361,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public WebConnectionInfo copyConnectionConfiguration(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String nodePath,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId
+        @NotNull WebConnectionConfig config
     ) throws DBWebException {
         try {
             DBNModel globalNavigatorModel = webSession.getNavigatorModel();
@@ -399,9 +399,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public WebConnectionInfo updateConnectionConfiguration(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String id,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId
+        @NotNull WebConnectionConfig config
     ) throws DBWebException {
         DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(id);
         if (dataSource == null) {
@@ -425,8 +425,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean deleteConnectionConfiguration(
         @NotNull WebSession webSession,
-        @NotNull String id,
-        @Nullable String projectId
+        @Nullable String projectId,
+        @NotNull String id
     ) throws DBWebException {
         DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(id);
         if (dataSource == null) {
@@ -705,7 +705,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CBApplication.getInstance().isMultiNode()) {
             globalConfigurationName = RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName;
         }
-        return session.getProjectFromId(globalConfigurationName).getDataSourceRegistry();
+        return session.getProjectById(globalConfigurationName).getDataSourceRegistry();
     }
 
 }

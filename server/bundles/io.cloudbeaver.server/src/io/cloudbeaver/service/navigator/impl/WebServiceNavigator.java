@@ -24,6 +24,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
@@ -37,6 +38,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -68,11 +70,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
         @NotNull WebSession session,
+        @Nullable String projectId,
         @NotNull String parentPath,
         Integer offset,
         Integer limit,
-        Boolean onlyFolders,
-        @Nullable String projectId
+        Boolean onlyFolders
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -81,7 +83,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
             DBNModel navigatorModel = session.getNavigatorModel();
             if (isRootPath) {
-                DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getProjectFromId(projectId));
+                DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getProjectById(projectId));
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, projectNode.getDatabases(), true);
                 if (SHOW_EXTRA_NODES) {
                     // Inject extra nodes. Disabled because we use different root path for extra nodes
@@ -139,8 +141,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeParents(
         @NotNull WebSession session,
-        String nodePath,
-        @Nullable String projectId
+        @Nullable String projectId,
+        String nodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -166,8 +168,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @NotNull
     public WebNavigatorNodeInfo getNavigatorNodeInfo(
         @NotNull WebSession session,
-        @NotNull String nodePath,
-        @Nullable String projectId
+        @Nullable String projectId,
+        @NotNull String nodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -185,8 +187,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public boolean refreshNavigatorNode(
         @NotNull WebSession session,
-        @NotNull String nodePath,
-        @Nullable String projectId
+        @Nullable String projectId,
+        @NotNull String nodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -217,10 +219,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public WebStructContainers getStructContainers(
+        String projectId,
         WebConnectionInfo connection,
         String contextId,
-        String catalog,
-        String projectId
+        String catalog
     ) throws DBWebException {
         DBPDataSource dataSource = connection.getDataSource();
         DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
@@ -327,9 +329,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public String renameNode(
         @NotNull WebSession session,
+        @Nullable String projectId,
         @NotNull String nodePath,
-        @NotNull String newName,
-        @Nullable String projectId
+        @NotNull String newName
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -368,8 +370,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public int deleteNodes(
         @NotNull WebSession session,
-        @NotNull List<String> nodePaths,
-        @Nullable String projectId
+        @Nullable String projectId,
+        @NotNull List<String> nodePaths
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -436,9 +438,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public boolean moveNodesToFolder(
         @NotNull WebSession session,
+        @Nullable String projectId,
         @NotNull List<String> nodePaths,
-        @NotNull String folderNodePath,
-        @Nullable String projectId
+        @NotNull String folderNodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();

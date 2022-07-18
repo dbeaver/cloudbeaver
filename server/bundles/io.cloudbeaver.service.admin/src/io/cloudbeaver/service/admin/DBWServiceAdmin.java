@@ -92,25 +92,25 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebConnectionInfo createConnectionConfiguration(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId) throws DBWebException;
+        @Nullable String projectId,
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebConnectionInfo copyConnectionConfiguration(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String nodePath,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId) throws DBWebException;
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebConnectionInfo updateConnectionConfiguration(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String id,
-        @NotNull WebConnectionConfig config,
-        @Nullable String projectId) throws DBWebException;
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(
         @NotNull WebSession webSession,
-        @NotNull String id,
-        @Nullable String projectId) throws DBWebException;
+        @Nullable String projectId,
+        @NotNull String id) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features

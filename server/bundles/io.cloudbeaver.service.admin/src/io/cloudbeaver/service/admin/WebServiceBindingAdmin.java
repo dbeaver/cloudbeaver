@@ -84,25 +84,25 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("createConnectionConfiguration",
             env -> getService(env).createConnectionConfiguration(
                 getWebSession(env),
-                new WebConnectionConfig(env.getArgument("config")),
-                env.getArgument("projectId")))
+                getProjectReference(env),
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("copyConnectionConfiguration",
             env -> getService(env).copyConnectionConfiguration(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePath"),
-                new WebConnectionConfig(env.getArgument("config")),
-                env.getArgument("projectId")))
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("updateConnectionConfiguration",
             env -> getService(env).updateConnectionConfiguration(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("id"),
-                new WebConnectionConfig(env.getArgument("config")),
-                env.getArgument("projectId")))
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("deleteConnectionConfiguration",
             env -> getService(env).deleteConnectionConfiguration(
                 getWebSession(env),
-                env.getArgument("id"),
-                env.getArgument("projectId")))
+                getProjectReference(env),
+                env.getArgument("id")))
 
         .dataFetcher("getConnectionSubjectAccess",
             env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")))

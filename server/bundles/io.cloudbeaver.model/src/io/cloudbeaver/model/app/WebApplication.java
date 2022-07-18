@@ -18,12 +18,11 @@ package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
+import org.jkiss.dbeaver.registry.VirtualProjectImpl;
 
 import java.nio.file.Path;
 
@@ -41,7 +40,11 @@ public interface WebApplication extends DBPApplication {
 
     boolean isMultiNode();
 
-    DataSourceConfigurationManager getConfigurationManager(@NotNull DBPProject project, @NotNull SMCredentialsProvider credentialsProvider);
+    VirtualProjectImpl createProjectImpl(
+        @NotNull String projectId,
+        @NotNull String projectName,
+        @NotNull Path projectPath,
+        @NotNull SMCredentialsProvider credentialsProvider);
 
     SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 

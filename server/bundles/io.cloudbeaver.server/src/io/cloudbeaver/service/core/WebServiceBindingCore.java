@@ -99,19 +99,19 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
-            .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getConnectionConfig(env), env.getArgument("projectId")))
-            .dataFetcher("updateConnection", env -> getService(env).updateConnection(getWebSession(env), getConnectionConfig(env), env.getArgument("projectId")))
-            .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id"), env.getArgument("projectId")))
+            .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+            .dataFetcher("updateConnection", env -> getService(env).updateConnection(getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+            .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), getProjectReference(env), env.getArgument("id")))
             .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("templateId"),
-                env.getArgument("connectionName"),
-                env.getArgument("projectId")))
+                env.getArgument("connectionName")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePath"),
-                new WebConnectionConfig(env.getArgument("config")),
-                env.getArgument("projectId")))
+                new WebConnectionConfig(env.getArgument("config"))))
             .dataFetcher("initConnection", env -> {
                     List<Map<String, Object>> networkCredentials = env.getArgument("networkCredentials");
                     List<WebNetworkHandlerConfigInput> nhc = null;
@@ -128,7 +128,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             )
             .dataFetcher("testConnection", env -> getService(env).testConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))))
-            .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), env.getArgument("id"), env.getArgument("projectId")))
+            .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), getProjectReference(env), env.getArgument("id")))
 
             .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(getWebSession(env), env.getArgument("id"), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
 

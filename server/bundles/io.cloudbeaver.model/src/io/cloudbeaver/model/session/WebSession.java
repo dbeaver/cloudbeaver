@@ -185,6 +185,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return defaultProject.getSessionContext();
     }
 
+    public SMSessionContext getSessionAuthContext() {
+        return sessionAuthContext;
+    }
+
     @Property
     public String getCreateTime() {
         return CBModelConstants.ISO_DATE_FORMAT.format(createTime);
@@ -351,29 +355,26 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                     } else {
                         projectPath = getUserProjectsFolder().resolve(project.getName());
                     }
-                    VirtualProjectImpl sessionProject = new VirtualProjectImpl(
-                        globalWorkspace,
+                    VirtualProjectImpl sessionProject = application.createProjectImpl(
                         project.getId(),
                         project.getName(),
                         projectPath,
-                        sessionAuthContext);
+                        this);
                     if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
                         this.defaultProject = sessionProject;
                     }
                     sessionProjects.add(sessionProject);
-                    sessionProject.setConfigurationManager(application.getConfigurationManager(sessionProject, this));
                 }
             } catch (DBException e) {
                 addSessionError(e);
                 log.error("Error getting accessible projects list", e);
             }
         } else {
-            this.defaultProject = new VirtualProjectImpl(
-                globalWorkspace,
+            this.defaultProject = application.createProjectImpl(
                 RMProject.Type.USER.getPrefix() + "_" + projectName,
                 projectName,
                 projectPath,
-                sessionAuthContext);
+                this);
             sessionProjects.add(this.defaultProject);
             sessionProjects.add(globalWorkspace.getActiveProject());
         }
@@ -969,7 +970,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return userContext.getActiveUserCredentials();
     }
 
-    public DBPProject getProjectFromId(@Nullable String projectId) {
+    public DBPProject getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
         }
