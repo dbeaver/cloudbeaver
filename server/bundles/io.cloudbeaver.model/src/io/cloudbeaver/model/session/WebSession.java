@@ -379,7 +379,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             sessionProjects.add(globalWorkspace.getActiveProject());
         }
         for (DBPProject project : sessionProjects) {
-            if (user == null) {
+            if (user == null && project.equals(defaultProject)) {
                 ((BaseProjectImpl) project).setInMemory(true);
             }
             DBPDataSourceRegistry dataSourceRegistry = project.getDataSourceRegistry();
