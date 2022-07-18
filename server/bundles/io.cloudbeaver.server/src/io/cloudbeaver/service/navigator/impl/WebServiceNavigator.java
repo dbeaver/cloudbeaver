@@ -33,10 +33,7 @@ import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
-import org.jkiss.dbeaver.model.DBPRefreshableObject;
-import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -50,6 +47,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -82,6 +80,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBNNode[] nodeChildren;
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
             DBNModel navigatorModel = session.getNavigatorModel();
+            List<DBPDriver> applicableDrivers = CBPlatform.getInstance().getApplicableDrivers();
             if (isRootPath) {
                 DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getProjectById(projectId));
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, projectNode.getDatabases(), true);
@@ -122,6 +121,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     continue;
                 }
                 if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
+                    // Skip connections which are not supported in CB
+                    if (node instanceof DBNDataSource) {
+                        DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
+                        if (!applicableDrivers.contains(container.getDriver())) {
+                            continue;
+                        }
+                    }
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
             }
