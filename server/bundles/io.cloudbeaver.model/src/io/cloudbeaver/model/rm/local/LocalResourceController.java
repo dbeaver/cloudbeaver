@@ -185,7 +185,8 @@ public class LocalResourceController implements RMController {
         final DBPProject project = getProjectMetadata(projectId);
         final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
-        registry.loadDataSources(List.of(storage), true, false);
+        final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
+        registry.loadDataSources(List.of(storage), manager, true, false);
         registry.saveDataSources();
     }
 
