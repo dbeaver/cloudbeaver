@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
@@ -148,6 +149,12 @@ public class WebUserContext implements SMCredentialsProvider {
             this.userPermissions = securityController.getTokenPermissions(smCredentials.getSmToken()).getPermissions();
         } else {
             this.userPermissions = getDefaultPermissions();
+        }
+        if (userPermissions != null &&
+            !userPermissions.isEmpty() &&
+            !userPermissions.contains(DBWConstants.PERMISSION_PUBLIC))
+        {
+            userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
     }
 
