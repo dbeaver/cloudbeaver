@@ -10,10 +10,10 @@ import { EObjectFeature, DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { IMenuContext, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ActionService, ACTION_EXPORT, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
-import { DATA_CONTEXT_CONNECTION } from '../../plugin-connections/src';
 import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
@@ -37,7 +37,7 @@ export class DataExportMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
-      isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
+      isHidden: () => this.isDisabled(),
       isDisabled(context) {
         return context.data.model.isLoading()
           || context.data.model.isDisabled(context.data.resultIndex)
@@ -55,7 +55,7 @@ export class DataExportMenuService {
         }
 
         return (
-          !this.dataExportSettingsService.settings.getValue('disabled')
+          !this.isDisabled()
           && context.has(DATA_CONTEXT_CONNECTION)
           && !context.has(DATA_CONTEXT_MENU_NESTED)
         );
@@ -109,5 +109,12 @@ export class DataExportMenuService {
         where: source.options.whereFilter,
       },
     });
+  }
+
+  private isDisabled() {
+    if (this.dataExportSettingsService.settings.isValueDefault('disabled')) {
+      return this.dataExportSettingsService.deprecatedSettings.getValue('disabled');
+    }
+    return this.dataExportSettingsService.settings.getValue('disabled');
   }
 }

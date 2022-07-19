@@ -195,7 +195,9 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+      const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
+        ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')
+        : this.sqlEditorSettingsService.settings.getValue('maxFileSize');
       const size = Math.round(resource.length / 1000); // kilobyte
 
       if (size > maxSize) {

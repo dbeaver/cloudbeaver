@@ -10,17 +10,19 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  baseAuthProvider: undefined as undefined | string,
-  primaryAuthProvider: 'local',
+  refreshTimeout: 3000,
+  maxLogRecords: 1000,
+  logBatchSize: 2000,
+  maxFailedRequests: 3,
 };
 
-export type AuthSettings = typeof defaultSettings;
+export type LogViewerSettings = typeof defaultSettings;
 
 @injectable()
-export class AuthSettingsService {
-  readonly settings: PluginSettings<AuthSettings>;
+export class LogViewerSettingsService {
+  readonly settings: PluginSettings<LogViewerSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('authentication', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('log-viewer', defaultSettings);
   }
 }

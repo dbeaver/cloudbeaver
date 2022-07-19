@@ -16,8 +16,11 @@ const defaultSettings = {
 @injectable()
 export class SqlEditorSettingsService {
   readonly settings: PluginSettings<typeof defaultSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('core.app.sqlEditor', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('sql-editor', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

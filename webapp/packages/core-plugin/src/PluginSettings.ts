@@ -20,6 +20,10 @@ export class PluginSettings<T> implements ISettingsSource {
     return true;
   }
 
+  isValueDefault<TKey extends keyof T>(key: TKey): boolean {
+    return !this.source.has(this.scopedKey(key));
+  }
+
   getValue<TKey extends keyof T>(key: TKey): T[TKey] {
     if (this.source.has(this.scopedKey(key))) {
       return this.source.getValue(this.scopedKey(key));

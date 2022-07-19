@@ -16,8 +16,11 @@ const defaultSettings = {
 @injectable()
 export class ResourceManagerSettingsService {
   readonly settings: PluginSettings<typeof defaultSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('plugin_resource_manager', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('resource-manager', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_resource_manager', defaultSettings);
   }
 }

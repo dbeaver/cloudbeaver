@@ -30,6 +30,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { CoreSettingsService } from '../../CoreSettingsService';
 import type { NavNode } from './EntityTypes';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
+import { NavTreeSettingsService } from './NavTreeSettingsService';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
 // TODO: so much dirty
@@ -62,13 +63,18 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
-    return this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit');
+    return (
+      this.navTreeSettingsService.settings.isValueDefault('childrenLimit')
+        ? this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit')
+        : this.navTreeSettingsService.settings.getValue('childrenLimit')
+    );
   }
 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly coreSettingsService: CoreSettingsService,
+    private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly sessionDataResource: SessionDataResource,
     private readonly connectionInfo: ConnectionInfoResource,
     private readonly userInfoResource: UserInfoResource,

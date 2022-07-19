@@ -25,6 +25,7 @@ import type { INodeActions } from './INodeActions';
 import { getNodeDisplayName, NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavNodeManagerService } from './NavNodeManagerService';
 import { NavTreeResource } from './NavTreeResource';
+import { NavTreeSettingsService } from './NavTreeSettingsService';
 import { nodeDeleteContext } from './nodeDeleteContext';
 
 export interface INodeMenuData {
@@ -43,7 +44,8 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly coreSettingsService: CoreSettingsService,
     private readonly localizationService: LocalizationService,
-    private readonly navNodeInfoResource: NavNodeInfoResource
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly navTreeSettingsService: NavTreeSettingsService
   ) {
     super();
   }
@@ -87,7 +89,9 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_RENAME) {
-          const globalPermission = this.coreSettingsService.settings.getValue('app.metadata.editing');
+          const globalPermission = this.navTreeSettingsService.settings.isValueDefault('editing')
+            ? this.coreSettingsService.settings.getValue('app.metadata.editing')
+            : this.navTreeSettingsService.settings.getValue('editing');
 
           if (!globalPermission) {
             return false;
@@ -97,7 +101,9 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          const globalPermission = this.coreSettingsService.settings.getValue('app.metadata.deleting');
+          const globalPermission = this.navTreeSettingsService.settings.isValueDefault('deleting')
+            ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
+            : this.navTreeSettingsService.settings.getValue('deleting');
 
           if (!globalPermission) {
             return false;

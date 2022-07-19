@@ -18,8 +18,11 @@ export type DataExportSettings = typeof defaultSettings;
 @injectable()
 export class DataExportSettingsService {
   readonly settings: PluginSettings<DataExportSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<DataExportSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('plugin_data_export', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('data-export', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_data_export', defaultSettings);
   }
 }

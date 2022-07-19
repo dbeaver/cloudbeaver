@@ -23,6 +23,7 @@ export * from './shared/NodesManager/NavNodeContextMenuService';
 export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NavTreeResource';
+export * from './shared/NodesManager/NavTreeSettingsService';
 export * from './shared/NodesManager/nodeDeleteContext';
 export * from './shared/NodesManager/NavNodeExtensionsService';
 export * from './shared/NodesManager/NodeLink';

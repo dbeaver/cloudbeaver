@@ -10,17 +10,19 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  baseAuthProvider: undefined as undefined | string,
-  primaryAuthProvider: 'local',
+  // temporary limit for all nodes children in app
+  childrenLimit: 500,
+  editing: true,
+  deleting: true,
 };
 
-export type AuthSettings = typeof defaultSettings;
+export type NavTreeSettings = typeof defaultSettings;
 
 @injectable()
-export class AuthSettingsService {
-  readonly settings: PluginSettings<AuthSettings>;
+export class NavTreeSettingsService {
+  readonly settings: PluginSettings<NavTreeSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('authentication', defaultSettings);
+    this.settings = this.pluginManagerService.getCoreSettings('navigation-tree', defaultSettings);
   }
 }

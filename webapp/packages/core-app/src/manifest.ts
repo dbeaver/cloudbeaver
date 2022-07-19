@@ -24,12 +24,14 @@ import { NavNodeInfoResource } from './shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from './shared/NodesManager/NavNodeManagerService';
 import { NavNodeViewService } from './shared/NodesManager/NavNodeView/NavNodeViewService';
 import { NavTreeResource } from './shared/NodesManager/NavTreeResource';
+import { NavTreeSettingsService } from './shared/NodesManager/NavTreeSettingsService';
 import { SessionExpiredDialogService } from './shared/SessionExpireDialog/SessionExpiredDialogService';
 import { SessionExpireWarningDialogService } from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
 import { SqlGeneratorsBootstrap } from './shared/SqlGenerators/SqlGeneratorsBootstrap';
 import { SqlGeneratorsResource } from './shared/SqlGenerators/SqlGeneratorsResource';
 import { LogViewerBootstrap } from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
 import { LogViewerService } from './shared/ToolsPanel/LogViewer/LogViewerService';
+import { LogViewerSettingsService } from './shared/ToolsPanel/LogViewer/LogViewerSettingsService';
 import { ToolsPanelService } from './shared/ToolsPanel/ToolsPanelService';
 import { AdministrationTopAppBarBootstrapService } from './TopNavBar/AdministrationTopAppBarBootstrapService';
 import { ConnectionSchemaManagerBootstrap } from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerBootstrap';
@@ -63,6 +65,8 @@ export const coreAppManifest: PluginManifest = {
     TopNavService,
     AppScreenService,
     CoreSettingsService,
+    NavTreeSettingsService,
+    LogViewerSettingsService,
     AdministrationTopAppBarBootstrapService,
     AppLocaleService,
     SessionExpiredDialogService,
