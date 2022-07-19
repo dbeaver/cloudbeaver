@@ -946,6 +946,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         synchronized (sessionProjects) {
             sessionProjects.add(project);
         }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().addProject(project, false);
+        }
+    }
+
+    public void deleteSessionProject(DBPProject project) {
+        synchronized (sessionProjects) {
+            sessionProjects.remove(project);
+        }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().removeProject(project);
+        }
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

@@ -18,6 +18,7 @@ package io.cloudbeaver.service.rm;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebProjectInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
@@ -66,4 +67,12 @@ public interface DBWServiceRM extends DBWService {
         @NotNull String resourcePath,
         @NotNull String data) throws DBException;
 
+    WebProjectInfo createProject(
+        @NotNull WebSession session,
+        @NotNull String name,
+        @Nullable String description) throws DBWebException;
+
+    boolean deleteProject(
+        @NotNull WebSession session,
+        @NotNull String projectId) throws DBWebException;
 }

@@ -561,6 +561,13 @@ public class WebServiceCore implements DBWServiceCore {
         return connectionInfo;
     }
 
+    // Projects
+    @Override
+    public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
+        return session.getSessionProjects().stream()
+            .map(pr -> new WebProjectInfo(session, pr)).collect(Collectors.toList());
+    }
+
     // Folders
     @Override
     public WebConnectionFolderInfo createConnectionFolder(

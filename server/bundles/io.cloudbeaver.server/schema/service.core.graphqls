@@ -350,6 +350,12 @@ type NavigatorSettings {
     hideVirtualModel: Boolean!
 }
 
+type ProjectInfo {
+    id: String!
+    name: String!
+    description: String
+}
+
 type LogEntry {
     time: DateTime
     type: String!
@@ -469,6 +475,9 @@ extend type Query {
 
     # Return connection info
     connectionInfo( id: ID! ): ConnectionInfo!
+
+    # Return list of accessible user projects
+    listProjects: [ ProjectInfo ]
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 }

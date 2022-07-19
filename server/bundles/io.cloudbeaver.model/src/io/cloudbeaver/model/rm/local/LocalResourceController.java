@@ -19,6 +19,7 @@ package io.cloudbeaver.model.rm.local;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
+import org.apache.commons.io.FileUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -148,13 +149,41 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public RMProject createProject(@NotNull String id, @NotNull String name, @NotNull String description) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+    public RMProject createProject(@NotNull String name, @Nullable String description) throws DBException {
+        if (!Files.exists(sharedProjectsPath)) {
+            try {
+                Files.createDirectory(sharedProjectsPath);
+            } catch (IOException e) {
+                throw new DBException("Error creating shared project path", e);
+            }
+        }
+        validateResourcePath(name);
+        RMProject project;
+        project = makeProjectFromPath(sharedProjectsPath.resolve(name),
+            RMProject.Type.SHARED, false);
+        if (project == null) {
+            throw new DBException("Project '" + name + "' already exists");
+        }
+        try {
+            Files.createDirectory(getProjectPath(project.getId()));
+            return project;
+        } catch (IOException e) {
+            throw new DBException("Error creating project path", e);
+        }
     }
 
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        RMProject project = makeProjectFromId(projectId);
+        Path targetPath = Path.of(project.getPath());
+        if (!Files.exists(targetPath)) {
+            throw new DBException("Project '" + project.getName() + "' doesn't exists");
+        }
+        try {
+            FileUtils.deleteDirectory(targetPath.toFile());
+        } catch (IOException e) {
+            throw new DBException("Error deleting project '" + project.getName() + "'", e);
+        }
     }
 
     @Override
@@ -297,7 +326,11 @@ public class LocalResourceController implements RMController {
         }
         List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
         try {
-            Files.delete(targetPath);
+            if (targetPath.toFile().isDirectory()) {
+                FileUtils.deleteDirectory(targetPath.toFile());
+            } else {
+                Files.delete(targetPath);
+            }
         } catch (IOException e) {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
