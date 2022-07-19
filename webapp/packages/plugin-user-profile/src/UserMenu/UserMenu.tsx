@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { topMenuStyles } from '@cloudbeaver/core-app';
 import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
 
 import { UserInfo } from '../UserInfo';
 import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';

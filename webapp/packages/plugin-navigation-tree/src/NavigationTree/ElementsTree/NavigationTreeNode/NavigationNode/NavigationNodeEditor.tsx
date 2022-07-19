@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { InlineEditor } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { InlineEditor } from '@cloudbeaver/core-ui';
 
 
 interface Props {

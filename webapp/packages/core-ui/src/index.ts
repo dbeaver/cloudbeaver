@@ -14,6 +14,8 @@ export * from './DragAndDrop/DNDProvider';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';
 
+export * from './InlineEditor/InlineEditor';
+
 export * from './Screens/AppScreen/NavigationService';
 export * from './Screens/AppScreen/OptionsPanelService';
 
@@ -56,4 +58,5 @@ export * from './SideBarPanel/SideBarPanelService';
 export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
 export * from './WindowsService';
+
 export { manifest as coreUIManifest } from './manifest';

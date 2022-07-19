@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ITab } from '@cloudbeaver/core-app';
+import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';

@@ -10,11 +10,8 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, ResultDataFormat, UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
+import { type IDatabaseDataModel, ResultSetEditAction, DocumentEditAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { DocumentEditAction } from '../DatabaseDataModel/Actions/Document/DocumentEditAction';
-import { ResultSetEditAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import { ScriptPreviewDialog } from './ScriptPreviewDialog';
 
 @injectable()
@@ -25,7 +22,7 @@ export class ScriptPreviewService {
     private readonly notificationService: NotificationService,
   ) { }
 
-  async open(model: IDatabaseDataModel<any, IDatabaseDataResult>, resultIndex: number): Promise<void> {
+  async open(model: IDatabaseDataModel, resultIndex: number): Promise<void> {
     try {
       const script = await model.source.runTask(() => this.tryGetScript(model, resultIndex));
 
@@ -39,7 +36,7 @@ export class ScriptPreviewService {
   }
 
   private async tryGetScript(
-    model: IDatabaseDataModel<any, IDatabaseDataResult>,
+    model: IDatabaseDataModel,
     resultIndex: number
   ): Promise<string> {
     const executionContext = model.source.executionContext;

@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { topMenuStyles } from '@cloudbeaver/core-app';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
 
 import { settingsMenuStyles } from './settingsMenuStyles';
 import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU';

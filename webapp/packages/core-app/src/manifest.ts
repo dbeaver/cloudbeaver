@@ -9,18 +9,9 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { AppLocaleService } from './AppLocaleService';
+import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap';
 import { AppScreenService } from './AppScreen/AppScreenService';
 import { CoreSettingsService } from './CoreSettingsService';
-import { QuotasService } from './QuotasService';
-import { NavigationTabsService } from './shared/NavigationTabs/NavigationTabsService';
-import { SessionExpiredDialogService } from './shared/SessionExpireDialog/SessionExpiredDialogService';
-import { SessionExpireWarningDialogService } from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
-import { SqlGeneratorsBootstrap } from './shared/SqlGenerators/SqlGeneratorsBootstrap';
-import { SqlGeneratorsResource } from './shared/SqlGenerators/SqlGeneratorsResource';
-import { ToolsPanelService } from './shared/ToolsPanel/ToolsPanelService';
-import { AdministrationTopAppBarBootstrapService } from './TopNavBar/AdministrationTopAppBarBootstrapService';
-import { MainMenuService } from './TopNavBar/MainMenu/MainMenuService';
-import { TopNavService } from './TopNavBar/TopNavBarService';
 
 
 export const coreAppManifest: PluginManifest = {
@@ -29,18 +20,9 @@ export const coreAppManifest: PluginManifest = {
   },
 
   providers: [
-    MainMenuService,
-    SqlGeneratorsBootstrap,
-    SqlGeneratorsResource,
-    NavigationTabsService,
-    TopNavService,
     AppScreenService,
+    AppScreenBootstrap,
     CoreSettingsService,
-    AdministrationTopAppBarBootstrapService,
     AppLocaleService,
-    SessionExpiredDialogService,
-    SessionExpireWarningDialogService,
-    ToolsPanelService,
-    QuotasService,
   ],
 };

@@ -13,11 +13,13 @@ const defaultSettings = {
   disabled: false,
 };
 
+export type ResourceManagerSettings = typeof defaultSettings;
+
 @injectable()
 export class ResourceManagerSettingsService {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly settings: PluginSettings<ResourceManagerSettings>;
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
-  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
+  readonly deprecatedSettings: PluginSettings<ResourceManagerSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
     this.settings = this.pluginManagerService.getPluginSettings('resource-manager', defaultSettings);

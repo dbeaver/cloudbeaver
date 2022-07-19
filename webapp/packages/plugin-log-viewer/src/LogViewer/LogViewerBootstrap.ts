@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, ToolsPanelService, EMainMenu } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
+import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { LogViewer } from './LogViewer';
 import { LogViewerService } from './LogViewerService';
+
 
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {

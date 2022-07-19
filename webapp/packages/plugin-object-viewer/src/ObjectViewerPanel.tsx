@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getComputed } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -20,6 +19,7 @@ import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigati
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsBox, TabPanel, useTabLocalState, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
+import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';

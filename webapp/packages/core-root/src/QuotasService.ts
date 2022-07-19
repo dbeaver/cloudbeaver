@@ -7,7 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+
+import { ServerConfigResource } from './ServerConfigResource';
 
 interface IQuotas {
   dataExportFileSizeLimit: number;

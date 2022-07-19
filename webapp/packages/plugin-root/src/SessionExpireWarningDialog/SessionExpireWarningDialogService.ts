@@ -13,7 +13,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { getCookies } from '@cloudbeaver/core-utils';
 
-import { SessionExpireWarningDialog } from '../SessionExpireWarningDialog/SessionExpireWarningDialog';
+import { SessionExpireWarningDialog } from './SessionExpireWarningDialog';
 
 const SESSION_COOKIE_NAME = 'cb-session';
 const WARN_IN = 5 * 1000 * 60;

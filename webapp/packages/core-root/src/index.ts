@@ -6,6 +6,7 @@ export * from './SessionPermissionsResource';
 export * from './PermissionsService';
 export * from './ServerConfigResource';
 export * from './SessionService';
+export * from './QuotasService';
 export * from './SessionResource';
 export * from './ServerService';
 export * from './ServerSettingsService';

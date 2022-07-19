@@ -12,8 +12,7 @@ import { AppLogo } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-
-import { useAppVersion } from '../useAppVersion';
+import { useAppVersion } from '@cloudbeaver/plugin-version';
 
 export const Logo = observer(function Logo() {
   const serverService = useService(ServerService);

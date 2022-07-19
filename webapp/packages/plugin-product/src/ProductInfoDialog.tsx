@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useAppVersion } from '@cloudbeaver/core-app';
 import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
+import { useAppVersion } from '@cloudbeaver/plugin-version';
 
 const dialogStyles = css`
   footer {

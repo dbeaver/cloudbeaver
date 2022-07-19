@@ -19,8 +19,8 @@ export enum EMainMenu {
 export class MainMenuService {
   readonly onConnectionClick: ISyncExecutor;
 
-  private menuOptions = new StaticMenu();
-  private mainMenuToken = 'mainMenu';
+  private readonly menuOptions = new StaticMenu();
+  private readonly mainMenuToken = 'mainMenu';
 
   constructor() {
     this.onConnectionClick = new SyncExecutor();

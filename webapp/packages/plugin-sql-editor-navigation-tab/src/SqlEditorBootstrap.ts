@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, NavigationTabsService } from '@cloudbeaver/core-app';
 import { ConnectionInfoResource, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
@@ -17,7 +16,9 @@ import { ISessionAction, sessionActionContext, SessionActionService } from '@clo
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';

@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { EMainMenu, MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {

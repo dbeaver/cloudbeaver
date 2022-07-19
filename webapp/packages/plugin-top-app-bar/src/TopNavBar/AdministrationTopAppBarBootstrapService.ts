@@ -14,8 +14,8 @@ import { Logo } from './Logo';
 @injectable()
 export class AdministrationTopAppBarBootstrapService extends Bootstrap {
   constructor(
-    private administrationTopAppBarService: AdministrationTopAppBarService,
-    private wizardTopAppBarService: WizardTopAppBarService
+    private readonly administrationTopAppBarService: AdministrationTopAppBarService,
+    private readonly wizardTopAppBarService: WizardTopAppBarService
   ) {
     super();
   }

@@ -25,10 +25,8 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-
-import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
-import { ToolsPanel } from '../shared/ToolsPanel/ToolsPanel';
-import { ToolsPanelService } from '../shared/ToolsPanel/ToolsPanelService';
+import { NavigationTabsBar } from '@cloudbeaver/plugin-navigation-tabs';
+import { ToolsPanelService, ToolsPanel } from '@cloudbeaver/plugin-tools-panel';
 
 const styles = css`
     Pane {

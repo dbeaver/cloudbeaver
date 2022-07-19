@@ -9,14 +9,14 @@
 import { Placeholder, TopAppBar } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TopNavService } from './TopNavBarService';
+import { TopNavService } from './TopNavService';
 
 export const TopNavBar = function TopNavBar() {
-  const topNavBarService = useService(TopNavService);
+  const topNavService = useService(TopNavService);
 
   return (
     <TopAppBar>
-      <Placeholder container={topNavBarService.placeholder} />
+      <Placeholder container={topNavService.placeholder} />
     </TopAppBar>
   );
 };

@@ -8,7 +8,6 @@
 
 import { computed, observable, makeObservable, action, runInAction } from 'mobx';
 
-import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import {
   ConnectionInfoResource,
   ConnectionsManagerService,
@@ -21,6 +20,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
 import { type IObjectNavNodeProvider, type IObjectSchemaProvider, type IObjectCatalogProvider, type IObjectCatalogSetter, type IObjectSchemaSetter, type IDataContextActiveNode, isObjectNavNodeProvider, isObjectCatalogProvider, isObjectSchemaProvider, isObjectCatalogSetter, isObjectSchemaSetter } from '@cloudbeaver/core-navigation-tree';
+import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 
 export interface IConnectionInfo {

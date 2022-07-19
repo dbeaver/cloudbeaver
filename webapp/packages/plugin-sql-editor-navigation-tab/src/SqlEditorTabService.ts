@@ -8,7 +8,6 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/core-app';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -25,6 +24,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, objectNavNodeProvider, objectCatalogProvider, objectSchemaProvider, objectCatalogSetter, objectSchemaSetter, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';

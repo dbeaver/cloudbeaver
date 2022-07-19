@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { topMenuStyles, TopNavButton } from '@cloudbeaver/core-app';
 import { getComputed, useDataResource, useMapResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ContainerResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -20,6 +19,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { topMenuStyles, TopNavButton } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
 import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from '../MENU_CONNECTION_DATA_CONTAINER_SELECTOR';

@@ -17,9 +17,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
-
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
 export const dialogStyle = css`
   footer {
