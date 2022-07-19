@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
-const { merge } = require('webpack-merge')
+const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
@@ -12,8 +12,8 @@ const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin.js');
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
-const outputDir = resolve('lib')
-const package = require(resolve('package.json'))
+const outputDir = resolve('lib');
+const package = require(resolve('package.json'));
 
 const excludedFromVendor = [
   'react-data-grid',
@@ -36,15 +36,15 @@ const excludedFromVendor = [
   'codemirror',
   'react-codemirror2',
   'd3',
-  'dagre'
-]
+  'dagre',
+];
 
-const timestampVersion = withTimestamp(package.version)
+const timestampVersion = withTimestamp(package.version);
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   entry: {
     main,
-    sso
+    sso,
   },
   output: {
     filename: 'index.[contenthash].js',
@@ -82,14 +82,14 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     }),
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(timestampVersion),
-      _DEV_: false
+      _DEV_: false,
     }),
     new HtmlWebpackPlugin({
       template: resolve('src/index.html.ejs'),
       inject: 'body',
       chunks: ['main'],
       version: timestampVersion,
-      title: package.product?.name
+      title: package.product?.name,
     }),
     new HtmlWebpackPlugin({
       filename: 'sso.html',
@@ -97,10 +97,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       inject: 'body',
       chunks: ['sso'],
       version: timestampVersion,
-      title: package.product?.name
+      title: package.product?.name,
     }),
     new HtmlInjectWebpackPlugin({
-      body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: "{STATIC_CONTENT}", voidTag: false }]
+      body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: '{STATIC_CONTENT}', voidTag: false }],
     }),
   ],
-})
+});

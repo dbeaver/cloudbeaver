@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -556,6 +557,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String folderName
     ) throws DBWebException {
         DBRProgressMonitor monitor = session.getProgressMonitor();
+        WebConnectionFolderUtils.validateConnectionFolder(folderName);
         session.addInfoMessage("Create new folder");
         WebConnectionFolderInfo parentNode = null;
         try {
@@ -579,6 +581,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String folderPath,
         @NotNull String newName
     ) throws DBWebException {
+        WebConnectionFolderUtils.validateConnectionFolder(newName);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
         WebServiceUtils.updateConfigAndRefreshDatabases(session);

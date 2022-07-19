@@ -85,7 +85,13 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result === DialogueStateResult.Resolved) {
             try {
-              await this.navResourceNodeService.delete(node.id);
+              const resourceData = this.navResourceNodeService.getResourceData(node.id);
+
+              if (!resourceData) {
+                throw new Error('Can\'t find resource');
+              }
+
+              await this.navResourceNodeService.delete(resourceData);
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_resource_manager_delete_script_error');
             }

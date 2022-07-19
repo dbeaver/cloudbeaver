@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useState } from 'react';
+import React, { forwardRef, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -61,9 +61,13 @@ const styles = css`
     margin-right: 16px !important;
     visibility: hidden;
   }
+  name-box {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
-export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(function NavigationNodeControl({
+export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeControl({
   node,
   dndElement,
   dndPlaceholder,
@@ -110,7 +114,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
-        {editing ? <NavigationNodeEditor node={node} onClose={() => setEditing(false)} /> : node.name}
+        {editing ? (
+          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+        ) : (
+          <name-box>{node.name}</name-box>
+        )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
@@ -119,4 +127,4 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       )}
     </TreeNodeControl>
   );
-}, { forwardRef: true });
+}));

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { forwardRef, useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
@@ -28,9 +28,9 @@ type Props = {
   expand?: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
-} & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
+} & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
-export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(function TableColumnValue({
+export const TableColumnValue = observer<Props, HTMLTableCellElement>(forwardRef(function TableColumnValue({
   align,
   children,
   centerContent,
@@ -46,7 +46,7 @@ export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(functi
   const context = useContext(TableItemContext);
   const props = useObjectRef({ onClick, onDoubleClick });
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
     if (!context) {
       return;
     }
@@ -61,7 +61,7 @@ export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(functi
     props.onClick?.();
   }, [tableContext, context, expand]);
 
-  const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement>) => {
+  const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
     props.onDoubleClick?.();
   }, []);
 
@@ -83,4 +83,4 @@ export const TableColumnValue = observer<Props, HTMLTableDataCellElement>(functi
       {!flex && children}
     </td>
   );
-}, { forwardRef: true });
+}));

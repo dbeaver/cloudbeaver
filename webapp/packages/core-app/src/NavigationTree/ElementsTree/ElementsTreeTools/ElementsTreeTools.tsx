@@ -33,13 +33,6 @@ const toolsStyles = css`
       position: sticky;
       top: 0;
       z-index: 1;
-
-      &:hover [|settings] {
-        display: block;
-      }
-      & [|settings] {
-        display: none;
-      }
     }
     actions {
       display: flex;
@@ -111,7 +104,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             style={toolsStyles}
             img
             onClick={() => setOpen(!opened)}
-            {...use({ opened, primary: true, settings: true })}
+            {...use({ opened, primary: true })}
           />
         )}
         <fill />

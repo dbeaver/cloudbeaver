@@ -99,7 +99,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
       const dataSource = sqlDataSourceService.get(this.state.editorId);
       const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId ?? '');
-      const name = getSqlEditorName(this.state, connection);
+      const name = getSqlEditorName(this.state, dataSource, connection);
 
       download(blob, generateFileName(name, '.sql'));
     },

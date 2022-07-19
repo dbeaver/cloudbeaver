@@ -9,9 +9,15 @@
 import type { Connection } from '@cloudbeaver/core-connections';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
-export function getSqlEditorName(state: ISqlEditorTabState, connection?: Connection): string {
-  if (state.name) {
-    return state.name;
+import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
+
+export function getSqlEditorName(
+  state: ISqlEditorTabState,
+  dataSource?: ISqlDataSource,
+  connection?: Connection
+): string {
+  if (dataSource?.name) {
+    return dataSource.name;
   }
 
   let name = `sql-${state.order}`;

@@ -140,6 +140,7 @@ export class ConnectionFolderResource extends CachedMapResource<string, Connecti
         this.delete(resourceKeyList(unrestoredProjects));
       }
 
+      this.set(baseProject, []);
       this.add(...folders);
     });
 

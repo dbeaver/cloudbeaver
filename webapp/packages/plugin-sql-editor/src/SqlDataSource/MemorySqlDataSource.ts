@@ -11,9 +11,14 @@ import { computed, makeObservable, observable } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
 import { BaseSqlDataSource } from './BaseSqlDataSource';
+import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 
 export class MemorySqlDataSource extends BaseSqlDataSource {
   static key = 'memory';
+
+  get name(): string | null {
+    return this._name;
+  }
 
   get script(): string {
     return this._script;
@@ -23,13 +28,20 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     return this._executionContext;
   }
 
+  private _name: string | null;
   private _script: string;
   private _executionContext?: IConnectionExecutionContextInfo;
 
-  constructor(script = '', executionContext?: IConnectionExecutionContextInfo) {
+  constructor(
+    name: string | null = null,
+    script = '',
+    executionContext?: IConnectionExecutionContextInfo
+  ) {
     super();
+    this._name = name;
     this._script = script;
     this._executionContext = executionContext;
+    this.features = [ESqlDataSourceFeatures.setName];
     this.outdated = false;
 
     makeObservable<this, '_script' | '_executionContext'>(this, {
@@ -47,5 +59,13 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this._executionContext = executionContext;
+  }
+
+  setName(name: string | null): void {
+    this._name = name;
+  }
+
+  canRename(name: string | null): boolean {
+    return true;
   }
 }

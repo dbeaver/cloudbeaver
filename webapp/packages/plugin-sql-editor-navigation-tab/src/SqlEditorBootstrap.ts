@@ -12,7 +12,7 @@ import {
   ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider, DATA_CONTEXT_NAV_NODE, NavigationTabsService
 } from '@cloudbeaver/core-app';
-import { isConnectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -20,7 +20,7 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
@@ -42,6 +42,9 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sessionActionService: SessionActionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly sqlEditorService: SqlEditorService,
   ) {
     super();
   }
@@ -97,35 +100,53 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
-      isActionApplicable: (context, action) => (
-        (
-          action === ACTION_RENAME
-          && context.has(DATA_CONTEXT_SQL_EDITOR_STATE)
-          && context.has(DATA_CONTEXT_SQL_EDITOR_TAB)
-        ) || (
+      isActionApplicable: (context, action) => {
+        if (action === ACTION_RENAME) {
+          const editorState = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+          if (!editorState) {
+            return false;
+          }
+
+          const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+
+          return dataSource?.features.includes(ESqlDataSourceFeatures.setName) ?? false;
+        }
+        return  (
           action === ACTION_SQL_EDITOR_OPEN
           && context.has(DATA_CONTEXT_CONNECTION)
-        )
-      ),
+        );
+      },
       handler: async (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
             const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+            const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-            const name = this.sqlEditorTabService.getName(state);
+            if (!dataSource) {
+              return;
+            }
+
+            const connection = this.connectionInfoResource.get(dataSource.executionContext?.connectionId ?? '');
+
+            const name = getSqlEditorName(state, dataSource, connection);
+            const regexp = /^(.*?)(\.\w+)$/ig.exec(name);
 
             const result = await this.commonDialogService.open(RenameDialog, {
-              value: name,
+              value: regexp?.[1] ?? name,
               objectName: name,
               icon: '/icons/sql_script_m.svg',
-              validation: name => !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
-                tab.handlerState.order !== state.order
-                && this.sqlEditorTabService.getName(tab.handlerState) === name.trim()
-              )),
+              validation: name => (
+                !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
+                  tab.handlerState.order !== state.order
+                  && this.sqlEditorService.getName(tab.handlerState) === name.trim()
+                ))
+                && dataSource.canRename(name)
+              ),
             });
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-              state.name = (result ?? '').trim();
+              dataSource.setName((result ?? '').trim());
             }
             break;
           }

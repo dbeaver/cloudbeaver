@@ -10,14 +10,15 @@ import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { createPath } from '@cloudbeaver/core-utils';
 
-import { ResourceManagerResource, RmResourceInfo } from './ResourceManagerResource';
+import { isRMNavNode } from './isRMNavNode';
+import { IResourceManagerParams, ResourceManagerResource, RmResourceInfo } from './ResourceManagerResource';
 import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
 interface IResourceData {
-  projectId: string;
-  folder?: string;
+  key: IResourceManagerParams;
   resourcePath: string;
   name: string;
+  nodeId: string;
 }
 
 export const PROJECT_NODE_TYPE = 'rm.project';
@@ -31,45 +32,39 @@ export class NavResourceNodeService {
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async loadResourceInfo(nodeId: string): Promise<RmResourceInfo | undefined> {
-    const data = this.getResourceData(nodeId);
-
-    const key = {
-      projectId: data.projectId,
-      folder: data.folder,
-    };
-    await this.resourceManagerResource.load(key);
-    return this.resourceManagerResource.getResource(key, data.name);
+  async loadResourceInfo(resourceData: IResourceData): Promise<RmResourceInfo | undefined> {
+    await this.resourceManagerResource.load(resourceData.key);
+    return this.resourceManagerResource.getResource(resourceData.key, resourceData.name);
   }
 
-  async saveScript(folderNodeId: string, name: string, script: string) {
-    const resourceData = this.getResourceData(folderNodeId);
-    const resourcePath = createPath([resourceData.resourcePath, name]);
-    await this.resourceManagerResource.createResource(resourceData.projectId, resourcePath, false);
-    await this.resourceManagerResource.writeResource(resourceData.projectId, resourcePath, script);
-    await this.navTreeResource.refreshTree(folderNodeId);
+  async saveScript(resourceData: IResourceData, name: string, script: string): Promise<string> {
+    const resourcePath = createPath(resourceData.resourcePath, name);
+    await this.resourceManagerResource.createResource(resourceData.key.projectId, resourcePath, false);
+    await this.resourceManagerResource.writeResource(resourceData.key.projectId, resourcePath, script);
+    await this.navTreeResource.refreshTree(resourceData.nodeId);
 
-    return createPath([RESOURCES_NODE_PATH, resourceData.projectId, resourcePath]);
+    return createPath(RESOURCES_NODE_PATH, resourceData.key.projectId, resourcePath);
   }
 
-  async delete(nodeId: string) {
-    const resourceData = this.getResourceData(nodeId);
-    const node = await this.navNodeInfoResource.load(nodeId);
-    await this.resourceManagerResource.deleteResource(resourceData.projectId, resourceData.resourcePath);
-    this.navTreeResource.deleteInNode(node.parentId, [nodeId]);
+  async delete(resourceData: IResourceData) {
+    const node = await this.navNodeInfoResource.load(resourceData.nodeId);
+    await this.resourceManagerResource.deleteResource(resourceData.key.projectId, resourceData.resourcePath);
+    this.navTreeResource.deleteInNode(node.parentId, [resourceData.nodeId]);
   }
 
-  async read(nodeId: string) {
-    const resourceData = this.getResourceData(nodeId);
-    return await this.resourceManagerResource.readResource(resourceData.projectId, resourceData.resourcePath);
+  async read(resourceData: IResourceData): Promise<string> {
+    return await this.resourceManagerResource.readResource(resourceData.key.projectId, resourceData.resourcePath);
   }
 
-  async write(nodeId: string, value: string) {
-    const resourceData = this.getResourceData(nodeId);
-    await this.resourceManagerResource.writeResource(resourceData.projectId, resourceData.resourcePath, value);
+  async write(resourceData: IResourceData, value: string) {
+    await this.resourceManagerResource.writeResource(resourceData.key.projectId, resourceData.resourcePath, value);
   }
 
-  getResourceData(nodeId: string): IResourceData {
+  getResourceData(nodeId: string): IResourceData | undefined {
+    if (!isRMNavNode(nodeId)) {
+      return;
+    }
+
     const parts = nodeId.replace('//', '\\').split('/');
     const projectId = parts[1];
     const resourcePath = parts.slice(2).join('/');
@@ -82,10 +77,10 @@ export class NavResourceNodeService {
     }
 
     return {
-      projectId,
-      folder,
+      key: { projectId, folder },
       resourcePath,
       name,
+      nodeId,
     };
   }
 }

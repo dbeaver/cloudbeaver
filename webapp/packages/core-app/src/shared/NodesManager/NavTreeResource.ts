@@ -11,7 +11,7 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -43,9 +43,22 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
   withDetails: boolean;
 }
 
+export interface INavNodeMoveData {
+  key: ResourceKey<string>;
+  target: string;
+}
+
+export interface INavNodeRenameData {
+  nodeId: string;
+  newNodeId: string;
+}
+
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
+  readonly beforeNodeDelete: IExecutor<ResourceKey<string>>;
   readonly onNodeRefresh: IExecutor<string>;
+  readonly onNodeRename: IExecutor<INavNodeRenameData>;
+  readonly onNodeMove: IExecutor<INavNodeMoveData>;
   protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
@@ -62,6 +75,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
+
+    this.beforeNodeDelete = new Executor();
+    this.onNodeRename = new Executor();
+    this.onNodeMove = new Executor();
 
     makeObservable<this, 'setNavObject' | 'connectionRemoveHandler'>(this, {
       childrenLimit: computed,
@@ -164,6 +181,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   async deleteNode(key: ResourceKey<string>): Promise<void> {
+    const contexts = await this.beforeNodeDelete.execute(key);
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     const nodePaths = isResourceKeyList(key) ? key.list : [key];
 
     await this.performUpdate(key, [], async () => {
@@ -210,22 +233,33 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.markOutdated(resourceKeyList([...parents, target]));
+    await this.onNodeMove.execute({ key, target });
   }
 
-  async changeName(node: NavNode, name: string): Promise<void> {
-    await this.performUpdate(node.parentId, [], async () => {
+  async changeName(node: NavNode, name: string): Promise<string> {
+    const newNodeId = await this.performUpdate(node.parentId, [], async () => {
       this.markDataLoading(node.id);
       try {
         await this.graphQLService.sdk.navRenameNode({
           nodePath: node.id,
           newName: name,
         });
+
+        const parts = node.id.split('/');
+        parts.splice(parts.length - 1, 1, name);
+
+        return parts.join('/');
       } finally {
         this.markDataLoaded(node.id);
       }
     });
 
     this.markOutdated(node.parentId);
+    await this.onNodeRename.execute({
+      nodeId: node.id,
+      newNodeId,
+    });
+    return newNodeId;
   }
 
   moveToNode(key: string, target: string): void;
@@ -282,7 +316,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.delete(resourceKeyList(deletedKeys));
-    this.markUpdated(keyObject);
+    this.markOutdated(keyObject);
     this.onItemAdd.execute(keyObject);
   }
 
@@ -512,7 +546,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           ...data.map(data => data.parentPath),
           ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
         ]), [
-          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
+          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(
+            data.navNodeInfo,
+            undefined,
+            data.parentPath
+          )).flat(),
           ...data.map(
             data => data.navNodeChildren.map(
               node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
@@ -537,7 +575,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           data.parentPath,
           ...data.navNodeChildren.map(node => node.id),
         ]), [
-          this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
+          this.navNodeInfoResource.navNodeInfoToNavNode(
+            data.navNodeInfo,
+            undefined,
+            data.parentPath
+          ),
           ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
         ]
       );

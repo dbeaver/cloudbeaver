@@ -39,4 +39,10 @@ public class WebConnectionFolderUtils {
             throw new DBWebException("Folder '" + folderPath + "' not found");
         }
     }
+
+    public static void validateConnectionFolder(String folderName) throws DBWebException {
+        if (folderName.contains("/")) {
+            throw new DBWebException("Folder name '" + folderName + "' contains illegal characters: /");
+        }
+    }
 }

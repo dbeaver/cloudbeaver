@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import type { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styled from 'reshadow';
 
 import { IconOrImage, Loader, useStateDelay } from '@cloudbeaver/core-blocks';
@@ -22,7 +22,7 @@ interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLBu
   style?: ComponentStyle;
 }
 
-export const MenuBarItem = observer<Props, HTMLButtonElement>(function MenuBarItem({
+export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(function MenuBarItem({
   label,
   loading = false,
   icon,
@@ -41,4 +41,4 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(function MenuBarIt
       {label && <item-label><Translate token={label} /></item-label>}
     </menu-bar-item>
   );
-}, { forwardRef: true });
+}));

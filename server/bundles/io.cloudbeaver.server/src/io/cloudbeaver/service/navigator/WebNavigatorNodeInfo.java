@@ -176,16 +176,10 @@ public class WebNavigatorNodeInfo {
             }
         } else if (isShared) {
             return features.toArray(new String[0]);
-        } else if (node instanceof DBNLocalFolder) {
+        } else if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
             features.add(NODE_FEATURE_CAN_RENAME);
             features.add(NODE_FEATURE_CAN_DELETE);
-        } else if (node instanceof DBNResourceManagerResource) {
-            features.add(NODE_FEATURE_CAN_DELETE);
-            if (!isFolder()) {
-                features.add(NODE_FEATURE_CAN_RENAME);
-            }
         }
-
         return features.toArray(new String[0]);
     }
 

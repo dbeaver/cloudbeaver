@@ -1,0 +1,33 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
+
+import { Icon } from './Icon';
+
+test('icons.svg#name', () => {
+  (globalThis as any)._ROOT_URI_ = undefined;
+
+  render(<Icon name='test' data-testid="icon" />);
+  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '\\icons\\icons.svg#test');
+});
+
+test('/image.jpg', () => {
+  (globalThis as any)._ROOT_URI_ = undefined;
+
+  render(<Icon name='/image.jpg' data-testid="icon" />);
+  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '\\image.jpg');
+});
+
+test('{_ROOT_URI_}/icons.svg#name', () => {
+  (globalThis as any)._ROOT_URI_ = '\\path\\';
+
+  render(<Icon name='test' data-testid="icon" />);
+  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '\\path\\icons\\icons.svg#test');
+});

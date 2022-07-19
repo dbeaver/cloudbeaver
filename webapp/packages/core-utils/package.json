@@ -12,14 +12,15 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test"
   },
   "dependencies": {
-    "@types/md5": "~2.3.2",
     "@timohausmann/quadtree-ts": "~2.0.0-beta.1",
+    "@types/md5": "~2.3.2",
+    "clsx": "~1.1.1",
     "md5": "~2.3.0",
-    "uuid": "~8.3.2",
-    "clsx": "~1.1.1"
+    "uuid": "~8.3.2"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"

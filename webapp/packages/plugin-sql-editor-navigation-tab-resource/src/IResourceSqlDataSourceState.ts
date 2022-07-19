@@ -14,6 +14,7 @@ export interface IResourceNodeInfo {
 }
 
 export interface IResourceSqlDataSourceState {
+  name?: string;
   nodeInfo?: IResourceNodeInfo;
   executionContext?: IConnectionExecutionContextInfo;
 }

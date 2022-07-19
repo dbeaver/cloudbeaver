@@ -54,6 +54,7 @@ export const defaultITLocale = [
   ['ui_rename', 'Rename'],
   ['ui_create', 'Create'],
   ['ui_folder', 'Folder'],
+  ['ui_folder_new', 'New folder'],
   ['ui_rename_processing', 'Renaming...'],
   ['ui_interval', 'Interval'],
   ['ui_name', 'Name'],

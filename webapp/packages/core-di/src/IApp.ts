@@ -14,7 +14,7 @@ export interface IServiceCollection {
   addServiceByClass: (ctor: IServiceConstructor<any>, value?: any) => void;
 }
 
-export type ExtractInitArgs<T> = T extends IInitializableController<infer TArgs>? TArgs : never;
+export type ExtractInitArgs<T> = T extends IInitializableController<infer TArgs> ? TArgs : never;
 
 export interface IDestructibleController {
   destruct: () => void;

@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import {
-  useEffect, useRef, useCallback, ChangeEvent, useImperativeHandle
+  useEffect, useRef, useCallback, ChangeEvent, useImperativeHandle, forwardRef
 } from 'react';
 import styled, { use } from 'reshadow';
 
@@ -42,7 +42,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   className?: string;
 }
 
-export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>(function InlineEditor({
+export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(forwardRef(function InlineEditor({
   value,
   controlsPosition = 'right',
   simple,
@@ -164,4 +164,4 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
       </editor-actions>
     </editor>
   );
-}, { forwardRef: true });
+}));
