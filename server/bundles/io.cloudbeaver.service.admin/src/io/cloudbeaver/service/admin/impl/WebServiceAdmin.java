@@ -702,10 +702,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
         String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
-        if (CBApplication.getInstance().isMultiNode()) {
-            globalConfigurationName = RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName;
-        }
-        return session.getProjectById(globalConfigurationName).getDataSourceRegistry();
+        return session.getProjectById(RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
     }
 
 }

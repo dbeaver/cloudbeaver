@@ -94,11 +94,9 @@ public class LocalResourceController implements RMController {
             VirtualProjectImpl project = projectRegistries.get(projectId);
             if (project == null) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
+                RMProject rmProject = makeProjectFromId(projectId);
                 project = new VirtualProjectImpl(
-                    DBWorkbench.getPlatform().getWorkspace(),
-                    projectId,
-                    parseProjectName(projectId).getName(),
-                    getProjectPath(projectId),
+                    rmProject,
                     sessionContext);
                 projectRegistries.put(projectId, project);
             }
@@ -419,6 +417,7 @@ public class LocalResourceController implements RMController {
         project.setName(projectName);
         project.setId(type.getPrefix() + "_" + projectName);
         project.setType(type);
+        project.setPath(path.toString());
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(

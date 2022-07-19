@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
@@ -41,9 +42,7 @@ public interface WebApplication extends DBPApplication {
     boolean isMultiNode();
 
     VirtualProjectImpl createProjectImpl(
-        @NotNull String projectId,
-        @NotNull String projectName,
-        @NotNull Path projectPath,
+        @NotNull RMProject project,
         @NotNull SMCredentialsProvider credentialsProvider);
 
     SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);

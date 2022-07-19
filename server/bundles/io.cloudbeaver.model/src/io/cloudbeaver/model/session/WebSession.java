@@ -119,16 +119,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final Map<String, DBWSessionHandler> sessionHandlers;
     private final WebUserContext userContext;
 
-    @NotNull
-    public static Path getUserProjectsFolder() {
-        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBWConstants.USER_PROJECTS_FOLDER);
-    }
-
-    @NotNull
-    public static Path getSharedProjectsFolder() {
-        return DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBWConstants.SHARED_PROJECTS_FOLDER);
-    }
-
     public WebSession(HttpSession httpSession,
                       WebApplication application,
                       Map<String, DBWSessionHandler> sessionHandlers) {
@@ -314,7 +304,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.sessionProjects.clear();
         }
 
-        createProjects();
+        loadProjects();
 
         this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.sessionProjects);
         this.navigatorModel.setModelAuthContext(sessionAuthContext);
@@ -330,60 +320,26 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void createProjects() {
-        DBPWorkspace globalWorkspace = DBWorkbench.getPlatform().getWorkspace();
-        String projectName;
-        Path projectPath;
+    private void loadProjects() {
         WebUser user = userContext.getUser();
-        if (user != null) {
-            projectName = CommonUtils.escapeFileName(user.getUserId());
-            projectPath = getUserProjectsFolder().resolve(projectName);
-        } else {
-            projectName = CommonUtils.escapeFileName(getSessionId());
-            // For anonymous sessions use path of global project
-            projectPath = globalWorkspace.getActiveProject().getAbsolutePath();
-        }
-        if (application.isMultiNode() && application.getAppConfiguration().isResourceManagerEnabled()) {
-            try {
-                RMController controller = application.getResourceController(this);
-                RMProject[] rmProjects =  controller.listAccessibleProjects();
-                for (RMProject project : rmProjects) {
-                    if (CommonUtils.equalObjects(project.getType(), RMProject.Type.GLOBAL)) {
-                        projectPath = globalWorkspace.getActiveProject().getAbsolutePath();
-                    } else if (CommonUtils.equalObjects(project.getType(), RMProject.Type.SHARED)) {
-                        projectPath = getSharedProjectsFolder().resolve(project.getName());
-                    } else {
-                        projectPath = getUserProjectsFolder().resolve(project.getName());
-                    }
-                    VirtualProjectImpl sessionProject = application.createProjectImpl(
-                        project.getId(),
-                        project.getName(),
-                        projectPath,
-                        this);
-                    if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
-                        this.defaultProject = sessionProject;
-                    }
-                    sessionProjects.add(sessionProject);
+        try {
+            RMController controller = application.getResourceController(this);
+            RMProject[] rmProjects =  controller.listAccessibleProjects();
+            for (RMProject project : rmProjects) {
+                VirtualProjectImpl sessionProject = application.createProjectImpl(project, this);
+                if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
+                    this.defaultProject = sessionProject;
                 }
-            } catch (DBException e) {
-                addSessionError(e);
-                log.error("Error getting accessible projects list", e);
+                DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
+                ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
+                addSessionProject(sessionProject);
+                if (user == null && sessionProject.equals(defaultProject)) {
+                    sessionProject.setInMemory(true);
+                }
             }
-        } else {
-            this.defaultProject = application.createProjectImpl(
-                RMProject.Type.USER.getPrefix() + "_" + projectName,
-                projectName,
-                projectPath,
-                this);
-            sessionProjects.add(this.defaultProject);
-            sessionProjects.add(globalWorkspace.getActiveProject());
-        }
-        for (DBPProject project : sessionProjects) {
-            if (user == null && project.equals(defaultProject)) {
-                ((BaseProjectImpl) project).setInMemory(true);
-            }
-            DBPDataSourceRegistry dataSourceRegistry = project.getDataSourceRegistry();
-            ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
+        } catch (DBException e) {
+            addSessionError(e);
+            log.error("Error getting accessible projects list", e);
         }
     }
 

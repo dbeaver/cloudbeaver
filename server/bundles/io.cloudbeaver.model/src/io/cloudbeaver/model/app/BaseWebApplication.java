@@ -27,7 +27,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -36,7 +35,6 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 import org.jkiss.dbeaver.registry.VirtualProjectImpl;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
@@ -116,16 +114,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public VirtualProjectImpl createProjectImpl(
-        @NotNull String projectId,
-        @NotNull String projectName,
-        @NotNull Path projectPath,
+        @NotNull RMProject project,
         @NotNull SMCredentialsProvider credentialsProvider
     ) {
         return new VirtualProjectImpl(
-            DBWorkbench.getPlatform().getWorkspace(),
-            RMProject.Type.USER.getPrefix() + "_" + projectName,
-            projectName,
-            projectPath,
+            project,
             ((WebSession) credentialsProvider).getSessionAuthContext());
     }
 
