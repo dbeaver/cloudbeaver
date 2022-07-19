@@ -12,10 +12,13 @@ import connectionAdministration from '@cloudbeaver/plugin-connections-administra
 import dataExport from '@cloudbeaver/plugin-data-export';
 import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
+import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import help from '@cloudbeaver/plugin-help';
 import localization from '@cloudbeaver/plugin-localization';
+import logViewer from '@cloudbeaver/plugin-log-viewer';
+import navigationTree from '@cloudbeaver/plugin-navigation-tree';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
@@ -63,6 +66,9 @@ const PLUGINS: PluginManifest[] = [
   resourceManager,
   resourceManagerAdministration,
   sqlEditorResource,
+  logViewer,
+  navigationTree,
+  datasourceContextSwitch,
 ];
 
 bootstrap(PLUGINS);

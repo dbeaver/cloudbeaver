@@ -8,10 +8,9 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService, DATA_CONTEXT_MENU_NESTED } from '@cloudbeaver/core-view';
 
-import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { DATA_CONTEXT_NAV_NODE } from '../NodesManager/DATA_CONTEXT_NAV_NODE';
 import { GeneratedSqlDialog } from './GeneratedSqlDialog';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';

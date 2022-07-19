@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DATA_CONTEXT_NAV_NODE, EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
+import { EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
 import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';

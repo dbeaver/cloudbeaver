@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { IMenuContext, CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ActionService, ACTION_EXPORT, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';

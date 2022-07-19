@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import {
   GraphQLService,
   CachedMapResource,
@@ -15,8 +16,6 @@ import {
   ResourceKeyUtils,
   resourceKeyList,
 } from '@cloudbeaver/core-sdk';
-
-import { NavNodeInfoResource } from '../NodesManager/NavNodeInfoResource';
 
 export const MAX_GENERATORS_LENGTH = 15;
 

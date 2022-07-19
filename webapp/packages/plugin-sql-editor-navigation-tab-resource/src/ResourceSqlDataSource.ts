@@ -8,8 +8,8 @@
 
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import type { NavNodeInfoResource } from '@cloudbeaver/core-app';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { debounce } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 

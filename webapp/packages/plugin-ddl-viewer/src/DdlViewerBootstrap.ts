@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
 import { DDLViewerTab } from './DdlViewer/DDLViewerTab';
@@ -42,7 +43,7 @@ export class DdlViewerBootstrap extends Bootstrap {
       transformer: (nodeId, children) => {
         const node = this.navNodeInfoResource.get(nodeId);
 
-        if (!node?.objectFeatures?.includes(EObjectFeature.script)) {
+        if (!node?.objectFeatures.includes(EObjectFeature.script)) {
           return children;
         }
 

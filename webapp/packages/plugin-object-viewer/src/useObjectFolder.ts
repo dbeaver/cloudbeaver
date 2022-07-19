@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, DBObjectResource } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
+import { NavNodeManagerService, DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 export function useObjectFolder(objectId: string) {

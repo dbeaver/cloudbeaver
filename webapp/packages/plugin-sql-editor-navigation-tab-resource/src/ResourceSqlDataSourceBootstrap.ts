@@ -8,11 +8,12 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { INavNodeMoveData, INavNodeRenameData, NavigationTabsService, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { NavigationTabsService } from '@cloudbeaver/core-app';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { NavTreeResource, NavNodeInfoResource, INavNodeMoveData, INavNodeRenameData } from '@cloudbeaver/core-navigation-tree';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';

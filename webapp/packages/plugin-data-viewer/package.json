@@ -15,6 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "peerDependencies": {
+    "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-codemirror": "~0.1.0",
     "@cloudbeaver/plugin-object-viewer": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",

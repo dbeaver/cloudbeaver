@@ -9,10 +9,11 @@
 import { action, computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
-import { ITab, NavNodeManagerService } from '@cloudbeaver/core-app';
+import type { ITab } from '@cloudbeaver/core-app';
 import { ILoadableState, isContainsException, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 

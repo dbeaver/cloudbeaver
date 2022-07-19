@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CoreSettingsService, ENodeFeature, getNodeDisplayName, NavNode, NavNodeInfoResource, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-app';
+import { CoreSettingsService } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -14,6 +14,7 @@ import {
   CommonDialogService, DialogueStateResult, ConfirmationDialogDelete
 } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { NavTreeResource, NavNodeInfoResource, NavTreeSettingsService, ENodeFeature, getNodeDisplayName, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface IObjectPropertyTableFooterContext {

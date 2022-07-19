@@ -7,8 +7,8 @@
  */
 
 
-import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/core-app';
 import { KEY_BINDING_OPEN_IN_TAB } from '@cloudbeaver/core-view';
+import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE, KEY_BINDING_SQL_EDITOR_EXECUTE_NEW, KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT, KEY_BINDING_SQL_EDITOR_FORMAT, KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IShortcut } from './IShortcut';

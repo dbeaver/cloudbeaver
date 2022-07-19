@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavNode } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
+import { EObjectFeature, NavNode } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';

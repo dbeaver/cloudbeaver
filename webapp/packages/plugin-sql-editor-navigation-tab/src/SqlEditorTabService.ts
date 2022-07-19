@@ -8,19 +8,7 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import {
-  NavigationTabsService,
-  TabHandler,
-  ITab,
-  objectSchemaProvider,
-  objectCatalogProvider,
-  objectCatalogSetter,
-  objectSchemaSetter,
-  ITabOptions,
-  objectNavNodeProvider,
-  NodeManagerUtils,
-  NavNodeManagerService
-} from '@cloudbeaver/core-app';
+import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/core-app';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -35,8 +23,9 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { NavNodeManagerService, objectNavNodeProvider, objectCatalogProvider, objectSchemaProvider, objectCatalogSetter, objectSchemaSetter, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';
 import { SqlEditorPanel } from './SqlEditorPanel';

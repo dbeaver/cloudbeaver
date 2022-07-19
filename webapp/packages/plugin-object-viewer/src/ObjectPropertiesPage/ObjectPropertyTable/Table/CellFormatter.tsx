@@ -10,13 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { DATA_CONTEXT_NAV_NODE, DBObject, MENU_NAV_TREE, NavNode, NavNodeManagerService, useNode } from '@cloudbeaver/core-app';
 import { getComputed, Icon, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { type NavNode, NavNodeManagerService, DATA_CONTEXT_NAV_NODE, type DBObject } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
+import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';

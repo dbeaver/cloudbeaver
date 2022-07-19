@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ITabNavigationContext, INodeNavigationContext, ITab } from '@cloudbeaver/core-app';
+import type { ITabNavigationContext, ITab } from '@cloudbeaver/core-app';
+import type { INodeNavigationContext } from '@cloudbeaver/core-navigation-tree';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage/ObjectPage';

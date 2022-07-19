@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, INodeNavigationData, ITab, NavigationTabsService, NavigationType } from '@cloudbeaver/core-app';
+import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
 
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';

@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { INodeNavigationData, NavigationTabsService, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-app';
+import { NavigationTabsService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';

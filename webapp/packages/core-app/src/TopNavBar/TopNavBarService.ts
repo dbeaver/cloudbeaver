@@ -9,7 +9,6 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
 import { Fill } from './Fill';
 import { Logo } from './Logo';
 import { MainMenu } from './MainMenu/MainMenu';
@@ -21,7 +20,6 @@ export class TopNavService {
   constructor() {
     this.placeholder.add(Logo, 0);
     this.placeholder.add(MainMenu, 1);
-    this.placeholder.add(ConnectionSelector, 2);
     this.placeholder.add(Fill, 3);
   }
 }

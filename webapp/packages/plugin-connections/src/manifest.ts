@@ -17,6 +17,7 @@ import { ConnectionSSHTabService } from './ConnectionForm/SSH/ConnectionSSHTabSe
 import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap';
 import { LocaleService } from './LocaleService';
 import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap';
+import { PluginBootstrap } from './PluginBootstrap';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
 
 export const connectionPlugin: PluginManifest = {
@@ -25,6 +26,7 @@ export const connectionPlugin: PluginManifest = {
   },
 
   providers: [
+    PluginBootstrap,
     ConnectionMenuBootstrap,
     PublicConnectionFormService,
     LocaleService,

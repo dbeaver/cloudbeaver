@@ -11,11 +11,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DBObject, DBObjectResource, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { NavTreeResource, DBObjectResource, type DBObject } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from './Table/TableLoader';
 
