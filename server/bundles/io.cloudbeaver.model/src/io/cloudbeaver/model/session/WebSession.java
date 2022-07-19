@@ -938,6 +938,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return null;
     }
 
+    public List<DBPProject> getSessionProjects() {
+        return sessionProjects;
+    }
+
+    public void addSessionProject(DBPProject project) {
+        synchronized (sessionProjects) {
+            sessionProjects.add(project);
+        }
+    }
+
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
         public void beginTask(String name, int totalWork) {
