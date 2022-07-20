@@ -45,6 +45,7 @@ public class WebServiceRM implements DBWServiceRM {
     @NotNull
     @Override
     public RMResource[] listResources(WebSession webSession, @NotNull String projectId, @Nullable String folder, @Nullable String nameMask, boolean readProperties, boolean readHistory) throws DBException {
+        checkIsRmEnabled(webSession);
         try {
             return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory, false);
         } catch (DBException e) {
@@ -54,6 +55,7 @@ public class WebServiceRM implements DBWServiceRM {
 
     @Override
     public String readResourceAsString(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        checkIsRmEnabled(webSession);
         try {
             byte[] data = getResourceController(webSession).getResourceContents(projectId, resourcePath);
             return new String(data, StandardCharsets.UTF_8);
@@ -64,6 +66,7 @@ public class WebServiceRM implements DBWServiceRM {
 
     @Override
     public String createResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, boolean isFolder) throws DBException {
+        checkIsRmEnabled(webSession);
         try {
             return getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
         } catch (Exception e) {
@@ -73,6 +76,7 @@ public class WebServiceRM implements DBWServiceRM {
 
     @Override
     public boolean deleteResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
             return true;
@@ -84,6 +88,7 @@ public class WebServiceRM implements DBWServiceRM {
     @NotNull
     @Override
     public String writeResourceStringContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, @NotNull String data) throws DBException {
+        checkIsRmEnabled(webSession);
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
             return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes);
@@ -94,5 +99,11 @@ public class WebServiceRM implements DBWServiceRM {
 
     private RMController getResourceController(WebSession webSession) {
         return webSession.getRmController();
+    }
+
+    private void checkIsRmEnabled(WebSession session) throws DBException {
+        if (!session.getApplication().getAppConfiguration().isResourceManagerEnabled()) {
+            throw new DBException("Resource Manager disabled");
+        }
     }
 }

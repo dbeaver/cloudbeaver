@@ -124,10 +124,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return (RMController) Proxy.newProxyInstance(getClass().getClassLoader(),
-            new Class[]{RMController.class},
-            new RMControllerInvocationHandler(createResourceController(credentialsProvider), this)
-        );
+        return createResourceController(credentialsProvider);
     }
 
     protected @NotNull RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
