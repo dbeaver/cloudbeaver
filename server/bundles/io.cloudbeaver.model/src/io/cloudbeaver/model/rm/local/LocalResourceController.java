@@ -336,9 +336,6 @@ public class LocalResourceController implements RMController {
                     data.length);
         }
         Path targetPath = getTargetPath(projectId, resourcePath);
-        if (!Files.exists(targetPath)) {
-            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
-        }
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
