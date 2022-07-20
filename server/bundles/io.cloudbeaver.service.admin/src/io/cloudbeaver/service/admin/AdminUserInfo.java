@@ -20,11 +20,11 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
-import io.cloudbeaver.service.security.CBDataSourceObject;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -82,7 +82,7 @@ public class AdminUserInfo {
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
         return session.getAdminSecurityController()
-            .getSubjectObjectPermissionGrants(getUserId(), CBDataSourceObject.INSTANCE)
+            .getSubjectObjectPermissionGrants(getUserId(), SMObjects.DATASOURCE)
             .stream()
             .map(objectPermission -> new SMDataSourceGrant(
                 objectPermission.getObjectPermissions().getObjectId(),

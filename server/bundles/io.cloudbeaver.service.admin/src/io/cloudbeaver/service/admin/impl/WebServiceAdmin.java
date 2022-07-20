@@ -37,7 +37,6 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
-import io.cloudbeaver.service.security.CBDataSourceObject;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -49,7 +48,9 @@ import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -109,7 +110,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<AdminPermissionInfo> permissionInfos = new ArrayList<>();
             for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
                 for (WebPermissionDescriptor pd : wsd.getPermissions()) {
-                    permissionInfos.add(new AdminPermissionInfo(pd));
+                    if(SMConstants.SUBJECT_PERMISSION_SCOPE.equals(pd.getScope())) {
+                        permissionInfos.add(new AdminPermissionInfo(pd));
+                    }
                 }
             }
             return permissionInfos;
@@ -423,7 +426,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
         try {
             webSession.getAdminSecurityController()
-                .deleteAllObjectPermissions(id, CBDataSourceObject.INSTANCE);
+                .deleteAllObjectPermissions(id, SMObjects.DATASOURCE);
         } catch (DBException e) {
             log.error(e);
         }
@@ -611,7 +614,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
-            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, CBDataSourceObject.INSTANCE)
+            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjects.DATASOURCE)
                 .stream()
                 .map(objectPermissionGrant -> new SMDataSourceGrant(
                     objectPermissionGrant.getObjectPermissions().getObjectId(),
@@ -636,7 +639,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController()
-                .setObjectPermissions(Set.of(connectionId), CBDataSourceObject.INSTANCE, new HashSet<>(subjects), Set.of("access"), grantor.getUserId());
+                .setObjectPermissions(Set.of(connectionId), SMObjects.DATASOURCE,
+                    new HashSet<>(subjects),
+                    Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION), grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
@@ -646,7 +651,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
-            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, CBDataSourceObject.INSTANCE)
+            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, SMObjects.DATASOURCE)
                 .stream()
                 .map(objectPermissionsGrant ->
                     new SMDataSourceGrant(
@@ -675,11 +680,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             webSession.getAdminSecurityController()
                 .setObjectPermissions(
                     new HashSet<>(connections),
-                    CBDataSourceObject.INSTANCE,
+                    SMObjects.DATASOURCE,
                     Set.of(subjectId),
-                    Set.of("access"),
-                    grantor.getUserId())
-            ;
+                    Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                    grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }

@@ -24,6 +24,8 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.registry.WebPermissionDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -51,9 +53,11 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -76,10 +80,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private final WebApplication application;
     private final CBDatabase database;
+    private final Map<String, WebPermissionDescriptor> permissionDescriptorByName;
 
     public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
         this.application = application;
         this.database = database;
+        this.permissionDescriptorByName = WebServiceRegistry.getInstance()
+            .getWebServices()
+            .stream()
+            .flatMap(service -> service.getPermissions().stream())
+            .collect(Collectors.toMap(WebPermissionDescriptor::getId, Function.identity()));
     }
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
@@ -698,7 +708,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Permissions
 
     @Override
-    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBCException {
+    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBException {
+        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissionIds);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
@@ -1391,6 +1402,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
             return;
         }
+        validatePermissions(objectType.getObjectType(), permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
@@ -1437,6 +1449,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         } catch (SQLException e) {
             throw new DBCException("Error deleting object permissions", e);
+        }
+    }
+
+    private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBException {
+        for (String permission : permissions) {
+            var permissionDescriptor = permissionDescriptorByName.get(permission);
+            if (permissionDescriptor == null) {
+                throw new DBException("Unknown permission: " + permission);
+            }
+            if (!expectedScope.equals(permissionDescriptor.getScope())) {
+                throw new DBException(MessageFormat.format(
+                    "Unexpected permission scope, expected [{}] but was [{}]",
+                    expectedScope, permissionDescriptor.getScope()
+                ));
+            }
         }
     }
 

@@ -24,7 +24,6 @@ import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
-import io.cloudbeaver.service.security.CBDataSourceObject;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -389,7 +388,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         try {
             return getSecurityController()
-                .getAllAvailableObjectsPermissions(subjectId, CBDataSourceObject.INSTANCE)
+                .getAllAvailableObjectsPermissions(subjectId, SMObjects.DATASOURCE)
                 .stream()
                 .map(SMObjectPermissions::getObjectId)
                 .collect(Collectors.toSet());

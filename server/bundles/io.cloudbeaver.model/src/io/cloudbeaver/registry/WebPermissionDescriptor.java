@@ -50,4 +50,8 @@ public class WebPermissionDescriptor {
     public String getCategory() {
         return cfg.getAttribute("category");
     }
+
+    public String getScope() {
+        return cfg.getAttribute("scope");
+    }
 }
