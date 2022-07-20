@@ -336,7 +336,6 @@ public class LocalResourceController implements RMController {
                     data.length);
         }
         Path targetPath = getTargetPath(projectId, resourcePath);
-        createResource(projectId, resourcePath, false);
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
@@ -371,6 +370,9 @@ public class LocalResourceController implements RMController {
             Path targetPath = projectPath.resolve(resourcePath).normalize();
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
+            }
+            if (!Files.exists(targetPath.getParent())) {
+                throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
             }
             return WebAppUtils.getWebApplication().getHomeDirectory().relativize(targetPath);
         } catch (InvalidPathException e) {
