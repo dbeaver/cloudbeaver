@@ -58,7 +58,9 @@ import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +69,13 @@ import java.util.stream.Collectors;
 public class WebServiceAdmin implements DBWServiceAdmin {
 
     private static final Log log = Log.getLog(WebServiceAdmin.class);
+
+    private final Map<String, WebPermissionDescriptor> permissionDescriptorByName = WebServiceRegistry.getInstance()
+        .getWebServices()
+        .stream()
+        .flatMap(service -> service.getPermissions().stream())
+        .collect(Collectors.toMap(WebPermissionDescriptor::getId, Function.identity()));
+
 
     @NotNull
     @Override
@@ -256,6 +265,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
+        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissions);
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
@@ -710,4 +720,18 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
+    private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBWebException {
+        for (String permission : permissions) {
+            var permissionDescriptor = permissionDescriptorByName.get(permission);
+            if (permissionDescriptor == null) {
+                throw new DBWebException("Unknown permission: " + permission);
+            }
+            if (!expectedScope.equals(permissionDescriptor.getScope())) {
+                throw new DBWebException(MessageFormat.format(
+                    "Unexpected permission scope, expected [{}] but was [{}]",
+                    expectedScope, permissionDescriptor.getScope()
+                ));
+            }
+        }
+    }
 }
