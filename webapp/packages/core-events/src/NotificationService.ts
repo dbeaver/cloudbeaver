@@ -51,8 +51,13 @@ export class NotificationService {
   ): INotification<TProps> {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
-      if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
-        throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent notification`);
+
+      const maxPersistentAllow = this.settings.settings.isValueDefault('maxPersistentAllow')
+        ? this.settings.deprecatedSettings.getValue('maxPersistentAllow')
+        : this.settings.settings.getValue('maxPersistentAllow');
+
+      if (persistentNotifications.length >= maxPersistentAllow) {
+        throw new Error(`You cannot create more than ${maxPersistentAllow} persistent notification`);
       }
     }
 
@@ -90,7 +95,11 @@ export class NotificationService {
 
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
 
-    if (filteredNotificationList.length > this.settings.settings.getValue('notificationsPool')) {
+    const notificationsPool = this.settings.settings.isValueDefault('notificationsPool')
+      ? this.settings.deprecatedSettings.getValue('notificationsPool')
+      : this.settings.settings.getValue('notificationsPool');
+
+    if (filteredNotificationList.length > notificationsPool) {
       let i = 0;
       while (this.notificationList.get(this.notificationList.keys[i])?.persistent) {
         i++;

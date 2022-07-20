@@ -20,7 +20,7 @@ export type AuthSettings = typeof defaultSettings;
 export class AuthSettingsService {
   readonly settings: PluginSettings<AuthSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) { 
-    this.settings = this.pluginManagerService.getPluginSettings('core.authentication', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getCoreSettings('authentication', defaultSettings);
   }
 }

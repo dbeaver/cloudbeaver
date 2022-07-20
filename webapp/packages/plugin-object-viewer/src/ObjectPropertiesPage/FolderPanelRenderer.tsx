@@ -8,9 +8,9 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { NavNodeViewService, useNode } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { NavNodeViewService, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ObjectPropertyTable } from './ObjectPropertyTable/ObjectPropertyTable';
 

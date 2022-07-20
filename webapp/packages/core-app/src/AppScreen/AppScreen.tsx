@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavBar } from '../TopNavBar/TopNavBar';
+import { Placeholder } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { TopNavBar } from '@cloudbeaver/plugin-top-app-bar';
+
+import { AppScreenService } from './AppScreenService';
 import { Main } from './Main';
 
 export function AppScreen() {
+  const appScreenService = useService(AppScreenService);
   return (
     <>
+      <Placeholder container={appScreenService.placeholder} />
       <TopNavBar />
       <Main />
     </>

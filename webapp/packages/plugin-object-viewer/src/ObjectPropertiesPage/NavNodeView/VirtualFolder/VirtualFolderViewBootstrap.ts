@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { VirtualFolderPanel } from './VirtualFolderPanel';
 import { VirtualFolderTab } from './VirtualFolderTab';
@@ -48,9 +49,9 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
         for (const child of children) {
           const node = this.navNodeInfoResource.get(child);
 
-          if (!node || node?.folder) {
+          if (!node || node.folder) {
             nextChildren.push(child);
-          } else if (node?.nodeType) {
+          } else if (node.nodeType) {
             const virtualId = VirtualFolderUtils.getFolderId(node.nodeType);
 
             if (!virtualFolders.includes(virtualId)) {

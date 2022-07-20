@@ -18,8 +18,11 @@ export type DataGridSettings = typeof defaultSettings;
 @injectable()
 export class DataGridSettingsService {
   readonly settings: PluginSettings<DataGridSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('data-spreadsheet', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
   }
 }

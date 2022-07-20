@@ -19,8 +19,8 @@ export type AdministrationSettings = typeof defaultSettings;
 export class AdministrationSettingsService {
   readonly settings: PluginSettings<AdministrationSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) { 
-    this.settings = this.pluginManagerService.getPluginSettings('core.administration', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getCoreSettings('administration', defaultSettings);
   }
 
   isBase(feature: string): boolean {

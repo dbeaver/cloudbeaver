@@ -19,7 +19,7 @@ export interface PlaceholderElement<T extends Record<string, any> = Record<strin
 }
 
 export class PlaceholderContainer<T extends Record<string, any> = Record<string, any>> {
-  private placeholders = observable<PlaceholderElement<T>>([], { deep: false });
+  private readonly placeholders = observable<PlaceholderElement<T>>([], { deep: false });
 
   get(): Array<PlaceholderElement<T>> {
     return this.placeholders;

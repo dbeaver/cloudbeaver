@@ -6,12 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  NavNodeManagerService, INodeNavigationData, NavigationType
-} from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { NavNodeManagerService, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import type { ObjectPage } from '../ObjectPage/ObjectPage';

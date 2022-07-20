@@ -22,8 +22,11 @@ export const defaultThemeSettings: IDefaultSettings = {
 @injectable()
 export class ThemeSettingsService {
   readonly settings: PluginSettings<IDefaultSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<IDefaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('theming', defaultThemeSettings);
+    this.deprecatedSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
   }
 }

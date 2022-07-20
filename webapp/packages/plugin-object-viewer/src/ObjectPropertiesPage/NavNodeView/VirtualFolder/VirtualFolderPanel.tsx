@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { DBObject, DBObjectResource, NavNodeInfoResource, NavNodeTransformViewComponent, NavNodeViewService, NavTreeResource } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { NavNodeInfoResource, NavTreeResource, DBObjectResource, type DBObject } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
 import { VirtualFolderUtils } from './VirtualFolderUtils';

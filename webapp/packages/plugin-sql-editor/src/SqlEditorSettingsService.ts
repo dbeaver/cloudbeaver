@@ -13,11 +13,16 @@ const defaultSettings = {
   maxFileSize: 100, // kilobyte
 };
 
+export type SqlEditorSettings = typeof defaultSettings;
+
 @injectable()
 export class SqlEditorSettingsService {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly settings: PluginSettings<SqlEditorSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<SqlEditorSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('core.app.sqlEditor', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('sql-editor', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

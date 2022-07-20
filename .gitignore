@@ -31,6 +31,12 @@ dist/
 /idea/
 .idea/
 
+## Mac OS
+.DS_Store
+
+## tests
+server/test/io.cloudbeaver.test.platform/workspace/.data/
+
 ## Eclipse configs
 
 .project

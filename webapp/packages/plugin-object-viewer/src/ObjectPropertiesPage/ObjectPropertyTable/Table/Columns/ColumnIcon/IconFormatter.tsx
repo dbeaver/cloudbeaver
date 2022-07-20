@@ -9,8 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { DBObject, useNode } from '@cloudbeaver/core-app';
 import { StaticImage } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 const styles = css`
