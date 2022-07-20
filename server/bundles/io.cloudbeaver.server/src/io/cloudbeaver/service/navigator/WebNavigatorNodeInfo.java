@@ -49,7 +49,6 @@ public class WebNavigatorNodeInfo {
     public static final String NODE_FEATURE_SHARED = "shared";
     public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
     public static final String NODE_FEATURE_CAN_RENAME = "canRename";
-    public static final String NODE_FEATURE_CAN_REFRESH = "canRefresh";
     private final WebSession session;
     private final DBNNode node;
 
@@ -159,9 +158,6 @@ public class WebNavigatorNodeInfo {
         }
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
-        }
-        if (node.supportsRefresh()) {
-            features.add(NODE_FEATURE_CAN_REFRESH);
         }
 
         if (node instanceof DBNDatabaseNode) {
