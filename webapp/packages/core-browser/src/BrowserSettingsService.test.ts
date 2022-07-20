@@ -32,22 +32,22 @@ const testValueA = false;
 const testValueB = true;
 
 const equalConfigA = {
-  'core.cookies': {
-    disabled: testValueA,
-  } as DeprecatedCookiesSettings,
-  plugin: {
-    'browser': {
+  core: {
+    cookies: {
+      disabled: testValueA,
+    } as DeprecatedCookiesSettings,
+    browser: {
       'cookies.disabled': testValueA,
     } as CookiesSettings,
   },
 };
 
 const equalConfigB = {
-  'core.cookies': {
-    disabled: testValueB,
-  } as DeprecatedCookiesSettings,
-  plugin: {
-    'browser': {
+  core: {
+    cookies: {
+      disabled: testValueB,
+    } as DeprecatedCookiesSettings,
+    browser: {
       'cookies.disabled': testValueB,
     } as CookiesSettings,
   },
