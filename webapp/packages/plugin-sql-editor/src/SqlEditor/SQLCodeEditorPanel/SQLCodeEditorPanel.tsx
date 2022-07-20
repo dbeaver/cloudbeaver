@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, getNodesFromContext } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorModeProps } from '../../SqlEditorModeService';

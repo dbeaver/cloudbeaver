@@ -8,13 +8,13 @@
 
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { NodeManagerUtils } from '@cloudbeaver/core-app';
 import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { CaptureView } from '@cloudbeaver/core-view';
 

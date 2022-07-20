@@ -40,7 +40,11 @@ export class SpreadsheetBootstrap extends Bootstrap {
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
-      hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
+      hidden: () => (
+        this.dataGridSettingsService.settings.isValueDefault('hidden')
+          ? this.dataGridSettingsService.deprecatedSettings.getValue('hidden')
+          : this.dataGridSettingsService.settings.getValue('hidden')
+      ),
       title: 'Table',
       icon: 'table-icon-sm',
     });

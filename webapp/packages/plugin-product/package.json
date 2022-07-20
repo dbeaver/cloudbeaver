@@ -37,6 +37,7 @@
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
+    "@cloudbeaver/plugin-version": "~0.1.0",
     "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",

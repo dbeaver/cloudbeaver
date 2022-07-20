@@ -6,33 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { ScreenService } from '@cloudbeaver/core-routing';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { injectable } from '@cloudbeaver/core-di';
 
-import { AppScreen } from './AppScreen';
 
 @injectable()
-export class AppScreenService extends Bootstrap {
-  static screenName = 'app';
-  readonly activation: IExecutor<void>;
+export class AppScreenService {
+  readonly placeholder: PlaceholderContainer;
 
-  constructor(
-    private screenService: ScreenService
-  ) {
-    super();
-    this.activation = new Executor();
+  constructor() {
+    this.placeholder = new PlaceholderContainer();
   }
-
-  register(): void {
-    this.screenService.create({
-      name: AppScreenService.screenName,
-      routes: [{ name: AppScreenService.screenName, path: '/' }],
-      component: AppScreen,
-      root: true,
-      onActivate: async () => { await this.activation.execute(); },
-    });
-  }
-
-  load(): void | Promise<void> { }
 }

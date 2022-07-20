@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import { DATA_CONTEXT_TAB_ID, useTab } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
 
 export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = function SqlEditorPanel({ tab }) {

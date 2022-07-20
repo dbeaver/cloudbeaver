@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
+import { NavTreeResource, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { createPath } from '@cloudbeaver/core-utils';
 
 import { isRMNavNode } from './isRMNavNode';

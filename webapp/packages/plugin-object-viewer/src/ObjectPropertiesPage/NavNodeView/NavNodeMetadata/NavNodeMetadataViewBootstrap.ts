@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ENodeFeature, NavNodeInfoResource, NavNodeViewService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { NavNodeInfoResource, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { NavNodeMetadataPanel } from './NavNodeMetadataPanel';
 import { NavNodeMetadataTab } from './NavNodeMetadataTab';

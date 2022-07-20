@@ -8,13 +8,16 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { CookiesSettingsService } from './CookiesSettingsService';
+import { BrowserSettingsService } from './BrowserSettingsService';
 
 @injectable()
 export class CookiesService {
   get cookiesEnabled() {
-    return !this.cookiesSettingsService.settings.getValue('disabled');
+    if (this.browserSettingsService.settings.isValueDefault('cookies.disabled')) {
+      return !this.browserSettingsService.deprecatedSettings.getValue('disabled');
+    }
+    return !this.browserSettingsService.settings.getValue('cookies.disabled');
   }
 
-  constructor(private readonly cookiesSettingsService: CookiesSettingsService) {}
+  constructor(private readonly browserSettingsService: BrowserSettingsService) {}
 }

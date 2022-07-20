@@ -8,8 +8,8 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import type { ITab } from '@cloudbeaver/core-app';
 import type { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 

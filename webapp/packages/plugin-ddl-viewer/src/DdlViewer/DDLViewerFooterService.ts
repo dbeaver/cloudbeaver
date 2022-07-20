@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, generateFileName } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';

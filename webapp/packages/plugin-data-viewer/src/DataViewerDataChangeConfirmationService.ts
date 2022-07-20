@@ -18,9 +18,9 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 @injectable()
 export class DataViewerDataChangeConfirmationService {
   constructor(
-    private commonDialogService: CommonDialogService,
-    private dataViewerTableService: TableViewerStorageService,
-    private notificationService: NotificationService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly dataViewerTableService: TableViewerStorageService,
+    private readonly notificationService: NotificationService
   ) {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
   }

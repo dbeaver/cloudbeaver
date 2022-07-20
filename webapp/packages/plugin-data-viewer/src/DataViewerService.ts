@@ -18,7 +18,9 @@ export class DataViewerService {
   ) { }
 
   isDataEditable(connection: Connection) {
-    const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
+    const disabled = this.dataViewerSettingsService.settings.isValueDefault('disableEdit')
+      ? this.dataViewerSettingsService.deprecatedSettings.getValue('disableEdit')
+      : this.dataViewerSettingsService.settings.getValue('disableEdit');
     return !disabled && !connection.readOnly;
   }
 }

@@ -43,6 +43,10 @@ export class LocalizationService extends Bootstrap {
   }
 
   get defaultLanguage(): string {
+    if (this.pluginSettings.getValue('defaultLanguage')) {
+      return this.deprecatedPluginSettings.getValue('defaultLanguage');
+    }
+
     return this.pluginSettings.getValue('defaultLanguage');
   }
 
@@ -50,6 +54,8 @@ export class LocalizationService extends Bootstrap {
     language: DEFAULT_LOCALE_NAME,
   };
   readonly pluginSettings: PluginSettings<IDefaultSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedPluginSettings: PluginSettings<IDefaultSettings>;
 
   readonly onChange: ISyncExecutor<string>;
   // observable.shallow - don't treat locales as observables
@@ -67,7 +73,8 @@ export class LocalizationService extends Bootstrap {
     super();
 
     this.onChange = new SyncExecutor();
-    this.pluginSettings = this.pluginManagerService.getPluginSettings('core.user', defaultThemeSettings);
+    this.pluginSettings = this.pluginManagerService.getCoreSettings('localization', defaultThemeSettings);
+    this.deprecatedPluginSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
     sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
 
     makeObservable<LocalizationService, 'localeMap' | 'setCurrentLocale'>(this, {

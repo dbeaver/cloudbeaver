@@ -11,6 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
 import { PermissionsService } from './PermissionsService';
+import { QuotasService } from './QuotasService';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerService } from './ServerService';
 import { ServerSettingsService } from './ServerSettingsService';
@@ -44,5 +45,6 @@ export const manifest: PluginManifest = {
     SessionService,
     SessionSettingsService,
     WindowEventsService,
+    QuotasService,
   ],
 };

@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { MenuBootstrap } from './MenuBootstrap';
+import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
 import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
@@ -18,6 +19,8 @@ import { SqlEditorModeService } from './SqlEditorModeService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorView } from './SqlEditorView';
+import { SqlGeneratorsBootstrap } from './SqlGenerators/SqlGeneratorsBootstrap';
+import { SqlGeneratorsResource } from './SqlGenerators/SqlGeneratorsResource';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
@@ -43,5 +46,8 @@ export const sqlEditorPluginManifest: PluginManifest = {
     MenuBootstrap,
     SqlDataSourceService,
     LocalStorageSqlDataSourceBootstrap,
+    SqlGeneratorsBootstrap,
+    SqlGeneratorsResource,
+    ScriptPreviewService,
   ],
 };

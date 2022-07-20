@@ -46,6 +46,10 @@ export class ThemeService extends Bootstrap {
   }
 
   get defaultThemeId(): string {
+    if (this.themeSettingsService.settings.isValueDefault('defaultTheme')) {
+      return this.themeSettingsService.deprecatedSettings.getValue('defaultTheme');
+    }
+
     return this.themeSettingsService.settings.getValue('defaultTheme');
   }
 

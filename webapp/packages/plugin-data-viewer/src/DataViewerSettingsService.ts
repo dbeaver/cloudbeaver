@@ -18,8 +18,11 @@ export type DataViewerSettings = typeof defaultSettings;
 @injectable()
 export class DataViewerSettingsService {
   readonly settings: PluginSettings<DataViewerSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('core.app.dataViewer', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('data-viewer', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.dataViewer', defaultSettings);
   }
 }
