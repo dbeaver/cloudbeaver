@@ -123,7 +123,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     @Override
     public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
         this.children = null;
-        return this;
+        return super.refreshNode(monitor, source);
     }
     @Override
     public boolean supportsRename() {
@@ -152,11 +152,6 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         } catch (Exception e) {
             throw new DBException("Can't rename resource", e);
         }
-    }
-
-    @Override
-    public boolean supportsRefresh() {
-        return resource.isFolder();
     }
 
     @Override
