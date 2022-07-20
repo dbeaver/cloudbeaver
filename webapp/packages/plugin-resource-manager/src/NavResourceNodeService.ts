@@ -39,7 +39,7 @@ export class NavResourceNodeService {
 
   async saveScript(resourceData: IResourceData, name: string, script: string): Promise<string> {
     const resourcePath = createPath(resourceData.resourcePath, name);
-    // await this.resourceManagerResource.createResource(resourceData.key.projectId, resourcePath, false);
+    await this.resourceManagerResource.createResource(resourceData.key.projectId, resourcePath, false);
     await this.resourceManagerResource.writeResource(resourceData.key.projectId, resourcePath, script);
     await this.navTreeResource.refreshTree(resourceData.nodeId);
 
