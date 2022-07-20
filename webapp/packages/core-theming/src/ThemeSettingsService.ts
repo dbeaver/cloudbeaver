@@ -11,19 +11,19 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 import { themes } from './themes';
 
-interface IDefaultSettings {
+export interface IThemeSettings {
   defaultTheme: string;
 }
 
-export const defaultThemeSettings: IDefaultSettings = {
+export const defaultThemeSettings: IThemeSettings = {
   defaultTheme: themes[0].id,
 };
 
 @injectable()
 export class ThemeSettingsService {
-  readonly settings: PluginSettings<IDefaultSettings>;
+  readonly settings: PluginSettings<IThemeSettings>;
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
-  readonly deprecatedSettings: PluginSettings<IDefaultSettings>;
+  readonly deprecatedSettings: PluginSettings<IThemeSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
     this.settings = this.pluginManagerService.getPluginSettings('theming', defaultThemeSettings);
