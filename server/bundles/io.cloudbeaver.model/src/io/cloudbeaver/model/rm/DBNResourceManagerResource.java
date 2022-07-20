@@ -153,6 +153,12 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
             throw new DBException("Can't rename resource", e);
         }
     }
+
+    @Override
+    public boolean supportsRefresh() {
+        return resource.isFolder();
+    }
+
     @Override
     public String toString() {
         return getNodeName();
