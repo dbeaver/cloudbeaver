@@ -8,7 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { QuotasService } from '@cloudbeaver/core-app';
+import { QuotasService } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 

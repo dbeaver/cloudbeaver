@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CoreSettingsService, ENodeFeature, getNodeDisplayName, NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-app';
+import { CoreSettingsService } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -14,6 +14,7 @@ import {
   CommonDialogService, DialogueStateResult, ConfirmationDialogDelete
 } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { NavTreeResource, NavNodeInfoResource, NavTreeSettingsService, ENodeFeature, getNodeDisplayName, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface IObjectPropertyTableFooterContext {
@@ -32,7 +33,8 @@ export class ObjectPropertyTableFooterService {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly coreSettingsService: CoreSettingsService
+    private readonly coreSettingsService: CoreSettingsService,
+    private readonly navTreeSettingsService: NavTreeSettingsService
   ) {
     this.contextMenuService.addPanel(this.objectPropertyTableFooterToken);
 
@@ -45,7 +47,9 @@ export class ObjectPropertyTableFooterService {
       isPresent(context) {
         return context.contextType === ObjectPropertyTableFooterService.objectPropertyContextType;
       },
-      isHidden: () => !this.coreSettingsService.settings.getValue('app.metadata.deleting'),
+      isHidden: () => !(this.navTreeSettingsService.settings.isValueDefault('deleting')
+        ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
+        : this.navTreeSettingsService.settings.getValue('deleting')),
       isDisabled: context => {
         if (context.data.tableState.selectedList.length === 0) {
           return true;

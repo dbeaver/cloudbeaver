@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DBObject } from '@cloudbeaver/core-app';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { Column as DataGridColumn } from '@cloudbeaver/plugin-react-data-grid';
 
 

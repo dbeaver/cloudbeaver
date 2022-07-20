@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TabProps } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { TabProps } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
@@ -37,7 +37,7 @@ export type DataPresentationComponent<
 
 export type PresentationTabProps = TabProps & {
   presentation: IDataPresentationOptions;
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
 };
 
 export type PresentationTabComponent = React.FunctionComponent<PresentationTabProps>;
@@ -50,7 +50,7 @@ export interface IDataPresentationOptions {
   icon?: string;
   hidden?: (
     dataFormat: ResultDataFormat | null,
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     resultIndex: number
   ) => boolean;
   getPresentationComponent: () => DataPresentationComponent;
@@ -64,7 +64,7 @@ export interface IDataPresentation extends IDataPresentationOptions {
 
 @injectable()
 export class DataPresentationService {
-  private dataPresentations: Map<string, IDataPresentation>;
+  private readonly dataPresentations: Map<string, IDataPresentation>;
 
   constructor() {
     this.dataPresentations = new Map();
@@ -78,7 +78,7 @@ export class DataPresentationService {
     type: DataPresentationType,
     supportedDataFormats: ResultDataFormat[],
     dataFormat: ResultDataFormat,
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     resultIndex: number,
   ): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
@@ -101,7 +101,7 @@ export class DataPresentationService {
     type: DataPresentationType,
     dataFormat: ResultDataFormat,
     presentationId: string | undefined,
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     resultIndex: number,
   ): IDataPresentation | null {
     if (presentationId) {

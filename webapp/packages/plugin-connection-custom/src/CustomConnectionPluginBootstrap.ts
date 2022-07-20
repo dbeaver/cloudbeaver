@@ -6,19 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, EMainMenu } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialog';
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
-    private mainMenuService: MainMenuService,
-    private commonDialogService: CommonDialogService,
-    private serverConfigResource: ServerConfigResource
+    private readonly mainMenuService: MainMenuService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly serverConfigResource: ServerConfigResource
   ) {
     super();
   }

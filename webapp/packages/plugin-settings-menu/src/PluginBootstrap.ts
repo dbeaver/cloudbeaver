@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
 import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 

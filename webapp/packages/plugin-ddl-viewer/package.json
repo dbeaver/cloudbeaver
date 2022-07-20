@@ -18,6 +18,8 @@
     "@cloudbeaver/plugin-object-viewer": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
+    "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
+    "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",

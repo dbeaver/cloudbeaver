@@ -9,8 +9,8 @@
 import { computed } from 'mobx';
 
 
-import type { DBObject } from '@cloudbeaver/core-app';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { CalculatedColumn as GridCalculatedColumn } from '@cloudbeaver/plugin-react-data-grid';
 
 import type { IDataColumn, ICustomColumn } from './Column';

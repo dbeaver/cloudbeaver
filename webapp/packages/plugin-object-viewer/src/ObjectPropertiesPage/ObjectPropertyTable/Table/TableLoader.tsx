@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DBObject } from '@cloudbeaver/core-app';
 import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 
 const loader = createComplexLoader(async function loader() {
   const { Table } = await import('./Table');

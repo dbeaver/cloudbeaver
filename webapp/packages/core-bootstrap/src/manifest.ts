@@ -16,6 +16,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { codeDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
@@ -60,4 +61,5 @@ export const coreManifests: PluginManifest[] = [
   coreAdministrationManifest,
   codeDialogsManifest,
   coreAppManifest,
+  coreNavigationTree,
 ];

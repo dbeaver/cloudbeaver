@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
+import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlResultTabsService } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';

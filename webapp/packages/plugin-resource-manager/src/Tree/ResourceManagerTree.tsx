@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { ElementsTree, NavigationTreeService, NavigationNodeControl } from '@cloudbeaver/core-app';
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { NavigationTreeService, ElementsTree, NavigationNodeControl } from '@cloudbeaver/plugin-navigation-tree';
 
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 

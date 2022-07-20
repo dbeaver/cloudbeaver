@@ -797,6 +797,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+        if (newServerName == null) {
+            throw new DBException("Invalid server configuration, server name cannot be empty");
+        }
         Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName, newServerURL, sessionExpireTime, appConfig);
         writeRuntimeConfig(configurationProperties);
     }

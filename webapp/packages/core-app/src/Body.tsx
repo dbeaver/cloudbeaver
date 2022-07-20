@@ -18,8 +18,7 @@ import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
-
-import { useAppVersion } from './useAppVersion';
+import { useAppVersion } from '@cloudbeaver/plugin-version';
 
 const bodyStyles = css`
     theme {

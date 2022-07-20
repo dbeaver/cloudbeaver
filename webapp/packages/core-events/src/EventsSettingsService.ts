@@ -12,7 +12,6 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 const defaultSettings = {
   notificationsPool: 5,
   maxPersistentAllow: 5,
-
 };
 
 export type EventsSettings = typeof defaultSettings;
@@ -20,8 +19,11 @@ export type EventsSettings = typeof defaultSettings;
 @injectable()
 export class EventsSettingsService {
   readonly settings: PluginSettings<EventsSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedSettings: PluginSettings<EventsSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) { 
-    this.settings = this.pluginManagerService.getPluginSettings('core_events', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService) {
+    this.settings = this.pluginManagerService.getPluginSettings('notifications', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core_events', defaultSettings);
   }
 }

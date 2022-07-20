@@ -8,8 +8,8 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { BrowserSettingsService } from './BrowserSettingsService';
 import { CookiesService } from './CookiesService';
-import { CookiesSettingsService } from './CookiesSettingsService';
 
 
 export const coreBrowserManifest: PluginManifest = {
@@ -18,7 +18,7 @@ export const coreBrowserManifest: PluginManifest = {
   },
 
   providers: [
-    CookiesSettingsService,
+    BrowserSettingsService,
     CookiesService,
   ],
 };

@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useNode } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';

@@ -12,8 +12,8 @@ import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
-import { InlineEditor } from '@cloudbeaver/core-app';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { InlineEditor } from '@cloudbeaver/core-ui';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { EditorProps } from '@cloudbeaver/plugin-react-data-grid';
 

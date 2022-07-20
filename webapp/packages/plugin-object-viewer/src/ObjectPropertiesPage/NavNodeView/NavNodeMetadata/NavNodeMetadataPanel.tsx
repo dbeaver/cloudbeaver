@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
+
+import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ObjectProperties } from './ObjectProperties';
 
