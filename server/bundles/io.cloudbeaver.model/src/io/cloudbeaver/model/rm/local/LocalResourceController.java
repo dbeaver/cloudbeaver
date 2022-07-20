@@ -336,6 +336,7 @@ public class LocalResourceController implements RMController {
                     data.length);
         }
         Path targetPath = getTargetPath(projectId, resourcePath);
+        createResource(projectId, resourcePath, false);
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
