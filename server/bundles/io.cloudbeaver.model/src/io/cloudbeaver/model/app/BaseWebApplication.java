@@ -17,7 +17,6 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.model.log.SLF4JLogHandler;
-import io.cloudbeaver.model.rm.RMControllerInvocationHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.resources.IWorkspace;
@@ -34,11 +33,10 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
-import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
-import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;

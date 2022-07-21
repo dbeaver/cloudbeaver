@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -423,7 +425,6 @@ public class LocalResourceController implements RMController {
         project.setName(projectName);
         project.setId(type.getPrefix() + "_" + projectName);
         project.setType(type);
-        project.setPath(path.toString());
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(
@@ -532,9 +533,9 @@ public class LocalResourceController implements RMController {
 
         private Builder(SMCredentialsProvider credentialsProvider) {
             this.credentialsProvider = credentialsProvider;
-            this.rootPath = DBWorkbench.getPlatform().getWorkspace().getAbsolutePath();
-            this.userProjectsPath = this.rootPath.resolve(DBWConstants.USER_PROJECTS_FOLDER);
-            this.sharedProjectsPath = this.rootPath.resolve(DBWConstants.SHARED_PROJECTS_FOLDER);
+            this.rootPath = RMUtils.getRootPath();
+            this.userProjectsPath = RMUtils.getUserProjectsPath();
+            this.sharedProjectsPath = RMUtils.getSharedProjectsPath();
         }
 
         public Builder setRootPath(Path rootPath) {

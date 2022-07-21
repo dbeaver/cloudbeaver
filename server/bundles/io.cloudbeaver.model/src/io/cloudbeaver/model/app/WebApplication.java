@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import io.cloudbeaver.VirtualProjectImpl;
 
 import java.nio.file.Path;
 
