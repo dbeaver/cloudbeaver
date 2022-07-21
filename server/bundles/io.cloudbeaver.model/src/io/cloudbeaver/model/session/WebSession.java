@@ -964,28 +964,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public DBPProject getProjectById(@Nullable String projectId) {
-        if (projectId == null) {
-            return defaultProject;
-        }
-        for (DBPProject project : sessionProjects) {
-            if (project.getId().equals(projectId)) {
-                return project;
-            }
-        }
-        return null;
-    }
-
-    public List<DBPProject> getSessionProjects() {
-        return sessionProjects;
-    }
-
-    public void addSessionProject(DBPProject project) {
-        synchronized (sessionProjects) {
-            sessionProjects.add(project);
-        }
-    }
-
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
         public void beginTask(String name, int totalWork) {

@@ -177,7 +177,7 @@ public class LocalResourceController implements RMController {
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
         RMProject project = makeProjectFromId(projectId);
-        Path targetPath = Path.of(project.getPath());
+        Path targetPath = getProjectPath(projectId);
         if (!Files.exists(targetPath)) {
             throw new DBException("Project '" + project.getName() + "' doesn't exists");
         }
@@ -458,7 +458,6 @@ public class LocalResourceController implements RMController {
         project.setName(projectName);
         project.setId(type.getPrefix() + "_" + projectName);
         project.setType(type);
-        project.setPath(path.toString());
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(
