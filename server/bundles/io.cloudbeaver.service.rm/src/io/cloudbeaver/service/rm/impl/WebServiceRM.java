@@ -105,7 +105,7 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
-            DBPProject project = session.getApplication().createProjectImpl(rmProject, session);
+            DBPProject project = session.getApplication().createProjectImpl(rmProject, session.getSessionAuthContext(), session);
             session.addSessionProject(project);
             return new WebProjectInfo(session, project);
         } catch (DBException e) {
