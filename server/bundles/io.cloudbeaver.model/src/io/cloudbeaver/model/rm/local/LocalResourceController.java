@@ -16,7 +16,8 @@
  */
 package io.cloudbeaver.model.rm.local;
 
-import io.cloudbeaver.DBWConstants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -30,6 +31,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
@@ -40,6 +42,8 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.OffsetDateTime;
@@ -56,6 +60,8 @@ public class LocalResourceController implements RMController {
     private static final Log log = Log.getLog(LocalResourceController.class);
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
+    private static final String FILE_METADATA_SUFFIX = ".metadata";
+    private static final Gson FILE_METADATA_GSON = new GsonBuilder().setLenient().serializeNulls().create();
 
     public static final String DEFAULT_CHANGE_ID = "0";
 
@@ -366,6 +372,55 @@ public class LocalResourceController implements RMController {
         }
 
         return DEFAULT_CHANGE_ID;
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> getResourceProperties(
+        @NotNull String projectId,
+        @NotNull String resourcePath
+    ) throws DBException {
+        validateResourcePath(resourcePath);
+
+        final Path path = getTargetPath(projectId, resourcePath);
+        final Path metadataPath = Path.of(path + FILE_METADATA_SUFFIX);
+
+        if (Files.notExists(path)) {
+            throw new DBException("Resource '" + resourcePath + "' doesn't exist");
+        }
+
+        if (Files.notExists(metadataPath)) {
+            return null;
+        }
+
+        try (Reader reader = Files.newBufferedReader(metadataPath, StandardCharsets.UTF_8)) {
+            return JSONUtils.parseMap(FILE_METADATA_GSON, reader);
+        } catch (Exception e) {
+            log.error("Error reading metadata for resource " + resourcePath, e);
+            return null;
+        }
+    }
+
+    @Override
+    public void setResourceProperties(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull Map<String, Object> properties
+    ) throws DBException {
+        validateResourcePath(resourcePath);
+
+        final Path path = getTargetPath(projectId, resourcePath);
+        final Path metadataPath = Path.of(path + FILE_METADATA_SUFFIX);
+
+        if (Files.notExists(path)) {
+            throw new DBException("Resource '" + resourcePath + "' doesn't exist");
+        }
+
+        try (Writer writer = Files.newBufferedWriter(metadataPath, StandardCharsets.UTF_8)) {
+            writer.write(FILE_METADATA_GSON.toJson(properties));
+        } catch (Exception e) {
+            log.error("Error writing metadata for resource " + resourcePath, e);
+        }
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
