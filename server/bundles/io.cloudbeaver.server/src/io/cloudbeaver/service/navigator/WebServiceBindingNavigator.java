@@ -38,37 +38,49 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
         model.getQueryType()
             .dataFetcher("navNodeChildren", env -> getService(env).getNavigatorNodeChildren(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("parentPath"),
                 env.getArgument("offset"),
                 env.getArgument("limit"),
-                env.getArgument("onlyFolders")))
-        .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
+                env.getArgument("onlyFolders")
+            ))
+            .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                getProjectReference(env),
+                env.getArgument("nodePath")
+            ))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                getProjectReference(env),
+                env.getArgument("nodePath")
+            ))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePath")
             ))
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
+                getProjectReference(env),
                 getWebConnection(env),
                 env.getArgument("contextId"),
                 env.getArgument("catalog")
+
             ));
         model.getMutationType()
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePath"),
                 env.getArgument("newName")
             ))
             .dataFetcher("navDeleteNodes", env -> getService(env).deleteNodes(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePaths")
             ))
             .dataFetcher("navMoveNodesToFolder", env -> getService(env).moveNodesToFolder(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePaths"),
                 env.getArgument("folderPath")
             ));

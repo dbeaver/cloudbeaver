@@ -17,13 +17,15 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -33,8 +35,7 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -44,7 +45,6 @@ import java.nio.file.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,10 +96,9 @@ public class LocalResourceController implements RMController {
             VirtualProjectImpl project = projectRegistries.get(projectId);
             if (project == null) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
+                RMProject rmProject = makeProjectFromId(projectId);
                 project = new VirtualProjectImpl(
-                    DBWorkbench.getPlatform().getWorkspace(),
-                    projectId,
-                    getProjectPath(projectId),
+                    rmProject,
                     sessionContext);
                 projectRegistries.put(projectId, project);
             }
@@ -172,24 +171,45 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
+    public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        return project.getProjectProperty(propName);
+    }
+
+    @Override
     public String getProjectsDataSources(@NotNull String projectId) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        Function<DBPDataSourceContainer, Boolean> dsC = dataSourceContainer -> true;
-        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, dsC);
+        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
 
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        final DBPProject project = getProjectMetadata(projectId);
+        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+        final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
+        final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
+        registry.loadDataSources(List.of(storage), manager, true, false);
+        registry.saveDataSources();
     }
 
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
-        throw new DBCFeatureNotSupportedException();
+        final DBPProject project = getProjectMetadata(projectId);
+        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+
+        for (String dataSourceId : dataSourceIds) {
+            final DataSourceDescriptor dataSource = registry.getDataSource(dataSourceId);
+
+            if (dataSource != null) {
+                registry.removeDataSource(dataSource);
+            } else {
+                log.warn("Could not find datasource " + dataSourceId + " for deletion");
+            }
+        }
     }
 
     @NotNull
@@ -513,9 +533,9 @@ public class LocalResourceController implements RMController {
 
         private Builder(SMCredentialsProvider credentialsProvider) {
             this.credentialsProvider = credentialsProvider;
-            this.rootPath = DBWorkbench.getPlatform().getWorkspace().getAbsolutePath();
-            this.userProjectsPath = this.rootPath.resolve(DBWConstants.USER_PROJECTS_FOLDER);
-            this.sharedProjectsPath = this.rootPath.resolve(DBWConstants.SHARED_PROJECTS_FOLDER);
+            this.rootPath = RMUtils.getRootPath();
+            this.userProjectsPath = RMUtils.getUserProjectsPath();
+            this.sharedProjectsPath = RMUtils.getSharedProjectsPath();
         }
 
         public Builder setRootPath(Path rootPath) {

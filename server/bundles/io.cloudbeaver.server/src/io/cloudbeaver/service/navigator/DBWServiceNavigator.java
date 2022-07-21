@@ -22,6 +22,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public interface DBWServiceNavigator extends DBWService {
     @WebAction
     List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
         @NotNull WebSession session,
+        @Nullable String projectId,
         String parentPath,
         Integer offset,
         Integer limit,
@@ -41,23 +43,45 @@ public interface DBWServiceNavigator extends DBWService {
     @WebAction
     List<WebNavigatorNodeInfo> getNavigatorNodeParents(
         @NotNull WebSession session,
+        @Nullable String projectId,
         String nodePath) throws DBWebException;
 
     @WebAction
-    WebNavigatorNodeInfo getNavigatorNodeInfo(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
+    WebNavigatorNodeInfo getNavigatorNodeInfo(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @NotNull String nodePath) throws DBWebException;
 
     @WebAction
-    boolean refreshNavigatorNode(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
+    boolean refreshNavigatorNode(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @NotNull String nodePath) throws DBWebException;
 
     @WebAction
-    WebStructContainers getStructContainers(WebConnectionInfo connectionInfo, String contextId, String catalog) throws DBWebException;
+    WebStructContainers getStructContainers(
+        String projectId,
+        WebConnectionInfo connectionInfo,
+        String contextId,
+        String catalog) throws DBWebException;
 
     @WebAction
-    String renameNode(@NotNull WebSession session, @NotNull String nodePath, @NotNull String newName) throws DBWebException;
+    String renameNode(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @NotNull String nodePath,
+        @NotNull String newName) throws DBWebException;
 
     @WebAction
-    int deleteNodes(@NotNull WebSession session, @NotNull List<String> nodePaths) throws DBWebException;
+    int deleteNodes(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @NotNull List<String> nodePaths) throws DBWebException;
 
     @WebAction
-    boolean moveNodesToFolder(@NotNull WebSession session, @NotNull List<String> nodePaths, @NotNull String folderPath) throws DBWebException;
+    boolean moveNodesToFolder(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @NotNull List<String> nodePaths,
+        @NotNull String folderPath) throws DBWebException;
 }

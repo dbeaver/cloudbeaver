@@ -113,6 +113,10 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env), getServletResponse(env), errorOnNotFound);
     }
 
+    protected static String getProjectReference(DataFetchingEnvironment env) {
+        return env.getArgument("projectId");
+    }
+
     @NotNull
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
         return getWebConnection(getWebSession(env), env.getArgument("connectionId"));

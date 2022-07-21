@@ -490,21 +490,21 @@ extend type Mutation {
     changeSessionLanguage(locale: String): Boolean
 
     # Create new custom connection. Custom connections exist only within the current session.
-    createConnection( config: ConnectionConfig! ): ConnectionInfo!
+    createConnection( config: ConnectionConfig!, projectId: String ): ConnectionInfo!
 
-    updateConnection( config: ConnectionConfig! ): ConnectionInfo!
+    updateConnection( config: ConnectionConfig!, projectId: String ): ConnectionInfo!
 
-    deleteConnection( id: ID! ): Boolean!
+    deleteConnection( id: ID!, projectId: String ): Boolean!
 
-    createConnectionFromTemplate( templateId: ID!, connectionName: String ): ConnectionInfo!
+    createConnectionFromTemplate( templateId: ID!, connectionName: String, projectId: String ): ConnectionInfo!
 
     # Create new folder
-    createConnectionFolder(parentFolderPath: ID, folderName: String! ): ConnectionFolderInfo!
+    createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: String ): ConnectionFolderInfo!
 
-    deleteConnectionFolder( folderPath: ID! ): Boolean!
+    deleteConnectionFolder( folderPath: ID!, projectId: String ): Boolean!
 
     # Copies connection configuration from node
-    copyConnectionFromNode( nodePath: String!, config: ConnectionConfig ): ConnectionInfo!
+    copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: String ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!

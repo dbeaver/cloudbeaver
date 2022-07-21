@@ -62,7 +62,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={createPath(RESOURCES_NODE_PATH, resource.userProject?.name)}
+          root={createPath(RESOURCES_NODE_PATH, resource.userProject?.id)}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}
