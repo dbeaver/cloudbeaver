@@ -326,7 +326,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMController controller = application.getResourceController(this);
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                VirtualProjectImpl sessionProject = application.createProjectImpl(project, this);
+                VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
                 if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
                     this.defaultProject = sessionProject;
                 }
