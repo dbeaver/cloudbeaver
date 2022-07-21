@@ -22,6 +22,7 @@ export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(functi
   const translate = useTranslate();
   const styles = useStyles(style);
   const nodeInfo = useNode(nodeId);
+  const title = translate('plugin_object_viewer_object_info_tab');
 
   if (!nodeInfo.node) {
     return null;
@@ -30,9 +31,9 @@ export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(functi
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/info.png';
 
   return styled(styles)(
-    <Tab tabId={folderId}>
+    <Tab tabId={folderId} title={title}>
       <TabIcon icon={icon} />
-      <TabTitle>{translate('plugin_object_viewer_object_info_tab')}</TabTitle>
+      <TabTitle>{title}</TabTitle>
     </Tab>
   );
 });
