@@ -169,6 +169,12 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
+    public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        return project.getProjectProperty(propName);
+    }
+
+    @Override
     public String getProjectsDataSources(@NotNull String projectId) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
