@@ -74,8 +74,14 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     @Override
     public DBNResourceManagerProject[] getChildren(DBRProgressMonitor monitor) throws DBException {
         if (projects == null) {
-            DBPProject dbProject = ((DBNProject) getParentNode()).getProject();
-            SMSession session = dbProject.getSessionContext().getSpaceSession(monitor, dbProject, false);
+            List<DBPProject> projectList = getParentNode().getModel().getModelProjects();
+            SMSession session = null;
+            for (DBPProject project : projectList) {
+                session = getParentNode().getModel().getModelAuthContext().getSpaceSession(monitor, project, false);
+                if (session instanceof WebSession) {
+                    break;
+                }
+            }
             if (!(session instanceof WebSession)) {
                 throw new DBException("Can't obtain credentials provider for resource manager");
             }
