@@ -11,5 +11,5 @@ export function isArraysEqual<T>(first: T[], second: T[]): boolean {
     return false;
   }
 
-  return !first.some(value => !second.includes(value));
+  return !first.some((value, index) => second[index] !== value);
 }

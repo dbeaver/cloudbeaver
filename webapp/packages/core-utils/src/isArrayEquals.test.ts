@@ -16,4 +16,16 @@ describe('Is array equals', () => {
   test('should return "false" when arrays are not the same', () => {
     expect(isArraysEqual([1, '2', true], [2, '1', true])).toBe(false);
   });
+
+  test('should return "false" when arrays have the same elements but elements order is different', () => {
+    expect(isArraysEqual(['1', 1, true], [1, '1', true])).toBe(false);
+  });
+
+  test('should return "false" when arrays length is different and the first array is larger', () => {
+    expect(isArraysEqual([1, true, '1'], [1, true])).toBe(false);
+  });
+
+  test('should return "false" when arrays length is different and the second array is larger', () => {
+    expect(isArraysEqual([1, true], [1, true, '1'])).toBe(false);
+  });
 });

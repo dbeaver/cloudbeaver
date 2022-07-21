@@ -21,6 +21,14 @@ describe('Is values equal', () => {
     expect(isValuesEqual(true, true)).toBe(true);
   });
 
+  test('should return "true" when the "null" and "undefined" are passed and default value is an "empty string"', () => {
+    expect(isValuesEqual(null, undefined, '')).toBe(true);
+  });
+
+  test('should return "true" when the "empty string" and "undefined" are passed and default value is an "empty string"', () => {
+    expect(isValuesEqual('', undefined, '')).toBe(true);
+  });
+
   test('should return "false" when the different strings are passed', () => {
     expect(isValuesEqual('value', 'another value')).toBe(false);
   });
