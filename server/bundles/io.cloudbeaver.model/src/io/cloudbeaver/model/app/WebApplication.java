@@ -19,6 +19,7 @@ package io.cloudbeaver.model.app;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -43,6 +44,7 @@ public interface WebApplication extends DBPApplication {
 
     VirtualProjectImpl createProjectImpl(
         @NotNull RMProject project,
+        @NotNull SMSessionContext sessionContext,
         @NotNull SMCredentialsProvider credentialsProvider);
 
     SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);

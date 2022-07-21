@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -113,11 +114,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @Override
     public VirtualProjectImpl createProjectImpl(
         @NotNull RMProject project,
+        @NotNull SMSessionContext sessionContext,
         @NotNull SMCredentialsProvider credentialsProvider
     ) {
         return new VirtualProjectImpl(
             project,
-            ((WebSession) credentialsProvider).getSessionAuthContext());
+            sessionContext);
     }
 
     @Override
