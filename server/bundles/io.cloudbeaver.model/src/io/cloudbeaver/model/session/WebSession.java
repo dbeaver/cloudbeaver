@@ -55,6 +55,7 @@ import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -81,6 +82,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
+    public static final SMObjectType CB_DATASOURCE_OBJECT = new SMObjectType("datasource");
 
     private static final String ATTR_LOCALE = "locale";
 
@@ -381,9 +383,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
 
         try {
-            return Arrays.stream(getSecurityController()
-                    .getSubjectConnectionAccess(new String[]{subjectId}))
-                .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
+            return getSecurityController()
+                .getAllAvailableObjectsPermissions(subjectId, SMObjects.DATASOURCE)
+                .stream()
+                .map(SMObjectPermissions::getObjectId)
+                .collect(Collectors.toSet());
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);

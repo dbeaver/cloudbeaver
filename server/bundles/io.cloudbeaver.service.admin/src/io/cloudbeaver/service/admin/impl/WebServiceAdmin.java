@@ -49,7 +49,9 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -57,7 +59,9 @@ import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +70,13 @@ import java.util.stream.Collectors;
 public class WebServiceAdmin implements DBWServiceAdmin {
 
     private static final Log log = Log.getLog(WebServiceAdmin.class);
+
+    private final Map<String, WebPermissionDescriptor> permissionDescriptorByName = WebServiceRegistry.getInstance()
+        .getWebServices()
+        .stream()
+        .flatMap(service -> service.getPermissions().stream())
+        .collect(Collectors.toMap(WebPermissionDescriptor::getId, Function.identity()));
+
 
     @NotNull
     @Override
@@ -109,7 +120,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<AdminPermissionInfo> permissionInfos = new ArrayList<>();
             for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
                 for (WebPermissionDescriptor pd : wsd.getPermissions()) {
-                    permissionInfos.add(new AdminPermissionInfo(pd));
+                    if(SMConstants.SUBJECT_PERMISSION_SCOPE.equals(pd.getScope())) {
+                        permissionInfos.add(new AdminPermissionInfo(pd));
+                    }
                 }
             }
             return permissionInfos;
@@ -253,6 +266,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
+        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissions);
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
@@ -440,7 +454,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         getGlobalRegistry(webSession).flushConfig();
 
         try {
-            webSession.getSecurityController().setConnectionSubjectAccess(id, null, null);
+            webSession.getAdminSecurityController()
+                .deleteAllObjectPermissions(id, SMObjects.DATASOURCE);
         } catch (DBException e) {
             log.error(e);
         }
@@ -628,7 +643,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
         try {
-            return webSession.getSecurityController().getConnectionSubjectAccess(connectionId);
+            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjects.DATASOURCE)
+                .stream()
+                .map(objectPermissionGrant -> new SMDataSourceGrant(
+                    objectPermissionGrant.getObjectPermissions().getObjectId(),
+                    objectPermissionGrant.getSubjectId(),
+                    objectPermissionGrant.getSubjectType()
+                ))
+                .toArray(SMDataSourceGrant[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -645,7 +667,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
-            webSession.getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
+            webSession.getAdminSecurityController()
+                .setObjectPermissions(Set.of(connectionId), SMObjects.DATASOURCE,
+                    new HashSet<>(subjects),
+                    Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION), grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
@@ -655,7 +680,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
-            return webSession.getSecurityController().getSubjectConnectionAccess(new String[]{subjectId});
+            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, SMObjects.DATASOURCE)
+                .stream()
+                .map(objectPermissionsGrant ->
+                    new SMDataSourceGrant(
+                        objectPermissionsGrant.getObjectPermissions().getObjectId(),
+                        objectPermissionsGrant.getSubjectId(),
+                        objectPermissionsGrant.getSubjectType()
+                    ))
+                .toArray(SMDataSourceGrant[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error getting connection access info", e);
         }
@@ -673,7 +706,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            webSession.getAdminSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
+            webSession.getAdminSecurityController()
+                .setObjectPermissions(
+                    new HashSet<>(connections),
+                    SMObjects.DATASOURCE,
+                    Set.of(subjectId),
+                    Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                    grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }
@@ -705,4 +744,18 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return session.getProjectById(RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
     }
 
+    private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBWebException {
+        for (String permission : permissions) {
+            var permissionDescriptor = permissionDescriptorByName.get(permission);
+            if (permissionDescriptor == null) {
+                throw new DBWebException("Unknown permission: " + permission);
+            }
+            if (!expectedScope.equals(permissionDescriptor.getScope())) {
+                throw new DBWebException(MessageFormat.format(
+                    "Unexpected permission scope, expected [{}] but was [{}]",
+                    expectedScope, permissionDescriptor.getScope()
+                ));
+            }
+        }
+    }
 }
