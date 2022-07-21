@@ -45,10 +45,7 @@ import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -57,7 +54,6 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -195,7 +191,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return productConfiguration;
     }
 
-    public SMController getSecurityController() {
+    public SMAdminController getSecurityController() {
         return securityController;
     }
 
@@ -779,14 +775,17 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
-            SMController securityController = getSecurityController();
+            var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                SMDataSourceGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
-                if (ArrayUtils.isEmpty(grants)) {
-                    securityController.setConnectionSubjectAccess(
-                        ds.getId(),
-                        new String[]{anonymousRoleId},
-                        adminName);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousRoleId, ds.getId(), SMObjects.DATASOURCE);
+                if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
+                    securityController.setObjectPermissions(
+                        Set.of(ds.getId()),
+                        SMObjects.DATASOURCE,
+                        Set.of(anonymousRoleId),
+                        Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                        adminName
+                    );
                 }
             }
         } catch (Exception e) {

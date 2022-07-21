@@ -14,7 +14,7 @@ import { renderInApp } from '@cloudbeaver/core-cli/tests/utils/renderInApp';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
-import { prettyDOM, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 
 
 import { ErrorMessage } from './ErrorMessage';
@@ -32,5 +32,4 @@ beforeAll(() => app.init());
 test('icons.svg#name', () => {
   renderInApp(<ErrorMessage text='error' />, app);
   expect(screen.getByText('error')).not.toBeNull();
-  console.log(prettyDOM(document.body));
 });

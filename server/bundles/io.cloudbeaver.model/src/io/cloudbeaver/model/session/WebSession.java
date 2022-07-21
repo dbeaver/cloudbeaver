@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.*;
@@ -56,10 +57,11 @@ import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.VirtualProjectImpl;
+import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -68,7 +70,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -83,6 +84,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
+    public static final SMObjectType CB_DATASOURCE_OBJECT = new SMObjectType("datasource");
 
     private static final String ATTR_LOCALE = "locale";
 
@@ -326,7 +328,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMController controller = application.getResourceController(this);
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                VirtualProjectImpl sessionProject = application.createProjectImpl(project, this);
+                VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
                 if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
                     this.defaultProject = sessionProject;
                 }
@@ -383,9 +385,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
 
         try {
-            return Arrays.stream(getSecurityController()
-                    .getSubjectConnectionAccess(new String[]{subjectId}))
-                .map(SMDataSourceGrant::getDataSourceId).collect(Collectors.toSet());
+            return getSecurityController()
+                .getAllAvailableObjectsPermissions(subjectId, SMObjects.DATASOURCE)
+                .stream()
+                .map(SMObjectPermissions::getObjectId)
+                .collect(Collectors.toSet());
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error reading connection grants", e);
@@ -957,6 +961,28 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
+        }
+    }
+
+    public DBPProject getProjectById(@Nullable String projectId) {
+        if (projectId == null) {
+            return defaultProject;
+        }
+        for (DBPProject project : sessionProjects) {
+            if (project.getId().equals(projectId)) {
+                return project;
+            }
+        }
+        return null;
+    }
+
+    public List<DBPProject> getSessionProjects() {
+        return sessionProjects;
+    }
+
+    public void addSessionProject(DBPProject project) {
+        synchronized (sessionProjects) {
+            sessionProjects.add(project);
         }
     }
 

@@ -8,10 +8,20 @@
 
 import { isValidUrl } from './isValidUrl';
 
-test('http', () => {
-  expect(isValidUrl('http://example.com')).toBe(true);
-});
+describe('Is valid url', () => {
+  test('should return "true" when valid url with "http" protocol is passed', () => {
+    expect(isValidUrl('http://example.com')).toBe(true);
+  });
 
-test('https', () => {
-  expect(isValidUrl('https://example.com')).toBe(true);
+  test('should return "true" when valid url with "https" protocol is passed', () => {
+    expect(isValidUrl('https://example.com')).toBe(true);
+  });
+
+  test('should return "false" when url without protocol is passed', () => {
+    expect(isValidUrl('example.com')).toBe(false);
+  });
+
+  test('should return "false" when not valid url is passed', () => {
+    expect(isValidUrl('example')).toBe(false);
+  });
 });

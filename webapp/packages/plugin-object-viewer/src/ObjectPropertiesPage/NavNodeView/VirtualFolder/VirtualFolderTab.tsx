@@ -23,7 +23,7 @@ export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualF
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/folder.png';
 
   return styled(styles)(
-    <Tab tabId={folderId}>
+    <Tab tabId={folderId} title={nodeType}>
       <TabIcon icon={icon} />
       <TabTitle>{nodeType}</TabTitle>
     </Tab>

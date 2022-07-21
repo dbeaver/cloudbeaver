@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.apache.commons.io.FileUtils;
@@ -195,6 +197,12 @@ public class LocalResourceController implements RMController {
             );
         }
         return project;
+    }
+
+    @Override
+    public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        return project.getProjectProperty(propName);
     }
 
     @Override
@@ -559,9 +567,9 @@ public class LocalResourceController implements RMController {
 
         private Builder(SMCredentialsProvider credentialsProvider) {
             this.credentialsProvider = credentialsProvider;
-            this.rootPath = DBWorkbench.getPlatform().getWorkspace().getAbsolutePath();
-            this.userProjectsPath = this.rootPath.resolve(DBWConstants.USER_PROJECTS_FOLDER);
-            this.sharedProjectsPath = this.rootPath.resolve(DBWConstants.SHARED_PROJECTS_FOLDER);
+            this.rootPath = RMUtils.getRootPath();
+            this.userProjectsPath = RMUtils.getUserProjectsPath();
+            this.sharedProjectsPath = RMUtils.getSharedProjectsPath();
         }
 
         public Builder setRootPath(Path rootPath) {

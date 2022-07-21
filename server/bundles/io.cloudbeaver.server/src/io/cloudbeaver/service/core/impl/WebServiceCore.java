@@ -107,7 +107,10 @@ public class WebServiceCore implements DBWServiceCore {
                 return Collections.singletonList(connectionInfo);
             }
         }
-        return webSession.getConnections();
+        List<DBPDriver> applicableDrivers = CBPlatform.getInstance().getApplicableDrivers();
+        return webSession.getConnections().stream()
+            .filter(c -> applicableDrivers.contains(c.getDataSourceContainer().getDriver()))
+            .collect(Collectors.toList());
     }
 
     @Deprecated

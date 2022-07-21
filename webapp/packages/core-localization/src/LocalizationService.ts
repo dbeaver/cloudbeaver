@@ -28,11 +28,11 @@ export type ServerLanguageShort = Pick<ServerLanguage, 'isoCode' | 'nativeName'>
 const DEFAULT_LOCALE_NAME = 'en';
 const LANG_SETTINGS_KEY = 'langSettings';
 
-interface IDefaultSettings {
+export interface ILocalizationSettings {
   defaultLanguage: string;
 }
 
-export const defaultThemeSettings: IDefaultSettings = {
+export const defaultThemeSettings: ILocalizationSettings = {
   defaultLanguage: DEFAULT_LOCALE_NAME,
 };
 
@@ -53,9 +53,9 @@ export class LocalizationService extends Bootstrap {
   settings = {
     language: DEFAULT_LOCALE_NAME,
   };
-  readonly pluginSettings: PluginSettings<IDefaultSettings>;
+  readonly pluginSettings: PluginSettings<ILocalizationSettings>;
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
-  readonly deprecatedPluginSettings: PluginSettings<IDefaultSettings>;
+  readonly deprecatedPluginSettings: PluginSettings<ILocalizationSettings>;
 
   readonly onChange: ISyncExecutor<string>;
   // observable.shallow - don't treat locales as observables
