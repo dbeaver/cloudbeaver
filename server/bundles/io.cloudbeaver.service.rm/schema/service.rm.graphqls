@@ -1,4 +1,7 @@
 # Metadata queries
+enum RMProjectPermission {
+    resource_edit
+}
 
 type RMProject {
     id: String!
@@ -8,6 +11,8 @@ type RMProject {
 
     createTime: DateTime!
     creator: String!
+    canEditResource: Boolean!
+    canEditConnection: Boolean!
 }
 
 type RMResource {

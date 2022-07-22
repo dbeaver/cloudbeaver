@@ -109,13 +109,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
     private final Map<String, Function<Object, Object>> attributeDisposers = new HashMap<>();
 
-    // Map of auth tokens. Key is authentication provdier
+    // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private VirtualProjectImpl defaultProject;
-    private final List<DBPProject> sessionProjects = new ArrayList<>();
+    private final List<VirtualProjectImpl> accessibleProjects = new ArrayList<>();
     private final SessionContextImpl sessionAuthContext;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
@@ -295,20 +295,20 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.navigatorModel = null;
         }
 
-        if (!this.sessionProjects.isEmpty()) {
-            for (DBPProject project : sessionProjects) {
+        if (!this.accessibleProjects.isEmpty()) {
+            for (VirtualProjectImpl project : accessibleProjects) {
                 if (project.equals(DBWorkbench.getPlatform().getWorkspace().getActiveProject())) {
                     continue;
                 }
-                ((BaseProjectImpl) project).dispose();
+                project.dispose();
             }
             this.defaultProject = null;
-            this.sessionProjects.clear();
+            this.accessibleProjects.clear();
         }
 
         loadProjects();
 
-        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.sessionProjects);
+        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.accessibleProjects);
         this.navigatorModel.setModelAuthContext(sessionAuthContext);
         this.navigatorModel.initialize();
 
@@ -325,7 +325,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private void loadProjects() {
         WebUser user = userContext.getUser();
         try {
-            RMController controller = application.getResourceController(this);
+            RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
@@ -349,7 +349,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
-        for (DBPProject project : sessionProjects) {
+        for (DBPProject project : accessibleProjects) {
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
             for (DBPDataSourceContainer ds : registry.getDataSources()) {
@@ -930,11 +930,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return userContext.getActiveUserCredentials();
     }
 
-    public DBPProject getProjectById(@Nullable String projectId) {
+    public VirtualProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
         }
-        for (DBPProject project : sessionProjects) {
+        for (VirtualProjectImpl project : accessibleProjects) {
             if (project.getId().equals(projectId)) {
                 return project;
             }
@@ -942,13 +942,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return null;
     }
 
-    public List<DBPProject> getSessionProjects() {
-        return sessionProjects;
+    public List<VirtualProjectImpl> getAccessibleProjects() {
+        return accessibleProjects;
     }
 
-    public void addSessionProject(DBPProject project) {
-        synchronized (sessionProjects) {
-            sessionProjects.add(project);
+    public void addSessionProject(VirtualProjectImpl project) {
+        synchronized (accessibleProjects) {
+            accessibleProjects.add(project);
         }
         if (navigatorModel != null) {
             navigatorModel.getRoot().addProject(project, false);
@@ -956,8 +956,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public void deleteSessionProject(DBPProject project) {
-        synchronized (sessionProjects) {
-            sessionProjects.remove(project);
+        synchronized (accessibleProjects) {
+            accessibleProjects.remove(project);
         }
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);

@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.rm;
+
+package io.cloudbeaver;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * RM constants
+ * Object association annotation
  */
-public interface RMConstants  {
-
-    String PERMISSION_PROJECT_VIEW = "project-view";
-    String PERMISSION_PROJECT_EDIT = "project-edit";
-    String PERMISSION_PROJECT_ADMIN = "project-admin";
-
-    // RM admin can create/delete projects. It also can assign project permissions.
-    String PERMISSION_RM_ADMIN = "rm-admin";
-
+@Target(value = {ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface WebProjectAction {
+    String[] requireProjectPermissions() default {};
 }

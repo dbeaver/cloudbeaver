@@ -16,14 +16,14 @@
  */
 package io.cloudbeaver.service.rm;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebProjectInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 
@@ -36,43 +36,60 @@ public interface DBWServiceRM extends DBWService {
     RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException;
 
     @NotNull
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_VIEW
+    )
     RMResource[] listResources(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
+        @NotNull @WebObjectId String projectId,
         @Nullable String folder,
         @Nullable String nameMask,
         boolean readProperties,
         boolean readHistory) throws DBException;
 
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_VIEW
+    )
     String readResourceAsString(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
+        @NotNull @WebObjectId String projectId,
         @NotNull String resourcePath) throws DBException;
 
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT
+    )
     String createResource(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
+        @NotNull @WebObjectId String projectId,
         @NotNull String resourcePath,
         boolean isFolder) throws DBException;
 
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT
+    )
     boolean deleteResource(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
+        @NotNull @WebObjectId String projectId,
         @NotNull String resourcePath) throws DBException;
 
     @NotNull
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT
+    )
     String writeResourceStringContent(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
+        @NotNull @WebObjectId String projectId,
         @NotNull String resourcePath,
         @NotNull String data) throws DBException;
 
+    @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
     WebProjectInfo createProject(
         @NotNull WebSession session,
         @NotNull String name,
         @Nullable String description) throws DBWebException;
 
+    @WebProjectAction(requireProjectPermissions = RMConstants.PERMISSION_RM_ADMIN)
     boolean deleteProject(
         @NotNull WebSession session,
-        @NotNull String projectId) throws DBWebException;
+        @NotNull @WebObjectId String projectId) throws DBWebException;
 }

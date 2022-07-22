@@ -51,7 +51,10 @@ public interface WebApplication extends DBPApplication {
 
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 
-    RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider);
+    RMController getResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull SMController smController
+    );
 
     String getServerURL();
 

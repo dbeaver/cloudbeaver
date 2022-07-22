@@ -567,7 +567,7 @@ public class WebServiceCore implements DBWServiceCore {
     // Projects
     @Override
     public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
-        return session.getSessionProjects().stream()
+        return session.getAccessibleProjects().stream()
             .map(pr -> new WebProjectInfo(session, pr)).collect(Collectors.toList());
     }
 

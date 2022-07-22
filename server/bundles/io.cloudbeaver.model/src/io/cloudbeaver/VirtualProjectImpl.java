@@ -79,4 +79,8 @@ public class VirtualProjectImpl extends BaseProjectImpl {
     public void ensureOpen() {
 
     }
+    @NotNull
+    public RMProject getRmProject() {
+        return this.project;
+    }
 }
