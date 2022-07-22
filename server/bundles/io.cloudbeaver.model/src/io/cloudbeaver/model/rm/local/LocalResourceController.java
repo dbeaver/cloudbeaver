@@ -16,12 +16,10 @@
  */
 package io.cloudbeaver.model.rm.local;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
-import org.apache.commons.io.FileUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -31,7 +29,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -182,7 +179,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + project.getName() + "' doesn't exists");
         }
         try {
-            FileUtils.deleteDirectory(targetPath.toFile());
+            CommonUtils.deleteDirectory(targetPath);
         } catch (IOException e) {
             throw new DBException("Error deleting project '" + project.getName() + "'", e);
         }
@@ -335,7 +332,7 @@ public class LocalResourceController implements RMController {
         List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
         try {
             if (targetPath.toFile().isDirectory()) {
-                FileUtils.deleteDirectory(targetPath.toFile());
+                CommonUtils.deleteDirectory(targetPath);
             } else {
                 Files.delete(targetPath);
             }
