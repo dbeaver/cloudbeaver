@@ -37,7 +37,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -947,6 +949,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public void addSessionProject(DBPProject project) {
         synchronized (sessionProjects) {
             sessionProjects.add(project);
+        }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().addProject(project, false);
+        }
+    }
+
+    public void deleteSessionProject(DBPProject project) {
+        synchronized (sessionProjects) {
+            sessionProjects.remove(project);
+        }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().removeProject(project);
         }
     }
 

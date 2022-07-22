@@ -17,11 +17,13 @@
 package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebProjectInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.rm.DBWServiceRM;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -94,6 +96,32 @@ public class WebServiceRM implements DBWServiceRM {
             return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes);
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
+        }
+    }
+
+    @Override
+    public WebProjectInfo createProject(
+        @NotNull WebSession session, @NotNull String name, @Nullable String description
+    ) throws DBWebException {
+        try {
+            RMProject rmProject = getResourceController(session).createProject(name, description);
+            DBPProject project = session.getApplication().createProjectImpl(rmProject, session.getSessionAuthContext(), session);
+            session.addSessionProject(project);
+            return new WebProjectInfo(session, project);
+        } catch (DBException e) {
+            throw new DBWebException("Error creating project", e);
+        }
+    }
+
+    @Override
+    public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
+        try {
+            DBPProject project = session.getProjectById(projectId);
+            getResourceController(session).deleteProject(projectId);
+            session.deleteSessionProject(project);
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting project", e);
         }
     }
 

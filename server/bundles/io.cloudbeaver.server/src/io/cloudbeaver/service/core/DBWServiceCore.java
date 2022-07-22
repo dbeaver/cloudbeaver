@@ -147,6 +147,12 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo closeConnection(@NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId) throws DBWebException;
 
     ///////////////////////////////////////////
+    // Projects
+
+    @WebAction
+    List<WebProjectInfo> getProjects(@NotNull WebSession session);
+
+    ///////////////////////////////////////////
     // Folders
 
     @WebAction
