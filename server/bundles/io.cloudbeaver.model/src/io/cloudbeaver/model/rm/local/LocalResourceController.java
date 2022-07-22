@@ -356,8 +356,8 @@ public class LocalResourceController implements RMController {
                     data.length);
         }
         Path targetPath = getTargetPath(projectId, resourcePath);
-        if (!Files.exists(targetPath)) {
-            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
+        if (!Files.exists(targetPath.getParent())) {
+            throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
         }
         try {
             Files.write(targetPath, data);
