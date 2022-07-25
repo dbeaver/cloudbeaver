@@ -20,6 +20,7 @@ import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -206,9 +207,10 @@ public class LocalResourceController implements RMController {
     public String getProjectsDataSources(@NotNull String projectId) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+        WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
-
+        WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
@@ -219,7 +221,9 @@ public class LocalResourceController implements RMController {
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
         registry.loadDataSources(List.of(storage), manager, true, false);
+        WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
         registry.saveDataSources();
+        WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
     }
 
     @Override
@@ -236,6 +240,7 @@ public class LocalResourceController implements RMController {
                 log.warn("Could not find datasource " + dataSourceId + " for deletion");
             }
         }
+        WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
     }
 
     @NotNull

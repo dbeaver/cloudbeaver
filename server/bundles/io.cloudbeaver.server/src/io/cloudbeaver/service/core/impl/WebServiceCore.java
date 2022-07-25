@@ -317,6 +317,7 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         sessionRegistry.addDataSource(newDataSource);
+        WebDataSourceUtils.validateDataSourceRegistryErrors(sessionRegistry);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -354,6 +355,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 
         sessionRegistry.updateDataSource(dataSource);
+        WebDataSourceUtils.validateDataSourceRegistryErrors(sessionRegistry);
 
         return connectionInfo;
     }
@@ -392,6 +394,7 @@ public class WebServiceCore implements DBWServiceCore {
             newDataSource.setName(connectionName);
         }
         projectRegistry.addDataSource(newDataSource);
+        WebDataSourceUtils.validateDataSourceRegistryErrors(projectRegistry);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -434,7 +437,7 @@ public class WebServiceCore implements DBWServiceCore {
 
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
             webSession.addConnection(connectionInfo);
-
+            WebDataSourceUtils.validateDataSourceRegistryErrors(dataSourceRegistry);
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -554,7 +557,9 @@ public class WebServiceCore implements DBWServiceCore {
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
         if (forceDelete) {
-            webSession.getProjectById(projectId).getDataSourceRegistry().removeDataSource(dataSourceContainer);
+            DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
+            registry.removeDataSource(dataSourceContainer);
+            WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
