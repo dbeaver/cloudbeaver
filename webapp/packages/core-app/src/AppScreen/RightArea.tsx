@@ -39,7 +39,11 @@ const styles = css`
     }
   `;
 
-export const RightArea = observer(function RightArea() {
+interface Props {
+  className?: string;
+}
+
+export const RightArea = observer<Props>(function RightArea({ className }) {
   const toolsPanelService = useService(ToolsPanelService);
   const optionsPanelService = useService(OptionsPanelService);
   const splitState = useSplitUserState('right-area');
@@ -48,7 +52,7 @@ export const RightArea = observer(function RightArea() {
   const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
-    <SlideBox open={optionsPanelService.active}>
+    <SlideBox open={optionsPanelService.active} className={className}>
       <SlideElement>
         <ErrorBoundary remount><OptionsPanel /></ErrorBoundary>
       </SlideElement>

@@ -11,11 +11,15 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { TopNavService } from './TopNavService';
 
-export const TopNavBar = function TopNavBar() {
+interface Props {
+  className?: string;
+}
+
+export const TopNavBar: React.FC<Props> = function TopNavBar({ className }) {
   const topNavService = useService(TopNavService);
 
   return (
-    <TopAppBar>
+    <TopAppBar className={className}>
       <Placeholder container={topNavService.placeholder} />
     </TopAppBar>
   );

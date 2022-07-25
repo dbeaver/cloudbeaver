@@ -14,7 +14,9 @@ import { MainMenuService } from './TopNavBar/MainMenu/MainMenuService';
 import { TopNavService } from './TopNavBar/TopNavService';
 
 export const topAppBarPlugin: PluginManifest = {
-  info: { name: 'Top App Bar plugin' },
+  info: {
+    name: 'Top App Bar plugin',
+  },
   providers: [
     PluginBootstrap,
     MainMenuService,

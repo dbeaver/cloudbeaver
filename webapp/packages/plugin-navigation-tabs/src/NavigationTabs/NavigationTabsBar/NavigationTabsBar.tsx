@@ -39,7 +39,11 @@ const styles = css`
     }
   `;
 
-export const NavigationTabsBar = observer(function NavigationTabsBar() {
+interface Props {
+  className?: string;
+}
+
+export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ className }) {
   const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
@@ -73,7 +77,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   }
 
   return styled(style)(
-    <CaptureView view={navigation}>
+    <CaptureView view={navigation} className={className}>
       <TabsBox
         currentTabId={navigation.currentTabId}
         tabs={navigation.tabIdList.map(tabId => (
