@@ -21,6 +21,9 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### CloudBeaver 22.1.3 - 2022-07-25
+- Scripts can be renamed in the Resource Manager.
+- Different Resource Management improvements have been made.
 ### CloudBeaver 22.1.2 - 2022-07-11
 
 - New folders allow users to group:
