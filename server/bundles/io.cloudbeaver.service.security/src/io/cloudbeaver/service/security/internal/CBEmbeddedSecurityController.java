@@ -24,8 +24,6 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.registry.WebPermissionDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -53,11 +51,9 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.sql.*;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -872,19 +868,24 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         var authProgressMonitor = new VoidProgressMonitor();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                Map<String, Object> userIdentifyingCredentials = userCredentials;
+                Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
                 AuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
-                    userIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
+                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
                 }
+
+                var filteredUserCreds = filterSecuredUserData(
+                    securedUserIdentifyingCredentials,
+                    authProviderDescriptor
+                );
 
                 var authAttemptId = createNewAuthAttempt(
                     SMAuthStatus.IN_PROGRESS,
                     authProviderId,
                     authProviderConfigurationId,
-                    userIdentifyingCredentials,
+                    filteredUserCreds,
                     appSessionId,
                     previousSmSessionId,
                     sessionType,
@@ -897,14 +898,33 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     var redirectUrl = buildRedirectLink(
                         authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
-                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, userIdentifyingCredentials);
+                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, filteredUserCreds);
                 }
                 txn.commit();
-                return finishAuthentication(authAttemptId, true);
+                return finishAuthentication(
+                    SMAuthInfo.inProgress(authAttemptId, null, Map.of(authProviderId, securedUserIdentifyingCredentials)),
+                    true,
+                    false
+                );
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    private Map<String, Object> filterSecuredUserData(
+        Map<String, Object> userIdentifyingCredentials,
+        AuthProviderDescriptor authProviderDescriptor
+    ) {
+        SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProviderDescriptor, userIdentifyingCredentials.keySet());
+        return userIdentifyingCredentials.entrySet()
+            .stream()
+            .filter((cred) -> {
+                AuthPropertyDescriptor property = credProfile.getCredentialParameter(cred.getKey());
+
+                return property != null && property.getEncryption() != AuthPropertyEncryption.none;
+                })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private String createNewAuthAttempt(
@@ -1109,11 +1129,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
-        return finishAuthentication(authId, false);
+        SMAuthInfo authInfo = getAuthStatus(authId);
+        return finishAuthentication(authInfo, false, true);
     }
 
-    private SMAuthInfo finishAuthentication(@NotNull String authId, boolean forceExpireAuthAfterSuccess) throws DBException {
-        SMAuthInfo authInfo = getAuthStatus(authId);
+    private SMAuthInfo finishAuthentication(@NotNull SMAuthInfo authInfo,  boolean forceExpireAuthAfterSuccess, boolean saveSecuredCreds) throws DBException {
+        String authId = authInfo.getAuthAttemptId();
         if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
         }
@@ -1135,6 +1156,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         String activeUserId = permissions == null ? null : permissions.getUserId();
 
+        Map<String, Object> storedUserData = new LinkedHashMap<>();
         for (String authProviderId : authProviderIds) {
             var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
@@ -1154,6 +1176,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             if (activeUserId == null) {
                 activeUserId = userIdFromCreds;
             }
+            storedUserData.put(
+                authProviderId,
+                saveSecuredCreds ? userCredentials : filterSecuredUserData(userCredentials, getAuthProvider(authProviderId))
+            );
         }
 
         if (token == null && permissions == null) {
@@ -1182,7 +1208,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         }
         var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
-        updateAuthStatus(authId, authStatus, authInfo.getAuthData(), null, permissions.getSessionId());
+        updateAuthStatus(authId, authStatus, storedUserData, null, permissions.getSessionId());
         return SMAuthInfo.success(authId, token, permissions, authInfo.getAuthData());
     }
 
