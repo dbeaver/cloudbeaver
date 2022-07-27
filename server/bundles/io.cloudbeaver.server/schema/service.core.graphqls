@@ -230,6 +230,8 @@ type DriverInfo {
     applicableAuthModels: [ID!]!
 
     applicableNetworkHandlers: [ID]!
+
+    configurationTypes: [DriverConfigurationType]!
 }
 
 enum ResultDataFormat {
@@ -237,6 +239,11 @@ enum ResultDataFormat {
     document,
     graph,
     timeseries
+}
+
+enum DriverConfigurationType {
+    EXTENDED,
+    URL
 }
 
 ## Network handler config
