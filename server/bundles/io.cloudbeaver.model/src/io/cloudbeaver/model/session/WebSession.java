@@ -22,6 +22,7 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -328,20 +329,25 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
-                if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
-                    this.defaultProject = sessionProject;
-                }
-                DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
-                ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
-                addSessionProject(sessionProject);
-                if (user == null && sessionProject.equals(defaultProject)) {
-                    sessionProject.setInMemory(true);
-                }
+                createVirtualProject(project);
+            }
+            if (user == null) {
+                createVirtualProject(RMUtils.createAnonymousProject());
+                this.defaultProject.setInMemory(true);
             }
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error getting accessible projects list", e);
+        }
+    }
+
+    private void createVirtualProject(RMProject project) {
+        VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
+        DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
+        ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
+        addSessionProject(sessionProject);
+        if (!project.isShared()) {
+            this.defaultProject = sessionProject;
         }
     }
 
