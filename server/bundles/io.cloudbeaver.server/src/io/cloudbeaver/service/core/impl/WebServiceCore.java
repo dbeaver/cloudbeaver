@@ -317,6 +317,11 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         sessionRegistry.addDataSource(newDataSource);
+        try {
+            sessionRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -354,6 +359,11 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 
         sessionRegistry.updateDataSource(dataSource);
+        try {
+            sessionRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         return connectionInfo;
     }
@@ -392,6 +402,11 @@ public class WebServiceCore implements DBWServiceCore {
             newDataSource.setName(connectionName);
         }
         projectRegistry.addDataSource(newDataSource);
+        try {
+            projectRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -434,7 +449,7 @@ public class WebServiceCore implements DBWServiceCore {
 
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
             webSession.addConnection(connectionInfo);
-
+            dataSourceRegistry.checkForErrors();
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -554,7 +569,13 @@ public class WebServiceCore implements DBWServiceCore {
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
         if (forceDelete) {
-            webSession.getProjectById(projectId).getDataSourceRegistry().removeDataSource(dataSourceContainer);
+            DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
+            registry.removeDataSource(dataSourceContainer);
+            try {
+                registry.checkForErrors();
+            } catch (DBException e) {
+                throw new DBWebException(e.getMessage(), e.getCause());
+            }
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials

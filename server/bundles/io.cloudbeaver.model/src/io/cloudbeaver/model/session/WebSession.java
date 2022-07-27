@@ -362,6 +362,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
                 connList.add(connectionInfo);
             }
+            Throwable lastError = registry.getLastError();
+            if (lastError != null) {
+                addSessionError(lastError);
+                log.error("Error refreshing connections from project '" + project.getId() + "'", lastError);
+            }
         }
 
         // Add all provided datasources to the session
