@@ -80,11 +80,4 @@ public class WebDataSourceUtils {
         }
         return registry;
     }
-
-    public static void validateDataSourceRegistryErrors(DBPDataSourceRegistry registry) throws DBWebException {
-        Throwable lastError = registry.getLastError();
-        if (lastError != null) {
-            throw new DBWebException(lastError.getMessage(), lastError.getCause());
-        }
-    }
 }

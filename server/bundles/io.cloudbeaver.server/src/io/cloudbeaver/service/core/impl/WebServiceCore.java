@@ -317,7 +317,11 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         sessionRegistry.addDataSource(newDataSource);
-        WebDataSourceUtils.validateDataSourceRegistryErrors(sessionRegistry);
+        try {
+            sessionRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -355,7 +359,11 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 
         sessionRegistry.updateDataSource(dataSource);
-        WebDataSourceUtils.validateDataSourceRegistryErrors(sessionRegistry);
+        try {
+            sessionRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         return connectionInfo;
     }
@@ -394,7 +402,11 @@ public class WebServiceCore implements DBWServiceCore {
             newDataSource.setName(connectionName);
         }
         projectRegistry.addDataSource(newDataSource);
-        WebDataSourceUtils.validateDataSourceRegistryErrors(projectRegistry);
+        try {
+            projectRegistry.checkForErrors();
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e.getCause());
+        }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
@@ -437,7 +449,7 @@ public class WebServiceCore implements DBWServiceCore {
 
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
             webSession.addConnection(connectionInfo);
-            WebDataSourceUtils.validateDataSourceRegistryErrors(dataSourceRegistry);
+            dataSourceRegistry.checkForErrors();
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -559,7 +571,11 @@ public class WebServiceCore implements DBWServiceCore {
         if (forceDelete) {
             DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
             registry.removeDataSource(dataSourceContainer);
-            WebDataSourceUtils.validateDataSourceRegistryErrors(registry);
+            try {
+                registry.checkForErrors();
+            } catch (DBException e) {
+                throw new DBWebException(e.getMessage(), e.getCause());
+            }
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
