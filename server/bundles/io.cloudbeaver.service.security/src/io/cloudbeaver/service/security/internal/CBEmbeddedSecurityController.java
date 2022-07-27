@@ -922,7 +922,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             .filter((cred) -> {
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(cred.getKey());
 
-                return property != null && property.getEncryption() != AuthPropertyEncryption.none;
+                return property != null && property.getEncryption() == AuthPropertyEncryption.none;
                 })
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
