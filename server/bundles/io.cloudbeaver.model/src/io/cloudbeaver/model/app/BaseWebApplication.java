@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 import io.cloudbeaver.VirtualProjectImpl;
@@ -123,12 +124,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return createResourceController(credentialsProvider);
-    }
+    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull SMController smController) {
+        return  LocalResourceController.builder(credentialsProvider, smController).build();
 
-    protected @NotNull RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return LocalResourceController.builder(credentialsProvider).build();
     }
 
     protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {

@@ -29,6 +29,7 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -38,10 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.Set;
 
 /**
@@ -153,6 +151,10 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     if (webAction != null) {
                         checkActionPermissions(method, webAction);
                     }
+                    WebProjectAction projectAction = method.getAnnotation(WebProjectAction.class);
+                    if(projectAction != null) {
+                        checkObjectActionPermissions(method, projectAction, args);
+                    }
                     beforeWebActionCall(webAction, method, args);
                     try {
                         return method.invoke(impl, args);
@@ -170,6 +172,42 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
                 // Undeclared exception - wrap
                 throw new InvocationTargetException(ex);
+            }
+        }
+
+        private void checkObjectActionPermissions(Method method, WebProjectAction objectAction, Object[] args) throws DBException {
+            WebSession webSession = findWebSession(env);
+
+            String[] requireProjectPermissions = objectAction.requireProjectPermissions();
+            if (requireProjectPermissions.length > 0) {
+                int objectIdArgumentIndex = -1;
+                for (int i = 0; i < method.getParameters().length; i++) {
+                    Parameter parameter = method.getParameters()[i];
+                    if (parameter.isAnnotationPresent(WebObjectId.class)) {
+                        if (String.class != parameter.getAnnotatedType().getType()) {
+                            throw new DBWebExceptionAccessDenied("Invalid object id type");
+                        }
+                        objectIdArgumentIndex = i;
+                        break;
+                    }
+                }
+
+                if (objectIdArgumentIndex < 0) {
+                    throw new DBWebExceptionAccessDenied("Project id argument not found");
+                }
+
+                String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
+                VirtualProjectImpl project = webSession.getProjectById(projectId);
+                if(project == null) {
+                    throw new DBException("Project not found:" + projectId);
+                }
+                RMProject rmProject = project.getRmProject();
+
+                for (String reqProjectPermission : requireProjectPermissions) {
+                    if (!rmProject.getProjectPermissions().contains(reqProjectPermission)) {
+                        throw new DBWebExceptionAccessDenied("Access denied");
+                    }
+                }
             }
         }
 

@@ -4,9 +4,13 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RMUtils {
 
@@ -32,5 +36,20 @@ public class RMUtils {
             default:
                 return getUserProjectsPath().resolve(project.getName());
         }
+    }
+
+    public static Set<String> parseProjectPermissions(Set<String> permissions) {
+       return permissions.stream()
+           .map(RMProjectPermission::fromPermission).filter(Objects::nonNull)
+           .flatMap(permission -> permission.getAllPermissions().stream())
+           .collect(Collectors.toSet());
+    }
+
+    public static RMProject createAnonymousProject() {
+        RMProject project = new RMProject("anonymous");
+        project.setId("anonymous");
+        project.setType(RMProject.Type.USER);
+        project.setProjectPermissions(RMProjectPermission.CONNECTIONS_EDIT.getAllPermissions());
+        return project;
     }
 }

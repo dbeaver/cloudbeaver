@@ -77,11 +77,11 @@ public class WebUserContext implements SMCredentialsProvider {
         if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), authPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smCredentials = new SMCredentials(smAuthInfo.getSmAuthToken(), authPermissions.getUserId());
+        this.smCredentials = new SMCredentials(smAuthInfo.getSmAuthToken(), authPermissions.getUserId(), authPermissions.getPermissions());
         this.userPermissions = authPermissions.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
-        this.rmController = application.getResourceController(this);
+        this.rmController = application.getResourceController(this, this.securityController);
         if (isSessionChanged) {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
             setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getUserById(authPermissions.getUserId())));
@@ -98,7 +98,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.user = null;
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = null;
-        this.rmController = application.getResourceController(this);
+        this.rmController = application.getResourceController(this, this.securityController);
     }
 
     @NotNull

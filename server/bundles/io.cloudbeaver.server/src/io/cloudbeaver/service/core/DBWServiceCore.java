@@ -18,12 +18,15 @@ package io.cloudbeaver.service.core;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebObjectId;
+import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,35 +108,35 @@ public interface DBWServiceCore extends DBWService {
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         @Nullable Boolean saveCredentials) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo updateConnection(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     boolean deleteConnection(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull String connectionId) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException;
 
-    @WebAction()
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo copyConnectionFromNode(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull String nodePath,
         @NotNull WebConnectionConfig config) throws DBWebException;
 
