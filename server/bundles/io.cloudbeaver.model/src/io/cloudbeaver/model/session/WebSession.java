@@ -329,15 +329,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
-                if (!project.isShared() || (user == null && project.getType().equals(RMProject.Type.GLOBAL))) {
+                if (!project.isShared()) {
                     this.defaultProject = sessionProject;
+                    if (user == null) {
+                        sessionProject.setInMemory(true);
+                    }
                 }
                 DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
                 ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
                 addSessionProject(sessionProject);
-                if (user == null && sessionProject.equals(defaultProject)) {
-                    sessionProject.setInMemory(true);
-                }
             }
         } catch (DBException e) {
             addSessionError(e);

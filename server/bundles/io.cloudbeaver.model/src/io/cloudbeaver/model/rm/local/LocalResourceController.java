@@ -18,6 +18,8 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -489,8 +491,20 @@ public class LocalResourceController implements RMController {
     }
 
     private RMProject makeProjectFromPath(Path path, Set<RMProjectPermission> permissions, RMProject.Type type, boolean checkExistence) {
+        Set<String> allProjectPermissions = permissions.stream()
+            .flatMap(rmProjectPermission -> rmProjectPermission.getAllPermissions().stream())
+            .collect(Collectors.toSet());
+        boolean anonymousAccess = ((WebApplication) BaseWebApplication.getInstance()).getAppConfiguration().isAnonymousAccessEnabled();
         if (path == null) {
-            return null;
+            if (anonymousAccess) {
+                RMProject anonymousProject = new RMProject();
+                anonymousProject.setId("anonymous");
+                anonymousProject.setType(RMProject.Type.USER);
+                anonymousProject.setProjectPermissions(allProjectPermissions);
+                return anonymousProject;
+            } else {
+                return null;
+            }
         }
         if (Files.exists(path)) {
             if (!Files.isDirectory(path)) {
@@ -500,10 +514,6 @@ public class LocalResourceController implements RMController {
         } else if (checkExistence) {
             return null;
         }
-
-        Set<String> allProjectPermissions = permissions.stream()
-            .flatMap(rmProjectPermission -> rmProjectPermission.getAllPermissions().stream())
-            .collect(Collectors.toSet());
 
         RMProject project = new RMProject();
         String projectName = path.getFileName().toString();
