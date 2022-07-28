@@ -99,10 +99,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters) throws DBCException {
+    public void createUser(String userId, Map<String, String> metaParameters) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
+        SMEventManager.fireEvent(SMEventManager.SMEvent.BEFORE_USER_ACTIVATED);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
@@ -348,6 +349,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     public void enableUser(String userId, boolean enabled) throws DBException {
+        if (enabled) {
+            var user = getUserById(userId);
+            if (user == null) {
+                throw new DBException("User not exist");
+            }
+            if (user.isEnabled()) {
+                return;
+            }
+            SMEventManager.fireEvent(SMEventManager.SMEvent.BEFORE_USER_ACTIVATED);
+        }
+
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
                 dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
@@ -1613,6 +1625,24 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         } catch (SQLException e) {
             throw new DBCException("Error reading granted object permissions ", e);
+        }
+    }
+
+    @Override
+    public int countActiveUsers() throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT COUNT(*) FROM CB_USER WHERE IS_ACTIVE=?")) {
+                dbStat.setString(1, CHAR_BOOL_TRUE);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        return dbResult.getInt(1);
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error counting active users ", e);
         }
     }
 
