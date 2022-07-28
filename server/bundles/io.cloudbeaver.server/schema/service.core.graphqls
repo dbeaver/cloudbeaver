@@ -318,6 +318,11 @@ type ConnectionInfo {
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
+
+    #Access properties
+    canViewSettings: Boolean!
+    canEdit: Boolean!
+    canDelete: Boolean!
 }
 
 type ConnectionFolderInfo {
@@ -354,6 +359,8 @@ type ProjectInfo {
     id: String!
     name: String!
     description: String
+    canCreateConnections: Boolean!
+    canViewConnections: Boolean!
 }
 
 type LogEntry {

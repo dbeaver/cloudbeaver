@@ -16,15 +16,17 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 
 public class WebProjectInfo {
     private final WebSession session;
-    private final DBPProject project;
+    private final VirtualProjectImpl project;
 
-    public WebProjectInfo(WebSession session, DBPProject project) {
+    public WebProjectInfo(WebSession session, VirtualProjectImpl project) {
         this.session = session;
         this.project = project;
     }
@@ -52,4 +54,17 @@ public class WebProjectInfo {
         return null;
     }
 
+    @Property
+    public boolean isCanCreateConnections() {
+        return hasRmPermission(RMProjectPermission.CONNECTIONS_EDIT);
+    }
+
+    @Property
+    public boolean isCanViewConnections() {
+        return hasRmPermission(RMProjectPermission.CONNECTIONS_VIEW);
+    }
+
+    private boolean hasRmPermission(RMProjectPermission permission) {
+        return project.getRmProject().getProjectPermissions().contains(permission.getPermissionId());
+    }
 }
