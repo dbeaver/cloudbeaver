@@ -43,7 +43,10 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -118,7 +121,7 @@ public class LocalResourceController implements RMController {
         List<RMProject> projects;
         //TODO refactor after implement current user api in sm
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
-        if (Files.exists(sharedProjectsPath) || activeUserCreds != null && activeUserCreds.getUserId() != null) {
+        if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
             var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
                 activeUserCreds.getUserId(),
                 SMObjects.PROJECT
