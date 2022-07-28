@@ -57,16 +57,16 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
         List<WebConnectionInfo> connectionInfoList = webSession.getConnections();
         WebConnectionInfo connectionInfo = null;
         if (connectionId != null) {
-            connectionInfo = webSession.getWebConnectionInfo(connectionId);
+            connectionInfo = webSession.getWebConnectionInfo(null, connectionId);
         } else if (connectionName != null) {
             List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getName().equals(connectionName)).collect(Collectors.toList());
             if (filteredConnections.size() == 1) {
-                connectionInfo = webSession.getWebConnectionInfo(filteredConnections.get(0).getId());
+                connectionInfo = webSession.getWebConnectionInfo(null, filteredConnections.get(0).getId());
             }
         } else if (connectionURL != null) {
             List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getUrl().equals(connectionURL)).collect(Collectors.toList());
             if (filteredConnections.size() == 1) {
-                connectionInfo = webSession.getWebConnectionInfo(filteredConnections.get(0).getId());
+                connectionInfo = webSession.getWebConnectionInfo(null, filteredConnections.get(0).getId());
             }
         }
         if (connectionInfo == null) {

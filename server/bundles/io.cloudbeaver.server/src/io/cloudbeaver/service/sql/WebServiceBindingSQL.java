@@ -53,6 +53,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
+                    getProjectReference(env),
                     env.getArgument("connectionId"),
                     env.getArgument("contextId"))
             )
