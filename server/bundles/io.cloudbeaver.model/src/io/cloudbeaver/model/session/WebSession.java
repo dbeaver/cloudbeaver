@@ -961,11 +961,17 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         synchronized (accessibleProjects) {
             accessibleProjects.add(project);
         }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().addProject(project, false);
+        }
     }
 
     public void deleteSessionProject(DBPProject project) {
         synchronized (accessibleProjects) {
             accessibleProjects.remove(project);
+        }
+        if (navigatorModel != null) {
+            navigatorModel.getRoot().removeProject(project);
         }
     }
 
