@@ -117,7 +117,7 @@ public class LocalResourceController implements RMController {
         List<RMProject> projects;
         //TODO refactor after implement current user api in sm
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
-        if (Files.exists(sharedProjectsPath) || activeUserCreds != null && activeUserCreds.getUserId() != null) {
+        if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
             var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
                 activeUserCreds.getUserId(),
                 SMObjects.PROJECT
