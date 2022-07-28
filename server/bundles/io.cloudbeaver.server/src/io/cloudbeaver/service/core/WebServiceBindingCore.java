@@ -136,8 +136,12 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                         env.getArgument("saveCredentials"));
                 }
             )
-            .dataFetcher("testConnection", env -> getService(env).testConnection(getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
-            .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))))
+            .dataFetcher("testConnection", env -> getService(env).testConnection(
+                getWebSession(env), getProjectReference(env), getConnectionConfig(env)
+            ))
+            .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
+                getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))
+            ))
             .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), getProjectReference(env), env.getArgument("id")))
 
             .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(

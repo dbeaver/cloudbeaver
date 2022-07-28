@@ -37,7 +37,11 @@ import java.util.Map;
 public interface DBWServiceSQL extends DBWService {
 
     @WebAction
-    WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String projectId, @Nullable String connectionId, @Nullable String contextId) throws DBWebException;
+    WebSQLContextInfo[] listContexts(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @Nullable String contextId) throws DBWebException;
 
     @WebAction
     WebSQLDialectInfo getDialectInfo(@NotNull WebConnectionInfo processor) throws DBWebException;

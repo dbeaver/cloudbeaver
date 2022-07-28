@@ -242,7 +242,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException {
+    public WebConnectionInfo getConnectionState(
+        WebSession webSession, @Nullable String projectId, String connectionId
+    ) throws DBWebException {
         return webSession.getWebConnectionInfo(projectId, connectionId);
     }
 
@@ -400,7 +402,9 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceRegistry projectRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = projectRegistry.createDataSource(dataSourceTemplate);
 
-        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
+            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+
         if (!CommonUtils.isEmpty(connectionName)) {
             newDataSource.setName(connectionName);
         }
@@ -438,7 +442,8 @@ public class WebServiceCore implements DBWServiceCore {
 
             DBPDataSourceContainer newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
+                CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
             // Copy props from config
             if (!CommonUtils.isEmpty(config.getName())) {
@@ -460,12 +465,15 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo testConnection(@NotNull WebSession webSession, @Nullable String projectId, @NotNull WebConnectionConfig connectionConfig) throws DBWebException {
+    public WebConnectionInfo testConnection(
+        @NotNull WebSession webSession, @Nullable String projectId, @NotNull WebConnectionConfig connectionConfig
+    ) throws DBWebException {
         String connectionId = connectionConfig.getConnectionId();
 
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(CBApplication.getInstance(), webSession, projectId, connectionId);
+        DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(
+            CBApplication.getInstance(), webSession, projectId, connectionId);
 
         DBPDataSourceRegistry sessionRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
         DBPDataSourceContainer testDataSource;
@@ -551,12 +559,16 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo closeConnection(@NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId) throws DBWebException {
+    public WebConnectionInfo closeConnection(
+        @NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId
+    ) throws DBWebException {
         return closeAndDeleteConnection(webSession, projectId, connectionId, false);
     }
 
     @NotNull
-    private WebConnectionInfo closeAndDeleteConnection(WebSession webSession, String projectId, String connectionId, boolean forceDelete) throws DBWebException {
+    private WebConnectionInfo closeAndDeleteConnection(
+        WebSession webSession, String projectId, String connectionId, boolean forceDelete
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
 
         boolean disconnected = false;
@@ -637,7 +649,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean deleteConnectionFolder(@NotNull WebSession session, @Nullable String projectId, @NotNull String folderPath) throws DBWebException {
+    public boolean deleteConnectionFolder(
+        @NotNull WebSession session, @Nullable String projectId, @NotNull String folderPath
+    ) throws DBWebException {
         try {
             WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
@@ -655,7 +669,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo setConnectionNavigatorSettings(WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings) throws DBWebException {
+    public WebConnectionInfo setConnectionNavigatorSettings(
+        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor)connectionInfo.getDataSourceContainer());
         dataSourceDescriptor.setNavigatorSettings(settings);

@@ -60,7 +60,9 @@ public class WebDataSourceUtils {
     }
 
     @Nullable
-    public static DBPDataSourceContainer getLocalOrGlobalDataSource(WebApplication application, WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException {
+    public static DBPDataSourceContainer getLocalOrGlobalDataSource(
+        WebApplication application, WebSession webSession, @Nullable String projectId, String connectionId
+    ) throws DBWebException {
         DBPDataSourceContainer dataSource = null;
         if (!CommonUtils.isEmpty(connectionId)) {
             dataSource = webSession.getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionId);
