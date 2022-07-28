@@ -16,11 +16,10 @@
  */
 package io.cloudbeaver.utils;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
-import org.eclipse.jgit.annotations.Nullable;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.utils.CommonUtils;
 
