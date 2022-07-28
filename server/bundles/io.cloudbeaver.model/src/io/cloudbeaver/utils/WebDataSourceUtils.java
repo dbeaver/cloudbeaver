@@ -60,10 +60,12 @@ public class WebDataSourceUtils {
     }
 
     @Nullable
-    public static DBPDataSourceContainer getLocalOrGlobalDataSource(WebApplication application, WebSession webSession, String connectionId) throws DBWebException {
+    public static DBPDataSourceContainer getLocalOrGlobalDataSource(
+        WebApplication application, WebSession webSession, @Nullable String projectId, String connectionId
+    ) throws DBWebException {
         DBPDataSourceContainer dataSource = null;
         if (!CommonUtils.isEmpty(connectionId)) {
-            dataSource = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(connectionId);
+            dataSource = webSession.getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionId);
             if (dataSource == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || application.isConfigurationMode())) {
                 // If called for new connection in admin mode then this connection may absent in session registry yet
                 dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);

@@ -528,13 +528,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     @NotNull
-    public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
+    public WebConnectionInfo getWebConnectionInfo(@Nullable String projectId, String connectionID) throws DBWebException {
         WebConnectionInfo connectionInfo;
         synchronized (connections) {
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(application, this, connectionID);
+            DBPDataSourceContainer dataSource = getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {

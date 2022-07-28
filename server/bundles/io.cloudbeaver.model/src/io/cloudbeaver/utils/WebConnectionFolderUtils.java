@@ -16,22 +16,21 @@
  */
 package io.cloudbeaver.utils;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionFolderUtils {
 
-    public static WebConnectionFolderInfo getFolderInfo(WebSession session, String folderPath) throws DBWebException {
+    public static WebConnectionFolderInfo getFolderInfo(
+        WebSession session, @Nullable String projectId, String folderPath
+    ) throws DBWebException {
         DBPDataSourceFolder folder = null;
         if (!CommonUtils.isEmpty(folderPath)) {
-            folder = session.getSingletonProject().getDataSourceRegistry().getFolder(folderPath);
-            if (folder == null && (session.hasPermission(DBWConstants.PERMISSION_ADMIN) || session.getApplication().isConfigurationMode())) {
-                folder = WebDataSourceUtils.getGlobalDataSourceRegistry().getFolder(folderPath);
-            }
+            folder = session.getProjectById(projectId).getDataSourceRegistry().getFolder(folderPath);
         }
         if (folder != null) {
             return new WebConnectionFolderInfo(session, folder);

@@ -71,10 +71,15 @@ public class WebServiceSQL implements DBWServiceSQL {
     private static final Log log = Log.getLog(WebServiceSQL.class);
 
     @Override
-    public WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException {
+    public WebSQLContextInfo[] listContexts(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @Nullable String contextId
+    ) throws DBWebException {
         List<WebConnectionInfo> conToRead = new ArrayList<>();
         if (connectionId != null) {
-            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, connectionId);
+            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, projectId, connectionId);
             conToRead.add(webConnection);
         } else {
             conToRead.addAll(session.getConnections());
