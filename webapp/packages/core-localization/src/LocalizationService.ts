@@ -43,7 +43,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   get defaultLanguage(): string {
-    if (this.pluginSettings.isValueDefault('defaultLanguage')) {
+    if (this.pluginSettings.getValue('defaultLanguage')) {
       return this.deprecatedPluginSettings.getValue('defaultLanguage');
     }
 

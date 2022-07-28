@@ -7,5 +7,4 @@ export * from './NavResourceNodeService';
 export * from './ResourceManagerResource';
 export * from './SaveScriptDialog';
 export * from './ResourceManagerService';
-export * from './ResourceProjectsResource';
 export * from './RESOURCES_NODE_PATH';

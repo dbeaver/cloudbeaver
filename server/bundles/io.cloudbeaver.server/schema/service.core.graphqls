@@ -463,21 +463,21 @@ extend type Query {
     networkHandlers: [NetworkHandlerDescriptor!]!
 
     # List of user connections.
-    userConnections( projectId: String, id: ID ): [ ConnectionInfo! ]!
+    userConnections( id: ID ): [ ConnectionInfo! ]!
     # List of template connections.
     templateConnections: [ ConnectionInfo! ]!
 
     # List of connection folders
-    connectionFolders( projectId: String, path: ID ): [ ConnectionFolderInfo! ]!
+    connectionFolders( path: ID ): [ ConnectionFolderInfo! ]!
 
     # Return connection state
-    connectionState( projectId: String, id: ID! ): ConnectionInfo! @deprecated
+    connectionState( id: ID! ): ConnectionInfo! @deprecated
 
     # Return connection info
-    connectionInfo( projectId: String, id: ID! ): ConnectionInfo!
+    connectionInfo( id: ID! ): ConnectionInfo!
 
     # Return list of accessible user projects
-    listProjects: [ ProjectInfo! ]!
+    listProjects: [ ProjectInfo ]
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 }
@@ -516,19 +516,19 @@ extend type Mutation {
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: String ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig!, projectId: String ): ConnectionInfo!
+    testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, projectId: String, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
+    initConnection( id: ID!, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
-    closeConnection( id: ID!, projectId: String ): ConnectionInfo!
+    closeConnection( id: ID! ): ConnectionInfo!
 
     # Changes navigator settings for connection
-    setConnectionNavigatorSettings( id: ID!, projectId: String, settings: NavigatorSettingsInput!): ConnectionInfo!
+    setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): ConnectionInfo!
 
     #### Generic async functions
 

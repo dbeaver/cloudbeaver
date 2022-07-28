@@ -11,11 +11,12 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -36,7 +37,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly resourceManagerService: ResourceManagerService,
-    private readonly resourceProjectsResource: ResourceProjectsResource,
+    private readonly projectsResource: ProjectsResource,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
@@ -85,9 +86,9 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
-              await this.resourceProjectsResource.load();
+              await this.projectsResource.load();
               const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
+              const folder = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.id);
               const resourceData = this.navResourceNodeService.getResourceData(folder);
 
               if (!resourceData) {

@@ -197,13 +197,12 @@ type SQLScriptQuery {
 
 extend type Query {
 
-    sqlDialectInfo( projectId: ID, connectionId: ID! ): SQLDialectInfo
+    sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
 
     # Lists SQL contexts for a connection (optional) or returns the particular context info
-    sqlListContexts( projectId: ID, connectionId: ID, contextId: ID ): [ SQLContextInfo ]!
+    sqlListContexts( connectionId: ID, contextId: ID ): [ SQLContextInfo ]!
 
     sqlCompletionProposals(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         query: String!,
@@ -213,14 +212,12 @@ extend type Query {
     ): [ SQLCompletionProposal ]
 
     sqlFormatQuery(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         query: String!
     ): String!
 
     sqlSupportedOperations(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
@@ -246,13 +243,11 @@ extend type Query {
     ): String!
 
     sqlParseScript(
-        projectId: ID,
         connectionId: ID!,
         script: String!
     ): SQLScriptInfo!
 
     sqlParseQuery(
-        projectId: ID,
         connectionId: ID!,
         script: String!,
         position: Int!
@@ -260,15 +255,14 @@ extend type Query {
 }
 
 extend type Mutation {
-    sqlContextCreate( projectId: ID, connectionId: ID!, defaultCatalog: String, defaultSchema: String ): SQLContextInfo!
+    sqlContextCreate( connectionId: ID!, defaultCatalog: String, defaultSchema: String ): SQLContextInfo!
 
-    sqlContextSetDefaults( projectId: ID, connectionId: ID!, contextId: ID!, defaultCatalog: ID, defaultSchema: ID ): Boolean!
+    sqlContextSetDefaults( connectionId: ID!, contextId: ID!, defaultCatalog: ID, defaultSchema: ID ): Boolean!
 
-    sqlContextDestroy( projectId: ID, connectionId: ID!, contextId: ID! ): Boolean!
+    sqlContextDestroy( connectionId: ID!, contextId: ID! ): Boolean!
 
     # Execute SQL and return results
     asyncSqlExecuteQuery(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         sql: String!,
@@ -279,7 +273,6 @@ extend type Mutation {
 
     # Read data from table
     asyncReadDataFromContainer(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         containerNodePath: ID!,
@@ -289,11 +282,10 @@ extend type Mutation {
     ): AsyncTaskInfo!
 
     # Close results (free resources)
-    sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
+    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
 
     # Update multiple cell values
     updateResultsDataBatch(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
@@ -305,7 +297,6 @@ extend type Mutation {
 
     # Return SQL script for cell values update
     updateResultsDataBatchScript(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
@@ -317,7 +308,6 @@ extend type Mutation {
 
     #Return BLOB name
     readLobValue(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
@@ -330,7 +320,6 @@ extend type Mutation {
 
     # Read data from table
     asyncSqlExplainExecutionPlan(
-        projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         query: String!,

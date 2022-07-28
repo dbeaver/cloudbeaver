@@ -1,7 +1,7 @@
 query getProjectList {
-  projects: listProjects {
+  projects: rmListProjects {
     id,
     name,
-    description,
+    shared,
   }
 }

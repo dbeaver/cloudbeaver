@@ -26,7 +26,7 @@ export class ThemeSettingsService {
   readonly deprecatedSettings: PluginSettings<IThemeSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('theming', defaultThemeSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('theming', defaultThemeSettings);
     this.deprecatedSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
   }
 }
