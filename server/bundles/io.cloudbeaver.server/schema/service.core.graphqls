@@ -477,7 +477,7 @@ extend type Query {
     connectionInfo( id: ID! ): ConnectionInfo!
 
     # Return list of accessible user projects
-    listProjects: [ ProjectInfo ]
+    listProjects: [ ProjectInfo! ]!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 }

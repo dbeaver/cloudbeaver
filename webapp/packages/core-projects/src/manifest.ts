@@ -9,6 +9,7 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ProjectsResource } from './ProjectsResource';
+import { ProjectsService } from './ProjectsService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -17,5 +18,6 @@ export const manifest: PluginManifest = {
 
   providers: [
     ProjectsResource,
+    ProjectsService,
   ],
 };

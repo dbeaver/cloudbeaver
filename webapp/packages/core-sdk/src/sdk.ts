@@ -358,7 +358,9 @@ export interface Mutation {
   openSession: SessionInfo;
   readLobValue: Scalars['String'];
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
+  rmCreateProject?: Maybe<ProjectInfo>;
   rmCreateResource: Scalars['String'];
+  rmDeleteProject: Scalars['Boolean'];
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
   rmWriteResourceStringContent: Scalars['String'];
@@ -444,33 +446,39 @@ export interface MutationCloseConnectionArgs {
 export interface MutationCopyConnectionFromNodeArgs {
   config?: InputMaybe<ConnectionConfig>;
   nodePath: Scalars['String'];
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
 export interface MutationCreateConnectionArgs {
   config: ConnectionConfig;
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
 export interface MutationCreateConnectionFolderArgs {
   folderName: Scalars['String'];
   parentFolderPath?: InputMaybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
 export interface MutationCreateConnectionFromTemplateArgs {
   connectionName?: InputMaybe<Scalars['String']>;
+  projectId?: InputMaybe<Scalars['String']>;
   templateId: Scalars['ID'];
 }
 
 
 export interface MutationDeleteConnectionArgs {
   id: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
 export interface MutationDeleteConnectionFolderArgs {
   folderPath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -484,18 +492,21 @@ export interface MutationInitConnectionArgs {
 
 export interface MutationNavDeleteNodesArgs {
   nodePaths: Array<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
 export interface MutationNavMoveNodesToFolderArgs {
   folderPath: Scalars['ID'];
   nodePaths: Array<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
 export interface MutationNavRenameNodeArgs {
   newName: Scalars['String'];
   nodePath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -518,10 +529,21 @@ export interface MutationReadLobValueArgs {
 }
 
 
+export interface MutationRmCreateProjectArgs {
+  description?: InputMaybe<Scalars['String']>;
+  projectName: Scalars['String'];
+}
+
+
 export interface MutationRmCreateResourceArgs {
   isFolder: Scalars['Boolean'];
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
+}
+
+
+export interface MutationRmDeleteProjectArgs {
+  projectId: Scalars['ID'];
 }
 
 
@@ -598,6 +620,7 @@ export interface MutationTestNetworkHandlerArgs {
 
 export interface MutationUpdateConnectionArgs {
   config: ConnectionConfig;
+  projectId?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -634,6 +657,7 @@ export interface NavigatorNodeInfo {
   nodeDetails?: Maybe<Array<ObjectPropertyInfo>>;
   nodeType?: Maybe<Scalars['String']>;
   object?: Maybe<DatabaseObjectInfo>;
+  projectId?: Maybe<Scalars['String']>;
 }
 
 export interface NavigatorSettings {
@@ -771,6 +795,12 @@ export interface ProductInfo {
   version: Scalars['String'];
 }
 
+export interface ProjectInfo {
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  name: Scalars['String'];
+}
+
 export interface Query {
   activeUser?: Maybe<UserInfo>;
   allConnections: Array<ConnectionInfo>;
@@ -807,6 +837,7 @@ export interface Query {
   listAuthProviderConfigurations: Array<AdminAuthProviderConfiguration>;
   listFeatureSets: Array<WebFeatureSet>;
   listPermissions: Array<AdminPermissionInfo>;
+  listProjects: Array<ProjectInfo>;
   listRoles: Array<AdminRoleInfo>;
   listUserProfileProperties: Array<ObjectPropertyInfo>;
   listUsers: Array<AdminUserInfo>;
@@ -1026,6 +1057,7 @@ export interface QueryNavGetStructContainersArgs {
   catalog?: InputMaybe<Scalars['ID']>;
   connectionId: Scalars['ID'];
   contextId?: InputMaybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -1034,21 +1066,25 @@ export interface QueryNavNodeChildrenArgs {
   offset?: InputMaybe<Scalars['Int']>;
   onlyFolders?: InputMaybe<Scalars['Boolean']>;
   parentPath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
 export interface QueryNavNodeInfoArgs {
   nodePath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
 export interface QueryNavNodeParentsArgs {
   nodePath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
 export interface QueryNavRefreshNodeArgs {
   nodePath: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -1218,12 +1254,18 @@ export interface QueryUserConnectionsArgs {
 }
 
 export interface RmProject {
+  canEditConnection: Scalars['Boolean'];
+  canEditResource: Scalars['Boolean'];
   createTime: Scalars['DateTime'];
   creator: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
   shared: Scalars['Boolean'];
+}
+
+export enum RmProjectPermission {
+  ResourceEdit = 'resource_edit'
 }
 
 export interface RmResource {
@@ -2297,6 +2339,11 @@ export type NavRenameNodeMutationVariables = Exact<{
 
 export type NavRenameNodeMutation = { navRenameNode?: string };
 
+export type GetProjectListQueryVariables = Exact<{ [key: string]: never }>;
+
+
+export type GetProjectListQuery = { projects: Array<{ id: string; name: string; description?: string }> };
+
 export type CreateResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
@@ -2315,11 +2362,6 @@ export type DeleteResourceMutationVariables = Exact<{
 
 export type DeleteResourceMutation = { rmDeleteResource?: boolean };
 
-export type GetProjectListQueryVariables = Exact<{ [key: string]: never }>;
-
-
-export type GetProjectListQuery = { projects: Array<{ id: string; name: string; shared: boolean }> };
-
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
   folder?: InputMaybe<Scalars['String']>;
@@ -2330,6 +2372,11 @@ export type GetResourceListQueryVariables = Exact<{
 
 
 export type GetResourceListQuery = { resources: Array<{ name: string; folder: boolean; length: number }> };
+
+export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never }>;
+
+
+export type GetResourceProjectListQuery = { projects: Array<{ id: string; name: string; shared: boolean; description?: string }> };
 
 export type MoveResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -3684,6 +3731,15 @@ export const NavRenameNodeDocument = `
   navRenameNode(nodePath: $nodePath, newName: $newName)
 }
     `;
+export const GetProjectListDocument = `
+    query getProjectList {
+  projects: listProjects {
+    id
+    name
+    description
+  }
+}
+    `;
 export const CreateResourceDocument = `
     mutation createResource($projectId: String!, $resourcePath: String!, $isFolder: Boolean!) {
   rmCreateResource(
@@ -3702,15 +3758,6 @@ export const DeleteResourceDocument = `
   )
 }
     `;
-export const GetProjectListDocument = `
-    query getProjectList {
-  projects: rmListProjects {
-    id
-    name
-    shared
-  }
-}
-    `;
 export const GetResourceListDocument = `
     query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
   resources: rmListResources(
@@ -3723,6 +3770,16 @@ export const GetResourceListDocument = `
     name
     folder
     length
+  }
+}
+    `;
+export const GetResourceProjectListDocument = `
+    query getResourceProjectList {
+  projects: rmListProjects {
+    id
+    name
+    shared
+    description
   }
 }
     `;
@@ -4229,17 +4286,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navRenameNode(variables: NavRenameNodeMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<NavRenameNodeMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRenameNode', 'mutation');
     },
+    getProjectList(variables?: GetProjectListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetProjectListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetProjectListQuery>(GetProjectListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProjectList', 'query');
+    },
     createResource(variables: CreateResourceMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<CreateResourceMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<CreateResourceMutation>(CreateResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createResource', 'mutation');
     },
     deleteResource(variables: DeleteResourceMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<DeleteResourceMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<DeleteResourceMutation>(DeleteResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteResource', 'mutation');
     },
-    getProjectList(variables?: GetProjectListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetProjectListQuery> {
-      return withWrapper(wrappedRequestHeaders => client.request<GetProjectListQuery>(GetProjectListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProjectList', 'query');
-    },
     getResourceList(variables: GetResourceListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetResourceListQuery> {
       return withWrapper(wrappedRequestHeaders => client.request<GetResourceListQuery>(GetResourceListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResourceList', 'query');
+    },
+    getResourceProjectList(variables?: GetResourceProjectListQueryVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<GetResourceProjectListQuery> {
+      return withWrapper(wrappedRequestHeaders => client.request<GetResourceProjectListQuery>(GetResourceProjectListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResourceProjectList', 'query');
     },
     moveResource(variables: MoveResourceMutationVariables, requestHeaders?: Dom.RequestInit['headers']): Promise<MoveResourceMutation> {
       return withWrapper(wrappedRequestHeaders => client.request<MoveResourceMutation>(MoveResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'moveResource', 'mutation');
