@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GraphQLClient, ClientError } from 'graphql-request';
-import type { RequestDocument, Variables } from 'graphql-request/dist/types';
+import { GraphQLClient, ClientError, resolveRequestDocument } from 'graphql-request';
+import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
+import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
 import type * as Dom from 'graphql-request/dist/types.dom';
 
 import { GQLError } from './GQLError';
@@ -27,15 +28,16 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  // @ts-expect-error should be fixed somehow
+  request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
+  request<T = any, V = Variables>(options: RequestOptions<V>): Promise<T>;
   request<T = any, V = Variables>(
-    document: RequestDocument,
+    document: RequestDocument | RequestOptions<V>,
     variables?: V,
     requestHeaders?: Dom.RequestInit['headers']
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T>(document as string, variables, requestHeaders)
+      this.overrideRequest<T>(document, variables, requestHeaders)
     );
   }
 
@@ -59,13 +61,20 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private async overrideRequest<T>(query: string, variables?: Variables, requestHeaders?: Dom.RequestInit['headers']): Promise<T> {
+  private async overrideRequest<T, V = Variables>(
+    documentOrOptions: RequestDocument | RequestOptions<V>,
+    variables?: V,
+    requestHeaders?: Dom.RequestInit['headers']
+  ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
+      const requestOptions  = parseRequestArgs(documentOrOptions, variables, requestHeaders);
+      const { query, operationName } = resolveRequestDocument(requestOptions.document);
+
       const response = await this.rawRequest<T>(query, variables, requestHeaders);
 
       // TODO: seems here can be undefined
-      return response.data as T;
+      return response.data;
     } catch (error: any) {
       if (isClientError(error)) {
         if (isObjectError(error)) {
