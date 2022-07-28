@@ -25,7 +25,9 @@ import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionFolderUtils {
 
-    public static WebConnectionFolderInfo getFolderInfo(WebSession session, @Nullable String projectId, String folderPath) throws DBWebException {
+    public static WebConnectionFolderInfo getFolderInfo(
+        WebSession session, @Nullable String projectId, String folderPath
+    ) throws DBWebException {
         DBPDataSourceFolder folder = null;
         if (!CommonUtils.isEmpty(folderPath)) {
             folder = session.getProjectById(projectId).getDataSourceRegistry().getFolder(folderPath);

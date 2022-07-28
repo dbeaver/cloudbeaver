@@ -100,7 +100,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException {
+    public List<WebConnectionInfo> getUserConnections(
+        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id
+    ) throws DBWebException {
         if (id != null) {
             WebConnectionInfo connectionInfo = getConnectionState(webSession, projectId, id);
             if (connectionInfo != null) {
