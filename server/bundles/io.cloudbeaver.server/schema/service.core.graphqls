@@ -325,6 +325,7 @@ type ConnectionInfo {
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
+    configurationType: DriverConfigurationType
 }
 
 type ConnectionFolderInfo {

@@ -92,7 +92,9 @@ public class WebConnectionConfig {
             saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
 
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
-            configurationType = DBPDriver.ConfigurationType.valueOf(JSONUtils.getString(params, "configurationType"));
+
+            String configType = JSONUtils.getString(params, "configurationType");
+            configurationType = configType == null ? null : DBPDriver.ConfigurationType.valueOf(configType);
 
             networkHandlersConfig = new ArrayList<>();
             for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {

@@ -188,6 +188,9 @@ public class WebServiceUtils extends WebCommonUtils {
                 dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
             }
         }
+        if (config.getConfigurationType() != null) {
+            dsConfig.setConfigurationType(config.getConfigurationType());
+        }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {
             for (WebNetworkHandlerConfigInput nhc : config.getNetworkHandlersConfig()) {
