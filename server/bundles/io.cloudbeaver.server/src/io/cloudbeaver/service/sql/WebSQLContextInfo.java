@@ -45,13 +45,17 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     private final WebSQLProcessor processor;
     private final String id;
+    private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
 
-    public WebSQLContextInfo(WebSQLProcessor processor, String id, String catalogName, String schemaName) throws DBCException {
+    public WebSQLContextInfo(
+        WebSQLProcessor processor, String id, String catalogName, String schemaName, String projectId
+    ) throws DBCException {
         this.processor = processor;
         this.id = id;
+        this.projectId = projectId;
 
         if (!CommonUtils.isEmpty(catalogName) || !CommonUtils.isEmpty(schemaName)) {
             try {
@@ -74,6 +78,10 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     public String getId() {
         return id;
+    }
+
+    public String getProjectId() {
+        return projectId;
     }
 
     public String getConnectionId() {

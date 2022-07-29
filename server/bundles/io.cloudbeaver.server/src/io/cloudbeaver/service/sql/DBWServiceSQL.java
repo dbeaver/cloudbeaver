@@ -76,7 +76,11 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull List<String> nodePathList) throws DBWebException;
 
     @WebAction
-    WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;
+    WebSQLContextInfo createContext(
+        @NotNull WebSQLProcessor processor,
+        String projectId,
+        String defaultCatalog,
+        String defaultSchema) throws DBWebException;
 
     @WebAction
     void destroyContext(@NotNull WebSQLContextInfo sqlContext);
