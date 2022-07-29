@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
@@ -45,13 +46,23 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     private final WebSQLProcessor processor;
     private final String id;
+    private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
 
-    public WebSQLContextInfo(WebSQLProcessor processor, String id, String catalogName, String schemaName) throws DBCException {
+    public WebSQLContextInfo(
+        WebSQLProcessor processor, String id, String catalogName, String schemaName, String projectId
+    ) throws DBCException {
         this.processor = processor;
         this.id = id;
+
+        VirtualProjectImpl project = processor.getWebSession().getProjectById(projectId);
+        if (project == null) {
+            throw new DBCException("Project '" + projectId + "' doesn't exist in the session");
+        }
+
+        this.projectId = project.getId();
 
         if (!CommonUtils.isEmpty(catalogName) || !CommonUtils.isEmpty(schemaName)) {
             try {
@@ -74,6 +85,10 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     public String getId() {
         return id;
+    }
+
+    public String getProjectId() {
+        return projectId;
     }
 
     public String getConnectionId() {

@@ -256,9 +256,11 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException {
+    public WebSQLContextInfo createContext(
+        @NotNull WebSQLProcessor processor, String projectId, String defaultCatalog, String defaultSchema
+    ) throws DBWebException {
         try {
-            return processor.createContext(defaultCatalog, defaultSchema);
+            return processor.createContext(defaultCatalog, defaultSchema, projectId);
         } catch (DBCException e) {
             throw new DBWebException("Error creating execution context", e);
         }
