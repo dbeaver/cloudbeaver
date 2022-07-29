@@ -35,7 +35,7 @@ const equalConfigA = {
   'core.user': {
     defaultTheme: testValueA,
   } as IThemeSettings,
-  plugin: {
+  core: {
     theming: {
       defaultTheme: testValueA,
     } as IThemeSettings,
@@ -46,7 +46,7 @@ const equalConfigB = {
   'core.user': {
     defaultTheme: testValueB,
   } as IThemeSettings,
-  plugin: {
+  core: {
     theming: {
       defaultTheme: testValueB,
     } as IThemeSettings,

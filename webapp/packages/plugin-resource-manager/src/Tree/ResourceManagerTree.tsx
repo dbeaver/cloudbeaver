@@ -12,11 +12,11 @@ import styled, { css } from 'reshadow';
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, NavigationNodeControl } from '@cloudbeaver/plugin-navigation-tree';
 
+import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 const styles = css`
@@ -56,7 +56,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const translate = useTranslate();
   const navTreeService = useService(NavigationTreeService);
 
-  const { resource } = useDataResource(ResourceManagerTree, ProjectsResource, undefined);
+  const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
 
   return styled(styles)(
     <Loader state={resource}>
