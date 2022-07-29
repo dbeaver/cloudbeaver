@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
@@ -55,7 +56,13 @@ public class WebSQLContextInfo implements WebSessionProvider {
     ) throws DBCException {
         this.processor = processor;
         this.id = id;
-        this.projectId = projectId;
+
+        VirtualProjectImpl project = processor.getWebSession().getProjectById(projectId);
+        if (project == null) {
+            throw new DBCException("Project '" + projectId + "' doesn't exist in the session");
+        }
+
+        this.projectId = project.getId();
 
         if (!CommonUtils.isEmpty(catalogName) || !CommonUtils.isEmpty(schemaName)) {
             try {
