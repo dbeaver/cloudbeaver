@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.WebCommonUtils;
@@ -23,6 +24,7 @@ import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -31,6 +33,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -334,5 +337,29 @@ public class WebConnectionInfo {
     @Override
     public String toString() {
         return "WebConnection:" + dataSourceContainer.toString();
+    }
+
+    @Property
+    public boolean isCanViewSettings() {
+        return true;
+    }
+
+    @Property
+    public boolean isCanEdit() {
+        return hasProjectPermission(RMProjectPermission.CONNECTIONS_EDIT);
+    }
+
+    @Property
+    public boolean isCanDelete() {
+        return isCanEdit();
+    }
+
+    private boolean hasProjectPermission(RMProjectPermission projectPermission) {
+        DBPProject project = dataSourceContainer.getProject();
+        if (!(project instanceof VirtualProjectImpl)) {
+            return false;
+        }
+        VirtualProjectImpl virtualProject = (VirtualProjectImpl) project;
+        return virtualProject.getRmProject().getProjectPermissions().contains(projectPermission.getPermissionId());
     }
 }

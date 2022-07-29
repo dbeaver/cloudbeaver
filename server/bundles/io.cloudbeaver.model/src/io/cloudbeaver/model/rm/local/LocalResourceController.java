@@ -21,7 +21,7 @@ import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
-import io.cloudbeaver.utils.WebDataSourceUtils;
+import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -43,7 +43,10 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -118,7 +121,7 @@ public class LocalResourceController implements RMController {
         List<RMProject> projects;
         //TODO refactor after implement current user api in sm
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
-        if (Files.exists(sharedProjectsPath) || activeUserCreds != null && activeUserCreds.getUserId() != null) {
+        if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
             var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
                 activeUserCreds.getUserId(),
                 SMObjects.PROJECT
@@ -234,11 +237,11 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public RMProject getProject(@NotNull String projectId, boolean readResources) throws DBException {
+    public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);
         if (readResources) {
             project.setChildren(
-                listResources(projectId, null, null, true, false, true)
+                listResources(projectId, null, null, readProperties, false, true)
             );
         }
         return project;
@@ -313,7 +316,7 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
-            return readChildResources(folderPath, readProperties, readHistory, recursive);
+            return readChildResources(projectId, folderPath, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
         } catch (IOException e) {
@@ -322,10 +325,16 @@ public class LocalResourceController implements RMController {
     }
 
     @NotNull
-    private RMResource[] readChildResources(Path folderPath, boolean readProperties, boolean readHistory, boolean recursive) throws IOException {
+    private RMResource[] readChildResources(
+        @NotNull String projectId,
+        @NotNull Path folderPath,
+        boolean readProperties,
+        boolean readHistory,
+        boolean recursive
+    ) throws IOException {
         try (Stream<Path> files = Files.list(folderPath)) {
             return files.filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
-                .map((Path path) -> makeResourceFromPath(path, readProperties, readHistory, recursive))
+                .map((Path path) -> makeResourceFromPath(projectId, path, readProperties, readHistory, recursive))
                 .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
         }
@@ -450,6 +459,19 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
+    @NotNull
+    @Override
+    public String setResourceProperty(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull String propertyName,
+        @Nullable Object propertyValue
+    ) throws DBException {
+        validateResourcePath(resourcePath);
+        getProjectMetadata(projectId).setResourceProperty(resourcePath, propertyName, propertyValue);
+        return DEFAULT_CHANGE_ID;
+    }
+
     private void validateResourcePath(String resourcePath) throws DBException {
         if (resourcePath.startsWith(".")) {
             throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
@@ -560,14 +582,20 @@ public class LocalResourceController implements RMController {
 
         for (var resourceName : relativeResourcePath) {
             resourcePath = resourcePath.resolve(resourceName);
-            result.add(makeResourceFromPath(resourcePath, false, false, recursive));
+            result.add(makeResourceFromPath(projectId, resourcePath, false, false, recursive));
         }
 
         return result;
     }
 
-    private RMResource makeResourceFromPath(Path path, boolean readProperties, boolean readHistory, boolean recursive) {
-        if (path == null || !Files.exists(path)) {
+    private RMResource makeResourceFromPath(
+        @NotNull String projectId,
+        @NotNull Path path,
+        boolean readProperties,
+        boolean readHistory,
+        boolean recursive
+    ) {
+        if (Files.notExists(path)) {
             return null;
         }
         RMResource resource = new RMResource();
@@ -595,20 +623,33 @@ public class LocalResourceController implements RMController {
                         ))
                 );
             }
-        } catch (IOException e) {
+            if (readProperties) {
+                final BaseProjectImpl project = (BaseProjectImpl) getProjectMetadata(projectId);
+                final String resourcePath = getProjectRelativePath(projectId, path);
+                final Map<String, Object> properties = project.getResourceProperties(resourcePath);
+
+                if (properties != null && !properties.isEmpty()) {
+                    resource.setProperties(new LinkedHashMap<>(properties));
+                }
+            }
+        } catch (Exception e) {
             log.error(e);
         }
 
         if (recursive && resource.isFolder()) {
             try {
-                resource.setChildren(
-                    readChildResources(path, readProperties, readHistory, recursive));
+                resource.setChildren(readChildResources(projectId, path, readProperties, readHistory, true));
             } catch (IOException e) {
                 log.error(e);
             }
         }
 
         return resource;
+    }
+
+    @NotNull
+    private String getProjectRelativePath(@NotNull String projectId, @NotNull Path path) throws DBException {
+        return getProjectPath(projectId).toAbsolutePath().relativize(path).toString().replace('\\', IPath.SEPARATOR);
     }
 
     public static Builder builder(SMCredentialsProvider credentialsProvider, SMController smController) {
