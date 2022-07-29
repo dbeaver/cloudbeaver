@@ -96,6 +96,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private final String id;
     private final long createTime;
     private long lastAccessTime;
+    private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
@@ -973,6 +974,20 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
         }
+    }
+
+    @Property
+    public boolean isValid() {
+        return (maxSessionIdleTime + lastAccessTime - System.currentTimeMillis()) > 0;
+    }
+
+    @Property
+    public String getExpirationTime() {
+        return CBModelConstants.ISO_DATE_FORMAT.format(maxSessionIdleTime);
+    }
+
+    public void setMaxSessionIdleTime(long maxSessionIdleTime) {
+        this.maxSessionIdleTime = maxSessionIdleTime;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

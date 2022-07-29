@@ -101,6 +101,8 @@ public class WebSessionManager {
                     .stream()
                     .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
                 webSession = new WebSession(httpSession, application, sessionHandlers);
+                long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
+                webSession.setMaxSessionIdleTime(maxSessionIdleTime);
                 sessionMap.put(sessionId, webSession);
 
                 if (!CBApplication.getInstance().isConfigurationMode()) {
