@@ -136,9 +136,10 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession) throws DBWebException {
+    public List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
-        for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
+        DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
                 CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver()))
             {
