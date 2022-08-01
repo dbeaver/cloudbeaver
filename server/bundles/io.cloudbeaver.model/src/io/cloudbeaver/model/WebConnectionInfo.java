@@ -336,6 +336,8 @@ public class WebConnectionInfo {
                 case (DBPConnectionConfiguration.VARIABLE_PORT):
                     properties.put(descriptorId, getPort());
                     break;
+                default:
+                    break;
             }
         }
         return properties;
