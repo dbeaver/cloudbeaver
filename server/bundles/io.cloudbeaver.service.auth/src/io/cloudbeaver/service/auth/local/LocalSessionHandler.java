@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.DBException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -54,24 +55,26 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
         String connectionId = action.getParameter(LocalServletHandler.PARAM_CONNECTION_ID);
         String connectionName = action.getParameter(LocalServletHandler.PARAM_CONNECTION_NAME);
         String connectionURL = action.getParameter(LocalServletHandler.PARAM_CONNECTION_URL);
-        List<WebConnectionInfo> connectionInfoList = webSession.getConnections();
         WebConnectionInfo connectionInfo = null;
         if (connectionId != null) {
-            connectionInfo = webSession.getWebConnectionInfo(null, connectionId);
+            connectionInfo = webSession.findWebConnectionInfo(connectionId);
         } else if (connectionName != null) {
-            List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getName().equals(connectionName)).collect(Collectors.toList());
-            if (filteredConnections.size() == 1) {
-                connectionInfo = webSession.getWebConnectionInfo(null, filteredConnections.get(0).getId());
-            }
+            connectionInfo = findConnection(webSession, t -> t.getName().equals(connectionName));
         } else if (connectionURL != null) {
-            List<WebConnectionInfo> filteredConnections = connectionInfoList.stream().filter(t -> t.getUrl().equals(connectionURL)).collect(Collectors.toList());
-            if (filteredConnections.size() == 1) {
-                connectionInfo = webSession.getWebConnectionInfo(null, filteredConnections.get(0).getId());
-            }
+            connectionInfo = findConnection(webSession, t -> t.getUrl().equals(connectionURL));
         }
         if (connectionInfo == null) {
-            throw new DBException("Connection info is null");
+            throw new DBException("Connection is not found in the session");
         }
         WebServiceUtils.fireActionParametersOpenEditor(webSession, connectionInfo.getDataSourceContainer(), false);
+    }
+
+    private WebConnectionInfo findConnection(WebSession webSession, Predicate<WebConnectionInfo> filter) {
+        List<WebConnectionInfo> filteredConnections = webSession.getConnections().stream().filter(filter).collect(Collectors.toList());
+        if (filteredConnections.size() != 1) {
+            return null;
+        }
+        return filteredConnections.get(0);
+
     }
 }
