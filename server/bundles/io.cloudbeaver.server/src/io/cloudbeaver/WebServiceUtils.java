@@ -307,6 +307,7 @@ public class WebServiceUtils extends WebCommonUtils {
         Map<String, Object> actionParameters = new HashMap<>();
         actionParameters.put("action", "open-sql-editor");
         actionParameters.put("connection-id", dataSource.getId());
+        actionParameters.put("project-id", dataSource.getProject().getId());
         if (addEditorName) {
             actionParameters.put("editor-name", dataSource.getName() + "-sql");
         }
