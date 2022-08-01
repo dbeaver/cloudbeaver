@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security.internal;
+package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,7 +24,9 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.service.security.internal.db.CBDatabase;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
+import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -65,8 +67,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final int TOKEN_HOURS_ALIVE_TIME = 1;
 
-    private static final String CHAR_BOOL_TRUE = "Y";
-    private static final String CHAR_BOOL_FALSE = "N";
+    protected static final String CHAR_BOOL_TRUE = "Y";
+    protected static final String CHAR_BOOL_FALSE = "N";
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
@@ -74,8 +76,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    private final WebApplication application;
-    private final CBDatabase database;
+    protected final WebApplication application;
+    protected final CBDatabase database;
 
     public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
         this.application = application;
@@ -103,7 +105,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
-        SMEventManager.fireEvent(SMEventManager.SMEvent.BEFORE_USER_ACTIVATED);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
@@ -349,17 +350,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     public void enableUser(String userId, boolean enabled) throws DBException {
-        if (enabled) {
-            var user = getUserById(userId);
-            if (user == null) {
-                throw new DBException("User not exist");
-            }
-            if (user.isEnabled()) {
-                return;
-            }
-            SMEventManager.fireEvent(SMEventManager.SMEvent.BEFORE_USER_ACTIVATED);
-        }
-
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
                 dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
@@ -1628,24 +1618,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    @Override
-    public int countActiveUsers() throws DBException {
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT COUNT(*) FROM CB_USER WHERE IS_ACTIVE=?")) {
-                dbStat.setString(1, CHAR_BOOL_TRUE);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        return dbResult.getInt(1);
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error counting active users ", e);
-        }
-    }
-
     private void appendStringParameters(StringBuilder sql, @NotNull String[] subjectIds) {
         for (int i = 0; i < subjectIds.length; i++) {
             String id = subjectIds[i];
@@ -1654,7 +1626,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    ///////////////////////////////////////////
+    public void shutdown() {
+        database.shutdown();
+    }
+
+    public void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+        database.finishConfiguration(adminName, adminPassword, authInfoList);
+    }
+
+        ///////////////////////////////////////////
     // Utils
 
     public void initializeMetaInformation() throws DBCException {
