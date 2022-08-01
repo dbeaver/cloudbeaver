@@ -983,7 +983,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @Property
     public String getExpirationTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(maxSessionIdleTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(maxSessionIdleTime + lastAccessTime);
     }
 
     public void setMaxSessionIdleTime(long maxSessionIdleTime) {

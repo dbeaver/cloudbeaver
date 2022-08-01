@@ -157,8 +157,6 @@ public class GraphQLEndpoint extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        beforeApiCall(request, response);
-
         String postBody = IOUtils.readToString(request.getReader());
         JsonElement json = gson.fromJson(postBody, JsonElement.class);
         if (json instanceof JsonArray) {
@@ -204,8 +202,6 @@ public class GraphQLEndpoint extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        beforeApiCall(request, response);
-
         String path = request.getPathInfo();
         if (path == null) {
             path = request.getServletPath();
@@ -262,16 +258,6 @@ public class GraphQLEndpoint extends HttpServlet {
         setDevelHeaders(request, response);
         response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
         response.getWriter().print(resString);
-    }
-
-    private void beforeApiCall(HttpServletRequest request, HttpServletResponse response) {
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
-        SimpleDateFormat sdf = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String cookieValue = sdf.format(new Date(System.currentTimeMillis() + maxSessionIdleTime));
-
-        WebAppUtils.addResponseCookie(
-            request, response, SESSION_TEMP_COOKIE, cookieValue, maxSessionIdleTime);
     }
 
     private static class WebInstrumentation extends SimpleInstrumentation {
