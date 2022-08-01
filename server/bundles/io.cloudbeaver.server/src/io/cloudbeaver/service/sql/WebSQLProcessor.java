@@ -112,9 +112,9 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     @NotNull
-    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema) throws DBCException {
+    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema, String projectId) throws DBCException {
         String contextId = connection.getId() + ":" + this.contextId.incrementAndGet();
-        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema);
+        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema, projectId);
         synchronized (contexts) {
             contexts.put(contextId, contextInfo);
         }

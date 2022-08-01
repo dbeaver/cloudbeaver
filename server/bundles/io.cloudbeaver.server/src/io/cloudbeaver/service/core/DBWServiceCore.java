@@ -51,17 +51,19 @@ public interface DBWServiceCore extends DBWService {
     List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession);
 
     @WebAction(requirePermissions = {})
-    List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
+    List<WebConnectionInfo> getUserConnections(
+        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    List<WebConnectionFolderInfo> getConnectionFolders(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
+    List<WebConnectionFolderInfo> getConnectionFolders(
+        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
     @Deprecated
     @WebAction
     List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
 
     @WebAction
-    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession) throws DBWebException;
+    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
@@ -98,11 +100,12 @@ public interface DBWServiceCore extends DBWService {
     // Connections
 
     @WebAction
-    WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException;
+    WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException;
 
     @WebAction
     WebConnectionInfo initConnection(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
@@ -141,7 +144,8 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebConnectionConfig config) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo testConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+    WebConnectionInfo testConnection(
+        @NotNull WebSession webSession, @Nullable String projectId, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
     WebNetworkEndpointInfo testNetworkHandler(@NotNull WebSession webSession, @NotNull WebNetworkHandlerConfigInput nhConfig) throws DBWebException;
@@ -159,19 +163,24 @@ public interface DBWServiceCore extends DBWService {
     // Folders
 
     @WebAction
-    WebConnectionFolderInfo createConnectionFolder(@NotNull WebSession session, @Nullable String folderPath, @NotNull String newName) throws DBWebException;
+    WebConnectionFolderInfo createConnectionFolder(
+        @NotNull WebSession session, @Nullable String projectId, @Nullable String folderPath, @NotNull String newName
+    ) throws DBWebException;
 
     @WebAction
-    WebConnectionFolderInfo renameConnectionFolder(@NotNull WebSession session, @NotNull String folderPath, @NotNull String newName) throws DBWebException;
+    WebConnectionFolderInfo renameConnectionFolder(
+        @NotNull WebSession session, @Nullable String projectId, @NotNull String folderPath, @NotNull String newName
+    ) throws DBWebException;
 
     @WebAction
-    boolean deleteConnectionFolder(@NotNull WebSession session, @NotNull String nodePath) throws DBWebException;
+    boolean deleteConnectionFolder(@NotNull WebSession session, @Nullable String projectId, @NotNull String nodePath) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings
 
     @WebAction
-    WebConnectionInfo setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException;
+    WebConnectionInfo setConnectionNavigatorSettings(
+        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings) throws DBWebException;
 
     ///////////////////////////////////////////
     // Async tasks

@@ -16,7 +16,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, type NavNode } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
@@ -25,6 +24,7 @@ import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTre
 import { NAV_NODE_TYPE_RM_PROJECT } from '../NAV_NODE_TYPE_RM_PROJECT';
 import { NavResourceNodeService } from '../NavResourceNodeService';
 import { ResourceManagerResource } from '../ResourceManagerResource';
+import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 import { NAV_NODE_TYPE_RM_RESOURCE } from './NAV_NODE_TYPE_RM_RESOURCE';
 
@@ -39,7 +39,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly resourceManagerResource: ResourceManagerResource,
-    private readonly projectsResource: ProjectsResource,
+    private readonly resourceProjectsResource: ResourceProjectsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -70,7 +70,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           return true;
         }
 
-        untracked(async () => await this.projectsResource.load());
+        untracked(async () => await this.resourceProjectsResource.load());
         return this.getTargetNode(tree) === undefined;
       },
       handler: this.elementsTreeActionHandler.bind(this),
@@ -111,10 +111,10 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       return;
     }
 
-    await this.projectsResource.load();
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.id);
+    await this.resourceProjectsResource.load();
+    const projectPath = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
 
-    if (!(this.projectsResource.userProject?.id === data.key.projectId)) {
+    if (!(this.resourceProjectsResource.userProject?.id === data.key.projectId)) {
       return;
     }
 
@@ -154,7 +154,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     if (tree === undefined) {
       return;
     }
-    await this.projectsResource.load();
+    await this.resourceProjectsResource.load();
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
@@ -245,7 +245,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       targetNode = this.navNodeInfoResource.get(targetFolder);
     }
 
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.projectsResource.userProject?.id);
+    const projectPath = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
     if (!targetNode?.id.startsWith(projectPath)) {
       targetNode = undefined;
     }

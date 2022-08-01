@@ -354,6 +354,11 @@ public class WebConnectionInfo {
         return isCanEdit();
     }
 
+    @Property
+    public String getProjectId() {
+        return dataSourceContainer.getProject().getId();
+    }
+
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
         if (!(project instanceof VirtualProjectImpl)) {

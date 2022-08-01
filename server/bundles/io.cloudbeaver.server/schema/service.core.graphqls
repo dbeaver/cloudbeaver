@@ -331,6 +331,8 @@ type ConnectionInfo {
     canViewSettings: Boolean!
     canEdit: Boolean!
     canDelete: Boolean!
+
+    projectId: ID!
 }
 
 type ConnectionFolderInfo {
@@ -478,21 +480,21 @@ extend type Query {
     networkHandlers: [NetworkHandlerDescriptor!]!
 
     # List of user connections.
-    userConnections( id: ID ): [ ConnectionInfo! ]!
+    userConnections( projectId: ID, id: ID ): [ ConnectionInfo! ]!
     # List of template connections.
-    templateConnections: [ ConnectionInfo! ]!
+    templateConnections( projectId: ID ): [ ConnectionInfo! ]!
 
     # List of connection folders
-    connectionFolders( path: ID ): [ ConnectionFolderInfo! ]!
+    connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
 
     # Return connection state
-    connectionState( id: ID! ): ConnectionInfo! @deprecated
+    connectionState( projectId: ID, id: ID! ): ConnectionInfo! @deprecated
 
     # Return connection info
-    connectionInfo( id: ID! ): ConnectionInfo!
+    connectionInfo( projectId: ID, id: ID! ): ConnectionInfo!
 
     # Return list of accessible user projects
-    listProjects: [ ProjectInfo ]
+    listProjects: [ ProjectInfo! ]!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 }
@@ -514,36 +516,36 @@ extend type Mutation {
     changeSessionLanguage(locale: String): Boolean
 
     # Create new custom connection. Custom connections exist only within the current session.
-    createConnection( config: ConnectionConfig!, projectId: String ): ConnectionInfo!
+    createConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
-    updateConnection( config: ConnectionConfig!, projectId: String ): ConnectionInfo!
+    updateConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
-    deleteConnection( id: ID!, projectId: String ): Boolean!
+    deleteConnection( id: ID!, projectId: ID ): Boolean!
 
-    createConnectionFromTemplate( templateId: ID!, connectionName: String, projectId: String ): ConnectionInfo!
+    createConnectionFromTemplate( templateId: ID!, connectionName: String, projectId: ID ): ConnectionInfo!
 
     # Create new folder
-    createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: String ): ConnectionFolderInfo!
+    createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!
 
-    deleteConnectionFolder( folderPath: ID!, projectId: String ): Boolean!
+    deleteConnectionFolder( folderPath: ID!, projectId: ID ): Boolean!
 
     # Copies connection configuration from node
-    copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: String ): ConnectionInfo!
+    copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig! ): ConnectionInfo!
+    testConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
+    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
-    closeConnection( id: ID! ): ConnectionInfo!
+    closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
     # Changes navigator settings for connection
-    setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): ConnectionInfo!
+    setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
 
     #### Generic async functions
 

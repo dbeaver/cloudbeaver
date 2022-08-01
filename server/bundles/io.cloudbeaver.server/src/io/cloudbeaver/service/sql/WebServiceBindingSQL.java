@@ -53,6 +53,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
+                    getProjectReference(env),
                     env.getArgument("connectionId"),
                     env.getArgument("contextId"))
             )
@@ -101,6 +102,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         model.getMutationType()
             .dataFetcher("sqlContextCreate", env -> getService(env).createContext(
                 getSQLProcessor(env),
+                getProjectReference(env),
                 env.getArgument("defaultCatalog"),
                 env.getArgument("defaultSchema")))
             .dataFetcher("sqlContextDestroy", env -> { getService(env).destroyContext(getSQLContext(env)); return true; } )

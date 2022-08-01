@@ -100,7 +100,7 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private DBPProject getProjectMetadata(String projectId) throws DBException {
+    private VirtualProjectImpl getProjectMetadata(String projectId) throws DBException {
         synchronized (projectRegistries) {
             VirtualProjectImpl project = projectRegistries.get(projectId);
             if (project == null) {
@@ -400,6 +400,10 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
+        // Nullify resource properties if any
+        VirtualProjectImpl project = getProjectMetadata(projectId);
+        project.resetResourceProperties(resourcePath);
+
         RMEventManager.fireEvent(
             new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                 makeProjectFromId(projectId, false),
