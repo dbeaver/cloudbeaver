@@ -18,6 +18,9 @@ interface Props {
 }
 
 const styles = css`
+    div {
+      z-index: 1;
+    }
     icon-btn {
       composes: theme-background-surface theme-text-on-surface theme-ripple from global;
       box-sizing: border-box;

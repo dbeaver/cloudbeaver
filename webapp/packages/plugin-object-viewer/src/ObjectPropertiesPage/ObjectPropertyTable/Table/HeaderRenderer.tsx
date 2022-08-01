@@ -8,9 +8,10 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import type { HeaderRendererProps } from 'react-data-grid';
 
-import type { DBObject } from '@cloudbeaver/core-app';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
+
 
 import { TableContext } from './TableContext';
 

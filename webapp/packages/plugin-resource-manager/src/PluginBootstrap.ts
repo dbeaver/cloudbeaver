@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DATA_CONTEXT_NAV_NODE, EMainMenu, MainMenuService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
 import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
+import { EMainMenu, MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 
 import { NavResourceNodeService, PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE } from './NavResourceNodeService';
 import { ResourceManager } from './ResourceManager';
@@ -44,7 +45,7 @@ export class PluginBootstrap extends Bootstrap {
         type: 'checkbox',
         title: 'plugin_resource_manager_title',
         isHidden: () => !this.resourceManagerService.enabled,
-        isChecked: () => this.resourceManagerService.panelEnabled,
+        isChecked: () => this.resourceManagerService.active,
         onClick: this.resourceManagerService.togglePanel,
       }
     );
@@ -53,7 +54,7 @@ export class PluginBootstrap extends Bootstrap {
       key: 'resource-manager-tab',
       order: 0,
       name: 'plugin_resource_manager_title',
-      isHidden: () => !this.resourceManagerService.enabled || !this.resourceManagerService.panelEnabled,
+      isHidden: () => !this.resourceManagerService.active,
       onClose: this.resourceManagerService.togglePanel,
       panel: () => ResourceManager,
     });
@@ -85,7 +86,13 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result === DialogueStateResult.Resolved) {
             try {
-              await this.navResourceNodeService.delete(node.id);
+              const resourceData = this.navResourceNodeService.getResourceData(node.id);
+
+              if (!resourceData) {
+                throw new Error('Can\'t find resource');
+              }
+
+              await this.navResourceNodeService.delete(resourceData);
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_resource_manager_delete_script_error');
             }

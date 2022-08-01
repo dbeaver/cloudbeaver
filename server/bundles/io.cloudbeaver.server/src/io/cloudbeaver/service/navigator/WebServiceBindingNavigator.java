@@ -41,21 +41,26 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 env.getArgument("parentPath"),
                 env.getArgument("offset"),
                 env.getArgument("limit"),
-                env.getArgument("onlyFolders")))
-        .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
+                env.getArgument("onlyFolders")
+            ))
+            .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                env.getArgument("nodePath")
+            ))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
                 getWebSession(env),
-                env.getArgument("nodePath")))
+                env.getArgument("nodePath")
+            ))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
                 env.getArgument("nodePath")
             ))
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
+                getProjectReference(env),
                 getWebConnection(env),
                 env.getArgument("contextId"),
                 env.getArgument("catalog")
+
             ));
         model.getMutationType()
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
@@ -66,6 +71,11 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
             .dataFetcher("navDeleteNodes", env -> getService(env).deleteNodes(
                 getWebSession(env),
                 env.getArgument("nodePaths")
+            ))
+            .dataFetcher("navMoveNodesToFolder", env -> getService(env).moveNodesToFolder(
+                getWebSession(env),
+                env.getArgument("nodePaths"),
+                env.getArgument("folderPath")
             ));
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")

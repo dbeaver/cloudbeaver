@@ -17,11 +17,11 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.Map;
@@ -34,12 +34,10 @@ public class WebAuthProviderConfiguration {
     private static final Log log = Log.getLog(WebAuthProviderConfiguration.class);
 
     private final AuthProviderDescriptor providerDescriptor;
-    private final String id;
-    private final AuthProviderConfig config;
+    private final SMAuthProviderCustomConfiguration config;
 
-    public WebAuthProviderConfiguration(AuthProviderDescriptor providerDescriptor, String id, AuthProviderConfig config) {
+    public WebAuthProviderConfiguration(AuthProviderDescriptor providerDescriptor, SMAuthProviderCustomConfiguration config) {
         this.providerDescriptor = providerDescriptor;
-        this.id = id;
         this.config = config;
     }
 
@@ -48,7 +46,7 @@ public class WebAuthProviderConfiguration {
     }
 
     public String getId() {
-        return id;
+        return config.getId();
     }
 
     public String getDisplayName() {

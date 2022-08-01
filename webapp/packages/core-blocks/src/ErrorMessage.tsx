@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from './Button';
 import { IconOrImage } from './IconOrImage';
@@ -62,7 +61,7 @@ export const ErrorMessage = observer<Props>(function ErrorMessage({
 }) {
   const translate = useTranslate();
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <message className={className}>
       <IconOrImage icon="/icons/error_icon_sm.svg" />
       <message-body title={text}>

@@ -21,7 +21,7 @@ interface Props {
   className?: string;
 }
 
-export const ToolsPanel: React.FC<Props> = function ToolsPanel({ className, children }) {
+export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children }) {
   return styled(useStyles(styles))(
     <container className={className}>
       {children}

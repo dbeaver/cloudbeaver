@@ -42,7 +42,7 @@ const style = css`
   }
 `;
 
-export const QuotaPlaceholder: React.FC<Props> = observer(function QuotaPlaceholder({
+export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({
   limit,
   size,
   className,

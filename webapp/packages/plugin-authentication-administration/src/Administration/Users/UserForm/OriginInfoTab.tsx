@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';

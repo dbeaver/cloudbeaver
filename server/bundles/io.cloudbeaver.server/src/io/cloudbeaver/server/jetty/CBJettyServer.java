@@ -16,6 +16,7 @@ import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -74,8 +75,14 @@ public class CBJettyServer {
                 servletContextHandler.addEventListener(new CBServerContextListener());
 
                 // Add extensions from services
+                
+                CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
-                    wsd.addServlets(application, servletContextHandler);
+                    try {
+                        wsd.addServlets(application, servletContext);
+                    } catch (DBException e) {
+                        log.error(e.getMessage(), e);
+                    }
                 }
 
                 initSessionManager(server, servletContextHandler);

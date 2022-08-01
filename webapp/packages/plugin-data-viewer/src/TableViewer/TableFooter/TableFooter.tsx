@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';

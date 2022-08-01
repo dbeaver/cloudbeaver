@@ -46,6 +46,7 @@ export interface ISQLEditorData {
   readonly value: string;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
+  readonly onFormat: ISyncExecutor<[ISQLScriptSegment, string]>;
   readonly onUpdate: ISyncExecutor;
   readonly onMode: ISyncExecutor<ISQLEditorData>;
 

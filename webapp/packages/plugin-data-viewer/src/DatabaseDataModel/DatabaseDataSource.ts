@@ -15,13 +15,11 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DatabaseDataActions } from './DatabaseDataActions';
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataManager } from './IDatabaseDataManager';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {
-  abstract readonly dataManager: IDatabaseDataManager;
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -176,7 +174,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
   setResults(results: TResult[]): this {
     this.actions.updateResults(results);
     this.results = results;
-    this.dataManager.clearCache();
     return this;
   }
 

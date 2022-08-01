@@ -17,8 +17,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
+import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NavigationTree } from '../NavigationTree';
 import { RightArea } from './RightArea';
 
 const mainStyles = css`

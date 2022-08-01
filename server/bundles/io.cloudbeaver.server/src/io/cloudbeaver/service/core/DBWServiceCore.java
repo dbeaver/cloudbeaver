@@ -16,14 +16,17 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebObjectId;
+import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,14 +51,19 @@ public interface DBWServiceCore extends DBWService {
     List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession);
 
     @WebAction(requirePermissions = {})
-    List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
+    List<WebConnectionInfo> getUserConnections(
+        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
+
+    @WebAction(requirePermissions = {})
+    List<WebConnectionFolderInfo> getConnectionFolders(
+        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
     @Deprecated
     @WebAction
     List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
 
     @WebAction
-    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession) throws DBWebException;
+    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
@@ -92,52 +100,87 @@ public interface DBWServiceCore extends DBWService {
     // Connections
 
     @WebAction
-    WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException;
+    WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException;
 
     @WebAction
     WebConnectionInfo initConnection(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         @Nullable Boolean saveCredentials) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo updateConnection(
         @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebAction
-    boolean deleteConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException;
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    boolean deleteConnection(
+        @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
+        @NotNull String connectionId) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException;
 
-    @WebAction()
-    WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    WebConnectionInfo copyConnectionFromNode(
+        @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
+        @NotNull String nodePath,
+        @NotNull WebConnectionConfig config) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo testConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+    WebConnectionInfo testConnection(
+        @NotNull WebSession webSession, @Nullable String projectId, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
     WebNetworkEndpointInfo testNetworkHandler(@NotNull WebSession webSession, @NotNull WebNetworkHandlerConfigInput nhConfig) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo closeConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException;
+    WebConnectionInfo closeConnection(@NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId) throws DBWebException;
+
+    ///////////////////////////////////////////
+    // Projects
+
+    @WebAction
+    List<WebProjectInfo> getProjects(@NotNull WebSession session);
+
+    ///////////////////////////////////////////
+    // Folders
+
+    @WebAction
+    WebConnectionFolderInfo createConnectionFolder(
+        @NotNull WebSession session, @Nullable String projectId, @Nullable String folderPath, @NotNull String newName
+    ) throws DBWebException;
+
+    @WebAction
+    WebConnectionFolderInfo renameConnectionFolder(
+        @NotNull WebSession session, @Nullable String projectId, @NotNull String folderPath, @NotNull String newName
+    ) throws DBWebException;
+
+    @WebAction
+    boolean deleteConnectionFolder(@NotNull WebSession session, @Nullable String projectId, @NotNull String nodePath) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings
 
     @WebAction
-    WebConnectionInfo setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException;
+    WebConnectionInfo setConnectionNavigatorSettings(
+        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings) throws DBWebException;
 
     ///////////////////////////////////////////
     // Async tasks

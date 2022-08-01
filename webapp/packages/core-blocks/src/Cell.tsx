@@ -52,7 +52,7 @@ const styles = css`
     }
 `;
 
-export const Cell: React.FC<Props> = function Cell({ before, after, description, style, className, children }) {
+export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({ before, after, description, style, className, children }) {
   return styled(useStyles(styles, style))(
     <cell className={className}>
       <main>

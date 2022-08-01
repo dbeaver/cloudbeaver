@@ -1,8 +1,9 @@
 package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
+import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
@@ -17,7 +18,9 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
@@ -29,13 +32,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
-
+    private static final String AUTO_LOGIN_ACTION = "auto-login";
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
@@ -56,19 +58,26 @@ public class CBStaticServlet extends DefaultServlet {
             }
         }
         String uri = request.getPathInfo();
-
-        if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth() &&
-            (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html")) &&
-            request.getParameterMap().isEmpty()) {
-            if (processSessionStart(request, response)) {
-                return;
+        try {
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
+                request, response, false);
+            WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
+            if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
+                && (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html"))
+                && request.getParameterMap().isEmpty()
+                && (webActionParameters == null || !webActionParameters.getParameters().containsValue(AUTO_LOGIN_ACTION))
+            ) {
+                if (processSessionStart(request, response, webSession)) {
+                    return;
+                }
             }
+        } catch (DBWebException e) {
+            log.error("Error reading websession", e);
         }
-
         super.doGet(request, response);
     }
 
-    private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response) {
+    private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response, WebSession webSession) {
         CBApplication application = CBApplication.getInstance();
         if (application.isConfigurationMode()) {
             return false;
@@ -79,15 +88,13 @@ public class CBStaticServlet extends DefaultServlet {
             String authProviderId = authProviders[0];
             AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
             if (authProvider != null && authProvider.isConfigurable()) {
-                String configId = null;
-                AuthProviderConfig activeAuthConfig = null;
-                for (Map.Entry<String, AuthProviderConfig> cfg : appConfig.getAuthProviderConfigurations().entrySet()) {
-                    if (!cfg.getValue().isDisabled() && cfg.getValue().getProvider().equals(authProviderId)) {
+                SMAuthProviderCustomConfiguration activeAuthConfig = null;
+                for (SMAuthProviderCustomConfiguration cfg : appConfig.getAuthCustomConfigurations()) {
+                    if (!cfg.isDisabled() && cfg.getProvider().equals(authProviderId)) {
                         if (activeAuthConfig != null) {
                             return false;
                         }
-                        configId = cfg.getKey();
-                        activeAuthConfig = cfg.getValue();
+                        activeAuthConfig = cfg;
                     }
                 }
                 if (activeAuthConfig == null) {
@@ -99,15 +106,29 @@ public class CBStaticServlet extends DefaultServlet {
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
                     if (authProviderInstance instanceof SMWAuthProviderFederated) {
-                        WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, false);
                         if (webSession.getUser() == null) {
-                            String signInLink = ((SMWAuthProviderFederated) authProviderInstance).getSignInLink(configId, Collections.emptyMap());
+                            var securityController = webSession.getSecurityController();
+                            SMAuthInfo authInfo = securityController.authenticate(
+                                webSession.getSessionId(),
+                                null,
+                                webSession.getSessionParameters(),
+                                WebSession.CB_SESSION_TYPE,
+                                authProvider.getId(),
+                                activeAuthConfig.getId(),
+                                Map.of()
+                            );
+                            String signInLink = authInfo.getRedirectUrl();
                             //ignore current routing if non-root page is open
                             if (!signInLink.endsWith("#")) {
                                 signInLink += "#";
                             }
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
+                                Map<String, Object> authActionParams = Map.of(
+                                    "action", AUTO_LOGIN_ACTION,
+                                    "auth-id", authInfo.getAuthAttemptId()
+                                );
+                                WebActionParameters.saveToSession(webSession, authActionParams);
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);
                                 response.sendRedirect(signInLink);
                                 return true;

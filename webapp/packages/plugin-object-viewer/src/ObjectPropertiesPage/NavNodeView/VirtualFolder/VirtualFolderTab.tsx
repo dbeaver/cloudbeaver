@@ -8,9 +8,9 @@
 
 import styled from 'reshadow';
 
-import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
@@ -23,7 +23,7 @@ export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualF
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/folder.png';
 
   return styled(styles)(
-    <Tab tabId={folderId}>
+    <Tab tabId={folderId} title={nodeType}>
       <TabIcon icon={icon} />
       <TabTitle>{nodeType}</TabTitle>
     </Tab>

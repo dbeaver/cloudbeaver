@@ -58,14 +58,23 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
             .dataFetcher("networkHandlers", env -> getService(env).getNetworkHandlers(getWebSession(env)))
             .dataFetcher("templateDataSources", env -> getService(env).getTemplateDataSources())
-            .dataFetcher("userConnections", env -> getService(env).getUserConnections(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("templateConnections", env -> getService(env).getTemplateConnections(getWebSession(env)))
+            .dataFetcher("userConnections", env -> getService(env).getUserConnections(
+                getWebSession(env), getProjectReference(env), env.getArgument("id")))
+            .dataFetcher("templateConnections", env -> getService(env).getTemplateConnections(
+                getWebSession(env), getProjectReference(env)))
+
+            .dataFetcher("connectionFolders", env -> getService(env).getConnectionFolders(
+                getWebSession(env), getProjectReference(env), env.getArgument("path")))
 
             .dataFetcher("sessionPermissions", env -> getService(env).getSessionPermissions(getWebSession(env)))
             .dataFetcher("sessionState", env -> getService(env).getSessionState(getWebSession(env)))
 
-            .dataFetcher("connectionState", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("connectionInfo", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("connectionState", env -> getService(env).getConnectionState(
+                getWebSession(env), getProjectReference(env), env.getArgument("id")))
+            .dataFetcher("connectionInfo", env -> getService(env).getConnectionState(
+                getWebSession(env), getProjectReference(env), env.getArgument("id")))
+
+            .dataFetcher("listProjects", env -> getService(env).getProjects(getWebSession(env)))
 
             .dataFetcher("readSessionLog", env -> {
                 // CB-90. Log read mustn't extend session lifetime and mustn't fail if there is no session.
@@ -97,15 +106,20 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
-            .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getConnectionConfig(env)))
-            .dataFetcher("updateConnection", env -> getService(env).updateConnection(getWebSession(env), getConnectionConfig(env)))
-            .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("createConnection", env -> getService(env).createConnection(
+                getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+            .dataFetcher("updateConnection", env -> getService(env).updateConnection(
+                getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+            .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(
+                getWebSession(env), getProjectReference(env), env.getArgument("id")))
             .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("templateId"),
                 env.getArgument("connectionName")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
+                getProjectReference(env),
                 env.getArgument("nodePath"),
                 new WebConnectionConfig(env.getArgument("config"))))
             .dataFetcher("initConnection", env -> {
@@ -116,24 +130,51 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     }
                     return getService(env).initConnection(
                         getWebSession(env),
+                        getProjectReference(env),
                         env.getArgument("id"),
                         env.getArgument("credentials"),
                         nhc,
                         env.getArgument("saveCredentials"));
                 }
             )
-            .dataFetcher("testConnection", env -> getService(env).testConnection(getWebSession(env), getConnectionConfig(env)))
-            .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))))
-            .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("testConnection", env -> getService(env).testConnection(
+                getWebSession(env), getProjectReference(env), getConnectionConfig(env)
+            ))
+            .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
+                getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))
+            ))
+            .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), getProjectReference(env), env.getArgument("id")))
 
-            .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(getWebSession(env), env.getArgument("id"), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
+            .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("id"),
+                WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))
+            ))
 
             .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(
                 getWebSession(env),
                 env.getArgument("id"),
                 env.getArgument("removeOnFinish")))
             .dataFetcher("asyncTaskCancel", env -> getService(env).cancelAsyncTask(getWebSession(env), env.getArgument("id")))
+
+            .dataFetcher("createConnectionFolder", env -> getService(env).createConnectionFolder(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("parentFolderPath"),
+                env.getArgument("folderName")
+            ))
+            .dataFetcher("renameConnectionFolder", env -> getService(env).renameConnectionFolder(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("folderPath"),
+                env.getArgument("newName")
+            ))
+            .dataFetcher("deleteConnectionFolder", env -> getService(env).deleteConnectionFolder(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("folderPath")
+            ))
         ;
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)

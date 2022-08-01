@@ -10,7 +10,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
-import { EPermission, NavigatorViewSettings, PermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -56,7 +56,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource,
-    permissionsResource: PermissionsResource
+    permissionsResource: SessionPermissionsResource
   ) {
     super();
 

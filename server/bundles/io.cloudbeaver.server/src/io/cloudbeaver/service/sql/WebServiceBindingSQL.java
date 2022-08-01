@@ -23,10 +23,9 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
+import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Web service implementation
  */
-public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> implements DBWServiceBindingServlet {
+public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> implements DBWServiceBindingServlet<CBApplication> {
 
     public WebServiceBindingSQL() {
         super(DBWServiceSQL.class, new WebServiceSQL(), "schema/service.sql.graphqls");
@@ -54,6 +53,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
+                    getProjectReference(env),
                     env.getArgument("connectionId"),
                     env.getArgument("contextId"))
             )
@@ -102,6 +102,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         model.getMutationType()
             .dataFetcher("sqlContextCreate", env -> getService(env).createContext(
                 getSQLProcessor(env),
+                getProjectReference(env),
                 env.getArgument("defaultCatalog"),
                 env.getArgument("defaultSchema")))
             .dataFetcher("sqlContextDestroy", env -> { getService(env).destroyContext(getSQLContext(env)); return true; } )
@@ -239,10 +240,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
     }
 
     @Override
-    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
-        servletContextHandler.addServlet(
-            new ServletHolder("sqlResultValueViewer", new WebSQLResultServlet(application, getServiceImpl())),
-            application.getServicesURI() + "sql-result-value/*");
+    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        servletContext.addServlet(
+            "sqlResultValueViewer",
+            new WebSQLResultServlet(application, getServiceImpl()),
+            application.getServicesURI() + "sql-result-value/*"
+        );
     }
 
     private static class WebSQLConfiguration {

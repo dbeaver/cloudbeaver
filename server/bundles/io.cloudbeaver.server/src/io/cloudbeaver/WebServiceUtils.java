@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
@@ -29,6 +30,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -36,6 +38,7 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -48,9 +51,6 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -130,6 +130,9 @@ public class WebServiceUtils extends WebCommonUtils {
         newDataSource.setSavePassword(true);
         newDataSource.setName(config.getName());
         newDataSource.setDescription(config.getDescription());
+        if (config.getFolder() != null) {
+            newDataSource.setFolder(registry.getFolder(config.getFolder()));
+        }
         ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         // Set default navigator settings
@@ -295,10 +298,16 @@ public class WebServiceUtils extends WebCommonUtils {
         }
     }
 
-    public static void updateConnectionFromConfig(DBPDataSourceContainer dataSource, WebConnectionConfig config) {
+    public static void updateConnectionFromConfig(DBPDataSourceContainer dataSource, WebConnectionConfig config) throws DBWebException {
         setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
+        if (config.getFolder() != null) {
+            dataSource.setFolder(dataSource.getRegistry().getFolder(config.getFolder()));
+        } else {
+            dataSource.setFolder(null);
+        }
+        getGlobalDataSourceRegistry().getAllFolders().clear();
         saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
     }
 
@@ -313,65 +322,6 @@ public class WebServiceUtils extends WebCommonUtils {
         }
     }
 
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
-        addResponseCookie(request, response, cookieName, cookieValue, maxSessionIdleTime, null);
-    }
-
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
-        Cookie sessionCookie = new Cookie(cookieName, cookieValue);
-        if (maxSessionIdleTime > 0) {
-            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
-        }
-
-        String path = CBApplication.getInstance().getRootURI();
-
-        if (sameSite != null) {
-            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
-                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
-            } else {
-                sessionCookie.setSecure(true);
-                path = path.concat("; SameSite=" + sameSite);
-            }
-        }
-
-        sessionCookie.setPath(path);
-        response.addCookie(sessionCookie);
-    }
-
-    public static String getRequestCookie(HttpServletRequest request, String cookieName) {
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
-
-    @NotNull
-    public static String removeSideSlashes(String action) {
-        if (CommonUtils.isEmpty(action)) {
-            return action;
-        }
-        while (action.startsWith("/")) action = action.substring(1);
-        while (action.endsWith("/")) action = action.substring(0, action.length() - 1);
-        return action;
-    }
-
-    @NotNull
-    public static StringBuilder getApiPrefix(String serviceId) {
-        CBApplication application = CBApplication.getInstance();
-        StringBuilder apiPrefix = new StringBuilder();
-        apiPrefix.append(removeSideSlashes(application.getServerURL()));
-        apiPrefix.append("/");
-        String rootURI = removeSideSlashes(application.getRootURI());
-        if (!CommonUtils.isEmpty(rootURI)) {
-            apiPrefix.append(rootURI).append("/");
-        }
-        apiPrefix.append(removeSideSlashes(application.getServicesURI()));
-        apiPrefix.append("/").append(serviceId).append("/");
-        return apiPrefix;
-    }
-
     public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource, boolean addEditorName) {
         Map<String, Object> actionParameters = new HashMap<>();
         actionParameters.put("action", "open-sql-editor");
@@ -381,5 +331,24 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         WebActionParameters.saveToSession(webSession, actionParameters);
     }
+
+    public static String getConnectionContainerInfo(DBPDataSourceContainer container) {
+        if (container == null) {
+            return null;
+        }
+        return container.getName() + " [" + container.getId() + "]";
+    }
+
+    public static DBPDataSourceFolder createFolder(WebConnectionFolderInfo parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
+        DBPDataSourceFolder folder = registry.addFolder(parentFolder == null ? null : parentFolder.getDataSourceFolder(), newName);
+        return folder;
+    }
+
+    public static void updateConfigAndRefreshDatabases(WebSession session) {
+        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+        DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
+    }
+
+
 
 }

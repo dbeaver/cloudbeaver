@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import type { TabHandlerTabComponent } from '@cloudbeaver/core-app';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-ui';
 import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
+import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 
@@ -29,10 +29,12 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_TAB, true);
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
 
+  const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
 
-  const connection = connectionInfo.get(tab.handlerState.executionContext?.connectionId || '');
-  const name = getSqlEditorName(tab.handlerState, connection);
+  const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
+  const connection = connectionInfo.get(dataSource?.executionContext?.connectionId || '');
+  const name = getSqlEditorName(tab.handlerState, dataSource, connection);
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;

@@ -6,16 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ITabNavigationContext, INodeNavigationContext, ITab } from '@cloudbeaver/core-app';
+import type { INodeNavigationContext } from '@cloudbeaver/core-navigation-tree';
+import type { ITabNavigationContext, ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
 
 export interface IObjectViewerTabContext {
+  isSupported: boolean;
   tab: ITab<IObjectViewerTabState> | null;
   page?: ObjectPage<any>;
   tabInfo: ITabNavigationContext;
   nodeInfo: INodeNavigationContext;
+
+  initTab(): ITab<IObjectViewerTabState> | null;
   isPageActive: (page: ObjectPage<any>) => boolean;
   canSwitchPage: (page: ObjectPage<any>) => boolean;
   trySwitchPage: <T>(page: ObjectPage<T>, state?: T) => boolean;

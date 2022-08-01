@@ -9,6 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
   StaticImage {
@@ -18,15 +19,17 @@ const styles = css`
 
 interface Props {
   icon?: string;
+  style?: ComponentStyle;
   className?: string;
 }
 
-export const TreeNodeIcon: React.FC<Props> = function TreeNodeIcon({
+export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function TreeNodeIcon({
   icon,
+  style,
   className,
   children,
 }) {
-  return styled(styles)(
+  return styled(useStyles(styles, style))(
     <icon className={className}>
       <StaticImage icon={icon} />
       {children}

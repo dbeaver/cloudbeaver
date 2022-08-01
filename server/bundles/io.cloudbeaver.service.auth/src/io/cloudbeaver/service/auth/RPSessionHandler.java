@@ -81,8 +81,10 @@ public class RPSessionHandler implements DBWSessionHandler {
                     webSession.getProgressMonitor(), sessionParameters, credentials);
                 try {
                     SMAuthInfo smAuthInfo = securityController.authenticate(
-                            webSession.getSessionId(), sessionParameters,
-                            WebSession.CB_SESSION_TYPE, authProvider.getId(), userCredentials);
+                        webSession.getSessionId(),
+                        webSession.getUserContext().getSmSessionId(),
+                        sessionParameters,
+                        WebSession.CB_SESSION_TYPE, authProvider.getId(), null, userCredentials);
                     webSession.updateSMAuthInfo(smAuthInfo);
                 } catch (SMException e) {
                     log.debug("Error during user authentication", e);

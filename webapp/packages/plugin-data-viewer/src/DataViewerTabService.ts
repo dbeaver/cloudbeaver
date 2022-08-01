@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, INodeNavigationData, ITab } from '@cloudbeaver/core-app';
+import { ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
+import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
 
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
@@ -27,6 +29,8 @@ export class DataViewerTabService {
     private readonly objectViewerTabService: ObjectViewerTabService,
     private readonly dbObjectPageService: DBObjectPageService,
     private readonly notificationService: NotificationService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly navigationTabsService: NavigationTabsService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -40,15 +44,44 @@ export class DataViewerTabService {
     });
   }
 
+  register() {
+    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
+  }
+
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
+  private async disconnectHandler(
+    data: IConnectionExecutorData,
+    contexts: IExecutionContextProvider<IConnectionExecutorData>
+  ) {
+    if (data.state === 'before') {
+      const tabs = Array.from(this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => data.connections.includes(tab.handlerState.connectionId ?? ''))
+      ));
+
+      for (const tab of tabs) {
+        const canDisconnect = await this.handleTabCanClose(tab);
+
+        if (!canDisconnect) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+      }
+    }
+  }
+
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
+    if (data.type !== NavigationType.open) {
+      return;
+    }
+
     try {
       const {
         nodeInfo,
         tabInfo,
+        initTab,
         trySwitchPage,
       } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
@@ -57,6 +90,8 @@ export class DataViewerTabService {
       if (!this.navNodeManagerService.isNodeHasData(node)) {
         return;
       }
+
+      initTab();
 
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);

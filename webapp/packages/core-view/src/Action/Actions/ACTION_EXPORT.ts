@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from '@cloudbeaver/core-view';
+import { createAction } from '../createAction';
 
 export const ACTION_EXPORT = createAction(
   'export',

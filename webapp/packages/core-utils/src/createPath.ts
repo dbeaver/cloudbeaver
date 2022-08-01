@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function createPath(names: Array<string | undefined>): string {
+export function createPath(...names: Array<string | undefined>): string {
   return names.filter(Boolean).join('/');
 }

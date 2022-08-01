@@ -80,6 +80,18 @@ implements ITabsContainer<TProps, TOptions> {
     return this.tabInfoList.filter(tabInfo => !tabInfo.isHidden?.(tabInfo.key, props));
   }
 
+  getIdList(props?: TProps): string[] {
+    return this.getDisplayed(props)
+      .map(tabInfo => {
+        if (tabInfo.generator) {
+          return tabInfo.generator(tabInfo.key, props);
+        }
+
+        return tabInfo.key;
+      })
+      .flat();
+  }
+
   add(tabInfo: ITabInfoOptions<TProps, TOptions>): void {
     if (this.tabInfoMap.has(tabInfo.key)) {
       throw new Error('Tab with same key already exists');

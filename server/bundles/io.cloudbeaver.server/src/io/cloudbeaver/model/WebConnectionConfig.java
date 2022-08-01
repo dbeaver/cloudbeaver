@@ -44,6 +44,7 @@ public class WebConnectionConfig {
 
     private String name;
     private String description;
+    private String folder;
     private Map<String, Object> properties;
     private String userName;
     private String userPassword;
@@ -78,6 +79,7 @@ public class WebConnectionConfig {
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
+            folder = JSONUtils.getString(params, "folder");
 
             properties = JSONUtils.getObjectOrNull(params, "properties");
             userName = JSONUtils.getString(params, "userName");
@@ -129,6 +131,11 @@ public class WebConnectionConfig {
     @Property
     public String getDescription() {
         return description;
+    }
+
+    @Property
+    public String getFolder() {
+        return folder;
     }
 
     @Property

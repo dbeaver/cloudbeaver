@@ -53,8 +53,8 @@ export class AuthProviderService {
     });
   }
 
-  async requireProvider(type: string, subType?: string): Promise<boolean>
-  async requireProvider(origin: ObjectOrigin): Promise<boolean>
+  async requireProvider(type: string, subType?: string): Promise<boolean>;
+  async requireProvider(origin: ObjectOrigin): Promise<boolean>;
   async requireProvider(origin: ObjectOrigin | string, subType?: string): Promise<boolean> {
     if (typeof origin === 'string') {
       origin = {

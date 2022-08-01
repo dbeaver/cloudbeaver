@@ -16,7 +16,7 @@ interface Props {
   className?: string;
 }
 
-export const OverlayHeaderSubTitle: React.FC<Props> = function OverlayHeaderSubTitle({ className, children }) {
+export const OverlayHeaderSubTitle: React.FC<React.PropsWithChildren<Props>> = function OverlayHeaderSubTitle({ className, children }) {
   return styled(useStyles(OVERLAY_BASE_STYLES))(
     <sub-title className={className}>{children}</sub-title>
   );

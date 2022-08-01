@@ -112,6 +112,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
         return;
       }
 
+      if (link.filter && !link.filter(data, context)) {
+        continue;
+      }
+
       const mappedData = link.map ? link.map(data, context) : data;
       const chainedContext = new ExecutionContext(mappedData, context);
 
@@ -151,10 +155,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     }
 
     const data = this.initialDataGetter();
-    
+
     this.scheduler.schedule(data, async () => {
       const context = new ExecutionContext(data);
-      
+
       try {
         await handler(data, context);
       } finally {

@@ -22,9 +22,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -61,7 +59,7 @@ public class WebSQLDataFilter {
         this.where = CommonUtils.toString(filterProps.get("where"), null);
         Object constraints = filterProps.get("constraints");
         if (constraints instanceof Collection) {
-            for (Object constrItem : (Collection)constraints) {
+            for (Object constrItem : (Collection<?>)constraints) {
                 if (constrItem instanceof Map) {
                     this.constraints.add(
                         new WebSQLDataFilterConstraint((Map<String, Object>)constrItem));

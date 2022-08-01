@@ -111,7 +111,7 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
         <error-name><span>{name || error.details?.name}</span></error-name>
         <error-message>{message || error.details?.message}</error-message>
         <error-actions>
-          {exception && (
+          {exception && error.details?.hasDetails && (
             <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
               {translate('ui_errors_details')}
             </Button>

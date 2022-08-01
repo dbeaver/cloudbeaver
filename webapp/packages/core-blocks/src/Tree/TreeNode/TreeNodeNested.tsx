@@ -6,15 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-interface Props {
+import { forwardRef } from 'react';
+
+interface Props extends React.PropsWithChildren {
   expanded?: boolean;
   root?: boolean;
   className?: string;
 }
 
-export const TreeNodeNested: React.FC<Props> = function TreeNodeNested({
+export const TreeNodeNested = forwardRef<HTMLDivElement, Props>(function TreeNodeNested({
   className,
   children,
-}) {
-  return <div className={className}>{children}</div>;
-};
+}, ref) {
+  return <div ref={ref} className={className}>{children}</div>;
+});

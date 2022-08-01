@@ -20,10 +20,11 @@ export const slideBoxStyles = css`
         vertical-align:top;
         white-space: normal;
         transition: transform cubic-bezier(0.4, 0.0, 0.2, 1) 0.6s;
-        transform: translateX(calc(-100% + 120px));
+        transform: translateX(-100%);
 
         &:first-child {
-          width: calc(100% - 120px);
+          transition: width cubic-bezier(0.4, 0.0, 0.2, 1) 0.6s;
+          width: 100%;
         }
       }
 
@@ -52,6 +53,10 @@ export const slideBoxStyles = css`
         }
         & SlideElement {
           transform: translateX(0%);
+
+          &:first-child {
+            width: calc(100% - 120px);
+          }
         }
       }
     }

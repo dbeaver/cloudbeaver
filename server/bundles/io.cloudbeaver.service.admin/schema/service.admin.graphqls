@@ -41,7 +41,7 @@ type AdminRoleInfo {
     grantedUsers: [ID!]!
     grantedConnections: [AdminConnectionGrantInfo!]!
 
-    rolePermissions: [ID]!
+    rolePermissions: [ID!]!
 }
 
 type AdminPermissionInfo {
@@ -104,9 +104,9 @@ extend type Query {
 
     #### Users and roles
 
-    listUsers(userId: ID): [AdminUserInfo]!
-    listRoles(roleId: ID): [AdminRoleInfo]!
-    listPermissions: [AdminPermissionInfo]!
+    listUsers(userId: ID): [AdminUserInfo!]!
+    listRoles(roleId: ID): [AdminRoleInfo!]!
+    listPermissions: [AdminPermissionInfo!]!
 
     createUser(userId: ID!): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
@@ -118,7 +118,7 @@ extend type Query {
     grantUserRole(userId: ID!, roleId: ID!): Boolean
     revokeUserRole(userId: ID!, roleId: ID!): Boolean
 
-    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): Boolean
+    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 

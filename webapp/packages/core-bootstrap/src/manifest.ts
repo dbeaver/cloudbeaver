@@ -6,63 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  AdministrationLocaleService,
-  AdministrationSettingsService,
-  AdministrationTopAppBarService,
-  AdministrationScreenService,
-  AdministrationItemService,
-  ConfigurationWizardService,
-  WizardTopAppBarService,
-  AdministrationScreenServiceBootstrap
-} from '@cloudbeaver/core-administration';
-import {
-  ConnectionDialogsService,
-  MainMenuService,
-  NavigationTreeService,
-  NavNodeManagerService,
-  DBObjectResource,
-  NavNodeViewService,
-  NavNodeExtensionsService,
-  NavNodeInfoResource,
-  SqlGeneratorsBootstrap,
-  SqlGeneratorsResource,
-  NavTreeResource,
-  ConnectionSchemaManagerService,
-  NavigationTabsService,
-  NavNodeContextMenuService,
-  LogViewerService,
-  LogViewerBootstrap,
-  TopNavService,
-  AppScreenService,
-  CoreSettingsService,
-  AdministrationTopAppBarBootstrapService,
-  AppLocaleService,
-  SessionExpiredDialogService,
-  SessionExpireWarningDialogService,
-  ConnectionSchemaManagerBootstrap,
-  NavigationTreeBootstrap,
-  ToolsPanelService,
-  QuotasService,
-} from '@cloudbeaver/core-app';
+import { coreAdministrationManifest } from '@cloudbeaver/core-administration';
+import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
-import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
+import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
+import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import type { PluginManifest } from '@cloudbeaver/core-di';
-import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
-import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { PluginManagerService } from '@cloudbeaver/core-plugin';
-import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
+import { codeDialogsManifest } from '@cloudbeaver/core-dialogs';
+import { coreEventsManifest } from '@cloudbeaver/core-events';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
+import { corePluginManifest } from '@cloudbeaver/core-plugin';
+import { coreProductManifest } from '@cloudbeaver/core-product';
+import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
-import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
+import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
-import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
-import { ThemeService, ThemeSettingsService } from '@cloudbeaver/core-theming';
+import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
+
 
 export const coreManifests: PluginManifest[] = [
   {
@@ -71,66 +38,28 @@ export const coreManifests: PluginManifest[] = [
     },
     depends: [],
 
-    providers: [
-      RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
-      AdministrationLocaleService,
-      AdministrationSettingsService,
-      AdministrationTopAppBarService,
-      AdministrationScreenService,
-      AdministrationScreenServiceBootstrap,
-      AdministrationItemService,
-      AdministrationTopAppBarBootstrapService,
-      ConfigurationWizardService,
-      WizardTopAppBarService,
-      ProductSettingsService,
-      ProductManagerService,
-      PluginManagerService,
-      CoreSettingsService,
-      QuotasService,
-      CommonDialogService,
-      SessionExpireWarningDialogService,
-      SessionExpiredDialogService,
-      ConnectionDialogsService,
-      ConnectionSchemaManagerBootstrap,
-      ConnectionSchemaManagerService,
-      BlocksLocaleService,
-      AppLocaleService,
-      ScreenService,
-      AppScreenService,
-      ContextMenuService,
-      ExceptionsCatcherService,
-      EventsSettingsService,
-      LocalStorageSaveService,
-      LocalizationService,
-      LogViewerBootstrap,
-      LogViewerService,
-      MainMenuService,
-      TopNavService,
-      NavigationTabsService,
-      NavNodeContextMenuService,
-      NavigationTreeService,
-      NavNodeManagerService,
-      NavNodeViewService,
-      NavNodeExtensionsService,
-      NavNodeInfoResource,
-      SqlGeneratorsBootstrap,
-      SqlGeneratorsResource,
-      NavigationTreeBootstrap,
-      NavTreeResource,
-      DBObjectResource,
-      NotificationService,
-      SettingsService,
-      ThemeSettingsService,
-      ThemeService,
-      ToolsPanelService,
-    ],
+    providers: [ ],
   },
+  coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
+  coreThemingManifest,
+  coreLocalizationManifest,
+  coreBlocksManifest,
+  coreSettingsManifest,
+  coreEventsManifest,
   coreSDKManifest,
+  coreRootManifest,
+  corePluginManifest,
+  coreBrowserManifest,
+  coreProductManifest,
+  coreProjectsManifest,
   coreAuthenticationManifest,
   coreUIManifest,
   coreViewManifest,
   coreVersionManifest,
   coreVersionUpdateManifest,
-  coreRootManifest,
   coreConnectionsManifest,
+  coreAdministrationManifest,
+  codeDialogsManifest,
+  coreAppManifest,
+  coreNavigationTree,
 ];

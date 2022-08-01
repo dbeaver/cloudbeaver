@@ -13,7 +13,7 @@ interface Props {
   className?: string;
 }
 
-export const SlideBox: React.FC<Props> = function SlideBox({ children, className }) {
+export const SlideBox: React.FC<React.PropsWithChildren<Props>> = function SlideBox({ children, className }) {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const SlideBox: React.FC<Props> = function SlideBox({ children, className
       div.addEventListener('scroll', handleScroll);
     }
 
-    return () => { 
+    return () => {
       if (div) {
         div.removeEventListener('scroll', handleScroll);
       }

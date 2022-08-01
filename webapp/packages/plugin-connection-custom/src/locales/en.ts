@@ -11,6 +11,7 @@ export default [
   ['customConnection_custom_database', 'Database'],
   ['customConnection_custom_server', 'Server'],
   ['customConnection_url_JDBC', 'JDBC URL'],
+  ['customConnection_folder', 'Folder'],
   ['customConnection_userName', 'User name'],
   ['customConnection_Password', 'Password'],
   ['customConnection_test', 'Test Connection'],

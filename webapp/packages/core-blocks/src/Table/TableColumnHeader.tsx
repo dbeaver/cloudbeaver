@@ -18,7 +18,7 @@ interface Props {
   className?: string;
 }
 
-export const TableColumnHeader: React.FC<Props> = function TableColumnHeader({
+export const TableColumnHeader: React.FC<React.PropsWithChildren<Props>> = function TableColumnHeader({
   title, min, flex, centerContent, className, children,
 }) {
   return styled(BASE_TABLE_STYLES)(

@@ -25,6 +25,12 @@ export class ActionService {
     this.handlers = new Map();
   }
 
+  activateAction(context: IDataContextProvider, action: IAction) {
+    this
+      .getAction(context, action)
+      ?.activate();
+  }
+
   addHandler(handler: IActionHandler): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Action handler with same id (${handler.id}) already exists`);

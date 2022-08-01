@@ -9,12 +9,14 @@
 import type { IExecutionContextProvider } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 
+export type ExecutorDataFilter<T> = (data: T, contexts: IExecutionContextProvider<T>) => boolean;
 export type ExecutorDataMap<T, TNext> = (data: T, contexts: IExecutionContextProvider<T>) => TNext;
 export type ChainLinkType = 'next' | 'before';
 
 export interface IChainLink<T, TResult> {
   executor: IExecutorHandlersCollection<any, TResult>;
   map?: ExecutorDataMap<T, any>;
+  filter?: ExecutorDataFilter<T>;
   type: ChainLinkType;
 }
 

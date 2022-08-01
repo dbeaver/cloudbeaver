@@ -17,16 +17,15 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.SMAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * WebAuthProviderInfo.
@@ -71,9 +70,9 @@ public class WebAuthProviderInfo {
 
     public List<WebAuthProviderConfiguration> getConfigurations() {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
-        for (Map.Entry<String, AuthProviderConfig> cfg : CBApplication.getInstance().getAppConfiguration().getAuthProviderConfigurations().entrySet()) {
-            if (!cfg.getValue().isDisabled() && getId().equals(cfg.getValue().getProvider())) {
-                result.add(new WebAuthProviderConfiguration(descriptor, cfg.getKey(), cfg.getValue()));
+        for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
+            if (!cfg.isDisabled() && getId().equals(cfg.getProvider())) {
+                result.add(new WebAuthProviderConfiguration(descriptor, cfg));
             }
         }
         return result;

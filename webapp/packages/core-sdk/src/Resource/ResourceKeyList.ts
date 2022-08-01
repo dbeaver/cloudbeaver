@@ -45,6 +45,10 @@ export interface ResourceKeyUtils {
   some: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   every: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   map: MapFnc;
+  toArray: <TKey>(key: ResourceKey<TKey>) => TKey[];
+  filter: <TKey>(key: ResourceKey<TKey>, filter: (key: TKey) => boolean) => TKey[];
+  mapKey: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
+  mapArray: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
   includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
   exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKeyList<TKey>;
   join: <TKey>(...keys: Array<ResourceKey<TKey>>) => ResourceKeyList<TKey>;
@@ -125,12 +129,38 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
       return predicate(key, -1);
     }
   },
+  toArray<TKey>(key: ResourceKey<TKey>): TKey[] {
+    if (isResourceKeyList(key)) {
+      return key.list;
+    } else {
+      return [key];
+    }
+  },
+  filter<TKey>(key: ResourceKey<TKey>, filter: (key: TKey) => boolean): TKey[] {
+    return this.toArray(key).filter(filter);
+  },
+
+  mapKey<TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKey<TValue> {
+    if (isResourceKeyList(key)) {
+      return resourceKeyList(key.list.map(selector), key.mark);
+    } else {
+      return selector(key, -1);
+    }
+  },
 
   map<TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue): TValue | TValue[] {
     if (isResourceKeyList(key)) {
       return key.list.map(selector);
     } else {
       return selector(key, -1);
+    }
+  },
+
+  mapArray<TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue): TValue[] {
+    if (isResourceKeyList(key)) {
+      return key.list.map(selector);
+    } else {
+      return [selector(key, -1)];
     }
   },
 

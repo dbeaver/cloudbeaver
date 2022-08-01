@@ -18,6 +18,7 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
     if (throttle) {
       if (tail) {
         functionArgs = args;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         thisObject = this;
         pending = true;
       }
@@ -57,6 +58,7 @@ export function throttleAsync<
   return async function exec(this: any, ...args: TArguments): Promise<TResult> {
     if (throttle) {
       functionArgs = args;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       thisObject = this;
 
       if (_reject) {

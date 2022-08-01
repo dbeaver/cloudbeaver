@@ -68,6 +68,8 @@ type NavigatorNodeInfo {
     nodeType: String
     # Can this property have child nodes?
     hasChildren: Boolean
+    # Project id of the node
+    projectId: String
 
     # Associated object. Maybe null for non-database objects
     object: DatabaseObjectInfo
@@ -111,14 +113,14 @@ extend type Query {
         onlyFolders: Boolean): [ NavigatorNodeInfo! ]!
 
     # Get child nodes
-    navNodeParents(nodePath: ID!): [ NavigatorNodeInfo! ]!
+    navNodeParents( nodePath: ID! ): [ NavigatorNodeInfo! ]!
 
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!
 
     navRefreshNode( nodePath: ID! ): Boolean
 
     # contextId currently not using
-    navGetStructContainers( connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
+    navGetStructContainers( projectId: ID, connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
 }
 
@@ -129,5 +131,8 @@ extend type Mutation {
 
     # Deletes nodes with specified IDs and returns number of deleted nodes
     navDeleteNodes( nodePaths: [ID!]! ): Int
+
+    # Moves nodes with specified IDs to the connection folder
+    navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean
 
 }

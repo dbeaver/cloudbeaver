@@ -75,7 +75,7 @@ public class WebUserInfo {
 
     @Property
     public Map<String, String> getMetaParameters() {
-        return user.getMetaParameters();
+        return session.getUserMetaParameters();
     }
 
     @Property

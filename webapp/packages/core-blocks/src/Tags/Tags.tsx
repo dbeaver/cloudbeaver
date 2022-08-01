@@ -25,7 +25,7 @@ const style = css`
   }
 `;
 
-export const Tags = observer<Props>(function Tags({ children, className }) {
+export const Tags = observer<React.PropsWithChildren<Props>>(function Tags({ children, className }) {
   return styled(style)(
     <tags as='ul' className={className}>
       {children}

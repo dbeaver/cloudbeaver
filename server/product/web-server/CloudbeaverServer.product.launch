@@ -104,7 +104,6 @@
         <setEntry value="org.slf4j.api@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="io.cloudbeaver.connect.provider.sample@default:default"/>
         <setEntry value="io.cloudbeaver.model@default:default"/>
         <setEntry value="io.cloudbeaver.product.ce@default:default"/>
         <setEntry value="io.cloudbeaver.resources.drivers.base@default:default"/>

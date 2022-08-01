@@ -20,8 +20,10 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +38,7 @@ public class AdminRoleInfo {
     public AdminRoleInfo(WebSession session, SMRole role) {
         this.role = role;
         this.session = session;
+        this.rolePermissions = new ArrayList<>(role.getPermissions());
     }
 
     public String getRoleId() {
@@ -60,7 +63,15 @@ public class AdminRoleInfo {
 
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
-        return session.getSecurityController().getSubjectConnectionAccess(new String[]{getRoleId()});
+        return session.getAdminSecurityController()
+            .getSubjectObjectPermissionGrants(getRoleId(), SMObjects.DATASOURCE)
+            .stream()
+            .map(objectPermission -> new SMDataSourceGrant(
+                objectPermission.getObjectPermissions().getObjectId(),
+                getRoleId(),
+                objectPermission.getSubjectType()
+            ))
+            .toArray(SMDataSourceGrant[]::new);
     }
 
     @Property

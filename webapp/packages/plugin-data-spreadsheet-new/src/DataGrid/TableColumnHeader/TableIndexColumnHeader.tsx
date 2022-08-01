@@ -8,11 +8,11 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
@@ -48,7 +48,7 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
     || dataGridContext.model.isReadonly()
   ));
 
-  function handleClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     selectionContext.selectTable();
     dataGridContext.focus();
   }

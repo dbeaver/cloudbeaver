@@ -1,0 +1,8 @@
+fragment AdminPermissionInfo on AdminPermissionInfo {
+    id
+    label
+    description
+
+    #provider
+    category
+}

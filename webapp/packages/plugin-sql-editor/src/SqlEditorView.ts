@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { IActiveView, View } from '@cloudbeaver/core-view';
+import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';

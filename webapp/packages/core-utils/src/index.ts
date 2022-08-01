@@ -6,6 +6,9 @@ export * from './Promises/PromiseExecutor';
 
 export * from './Quadtree/index';
 
+export * from './blobToData';
+export * from './bytesToSize';
+export * from './clsx';
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
 export * from './filterUndefined';
@@ -35,11 +38,9 @@ export * from './download';
 export * from './getTextFileReadingProcess';
 export * from './getTextBetween';
 export * from './timestampToDate';
-export * from './bytesToSize';
 export * from './isDefined';
 export * from './createPath';
 export * from './debounce';
-export * from './blobToData';
 export * from './svgToDataUri';
 export * from './uriToBlob';
 export * from './utf8ToBase64';

@@ -16,6 +16,7 @@ import { AsyncTaskInfoService, GraphQLService, SqlExecutionPlan } from '@cloudbe
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
+import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
 
 interface IExecutionPlanData {
   task: ITask<SqlExecutionPlan>;
@@ -30,7 +31,8 @@ export class SqlExecutionPlanService {
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly connectionExecutionContextService: ConnectionExecutionContextService
+    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    private readonly sqlDataSourceService: SqlDataSourceService
   ) {
     this.data = new Map();
 
@@ -43,7 +45,8 @@ export class SqlExecutionPlanService {
     editorState: ISqlEditorTabState,
     query: string,
   ): Promise<void> {
-    const contextInfo = editorState.executionContext;
+    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+    const contextInfo = dataSource?.executionContext;
 
     const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
@@ -138,8 +141,9 @@ export class SqlExecutionPlanService {
   }
 
   private createExecutionPlanTab(state: ISqlEditorTabState, query: string) {
-    if (!state.executionContext) {
-      throw new Error('ExecutionContext is not provided');
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
+    if (!dataSource) {
+      throw new Error('SQL Data Source is not provided');
     }
 
     const id = uuid();

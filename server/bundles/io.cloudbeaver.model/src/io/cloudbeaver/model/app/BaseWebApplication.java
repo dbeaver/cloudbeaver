@@ -17,8 +17,8 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.model.log.SLF4JLogHandler;
-import io.cloudbeaver.model.rm.RMControllerInvocationHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -28,13 +28,17 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
+import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
-import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -76,7 +80,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
             }
         }
         Path path = Path.of(configPath).toAbsolutePath();
-        log.debug("Loading configuration from " + path);
 
         // Configure logging
         Path logbackConfigPath = null;
@@ -96,6 +99,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         Log.setLogHandler(new SLF4JLogHandler());
 
         // Load config file
+        log.debug("Loading configuration from " + path);
         try {
             loadConfiguration(configPath);
         } catch (Exception e) {
@@ -109,19 +113,28 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     protected abstract void loadConfiguration(String configPath) throws DBException;
 
     @Override
-    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return (RMController) Proxy.newProxyInstance(getClass().getClassLoader(),
-            new Class[]{RMController.class},
-            new RMControllerInvocationHandler(createResourceController(credentialsProvider), this)
-        );
+    public VirtualProjectImpl createProjectImpl(
+        @NotNull RMProject project,
+        @NotNull SMSessionContext sessionContext,
+        @NotNull SMCredentialsProvider credentialsProvider
+    ) {
+        return new VirtualProjectImpl(
+            project,
+            sessionContext);
     }
 
-    protected @NotNull RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return LocalResourceController.builder(credentialsProvider).build();
+    @Override
+    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull SMController smController) {
+        return  LocalResourceController.builder(credentialsProvider, smController).build();
+
+    }
+
+    protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+        return JSONUtils.getObject(configProps, "server");
     }
 
     @SuppressWarnings("unchecked")
-    protected void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+    public static void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
         for (Map.Entry<String, Object> entry : configProps.entrySet()) {
             Object propValue = entry.getValue();
             if (propValue instanceof String) {

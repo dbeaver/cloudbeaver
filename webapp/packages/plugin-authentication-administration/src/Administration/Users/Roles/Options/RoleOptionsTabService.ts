@@ -70,6 +70,8 @@ export class RoleOptionsTabService extends Bootstrap {
     if (state.config.description) {
       config.description = state.config.description;
     }
+
+    config.rolePermissions = [...state.config.rolePermissions];
   }
 
   private async validate(
@@ -142,5 +144,6 @@ export class RoleOptionsTabService extends Bootstrap {
     if (state.info.description) {
       state.config.description = state.info.description;
     }
+    state.config.rolePermissions = [...state.info.rolePermissions];
   }
 }

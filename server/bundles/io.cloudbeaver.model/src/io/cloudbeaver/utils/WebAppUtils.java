@@ -16,12 +16,29 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WebAppUtils {
+    private static final Log log = Log.getLog(WebAppUtils.class);
+
     public static String getRelativePath(String path, String curDir) {
         return getRelativePath(path, Path.of(curDir));
     }
@@ -37,4 +54,102 @@ public class WebAppUtils {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
     }
 
+    public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
+        var smController = application.getSecurityController(new NoAuthCredentialsProvider());
+        if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
+            throw new DBException("The current application cannot be used for authorization");
+        }
+        return (SMAuthenticationManager) smController;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> mergeConfigurations(Map<String, Object> origin, Map<String, Object> additional) {
+        var resultConfig = new HashMap<String, Object>();
+        Set<String> rootKeys = new HashSet<>(origin.keySet());
+        rootKeys.addAll(additional.keySet());
+
+        for (var rootKey : rootKeys) {
+            var originValue = origin.get(rootKey);
+            var additionalValue = additional.get(rootKey);
+
+            if (originValue == null || additionalValue == null) {
+                var resultValue = originValue != null ? originValue : additionalValue;
+                resultConfig.put(rootKey, resultValue);
+                continue;
+            }
+
+            if (originValue instanceof Map) {
+                var resultValue = mergeConfigurations((Map<String, Object>) originValue, (Map<String, Object>) additionalValue);
+                resultConfig.put(rootKey, resultValue);
+            } else {
+                resultConfig.put(rootKey, additionalValue);
+            }
+
+        }
+
+        return resultConfig;
+    }
+
+
+    @NotNull
+    public static String removeSideSlashes(String action) {
+        if (CommonUtils.isEmpty(action)) {
+            return action;
+        }
+        while (action.startsWith("/")) action = action.substring(1);
+        while (action.endsWith("/")) action = action.substring(0, action.length() - 1);
+        return action;
+    }
+
+    @NotNull
+    public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
+        WebApplication application = getWebApplication();
+        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
+            throw new DBException("The current application doesn't contain authorization configuration");
+        }
+        WebAuthApplication webAuthApplication = (WebAuthApplication) application;
+        return getAuthApiPrefix(webAuthApplication, serviceId);
+    }
+
+    @NotNull
+    public static StringBuilder getAuthApiPrefix(WebAuthApplication webAuthApplication, String serviceId) {
+        String authUrl = removeSideSlashes(webAuthApplication.getAuthServiceURL());
+        StringBuilder apiPrefix = new StringBuilder(authUrl);
+        apiPrefix.append("/").append(serviceId).append("/");
+        return apiPrefix;
+    }
+
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
+        addResponseCookie(request, response, cookieName, cookieValue, maxSessionIdleTime, null);
+    }
+
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime, @Nullable String sameSite) {
+        Cookie sessionCookie = new Cookie(cookieName, cookieValue);
+        if (maxSessionIdleTime > 0) {
+            sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
+        }
+
+        String path = getWebApplication().getRootURI();
+
+        if (sameSite != null) {
+            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
+                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
+            } else {
+                sessionCookie.setSecure(true);
+                path = path.concat("; SameSite=" + sameSite);
+            }
+        }
+
+        sessionCookie.setPath(path);
+        response.addCookie(sessionCookie);
+    }
+
+    public static String getRequestCookie(HttpServletRequest request, String cookieName) {
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(cookieName)) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
 }

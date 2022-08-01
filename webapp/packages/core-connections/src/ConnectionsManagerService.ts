@@ -10,16 +10,23 @@ import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
+export interface IConnectionExecutorData {
+  connections: string[];
+  state: 'before' | 'after';
+}
+
 @injectable()
 export class ConnectionsManagerService {
   readonly connectionExecutor: IExecutor<string | null>;
+  readonly onDisconnect: IExecutor<IConnectionExecutorData>;
+  readonly onDelete: IExecutor<IConnectionExecutorData>;
 
   private disconnecting: boolean;
 
@@ -27,11 +34,16 @@ export class ConnectionsManagerService {
     readonly connectionInfo: ConnectionInfoResource,
     readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService,
   ) {
     this.disconnecting = false;
+
     this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
+    this.onDisconnect = new Executor();
+    this.onDelete = new Executor();
+
     this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
+    this.onDelete.before(this.onDisconnect);
   }
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
@@ -93,7 +105,21 @@ export class ConnectionsManagerService {
       return;
     }
 
+    const contexts = await this.onDelete.execute({
+      connections: [id],
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     await this.connectionInfo.deleteConnection(id);
+
+    this.onDelete.execute({
+      connections: [id],
+      state: 'after',
+    });
   }
 
   hasAnyConnection(connected?: boolean): boolean {
@@ -140,11 +166,25 @@ export class ConnectionsManagerService {
     if (!connection || !connection.connected) {
       return;
     }
+    const contexts = await this.onDisconnect.execute({
+      connections: [connection.id],
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
       await this._closeConnectionAsync(connection);
+
       notification.close();
+      this.onDisconnect.execute({
+        connections: [connection.id],
+        state: 'after',
+      });
     } catch (exception: any) {
       controller.reject(exception);
     }

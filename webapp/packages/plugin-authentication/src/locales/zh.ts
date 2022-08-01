@@ -3,6 +3,7 @@ export default [
   ['authentication_login', '登录'],
   ['authentication_logout', '登出'],
   ['authentication_authenticate', '认证'],
+  ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', '联合认证'],
   ['authentication_select_provider', '选择可用提供者'],
   ['authentication_configure', '请配置认证方法'],

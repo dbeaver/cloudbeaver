@@ -8,11 +8,11 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 import type { IDataPresentationActions, IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { CellContext } from '../CellRenderer/CellContext';
@@ -27,13 +27,19 @@ interface Props extends FormatterProps<IResultSetRowKey> {
 
 const styles = css`
   formatter-wrapper {
-    flex: 1;
+    height: 100%;
     display: flex;
     overflow: hidden;
-    position: relative;
+    box-sizing: border-box;
   }
   formatter-container {
     flex: 1;
+    overflow: hidden;
+  }
+  menu-container {
+    width: 20px;
+    height: 100%;
+    box-sizing: border-box;
     overflow: hidden;
   }
 `;
@@ -47,7 +53,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
   const isEditing = cellContext.isEditing;
   const showCellMenu = getComputed(() => !isEditing && (
     rest.isCellSelected
-    || cellContext?.mouse.state.mouseEnter
+    || cellContext.mouse.state.mouseEnter
     || menuVisible
   ));
 
@@ -67,7 +73,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && cellContext.cell && (
+      {showCellMenu && cellContext.cell && !rest.isScrolling  && (
         <menu-container>
           <CellMenu
             cellKey={cellContext.cell}

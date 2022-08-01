@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Column as DataGridColumn } from 'react-data-grid';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import type { Column as DataGridColumn } from '@cloudbeaver/plugin-react-data-grid';
 
-import type { DBObject } from '@cloudbeaver/core-app';
 
 export interface IDataColumn extends DataGridColumn<DBObject> {
   description?: string;

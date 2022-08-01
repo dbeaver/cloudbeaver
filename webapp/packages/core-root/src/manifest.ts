@@ -10,14 +10,15 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
-import { PermissionsResource } from './PermissionsResource';
 import { PermissionsService } from './PermissionsService';
+import { QuotasService } from './QuotasService';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerService } from './ServerService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionDataResource } from './SessionDataResource';
 import { SessionExpireService } from './SessionExpireService';
+import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionService } from './SessionService';
 import { SessionSettingsService } from './SessionSettingsService';
@@ -32,7 +33,7 @@ export const manifest: PluginManifest = {
   providers: [
     FeaturesResource,
     NetworkStateService,
-    PermissionsResource,
+    SessionPermissionsResource,
     PermissionsService,
     ServerConfigResource,
     ServerService,
@@ -44,5 +45,6 @@ export const manifest: PluginManifest = {
     SessionService,
     SessionSettingsService,
     WindowEventsService,
+    QuotasService,
   ],
 };

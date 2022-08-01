@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';

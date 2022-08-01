@@ -6,21 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
+
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { DataContextGetter } from './DataContextGetter';
-import type { IDataContext } from './IDataContext';
+import type { DeleteVersionedContextCallback, IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
 
 export class DataContext implements IDataContext {
-  private map: Map<DataContextGetter<any>, any>;
+  private readonly map: Map<DataContextGetter<any>, any>;
+  private readonly versions: MetadataMap<DataContextGetter<any>, number>;
   fallback?: IDataContextProvider;
 
   constructor(fallback?: IDataContextProvider) {
     this.map = new Map();
+    this.versions = new MetadataMap(() => 0);
     this.fallback = fallback;
 
     makeObservable<this, 'map'>(this, {
+      set: action,
+      delete: action,
       map: observable.shallow,
       fallback: observable.ref,
     });
@@ -51,13 +57,26 @@ export class DataContext implements IDataContext {
     }
   }
 
-  set<T>(context: DataContextGetter<T>, value: T): this {
-    this.map.set(context, value);
+  set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
+    const data = this.map.get(context);
+    let version = this.versions.get(context);
 
-    return this;
+    if (data === value) {
+      return this.delete.bind(this, context, version);
+    }
+
+    version++;
+    this.map.set(context, value);
+    this.versions.set(context, version);
+
+    return this.delete.bind(this, context, version);
   }
 
-  delete(context: DataContextGetter<any>): this {
+  delete(context: DataContextGetter<any>, version?: number): this {
+    if (version !== this.versions.get(context)) {
+      return this;
+    }
+
     this.map.delete(context);
 
     return this;

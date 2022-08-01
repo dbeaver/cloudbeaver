@@ -37,7 +37,6 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     }
 
     try {
-      await this.authProvidersResource.loadAll();
       const config = await this.serverConfigResource.load();
 
       if (!config) {
@@ -45,6 +44,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       }
 
       if (config.configurationMode) {
+        await this.authProvidersResource.loadAll();
         if (this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID)) {
           data.state.serverConfig.adminName = 'cbadmin';
           data.state.serverConfig.adminPassword = '';

@@ -12,10 +12,11 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test"
   },
   "dependencies": {
-    "go-split": "^3.0.2"
+    "go-split": "^3.0.5"
   },
   "peerDependencies": {
     "@cloudbeaver/core-authentication": "~0.1.0",
@@ -28,7 +29,7 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "reshadow": "~0.x.x",
     "reakit": "~1.x.x",
-    "react": "~17.x.x",
+    "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x"
   }

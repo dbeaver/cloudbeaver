@@ -9,14 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { ElementsTree, NavigationTreeService, NavigationNodeControl } from '@cloudbeaver/core-app';
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { NavigationTreeService, ElementsTree, NavigationNodeControl } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ProjectsResource } from '../ProjectsResource';
+import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 const styles = css`
@@ -56,13 +56,13 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const translate = useTranslate();
   const navTreeService = useService(NavigationTreeService);
 
-  const { resource } = useDataResource(ResourceManagerTree, ProjectsResource, undefined);
+  const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
 
   return styled(styles)(
     <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={createPath([RESOURCES_NODE_PATH, resource.userProject?.name])}
+          root={createPath(RESOURCES_NODE_PATH, resource.userProject?.id)}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
           control={NavigationNodeControl}

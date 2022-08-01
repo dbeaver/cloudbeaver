@@ -7,15 +7,16 @@
  */
 
 import { computed, observable } from 'mobx';
-import type { Column } from 'react-data-grid';
+
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { TextTools, uuid } from '@cloudbeaver/core-utils';
+import { TextTools } from '@cloudbeaver/core-utils';
 import {
   IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey,
   ResultSetConstraintAction, ResultSetDataAction, ResultSetDataKeysUtils,
   ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction
 } from '@cloudbeaver/plugin-data-viewer';
+import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
@@ -28,6 +29,7 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   name: '#',
   minWidth: 60,
   width: 60,
+  selectable: false,
   resizable: false,
   frozen: true,
   headerRenderer: TableIndexColumnHeader,
@@ -77,7 +79,8 @@ export function useTableData(
 
       const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>(
         (col, index) => ({
-          key: uuid(),
+          // key: uuid(),
+          key: ResultSetDataKeysUtils.serialize(col),
           columnDataIndex: { index },
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
@@ -92,13 +95,17 @@ export function useTableData(
       return columns;
     },
     getMetrics(columnIndex) {
+      if (columnIndex < 0 || columnIndex > this.columns.length) {
+        return undefined;
+      }
+
       let left = 0;
       for (let i = 0; i < columnIndex; i++) {
         const column = this.columns[i];
         left += column.width as number;
       }
 
-      const column = this.getColumn(columnIndex);
+      const column = this.getColumn(columnIndex)!;
 
       return {
         left,
@@ -148,6 +155,9 @@ export function useTableData(
     },
     getEditionState(key) {
       return this.editor.getElementState(key);
+    },
+    inBounds(position) {
+      return this.view.has(position);
     },
     isCellEdited(key) {
       return this.editor.isElementEdited(key);

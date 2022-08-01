@@ -10,19 +10,21 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { NodeManagerUtils } from '@cloudbeaver/core-app';
-import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
+import { useDataSource } from './useDataSource';
 
 const viewerStyles = css`
   CaptureView {
@@ -33,12 +35,28 @@ const viewerStyles = css`
   Pane {
     composes: theme-typography--body2 from global;
     display: flex;
+    position: relative;
+  }
+  Pane:first-child {
+    flex-direction: column;
   }
   SqlEditorLoader {
     composes: theme-typography--body1 from global;
   }
   OverlayActions {
     justify-content: space-between;
+  }
+
+  Loader {
+    composes: theme-background-surface theme-border-color-background from global;
+
+    position: absolute;
+    bottom: 0px;
+
+    border-top: 1px solid;
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
   }
 `;
 
@@ -50,8 +68,15 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const translate = useTranslate();
   const sqlEditorView = useService(SqlEditorView);
   const sqlEditorService = useService(SqlEditorService);
+  const sqlDataSourceService = useService(SqlDataSourceService);
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
-  const connection = useMapResource(SqlEditor, ConnectionInfoResource, state.executionContext?.connectionId ?? null);
+  const dataSource = sqlDataSourceService.get(state.editorId);
+  useDataSource(dataSource);
+  const connection = useMapResource(
+    SqlEditor,
+    ConnectionInfoResource,
+    dataSource?.executionContext?.connectionId ?? null
+  );
   const driver = useMapResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
   const splitState = useSplitUserState('sql-editor');
 
@@ -60,11 +85,14 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const context = useMapResource(
     SqlEditor,
     ConnectionExecutionContextResource,
-    connected ? (state.executionContext?.id ?? null) : null
+    connected ? (dataSource?.executionContext?.id ?? null) : null
   );
 
   const initializingContext = getComputed(() => connection.isLoading() || context.isLoading());
-  const initExecutionContext = getComputed(() => context.data === undefined && state.executionContext !== undefined);
+  const initExecutionContext = getComputed(() => (
+    context.data === undefined
+    && dataSource?.executionContext !== undefined
+  ));
 
   async function cancelConnection() {
     await sqlEditorService.resetExecutionContext(state);
@@ -75,15 +103,14 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   }
 
   const dataContainer = getComputed(() => NodeManagerUtils.concatSchemaAndCatalog(
-    state.executionContext?.defaultCatalog,
-    state.executionContext?.defaultSchema
+    dataSource?.executionContext?.defaultCatalog,
+    dataSource?.executionContext?.defaultSchema
   ));
 
   useEffect(() => {
     if (initExecutionContext && connected) {
       init();
     }
-
   }, [connected, initExecutionContext]);
 
   return styled(styles)(
@@ -91,6 +118,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
       <Split {...splitState} split="horizontal" sticky={30}>
         <Pane>
           <SqlEditorLoader state={state} />
+          <Loader state={dataSource} message={dataSource?.message} small inline inlineException />
         </Pane>
         <ResizerControls />
         <Pane basis='50%' main>

@@ -14,7 +14,7 @@ interface Props {
   className?: string;
 }
 
-export const TableBody: React.FC<Props> = function TableBody({ children, className }) {
+export const TableBody: React.FC<React.PropsWithChildren<Props>> = function TableBody({ children, className }) {
   return styled(BASE_TABLE_STYLES)(
     <tbody className={className}>
       {children}

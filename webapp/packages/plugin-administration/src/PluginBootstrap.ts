@@ -37,7 +37,7 @@ export class PluginBootstrap extends Bootstrap {
               {
                 id: 'administrationMenuEnter',
                 label: 'administration_menu_enter',
-                tooltip: 'administration_menu_enter', 
+                tooltip: 'administration_menu_enter',
               },
               { onSelect: () => this.administrationScreenService.navigateToRoot() }
             ),

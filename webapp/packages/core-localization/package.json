@@ -12,7 +12,8 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test"
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
@@ -20,7 +21,7 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
-    "react": "~17.x.x",
+    "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x"
   }

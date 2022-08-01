@@ -21,7 +21,7 @@ export enum ENotificationType {
   Error = 'Error',
   Success = 'Success',
   Loading = 'Loading',
-  Custom =' Custom'
+  Custom = ' Custom'
 }
 
 export interface INotificationExtraProps<T = never> {
@@ -53,7 +53,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   title: string;
   message?: string;
   timestamp: number;
-  details?: string | Error;
+  details?: string | Error | null;
   persistent?: boolean;
   state: { deleteDelay: number };
   isSilent: boolean;
@@ -67,7 +67,7 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   title: string;
   uuid?: string;
   message?: string;
-  details?: string | Error;
+  details?: string | Error | null;
   isSilent?: boolean;
   persistent?: boolean;
   extraProps?: TProps;

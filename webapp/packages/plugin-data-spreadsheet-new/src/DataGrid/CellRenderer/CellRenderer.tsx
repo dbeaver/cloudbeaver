@@ -9,12 +9,13 @@
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useEffect } from 'react';
-import type { CalculatedColumn, CellRendererProps } from 'react-data-grid';
-import { Cell } from 'react-data-grid';
+
 
 import { getComputed, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { clsx } from '@cloudbeaver/core-utils';
 import { IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
+import { CalculatedColumn, Cell, CellRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
@@ -22,13 +23,15 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
-export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(function CellRenderer(props) {
-  const { rowIdx, row, column, isCellSelected } = props;
+export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
+  const { row, column, isCellSelected, selectCell } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
   const mouse = useMouse<HTMLDivElement>({});
+
+  const rowIdx = tableDataContext.getRowIndexFromKey(row);
 
   const cellContext = useObservableRef(() => ({
     mouse,
@@ -42,13 +45,13 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
       return { row: this.row, column: this.column.columnDataIndex };
     },
     get isEditing(): boolean {
-      return editingContext?.isEditing(this.position) || false;
+      return editingContext.isEditing(this.position) || false;
     },
     get isSelected(): boolean {
-      return selectionContext?.isSelected(this.position.rowIdx, this.position.idx) || false;
+      return selectionContext.isSelected(this.position.rowIdx, this.position.idx) || false;
     },
     get editionState(): DatabaseEditChangeType | null {
-      if (!this.cell || !tableDataContext) {
+      if (!this.cell) {
         return null;
       }
 
@@ -65,37 +68,16 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     editionState: computed,
   }, { row, column, rowIdx });
 
-  const classes = getComputed(() => {
-    let classes = '';
-    if (cellContext.isSelected) {
-      classes += ' rdg-cell-custom-selected';
-    }
+  const classes = getComputed(() => clsx({
+    'rdg-cell-custom-selected': cellContext.isSelected,
+    'rdg-cell-custom-editing': cellContext.isEditing,
+    'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
+    'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
+    'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
+  }));
 
-    if (cellContext.isEditing) {
-      classes += ' rdg-cell-custom-editing';
-    }
-
-    if (cellContext.editionState !== null) {
-      switch (cellContext.editionState) {
-        case DatabaseEditChangeType.add:
-          classes += ' rdg-cell-custom-added';
-          break;
-        case DatabaseEditChangeType.delete:
-          classes += ' rdg-cell-custom-deleted';
-          break;
-        case DatabaseEditChangeType.update:
-          classes += ' rdg-cell-custom-edited';
-      }
-    }
-    return classes;
-  });
-
-  function isEditable(column: CalculatedColumn<IResultSetRowKey, unknown>): boolean {
-    if (
-      !editingContext
-      || !tableDataContext
-      || !cellContext.cell
-    ) {
+  function isEditable(column: CalculatedColumn<IResultSetRowKey>): boolean {
+    if (!cellContext.cell) {
       return false;
     }
 
@@ -115,11 +97,13 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
   }
 
   const state = useObjectRef(() => ({
-    mouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    mouseDown(event: React.MouseEvent<HTMLDivElement>) {
+      // this.selectCell(this.row, this.column);
+    },
+    mouseUp(event: React.MouseEvent<HTMLDivElement>) {
       if (
-        !this.selectionContext
-        || !this.dataGridContext?.isGridInFocus()
-        || EventContext.has(event, EventStopPropagationFlag)
+        // !this.dataGridContext.isGridInFocus()
+        EventContext.has(event, EventStopPropagationFlag)
       ) {
         return;
       }
@@ -137,6 +121,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     doubleClick(event: React.MouseEvent<HTMLDivElement>) {
       if (
         !this.isEditable(this.column)
+        // !this.dataGridContext.isGridInFocus()
         || EventContext.has(event, EventStopPropagationFlag)
       ) {
         return;
@@ -145,6 +130,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
       this.editingContext.edit(cellContext.position);
     },
   }), {
+    row,
     column,
     rowIdx,
     isCellSelected,
@@ -153,9 +139,10 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
     editingContext,
     tableDataContext,
     isEditable,
-  }, ['doubleClick', 'mouseUp']);
+    selectCell,
+  }, ['doubleClick', 'mouseUp', 'mouseDown']);
 
-  useEffect(() => () => editingContext?.closeEditor(cellContext.position), []);
+  useEffect(() => () => editingContext.closeEditor(cellContext.position), []);
 
   return (
     <CellContext.Provider value={cellContext}>
@@ -164,9 +151,11 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey>>(functi
         className={classes}
         data-row-index={rowIdx}
         data-column-index={column.idx}
+        onMouseDown={state.mouseDown}
         onMouseUp={state.mouseUp}
         onDoubleClick={state.doubleClick}
         {...props}
+        isCellSelected={cellContext.isEditing ? false : isCellSelected}
       />
     </CellContext.Provider>
   );

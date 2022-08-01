@@ -12,7 +12,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
     status {
-      composes: theme-background-positive theme-border-color-surface from global;
+      composes: theme-background-positive from global;
       position: absolute;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -21,8 +21,7 @@ const styles = css`
       box-sizing: border-box;
       width: 8px;
       height: 8px;
-      border-radius: 50%;      
-      border: 1px solid;
+      border-radius: 50%;
 
       &[|connected] {
         opacity: 1;

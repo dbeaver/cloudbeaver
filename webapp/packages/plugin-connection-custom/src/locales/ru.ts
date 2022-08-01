@@ -11,6 +11,7 @@ export default [
   ['customConnection_custom_database', 'База'],
   ['customConnection_custom_server', 'Сервер'],
   ['customConnection_url_JDBC', 'JDBC URL'],
+  ['customConnection_folder', 'Папка'],
   ['customConnection_userName', 'Пользователь'],
   ['customConnection_Password', 'Пароль'],
   ['customConnection_test', 'Проверить'],

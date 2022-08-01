@@ -23,7 +23,7 @@ const styles = css`
       padding-bottom: 24px;
       display: flex;
       flex-direction: column;
-      height: 664px;
+      height: 740px;
     }
   `;
 

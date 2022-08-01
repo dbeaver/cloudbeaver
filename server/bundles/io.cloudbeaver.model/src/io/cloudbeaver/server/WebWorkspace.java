@@ -19,14 +19,14 @@ package io.cloudbeaver.server;
 import org.eclipse.core.resources.IWorkspace;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
+import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 
 /**
  * Web workspace.
  * <p>
  * Basically just a wrapper around Eclipse workspace.
  */
-public class WebWorkspace extends BaseWorkspaceImpl {
+public class WebWorkspace extends EclipseWorkspaceImpl {
 
     private final String workspaceId;
 

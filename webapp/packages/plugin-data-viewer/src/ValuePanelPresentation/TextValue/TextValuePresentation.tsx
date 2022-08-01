@@ -10,11 +10,11 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { QuotasService } from '@cloudbeaver/core-app';
 import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { QuotasService } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
@@ -22,6 +22,7 @@ import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -81,6 +82,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const quotasService = useService(QuotasService);
   const textValuePresentationService = useService(TextValuePresentationService);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+
   const state = useObservableRef(() => ({
     currentContentType: 'text/plain',
     lastContentType: 'text/plain',
@@ -99,6 +101,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
+  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
   const focusCell = selection.getFocusedElement();
 
@@ -123,7 +126,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
 
     if (isResultSetContentValue(value)) {
-      valueTruncated = model.source.dataManager.isContentTruncated(value);
+      valueTruncated = content.isContentTruncated(value);
 
       if (valueTruncated) {
         limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
@@ -162,7 +165,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
 
     try {
-      await model.source.dataManager.downloadFileData(firstSelectedCell, resultIndex);
+      await content.downloadFileData(firstSelectedCell);
     } catch (exception) {
       notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
     }
@@ -170,7 +173,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
-  const canSave = firstSelectedCell && model.source.dataManager.isContent(firstSelectedCell, resultIndex);
+  const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
 
   return styled(style)(
     <container>

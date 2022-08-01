@@ -10,7 +10,20 @@
 
 @mixin base-metadata-grid() {
   :global {
+    .metadata-grid-container {
+      @include mdc-typography(caption);
+
+      :global(input) {
+        @include mdc-typography(caption);
+      }
+    }
+    .metadata-grid-container:focus-within {
+      .rdg-cell:global([aria-selected=true]) {
+        box-shadow: inset 0 0 0 1px #0091ea;
+      }
+    }
     .cb-metadata-grid-theme {
+      @include mdc-typography(caption);
       @include mdc-theme-prop(color, on-surface, false);
 
       .rdg-header-row {
@@ -27,8 +40,14 @@
 
       .rdg-cell {
         @include mdc-theme-prop(border-color, background, false);
+
         &:focus {
           outline: 0;
+        }
+        
+        &:global([aria-selected=true]) {
+          outline: 0;
+          box-shadow: inset 0 0 0 1px #808080;
         }
       }
 

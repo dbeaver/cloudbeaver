@@ -1,7 +1,6 @@
 export * from './Clipboard/ClipboardBootstrap';
 export * from './Clipboard/ClipboardService';
 
-export * from './ContextMenu/MenuItemElement';
 export * from './ContextMenu/ContextMenu';
 export * from './ContextMenu/MenuBar/MenuBar';
 export * from './ContextMenu/MenuBar/MENU_BAR_DEFAULT_STYLES';
@@ -14,6 +13,8 @@ export * from './DragAndDrop/DNDPreview';
 export * from './DragAndDrop/DNDProvider';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';
+
+export * from './InlineEditor/InlineEditor';
 
 export * from './Screens/AppScreen/NavigationService';
 export * from './Screens/AppScreen/OptionsPanelService';
@@ -56,4 +57,6 @@ export * from './SideBarPanel/SideBarPanelService';
 
 export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
+export * from './WindowsService';
+
 export { manifest as coreUIManifest } from './manifest';

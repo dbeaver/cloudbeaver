@@ -14,12 +14,19 @@ $deleted-color: rgba(255,51,0,0.3);
 
 @mixin base-react-grid() {
   :global {
+    .cb-react-grid-container {
+      @include mdc-typography(caption);
+
+      :global(input) {
+        @include mdc-typography(caption);
+      }
+    }
     .cb-react-grid-container:focus-within {
       .rdg-cell-custom-selected::before {
         background-color: rgba(0, 145, 234, 0.2);
       }
 
-      .rdg-cell-selected {
+      .rdg-cell:global([aria-selected=true]) {
         box-shadow: inset 0 0 0 1px #0091ea;
       }
 
@@ -44,6 +51,7 @@ $deleted-color: rgba(255,51,0,0.3);
       }
     }
     .cb-react-grid-theme {
+      @include mdc-typography(caption);
       @include mdc-theme-prop(color, on-surface, false);
 
       .rdg-table-header__readonly-status {
@@ -75,8 +83,14 @@ $deleted-color: rgba(255,51,0,0.3);
 
       .rdg-cell {
         @include mdc-theme-prop(border-color, background, false);
+
         &:focus {
           outline: 0;
+        }
+        
+        &:global([aria-selected=true]) {
+          outline: 0;
+          box-shadow: inset 0 0 0 1px #808080;
         }
       }
 
@@ -96,10 +110,6 @@ $deleted-color: rgba(255,51,0,0.3);
         width: 100%;
         height: 100%;
         background-color: rgba(150, 150, 150, 0.2);
-      }
-
-      .rdg-cell-selected {
-        box-shadow: inset 0 0 0 1px #808080;
       }
 
       .rdg-cell-custom-editing {

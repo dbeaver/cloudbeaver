@@ -14,12 +14,11 @@ import { Loader, useAppLoadingScreen, useDataResource } from '@cloudbeaver/core-
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
-import { PermissionsResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
-
-import { useAppVersion } from './useAppVersion';
+import { useAppVersion } from '@cloudbeaver/plugin-version';
 
 const bodyStyles = css`
     theme {
@@ -32,12 +31,18 @@ const bodyStyles = css`
     }
   `;
 
+const loaderStyle = css`
+    ExceptionMessage {
+      padding: 24px;
+    }
+  `;
+
 export const Body = observer(function Body() {
   useAppLoadingScreen();
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
-  const permissionsService = useDataResource(Body, PermissionsResource, undefined);
+  const permissionsService = useDataResource(Body, SessionPermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
@@ -53,7 +58,7 @@ export const Body = observer(function Body() {
   return styled(style)(
     <DNDProvider>
       <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={permissionsService}>{() => styled(style)(
+        <Loader state={permissionsService} style={loaderStyle}>{() => styled(style)(
           <>
             {Screen && <Screen {...screenService.routerService.params} />}
           </>

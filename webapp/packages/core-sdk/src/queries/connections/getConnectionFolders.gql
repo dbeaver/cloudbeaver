@@ -1,0 +1,5 @@
+query getConnectionFolders($project: ID) {
+  folders: connectionFolders(path: $project) {
+    ...ConnectionFolderInfo
+  }
+}

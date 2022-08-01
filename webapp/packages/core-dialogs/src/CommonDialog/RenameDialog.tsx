@@ -8,6 +8,7 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -28,15 +29,26 @@ const style = css`
   }
 `;
 
+interface IRenameDialogState {
+  value: string;
+  message: string | undefined;
+  valid: boolean;
+  payload: RenameDialogPayload;
+  validate: () => void;
+  setMessage: (message: string) => void;
+}
+
 export interface RenameDialogPayload {
   value: string;
-  objectName: string;
+  objectName?: string;
   icon?: string;
   subTitle?: string;
   bigIcon?: boolean;
   viewBox?: string;
   confirmActionText?: string;
-  validation?: (name: string) => Promise<boolean> | boolean;
+  create?: boolean;
+  title?: string;
+  validation?: (name: string, setMessage: (message: string) => void) => Promise<boolean> | boolean;
 }
 
 export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observer(function RenameDialog({
@@ -48,23 +60,46 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const { icon, subTitle, bigIcon, viewBox, value, objectName, confirmActionText } = payload;
-  const title = `${translate('ui_rename')} ${objectName}`;
+  const { icon, subTitle, bigIcon, viewBox, value, objectName, create, confirmActionText } = payload;
+  let { title } = payload;
 
-  const state = useObservableRef(() => ({
+  if (!title) {
+    title = create ? 'ui_create' : 'ui_rename';
+  }
+
+  title = translate(title);
+
+  if (objectName) {
+    title += ` ${translate(objectName)}`;
+  }
+
+  const state = useObservableRef<IRenameDialogState>(() => ({
     value,
+    message: undefined,
     valid: true,
     validate: throttleAsync(async () => {
-      state.valid = (await state.payload.validation?.(state.value)) ?? true;
+      state.message = undefined;
+      state.valid = (await state.payload.validation?.(
+        state.value,
+        state.setMessage.bind(state)
+      )) ?? true;
     }, 300),
+    setMessage(message) {
+      this.message = message;
+    },
   }), {
     value: observable.ref,
     valid: observable.ref,
+    message: observable.ref,
   }, {
     payload,
   });
 
-  const errorMessage = state.valid ? ' ' : translate('ui_rename_taken_or_invalid');
+  useEffect(() => {
+    state.validate();
+  }, [value]);
+
+  const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper
@@ -92,7 +127,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
             disabled={!state.valid}
             onClick={() => resolveDialog(state.value)}
           >
-            <Translate token={confirmActionText || 'ui_rename'} />
+            <Translate token={confirmActionText || (create ? 'ui_create' : 'ui_rename')} />
           </Button>
         </>
       )}

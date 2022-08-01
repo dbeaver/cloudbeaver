@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
-import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 
 export const FinishPageDrawerItem = observer<AdministrationItemDrawerProps>(function FinishPageDrawerItem({
   item,

@@ -27,7 +27,7 @@ export class ProductBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.menuService.addCreator({
       isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU 
+        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU
         && !!this.serverConfigResource.data?.productInfo
       ),
       getItems: (context, items) => [
@@ -38,8 +38,8 @@ export class ProductBootstrap extends Bootstrap {
             label: 'app_product_info',
             tooltip: 'app_product_info',
           },
-          { 
-            onSelect: () => this.commonDialogService.open(ProductInfoDialog, null), 
+          {
+            onSelect: () => this.commonDialogService.open(ProductInfoDialog, null),
           }
         ),
       ],

@@ -16,9 +16,14 @@
  */
 package io.cloudbeaver.service.security.internal;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.service.security.internal.db.CBDatabase;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -34,6 +39,7 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -43,6 +49,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -52,7 +59,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBEmbeddedSecurityController implements SMAdminController {
+public class CBEmbeddedSecurityController implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
@@ -63,11 +70,15 @@ public class CBEmbeddedSecurityController implements SMAdminController {
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
+    private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
+    }.getType();
+    private static final Gson gson = new GsonBuilder().create();
 
-
+    private final WebApplication application;
     private final CBDatabase database;
 
-    public CBEmbeddedSecurityController(CBDatabase database) {
+    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
+        this.application = application;
         this.database = database;
     }
 
@@ -351,7 +362,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     ///////////////////////////////////////////
     // Credentials
 
-    private static SMAuthCredentialsProfile getCredentialProfileByParameters(SMAuthProviderDescriptor authProvider, Set<String> keySet) {
+    private static SMAuthCredentialsProfile getCredentialProfileByParameters(AuthProviderDescriptor authProvider, Set<String> keySet) {
         List<SMAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
         if (credentialProfiles.size() > 1) {
             for (SMAuthCredentialsProfile profile : credentialProfiles) {
@@ -373,7 +384,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBException {
+    public void setUserCredentials(@NotNull String userId, @NotNull String authProviderId, @NotNull Map<String, Object> credentials) throws DBException {
         var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
@@ -514,7 +525,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public String[] getUserLinkedProviders(String userId) throws DBException {
+    public String[] getUserLinkedProviders(@NotNull String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
@@ -687,7 +698,8 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     // Permissions
 
     @Override
-    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBCException {
+    public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBException {
+//        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissionIds);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
@@ -779,40 +791,47 @@ public class CBEmbeddedSecurityController implements SMAdminController {
             }
             return false;
         } catch (SQLException e) {
-            throw new DBCException("Error reading session state", e);
+            throw new DBCException("Error reading session persistence state", e);
         }
     }
 
-    private void createSessionIfNotExist(@NotNull String appSessionId, @Nullable String userId, @NotNull Map<String, Object> parameters, @NotNull SMSessionType sessionType, Connection dbCon) throws SQLException, DBException {
-        if (isSessionPersisted(appSessionId)) {
-            return;
-        }
+    private String createSmSession(
+        @NotNull String appSessionId,
+        @Nullable String userId,
+        @NotNull Map<String, Object> parameters,
+        @NotNull SMSessionType sessionType,
+        Connection dbCon
+    ) throws SQLException, DBException {
+        var sessionId = UUID.randomUUID().toString();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
-                "VALUES(?,?,?,?,?,?,?,?)")) {
-            dbStat.setString(1, appSessionId);
+            "INSERT INTO CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME,"
+                + "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) "
+                + "VALUES(?,?,?,?,?,?,?,?,?)")) {
+            dbStat.setString(1, sessionId);
+            dbStat.setString(2, appSessionId);
             if (userId != null) {
-                dbStat.setString(2, userId);
+                dbStat.setString(3, userId);
             } else {
-                dbStat.setNull(2, Types.VARCHAR);
+                dbStat.setNull(3, Types.VARCHAR);
             }
 
             Timestamp currentTS = new Timestamp(System.currentTimeMillis());
-            dbStat.setTimestamp(3, currentTS);
             dbStat.setTimestamp(4, currentTS);
+            dbStat.setTimestamp(5, currentTS);
             if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
-                dbStat.setString(5, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
-            } else {
-                dbStat.setNull(5, Types.VARCHAR);
-            }
-            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
-                dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
+                dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
             } else {
                 dbStat.setNull(6, Types.VARCHAR);
             }
-            dbStat.setString(7, database.getInstanceId());
-            dbStat.setString(8, sessionType.getSessionType());
+            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
+                dbStat.setString(7, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
+            } else {
+                dbStat.setNull(7, Types.VARCHAR);
+            }
+            dbStat.setString(8, database.getInstanceId());
+            dbStat.setString(9, sessionType.getSessionType());
             dbStat.execute();
+            return sessionId;
         }
     }
 
@@ -820,11 +839,11 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createSessionIfNotExist(appSessionId, null, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(appSessionId, null, dbCon);
+                var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
+                var token = generateAuthToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(null, appSessionId, permissions));
+                return SMAuthInfo.success(UUID.randomUUID().toString(), token, new SMAuthPermissions(null, smSessionId, permissions), Map.of());
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -837,31 +856,395 @@ public class CBEmbeddedSecurityController implements SMAdminController {
     }
 
     @Override
-    public SMAuthInfo authenticate(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType, @NotNull String authProviderId, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public SMAuthInfo authenticate(
+        @NotNull String appSessionId,
+        @Nullable String previousSmSessionId,
+        @NotNull Map<String, Object> sessionParameters,
+        @NotNull SMSessionType sessionType,
+        @NotNull String authProviderId,
+        @Nullable String authProviderConfigurationId,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
+        var authProgressMonitor = new VoidProgressMonitor();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var userId = findOrCreateExternalUserByCredentials(authProviderId,
-                    sessionParameters,
-                    userCredentials,
-                    new VoidProgressMonitor());
-                if (userId == null) {
-                    throw new SMException("Invalid user credentials");
+                Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
+                AuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                var authProviderInstance = authProviderDescriptor.getInstance();
+                if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
+                    var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
+                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
                 }
-                createSessionIfNotExist(appSessionId, userId, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(appSessionId, userId, dbCon);
-                var permissions = getUserPermissions(userId);
+
+                var filteredUserCreds = filterSecuredUserData(
+                    securedUserIdentifyingCredentials,
+                    authProviderDescriptor
+                );
+
+                var authAttemptId = createNewAuthAttempt(
+                    SMAuthStatus.IN_PROGRESS,
+                    authProviderId,
+                    authProviderConfigurationId,
+                    filteredUserCreds,
+                    appSessionId,
+                    previousSmSessionId,
+                    sessionType,
+                    sessionParameters
+                );
+
+                if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                    //async auth
+                    var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
+                    var redirectUrl = buildRedirectLink(
+                        authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
+                        authAttemptId);
+                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, filteredUserCreds);
+                }
                 txn.commit();
-                return new SMAuthInfo(token, new SMAuthPermissions(userId, appSessionId, permissions));
+                return finishAuthentication(
+                    SMAuthInfo.inProgress(authAttemptId, null, Map.of(authProviderId, securedUserIdentifyingCredentials)),
+                    true,
+                    false
+                );
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
     }
 
-    private String findOrCreateExternalUserByCredentials(@NotNull String authProviderId,
-                                                         @NotNull Map<String, Object> sessionParameters,
-                                                         @NotNull Map<String, Object> userCredentials,
-                                                         @NotNull DBRProgressMonitor progressMonitor) throws DBException {
+    private Map<String, Object> filterSecuredUserData(
+        Map<String, Object> userIdentifyingCredentials,
+        AuthProviderDescriptor authProviderDescriptor
+    ) {
+        SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProviderDescriptor, userIdentifyingCredentials.keySet());
+        return userIdentifyingCredentials.entrySet()
+            .stream()
+            .filter((cred) -> {
+                AuthPropertyDescriptor property = credProfile.getCredentialParameter(cred.getKey());
+
+                return property != null && property.getEncryption() == AuthPropertyEncryption.none;
+                })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private String createNewAuthAttempt(
+        SMAuthStatus status,
+        String authProviderId,
+        String authProviderConfigurationId,
+        Map<String, Object> authData,
+        String appSessionId,
+        String prevSessionId,
+        SMSessionType sessionType,
+        Map<String, Object> sessionParameters
+    ) throws DBException {
+        String authAttemptId = UUID.randomUUID().toString();
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
+                        "VALUES(?,?,?,?,?,?)")) {
+                    dbStat.setString(1, authAttemptId);
+                    dbStat.setString(2, status.toString());
+                    dbStat.setString(3, appSessionId);
+                    dbStat.setString(4, sessionType.getSessionType());
+                    dbStat.setString(5, gson.toJson(sessionParameters));
+                    if (prevSessionId != null && isSmSessionNotExpired(prevSessionId)) {
+                        dbStat.setString(6, prevSessionId);
+                    } else {
+                        dbStat.setNull(6, Types.VARCHAR);
+                    }
+                    dbStat.execute();
+                }
+
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
+                        "VALUES(?,?,?,?)")) {
+                    dbStat.setString(1, authAttemptId);
+                    dbStat.setString(2, authProviderId);
+                    dbStat.setString(3, authProviderConfigurationId);
+                    dbStat.setString(4, gson.toJson(authData));
+                    dbStat.execute();
+                }
+                txn.commit();
+            }
+            return authAttemptId;
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage(), e);
+        }
+    }
+
+    private boolean isSmSessionNotExpired(String prevSessionId) {
+        //TODO: implement after we start tracking user logout
+        return true;
+    }
+
+    @Override
+    public void updateAuthStatus(@NotNull String authId,
+                                 @NotNull SMAuthStatus authStatus,
+                                 @NotNull Map<String, Object> authInfo,
+                                 @Nullable String error) throws DBException {
+        var existAuthInfo = getAuthStatus(authId);
+        if (existAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+            throw new SMException("Authorization already finished and cannot be updated");
+        }
+        var authSessionInfo = readAuthAttemptSessionInfo(authId);
+        updateAuthStatus(authId, authStatus, authInfo, error, authSessionInfo.getSmSessionId());
+    }
+
+    private void updateAuthStatus(@NotNull String authId,
+                                  @NotNull SMAuthStatus authStatus,
+                                  @NotNull Map<String, Object> authInfo,
+                                  @Nullable String error,
+                                  @Nullable String smSessionId) throws DBException {
+        try (Connection dbCon = database.openConnection();
+            JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
+                dbStat.setString(1, authStatus.toString());
+                if (error != null) {
+                    dbStat.setString(2, error);
+                } else {
+                    dbStat.setNull(2, Types.VARCHAR);
+                }
+                if (smSessionId != null) {
+                    dbStat.setString(3, smSessionId);
+                } else {
+                    dbStat.setNull(3, Types.VARCHAR);
+                }
+                dbStat.setString(4, authId);
+                if (dbStat.executeUpdate() <= 0) {
+                    throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
+                }
+            }
+
+            for (Map.Entry<String, Object> entry : authInfo.entrySet()) {
+                String providerId = entry.getKey();
+                String authJson = gson.toJson(entry.getValue());
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "UPDATE CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?")) {
+                    dbStat.setString(1, authJson);
+                    dbStat.setString(2, authId);
+                    dbStat.setString(3, providerId);
+                    if (dbStat.executeUpdate() <= 0) {
+                        try (PreparedStatement dbStatIns = dbCon.prepareStatement(
+                            "INSERT INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_STATE) VALUES(?,?,?)")) {
+                            dbStatIns.setString(1, authId);
+                            dbStatIns.setString(2, providerId);
+                            dbStatIns.setString(3, authJson);
+                            dbStatIns.execute();
+                        }
+                    }
+                }
+            }
+            txn.commit();
+        } catch (SQLException e) {
+            throw new DBCException("Error updating auth status", e);
+        }
+    }
+
+    @Override
+    public SMAuthInfo getAuthStatus(@NotNull String authId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            SMAuthStatus smAuthStatus;
+            String authError;
+            String smSessionId;
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+            )) {
+                dbStat.setString(1, authId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        throw new SMException("Auth attempt " + authId + " not found");
+                    }
+                    smAuthStatus = SMAuthStatus.valueOf(dbResult.getString(1));
+                    authError = dbResult.getString(2);
+                    smSessionId = dbResult.getString(3);
+                }
+            }
+            Map<String, Object> authData = new LinkedHashMap<>();
+            String redirectUrl = null;
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE FROM CB_AUTH_ATTEMPT_INFO "
+                    + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
+            )) {
+                dbStat.setString(1, authId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String authProviderId = dbResult.getString(1);
+                        String authProviderConfiguration = dbResult.getString(2);
+                        Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
+                        if (authProviderConfiguration != null) {
+                            var authProviderInstance = getAuthProvider(authProviderId).getInstance();
+                            if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                                redirectUrl = buildRedirectLink(
+                                    ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
+                                    authId
+                                );
+                            }
+                        }
+                        authData.put(authProviderId, authProviderData);
+                    }
+                }
+            }
+
+            if (smAuthStatus != SMAuthStatus.SUCCESS) {
+                switch (smAuthStatus) {
+                    case IN_PROGRESS:
+                        return SMAuthInfo.inProgress(authId, redirectUrl, authData);
+                    case ERROR:
+                        return SMAuthInfo.error(authId, authError);
+                    case EXPIRED:
+                        return SMAuthInfo.expired(authId);
+                    default:
+                        throw new SMException("Unknown auth status:" + smAuthStatus);
+                }
+            }
+
+            String smToken = findTokenBySmSession(smSessionId);
+            SMAuthPermissions authPermissions = getTokenPermissions(smToken);
+            var successAuthStatus = SMAuthInfo.success(authId, smToken, authPermissions, authData);
+            updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
+            return successAuthStatus;
+
+        } catch (SQLException e) {
+            throw new DBException("Error while read auth info", e);
+        }
+    }
+
+    private String findTokenBySmSession(String smSessionId) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?");
+        ) {
+            dbStat.setString(1, smSessionId);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Token not found");
+                }
+                return dbResult.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+    }
+
+    @Override
+    public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
+        SMAuthInfo authInfo = getAuthStatus(authId);
+        return finishAuthentication(authInfo, false, true);
+    }
+
+    private SMAuthInfo finishAuthentication(@NotNull SMAuthInfo authInfo,  boolean forceExpireAuthAfterSuccess, boolean saveSecuredCreds) throws DBException {
+        String authId = authInfo.getAuthAttemptId();
+        if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+            throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
+        }
+        Set<String> authProviderIds = authInfo.getAuthData().keySet();
+        if (authProviderIds.isEmpty()) {
+            throw new SMException("Authorization providers are not defined");
+        }
+
+        var finishAuthMonitor = new VoidProgressMonitor();
+        AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
+        boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
+
+        String token = null;
+        SMAuthPermissions permissions = null;
+        if (!isMainAuthSession) {
+            //this is an additional authorization and we should to return the original permissions and  userId
+            token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
+            permissions = getTokenPermissions(token);
+        }
+        String activeUserId = permissions == null ? null : permissions.getUserId();
+
+        Map<String, Object> storedUserData = new LinkedHashMap<>();
+        for (String authProviderId : authProviderIds) {
+            var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                authProviderId,
+                authAttemptSessionInfo.getSessionParams(),
+                userCredentials,
+                finishAuthMonitor,
+                activeUserId,
+                activeUserId == null
+            );
+
+            if (userIdFromCreds == null) {
+                var error = "Invalid user credentials";
+                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                return SMAuthInfo.error(authId, error);
+            }
+            if (activeUserId == null) {
+                activeUserId = userIdFromCreds;
+            }
+            storedUserData.put(
+                authProviderId,
+                saveSecuredCreds ? userCredentials : filterSecuredUserData(userCredentials, getAuthProvider(authProviderId))
+            );
+        }
+
+        if (token == null && permissions == null) {
+            try (Connection dbCon = database.openConnection()) {
+                try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                    String smSessionId;
+                    if (authAttemptSessionInfo.getSmSessionId() == null) {
+                        smSessionId = createSmSession(
+                            authAttemptSessionInfo.getAppSessionId(),
+                            activeUserId,
+                            authAttemptSessionInfo.getSessionParams(),
+                            authAttemptSessionInfo.getSessionType(),
+                            dbCon
+                        );
+                    } else {
+                        smSessionId = authAttemptSessionInfo.getSmSessionId();
+                    }
+                    token = generateAuthToken(smSessionId, activeUserId, dbCon);
+                    permissions = new SMAuthPermissions(activeUserId, smSessionId, getUserPermissions(activeUserId));
+                    txn.commit();
+                }
+            } catch (SQLException e) {
+                var error = "Error during token generation";
+                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                throw new SMException(error, e);
+            }
+        }
+        var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
+        updateAuthStatus(authId, authStatus, storedUserData, null, permissions.getSessionId());
+        return SMAuthInfo.success(authId, token, permissions, authInfo.getAuthData());
+    }
+
+    private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+            )) {
+                dbStat.setString(1, authId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        throw new SMException("Auth attempt not found");
+                    }
+                    String appSessionId = dbResult.getString(1);
+                    SMSessionType sessionType = new SMSessionType(dbResult.getString(2));
+                    Map<String, Object> sessionParams = gson.fromJson(
+                        dbResult.getString(3), MAP_STRING_OBJECT_TYPE
+                    );
+                    String smSessionId = dbResult.getString(4);
+
+                    return new AuthAttemptSessionInfo(appSessionId, smSessionId, sessionType, sessionParams);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error while read auth info", e);
+        }
+    }
+
+    private String findOrCreateExternalUserByCredentials(
+        @NotNull String authProviderId,
+        @NotNull Map<String, Object> sessionParameters,
+        @NotNull Map<String, Object> userCredentials,
+        @NotNull DBRProgressMonitor progressMonitor,
+        @Nullable String activeUserId,
+        boolean createNewUserIfNotExist
+    ) throws DBException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);
@@ -869,9 +1252,15 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
         } catch (DBException e) {
+            log.debug("Local auth validation error", e);
             return null;
         }
-        if (userId == null) {
+        if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
+            log.debug("User '" + activeUserId + "' is authenticated in '"
+                + authProviderId + "' auth provider with credentials of user '"
+                + userIdFromCredentials + "'");
+        }
+        if (userId == null && createNewUserIfNotExist) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
@@ -886,6 +1275,8 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
+        } else if (userId == null) {
+            userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
             if (WebAppUtils.getWebApplication().isMultiNode()) {
@@ -899,15 +1290,15 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         return userId;
     }
 
-    private String generateAuthToken(@NotNull String appSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
-        JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", appSessionId);
+    private String generateAuthToken(@NotNull String smSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
+        JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID, SESSION_ID, USER_ID, EXPIRATION_TIME) " +
                 "VALUES(?,?,?,?)")) {
 
             String authToken = SecurityUtils.generatePassword(32);
             dbStat.setString(1, authToken);
-            dbStat.setString(2, appSessionId);
+            dbStat.setString(2, smSessionId);
             if (userId == null) {
                 dbStat.setNull(3, Types.VARCHAR);
             } else {
@@ -934,7 +1325,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 }
                 userId = dbResult.getString(1);
                 var expiredDate = dbResult.getTimestamp(2);
-                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                if (application.isMultiNode() && Timestamp.from(Instant.now()).after(expiredDate)) {
                     throw new SMException("Token expired");
                 }
                 sessionId = dbResult.getString(3);
@@ -944,6 +1335,45 @@ public class CBEmbeddedSecurityController implements SMAdminController {
         }
         var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
         return new SMAuthPermissions(userId, sessionId, permissions);
+    }
+
+    @Override
+    public SMAuthProviderDescriptor[] getAvailableAuthProviders() throws DBException {
+        if (!(application.getAppConfiguration() instanceof WebAuthConfiguration)) {
+            throw new DBException("Web application doesn't support external authentication");
+        }
+        WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
+        Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
+        List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
+            .filter(ap ->
+                !ap.isTrusted() &&
+                    appConfiguration.isAuthProviderEnabled(ap.getId()) &&
+                    (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
+            .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
+
+        if (!CommonUtils.isEmpty(customConfigurations)) {
+            // Attach custom configs to providers
+            for (SMAuthProviderDescriptor provider : providers) {
+                for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
+                    if (!cc.isDisabled() && cc.getProvider().equals(provider.getId())) {
+                        cc = new SMAuthProviderCustomConfiguration(cc);
+                        // Do not pass secure parameters
+                        cc.setParameters(Map.of());
+                        provider.addCustomConfiguration(cc);
+                    }
+                }
+            }
+        }
+        return providers.toArray(new SMAuthProviderDescriptor[0]);
+    }
+
+    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
+        for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
+            if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -981,132 +1411,208 @@ public class CBEmbeddedSecurityController implements SMAdminController {
 
     ///////////////////////////////////////////
     // Access management
-
-    @NotNull
     @Override
-    public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBException {
-        if (subjectIds.length == 0) {
-            return new SMDataSourceGrant[0];
+    public void setObjectPermissions(
+        @NotNull Set<String> objectIds,
+        @NotNull SMObjectType objectType,
+        @NotNull Set<String> subjectIds,
+        @NotNull Set<String> permissions,
+        @NotNull String grantor
+    ) throws DBException {
+        if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
+            return;
         }
-        List<String> allSubjects = new ArrayList<>();
-        Collections.addAll(allSubjects, subjectIds);
-
-        try (Connection dbCon = database.openConnection()) {
-            {
-                StringBuilder sql = new StringBuilder("SELECT ROLE_ID FROM CB_USER_ROLE WHERE USER_ID IN (");
-                appendStringParameters(sql, subjectIds);
-                sql.append(")");
-
-                try (Statement dbStat = dbCon.createStatement()) {
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        while (dbResult.next()) {
-                            allSubjects.add(dbResult.getString(1));
-                        }
-                    }
-                }
-            }
-            {
-                StringBuilder sql = new StringBuilder("SELECT DA.DATASOURCE_ID,DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA,\n" +
-                    "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.SUBJECT_ID IN (");
-                appendStringParameters(sql, allSubjects.toArray(new String[0]));
-                sql.append(")");
-
-                if (allSubjects.isEmpty()) {
-                    return new SMDataSourceGrant[0];
-                }
-                try (Statement dbStat = dbCon.createStatement()) {
-                    List<SMDataSourceGrant> result = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        while (dbResult.next()) {
-                            result.add(new SMDataSourceGrant(
-                                dbResult.getString(1),
-                                dbResult.getString(2),
-                                SMSubjectType.fromCode(dbResult.getString(3))));
-                        }
-                    }
-                    return result.toArray(new SMDataSourceGrant[0]);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error reading datasource access", e);
-        }
-    }
-
-    @Override
-    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull List<String> connectionIds, String grantorId) throws DBCException {
+//        validatePermissions(objectType.getObjectType(), permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(dbCon,
-                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
-                if (!CommonUtils.isEmpty(connectionIds)) {
+                var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
+                appendStringParameters(sqlBuilder, subjectIds.toArray(String[]::new));
+                sqlBuilder.append(") AND OBJECT_TYPE=? ")
+                    .append("AND OBJECT_ID IN (");
+                appendStringParameters(sqlBuilder, objectIds.toArray(String[]::new));
+                sqlBuilder.append(")");
+                JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.getObjectType());
+                if (!CommonUtils.isEmpty(permissions)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
-                        dbStat.setString(1, subjectId);
-                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(3, grantorId);
-                        for (String connectionId : connectionIds) {
-                            dbStat.setString(4, connectionId);
-                            dbStat.execute();
+                        "INSERT INTO CB_OBJECT_PERMISSIONS(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
+                            + "VALUES(?,?,?,?,?,?)")) {
+                        for (String objectId : objectIds) {
+                            dbStat.setString(1, objectId);
+                            dbStat.setString(2, objectType.getObjectType());
+                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                            dbStat.setString(4, grantor);
+                            for (String subjectId : subjectIds) {
+                                dbStat.setString(5, subjectId);
+                                for (String permission : permissions) {
+                                    dbStat.setString(6, permission);
+                                    dbStat.execute();
+                                }
+                            }
                         }
                     }
                 }
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error granting datasource access", e);
+            throw new DBCException("Error granting object permissions", e);
+        }
+    }
+
+    @Override
+    public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+                objectType.getObjectType(),
+                objectId
+            );
+
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting object permissions", e);
         }
     }
 
     @NotNull
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(String connectionId) throws DBException {
+    public List<SMObjectPermissions> getAllAvailableObjectsPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
+        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
             {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "SELECT DA.SUBJECT_ID,S.SUBJECT_TYPE\n" +
-                        "FROM CB_DATASOURCE_ACCESS DA,CB_AUTH_SUBJECT S\n" +
-                        "WHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.DATASOURCE_ID=?")) {
-                    dbStat.setString(1, connectionId);
-                    List<SMDataSourceGrant> result = new ArrayList<>();
+                var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM CB_OBJECT_PERMISSIONS ");
+                sqlBuilder.append("WHERE SUBJECT_ID IN (");
+                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                sqlBuilder.append(") AND OBJECT_TYPE=?");
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                    dbStat.setString(1, objectType.getObjectType());
+
+                    var permissionsByObjectId = new LinkedHashMap<String, Set<String>>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
-                            result.add(new SMDataSourceGrant(
-                                connectionId,
-                                dbResult.getString(1),
-                                SMSubjectType.fromCode(dbResult.getString(2))));
+                            var objectId = dbResult.getString(1);
+                            permissionsByObjectId.computeIfAbsent(objectId, key -> new HashSet<>()).add(dbResult.getString(2));
                         }
                     }
-                    return result.toArray(new SMDataSourceGrant[0]);
+                    return permissionsByObjectId.entrySet()
+                        .stream()
+                        .map(entry -> new SMObjectPermissions(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
                 }
             }
         } catch (SQLException e) {
-            throw new DBCException("Error reading datasource access", e);
+            throw new DBCException("Error reading projects permissions", e);
+        }
+    }
+
+    private Set<String> getAllLinkedSubjects(String subjectId) throws DBException {
+        Set<String> allSubjects = new HashSet<>();
+        allSubjects.add(subjectId);
+        var userRoleIds = Arrays.stream(getUserRoles(subjectId))
+            .map(SMRole::getRoleId)
+            .collect(Collectors.toSet());
+        allSubjects.addAll(userRoleIds);
+        return allSubjects;
+    }
+
+    @NotNull
+    @Override
+    public SMObjectPermissions getObjectPermissions(
+        @NotNull String subjectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws DBException {
+        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
+        try (Connection dbCon = database.openConnection()) {
+            {
+                var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM CB_OBJECT_PERMISSIONS ");
+                sqlBuilder.append("WHERE SUBJECT_ID IN (");
+                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
+
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                    dbStat.setString(1, objectType.getObjectType());
+                    dbStat.setString(2, objectId);
+
+                    var permissions = new HashSet<String>();
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        while (dbResult.next()) {
+                            permissions.add(dbResult.getString(1));
+                        }
+                    }
+                    return new SMObjectPermissions(objectId, permissions);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading projects permissions", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public List<SMObjectPermissionsGrant> getObjectPermissionGrants(
+        @NotNull String objectId,
+        @NotNull SMObjectType smObjectType
+    ) throws DBException {
+        var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
+                    "FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n" +
+                    "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?")) {
+                dbStat.setString(1, smObjectType.getObjectType());
+                dbStat.setString(2, objectId);
+                List<SMDataSourceGrant> result = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String subjectId = dbResult.getString(1);
+                        SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
+                        String permission = dbResult.getString(3);
+                        grantedPermissionsBySubjectId.computeIfAbsent(
+                            subjectId,
+                            key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
+                        ).addPermission(permission);
+                    }
+                }
+                return grantedPermissionsBySubjectId.values().stream()
+                    .map(SMObjectPermissionsGrant.Builder::build)
+                    .collect(Collectors.toList());
+            }
+
+        } catch (SQLException e) {
+            throw new DBCException("Error reading granted object permissions ", e);
         }
     }
 
     @Override
-    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBException {
+    public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
+        var allLinkedSubjects = getAllLinkedSubjects(subjectId);
+        var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                // Delete all permissions
-                JDBCUtils.executeStatement(dbCon,
-                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE DATASOURCE_ID=?", connectionId);
-                if (!ArrayUtils.isEmpty(subjects)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_DATASOURCE_ACCESS(DATASOURCE_ID,GRANT_TIME,GRANTED_BY,SUBJECT_ID) VALUES(?,?,?,?)")) {
-                        dbStat.setString(1, connectionId);
-                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(3, grantorId);
-                        for (String subject : subjects) {
-                            dbStat.setString(4, subject);
-                            dbStat.execute();
-                        }
+            var sqlBuilder = new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,OP.PERMISSION\n")
+                .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
+                .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
+            appendStringParameters(sqlBuilder, allLinkedSubjects.toArray(String[]::new));
+            sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
+            try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                dbStat.setString(1, smObjectType.getObjectType());
+                List<SMDataSourceGrant> result = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String objectId = dbResult.getString(1);
+                        SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
+                        String permission = dbResult.getString(3);
+                        grantedPermissionsBySubjectId.computeIfAbsent(
+                            subjectId,
+                            key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
+                        ).addPermission(permission);
                     }
                 }
-                txn.commit();
+                return grantedPermissionsBySubjectId.values().stream()
+                    .map(SMObjectPermissionsGrant.Builder::build)
+                    .collect(Collectors.toList());
             }
+
         } catch (SQLException e) {
-            throw new DBCException("Error granting datasource access", e);
+            throw new DBCException("Error reading granted object permissions ", e);
         }
     }
 
@@ -1146,7 +1652,7 @@ public class CBEmbeddedSecurityController implements SMAdminController {
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error reading session state", e);
+            throw new DBCException("Error initializing security manager meta info", e);
         }
     }
 
@@ -1171,6 +1677,10 @@ public class CBEmbeddedSecurityController implements SMAdminController {
             throw new DBCException("Auth provider not found: " + authProviderId);
         }
         return authProvider;
+    }
+
+    private String buildRedirectLink(String originalLink, String authId) {
+        return originalLink + "?authId=" + authId;
     }
 
 }

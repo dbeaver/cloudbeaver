@@ -32,7 +32,7 @@
     "mobx": "~6.x.x"
   },
   "dependencies": {
-    "semver": "~7.3.5"
+    "semver": "~7.3.7"
   },
   "devDependencies": {
     "@types/semver": "~7.3.9"

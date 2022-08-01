@@ -92,6 +92,10 @@ export const menuPanelStyles = css`
       margin: 4px 0;
       border: none !important;
       border-bottom: 1px solid !important;
+
+      &:first-child, &:last-child {
+        display: none;
+      }
     }
 
     menu-item-binding {
@@ -117,6 +121,7 @@ export const menuPanelStyles = css`
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      & menu-item-icon,
       & menu-item-content {
         width: 24px;
         height: 24px;

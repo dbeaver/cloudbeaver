@@ -17,7 +17,7 @@ interface Props {
   className?: string;
 }
 
-export const OverlayActions = observer<Props>(function OverlayActions({
+export const OverlayActions = observer<React.PropsWithChildren<Props>>(function OverlayActions({
   className,
   children,
 }) {

@@ -14,7 +14,7 @@ interface Props{
   state: IFolderExplorerContext;
 }
 
-export const FolderExplorer = observer<Props>(function FolderExplorer({
+export const FolderExplorer = observer<React.PropsWithChildren<Props>>(function FolderExplorer({
   state,
   children,
 }) {

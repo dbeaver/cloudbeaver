@@ -7,6 +7,7 @@ export * from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';
 export * from './ConnectionsManagerService';
+export * from './ConnectionFolderResource';
 export * from './ConnectionDialectResource';
 export * from './ConnectionInfoResource';
 export * from './EConnectionFeature';

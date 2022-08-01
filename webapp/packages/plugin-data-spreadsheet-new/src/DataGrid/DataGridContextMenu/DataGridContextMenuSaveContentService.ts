@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { ResultSetDataContentAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -37,21 +37,26 @@ export class DataGridContextMenuSaveContentService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         onClick: async context => {
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
           try {
-            await context.data.model.source.dataManager.downloadFileData(context.data.key, context.data.resultIndex);
+            await content.downloadFileData(context.data.key);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'data_grid_table_context_menu_save_value_error');
           }
         },
-        isHidden: context => !context.data.model.source.dataManager.isContent(
-          context.data.key,
-          context.data.resultIndex
-        ),
-        isDisabled: context => context.data.model.isLoading() || (
-          !!context.data.model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-            context.data.key, context.data.model.source.dataManager.activeElement
-          )
-        ),
+        isHidden: context => {
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+          return !content.isDownloadable(context.data.key);
+        },
+        isDisabled: context => {
+          const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+
+          return context.data.model.isLoading() || (
+            !!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+              context.data.key, content.activeElement
+            )
+          );
+        },
       }
     );
   }

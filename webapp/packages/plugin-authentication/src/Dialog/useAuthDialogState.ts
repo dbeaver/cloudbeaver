@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AuthInfoService, AuthProvider, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
 import { ILoadableState, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -18,25 +18,32 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
-interface IState {
-  tabId: string | null;
-  activeProvider: AuthProvider | null;
+interface IData {
+  state: IState;
   exception: Error | null;
   authenticating: boolean;
   destroyed: boolean;
   configure: boolean;
   adminPageActive: boolean;
-  credentials: IAuthCredentials;
   loadingState: ILoadableState;
   providers: AuthProvider[];
   configurations: AuthProvider[];
 
-  setTabId: (tabId: string) => void;
-  setActiveProvider: (provider: AuthProvider | null) => void;
   login: (link: boolean) => Promise<void>;
 }
 
-export function useAuthDialogState(providerId: string | null): IState {
+interface IState {
+  tabId: string | null;
+  activeProvider: AuthProvider | null;
+  activeConfiguration: AuthProviderConfiguration | null;
+  credentials: IAuthCredentials;
+
+  setTabId: (tabId: string) => void;
+  setActiveProvider: (provider: AuthProvider | null) => void;
+  setActiveConfiguration: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
+}
+
+export function useAuthDialogState(accessRequest: boolean, providerId: string | null, configurationId?: string): IData {
   const authProvidersResource = useMapResource(useAuthDialogState, AuthProvidersResource, CachedMapAllKey);
   const administrationScreenService = useService(AdministrationScreenService);
   const authInfoService = useService(AuthInfoService);
@@ -48,8 +55,46 @@ export function useAuthDialogState(providerId: string | null): IState {
     .filter(notEmptyProvider)
     .sort(compareProviders);
 
+  const state = useObservableRef<IState>(() => ({
+    tabId: null,
+    activeProvider: null,
+    activeConfiguration: null,
+    credentials: {
+      profile: '0',
+      credentials: {},
+    },
+
+    setTabId(tabId: string): void {
+      this.tabId = tabId;
+    },
+    setActiveProvider(provider: AuthProvider | null): void {
+      this.activeProvider = provider;
+      this.credentials.profile = '0';
+      this.credentials.credentials = {};
+      this.activeConfiguration = null;
+    },
+    setActiveConfiguration(
+      provider: AuthProvider | null,
+      configuration: AuthProviderConfiguration | null
+    ): void {
+      this.setActiveProvider(provider);
+      this.activeConfiguration = configuration;
+    },
+  }), {
+    tabId: observable.ref,
+    activeProvider: observable.ref,
+    activeConfiguration: observable.ref,
+    credentials: observable,
+    setActiveProvider: action,
+    setActiveConfiguration: action,
+  }, false);
+
   const activeProviders = providers
     .filter(provider => {
+      if (provider.id === primaryId && adminPageActive && accessRequest) {
+        return true;
+      }
+
       if (provider.configurable) {
         return false;
       }
@@ -62,10 +107,6 @@ export function useAuthDialogState(providerId: string | null): IState {
 
       if (active) {
         return true;
-      }
-
-      if (provider.id === primaryId) {
-        return adminPageActive;
       }
 
       return false;
@@ -83,44 +124,32 @@ export function useAuthDialogState(providerId: string | null): IState {
     tabIds.push(FEDERATED_AUTH);
   }
 
-  const state = useObservableRef<IState>(() => ({
-    tabId: null,
-    activeProvider: null,
+  const data = useObservableRef<IData>(() => ({
     exception: null,
     authenticating: false,
     destroyed: false,
-    credentials: {
-      profile: '0',
-      credentials: {},
-    },
     loadingState: authProvidersResource,
 
     get configure(): boolean {
-      if (this.activeProvider) {
-        if (this.adminPageActive && authProvidersResource.resource.isPrimary(this.activeProvider.id)) {
+      if (state.activeProvider) {
+        if (this.adminPageActive && authProvidersResource.resource.isPrimary(state.activeProvider.id)) {
           return false;
         }
-        return !authProvidersResource.resource.isAuthEnabled(this.activeProvider.id);
+        return !authProvidersResource.resource.isAuthEnabled(state.activeProvider.id);
       }
       return false;
     },
-
-    setTabId(tabId: string): void {
-      this.tabId = tabId;
-    },
-    setActiveProvider(provider: AuthProvider | null): void {
-      this.activeProvider = provider;
-      this.credentials.profile = '0';
-      this.credentials.credentials = {};
-    },
     async login(link: boolean): Promise<void> {
-      if (!this.activeProvider || this.authenticating) {
+      if (!state.activeProvider || this.authenticating) {
         return;
       }
 
       this.authenticating = true;
       try {
-        await authInfoService.login(this.activeProvider.id, this.credentials, link);
+        await authInfoService.login(state.activeProvider.id, {
+          credentials: state.credentials,
+          linkUser: link,
+        });
       } catch (exception: any) {
         if (this.destroyed) {
           notificationService.logException(exception, 'Login failed');
@@ -133,29 +162,37 @@ export function useAuthDialogState(providerId: string | null): IState {
       }
     },
   }), {
-    tabId: observable.ref,
-    activeProvider: observable.ref,
+    state: observable.ref,
     exception: observable.ref,
     authenticating: observable.ref,
     configure: computed,
     adminPageActive: observable.ref,
-    credentials: observable,
   }, {
+    state,
     adminPageActive,
     providers: activeProviders,
     configurations,
   });
 
-  useEffect(() => () => { state.destroyed = true; }, []);
+  useEffect(() => () => { data.destroyed = true; }, []);
 
-  if (tabIds.length > 0 && (state.tabId === null || !tabIds.includes(state.tabId))
-  ) {
+  if (tabIds.length > 0 && (state.tabId === null || !tabIds.includes(state.tabId))) {
     const tabId = tabIds[0];
     state.setTabId(tabId);
-    state.setActiveProvider(activeProviders.find(provider => provider.id === tabId) || null);
+
+    const provider = (
+      activeProviders.find(provider => provider.id === tabId)
+      || providers.find(provider => provider.id === providerId)
+      || null
+    );
+    const configuration = provider?.configurations?.find(
+      configuration => configuration.id === configurationId
+    ) ?? null;
+
+    state.setActiveConfiguration(provider, configuration);
   }
 
-  return state;
+  return data;
 }
 
 function notEmptyProvider(obj: any): obj is AuthProvider {

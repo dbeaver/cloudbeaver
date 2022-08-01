@@ -9,11 +9,11 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
-import type { DBObject } from '@cloudbeaver/core-app';
 import { Checkbox, getComputed } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { TableContext } from '../../TableContext';
 

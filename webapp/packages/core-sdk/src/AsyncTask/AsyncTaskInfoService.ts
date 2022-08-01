@@ -17,10 +17,10 @@ const DELAY_BETWEEN_TRIES = 1000;
 
 @injectable()
 export class AsyncTaskInfoService {
-  private tasks: Map<string, AsyncTask>;
+  private readonly tasks: Map<string, AsyncTask>;
 
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
   ) {
     this.tasks = new Map();
   }

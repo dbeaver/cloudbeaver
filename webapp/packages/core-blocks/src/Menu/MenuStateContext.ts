@@ -9,4 +9,6 @@
 import { createContext } from 'react';
 import type { MenuStateReturn } from 'reakit/ts';
 
-export const MenuStateContext = createContext<MenuStateReturn | null>(null);
+export type IMenuState = MenuStateReturn;
+
+export const MenuStateContext = createContext<IMenuState | null>(null);

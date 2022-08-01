@@ -8,11 +8,11 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ServerInternalError, ServerErrorType } from '@cloudbeaver/core-sdk';
 import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
@@ -96,10 +96,10 @@ export class ExportNotificationController implements IInitializableController {
   private notification!: INotification<{ source: string }>;
 
   constructor(
-    private commonDialogService: CommonDialogService,
-    private dataExportProcessService: DataExportProcessService,
-    private navNodeManagerService: NavNodeManagerService,
-    private localization: LocalizationService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly dataExportProcessService: DataExportProcessService,
+    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly localization: LocalizationService
   ) {
     makeObservable(this, {
       isDetailsDialogOpen: observable,

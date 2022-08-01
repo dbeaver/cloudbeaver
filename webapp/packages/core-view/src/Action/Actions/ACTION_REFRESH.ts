@@ -9,5 +9,5 @@
 import { createAction } from '../createAction';
 
 export const ACTION_REFRESH = createAction('refresh', {
-  label: 'app_navigationTree_refreshNode',
+  label: 'app_navigationTree_refresh',
 });

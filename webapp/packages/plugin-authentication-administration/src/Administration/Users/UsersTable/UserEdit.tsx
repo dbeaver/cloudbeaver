@@ -25,7 +25,7 @@ const styles = css`
       composes: theme-background-secondary theme-text-on-secondary from global;
       box-sizing: border-box;
       padding-bottom: 24px;
-      height: 520px;
+      height: 560px;
       display: flex;
       flex-direction: column;
     }

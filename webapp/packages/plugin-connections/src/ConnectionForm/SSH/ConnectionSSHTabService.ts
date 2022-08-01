@@ -19,7 +19,7 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { SSH } from './SSH';
+import { SSHPanel } from './SSHPanel';
 import { SSHTab } from './SSHTab';
 
 @injectable()
@@ -42,7 +42,7 @@ export class ConnectionSSHTabService extends Bootstrap {
       name: 'customConnection_options',
       order: 3,
       tab: () => SSHTab,
-      panel: () => SSH,
+      panel: () => SSHPanel,
       isHidden: (tabId, props) => {
         if (props?.state.config.driverId) {
           const driver = this.dbDriverResource.get(props.state.config.driverId);

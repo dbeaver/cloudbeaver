@@ -13,6 +13,7 @@ import styled, { use } from 'reshadow';
 
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
+import { getComputed } from '../getComputed';
 import { MenuEmptyItem } from './MenuEmptyItem';
 import { menuPanelStyles } from './menuPanelStyles';
 
@@ -22,18 +23,23 @@ export interface IMenuPanelProps {
   menu: MenuStateReturn; // from reakit useMenuState
   panelAvailable?: boolean;
   hasBindings?: boolean;
+  getHasBindings?: () => boolean;
+  children: React.ReactNode | (() => React.ReactNode);
   rtl?: boolean;
   style?: ComponentStyle;
+  className?: string;
 }
 
 export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
   label,
   menu,
   panelAvailable = true,
-  hasBindings,
   rtl,
+  getHasBindings,
+  hasBindings,
   children,
   style,
+  className,
 }) {
   const styles = useStyles(menuPanelStyles, style);
   const visible = menu.visible;
@@ -42,13 +48,23 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
     return null;
   }
 
+  hasBindings = panelAvailable && (hasBindings || getComputed(() => getHasBindings?.()));
+
+  let renderedChildren: React.ReactNode = <></>;
+
+  if (panelAvailable) {
+    renderedChildren = typeof children === 'function'
+      ? children()
+      : children;
+  }
+
   return styled(styles)(
-    <Menu {...menu} aria-label={label} visible={panelAvailable}>
+    <Menu {...menu} aria-label={label} className={className} visible={panelAvailable}>
       <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
-        {Children.count(children) === 0 && (
+        {Children.count(renderedChildren) === 0 && (
           <MenuEmptyItem style={style} />
         )}
-        {children}
+        {renderedChildren}
       </menu-box>
     </Menu>
   );

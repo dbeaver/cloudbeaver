@@ -35,7 +35,7 @@ interface Props {
   onDoubleClick?: () => void;
 }
 
-export const TableItem = observer<Props>(function TableItem({
+export const TableItem = observer<React.PropsWithChildren<Props>>(function TableItem({
   item,
   expandElement,
   selectOnItem,

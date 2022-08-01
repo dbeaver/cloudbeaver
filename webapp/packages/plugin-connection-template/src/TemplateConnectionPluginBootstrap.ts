@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, EMainMenu } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
+import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
@@ -18,11 +18,11 @@ import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
   constructor(
-    private mainMenuService: MainMenuService,
-    private templateConnectionsResource: TemplateConnectionsResource,
-    private commonDialogService: CommonDialogService,
-    private notificationService: NotificationService,
-    private permissionsService: PermissionsService
+    private readonly mainMenuService: MainMenuService,
+    private readonly templateConnectionsResource: TemplateConnectionsResource,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly notificationService: NotificationService,
+    private readonly permissionsService: PermissionsService
   ) {
     super();
   }

@@ -12,10 +12,10 @@ import type { IServiceInjector } from './IApp';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 
-interface IProps {
+interface Props {
   app: IServiceInjector;
 }
 
-export const AppContext: React.FC<IProps> = function AppContext({ app, children }) {
+export const AppContext: React.FC<React.PropsWithChildren<Props>> = function AppContext({ app, children }) {
   return <appContext.Provider value={app}>{children}</appContext.Provider>;
 };

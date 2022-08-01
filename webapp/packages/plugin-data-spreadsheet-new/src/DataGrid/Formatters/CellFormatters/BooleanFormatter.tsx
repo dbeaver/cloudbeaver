@@ -9,10 +9,10 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 import styled, { use, css } from 'reshadow';
 
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellContext } from '../../CellRenderer/CellContext';
@@ -40,7 +40,7 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   const editingContext = useContext(EditingContext);
   const cellContext = useContext(CellContext);
 
-  if (!context || !tableDataContext || !editingContext || !cellContext?.cell) {
+  if (!context || !tableDataContext || !editingContext || !cellContext.cell) {
     throw new Error('Contexts required');
   }
 
@@ -59,7 +59,7 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   );
 
   function toggleValue() {
-    if (disabled || !tableDataContext || !cellContext?.cell) {
+    if (disabled || !tableDataContext || !cellContext.cell) {
       return;
     }
     const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);

@@ -15,7 +15,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { ISqlEditorTabState, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { uuid } from '@cloudbeaver/core-utils';
+import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
 
@@ -28,22 +29,41 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
     ConnectionExecutionContextResource,
     CachedMapAllKey
   );
+  const sqlDataSourceService = useService(SqlDataSourceService);
   const sqlEditorService = useService(SqlEditorService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(contextId);
 
   const state = useObservableRef(() => ({
+    get dataSource() {
+      if (!this.state) {
+        return undefined;
+      }
+
+      return sqlDataSourceService.get(this.state.editorId);
+    },
     state: null as null | ISqlEditorTabState,
     setState(contextInfo: IConnectionExecutionContextInfo | undefined) {
       if (contextInfo) {
-        this.state = sqlEditorService.getState(0, undefined, undefined, undefined, contextInfo);
+        const editorId = uuid();
+
+
+        this.state = sqlEditorService.getState(
+          editorId,
+          MemorySqlDataSource.key,
+          0,
+          undefined,
+        );
+
+        sqlDataSourceService.create(this.state, MemorySqlDataSource.key, { script: '', executionContext:contextInfo });
+
       } else {
         this.state = null;
       }
     },
   }), { state: observable }, false);
 
-  if (context?.context?.id !== state.state?.executionContext?.id) {
+  if (context?.context?.id !== state.dataSource?.executionContext?.id) {
     state.setState(context?.context);
   }
 

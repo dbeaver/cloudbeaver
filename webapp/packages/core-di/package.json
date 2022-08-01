@@ -12,13 +12,14 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test"
   },
   "dependencies": {
     "inversify": "~6.0.1"
   },
   "peerDependencies": {
     "@cloudbeaver/core-utils": "~0.1.0",
-    "react": "~17.x.x"
+    "react": "~18.x.x"
   }
 }

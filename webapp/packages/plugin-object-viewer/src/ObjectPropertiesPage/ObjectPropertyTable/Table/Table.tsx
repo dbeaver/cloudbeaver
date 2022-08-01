@@ -7,18 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useRef, useState } from 'react';
-import DataGrid from 'react-data-grid';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DBObject, NavTreeResource } from '@cloudbeaver/core-app';
 import { IScrollState, useControlledScroll, useTable } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
+import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
+import DataGrid from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
@@ -27,7 +27,6 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import { RowRenderer } from './RowRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import { TableContext } from './TableContext';
@@ -134,7 +133,6 @@ export const Table = observer<Props>(function Table({
           className='cb-metadata-grid-theme'
           rows={objects}
           rowKeyGetter={row => row.id}
-          rowRenderer={RowRenderer}
           columns={tableData.columns}
           rowHeight={40}
         />

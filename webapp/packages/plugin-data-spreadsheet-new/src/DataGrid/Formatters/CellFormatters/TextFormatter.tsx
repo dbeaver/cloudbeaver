@@ -8,17 +8,19 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
-import type { FormatterProps } from 'react-data-grid';
+
 
 import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
-import { isValidUrl } from '@cloudbeaver/core-utils';
+import { clsx, isValidUrl } from '@cloudbeaver/core-utils';
+import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { TableDataContext } from '../../TableDataContext';
 
-export const TextFormatter = observer<FormatterProps>(function TextFormatter({ row, column, isCellSelected }) {
+export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function TextFormatter({ row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const editingContext = useContext(EditingContext);
   const tableDataContext = useContext(TableDataContext);
@@ -31,10 +33,7 @@ export const TextFormatter = observer<FormatterProps>(function TextFormatter({ r
   const formatter = tableDataContext.format;
   const rawValue = getComputed(() => formatter.get(tableDataContext.getCellValue(cellContext.cell!)!));
 
-  let classes = 'text-formatter';
-  if (rawValue === null) {
-    classes += ' cell-null';
-  }
+  const classes = clsx('text-formatter', { 'cell-null': rawValue === null });
 
   const value = formatter.toDisplayString(rawValue);
 

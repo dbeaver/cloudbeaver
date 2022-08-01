@@ -18,6 +18,9 @@ package io.cloudbeaver;
 
 import org.jkiss.code.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * User identity provided by auth provider.
  */
@@ -27,9 +30,16 @@ public class DBWUserIdentity {
     @NotNull
     private final String displayName;
 
+    private final Map<String, String> metaParameters = new HashMap<>();
+
     public DBWUserIdentity(@NotNull String id, @NotNull String displayName) {
+        this(id, displayName, Map.of());
+    }
+
+    public DBWUserIdentity(@NotNull String id, @NotNull String displayName, @NotNull Map<String, String> metaParameters) {
         this.id = id;
         this.displayName = displayName;
+        this.metaParameters.putAll(metaParameters);
     }
 
     @NotNull
@@ -40,5 +50,10 @@ public class DBWUserIdentity {
     @NotNull
     public String getDisplayName() {
         return displayName;
+    }
+
+    @NotNull
+    public Map<String, String> getMetaParameters() {
+        return Map.copyOf(metaParameters);
     }
 }

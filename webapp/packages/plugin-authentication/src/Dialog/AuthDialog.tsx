@@ -18,6 +18,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
+import type { IAuthOptions } from '../IAuthOptions';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
@@ -62,41 +63,45 @@ const styles = css`
     }
 `;
 
-interface IAuthPayload {
-  providerId: string | null;
-  link?: boolean;
-}
-
-export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
+export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: {
     providerId,
+    configurationId,
     link = false,
+    accessRequest = false,
   },
   options,
   rejectDialog,
 }) {
-  const state = useAuthDialogState(providerId);
-  const errorDetails = useErrorDetails(state.exception);
+  const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
+  const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
   const translate = useTranslate();
+  const state = dialogData.state;
 
   const additional = userInfo.data !== null
     && state.activeProvider?.id !== undefined
     && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = (state.providers.length + state.configurations.length) > 1;
+  const showTabs = (dialogData.providers.length + dialogData.configurations.length) > 1;
   const federate = state.tabId === FEDERATED_AUTH;
 
   let dialogTitle = translate('authentication_login_dialog_title');
   let subTitle: string | undefined;
+  let icon: string | undefined;
 
   if (state.activeProvider) {
     dialogTitle += `: ${state.activeProvider.label}`;
     subTitle = state.activeProvider.description;
-  }
+    icon = state.activeProvider.icon;
 
-  if (federate) {
+    if (state.activeConfiguration) {
+      dialogTitle  += `: ${state.activeConfiguration.displayName}`;
+      subTitle = state.activeConfiguration.description;
+      icon = state.activeConfiguration.iconURL || icon;
+    }
+  } else if (federate) {
     dialogTitle += `: ${translate('authentication_auth_federated')}`;
     subTitle = 'authentication_identity_provider_dialog_subtitle';
   }
@@ -106,7 +111,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   }
 
   async function login() {
-    await state.login(link);
+    await dialogData.login(link);
     rejectDialog();
   }
 
@@ -120,7 +125,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       return <TextPlaceholder>{translate('authentication_select_provider')}</TextPlaceholder>;
     }
 
-    if (state.configure) {
+    if (dialogData.configure) {
       return (
         <TextPlaceholder>
           {translate('authentication_provider_disabled')}
@@ -137,7 +142,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       <AuthProviderForm
         provider={provider}
         credentials={state.credentials}
-        authenticate={state.authenticating}
+        authenticate={dialogData.authenticating}
       />
     );
   }
@@ -147,15 +152,15 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       <CommonDialogWrapper
         size='large'
         title={dialogTitle}
-        icon={state.activeProvider?.icon}
+        icon={icon}
         subTitle={subTitle}
         footer={!federate && (
           <AuthDialogFooter
-            authAvailable={!state.configure}
-            isAuthenticating={state.authenticating}
+            authAvailable={!dialogData.configure}
+            isAuthenticating={dialogData.authenticating}
             onLogin={login}
           >
-            {state.exception && (
+            {dialogData.exception && (
               <ErrorMessage
                 text={errorDetails.details?.message || ''}
                 hasDetails={errorDetails.details?.hasDetails}
@@ -169,23 +174,23 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
       >
         {showTabs && (
           <TabList aria-label='Auth providers'>
-            {state.providers.map(provider => (
+            {dialogData.providers.map(provider => (
               <Tab
                 key={provider.id}
                 tabId={provider.id}
                 title={provider.description || provider.label}
-                disabled={state.authenticating}
+                disabled={dialogData.authenticating}
                 onClick={() => { state.setActiveProvider(provider); }}
               >
                 <TabTitle>{provider.label}</TabTitle>
               </Tab>
             ))}
-            {state.configurations.length > 0 && (
+            {dialogData.configurations.length > 0 && (
               <Tab
                 key={FEDERATED_AUTH}
                 tabId={FEDERATED_AUTH}
                 title={translate('authentication_auth_federated')}
-                disabled={state.authenticating}
+                disabled={dialogData.authenticating}
                 onClick={() => { state.setActiveProvider(null); }}
               >
                 <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
@@ -194,10 +199,18 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
           </TabList>
         )}
         <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
-          <Loader state={state.loadingState}>
+          <Loader state={dialogData.loadingState}>
             {() => federate
               ? (
-                <ConfigurationsList providers={state.configurations} onClose={rejectDialog} />
+                <ConfigurationsList
+                  activeProvider={state.activeProvider}
+                  activeConfiguration={state.activeConfiguration}
+                  providers={dialogData.configurations}
+                  onAuthorize={(provider, configuration) => {
+                    state.setActiveConfiguration(provider, configuration);
+                  }}
+                  onClose={rejectDialog}
+                />
               )
               : renderForm(state.activeProvider)}
           </Loader>

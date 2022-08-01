@@ -9,6 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
+import type { IAuthOptions } from '../IAuthOptions';
 import { AuthDialog } from './AuthDialog';
 
 @injectable()
@@ -18,11 +19,12 @@ export class AuthDialogService {
   ) { }
 
   showLoginForm(
-    persistent = false, 
-    providerId: string | null = null, 
-    link?: boolean
+    persistent = false,
+    options: IAuthOptions = {
+      providerId: null,
+    }
   ): Promise<DialogueStateResult | null> {
-    return this.commonDialogService.open(AuthDialog, { providerId, link }, { persistent });
+    return this.commonDialogService.open(AuthDialog, options, { persistent });
   }
 
   closeLoginForm(promise: Promise<DialogueStateResult | null>): void {

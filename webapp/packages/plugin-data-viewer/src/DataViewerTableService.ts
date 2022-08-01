@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavNode, QuotasService } from '@cloudbeaver/core-app';
 import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
+import { EObjectFeature, NavNode } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
@@ -29,7 +29,6 @@ export class DataViewerTableService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService,
-    private readonly quotasService: QuotasService
   ) { }
 
   has(tableId: string): boolean {
@@ -58,7 +57,6 @@ export class DataViewerTableService {
       this.graphQLService,
       this.asyncTaskInfoService,
       this.connectionExecutionContextService,
-      this.quotasService
     );
 
     source

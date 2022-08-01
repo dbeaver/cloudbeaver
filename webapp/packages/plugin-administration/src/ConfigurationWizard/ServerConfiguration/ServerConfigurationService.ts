@@ -129,12 +129,16 @@ export class ServerConfigurationService {
           }
         );
 
+        this.stateLinked = true;
         await this.serverConfigResource.load();
 
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
         this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
 
-        this.stateLinked = true;
+        if (reset) {
+          this.serverConfigResource.resetUpdate();
+        }
+
       }
 
       await this.loadConfigTask.execute({
@@ -263,6 +267,7 @@ export class ServerConfigurationService {
 
     if (
       close
+      || !this.stateLinked
       || this.unSaveNotification
       || this.administrationScreenService.isConfigurationMode
       // || !this.administrationScreenService.isAdministrationPageActive

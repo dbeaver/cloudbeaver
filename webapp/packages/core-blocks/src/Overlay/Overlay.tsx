@@ -19,7 +19,7 @@ interface Props {
   className?: string;
 }
 
-export const Overlay = observer<Props>(function Overlay({
+export const Overlay = observer<React.PropsWithChildren<Props>>(function Overlay({
   active,
   fill,
   className,

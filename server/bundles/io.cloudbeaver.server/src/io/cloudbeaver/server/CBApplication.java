@@ -19,10 +19,10 @@ package io.cloudbeaver.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
-import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.provider.AuthProviderConfig;
 import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -45,17 +45,15 @@ import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -77,7 +75,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseWebApplication {
+public class CBApplication extends BaseWebApplication implements WebAuthApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -106,7 +104,7 @@ public class CBApplication extends BaseWebApplication {
     private File homeDirectory;
 
     // Configurations
-    private final Map<String, Object> productConfiguration = new HashMap<>();
+    protected final Map<String, Object> productConfiguration = new HashMap<>();
     private final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
@@ -176,11 +174,24 @@ public class CBApplication extends BaseWebApplication {
         return appConfiguration;
     }
 
+    @Override
+    public WebAuthConfiguration getAuthConfiguration() {
+        return appConfiguration;
+    }
+
+    @Override
+    public String getAuthServiceURL() {
+        return Stream.of(getServerURL(), getRootURI(), getServicesURI())
+            .map(WebAppUtils::removeSideSlashes)
+            .filter(CommonUtils::isNotEmpty)
+            .collect(Collectors.joining("/"));
+    }
+
     public Map<String, Object> getProductConfiguration() {
         return productConfiguration;
     }
 
-    public SMController getSecurityController() {
+    public SMAdminController getSecurityController() {
         return securityController;
     }
 
@@ -478,6 +489,11 @@ public class CBApplication extends BaseWebApplication {
     }
 
     private void parseConfiguration(File configFile) throws DBException {
+        Map<String, Object> configProps = readConfiguration(configFile);
+        parseConfiguration(configProps);
+    }
+
+    private void parseConfiguration(Map<String, Object> configProps) throws DBException {
         String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = System.getProperty("user.dir");
@@ -486,40 +502,11 @@ public class CBApplication extends BaseWebApplication {
             homeFolder = ".";
         }
         homeDirectory = new File(homeFolder);
-        String productConfigPath = null;
 
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
-
-        // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
-        InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
-        InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
-
-        Gson gson = new GsonBuilder()
-            .setLenient()
-            .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
-            .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .create();
-
-        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-            Map<String, Object> configProps = JSONUtils.parseMap(gson, reader);
-
+        Gson gson = getGson();
+        try {
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
-
-            String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
-            if (!CommonUtils.isEmpty(externalPropertiesFile)) {
-                Properties props = new Properties();
-                try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
-                    props.load(is);
-                } catch (IOException e) {
-                    log.error("Error loading external properties from " + externalPropertiesFile, e);
-                }
-                for (String propName : props.stringPropertyNames()) {
-                    this.externalProperties.put(propName, props.getProperty(propName));
-                }
-            }
-
-            patchConfigurationWithProperties(configProps);
-
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
             serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
             if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
@@ -552,14 +539,7 @@ public class CBApplication extends BaseWebApplication {
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
-            productConfigPath = WebAppUtils.getRelativePath(
-                JSONUtils.getString(
-                    serverConfig,
-                    CBConstants.PARAM_PRODUCT_CONFIGURATION,
-                    CBConstants.DEFAULT_PRODUCT_CONFIGURATION
-                ),
-                homeFolder
-            );
+            readProductConfiguration(serverConfig, gson, homeFolder);
 
             String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
             if (!CommonUtils.isEmpty(staticContentsFile)) {
@@ -569,7 +549,7 @@ public class CBApplication extends BaseWebApplication {
                     log.error("Error reading static contents from " + staticContentsFile, e);
                 }
             }
-            parseAdditionalServerConfiguration(serverConfig);
+            parseAdditionalConfiguration(configProps);
         } catch (IOException | DBException e) {
             throw new DBException("Error parsing server configuration", e);
         }
@@ -583,13 +563,29 @@ public class CBApplication extends BaseWebApplication {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
             appConfiguration.setPlugins(mergedPlugins);
 
-            Map<String, AuthProviderConfig> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthProviderConfigurations().entrySet().stream(),
-                    appConfiguration.getAuthProviderConfigurations().entrySet().stream()
+            // Backward compatibility: load configs map
+            appConfiguration.loadLegacyCustomConfigs();
+
+            Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+                    prevConfig.getAuthCustomConfigurations().stream(),
+                    appConfiguration.getAuthCustomConfigurations().stream()
                 )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setAuthProvidersConfiguration(mergedAuthProviders);
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+            appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
         }
+
+        patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder) throws DBException {
+        String productConfigPath = WebAppUtils.getRelativePath(
+            JSONUtils.getString(
+                serverConfig,
+                CBConstants.PARAM_PRODUCT_CONFIGURATION,
+                CBConstants.DEFAULT_PRODUCT_CONFIGURATION
+            ),
+            homeFolder
+        );
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
             File productConfigFile = new File(productConfigPath);
@@ -606,21 +602,70 @@ public class CBApplication extends BaseWebApplication {
         }
 
         // Add product config from runtime
-        {
-            File rtConfig = getRuntimeProductConfigFilePath().toFile();
-            if (rtConfig.exists()) {
-                log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
-                try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
-                    productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
-                } catch (Exception e) {
-                    throw new DBException("Error reading product runtime configuration", e);
-                }
+        File rtConfig = getRuntimeProductConfigFilePath().toFile();
+        if (rtConfig.exists()) {
+            log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
+            try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+            } catch (Exception e) {
+                throw new DBException("Error reading product runtime configuration", e);
             }
         }
-        patchConfigurationWithProperties(productConfiguration);
     }
 
-    protected void parseAdditionalServerConfiguration(Map<String, Object> serverConfig) throws DBException {
+    protected Map<String, Object> readConfiguration(File configFile) throws DBException {
+        Map<String, Object> configProps = new LinkedHashMap<>();
+        if (configFile.exists()) {
+            log.debug("Read configuration [" + configFile.getAbsolutePath() + "]");
+            try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+                configProps.putAll(JSONUtils.parseMap(getGson(), reader));
+                patchConfigurationWithProperties(configProps); // patch original properties
+
+            } catch (IOException e) {
+                throw new DBException("Error parsing server configuration", e);
+            }
+        }
+
+        readAdditionalConfiguration(configProps);
+        if (configProps.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, Object> serverConfig = getServerConfigProps(configProps);
+        String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
+        if (!CommonUtils.isEmpty(externalPropertiesFile)) {
+            Properties props = new Properties();
+            try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
+                props.load(is);
+            } catch (IOException e) {
+                log.error("Error loading external properties from " + externalPropertiesFile, e);
+            }
+            for (String propName : props.stringPropertyNames()) {
+                this.externalProperties.put(propName, props.getProperty(propName));
+            }
+        }
+
+        patchConfigurationWithProperties(configProps); // patch again because properties can be changed
+        return configProps;
+    }
+
+    private Gson getGson() {
+        // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
+        InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
+        InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
+
+        return new GsonBuilder()
+            .setLenient()
+            .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
+            .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
+            .create();
+    }
+
+    protected void readAdditionalConfiguration(Map<String, Object> rootConfig) throws DBException {
+
+    }
+
+    protected void parseAdditionalConfiguration(Map<String, Object> serverConfig) throws DBException {
 
     }
 
@@ -702,16 +747,20 @@ public class CBApplication extends BaseWebApplication {
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
-            File runtimeConfigFile = getRuntimeAppConfigFile();
-            if (runtimeConfigFile.exists()) {
-                log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
-                parseConfiguration(runtimeConfigFile);
+            Map<String, Object> runtimeConfigProps = readRuntimeConfigurationProperties();
+            if (!runtimeConfigProps.isEmpty()) {
+                parseConfiguration(runtimeConfigProps);
             }
         } catch (Exception e) {
             throw new DBException("Error parsing configuration", e);
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+    }
+
+    private Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
+        File runtimeConfigFile = getRuntimeAppConfigFile();
+        return readConfiguration(runtimeConfigFile);
     }
 
     protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
@@ -726,14 +775,17 @@ public class CBApplication extends BaseWebApplication {
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
-            SMController securityController = getSecurityController();
+            var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                SMDataSourceGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
-                if (ArrayUtils.isEmpty(grants)) {
-                    securityController.setConnectionSubjectAccess(
-                        ds.getId(),
-                        new String[]{anonymousRoleId},
-                        adminName);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousRoleId, ds.getId(), SMObjects.DATASOURCE);
+                if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
+                    securityController.setObjectPermissions(
+                        Set.of(ds.getId()),
+                        SMObjects.DATASOURCE,
+                        Set.of(anonymousRoleId),
+                        Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                        adminName
+                    );
                 }
             }
         } catch (Exception e) {
@@ -741,104 +793,122 @@ public class CBApplication extends BaseWebApplication {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+    protected void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+        if (newServerName == null) {
+            throw new DBException("Invalid server configuration, server name cannot be empty");
+        }
+        Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName, newServerURL, sessionExpireTime, appConfig);
+        writeRuntimeConfig(configurationProperties);
+    }
 
+    private void writeRuntimeConfig(Map<String, Object> configurationProperties) throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
+        if (runtimeConfigFile.exists()) {
+            ContentUtils.makeFileBackup(runtimeConfigFile.toPath());
+        }
+
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setLenient()
                 .setPrettyPrinting()
                 .create();
-            try (JsonWriter json = gson.newJsonWriter(out)) {
-                json.setLenient(true);
-                json.beginObject();
-                {
-                    json.name("server");
-                    json.beginObject();
-                    if (!CommonUtils.isEmpty(newServerName)) {
-                        JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
-                    }
-                    if (!CommonUtils.isEmpty(newServerURL)) {
-                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
-                    }
-                    if (sessionExpireTime > 0) {
-                        JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
-                    }
-
-                    if (!CommonUtils.isEmpty(databaseConfiguration)) {
-                        JSONUtils.serializeProperties(json, CBConstants.PARAM_DB_CONFIGURATION, databaseConfiguration);
-                    }
-                    json.endObject();
-                }
-                {
-                    json.name("app");
-                    json.beginObject();
-                    JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-                    JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
-                    JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-                    JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
-                    JSONUtils.field(json, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
-                    JSONUtils.field(json, "forwardProxy", appConfig.isEnabledForwardProxy());
-                    JSONUtils.field(json, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
-
-                    Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
-                    if (!CommonUtils.isEmpty(resourceQuotas)) {
-                        JSONUtils.serializeProperties(json, CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
-                    }
-
-                    {
-                        // Save only differences in def navigator settings
-                        DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
-
-                        json.name("defaultNavigatorSettings");
-                        json.beginObject();
-                        if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects())
-                            JSONUtils.field(json, "showSystemObjects", navSettings.isShowSystemObjects());
-                        if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects())
-                            JSONUtils.field(json, "showUtilityObjects", navSettings.isShowUtilityObjects());
-                        if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities())
-                            JSONUtils.field(json, "showOnlyEntities", navSettings.isShowOnlyEntities());
-                        if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities())
-                            JSONUtils.field(json, "mergeEntities", navSettings.isMergeEntities());
-                        if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
-                            JSONUtils.field(json, "hideFolders", navSettings.isHideFolders());
-                        if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
-                            JSONUtils.field(json, "hideSchemas", navSettings.isHideSchemas());
-                        if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
-                            JSONUtils.field(json, "hideVirtualModel", navSettings.isHideVirtualModel());
-
-                        json.endObject();
-                    }
-                    if (appConfig.getEnabledFeatures() != null) {
-                        JSONUtils.serializeStringList(json, "enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()), true);
-                    }
-                    if (appConfig.getEnabledAuthProviders() != null) {
-                        JSONUtils.serializeStringList(json, "enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()), true);
-                    }
-                    if (appConfig.getEnabledDrivers() != null) {
-                        JSONUtils.serializeStringList(json, "enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()), true);
-                    }
-                    if (appConfig.getDisabledDrivers() != null) {
-                        JSONUtils.serializeStringList(json, "disabledDrivers", Arrays.asList(appConfig.getDisabledDrivers()), true);
-                    }
-
-                    if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
-                        JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
-                    }
-                    if (!CommonUtils.isEmpty(appConfig.getAuthProviderConfigurations())) {
-                        json.name("authConfiguration");
-                        gson.toJson(appConfig.getAuthProviderConfigurations(), Map.class, json);
-                    }
-
-
-                    json.endObject();
-                }
-                json.endObject();
-            }
+            gson.toJson(configurationProperties, out);
 
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
+    }
+
+    protected Map<String, Object> collectConfigurationProperties(
+        String newServerName,
+        String newServerURL,
+        long sessionExpireTime,
+        CBAppConfig appConfig
+    ) {
+        Map<String, Object> rootConfig = new LinkedHashMap<>();
+        {
+            var serverConfigProperties = new LinkedHashMap<String, Object>();
+            rootConfig.put("server", serverConfigProperties);
+            if (!CommonUtils.isEmpty(newServerName)) {
+                serverConfigProperties.put(CBConstants.PARAM_SERVER_NAME, newServerName);
+            }
+            if (!CommonUtils.isEmpty(newServerURL)) {
+                serverConfigProperties.put(CBConstants.PARAM_SERVER_URL, newServerURL);
+            }
+            if (sessionExpireTime > 0) {
+                serverConfigProperties.put(CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+            }
+
+            if (!CommonUtils.isEmpty(databaseConfiguration)) {
+                serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfiguration);
+            }
+        }
+        {
+            var appConfigProperties = new LinkedHashMap<String, Object>();
+            rootConfig.put("app", appConfigProperties);
+
+            appConfigProperties.put("anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+            appConfigProperties.put("supportsCustomConnections", appConfig.isSupportsCustomConnections());
+            appConfigProperties.put("publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+            appConfigProperties.put("adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+            appConfigProperties.put("enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
+            appConfigProperties.put("forwardProxy", appConfig.isEnabledForwardProxy());
+            appConfigProperties.put("linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
+            appConfigProperties.put("redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
+            appConfigProperties.put(CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
+
+            Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
+            appConfigProperties.put(CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
+
+            {
+                // Save only differences in def navigator settings
+                DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
+                var navigatorProperties = new LinkedHashMap<String, Object>();
+                appConfigProperties.put("defaultNavigatorSettings", navigatorProperties);
+
+                if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects()) {
+                    navigatorProperties.put("showSystemObjects", navSettings.isShowSystemObjects());
+                }
+                if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects()) {
+                    navigatorProperties.put("showUtilityObjects", navSettings.isShowUtilityObjects());
+                }
+                if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities()) {
+                    navigatorProperties.put("showOnlyEntities", navSettings.isShowOnlyEntities());
+                }
+                if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities()) {
+                    navigatorProperties.put("mergeEntities", navSettings.isMergeEntities());
+                }
+                if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders()) {
+                    navigatorProperties.put("hideFolders", navSettings.isHideFolders());
+                }
+                if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas()) {
+                    navigatorProperties.put("hideSchemas", navSettings.isHideSchemas());
+                }
+                if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel()) {
+                    navigatorProperties.put("hideVirtualModel", navSettings.isHideVirtualModel());
+                }
+            }
+            if (appConfig.getEnabledFeatures() != null) {
+                appConfigProperties.put("enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()));
+            }
+            if (appConfig.getEnabledAuthProviders() != null) {
+                appConfigProperties.put("enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()));
+            }
+            if (appConfig.getEnabledDrivers() != null) {
+                appConfigProperties.put("enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()));
+            }
+            if (appConfig.getDisabledDrivers() != null) {
+                appConfigProperties.put("disabledDrivers", Arrays.asList(appConfig.getDisabledDrivers()));
+            }
+
+            if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
+                appConfigProperties.put("plugins", appConfig.getPlugins());
+            }
+            if (!CommonUtils.isEmpty(appConfig.getAuthCustomConfigurations())) {
+                appConfigProperties.put("authConfigurations", appConfig.getAuthCustomConfigurations());
+            }
+        }
+        return rootConfig;
     }
 
     ////////////////////////////////////////////////////////////////////////

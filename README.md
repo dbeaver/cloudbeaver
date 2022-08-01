@@ -21,6 +21,58 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### CloudBeaver 22.1.3 - 2022-07-25
+- Scripts can be renamed in the Resource Manager.
+- Different Resource Management improvements have been made.
+### CloudBeaver 22.1.2 - 2022-07-11
+
+- New folders allow users to group:
+  - connections in the Navigator tree;
+  - scripts in the Resource Manager.
+- The Navigator tree and the Resource Manager can be refreshed.
+- The application language can be set in the configuration file.
+- Different bugs have been fixed.
+
+### CloudBeaver 22.1.1 - 2022-06-27
+
+- New types of messages have been added to the Log Viewer.
+- Formatting can be undone in the SQL Editor.
+- "Link with editor" now also synchronizes the active SQL Editor with the element in the Database Navigator.
+- Additional confirmations were added in case there are any unsaved changes in result sets. Applied for the following actions: logout, connection disconnect, connection delete.
+- The cookies can be disabled via the configuration file.
+- SQL query execution time limit can be configured now.
+- Different bug fixes and enhancements have been made.
+
+### CloudBeaver 22.1.0 - 2022-06-06
+
+Changes since 22.0.0
+- The new Resource Manager allows users to store and manage scripts in CloudBeaver.
+- Data Editor:
+  - The auto-refresh tool has been added to update table data automatically;
+  - Big values can be saved to an external file;
+  - The Value panel supports BLOB images.
+- SQL Editor:
+  - Object names can be added to the SQL Editor field by dragging them from the Navigator Tree;
+  - The SQL Editor for a connection can be opened via URL.
+- Metadata Editor:
+  - Objects DDL can be opened in the SQL Editor.
+- Authentication:
+  - Users can login to the application via Nginx.
+- Connection:
+  - Keep-Alive interval and Connect timeout parameters can be configured for an SSH Tunnel;
+  - SQL Server supports NTLM authentication;
+  - Administrators can use PgPass authentication for PostgreSQL.
+- Administration:
+  - The Resource Manager can be disabled;
+  - Administrators can revoke and return permissions to a user with a single click in the user's dialog.
+- Local configuration:
+  - The size limit of the Resource Manager scripts and the Value panel files can be configured to improve CloudBeaver performance;
+  - SSH key value for a connection can be stored in the configuration file.
+  - Application fields can be returned to a default size by double-clicking on the field's separator.
+- Different bug fixes and enhancements have been made.
+
+
+
 ### CloudBeaver 22.0.5 - 2022-05-23
 - The new Resource manager allows users to store and manage scripts in CloudBeaver.
 - The auto-refresh tool is added to the Data Editor to update table data automatically.

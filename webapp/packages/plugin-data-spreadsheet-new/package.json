@@ -12,15 +12,14 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test"
   },
   "dependencies": {
-    "react-data-grid": "7.0.0-canary.34",
-    "@popperjs/core": "~2.11.2",
-    "react-popper": "~2.2.5"
+    "@popperjs/core": "~2.11.5",
+    "react-popper": "~2.3.0"
   },
   "peerDependencies": {
-    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
@@ -43,7 +42,9 @@
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
-    "react": "~17.x.x",
+    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
+    "@cloudbeaver/plugin-react-data-grid": "~0.1.0",
+    "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
     "reshadow": "~0.x.x"

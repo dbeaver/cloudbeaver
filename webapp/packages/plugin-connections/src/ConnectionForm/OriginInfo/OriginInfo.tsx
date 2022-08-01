@@ -9,12 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, Loader, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoForm, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { TabContainerPanelComponent, AuthenticationProvider, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
@@ -25,6 +23,9 @@ const style = css`
   ColoredContainer {
     flex: 1;
     overflow: auto;
+  }
+  ExceptionMessage {
+    padding: 16px;
   }
 `;
 
@@ -37,7 +38,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
-  const userInfoService = useService(UserInfoResource);
+  // const userInfoService = useService(UserInfoResource);
   const state = useTabState<Record<string, any>>();
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
@@ -45,7 +46,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     key: tab.selected ? info!.id : null,
     includes: ['includeOrigin', 'customIncludeOriginDetails'],
   }, {
-    isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
+    // isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
     onData: (connection, res, prev) => {
       if (!connection.origin.details) {
         return;
@@ -81,15 +82,15 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  const authorized = !info?.origin || userInfoService.hasOrigin(info.origin);
+  // const authorized = !info?.origin || userInfoService.hasOrigin(info.origin);
 
-  if (!authorized && info?.origin) {
-    return styled(styles)(
-      <ColoredContainer parent vertical>
-        <AuthenticationProvider origin={info.origin} onAuthenticate={connection.reload} />
-      </ColoredContainer>
-    );
-  }
+  // if (!authorized && info?.origin) {
+  //   return styled(styles)(
+  //     <ColoredContainer parent vertical>
+  //       <AuthenticationProvider origin={info.origin} onAuthenticate={connection.reload} />
+  //     </ColoredContainer>
+  //   );
+  // }
 
   if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
     return styled(styles)(

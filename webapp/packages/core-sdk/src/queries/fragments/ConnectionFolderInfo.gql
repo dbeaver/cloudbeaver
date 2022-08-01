@@ -1,0 +1,4 @@
+fragment ConnectionFolderInfo on ConnectionFolderInfo {
+    id
+    description
+}

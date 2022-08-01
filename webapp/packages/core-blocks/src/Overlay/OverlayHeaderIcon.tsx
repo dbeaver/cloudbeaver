@@ -19,7 +19,7 @@ interface Props {
   className?: string;
 }
 
-export const OverlayHeaderIcon: React.FC<Props> = function OverlayHeaderIcon({ icon, viewBox, className, children }) {
+export const OverlayHeaderIcon: React.FC<React.PropsWithChildren<Props>> = function OverlayHeaderIcon({ icon, viewBox, className, children }) {
   const style = useStyles(OVERLAY_BASE_STYLES);
 
   if (!icon && !children) {

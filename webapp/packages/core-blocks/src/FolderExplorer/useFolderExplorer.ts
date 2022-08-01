@@ -7,33 +7,55 @@
  */
 
 import { action, observable } from 'mobx';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { useObservableRef } from '../useObservableRef';
-import { FolderExplorerContext, IFolderExplorerContext, IFolderExplorerOptions } from './FolderExplorerContext';
+import { useUserData } from '../useUserData';
+import { FolderExplorerContext, IFolderExplorerContext, IFolderExplorerOptions, IFolderExplorerState } from './FolderExplorerContext';
 
 export function useFolderExplorer(root: string, options: IFolderExplorerOptions = {}): IFolderExplorerContext {
   const context = useContext(FolderExplorerContext);
 
-  const state = useObservableRef<IFolderExplorerContext>(() => ({
+  const userState = useUserData<IFolderExplorerState>(
+    `folders-explorer-${root}`,
+    () => ({
+      path: [],
+      fullPath: [root],
+      folder: root,
+    }),
+    () => { },
+    data => (
+      typeof data === 'object'
+      && typeof data.folder === 'string'
+      && Array.isArray(data.path)
+      && Array.isArray(data.fullPath)
+    )
+  );
+
+  useMemo(action(() => {
+    if (!options.saveState) {
+      userState.folder = root;
+      userState.fullPath = [root];
+      userState.path = [];
+    }
+  }), [userState]);
+
+  const data = useObservableRef<IFolderExplorerContext>(() => ({
     root,
-    path: [],
-    fullPath: [root],
-    folder: root,
     options,
     open(path: string[], folder: string) {
-      this.path = path.slice();
-      this.fullPath = [...path, folder];
-      this.folder = folder;
+      this.state.path = path.slice();
+      this.state.fullPath = [...path, folder];
+      this.state.folder = folder;
     },
   }), {
     root: observable,
-    path: observable,
-    fullPath: observable,
-    folder: observable,
+    state: observable.ref,
     options: observable.ref,
     open: action.bound,
-  }, false);
+  }, {
+    state: userState,
+  });
 
-  return context || state;
+  return context || data;
 }

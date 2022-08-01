@@ -17,16 +17,20 @@ mkdir cloudbeaver\conf
 mkdir cloudbeaver\workspace
 mkdir cloudbeaver\web
 
+echo Pull cloudbeaver platform
+
+cd ..\..
+rem IF NOT EXIST react-data-grid git clone https://github.com/dbeaver/react-data-grid.git
+
 echo Pull dbeaver platform
 
-cd ../..
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 cd cloudbeaver\deploy
 
 echo Build cloudbeaver server
 
 cd ..\server\product\aggregate
-call mvn clean package -Dheadless-platform
+call mvn clean verify -Dheadless-platform
 
 cd ..\..\..\deploy
 
@@ -48,9 +52,18 @@ move drivers cloudbeaver >NUL
 
 echo Build static content
 
-cd ..\webapp
+cd ..\
+
+rem cd ..\react-data-grid
+rem call npm i
+rem call npm run build
+rem call npm run build:types
+rem call yarn link
+
+cd ..\cloudbeaver\webapp
 
 call yarn
+rem call yarn link "react-data-grid"
 call lerna bootstrap
 call lerna run build --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
 

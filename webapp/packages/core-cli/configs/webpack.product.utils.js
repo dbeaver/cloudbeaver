@@ -3,7 +3,7 @@ const { resolve } = require('path');
 const paths = [resolve('.')];
 
 function withTimestamp(version) {
-  return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`
+  return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`;
 }
 
 function getCloudbeaverDeps(package) {
@@ -12,7 +12,7 @@ function getCloudbeaverDeps(package) {
   }
 
   return Object.keys(package.dependencies)
-    .filter(dependency => /@cloudbeaver\/(.*?)/.test(dependency))
+    .filter(dependency => /@cloudbeaver\/(.*?)/.test(dependency));
 }
 
 function scanCloudbeaverDeps(package) {
@@ -23,13 +23,13 @@ function scanCloudbeaverDeps(package) {
     const dependency = list.shift();
 
     if (!deps.has(dependency)) {
-      list.push(...getCloudbeaverDeps(require(resolve('../../node_modules', dependency, 'package.json'))))
+      list.push(...getCloudbeaverDeps(require(resolve('../../node_modules', dependency, 'package.json'))));
     }
 
     deps.add(dependency);
   }
 
-  return Array.from(deps.keys())
+  return Array.from(deps.keys());
 }
 
 function getAssets(package, to) {
@@ -39,10 +39,10 @@ function getAssets(package, to) {
 
   patterns.push({ from: './public', to, force: true });
 
-  return patterns.filter(pattern => fs.existsSync(pattern.from))
+  return patterns.filter(pattern => fs.existsSync(pattern.from));
 }
 
-module.exports = { 
-  withTimestamp, 
-  getAssets
-}
+module.exports = {
+  withTimestamp,
+  getAssets,
+};

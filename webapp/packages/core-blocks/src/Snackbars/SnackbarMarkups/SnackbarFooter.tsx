@@ -26,12 +26,12 @@ const SNACKBAR_FOOTER_STYLES = css`
   }
 `;
 
-interface ISnackbarFooter {
+interface Props {
   timestamp: number;
   className?: string;
 }
 
-export const SnackbarFooter: React.FC<ISnackbarFooter> = function SnackbarFooter({ timestamp, className, children }) {
+export const SnackbarFooter: React.FC<React.PropsWithChildren<Props>> = function SnackbarFooter({ timestamp, className, children }) {
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();
 
   return styled(SNACKBAR_FOOTER_STYLES)(

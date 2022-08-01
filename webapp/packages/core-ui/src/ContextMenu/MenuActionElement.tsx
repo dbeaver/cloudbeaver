@@ -11,12 +11,9 @@ import React from 'react';
 import { MenuItem, MenuItemCheckbox, MenuItemRadio, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, Radio } from '@cloudbeaver/core-blocks';
+import { Checkbox, MenuItemElement, menuPanelStyles, Radio } from '@cloudbeaver/core-blocks';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import type { IMenuActionItem } from '@cloudbeaver/core-view';
-
-import { MenuItemElement } from './MenuItemElement';
-import { menuPanelStyles } from './menuPanelStyles';
 
 interface IMenuActionElementProps {
   item: IMenuActionItem;

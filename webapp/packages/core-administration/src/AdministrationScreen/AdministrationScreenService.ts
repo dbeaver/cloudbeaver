@@ -11,7 +11,7 @@ import { computed, observable, makeObservable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
-import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
@@ -66,7 +66,7 @@ export class AdministrationScreenService {
   readonly activationEvent: IExecutor<boolean>;
 
   constructor(
-    private readonly permissionsResource: PermissionsResource,
+    private readonly permissionsResource: SessionPermissionsResource,
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationItemService: AdministrationItemService,

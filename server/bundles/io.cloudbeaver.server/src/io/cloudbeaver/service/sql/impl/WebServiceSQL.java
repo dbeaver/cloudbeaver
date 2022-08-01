@@ -38,7 +38,10 @@ import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.*;
+import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLScriptElement;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
@@ -68,10 +71,15 @@ public class WebServiceSQL implements DBWServiceSQL {
     private static final Log log = Log.getLog(WebServiceSQL.class);
 
     @Override
-    public WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException {
+    public WebSQLContextInfo[] listContexts(
+        @NotNull WebSession session,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @Nullable String contextId
+    ) throws DBWebException {
         List<WebConnectionInfo> conToRead = new ArrayList<>();
         if (connectionId != null) {
-            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, connectionId);
+            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, projectId, connectionId);
             conToRead.add(webConnection);
         } else {
             conToRead.addAll(session.getConnections());
@@ -248,9 +256,11 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException {
+    public WebSQLContextInfo createContext(
+        @NotNull WebSQLProcessor processor, String projectId, String defaultCatalog, String defaultSchema
+    ) throws DBWebException {
         try {
-            return processor.createContext(defaultCatalog, defaultSchema);
+            return processor.createContext(defaultCatalog, defaultSchema, projectId);
         } catch (DBCException e) {
             throw new DBWebException("Error creating execution context", e);
         }
@@ -266,7 +276,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
             sqlContext.setDefaults(catalogName, schemaName);
         } catch (DBCException e) {
-            throw new DBWebException("Error changing context defaul schema/catalog", e);
+            throw new DBWebException("Error changing context default schema/catalog", e);
         }
     }
 

@@ -30,9 +30,9 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
   private currentTask: ITask<any> | null;
 
   constructor(
-    private scheduler: TaskScheduler<string>,
-    private connectionExecutionContextResource: ConnectionExecutionContextResource,
-    private contextId: string
+    private readonly scheduler: TaskScheduler<string>,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly contextId: string
   ) {
     this.currentTask = null;
     makeObservable<this, 'currentTask'>(this, {
@@ -75,11 +75,14 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     await this.connectionExecutionContextResource.destroy(this.contextId);
   }
 
-  async update(defaultCatalog?: string, defaultSchema?: string): Promise<void> {
+  async update(
+    defaultCatalog?: string,
+    defaultSchema?: string
+  ): Promise<IConnectionExecutionContextInfo> {
     if (!this.context) {
       throw new Error('Execution Context not found');
     }
 
-    await this.connectionExecutionContextResource.update(this.contextId, defaultCatalog, defaultSchema);
+    return await this.connectionExecutionContextResource.update(this.contextId, defaultCatalog, defaultSchema);
   }
 }

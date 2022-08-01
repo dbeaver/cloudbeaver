@@ -7,8 +7,9 @@
  */
 
 
-import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/core-app';
 import { KEY_BINDING_OPEN_IN_TAB } from '@cloudbeaver/core-view';
+import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
+import { KEY_BINDING_SQL_EDITOR_EXECUTE, KEY_BINDING_SQL_EDITOR_EXECUTE_NEW, KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT, KEY_BINDING_SQL_EDITOR_FORMAT, KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IShortcut } from './IShortcut';
 
@@ -46,37 +47,49 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
 export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_execute_statement',
-    code: ['Ctrl + Enter'],
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE.keys),
   },
   {
     label: 'sql_editor_shortcut_execute_statement_new_tab',
-    code: ['Ctrl + \\', 'Ctrl + Shift + Enter'],
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.keys),
   },
   {
     label: 'sql_editor_shortcut_execute_script',
-    code: ['Alt + X'],
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.keys),
   },
   {
     label: 'sql_editor_shortcut_show_execution_plan',
-    code: ['Shift + Ctrl + E'],
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.keys),
+  },
+  {
+    label: 'sql_editor_shortcut_format',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT.keys),
   },
   {
     label: 'sql_editor_shortcut_open_editor_in_new_tab',
-    code: [KEY_BINDING_OPEN_IN_TAB.label],
+    code: transformKeys(KEY_BINDING_OPEN_IN_TAB.keys),
   },
 ];
 
 export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
   {
     label: 'navigation_tree_shortcut_enable_filter',
-    code: [KEY_BINDING_ENABLE_FILTER.label],
+    code: transformKeys(KEY_BINDING_ENABLE_FILTER.keys),
   },
   {
     label: 'app_navigationTree_action_collapse_all',
-    code: [KEY_BINDING_COLLAPSE_ALL.label],
+    code: transformKeys(KEY_BINDING_COLLAPSE_ALL.keys),
   },
   {
     label: 'app_navigationTree_action_link_with_editor',
-    code: [KEY_BINDING_LINK_OBJECT.label],
+    code: transformKeys(KEY_BINDING_LINK_OBJECT.keys),
   },
 ];
+
+function transformKeys(keys: string | string[]): string[] {
+  if (!Array.isArray(keys)) {
+    keys = [keys];
+  }
+
+  return keys.map(key => key.toLocaleUpperCase().replace(/\+/ig, ' + '));
+}

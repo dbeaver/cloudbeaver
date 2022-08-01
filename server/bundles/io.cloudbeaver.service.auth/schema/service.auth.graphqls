@@ -4,6 +4,12 @@ enum AuthCredentialEncryption {
     hash
 }
 
+enum AuthStatus {
+    SUCCESS,
+    IN_PROGRESS,
+    ERROR
+}
+
 type AuthCredentialInfo {
     id: ID!
     displayName: String!
@@ -62,8 +68,18 @@ type AuthProviderInfo {
     requiredFeatures: [String!]!
 }
 
+type AuthInfo {
+    redirectLink: String
+
+    authId: String
+
+    authStatus: AuthStatus!
+
+    userTokens: [UserAuthToken!]
+}
+
 type UserAuthToken {
-    # Auth provider used for autgorization
+    # Auth provider used for authorization
     authProvider: ID!
 
     # Auth provider configuration ID
@@ -83,6 +99,7 @@ type UserAuthToken {
 
     # Auth origin
     origin: ObjectOrigin!
+
 }
 
 type UserInfo {
@@ -106,13 +123,12 @@ type UserInfo {
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, configuration: ID, credentials: Object!, linkUser: Boolean): UserAuthToken!
+    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean): AuthInfo!
+
+    authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID, configuration: ID): Boolean
-
-    # Tries to login using active federated session
-    tryFederatedLogin(provider: ID!): UserAuthToken!
 
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo

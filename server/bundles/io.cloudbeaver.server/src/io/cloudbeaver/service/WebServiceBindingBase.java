@@ -27,8 +27,10 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -38,10 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.Set;
 
 /**
@@ -78,7 +77,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return apiInterface.cast(proxyImpl);
     }
 
-    public static TypeDefinitionRegistry loadSchemaDefinition(Class theClass, String schemaPath) throws DBWebException {
+    public static TypeDefinitionRegistry loadSchemaDefinition(Class<?> theClass, String schemaPath) throws DBWebException {
         try (InputStream schemaStream = theClass.getClassLoader().getResourceAsStream(schemaPath)) {
             if (schemaStream == null) {
                 throw new IOException("Schema file '" + schemaPath + "' not found");
@@ -113,9 +112,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env), getServletResponse(env), errorOnNotFound);
     }
 
+    protected static String getProjectReference(DataFetchingEnvironment env) {
+        return env.getArgument("projectId");
+    }
+
     @NotNull
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
-        return getWebConnection(getWebSession(env), env.getArgument("connectionId"));
+        return getWebConnection(getWebSession(env), getProjectReference(env), env.getArgument("connectionId"));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env) {
@@ -124,8 +127,8 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     @NotNull
-    public static WebConnectionInfo getWebConnection(WebSession session, String connectionId) throws DBWebException {
-        return session.getWebConnectionInfo(connectionId);
+    public static WebConnectionInfo getWebConnection(WebSession session, String projectId, String connectionId) throws DBWebException {
+        return session.getWebConnectionInfo(projectId, connectionId);
     }
 
     private class ServiceInvocationHandler implements InvocationHandler {
@@ -149,6 +152,10 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     if (webAction != null) {
                         checkActionPermissions(method, webAction);
                     }
+                    WebProjectAction projectAction = method.getAnnotation(WebProjectAction.class);
+                    if(projectAction != null) {
+                        checkObjectActionPermissions(method, projectAction, args);
+                    }
                     beforeWebActionCall(webAction, method, args);
                     try {
                         return method.invoke(impl, args);
@@ -166,6 +173,42 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
                 // Undeclared exception - wrap
                 throw new InvocationTargetException(ex);
+            }
+        }
+
+        private void checkObjectActionPermissions(Method method, WebProjectAction objectAction, Object[] args) throws DBException {
+            WebSession webSession = findWebSession(env);
+
+            String[] requireProjectPermissions = objectAction.requireProjectPermissions();
+            if (requireProjectPermissions.length > 0) {
+                int objectIdArgumentIndex = -1;
+                for (int i = 0; i < method.getParameters().length; i++) {
+                    Parameter parameter = method.getParameters()[i];
+                    if (parameter.isAnnotationPresent(WebObjectId.class)) {
+                        if (String.class != parameter.getAnnotatedType().getType()) {
+                            throw new DBWebExceptionAccessDenied("Invalid object id type");
+                        }
+                        objectIdArgumentIndex = i;
+                        break;
+                    }
+                }
+
+                if (objectIdArgumentIndex < 0) {
+                    throw new DBWebExceptionAccessDenied("Project id argument not found");
+                }
+
+                String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
+                VirtualProjectImpl project = webSession.getProjectById(projectId);
+                if(project == null) {
+                    throw new DBException("Project not found:" + projectId);
+                }
+                RMProject rmProject = project.getRmProject();
+
+                for (String reqProjectPermission : requireProjectPermissions) {
+                    if (!rmProject.getProjectPermissions().contains(reqProjectPermission)) {
+                        throw new DBWebExceptionAccessDenied("Access denied");
+                    }
+                }
             }
         }
 

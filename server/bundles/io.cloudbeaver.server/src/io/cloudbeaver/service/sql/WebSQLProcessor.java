@@ -67,12 +67,13 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private AtomicInteger contextId = new AtomicInteger();
 
-    WebSQLProcessor(@NotNull  WebSession webSession, @NotNull WebConnectionInfo connection) {
+    WebSQLProcessor(@NotNull WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
 
         syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
+        syntaxManager.init(
+            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
 
         ruleManager = new SQLRuleManager(syntaxManager);
         ruleManager.loadRules(connection.getDataSource(), false);
@@ -111,9 +112,9 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     @NotNull
-    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema) throws DBCException {
+    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema, String projectId) throws DBCException {
         String contextId = connection.getId() + ":" + this.contextId.incrementAndGet();
-        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema);
+        WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema, projectId);
         synchronized (contexts) {
             contexts.put(contextId, contextInfo);
         }
@@ -180,6 +181,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         session.getExecutionContext(),
                         WebSQLProcessor.this,
                         sqlQuery);
+
                     try (DBCStatement dbStat = DBUtils.makeStatement(
                         source,
                         session,
@@ -188,6 +190,22 @@ public class WebSQLProcessor implements WebSessionProvider {
                         webDataFilter.getOffset(),
                         webDataFilter.getLimit()))
                     {
+                        // Set query timeout
+                        int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
+                            .getDouble(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
+                        if (queryTimeout <= 0) {
+                            queryTimeout = CommonUtils.toInt(
+                                getWebSession().getApplication().getAppConfiguration()
+                                    .getResourceQuota(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT));
+                        }
+                        if (queryTimeout > 0) {
+                            try {
+                                dbStat.setStatementTimeout(queryTimeout);
+                            } catch (Throwable e) {
+                                log.debug("Can't set statement timeout:" + e.getMessage());
+                            }
+                        }
+
                         boolean hasResultSet = dbStat.executeStatement();
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {
@@ -279,7 +297,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
             DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
             boolean revertToAutoCommit = false;
-            if (txnManager  != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
+            if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
                 txnManager.setAutoCommit(monitor, false);
                 revertToAutoCommit = true;
             }
@@ -461,7 +479,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
                                 addedValues.get(i), withoutExecution);
                             insertAttributes.put(allAttributes[i], realCellValue);
-                            finalRow[i] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
+                            finalRow[i] = realCellValue;
                         }
                     }
 
@@ -546,11 +564,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (!(realCellValue instanceof DBDValue)) {
             try {
                 realCellValue = updateAttribute.getValueHandler().getValueFromObject(
-                        session,
-                        updateAttribute,
-                        cellRawValue,
-                        false,
-                        true);
+                    session,
+                    updateAttribute,
+                    cellRawValue,
+                    false,
+                    true);
             } catch (DBCException e) {
                 //checks if this function is used only for script generation
                 if (justGenerateScript) {
@@ -607,11 +625,12 @@ public class WebSQLProcessor implements WebSessionProvider {
 
 
     public String readLobValue(
-            @NotNull DBRProgressMonitor monitor,
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String resultsId,
-            @NotNull Integer lobColumnIndex,
-            @Nullable WebSQLResultsRow row) throws DBException {
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @Nullable WebSQLResultsRow row
+    ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
@@ -631,17 +650,17 @@ public class WebSQLProcessor implements WebSessionProvider {
                 boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                 if (isDocumentValue) {
                     rowValues[i] =
-                            makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                        makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
                 } else {
                     Object inputCellValue = row.getData().get(keyAttribute.getOrdinalPosition());
 
                     rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
-                            session,
-                            keyAttribute,
-                            convertInputCellValue(session, keyAttribute,
-                                    inputCellValue, false),
-                            false,
-                            true);
+                        session,
+                        keyAttribute,
+                        convertInputCellValue(session, keyAttribute,
+                            inputCellValue, false),
+                        false,
+                        true);
                 }
                 final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
                 constraint.setOperator(DBCLogicalOperator.EQUALS);
@@ -650,8 +669,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
             dataFilter.addConstraints(constraints);
             DBCStatistics statistics = dataContainer.readData(
-                    executionSource, session, dataReceiver, dataFilter,
-                    0, 1, DBSDataContainer.FLAG_NONE, 1);
+                executionSource, session, dataReceiver, dataFilter,
+                0, 1, DBSDataContainer.FLAG_NONE, 1);
             try {
                 return dataReceiver.createLobFile(session);
             } catch (Exception e) {

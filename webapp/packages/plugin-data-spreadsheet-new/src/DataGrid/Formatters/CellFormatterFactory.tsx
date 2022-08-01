@@ -8,9 +8,10 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
-import type { FormatterProps } from 'react-data-grid';
 
 import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+
 
 import { CellContext } from '../CellRenderer/CellContext';
 import { TableDataContext } from '../TableDataContext';

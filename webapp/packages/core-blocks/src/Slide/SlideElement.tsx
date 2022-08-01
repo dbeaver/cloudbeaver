@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-export const SlideElement: React.FC<Props> = function SlideElement({ children, className }) {
+export const SlideElement: React.FC<React.PropsWithChildren<Props>> = function SlideElement({ children, className }) {
   return (
     <div className={className}>
       {children}

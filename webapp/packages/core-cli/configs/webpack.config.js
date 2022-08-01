@@ -1,20 +1,20 @@
-const { resolve, join } = require('path')
-const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
+const { resolve, join } = require('path');
+const PnpWebpackPlugin = require('pnp-webpack-plugin');
+const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
-  apply (compiler) {
+  apply(compiler) {
     const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/;
-    function doneHook (stats) {
+    function doneHook(stats) {
       stats.compilation.warnings = stats.compilation.warnings.filter(warn => {
         if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
           return false;
         }
-        return true
+        return true;
       });
     }
     if (compiler.hooks) {
@@ -32,37 +32,37 @@ const nodeModules = [
 ];
 
 module.exports = (env, argv) => {
-  process.env.NODE_ENV = argv.mode
-  const devTool = 'source-map' in env && 'source-map'
-  const devMode = argv.mode !== 'production'
-  function getBaseStyleLoaders () {
-    const loaders = []
+  process.env.NODE_ENV = argv.mode;
+  const devTool = 'source-map' in env && 'source-map';
+  const devMode = argv.mode !== 'production';
+  function getBaseStyleLoaders() {
+    const loaders = [];
 
     // Broke styles order in dev mode
     // if (devMode) {
     //  loaders.push('style-loader');
     // } else {
-    loaders.push(MiniCssExtractPlugin.loader)
+    loaders.push(MiniCssExtractPlugin.loader);
     // }
 
-    return loaders
+    return loaders;
   }
 
-  function generateStyleLoaders (options = { hasModule: false, disable: false }) {
-    const moduleScope = options.hasModule ? 'local' : 'global'
+  function generateStyleLoaders(options = { hasModule: false, disable: false }) {
+    const moduleScope = options.hasModule ? 'local' : 'global';
     let modules = {
       mode: moduleScope,
       localIdentName: '[local]___[hash:base64:5]',
-    }
+    };
 
-    if(options.disable) {
+    if (options.disable) {
       modules = false;
     }
 
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
       require('@reshadow/postcss')({ scopeBehaviour: moduleScope }),
-    ]
+    ];
 
     return [
       ...getBaseStyleLoaders(),
@@ -93,7 +93,7 @@ module.exports = (env, argv) => {
           },
         },
       },
-    ]
+    ];
   }
 
   var babelLoader = {
@@ -108,20 +108,22 @@ module.exports = (env, argv) => {
     optimization: {
       removeAvailableModules: false,
       removeEmptyChunks: false,
-      splitChunks: false
+      splitChunks: false,
     },
     output: {
-      pathinfo: false
+      pathinfo: false,
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
-      alias: {
-        "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
-        "react/jsx-runtime": "react/jsx-runtime.js",
-      },
+      // alias: {
+      // "react/jsx-dev-runtime": "react/jsx-dev-runtime.js", // 17->18
+      // "react/jsx-runtime": "react/jsx-runtime.js",
+      // "react/jsx-runtime.js": "react/jsx-runtime", // 18->17
+      // "react/jsx-dev-runtime.js": "react/jsx-dev-runtime"
+      // },
       fallback: {
-        path: require.resolve("path-browserify"),
+        path: require.resolve('path-browserify'),
       },
       plugins: [
         PnpWebpackPlugin,
@@ -201,13 +203,13 @@ module.exports = (env, argv) => {
         insert: linkTag => {
           let reshadowObj = document.getElementById('__reshadow__');
 
-          if(reshadowObj) {
+          if (reshadowObj) {
             document.head.insertBefore(linkTag, reshadowObj);
-          } else { 
-            document.head.appendChild(linkTag)
+          } else {
+            document.head.appendChild(linkTag);
           }
-        }
+        },
       }),
     ],
-  }
-}
+  };
+};

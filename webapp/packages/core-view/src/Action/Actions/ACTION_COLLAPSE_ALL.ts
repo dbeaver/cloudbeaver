@@ -10,4 +10,5 @@ import { createAction } from '../createAction';
 
 export const ACTION_COLLAPSE_ALL = createAction('collapse-all', {
   label: 'collapse-all',
+  icon: '/icons/collapse_sm.svg',
 });

@@ -20,7 +20,7 @@ import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridCo
 import { cellMenuStyles } from './cellMenuStyles';
 
 interface Props {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
@@ -54,11 +54,11 @@ export const CellMenu = observer<Props>(function CellMenu({
     onClick?.();
   }
 
-  function stopPropagation(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function stopPropagation(event: React.MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
   }
 
-  function markStopPropagation(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function markStopPropagation(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventStopPropagationFlag);
   }
 

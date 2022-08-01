@@ -64,6 +64,7 @@ export default [
   ['administration_roles_role_id', 'Role ID'],
   ['administration_roles_role_name', 'Role name'],
   ['administration_roles_role_description', 'Description'],
+  ['administration_roles_role_permissions', 'Permissions'],
   ['administration_roles_role_create_error', 'Create role error'],
   ['administration_roles_role_save_error', 'Save role error'],
   ['administration_roles_role_list_update_success', 'Role list was refreshed'],

@@ -6,13 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function openCenteredPopup(
-  url?: string,
-  target?: string,
+export interface IWindowOptions {
+  url?: string;
+  target?: string;
+  width?: number;
+  height?: number;
+  features?: string;
+}
+
+export function openCenteredPopup({
+  url,
+  target,
   width = 500,
   height = 500,
-  features?: string
-): Window | null {
+  features,
+}: IWindowOptions): Window | null {
   if (window.top === null) {
     return null;
   }

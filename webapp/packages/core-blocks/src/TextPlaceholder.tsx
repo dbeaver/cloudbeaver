@@ -29,7 +29,7 @@ interface Props {
   className?: string;
 }
 
-export const TextPlaceholder: React.FC<Props> = function TextPlaceholder(props) {
+export const TextPlaceholder: React.FC<React.PropsWithChildren<Props>> = function TextPlaceholder(props) {
   return styled(useStyles(TextPlaceholderStyles))(
     <div>
       <span className={props.className}>

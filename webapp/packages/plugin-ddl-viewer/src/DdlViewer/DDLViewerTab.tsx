@@ -9,16 +9,16 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import type { NavNodeTransformViewComponent } from '@cloudbeaver/core-app';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
 export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({
   folderId,
   style,
 }) {
   return styled(useStyles(style))(
-    <Tab tabId={folderId}>
+    <Tab tabId={folderId} title='DDL'>
       <TabIcon icon="/icons/DDL.svg" />
       <TabTitle>DDL</TabTitle>
     </Tab>

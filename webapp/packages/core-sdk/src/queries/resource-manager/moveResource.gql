@@ -1,0 +1,7 @@
+mutation moveResource($projectId: String!, $oldPath: String!, $newPath: String!) {
+  rmMoveResource(
+    projectId:$projectId
+    oldResourcePath: $oldPath
+    newResourcePath: $newPath
+  )
+}

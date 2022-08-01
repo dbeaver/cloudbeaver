@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { ReactNode, useImperativeHandle } from 'react';
+import { forwardRef, ReactNode, useImperativeHandle } from 'react';
 import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureState } from 'reakit';
 import styled, { css, use } from 'reshadow';
 
@@ -59,7 +59,7 @@ const styles = css`
   }
 `;
 
-export const Expandable = observer<Props, ExpandableState>(function Expandable({
+export const Expandable = observer<Props, ExpandableState>(forwardRef(function Expandable({
   label,
   defaultExpanded,
   disabled,
@@ -83,4 +83,4 @@ export const Expandable = observer<Props, ExpandableState>(function Expandable({
       </DisclosureContent>
     </>
   );
-}, { forwardRef: true });
+}));

@@ -128,7 +128,7 @@ export abstract class CachedMapResource<
   isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
 
       //@ts-expect-error fix
       return includes.every(include => metadata.includes.includes(include));
@@ -140,7 +140,7 @@ export abstract class CachedMapResource<
   getException(key: ResourceKey<TKey>): Array<Error | null> | Error | null;
   getException(key: ResourceKey<TKey>): Array<Error | null> | Error | null {
     key = this.transformParam(key);
-    return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
+    return ResourceKeyUtils.map(key, key => this.getMetadata(key).exception);
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
@@ -150,7 +150,7 @@ export abstract class CachedMapResource<
 
     key = this.transformParam(key);
     return ResourceKeyUtils.some(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
 
       return metadata.outdated;
     });
@@ -158,13 +158,13 @@ export abstract class CachedMapResource<
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
     key = this.transformParam(key);
-    return ResourceKeyUtils.some(key, key => this.metadata.get(key).loading);
+    return ResourceKeyUtils.some(key, key => this.getMetadata(key).loading);
   }
 
   markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.loading = true;
     });
   }
@@ -177,7 +177,7 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.loading = false;
     });
   }
@@ -189,7 +189,7 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.exception = exception;
       metadata.outdated = false;
     });
@@ -221,7 +221,7 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.exception = null;
     });
   }
@@ -241,7 +241,7 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.outdated = false;
     });
   }
@@ -259,7 +259,7 @@ export abstract class CachedMapResource<
       }
 
       if (includes) {
-        const metadata = this.metadata.get(key);
+        const metadata = this.getMetadata(key);
 
         //@ts-expect-error fix
         if (includes.some(include => !metadata.includes.includes(include))) {
@@ -275,7 +275,7 @@ export abstract class CachedMapResource<
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined;
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined {
     key = this.transformParam(key);
-    return ResourceKeyUtils.map(key, key => this.data.get(key));
+    return ResourceKeyUtils.map(key, key => this.data.get(this.getKeyRef(key)));
   }
 
   set(key: TKey, value: TValue): void;
@@ -303,7 +303,7 @@ export abstract class CachedMapResource<
     this.onItemDelete.execute(key);
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(key);
-      this.metadata.delete(key);
+      this.deleteMetadata(key);
     });
     this.markUpdated(key);
   }
@@ -361,10 +361,17 @@ export abstract class CachedMapResource<
     }
 
     key = this.transformParam(key) as TKey;
-    return this.data.has(key);
+    return this.data.has(this.getKeyRef(key));
   }
 
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
+    if (param === key) {
+      return true;
+    }
+
+    param = ResourceKeyUtils.mapKey(param, this.getKeyRef.bind(this));
+    key = ResourceKeyUtils.mapKey(key, this.getKeyRef.bind(this));
+
     if (param === key) {
       return true;
     }
@@ -378,7 +385,7 @@ export abstract class CachedMapResource<
     }
     key = this.transformParam(key);
 
-    const metadata = this.metadata.get(ResourceKeyUtils.first(key));
+    const metadata = this.getMetadata(ResourceKeyUtils.first(key));
 
     return metadata.includes;
   }
@@ -400,18 +407,33 @@ export abstract class CachedMapResource<
     return this.includes(param, second);
   }
 
+  getMetadata(param: TKey): ICachedMapResourceMetadata {
+    const metadata = this.metadata.get(this.getKeyRef(param));
+    return metadata;
+  }
+
+  deleteMetadata(param: TKey): void {
+    this.metadata.delete(this.getKeyRef(param));
+  }
+
+  protected getKeyRef(key: TKey): TKey {
+    return key;
+  }
+
   protected dataSet(key: TKey, value: TValue): void {
+    key = this.getKeyRef(key);
     this.data.set(key, value);
   }
 
   protected dataDelete(key: TKey): void {
+    key = this.getKeyRef(key);
     this.data.delete(key);
   }
 
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
 
       for (const include of includes) {
         if (!metadata.includes.includes(include)) {
@@ -440,7 +462,7 @@ export abstract class CachedMapResource<
     }
 
     runInAction(() => ResourceKeyUtils.forEach(key!, key => {
-      const metadata = this.metadata.get(key);
+      const metadata = this.getMetadata(key);
       metadata.outdated = true;
     }));
 

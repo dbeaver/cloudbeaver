@@ -17,7 +17,7 @@ export interface IFilterState {
   filterValue: string;
 }
 
-interface Props {
+interface Props extends React.PropsWithChildren {
   filterState: IFilterState;
   disabled: boolean;
   className?: string;

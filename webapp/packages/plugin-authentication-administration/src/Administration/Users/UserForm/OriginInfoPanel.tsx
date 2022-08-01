@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, Loader, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent, useTab, useTabState, AuthenticationProvider } from '@cloudbeaver/core-ui';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';
@@ -35,7 +35,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
   const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
-  const userInfoService = useService(UserInfoResource);
+  // const userInfoService = useService(UserInfoResource);
   const state = useTabState<IState>(() => ({
     origin: null,
     properties: [],
@@ -51,10 +51,10 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
     origin = user.origins[0];
   }
 
-  const authorized = userInfoService.hasOrigin(origin);
+  // const authorized = userInfoService.hasOrigin(origin);
 
   const load = async () => {
-    if (state.loaded || !origin || !userInfoService.hasOrigin(origin)) {
+    if (state.loaded || !origin /* || !userInfoService.hasOrigin(origin)*/) {
       return;
     }
     state.loading = true;
@@ -109,15 +109,15 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
     );
   }
 
-  if (!authorized) {
-    return styled(style)(
-      <ColoredContainer parent>
-        <Group large>
-          <AuthenticationProvider origin={origin} onAuthenticate={load} />
-        </Group>
-      </ColoredContainer>
-    );
-  }
+  // if (!authorized) {
+  //   return styled(style)(
+  //     <ColoredContainer parent>
+  //       <Group large>
+  //         <AuthenticationProvider origin={origin} onAuthenticate={load} />
+  //       </Group>
+  //     </ColoredContainer>
+  //   );
+  // }
 
   if (!origin || (state.loaded && state.properties.length === 0)) {
     return styled(style)(

@@ -6,7 +6,7 @@ export * from './CommonDialog/RenameDialog';
 export * from './CommonDialog/DialogsPortal';
 
 export * from './Menu/IMenuPanel';
-export { MenuTrigger } from './Menu/MenuPanel/MenuTrigger';
+export { MenuTrigger, type MenuState } from './Menu/MenuPanel/MenuTrigger';
 export * from './Menu/StaticMenu/StaticMenu';
 
 export * from './Menu/models/ComputedContextMenuModel';
@@ -17,3 +17,4 @@ export * from './Menu/models/ComputedMenuPanelModel';
 export * from './Menu/ContextMenu/ContextMenuService';
 export * from './Menu/ContextMenu/IContextMenuItem';
 export * from './Menu/ContextMenu/IMenuContext';
+export * from './manifest';

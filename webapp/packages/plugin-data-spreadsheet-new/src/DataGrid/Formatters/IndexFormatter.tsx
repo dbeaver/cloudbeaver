@@ -6,8 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { FormatterProps } from 'react-data-grid';
+import { useContext } from 'react';
 
-export const IndexFormatter: React.FC<FormatterProps> = function IndexFormatter({ rowIdx }) {
-  return <div>{rowIdx + 1}</div>;
+import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+
+
+import { CellContext } from '../CellRenderer/CellContext';
+
+export const IndexFormatter: React.FC<FormatterProps<IResultSetRowKey>> = function IndexFormatter(props) {
+  const context = useContext(CellContext);
+
+  return <div>{context.position.rowIdx + 1}</div>;
 };

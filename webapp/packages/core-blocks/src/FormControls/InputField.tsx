@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useState } from 'react';
+import { forwardRef, useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -15,9 +15,11 @@ import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
+import { useCombinedHandler } from '../useCombinedHandler';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
+import { useCapsLockTracker } from './useCapsLockTracker';
 
 const INPUT_FIELD_STYLES = css`
     Icon {
@@ -92,7 +94,7 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(function InputField({
+export const InputField: InputFieldType = observer(forwardRef(function InputField({
   name,
   style,
   value: valueControlled,
@@ -117,6 +119,7 @@ export const InputField: InputFieldType = observer(function InputField({
   onCustomCopy,
   ...rest
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
+  const capsLock = useCapsLockTracker();
   const [passwordRevealed, setPasswordRevealed] = useState(false);
   const translate = useTranslate();
   const styles = useStyles(
@@ -149,6 +152,9 @@ export const InputField: InputFieldType = observer(function InputField({
     }
   }, [state, name, context, onChange]);
 
+  const handleBlur = useCombinedHandler(rest.onBlur, capsLock.handleBlur);
+  const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown);
+
   if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;
   }
@@ -165,6 +171,10 @@ export const InputField: InputFieldType = observer(function InputField({
 
   const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
 
+  if (showRevealPasswordButton && capsLock.warn) {
+    description = translate('ui_capslock_on');
+  }
+
   return styled(styles)(
     <field className={className} {...use({ small, medium, large, tiny })}>
       <field-label title={labelTooltip || rest.title}>{children}{required && ' *'}</field-label>
@@ -176,6 +186,8 @@ export const InputField: InputFieldType = observer(function InputField({
           name={name}
           value={value ?? ''}
           onChange={handleChange}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           {...use({ mod })}
           required={required}
         />
@@ -196,11 +208,11 @@ export const InputField: InputFieldType = observer(function InputField({
           </icon-container>
         )}
       </input-container>
-      {description && (
+      {(description || showRevealPasswordButton) && (
         <field-description>
           {description}
         </field-description>
       )}
     </field>
   );
-}, { forwardRef: true });
+}));

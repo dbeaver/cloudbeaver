@@ -10,17 +10,18 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { QuotasService } from '@cloudbeaver/core-app';
 import { Button, IconOrImage, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { QuotasService } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
@@ -112,6 +113,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const quotasService = useService(QuotasService);
   const style = useStyles(styles);
 
+  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+
   const state = useObservableRef(() => ({
     get selectedCell() {
       const selection = this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
@@ -139,17 +142,17 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return '';
     },
     get savedSrc() {
-      return this.model.source.dataManager.retrieveFileDataUrlFromCache(this.selectedCell, this.resultIndex);
-    },
-    get content() {
-      return this.model.source.dataManager.isContent(this.selectedCell, this.resultIndex);
+      return content.retrieveFileDataUrlFromCache(this.selectedCell);
     },
     get canSave() {
-      return this.content || !!this.src;
+      if (this.truncated) {
+        return content.isDownloadable(this.selectedCell);
+      }
+
+      return !!this.src;
     },
     get truncated() {
-      return isResultSetContentValue(this.cellValue)
-        && this.model.source.dataManager.isContentTruncated(this.cellValue);
+      return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
     },
     stretch: false,
     toggleStretch() {
@@ -157,10 +160,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     },
     async save() {
       try {
-        if (!this.content) {
-          download(this.src, '', true);
+        if (this.truncated) {
+          await content.downloadFileData(this.selectedCell);
         } else {
-          await this.model.source.dataManager.downloadFileData(this.selectedCell, this.resultIndex);
+          download(this.src, '', true);
         }
       } catch (exception: any) {
         this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
@@ -187,7 +190,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     const load = async () => {
       try {
-        await model.source.dataManager.resolveFileDataUrl(state.selectedCell, resultIndex);
+        await content.resolveFileDataUrl(state.selectedCell);
       } catch (exception: any) {
         notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
       }
@@ -196,14 +199,16 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     return styled(style)(
       <container>
         <QuotaPlaceholder limit={limit} size={valueSize}>
-          <Button
-            disabled={loading}
-            loading={!!model.source.dataManager.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-              model.source.dataManager.activeElement, state.selectedCell)}
-            onClick={load}
-          >
-            {translate('ui_download')}
-          </Button>
+          {content.isDownloadable(state.selectedCell) && (
+            <Button
+              disabled={loading}
+              loading={!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
+                content.activeElement, state.selectedCell)}
+              onClick={load}
+            >
+              {translate('ui_download')}
+            </Button>
+          )}
         </QuotaPlaceholder>
         <Tools loading={loading} onSave={save} />
       </container>

@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { EPermission, PermissionsResource } from '@cloudbeaver/core-root';
+import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
@@ -59,7 +59,7 @@ string
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    permissionsResource: PermissionsResource,
+    permissionsResource: SessionPermissionsResource,
   ) {
     super(new Map());
 

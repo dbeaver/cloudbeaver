@@ -32,6 +32,8 @@ export default [
   ['connections_connection_edit_search', '搜索'],
   ['connections_connection_edit_search_hosts', '主机名称'],
   ['connections_connection_address', '地址'],
+  ['connections_connection_folder', 'Folder'],
+  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
   ['connections_connection_name', '连接名称'],
   ['connections_connection_access_user_or_role_name', '用户或角色名称'],
   ['connections_connection_access_filter_placeholder', '搜索用户或角色名称'],

@@ -15,6 +15,7 @@ export const ColumnIcon: ICustomColumn = {
   name: '',
   width: 40,
   maxWidth: 40,
+  minWidth: 40,
   frozen: true,
   formatter: IconFormatter,
   order: 1,

@@ -6,10 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable, makeObservable } from 'mobx';
+import { action, observable, makeObservable, computed } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 import { ServerConfigResource, SessionResource } from '@cloudbeaver/core-root';
 import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
@@ -26,12 +28,36 @@ export type ServerLanguageShort = Pick<ServerLanguage, 'isoCode' | 'nativeName'>
 const DEFAULT_LOCALE_NAME = 'en';
 const LANG_SETTINGS_KEY = 'langSettings';
 
+export interface ILocalizationSettings {
+  defaultLanguage: string;
+}
+
+export const defaultThemeSettings: ILocalizationSettings = {
+  defaultLanguage: DEFAULT_LOCALE_NAME,
+};
+
 @injectable()
 export class LocalizationService extends Bootstrap {
+  get currentLanguage(): string {
+    return this.settings.language;
+  }
+
+  get defaultLanguage(): string {
+    if (this.pluginSettings.isValueDefault('defaultLanguage')) {
+      return this.deprecatedPluginSettings.getValue('defaultLanguage');
+    }
+
+    return this.pluginSettings.getValue('defaultLanguage');
+  }
+
   settings = {
     language: DEFAULT_LOCALE_NAME,
   };
+  readonly pluginSettings: PluginSettings<ILocalizationSettings>;
+  /** @deprecated Use settings instead, will be removed in 23.0.0 */
+  readonly deprecatedPluginSettings: PluginSettings<ILocalizationSettings>;
 
+  readonly onChange: ISyncExecutor<string>;
   // observable.shallow - don't treat locales as observables
   private readonly localeMap: Map<string, Map<string, string>> = new Map();
 
@@ -40,18 +66,23 @@ export class LocalizationService extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly sessionResource: SessionResource,
+    private readonly pluginManagerService: PluginManagerService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly settingsService: SettingsService
   ) {
     super();
 
+    this.onChange = new SyncExecutor();
+    this.pluginSettings = this.pluginManagerService.getCoreSettings('localization', defaultThemeSettings);
+    this.deprecatedPluginSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
+    sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
+
     makeObservable<LocalizationService, 'localeMap' | 'setCurrentLocale'>(this, {
       settings: observable,
       localeMap: observable.shallow,
+      defaultLanguage: computed,
       setCurrentLocale: action,
     });
-
-    sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
   }
 
   addProvider(provider: ILocaleProvider): void {
@@ -93,11 +124,14 @@ export class LocalizationService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
-    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
     this.sessionResource.setDefaultLocale(this.settings.language);
   }
 
   async load(): Promise<void> {
+    await this.serverConfigResource.load();
+    this.setCurrentLocale(this.defaultLanguage); // set default app locale
+    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // load user state locale
+    this.sessionResource.setDefaultLocale(this.settings.language);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
     await this.loadLocaleAsync(this.settings.language);
   }
@@ -110,11 +144,12 @@ export class LocalizationService extends Bootstrap {
     if (key === this.settings.language) {
       return;
     }
+    this.sessionResource.setDefaultLocale(this.settings.language);
     await this.sessionResource.changeLanguage(key);
+    this.onChange.execute(key);
   }
 
   private async syncLanguage() {
-    // await this.sessionResource.refreshSilent(); // TODO: remove
     const session = this.sessionResource.data;
 
     if (session) {

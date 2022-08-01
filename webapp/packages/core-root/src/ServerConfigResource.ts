@@ -149,6 +149,12 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     this.navigatorSettingsUpdate = update;
   }
 
+  resetUpdate(): void {
+    if (this.data) {
+      this.syncUpdateData(this.data);
+    }
+  }
+
   unlinkUpdate(): void {
     this.update = {};
 

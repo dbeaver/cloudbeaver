@@ -1,0 +1,21 @@
+{
+  "query": "\n    mutation createConnection($config: ConnectionConfig!) {\n createConnection(config: $config) {\n    id\n  }\n}     ",
+  "variables": {
+    "config": {
+      "name": "PostgreSQL@localhost (1)",
+      "driverId": "postgresql:postgres-jdbc",
+      "host": "localhost",
+      "port": "5432",
+      "databaseName": "postgres",
+      "authModelId": "native",
+      "saveCredentials": true,
+      "credentials": {
+        "userName": "postgres",
+        "userPassword": "postgres"
+      },
+      "providerProperties": {},
+      "properties": {}
+    }
+  },
+  "operationName": "createConnection"
+}

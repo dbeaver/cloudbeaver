@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { InlineEditor } from '@cloudbeaver/core-app';
 import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 import { useWhereFilter } from './useWhereFilter';

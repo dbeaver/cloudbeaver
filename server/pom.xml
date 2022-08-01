@@ -19,13 +19,14 @@
 
     <properties>
         <dbeaver-product>CloudBeaver CE</dbeaver-product>
-        <dbeaver-version>22.1.0</dbeaver-version>
+        <dbeaver-version>22.1.4</dbeaver-version>
     </properties>
 
     <modules>
         <module>bundles</module>
         <module>features</module>
         <module>drivers</module>
+        <module>test</module>
 
         <!-- Products -->
         <module>product</module>

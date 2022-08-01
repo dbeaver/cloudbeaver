@@ -68,6 +68,10 @@ const TABLE_HEADER_MENU_BAR_STYLES = css`
       margin: 0;
       border: 0 !important;
       border-right: 1px solid !important;
+
+      &:first-child, &:last-child {
+        display: none;
+      }
     }
   `;
 

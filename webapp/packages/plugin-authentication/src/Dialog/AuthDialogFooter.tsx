@@ -28,7 +28,7 @@ const styles = css`
   }
 `;
 
-export interface Props {
+export interface Props extends React.PropsWithChildren {
   authAvailable: boolean;
   isAuthenticating: boolean;
   onLogin: () => void;

@@ -41,9 +41,9 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
 
   return styled(useStyles(menuPanelStyles, style))(
     <menu-panel-item title={tooltip ? translate(tooltip) : title}>
-      <menu-item-content>
+      <menu-item-icon>
         {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
-      </menu-item-content>
+      </menu-item-icon>
       <menu-item-text title={title}>
         {title}
       </menu-item-text>

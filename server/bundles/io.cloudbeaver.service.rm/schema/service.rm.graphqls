@@ -8,6 +8,7 @@ type RMProject {
 
     createTime: DateTime!
     creator: String!
+    projectPermissions: [String!]!
 }
 
 type RMResource {
@@ -57,4 +58,10 @@ extend type Mutation {
         projectId: String!,
         resourcePath: String!,
         data: String!): String!
+
+    rmCreateProject(
+        projectName: String!,
+        description: String): ProjectInfo
+
+    rmDeleteProject(projectId: ID!): Boolean!
 }

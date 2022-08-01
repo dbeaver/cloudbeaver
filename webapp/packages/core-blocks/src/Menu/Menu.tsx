@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
@@ -16,28 +16,36 @@ import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 import { useObjectRef } from '../useObjectRef';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
-import { MenuStateContext } from './MenuStateContext';
+import { IMenuState, MenuStateContext } from './MenuStateContext';
 
 interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   label: string;
-  items: React.ReactNode;
+  items: React.ReactNode | (() => React.ReactNode);
+  menuRef?: React.RefObject<IMenuState | undefined>;
   style?: ComponentStyle;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   modal?: boolean;
   visible?: boolean;
   rtl?: boolean;
+  hasBindings?: boolean;
+  panelAvailable?: boolean;
+  getHasBindings?: () => boolean;
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const Menu = observer<IMenuProps, React.ButtonHTMLAttributes<any>>(function Menu({
+export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function Menu({
   label,
   items,
+  menuRef,
   disclosure,
   children,
   style,
   placement,
   visible,
+  hasBindings,
+  panelAvailable,
+  getHasBindings,
   onVisibleSwitch,
   modal,
   rtl,
@@ -46,6 +54,11 @@ export const Menu = observer<IMenuProps, React.ButtonHTMLAttributes<any>>(functi
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
+
+  if (menuRef) {
+  //@ts-expect-error Ref mutation
+    menuRef.current = menu;
+  }
 
   useEffect(() => {
     propsRef.onVisibleSwitch?.(menu.visible);
@@ -63,6 +76,9 @@ export const Menu = observer<IMenuProps, React.ButtonHTMLAttributes<any>>(functi
           menu={menu}
           style={style}
           rtl={rtl}
+          panelAvailable={panelAvailable}
+          hasBindings={hasBindings}
+          getHasBindings={getHasBindings}
         >
           {items}
         </MenuPanel>
@@ -72,7 +88,7 @@ export const Menu = observer<IMenuProps, React.ButtonHTMLAttributes<any>>(functi
 
   return styled(styles)(
     <MenuStateContext.Provider value={menu}>
-      <MenuButton {...menu} {...props}>
+      <MenuButton ref={ref} {...menu} {...props}>
         <box>{children}</box>
       </MenuButton>
       <MenuPanel
@@ -80,9 +96,12 @@ export const Menu = observer<IMenuProps, React.ButtonHTMLAttributes<any>>(functi
         menu={menu}
         style={style}
         rtl={rtl}
+        panelAvailable={panelAvailable}
+        hasBindings={hasBindings}
+        getHasBindings={getHasBindings}
       >
         {items}
       </MenuPanel>
     </MenuStateContext.Provider>
   );
-}, { forwardRef: true });
+}));

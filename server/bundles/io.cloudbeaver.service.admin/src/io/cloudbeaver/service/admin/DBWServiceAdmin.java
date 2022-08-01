@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWFeatureSet;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -73,7 +76,7 @@ public interface DBWServiceAdmin extends DBWService {
     boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException;
+    List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
@@ -87,13 +90,27 @@ public interface DBWServiceAdmin extends DBWService {
     List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo createConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo copyConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String nodePath,
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
+    WebConnectionInfo updateConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+    boolean deleteConnectionConfiguration(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features

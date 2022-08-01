@@ -204,7 +204,7 @@ public class WebPropertyInfo {
             return basicInfo;
         } else if (value instanceof Collection) {
             List<Object> result = new ArrayList<>();
-            for (Object item : (Collection)value) {
+            for (Object item : (Collection<?>)value) {
                 result.add(makePropertyValue(item));
             }
             return result;

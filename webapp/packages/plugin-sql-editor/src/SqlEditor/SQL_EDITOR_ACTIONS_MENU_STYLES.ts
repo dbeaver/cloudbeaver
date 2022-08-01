@@ -59,5 +59,9 @@ export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
     height: 100%;
     margin: 0;
     border: 1px solid !important;
+
+    &:first-child, &:last-child {
+      display: none;
+    }
   }
 `;

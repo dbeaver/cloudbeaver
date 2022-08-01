@@ -21,9 +21,13 @@ export const topAppBarStyles = css`
     }
   `;
 
-export const TopAppBar: React.FC = function TopAppBar({ children }) {
+interface Props extends React.PropsWithChildren {
+  className?: string;
+}
+
+export const TopAppBar: React.FC<Props> = function TopAppBar({ children, className }) {
   return styled(useStyles(topAppBarStyles))(
-    <header>
+    <header className={className}>
       {children}
     </header>
   );

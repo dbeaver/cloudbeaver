@@ -22,11 +22,14 @@ const defaultSettings = {
 
 export type CoreSettings = typeof defaultSettings;
 
+/**
+ * @deprecated use plugin-log-viewer, core-navigation-tree settings instead
+ */
 @injectable()
 export class CoreSettingsService {
   readonly settings: PluginSettings<CoreSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
+    this.settings = this.pluginManagerService.getDeprecatedPluginSettings('core', defaultSettings);
   }
 }

@@ -10,14 +10,18 @@ import type { ISettingsSource } from '@cloudbeaver/core-settings';
 
 export class PluginSettings<T> implements ISettingsSource {
   constructor(
-    private source: ISettingsSource,
-    private scope: string,
-    private defaults: T
+    private readonly source: ISettingsSource,
+    private readonly scope: string,
+    private readonly defaults: T
   ) {
   }
 
   has<TKey extends keyof T>(key: TKey): boolean {
     return true;
+  }
+
+  isValueDefault<TKey extends keyof T>(key: TKey): boolean {
+    return !this.source.has(this.scopedKey(key));
   }
 
   getValue<TKey extends keyof T>(key: TKey): T[TKey] {

@@ -31,6 +31,9 @@ const tabsStyles = css`
   `;
 
 const administrationStyles = css`
+    SlideElement {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
     container {
       composes: theme-background-secondary theme-text-on-secondary from global;
       display: flex;
@@ -66,7 +69,7 @@ interface Props {
   onItemSelect: (name: string) => void;
 }
 
-export const Administration = observer<Props>(function Administration({
+export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
   configurationWizard, activeScreen, onItemSelect, children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);

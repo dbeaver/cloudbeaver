@@ -21,7 +21,7 @@ const styles = css`
     }
   `;
 
-export const Code: React.FC<Props> = function Code({ children, className }) {
+export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ children, className }) {
   return styled(useStyles(styles))(
     <code-container className={className}>
       <code>

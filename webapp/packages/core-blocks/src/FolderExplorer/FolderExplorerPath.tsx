@@ -31,7 +31,7 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
     throw new Error('Folder explorer context should be provided');
   }
 
-  if (context.fullPath.length <= 1) {
+  if (context.state.fullPath.length <= 1) {
     return null;
   }
 
@@ -39,12 +39,12 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
   let skip = false;
   let skipTitle = '';
 
-  for (let i = 0; i < context.fullPath.length; i++) {
-    const folder = context.fullPath[i];
-    const path = context.fullPath.slice(0, i);
+  for (let i = 0; i < context.state.fullPath.length; i++) {
+    const folder = context.state.fullPath[i];
+    const path = context.state.fullPath.slice(0, i);
     const skipFolder = !canSkip || canSkip(folder);
 
-    if (i === 0 || i === context.fullPath.length - 1 || !skipFolder || context.fullPath.length < 5) {
+    if (i === 0 || i === context.state.fullPath.length - 1 || !skipFolder || context.state.fullPath.length < 5) {
       if (skip) {
         pathElements.push(
           <FolderName
@@ -61,7 +61,7 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
           key={i}
           folder={folder}
           path={path}
-          last={i === context.fullPath.length - 1}
+          last={i === context.state.fullPath.length - 1}
           getName={getName}
         />
       );

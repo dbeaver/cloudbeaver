@@ -22,17 +22,17 @@ import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
+import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.admin.impl.WebAdminLogsServlet;
 import io.cloudbeaver.service.admin.impl.WebServiceAdmin;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplication> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -82,13 +82,27 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
 
         .dataFetcher("createConnectionConfiguration",
-            env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).createConnectionConfiguration(
+                getWebSession(env),
+                getProjectReference(env),
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("copyConnectionConfiguration",
-            env -> getService(env).copyConnectionConfiguration(getWebSession(env), env.getArgument("nodePath"), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).copyConnectionConfiguration(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("nodePath"),
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("updateConnectionConfiguration",
-            env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))))
+            env -> getService(env).updateConnectionConfiguration(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("id"),
+                new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("deleteConnectionConfiguration",
-            env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")))
+            env -> getService(env).deleteConnectionConfiguration(
+                getWebSession(env),
+                getProjectReference(env),
+                env.getArgument("id")))
 
         .dataFetcher("getConnectionSubjectAccess",
             env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")))
@@ -147,10 +161,8 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     }
 
     @Override
-    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
-        servletContextHandler.addServlet(
-            new ServletHolder("adminLogs", new WebAdminLogsServlet(application)),
-            application.getServicesURI() + "logs/*");
+    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        servletContext.addServlet("adminLogs", new WebAdminLogsServlet(application), application.getServicesURI() + "logs/*");
     }
 
 }

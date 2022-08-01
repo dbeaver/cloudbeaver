@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
@@ -18,15 +18,9 @@ import { uuid } from '@cloudbeaver/core-utils';
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { StaticImage } from '../StaticImage';
+import type { ILoadableState } from './ILoadableState';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
-
-export interface ILoadableState {
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
-  exception?: Error[] | Error | null;
-  reload?: () => void;
-}
 
 type LoaderState = ILoadableState | {
   loading: boolean;
@@ -41,6 +35,8 @@ interface Props {
   message?: string;
   /** hides message */
   hideMessage?: boolean;
+  /** hides error message */
+  hideException?: boolean;
   /** render loader as overlay with white spinner */
   overlay?: boolean;
   /** loader with white spinner */
@@ -69,6 +65,7 @@ export const Loader = observer<Props>(function Loader({
   overlay,
   message,
   hideMessage,
+  hideException,
   secondary,
   small,
   inline,
@@ -85,6 +82,7 @@ export const Loader = observer<Props>(function Loader({
   const context = useContext(LoaderContext);
   const [loaderId] = useState(() => uuid());
   const [contextState] = useState<ILoaderContext>(() => ({ state: observable(new Set<string>()) }));
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   let exception: Error | null = null;
   let reload: (() => void) | undefined;
@@ -94,29 +92,42 @@ export const Loader = observer<Props>(function Loader({
     state = Array.isArray(state) ? state : [state];
 
     for (const element of state) {
-      if ('loading' in element) {
-        loading = element.loading;
-        loaded = !loading;
-      } else {
+      if (
+        'isLoaded' in element
+        && 'isLoading' in element
+      ) {
         loaded = element.isLoaded();
         loading = element.isLoading();
 
-        if ('exception' in element && element.exception) {
-          if (Array.isArray(element.exception)) {
-            const error = element.exception.find(Boolean);
-
-            if (!error) {
-              continue;
-            }
-
-            exception = error;
-          } else {
-            exception = element.exception;
+        if (loading) {
+          if (element.cancel) {
+            onCancel = element.cancel;
           }
 
-          if ('reload' in element) {
-            reload = element.reload;
+          if (element.isCancelled) {
+            cancelDisabled = element.isCancelled();
           }
+        }
+      } else {
+        loading = element.loading;
+        loaded = !loading;
+      }
+
+      if ('exception' in element && element.exception) {
+        if (Array.isArray(element.exception)) {
+          const error = element.exception.find(Boolean);
+
+          if (!error) {
+            continue;
+          }
+
+          exception = error;
+        } else {
+          exception = element.exception;
+        }
+
+        if ('reload' in element) {
+          reload = element.reload;
         }
       }
     }
@@ -158,17 +169,27 @@ export const Loader = observer<Props>(function Loader({
     }
   }, []);
 
-  if (exception && !loading) {
+  useEffect(() => {
+    if (loaderRef.current) {
+      loaderRef.current.classList.add('animate');
+    }
+  });
+
+  if (exception && !loading && !hideException) {
     return styled(style)(
-      <ExceptionMessage exception={exception} inline={inline || inlineException} onRetry={reload} />
+      <ExceptionMessage
+        exception={exception}
+        inline={inline || inlineException}
+        className={className}
+        onRetry={reload}
+      />
     );
   }
 
   if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
       if (typeof children === 'function') {
-        // TODO: fix type error
-        return <LoaderContext.Provider value={contextState}>{(children as any)()}</LoaderContext.Provider>;
+        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
       } else {
         return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
       }
@@ -181,7 +202,11 @@ export const Loader = observer<Props>(function Loader({
 
   if ((!isVisible && overlay) || !loading) {
     if (overlay) {
-      return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
+      if (typeof children === 'function') {
+        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
+      } else {
+        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
+      }
     }
 
     return null;
@@ -199,23 +224,25 @@ export const Loader = observer<Props>(function Loader({
 
   return styled(style)(
     <LoaderContext.Provider value={contextState}>
-      {overlay && children}
-      <loader className={className} {...use({ small, fullSize, inline })}>
-        <icon><StaticImage icon={spinnerURL} /></icon>
-        {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
-        {onCancel && (
-          <actions>
-            <Button
-              type="button"
-              mod={['unelevated']}
-              disabled={cancelDisabled}
-              onClick={onCancel}
-            >
-              <Translate token='ui_processing_cancel' />
-            </Button>
-          </actions>
-        )}
-      </loader>
+      <>
+        {overlay && children}
+        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline })}>
+          <icon><StaticImage icon={spinnerURL} /></icon>
+          {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
+          {onCancel && (
+            <actions>
+              <Button
+                type="button"
+                mod={['unelevated']}
+                disabled={cancelDisabled}
+                onClick={onCancel}
+              >
+                <Translate token='ui_processing_cancel' />
+              </Button>
+            </actions>
+          )}
+        </loader>
+      </>
     </LoaderContext.Provider>
   );
 });

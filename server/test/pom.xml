@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.cloudbeaver</groupId>
+        <artifactId>cloudbeaver</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>tests</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>io.cloudbeaver.test.platform</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <dependency-resolution>
+                        <extraRequirements>
+                            <requirement>
+                                <type>eclipse-plugin</type>
+                                <id>ch.qos.logback.slf4j</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
+                        </extraRequirements>
+                    </dependency-resolution>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-surefire-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <useUIHarness>false</useUIHarness>
+                    <useUIThread>false</useUIThread>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <application>io.cloudbeaver.product.ce.application</application>
+                    <product>io.cloudbeaver.product.ce.product</product>
+                    <testRuntime>default</testRuntime>
+                    <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
+<!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

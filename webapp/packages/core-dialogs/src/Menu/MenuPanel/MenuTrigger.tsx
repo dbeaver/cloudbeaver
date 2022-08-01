@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { ButtonHTMLAttributes, useCallback, useEffect, useMemo } from 'react';
+import React, { ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import {
   MenuButton, Menu, MenuItem, MenuStateReturn, useMenuState,
   MenuItemCheckbox, MenuItemRadio, MenuInitialState
@@ -24,12 +24,15 @@ import type {
 import { MenuPanelItem } from './MenuPanelItem';
 import { menuPanelStyles } from './menuPanelStyles';
 
+export type MenuState = MenuStateReturn;
+
 /**
  * MenuTrigger
  */
 
 interface IMenuTriggerBaseProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
+  menuRef?: React.RefObject<MenuState | undefined>;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   modal?: boolean;
@@ -50,6 +53,7 @@ interface IMenuTriggerProps extends IMenuTriggerBaseProps {
 
 export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger({
   panel,
+  menuRef,
   getPanel,
   disclosure,
   children,
@@ -64,6 +68,11 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
+
+  if (menuRef) {
+    //@ts-expect-error ref mutation
+    menuRef.current = menu;
+  }
 
   const handleItemClose = useCallback(() => {
     menu.hide();
@@ -242,38 +251,39 @@ interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, '
   style?: ComponentStyle;
 }
 
-export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(function MenuInnerTrigger(
-  props,
-  ref
-) {
-  const { menuItem, style, onItemClose, ...rest } = props;
-  const menu = useMenuState();
+export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(forwardRef(
+  function MenuInnerTrigger(
+    props,
+    ref
+  ) {
+    const { menuItem, style, onItemClose, ...rest } = props;
+    const menu = useMenuState();
 
-  const handleItemClose = useCallback(() => {
-    menu.hide();
-    onItemClose?.();
-  }, [menu.hide, onItemClose]);
+    const handleItemClose = useCallback(() => {
+      menu.hide();
+      onItemClose?.();
+    }, [menu.hide, onItemClose]);
 
-  const handleMouseEnter = useCallback(() => {
-    menuItem.onMouseEnter?.();
-  }, [menuItem.onMouseEnter]);
+    const handleMouseEnter = useCallback(() => {
+      menuItem.onMouseEnter?.();
+    }, [menuItem.onMouseEnter]);
 
-  return styled(useStyles(menuPanelStyles, style))(
-    <>
-      <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
-        <MenuButton ref={ref} {...menu} {...rest}>
-          <box>
-            <MenuPanelItem menuItem={menuItem} style={style} />
-          </box>
-        </MenuButton>
-      </menu-panel-button-wrapper>
-      <MenuPanel
-        panel={menuItem.panel!}
-        menu={menu}
-        style={style}
-        panelAvailable={menuItem.isPanelAvailable}
-        onItemClose={handleItemClose}
-      />
-    </>
-  );
-}, { forwardRef: true });
+    return styled(useStyles(menuPanelStyles, style))(
+      <>
+        <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
+          <MenuButton ref={ref} {...menu} {...rest}>
+            <box>
+              <MenuPanelItem menuItem={menuItem} style={style} />
+            </box>
+          </MenuButton>
+        </menu-panel-button-wrapper>
+        <MenuPanel
+          panel={menuItem.panel!}
+          menu={menu}
+          style={style}
+          panelAvailable={menuItem.isPanelAvailable}
+          onItemClose={handleItemClose}
+        />
+      </>
+    );
+  }));

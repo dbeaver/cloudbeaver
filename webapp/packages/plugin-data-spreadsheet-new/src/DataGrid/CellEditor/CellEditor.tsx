@@ -7,15 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
-import type { EditorProps } from 'react-data-grid';
+import { forwardRef, useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
-import { InlineEditor } from '@cloudbeaver/core-app';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { InlineEditor } from '@cloudbeaver/core-ui';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { EditorProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
@@ -26,7 +26,7 @@ const styles = css`
   }
   box {
     position: absolute;
-    left: -8px;
+    left: 0;
     top: 0;
     width: 0;
     height: 100%;
@@ -44,7 +44,7 @@ export interface IEditorRef {
 
 const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'];
 
-export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(function CellEditor({
+export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(forwardRef(function CellEditor({
   row,
   column,
   onClose,
@@ -150,7 +150,7 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
             onUndo={handleUndo}
           />
         </editor>
-      ), dataGridContext.getEditorPortal()!)}
+      ), dataGridContext.getEditorPortal()!) as any}
     </box>
   );
-}, { forwardRef: true });
+}));

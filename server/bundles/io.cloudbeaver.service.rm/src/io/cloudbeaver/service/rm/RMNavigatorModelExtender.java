@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.service.rm;
 
+import io.cloudbeaver.model.rm.DBNResourceManagerRoot;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNModelExtender;

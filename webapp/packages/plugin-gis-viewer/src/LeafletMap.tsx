@@ -88,7 +88,7 @@ function polyStyle() {
 }
 
 function getCRS(feature?: IGeoJSONFeature): leaflet.CRS {
-  switch (feature?.properties?.srid) {
+  switch (feature?.properties.srid) {
     case 0:
       return leaflet.CRS.Simple;
     case 3857:
@@ -181,7 +181,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
   }, [splitContext.isResizing, splitContext.mode, crs, mapRef]);
 
   return styled(styles, baseStyles)(
-    <MapContainer crs={crs} whenCreated={setMapRef} zoom={12}>
+    <MapContainer ref={setMapRef} crs={crs} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts
         // data={[]}

@@ -37,11 +37,11 @@ const style = css`
   }
 `;
 
-interface IProps {
+interface Props {
   root?: boolean;
 }
 
-export const DisplayError: React.FC<IProps> = function DisplayError({ root, children }) {
+export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children }) {
   return styled(style)(
     <container {...use({ root })}>
       <container-inner-block>

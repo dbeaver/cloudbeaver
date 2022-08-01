@@ -17,11 +17,11 @@ const SNACKBAR_CONTENT_STYLES = css`
   }
 `;
 
-interface ISnackbarContent {
+interface Props {
   className?: string;
 }
 
-export const SnackbarContent: React.FC<ISnackbarContent> = function SnackbarContent({ children, className }) {
+export const SnackbarContent: React.FC<React.PropsWithChildren<Props>> = function SnackbarContent({ children, className }) {
   return styled(SNACKBAR_CONTENT_STYLES)(
     <notification-content as='div' className={className}>
       {children}

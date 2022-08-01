@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import type { ITab } from '@cloudbeaver/core-app';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage';

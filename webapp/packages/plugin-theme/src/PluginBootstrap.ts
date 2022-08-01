@@ -25,7 +25,7 @@ export class PluginBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.menuService.addCreator({
       isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU 
+        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU
         && this.themeService.themes.length > 0
       ),
       getItems(context, items) {

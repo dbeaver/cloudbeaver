@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeNestedMessage: React.FC<Props> = function TreeNodeNestedMessage({
+export const TreeNodeNestedMessage: React.FC<React.PropsWithChildren<Props>> = function TreeNodeNestedMessage({
   className,
   children,
 }) {

@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.DBWFeatureSet;
+import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
+import org.jkiss.utils.ArrayUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -30,6 +33,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     protected String anonymousUserRole;
     protected String defaultUserRole;
     protected boolean resourceManagerEnabled;
+    protected String[] enabledFeatures;
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
@@ -37,7 +41,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.defaultUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.resourceManagerEnabled = true;
-
+        this.enabledFeatures = null;
     }
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
@@ -46,6 +50,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.anonymousUserRole = src.anonymousUserRole;
         this.defaultUserRole = src.defaultUserRole;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
+        this.enabledFeatures = src.enabledFeatures;
     }
 
     @Override
@@ -87,5 +92,26 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     @Override
     public boolean isResourceManagerEnabled() {
         return resourceManagerEnabled;
+    }
+
+    public boolean isFeatureEnabled(String id) {
+        return ArrayUtils.contains(getEnabledFeatures(), id);
+    }
+
+    public boolean isFeaturesEnabled(String[] features) {
+        return ArrayUtils.containsAll(getEnabledFeatures(), features);
+    }
+
+    public String[] getEnabledFeatures() {
+        if (enabledFeatures == null) {
+            // No config - enable all features (+backward compatibility)
+            return WebFeatureRegistry.getInstance().getWebFeatures()
+                .stream().map(DBWFeatureSet::getId).toArray(String[]::new);
+        }
+        return enabledFeatures;
+    }
+
+    public void setEnabledFeatures(String[] enabledFeatures) {
+        this.enabledFeatures = enabledFeatures;
     }
 }

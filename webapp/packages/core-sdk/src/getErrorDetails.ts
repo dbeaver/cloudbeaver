@@ -16,15 +16,15 @@ export interface IErrorDetails {
   errorType?: ServerErrorType;
 }
 
-export function hasDetails(error: Error): error is DetailsError {
+export function hasDetails(error: Error | undefined | null): error is DetailsError {
   return error instanceof DetailsError && error.hasDetails();
 }
 
-export function getErrorDetails(error: Error | DetailsError): IErrorDetails {
-  const exceptionMessage = hasDetails(error) ? error.errorMessage : error.message || error.name;
+export function getErrorDetails(error: Error | DetailsError | undefined | null): IErrorDetails {
+  const exceptionMessage = (hasDetails(error) ? error.errorMessage : error?.message) || error?.name || 'Unknown error';
 
   const details: IErrorDetails = {
-    name: error.name,
+    name: error?.name ?? 'Error',
     message: exceptionMessage,
     hasDetails: hasDetails(error),
   };
