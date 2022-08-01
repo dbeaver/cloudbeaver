@@ -347,7 +347,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
-        if (!project.isShared()) {
+        if (!project.isShared() || application.isConfigurationMode()) {
             this.defaultProject = sessionProject;
         }
     }
