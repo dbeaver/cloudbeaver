@@ -27,7 +27,8 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
-import io.cloudbeaver.service.security.SecurityPluginService;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
+import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -105,7 +106,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     // Configurations
     protected final Map<String, Object> productConfiguration = new HashMap<>();
-    private final Map<String, Object> databaseConfiguration = new HashMap<>();
+    protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
@@ -299,6 +300,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         }
 
+        try {
+            initializeServer();
+        } catch (DBException e) {
+            log.error("Error initializing server", e);
+            return null;
+        }
+
         {
             try {
                 initializeSecurityController();
@@ -323,12 +331,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             System.setSecurityManager(new SecurityManager());
         }
 
-        try {
-            initializeServer();
-        } catch (DBException e) {
-            log.error("Error initializing server", e);
-            return null;
-        }
         runWebServer();
 
         log.debug("Shutdown");
@@ -451,7 +453,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return SecurityPluginService.createSecurityService(this, databaseConfiguration);
+        return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration);
     }
 
     @Nullable
@@ -681,6 +683,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     private void shutdown() {
+        try {
+            if (securityController instanceof CBEmbeddedSecurityController) {
+                ((CBEmbeddedSecurityController) securityController).shutdown();
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
     }
 
@@ -763,8 +772,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return readConfiguration(runtimeConfigFile);
     }
 
-    protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
-        SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
+    protected void finishSecurityServiceConfiguration(@NotNull String adminName,
+                                                      @Nullable String adminPassword,
+                                                      @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
+        if (securityController instanceof CBEmbeddedSecurityController) {
+            ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
+        }
     }
 
     public synchronized void flushConfiguration() throws DBException {

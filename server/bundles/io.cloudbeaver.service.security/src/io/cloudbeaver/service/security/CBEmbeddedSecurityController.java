@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security.internal;
+package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,7 +24,9 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.service.security.internal.db.CBDatabase;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.service.security.db.CBDatabase;
+import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -65,8 +67,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final int TOKEN_HOURS_ALIVE_TIME = 1;
 
-    private static final String CHAR_BOOL_TRUE = "Y";
-    private static final String CHAR_BOOL_FALSE = "N";
+    protected static final String CHAR_BOOL_TRUE = "Y";
+    protected static final String CHAR_BOOL_FALSE = "N";
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
@@ -74,8 +76,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    private final WebApplication application;
-    private final CBDatabase database;
+    protected final WebApplication application;
+    protected final CBDatabase database;
 
     public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
         this.application = application;
@@ -99,7 +101,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters) throws DBCException {
+    public void createUser(String userId, Map<String, String> metaParameters) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
@@ -1622,6 +1624,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             if (i > 0) sql.append(",");
             sql.append("'").append(id.replace("'", "''")).append("'");
         }
+    }
+
+    public void shutdown() {
+        database.shutdown();
+    }
+
+    public void finishConfiguration(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
+        database.finishConfiguration(adminName, adminPassword, authInfoList);
     }
 
     ///////////////////////////////////////////
