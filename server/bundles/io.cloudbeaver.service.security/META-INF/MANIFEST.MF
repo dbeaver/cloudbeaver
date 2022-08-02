@@ -15,5 +15,6 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  io.cloudbeaver.model
 Export-Package: io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provider.rp,
- io.cloudbeaver.service.security
+ io.cloudbeaver.service.security,
+ io.cloudbeaver.service.security.db
 Automatic-Module-Name: io.cloudbeaver.service.security
