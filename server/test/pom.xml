@@ -50,7 +50,7 @@
                     <testRuntime>default</testRuntime>
                     <testClass>io.cloudbeaver.test.platform.AllTests</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
-                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>
+<!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>-->
                 </configuration>
             </plugin>
         </plugins>
