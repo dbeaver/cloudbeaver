@@ -176,8 +176,8 @@ public class CBStaticServlet extends DefaultServlet {
 
             putHeaders(response, content, indexBytes.length);
             // Disable cache for index.html
-            response.setHeader(HttpHeader.CACHE_CONTROL.toString(), null);
-            response.setHeader(HttpHeader.EXPIRES.toString(), null);
+            response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache, no-store, must-revalidate");
+            response.setHeader(HttpHeader.EXPIRES.toString(), "0");
 
             response.getOutputStream().write(indexBytes);
 
