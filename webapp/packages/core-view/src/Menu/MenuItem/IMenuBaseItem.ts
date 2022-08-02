@@ -10,28 +10,29 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IMenuItem } from './IMenuItem';
 
-interface IMenuBaseItemCommonProperties {
+interface IMenuBaseItemCommonProperties<TExtraProps = unknown> {
   label?: string;
   icon?: string;
   tooltip?: string;
   hidden?: boolean;
   disabled?: boolean;
-  iconComponent?: () => MenuBaseItemIconComponent;
+  getExtraProps?: () => TExtraProps;
+  iconComponent?: () => MenuBaseItemIconComponent<TExtraProps>;
 }
 
-export type MenuBaseItemIconComponent = React.FC<IIconComponentProps>;
+export type MenuBaseItemIconComponent<TExtraProps = unknown> = React.FC<IIconComponentProps<TExtraProps> & TExtraProps>;
 
-export interface IIconComponentProps {
-  item: IMenuBaseItem;
+export interface IIconComponentProps<TExtraProps = unknown> {
+  item: IMenuBaseItem<TExtraProps>;
   style?: ComponentStyle;
   className?: string;
 }
 
-export interface IMenuBaseItemOptions extends IMenuBaseItemCommonProperties {
+export interface IMenuBaseItemOptions<TExtraProps = unknown> extends IMenuBaseItemCommonProperties<TExtraProps> {
   id: string;
   label: string;
 }
 
-export interface IMenuBaseItem extends IMenuItem, IMenuBaseItemCommonProperties {
+export interface IMenuBaseItem<TExtraProps = unknown> extends IMenuItem, IMenuBaseItemCommonProperties<TExtraProps> {
   label: string;
 }

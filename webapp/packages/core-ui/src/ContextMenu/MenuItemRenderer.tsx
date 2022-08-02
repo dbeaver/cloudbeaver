@@ -76,6 +76,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
 
   if (item instanceof MenuBaseItem) {
     const IconComponent = item.iconComponent?.();
+    const extraProps = item.getExtraProps?.();
 
     return styled(styles)(
       <MenuItem
@@ -85,10 +86,17 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         aria-label={item.label}
         disabled={item.disabled}
         onClick={onClick}
+        {...extraProps}
       >
         <MenuItemElement
           label={item.label}
-          icon={IconComponent ? <IconComponent item={item} style={joinStyles(menuPanelStyles, style)} /> : item.icon}
+          icon={IconComponent ? (
+            <IconComponent
+              item={item}
+              style={joinStyles(menuPanelStyles, style)}
+              {...extraProps}
+            />
+          ) : item.icon}
           tooltip={item.tooltip}
           style={style}
         />
