@@ -641,7 +641,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Access management
 
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        String connectionId
+    ) throws DBWebException {
         try {
             return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjects.DATASOURCE)
                 .stream()
@@ -657,7 +661,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException {
+    public boolean setConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull List<String> subjects
+    ) throws DBWebException {
         DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");

@@ -150,9 +150,17 @@ public interface DBWServiceAdmin extends DBWService {
     // Permissions
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException;
+    SMDataSourceGrant[] getConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        String connectionId) throws DBWebException;
+
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException;
+    boolean setConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull List<String> subjects) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException;
