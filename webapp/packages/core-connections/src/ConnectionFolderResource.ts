@@ -22,9 +22,7 @@ import {
   ResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
-export type ConnectionFolder = ConnectionFolderInfoFragment & {
-  projectId: string;
-};
+export type ConnectionFolder = ConnectionFolderInfoFragment;
 
 export interface IConnectionFolderParam {
   projectId: string;
@@ -143,14 +141,12 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
             this.delete(resourceKeyList(removedFolders));
           }
 
-          projectId = projectId ?? ''; // TODO: remove cast to empty string
-
           this.set(
             resourceKeyList(folders.map<IConnectionFolderParam>(folder => createConnectionFolderParam(
-              projectId ?? '',
+              folder.projectId,
               folder.id,
             ))),
-            folders.map(folder => ({ ...folder, projectId: projectId ?? '' }))
+            folders
           );
         });
       });

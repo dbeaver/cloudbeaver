@@ -179,6 +179,7 @@ export interface ConnectionConfig {
 export interface ConnectionFolderInfo {
   description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
+  projectId: Scalars['ID'];
 }
 
 export interface ConnectionInfo {
@@ -1936,7 +1937,7 @@ export type CreateConnectionFolderMutationVariables = Exact<{
 }>;
 
 
-export type CreateConnectionFolderMutation = { folder: { id: string; description?: string } };
+export type CreateConnectionFolderMutation = { folder: { id: string; projectId: string; description?: string } };
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2040,7 +2041,7 @@ export type GetConnectionFoldersQueryVariables = Exact<{
 }>;
 
 
-export type GetConnectionFoldersQuery = { folders: Array<{ id: string; description?: string }> };
+export type GetConnectionFoldersQuery = { folders: Array<{ id: string; projectId: string; description?: string }> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2182,7 +2183,7 @@ export type AuthProviderConfigurationParametersFragment = { id?: string; display
 
 export type AuthTokenFragment = { authProvider: string; authConfiguration?: string; loginTime: any; message?: string; origin: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> } };
 
-export type ConnectionFolderInfoFragment = { id: string; description?: string };
+export type ConnectionFolderInfoFragment = { id: string; projectId: string; description?: string };
 
 export type DatabaseConnectionFragment = { id: string; projectId: string; name: string; description?: string; driverId: string; template: boolean; connected: boolean; provided: boolean; useUrl: boolean; readOnly: boolean; saveCredentials: boolean; folder?: string; nodePath?: string; host?: string; port?: string; serverName?: string; databaseName?: string; url?: string; properties?: any; providerProperties: any; features: Array<string>; supportedDataFormats: Array<ResultDataFormat>; authNeeded: boolean; authModel?: string; origin?: { type: string; subType?: string; displayName: string; icon?: string; details?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; defaultValue?: any; validValues?: Array<any>; value?: any; length: ObjectPropertyLength; features: Array<string>; order: number }> }; authProperties?: Array<{ id?: string; displayName?: string; description?: string; category?: string; dataType?: string; value?: any; validValues?: Array<any>; defaultValue?: any; length: ObjectPropertyLength; features: Array<string>; order: number }>; networkHandlersConfig: Array<{ id: string; enabled: boolean; authType: NetworkHandlerAuthType; userName?: string; password?: string; key?: string; savePassword: boolean; properties?: any }>; navigatorSettings: { showSystemObjects: boolean; showUtilityObjects: boolean; showOnlyEntities: boolean; mergeEntities: boolean; hideFolders: boolean; hideSchemas: boolean; hideVirtualModel: boolean } };
 
@@ -2673,6 +2674,7 @@ export const AuthTokenFragmentDoc = `
 export const ConnectionFolderInfoFragmentDoc = `
     fragment ConnectionFolderInfo on ConnectionFolderInfo {
   id
+  projectId
   description
 }
     `;
