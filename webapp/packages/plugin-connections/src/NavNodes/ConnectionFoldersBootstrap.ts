@@ -238,14 +238,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
               return false;
             }
 
-            console.log(
-              targetNode.projectId,
-              createPath(folder?.id, trimmed),
-              this.connectionFolderResource.has(createConnectionFolderParam(
-                targetNode.projectId,
-                createPath(folder?.id, trimmed)
-              )));
-
             return !this.connectionFolderResource.has(createConnectionFolderParam(
               targetNode.projectId,
               createPath(folder?.id, trimmed)
