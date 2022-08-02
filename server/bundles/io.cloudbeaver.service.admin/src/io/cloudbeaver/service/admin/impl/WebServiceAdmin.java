@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -641,7 +642,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Access management
 
     @Override
-    public SMDataSourceGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
+    public SMDataSourceGrant[] getConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        String connectionId
+    ) throws DBWebException {
+        DBPProject globalProject = webSession.getProjectById(projectId);
+        if (!CommonUtils.equalObjects(globalProject.getName(), CBApplication.getInstance().getDefaultProjectName())) {
+            throw new DBWebException("Project '" + projectId + "'is not global");
+        }
         try {
             return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjects.DATASOURCE)
                 .stream()
@@ -657,7 +666,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException {
+    public boolean setConnectionSubjectAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull List<String> subjects
+    ) throws DBWebException {
+        DBPProject globalProject = webSession.getProjectById(projectId);
+        if (!CommonUtils.equalObjects(globalProject.getName(), CBApplication.getInstance().getDefaultProjectName())) {
+            throw new DBWebException("Project '" + projectId + "'is not global");
+        }
         DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");
