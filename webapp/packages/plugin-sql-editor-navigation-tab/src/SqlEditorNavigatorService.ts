@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -31,7 +32,7 @@ export interface SQLEditorActionContext {
 export interface ISQLEditorOptions {
   dataSourceKey?: string;
   name?: string;
-  connectionId?: string;
+  connectionKey?: IConnectionInfoParams;
   catalogId?: string;
   schemaId?: string;
   source?: string;
@@ -58,6 +59,7 @@ export class SqlEditorNavigatorService {
     private readonly notificationService: NotificationService,
     private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly sqlResultTabsService: SqlResultTabsService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     navigationService: NavigationService,
     private readonly sqlDataSourceService: SqlDataSourceService
   ) {
@@ -108,7 +110,12 @@ export class SqlEditorNavigatorService {
 
             return (
               tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION
-              && dataSource?.executionContext?.connectionId === data.connectionId
+              && dataSource?.executionContext !== undefined
+              && data.connectionKey !== undefined
+              && this.connectionInfoResource.isKeyEqual(createConnectionParam(
+                dataSource.executionContext.projectId,
+                dataSource.executionContext.connectionId
+              ), data.connectionKey)
             );
           }));
         }
@@ -128,8 +135,8 @@ export class SqlEditorNavigatorService {
             tab = tabInfo.openNewTab(tabOptions);
           }
 
-          if (tab && data.connectionId) {
-            await this.sqlEditorTabService.setConnectionId(tab, data.connectionId, data.catalogId, data.schemaId);
+          if (tab && data.connectionKey) {
+            await this.sqlEditorTabService.setConnectionId(tab, data.connectionKey, data.catalogId, data.schemaId);
           }
           return;
         }

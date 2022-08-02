@@ -42,12 +42,12 @@ export const Main = observer(function Main() {
 
   const styles = useStyles(mainStyles, splitStyles);
   const splitState = useSplitUserState('main');
-  useMapResource(
-    Main,
-    ConnectionExecutionContextResource,
-    CachedMapAllKey
-  );
-  useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
+  // useMapResource(
+  //   Main,
+  //   ConnectionExecutionContextResource,
+  //   CachedMapAllKey
+  // );
+  // useMapResource(Main, ConnectionInfoResource, CachedMapAllKey);
 
   const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
 

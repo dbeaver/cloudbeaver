@@ -8,7 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { ConnectionExecutionContextService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -81,7 +81,9 @@ export class SqlQueryService {
     let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
     let isNewTabCreated = false;
 
-    const connectionInfo = await this.connectionInfoResource.load(contextInfo.connectionId);
+    const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
+
+    const connectionInfo = await this.connectionInfoResource.load(connectionKey);
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
@@ -107,7 +109,7 @@ export class SqlQueryService {
       .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
       .setOptions({
         query: query,
-        connectionId: contextInfo.connectionId,
+        connectionKey,
         constraints: [],
         whereFilter: '',
       })
@@ -155,7 +157,9 @@ export class SqlQueryService {
       return;
     }
 
-    const connectionInfo = await this.connectionInfoResource.load(contextInfo.connectionId);
+    const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
+
+    const connectionInfo = await this.connectionInfoResource.load(connectionKey);
 
     const statisticsTab = this.sqlQueryResultService.createStatisticsTab(editorState);
 
@@ -195,7 +199,7 @@ export class SqlQueryService {
         .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
         .setOptions({
           query: query,
-          connectionId: contextInfo.connectionId,
+          connectionKey,
           constraints: [],
           whereFilter: '',
         })

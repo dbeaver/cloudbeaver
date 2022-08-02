@@ -38,7 +38,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
   private changed: boolean;
 
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
     sessionDataResource: SessionDataResource
   ) {

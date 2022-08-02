@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   Table, TableHeader, TableColumnHeader, TableBody, TableSelect
 } from '@cloudbeaver/core-blocks';
-import type { DatabaseConnection } from '@cloudbeaver/core-connections';
+import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -29,18 +29,19 @@ const styles = css`
   `;
 
 interface Props {
+  keys: IConnectionInfoParams[];
   connections: DatabaseConnection[];
-  selectedItems: Map<string, boolean>;
-  expandedItems: Map<string, boolean>;
+  selectedItems: Map<IConnectionInfoParams, boolean>;
+  expandedItems: Map<IConnectionInfoParams, boolean>;
 }
 
 export const ConnectionsTable = observer<Props>(function ConnectionsTable({
+  keys,
   connections,
   selectedItems,
   expandedItems,
 }) {
   const translate = useTranslate();
-  const keys = connections.map(connection => connection.id);
 
   return styled(useStyles(styles))(
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
@@ -56,7 +57,13 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
-        {connections.map(connection => <Connection key={connection.id} connection={connection} />)}
+        {connections.map((connection, i) => (
+          <Connection
+            key={serializeConnectionParam(keys[i])}
+            connectionKey={keys[i]}
+            connection={connection}
+          />
+        ))}
       </TableBody>
     </Table>
   );

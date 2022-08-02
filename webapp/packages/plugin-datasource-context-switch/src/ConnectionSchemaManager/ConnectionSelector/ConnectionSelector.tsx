@@ -98,11 +98,11 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     isEnabled
     && !connectionInfo.isOutdated()
     && connection?.connected === true
-    && !!connectionSelectorService.activeConnectionId
+    && !!connectionSelectorService.activeConnectionKey
   ));
 
   useDataResource(ConnectionSelector, ContainerResource, {
-    connectionId: connectionSelectorService.activeConnectionId!,
+    ...connectionSelectorService.activeConnectionKey!,
     catalogId: connectionSelectorService.activeObjectCatalogId,
   }, {
     active: contextsActive,
@@ -142,7 +142,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     !optionsPanelService.active
     && (
       connectionSelectorService.isConnectionChangeable
-      || connectionSelectorService.currentConnectionId !== null
+      || connectionSelectorService.currentConnectionKey !== null
     )
   ));
 

@@ -10,7 +10,7 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
@@ -441,7 +441,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return nestedChildren;
   }
 
-  private connectionUpdateHandler(key: ResourceKey<string>) {
+  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
     const outdatedTrees: string[] = [];
     const outdatedFolders: string[] = [];
     const closedConnections: string[] = [];
@@ -482,7 +482,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
   }
 
-  private connectionRemoveHandler(key: ResourceKey<string>) {
+  private connectionRemoveHandler(key: ResourceKey<IConnectionInfoParams>) {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfo.get(key);
 
@@ -493,7 +493,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       let nodePath = connectionInfo.nodePath;
 
       if (!nodePath) {
-        nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+        nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
       }
 
       const node = this.navNodeInfoResource.get(nodePath);

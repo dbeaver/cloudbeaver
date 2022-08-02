@@ -8,7 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
@@ -64,7 +64,7 @@ export class DdlViewerController implements IInitializableController, IDestructi
     const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
 
     if (connection) {
-      this.dialect = await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
+      this.dialect = await this.sqlDialectInfoService.loadSqlDialectInfo(createConnectionParam(connection));
     }
   }
 }

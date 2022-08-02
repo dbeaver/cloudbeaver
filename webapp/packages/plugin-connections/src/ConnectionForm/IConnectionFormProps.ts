@@ -18,6 +18,7 @@ export type ConnectionFormType = 'admin' | 'public';
 export interface IConnectionFormState {
   mode: ConnectionFormMode;
   type: ConnectionFormType;
+  projectId: string | null;
 
   config: ConnectionConfig;
 
@@ -44,7 +45,7 @@ export interface IConnectionFormState {
     mode: ConnectionFormMode,
     type: ConnectionFormType
   ) => this;
-  readonly setConfig: (config: ConnectionConfig) => this;
+  readonly setConfig: (projectId: string, config: ConnectionConfig) => this;
   readonly setAvailableDrivers: (drivers: string[]) => this;
   readonly save: () => Promise<void>;
   readonly test: () => Promise<void>;

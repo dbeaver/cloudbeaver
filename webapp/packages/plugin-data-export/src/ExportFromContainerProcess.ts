@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import {
   AsyncTaskInfo, GraphQLService, ServerInternalError, DataTransferParameters
@@ -22,20 +23,21 @@ export class ExportFromContainerProcess extends Deferred<string> {
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
 
-  constructor(private graphQLService: GraphQLService,
-    private notificationService: NotificationService) {
+  constructor(private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService) {
     super();
   }
 
   async start(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     containerNodePath: string,
     parameters: DataTransferParameters
   ): Promise<string> {
     // start async task
     try {
       const { taskInfo } = await this.graphQLService.sdk.exportDataFromContainer({
-        connectionId,
+        projectId: connectionKey.projectId,
+        connectionId: connectionKey.connectionId,
         containerNodePath,
         parameters,
       });

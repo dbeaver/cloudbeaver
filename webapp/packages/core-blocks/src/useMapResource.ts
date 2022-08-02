@@ -145,7 +145,11 @@ export function useMapResource<
         return true;
       }
 
-      return resource.isKeyEqual(this.loadedKey, this.key);
+      if (this.loadedKey === null) {
+        return false;
+      }
+
+      return resource.includes(this.loadedKey, this.key);
     },
   }), { key });
 
@@ -250,8 +254,11 @@ export function useMapResource<
 
   // TODO: getComputed skips update somehow ...
   const outdated = (
-    (resource.isOutdated(key) || !resource.isLoaded(key, includes as any))
-    && !resource.isDataLoading(key)
+    refObj.key === null
+    || (
+      (resource.isOutdated(key) || !resource.isLoaded(key, includes as any))
+      && !resource.isDataLoading(key)
+    )
   );
 
   const [result] = useState<
@@ -263,7 +270,16 @@ export function useMapResource<
     },
     get exception() {
       refObj.exceptionObserved = true;
-      return refObj.exception || resource.getException(refObj.key);
+
+      if (refObj.exception) {
+        return refObj.exception;
+      }
+
+      if (refObj.key === null) {
+        return null;
+      }
+
+      return resource.getException(refObj.key);
     },
     get data() {
       if (refObj.key === null || !resource.isLoaded(refObj.key, refObj.includes as any)) {

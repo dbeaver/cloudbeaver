@@ -8,7 +8,7 @@
 
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
+import { ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,6 +16,7 @@ import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/cor
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ENodeFeature, ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_ROOT, nodeDeleteContext, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -162,8 +163,16 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
         const connections = nodeIdList
-          .map(nodeId => this.connectionInfoResource.getConnectionForNode(nodeId)?.id)
-          .filter<string>(Boolean as any);
+          .map(nodeId => {
+            const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
+
+            if (connection) {
+              return createConnectionParam(connection);
+            }
+
+            return null;
+          })
+          .filter<IConnectionInfoParams>(Boolean as any);
 
         this.connectionInfoResource.markOutdated(resourceKeyList(connections));
       } catch (exception: any) {
@@ -181,7 +190,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        await this.connectionFolderResource.load(CachedMapAllKey);
         const targetNode = this.getTargetNode(tree);
 
         if (!targetNode) {
@@ -190,10 +198,17 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         const folder = this.connectionFolderResource.fromNodeId(targetNode.id);
 
+        if (!folder) {
+          this.notificationService.logError({ title:'Can\'t create folder', message: 'Project or folder not found' });
+          return;
+        }
+
+        await this.connectionFolderResource.load(ConnectionFolderProjectKey(folder.projectId));
+
         const result = await this.commonDialogService.open(RenameDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           title: 'core_view_action_new_folder',
-          subTitle: folder?.id,
+          subTitle: folder.id,
           icon: '/icons/folder.svg#root',
           create: true,
           validation: (name, setMessage) => {
@@ -204,20 +219,23 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
               return false;
             }
 
-            return this.connectionFolderResource.getFolder(
-              ConnectionFolderResource.baseProject,
-              [folder?.id, trimmed].filter(Boolean).join('/')
-            ) === undefined;
+            return !this.connectionFolderResource.has(createConnectionFolderParam(
+              folder.projectId,
+              createPath(folder.id, trimmed)
+            ));
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
-            await this.connectionFolderResource.create(result, folder?.id);
+            await this.connectionFolderResource.create(createConnectionFolderParam(
+              folder.projectId,
+              result
+            ), folder.id);
             this.navTreeResource.markOutdated(targetNode.parentId);
             this.navTreeResource.markOutdated(targetNode.id);
           } catch (exception: any) {
-            this.notificationService.logException(exception, 'Error occurred while renaming');
+            this.notificationService.logException(exception, 'Can\'t create folder');
           }
         }
 

@@ -8,13 +8,12 @@
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DatabaseConnection, DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionDataResource } from '@cloudbeaver/core-root';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
@@ -33,10 +32,9 @@ export class ConnectionsAdministrationService extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly notificationService: NotificationService,
-    private readonly connectionsResource: ConnectionsResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
-    private readonly sessionDataResource: SessionDataResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly commonDialogService: CommonDialogService
   ) {
@@ -79,12 +77,12 @@ export class ConnectionsAdministrationService extends Bootstrap {
   ): Promise<void> {
     // TODO: we have to track users' leaving the page
     if (outside) {
-      this.connectionsResource.cleanNewFlags();
-      const updated = await this.connectionsResource.updateSessionConnections();
+      this.connectionInfoResource.cleanNewFlags();
+      // const updated = await this.connectionInfoResource.updateSessionConnections();
 
-      if (updated) {
-        this.sessionDataResource.markOutdated();
-      }
+      // if (updated) {
+      //   this.sessionDataResource.markOutdated();
+      // }
     }
   }
 
@@ -117,7 +115,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   private async loadConnections() {
     try {
-      await this.connectionsResource.loadAll();
+      await this.connectionInfoResource.load(CachedMapAllKey);
       await this.dbDriverResource.loadAll();
       await this.networkHandlerResource.loadAll();
     } catch (exception: any) {

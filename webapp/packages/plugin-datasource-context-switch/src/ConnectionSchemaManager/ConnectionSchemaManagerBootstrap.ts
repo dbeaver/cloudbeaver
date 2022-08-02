@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -70,20 +70,30 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
 
         for (const connection of connections) {
+          const connectionKey = createConnectionParam(connection);
+
           items.push(new MenuBaseItem(
             {
-              id: connection.id,
+              id: serializeConnectionParam(connectionKey),
               label: connection.name,
               tooltip: connection.description,
             },
             {
               onSelect: () => {
-                this.connectionSchemaManagerService.selectConnection(connection.id);
+                this.connectionSchemaManagerService.selectConnection(connectionKey);
               },
             },
             {
               iconComponent: () => ConnectionIcon,
-              isDisabled: () => this.connectionSchemaManagerService.currentConnectionId === connection.id,
+              isDisabled: () => (
+                this.connectionSchemaManagerService.currentConnectionKey !== null
+                && this.connectionSchemaManagerService.currentConnectionKey !== undefined
+                && this.connectionInfoResource.isKeyEqual(
+                  this.connectionSchemaManagerService.currentConnectionKey,
+                  connectionKey
+                )
+              ),
+              getExtraProps: () => ({ projectId:connection.projectId, connectionId: connection.id }),
             }
           ));
         }

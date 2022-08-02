@@ -1,3 +1,11 @@
-query setConnectionAccess($connectionId: ID!, $subjects: [ID!]!) {
-  setConnectionSubjectAccess(connectionId: $connectionId, subjects: $subjects)
+query setConnectionAccess(
+  $projectId: ID!
+  $connectionId: ID!
+  $subjects: [ID!]!
+) {
+  setConnectionSubjectAccess(
+    projectId: $projectId
+    connectionId: $connectionId
+    subjects: $subjects
+  )
 }

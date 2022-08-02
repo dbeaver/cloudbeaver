@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { SqlContextInfo } from '@cloudbeaver/core-sdk';
-
-export type IConnectionExecutionContextInfo = SqlContextInfo;
+export const PROJECT_GLOBAL_ID = 'g_GlobalConfiguration';

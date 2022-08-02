@@ -1,5 +1,11 @@
-query getConnectionAccess($connectionId: ID) {
-  subjects: getConnectionSubjectAccess(connectionId: $connectionId) {
+query getConnectionAccess(
+  $projectId: ID!
+  $connectionId: ID!
+) {
+  subjects: getConnectionSubjectAccess(
+    projectId: $projectId
+    connectionId: $connectionId
+  ) {
     connectionId
     dataSourceId
     subjectId

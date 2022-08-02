@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { SqlContextInfo } from '@cloudbeaver/core-sdk';
-
-export type IConnectionExecutionContextInfo = SqlContextInfo;
+export interface IConnectionSelectorExtraProps {
+  projectId: string;
+  connectionId: string;
+}

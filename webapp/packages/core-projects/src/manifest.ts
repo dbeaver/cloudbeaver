@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { ProjectsResource } from './ProjectsResource';
 import { ProjectsService } from './ProjectsService';
 
@@ -19,5 +20,6 @@ export const manifest: PluginManifest = {
   providers: [
     ProjectsResource,
     ProjectsService,
+    LocaleService,
   ],
 };

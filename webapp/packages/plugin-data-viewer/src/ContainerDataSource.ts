@@ -143,6 +143,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         }
         const executionContextInfo = executionContext.context!;
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
+          projectId: executionContextInfo.projectId,
           connectionId: executionContextInfo.connectionId,
           contextId: executionContextInfo.id,
           resultsId: result.id,
@@ -234,7 +235,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       if (!this.options) {
         throw new Error('Options must be provided');
       }
-      this.executionContext = await this.connectionExecutionContextService.create(this.options.connectionId);
+      this.executionContext = await this.connectionExecutionContextService.create(this.options.connectionKey);
     }
     return this.executionContext;
   }

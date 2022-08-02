@@ -1,5 +1,5 @@
-mutation testConnection($config: ConnectionConfig!) {
-  connection: testConnection(config: $config) {
+mutation testConnection($projectId: ID!, $config: ConnectionConfig!) {
+  connection: testConnection(projectId: $projectId, config: $config) {
     id
     connectTime
     connectionError {

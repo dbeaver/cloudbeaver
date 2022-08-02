@@ -10,9 +10,14 @@ import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables,
 
 import type { DatabaseConnection } from './DatabaseConnection';
 
+export interface IConnectionInfoParams {
+  projectId: string;
+  connectionId: string;
+}
+
 export interface IConnectionsResource
-  extends CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables> {
-  update: (config: ConnectionConfig) => Promise<DatabaseConnection>;
-  create: (config: ConnectionConfig) => Promise<DatabaseConnection>;
-  test: (config: ConnectionConfig) => Promise<TestConnectionMutation['connection']>;
+  extends CachedMapResource<IConnectionInfoParams, DatabaseConnection, GetConnectionsQueryVariables> {
+  update: (key: IConnectionInfoParams, config: ConnectionConfig) => Promise<DatabaseConnection>;
+  create: (projectId: string, config: ConnectionConfig) => Promise<DatabaseConnection>;
+  test: (projectId: string, config: ConnectionConfig) => Promise<TestConnectionMutation['connection']>;
 }

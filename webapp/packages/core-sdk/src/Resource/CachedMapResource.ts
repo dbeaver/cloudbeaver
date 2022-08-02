@@ -369,6 +369,10 @@ export abstract class CachedMapResource<
       return true;
     }
 
+    if (this.isAlias(param) || this.isAlias(key)) {
+      return param === key;
+    }
+
     param = ResourceKeyUtils.mapKey(param, this.getKeyRef.bind(this));
     key = ResourceKeyUtils.mapKey(key, this.getKeyRef.bind(this));
 
@@ -376,7 +380,7 @@ export abstract class CachedMapResource<
       return true;
     }
 
-    return ResourceKeyUtils.includes(param, key);
+    return ResourceKeyUtils.includes(param, key, this.isKeyEqual);
   }
 
   getIncludes(key?: ResourceKey<TKey>): string[] {
@@ -399,12 +403,8 @@ export abstract class CachedMapResource<
     }, {});
   }
 
-  isKeyEqual(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
-    if (this.isAlias(param) || this.isAlias(second)) {
-      return true;
-    }
-
-    return this.includes(param, second);
+  isKeyEqual(param: TKey, second: TKey): boolean {
+    return param === second;
   }
 
   getMetadata(param: TKey): ICachedMapResourceMetadata {
@@ -416,7 +416,7 @@ export abstract class CachedMapResource<
     this.metadata.delete(this.getKeyRef(param));
   }
 
-  protected getKeyRef(key: TKey): TKey {
+  getKeyRef(key: TKey): TKey {
     return key;
   }
 

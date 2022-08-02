@@ -9,7 +9,7 @@
 import { action } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -101,7 +101,16 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       });
 
       const dataSource = sqlDataSourceService.get(this.state.editorId);
-      const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId ?? '');
+
+      let connection: Connection | undefined;
+
+      if (dataSource?.executionContext) {
+        connection = this.connectionInfoResource.get({
+          projectId: dataSource.executionContext.projectId,
+          connectionId: dataSource.executionContext.connectionId,
+        });
+      }
+
       const name = getSqlEditorName(this.state, dataSource, connection);
 
       download(blob, generateFileName(name, '.sql'));

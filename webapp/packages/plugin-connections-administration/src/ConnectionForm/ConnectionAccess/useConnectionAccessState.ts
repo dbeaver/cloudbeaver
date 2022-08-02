@@ -8,15 +8,16 @@
 
 import { action, computed, observable } from 'mobx';
 
-import { useTabState } from '@cloudbeaver/core-ui';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
+import { useTabState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { ConnectionsResource } from '../../Administration/ConnectionsResource';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
+
 
 interface State {
   state: IConnectionAccessTabState;
@@ -28,7 +29,7 @@ interface State {
 }
 
 export function useConnectionAccessState(connection: DatabaseConnectionFragment | undefined): Readonly<State> {
-  const resource = useService(ConnectionsResource);
+  const resource = useService(ConnectionInfoResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IConnectionAccessTabState>();
 
@@ -54,7 +55,8 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
         this.state.loading = true;
 
         if (this.connection) {
-          const grantedSubjects = await this.resource.loadAccessSubjects(this.connection.id);
+          const key = createConnectionParam(this.connection);
+          const grantedSubjects = await this.resource.loadAccessSubjects(key);
           this.state.grantedSubjects = grantedSubjects.map(subject => subject.subjectId);
           this.state.initialGrantedSubjects = this.state.grantedSubjects.slice();
         }

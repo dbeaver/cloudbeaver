@@ -13,6 +13,7 @@ import { SESSION_ACTION_OPEN_SQL_EDITOR } from './SESSION_ACTION_OPEN_SQL_EDITOR
 export interface ISessionActionOpenSQLEditor {
   action: typeof SESSION_ACTION_OPEN_SQL_EDITOR;
   'editor-name': string;
+  'project-id': string;
   'connection-id': string;
 }
 

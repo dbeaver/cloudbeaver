@@ -10,11 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ConnectionForm, useConnectionFormState } from '@cloudbeaver/plugin-connections';
-
-import { ConnectionsResource } from '../../ConnectionsResource';
 
 const styles = css`
     box {
@@ -28,13 +27,13 @@ const styles = css`
   `;
 
 interface Props {
-  item: string;
+  item: IConnectionInfoParams;
 }
 
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
   item,
 }) {
-  const connectionsResource = useService(ConnectionsResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const boxRef = useRef<HTMLDivElement>(null);
   // const tableContext = useContext(TableContext);
   // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
@@ -47,11 +46,12 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
   }, []);
 
   const data = useConnectionFormState(
-    connectionsResource,
+    connectionInfoResource,
     state => state.setOptions('edit', 'admin')
   );
 
-  data.config.connectionId = item;
+  data.config.connectionId = item.connectionId;
+  data.projectId = item.projectId;
 
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>

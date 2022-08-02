@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { IMenuContext, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
@@ -78,7 +79,7 @@ export class DataExportMenuService {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
         this.commonDialogService.open(DataExportDialog, {
-          connectionId: connection.id,
+          connectionKey: createConnectionParam(connection),
           containerNodePath: node.id,
         });
       },
@@ -99,7 +100,7 @@ export class DataExportMenuService {
     }
 
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: source.options.connectionId,
+      connectionKey: source.options.connectionKey,
       contextId: context.data.model.source.executionContext?.context?.id,
       containerNodePath: source.options.containerNodePath,
       resultId: result.id,

@@ -75,7 +75,12 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const connection = useMapResource(
     SqlEditor,
     ConnectionInfoResource,
-    dataSource?.executionContext?.connectionId ?? null
+    dataSource?.executionContext
+      ? ({
+        projectId: dataSource.executionContext.projectId,
+        connectionId: dataSource.executionContext.connectionId,
+      })
+      : null
   );
   const driver = useMapResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
   const splitState = useSplitUserState('sql-editor');

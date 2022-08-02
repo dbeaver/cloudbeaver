@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-ui';
@@ -33,7 +33,15 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const connectionInfo = useService(ConnectionInfoResource);
 
   const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
-  const connection = connectionInfo.get(dataSource?.executionContext?.connectionId || '');
+  let connection: Connection | undefined;
+
+  if (dataSource?.executionContext) {
+    connection = connectionInfo.get({
+      projectId: dataSource.executionContext.projectId,
+      connectionId: dataSource.executionContext.connectionId,
+    });
+  }
+
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);

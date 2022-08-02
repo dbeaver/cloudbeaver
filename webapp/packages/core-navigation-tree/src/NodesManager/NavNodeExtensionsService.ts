@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, connectionProvider } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, connectionProvider, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { IExtension } from '@cloudbeaver/core-extensions';
 
@@ -29,8 +29,14 @@ export class NavNodeExtensionsService {
     ];
   }
 
-  getConnection(navNodeId: string) {
-    return this.connectionInfoResource.getConnectionForNode(navNodeId)?.id;
+  getConnection(navNodeId: string): IConnectionInfoParams | undefined {
+    const connection = this.connectionInfoResource.getConnectionForNode(navNodeId);
+
+    if (!connection) {
+      return;
+    }
+
+    return createConnectionParam(connection);
   }
 
   getDBObjectCatalog(navNodeId: string) {

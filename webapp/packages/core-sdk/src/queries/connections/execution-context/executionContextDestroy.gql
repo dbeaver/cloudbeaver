@@ -1,8 +1,10 @@
 mutation executionContextDestroy(
+  $projectId: ID!
   $connectionId: ID!
   $contextId: ID!
 ) {
   sqlContextDestroy(
+    projectId: $projectId
     connectionId: $connectionId
     contextId: $contextId
   )

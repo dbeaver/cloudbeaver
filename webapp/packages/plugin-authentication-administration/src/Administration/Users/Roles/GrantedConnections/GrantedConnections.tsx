@@ -11,16 +11,15 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
   InfoItem, Loader, TextPlaceholder, useMapResource
 } from '@cloudbeaver/core-blocks';
-import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ConnectionsResource } from '@cloudbeaver/plugin-connections-administration';
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
 import { ConnectionList } from './ConnectionList';
@@ -61,7 +60,7 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
   );
   const connections = useMapResource(
     GrantedConnections,
-    ConnectionsResource,
+    ConnectionInfoResource,
     CachedMapAllKey,
     { isActive: () => selected }
   );

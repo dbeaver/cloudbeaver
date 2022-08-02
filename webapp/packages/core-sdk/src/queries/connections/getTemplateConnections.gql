@@ -1,10 +1,11 @@
 query getTemplateConnections(
-  $includeOrigin: Boolean!,
-  $customIncludeOriginDetails: Boolean!,
-  $includeAuthProperties: Boolean!,
+  $projectId: ID
+  $includeOrigin: Boolean!
+  $customIncludeOriginDetails: Boolean!
+  $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
 ) {
-  connections: templateConnections {
+  connections: templateConnections(projectId: $projectId) {
     ...DatabaseConnection
   }
 }

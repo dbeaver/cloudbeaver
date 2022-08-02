@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { SqlDataFilter } from '@cloudbeaver/core-sdk';
 
 export interface IExportContext {
-  connectionId: string;
+  connectionKey: IConnectionInfoParams;
   contextId?: string;
   containerNodePath?: string;
   resultId?: string | null;

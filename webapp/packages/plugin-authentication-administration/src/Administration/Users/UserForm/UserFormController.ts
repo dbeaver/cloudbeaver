@@ -9,14 +9,13 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { ConnectionsResource } from '@cloudbeaver/plugin-connections-administration';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface IStatusMessage {
   status: ENotificationType;
@@ -43,7 +42,7 @@ export class UserFormController implements IInitializableController, IDestructib
   statusMessage: IStatusMessage | null;
 
   get connections(): DatabaseConnection[] {
-    return Array.from(this.connectionsResource.data.values());
+    return Array.from(this.connectionInfoResource.data.values());
   }
 
   get roles(): RoleInfo[] {
@@ -69,7 +68,7 @@ export class UserFormController implements IInitializableController, IDestructib
     private readonly commonDialogService: CommonDialogService,
     private readonly rolesResource: RolesResource,
     private readonly usersResource: UsersResource,
-    private readonly connectionsResource: ConnectionsResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource
   ) {
     makeObservable(this, {
@@ -320,7 +319,7 @@ export class UserFormController implements IInitializableController, IDestructib
   private async loadConnections() {
     try {
       await this.dbDriverResource.loadAll();
-      await this.connectionsResource.loadAll();
+      await this.connectionInfoResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }

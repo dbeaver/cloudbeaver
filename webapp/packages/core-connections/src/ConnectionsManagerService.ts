@@ -13,18 +13,19 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
-import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
+import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
+import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export interface IConnectionExecutorData {
-  connections: string[];
+  connections: IConnectionInfoParams[];
   state: 'before' | 'after';
 }
 
 @injectable()
 export class ConnectionsManagerService {
-  readonly connectionExecutor: IExecutor<string | null>;
+  readonly connectionExecutor: IExecutor<IConnectionInfoParams | null>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
   readonly onDelete: IExecutor<IConnectionExecutorData>;
 
@@ -38,7 +39,14 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
 
-    this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
+    this.connectionExecutor = new Executor<IConnectionInfoParams | null>(null, (active, current) => (
+      active === current
+      || (
+        active !== null
+        && current !== null
+        && connectionInfo.includes(active, current)
+      )
+    ));
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 
@@ -46,9 +54,9 @@ export class ConnectionsManagerService {
     this.onDelete.before(this.onDisconnect);
   }
 
-  async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
+  async requireConnection(key: IConnectionInfoParams | null = null): Promise<Connection | null> {
     try {
-      const context = await this.connectionExecutor.execute(connectionId);
+      const context = await this.connectionExecutor.execute(key);
       const connection = context.getContext(this.connectionContext);
 
       return connection.connection;
@@ -57,17 +65,17 @@ export class ConnectionsManagerService {
     }
   }
 
-  async addOpenedConnection(connection: Connection): Promise<void> {
-    this.addConnection(connection);
+  addOpenedConnection(connection: Connection): void {
+    this.connectionInfo.add(connection);
   }
 
   getObjectContainerById(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     objectCatalogId?: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
     if (objectCatalogId) {
-      const objectContainers = this.containerContainers.getCatalogData(connectionId, objectCatalogId);
+      const objectContainers = this.containerContainers.getCatalogData(connectionKey, objectCatalogId);
 
       if (!objectContainers) {
         return;
@@ -83,14 +91,14 @@ export class ConnectionsManagerService {
     }
 
     if (objectSchemaId) {
-      return this.containerContainers.getSchema(connectionId, objectSchemaId);
+      return this.containerContainers.getSchema(connectionKey, objectSchemaId);
     }
 
     return undefined;
   }
 
-  async deleteConnection(id: string): Promise<void> {
-    const connection = await this.connectionInfo.load(id);
+  async deleteConnection(key: IConnectionInfoParams): Promise<void> {
+    const connection = await this.connectionInfo.load(key);
 
     if (!connection.features.includes(EConnectionFeature.manageable)) {
       return;
@@ -106,7 +114,7 @@ export class ConnectionsManagerService {
     }
 
     const contexts = await this.onDelete.execute({
-      connections: [id],
+      connections: [key],
       state: 'before',
     });
 
@@ -114,10 +122,10 @@ export class ConnectionsManagerService {
       return;
     }
 
-    await this.connectionInfo.deleteConnection(id);
+    await this.connectionInfo.deleteConnection(key);
 
     this.onDelete.execute({
-      connections: [id],
+      connections: [key],
       state: 'after',
     });
   }
@@ -139,7 +147,7 @@ export class ConnectionsManagerService {
     if (!connection.connected) {
       return;
     }
-    await this.connectionInfo.close(connection.id);
+    await this.connectionInfo.close(createConnectionParam(connection));
   }
 
   async closeAllConnections(): Promise<void> {
@@ -161,13 +169,13 @@ export class ConnectionsManagerService {
     }
   }
 
-  async closeConnectionAsync(id: string): Promise<void> {
-    const connection = this.connectionInfo.get(id);
+  async closeConnectionAsync(key: IConnectionInfoParams): Promise<void> {
+    const connection = this.connectionInfo.get(key);
     if (!connection || !connection.connected) {
       return;
     }
     const contexts = await this.onDisconnect.execute({
-      connections: [connection.id],
+      connections: [createConnectionParam(connection)],
       state: 'before',
     });
 
@@ -182,7 +190,7 @@ export class ConnectionsManagerService {
 
       notification.close();
       this.onDisconnect.execute({
-        connections: [connection.id],
+        connections: [createConnectionParam(connection)],
         state: 'after',
       });
     } catch (exception: any) {
@@ -190,12 +198,8 @@ export class ConnectionsManagerService {
     }
   }
 
-  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<IStructContainers> {
-    await this.containerContainers.load({ connectionId, catalogId });
-    return this.containerContainers.get({ connectionId, catalogId })!;
-  }
-
-  private addConnection(connection: Connection) {
-    this.connectionInfo.set(connection.id, connection);
+  async loadObjectContainer(key: IConnectionInfoParams, catalogId?: string): Promise<IStructContainers> {
+    await this.containerContainers.load({ projectId: key.projectId, connectionId: key.connectionId, catalogId });
+    return this.containerContainers.get({ projectId: key.projectId, connectionId: key.connectionId, catalogId })!;
   }
 }

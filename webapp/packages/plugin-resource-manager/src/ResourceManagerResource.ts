@@ -86,7 +86,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     // await this.load({ projectId, folder: folder ? resourcePath : this.getFolder(resourcePath) });
   }
 
-  protected getKeyRef(key: IResourceManagerParams): IResourceManagerParams {
+  getKeyRef(key: IResourceManagerParams): IResourceManagerParams {
     if (this.keys.includes(key)) {
       return key;
     }

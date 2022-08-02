@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 
-import { ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionExecutionContextProjectKey, ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionExecutionContext, IConnectionExecutionContextInfo, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
@@ -111,7 +111,14 @@ export class SqlEditorService {
 
   getName(tabState: ISqlEditorTabState): string {
     const dataSource = this.sqlDataSourceService.get(tabState.editorId);
-    const connection = this.connectionInfoResource.get(dataSource?.executionContext?.connectionId || '');
+    let connection: Connection | undefined;
+
+    if (dataSource?.executionContext) {
+      connection = this.connectionInfoResource.get({
+        projectId: dataSource.executionContext.projectId,
+        connectionId: dataSource.executionContext.connectionId,
+      });
+    }
 
     return getSqlEditorName(tabState, dataSource, connection);
   }
@@ -147,12 +154,12 @@ export class SqlEditorService {
 
   async setConnection(
     state: ISqlEditorTabState,
-    connectionId: string,
+    connectionKey?: IConnectionInfoParams,
     catalogId?: string,
     schemaId?: string
   ): Promise<boolean> {
     try {
-      const executionContext = await this.initContext(connectionId, catalogId, schemaId);
+      const executionContext = await this.initContext(connectionKey, catalogId, schemaId);
       const dataSource = this.sqlDataSourceService.get(state.editorId);
 
       if (!executionContext?.context || !dataSource) {
@@ -174,27 +181,45 @@ export class SqlEditorService {
   }
 
   async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
-    const dataSource = this.sqlDataSourceService.get(state.editorId);
+    return this.sqlDataSourceService.executeAction(
+      state.editorId,
+      async dataSource => {
+        if (!dataSource.executionContext) {
+          console.error('executeEditorQuery executionContext is not provided');
+          return;
+        }
 
-    if (!dataSource?.executionContext) {
-      console.error('executeEditorQuery executionContext is not provided');
-      return;
-    }
+        await this.connectionExecutionContextResource.load(
+          ConnectionExecutionContextProjectKey(dataSource.executionContext.projectId)
+        );
 
-    const context = await this.initContext(
-      dataSource.executionContext.connectionId,
-      dataSource.executionContext.defaultCatalog,
-      dataSource.executionContext.defaultSchema
+        if (this.connectionExecutionContextResource.has(dataSource.executionContext.id)) {
+          return this.connectionExecutionContextService.get(dataSource.executionContext.id);
+        }
+
+        const context = await this.initContext(
+          createConnectionParam(
+            dataSource.executionContext.projectId,
+            dataSource.executionContext.connectionId
+          ),
+          dataSource.executionContext.defaultCatalog,
+          dataSource.executionContext.defaultSchema
+        );
+
+        if (!context?.context) {
+          await this.resetExecutionContext(state);
+          return;
+        }
+
+        dataSource.setExecutionContext({ ...context.context });
+
+        return context;
+      },
+      () => {
+        console.error('executeEditorQuery executionContext is not provided');
+      }
     );
 
-    if (!context?.context) {
-      await this.resetExecutionContext(state);
-      return;
-    }
-
-    dataSource.setExecutionContext({ ...context.context });
-
-    return context;
   }
 
   async canDestroy(state: ISqlEditorTabState): Promise<boolean> {
@@ -206,18 +231,18 @@ export class SqlEditorService {
   }
 
   async initContext(
-    connectionId?: string,
+    connectionKey?: IConnectionInfoParams,
     catalogId?: string,
     schemaId?: string
   ): Promise<IConnectionExecutionContext | null> {
-    const connection = await this.connectionsManagerService.requireConnection(connectionId);
+    const connection = await this.connectionsManagerService.requireConnection(connectionKey);
 
-    if (!connection) {
+    if (!connection || !connectionKey) {
       return null;
     }
 
     try {
-      return await this.connectionExecutionContextService.create(connection.id, catalogId, schemaId);
+      return await this.connectionExecutionContextService.create(connectionKey, catalogId, schemaId);
     } catch (exception: any) {
       this.notificationService.logException(
         exception,

@@ -9,9 +9,9 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, EConnectionFeature, IConnectionsResource } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DatabaseConnection, EConnectionFeature, IConnectionInfoParams, IConnectionsResource } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
-import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
@@ -22,6 +22,7 @@ import type { IConnectionFormState, ConnectionFormMode, ConnectionFormType, ICon
 export class ConnectionFormState implements IConnectionFormState {
   mode: ConnectionFormMode;
   type: ConnectionFormType;
+  projectId: string | null;
 
   config: ConnectionConfig;
 
@@ -48,11 +49,11 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   get info(): DatabaseConnection | undefined {
-    if (!this.config.connectionId) {
+    if (!this.config.connectionId || this.projectId === null) {
       return undefined;
     }
 
-    return this.resource.get(this.config.connectionId);
+    return this.resource.get(createConnectionParam(this.projectId, this.config.connectionId));
   }
 
   get readonly(): boolean {
@@ -97,6 +98,7 @@ export class ConnectionFormState implements IConnectionFormState {
     this.initError = null;
 
     this.resource = resource;
+    this.projectId = null;
     this.config = {};
     this._availableDrivers = [];
     this.stateInfo = null;
@@ -205,7 +207,8 @@ export class ConnectionFormState implements IConnectionFormState {
     return this;
   }
 
-  setConfig(config: ConnectionConfig): this {
+  setConfig(projectId: string, config: ConnectionConfig): this {
+    this.projectId = projectId;
     this.config = config;
     this.reset();
     return this;
@@ -266,8 +269,12 @@ export class ConnectionFormState implements IConnectionFormState {
     this.configured = true;
   }
 
-  private syncInfo(key: ResourceKey<string>) {
-    if (!ResourceKeyUtils.includes(key, this.config.connectionId)) {
+  private syncInfo(key: ResourceKey<IConnectionInfoParams>) {
+    if (
+      !this.config.connectionId
+      || this.projectId === null
+      || !this.resource.includes(key, createConnectionParam(this.projectId, this.config.connectionId))
+    ) {
       return;
     }
 
@@ -275,16 +282,17 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   private async loadInfo(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
-    if (!data.config.connectionId) {
+    if (!data.config.connectionId || data.projectId === null) {
       return;
     }
 
+    const key = createConnectionParam(data.projectId, data.config.connectionId);
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    if (!this.resource.has(data.config.connectionId)) {
+    if (!data.resource.has(key)) {
       return;
     }
 
-    await this.resource.load(data.config.connectionId, configuration.connectionIncludes);
+    await data.resource.load(key, configuration.connectionIncludes);
   }
 }

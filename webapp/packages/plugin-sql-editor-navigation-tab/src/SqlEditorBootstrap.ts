@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, createConnectionParam, IConnectionInfoParams, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -125,7 +125,14 @@ export class SqlEditorBootstrap extends Bootstrap {
               return;
             }
 
-            const connection = this.connectionInfoResource.get(dataSource.executionContext?.connectionId ?? '');
+            let connection: Connection | undefined;
+
+            if (dataSource.executionContext) {
+              connection = this.connectionInfoResource.get({
+                projectId: dataSource.executionContext.projectId,
+                connectionId: dataSource.executionContext.connectionId,
+              });
+            }
 
             const name = getSqlEditorName(state, dataSource, connection);
             const regexp = /^(.*?)(\.\w+)$/ig.exec(name);
@@ -153,7 +160,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
             this.sqlEditorNavigatorService.openNewEditor({
               dataSourceKey: LocalStorageSqlDataSource.key,
-              connectionId: connection.id,
+              connectionKey: createConnectionParam(connection),
             });
             break;
           }
@@ -173,7 +180,7 @@ export class SqlEditorBootstrap extends Bootstrap {
   load(): void { }
 
   private openSQLEditor() {
-    let connectionId: string | undefined;
+    let connectionKey: IConnectionInfoParams | undefined;
     let catalogId: string | undefined;
     let schemaId: string | undefined;
 
@@ -181,18 +188,18 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     if (activeView) {
       ExtensionUtils.from(activeView.extensions)
-        .on(isConnectionProvider, extension => { connectionId = extension(activeView.context); })
+        .on(isConnectionProvider, extension => { connectionKey = extension(activeView.context); })
         .on(isObjectCatalogProvider, extension => { catalogId = extension(activeView.context); })
         .on(isObjectSchemaProvider, extension => { schemaId = extension(activeView.context); });
     } else {
-      connectionId = this.connectionSchemaManagerService.currentConnectionId || undefined;
+      connectionKey = this.connectionSchemaManagerService.currentConnectionKey || undefined;
       catalogId = this.connectionSchemaManagerService.currentObjectCatalogId;
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
 
     this.sqlEditorNavigatorService.openNewEditor({
       dataSourceKey: LocalStorageSqlDataSource.key,
-      connectionId,
+      connectionKey,
       catalogId,
       schemaId,
     });
@@ -206,7 +213,7 @@ export class SqlEditorBootstrap extends Bootstrap {
         this.sqlEditorNavigatorService.openNewEditor({
           dataSourceKey: LocalStorageSqlDataSource.key,
           name: data['editor-name'],
-          connectionId: data['connection-id'],
+          connectionKey: createConnectionParam(data['project-id'], data['connection-id']),
           source: SQL_EDITOR_SOURCE_ACTION,
         });
       } finally {

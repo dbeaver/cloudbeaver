@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionExecutionContextService, Connection } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextService, Connection, createConnectionParam } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNode } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -61,7 +61,7 @@ export class DataViewerTableService {
 
     source
       .setOptions({
-        connectionId: connection.id,
+        connectionKey: createConnectionParam(connection),
         containerNodePath: node?.id ?? '',
         constraints: [],
         whereFilter: '',
