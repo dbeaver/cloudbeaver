@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -251,7 +252,7 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
-    public Set<DBPDriver.ConfigurationType> getConfigurationTypes() {
+    public Set<DBPDriverConfigurationType> getConfigurationTypes() {
         return driver.getConfigurationTypes();
     }
 }

@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.utils.CommonUtils;
@@ -55,7 +55,7 @@ public class WebConnectionConfig {
     private boolean saveCredentials;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
-    private DBPDriver.ConfigurationType configurationType;
+    private DBPDriverConfigurationType configurationType;
 
     public WebConnectionConfig() {
     }
@@ -94,7 +94,7 @@ public class WebConnectionConfig {
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
 
             String configType = JSONUtils.getString(params, "configurationType");
-            configurationType = configType == null ? null : DBPDriver.ConfigurationType.valueOf(configType);
+            configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
 
             networkHandlersConfig = new ArrayList<>();
             for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
@@ -189,7 +189,7 @@ public class WebConnectionConfig {
     }
 
     @Property
-    public DBPDriver.ConfigurationType getConfigurationType() {
+    public DBPDriverConfigurationType getConfigurationType() {
         return configurationType;
     }
 

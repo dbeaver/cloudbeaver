@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -255,10 +255,10 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public DBPDriver.ConfigurationType getConfigurationType() {
-        DBPDriver.ConfigurationType configurationType = dataSourceContainer.getConnectionConfiguration().getConfigurationType();
+    public DBPDriverConfigurationType getConfigurationType() {
+        DBPDriverConfigurationType configurationType = dataSourceContainer.getConnectionConfiguration().getConfigurationType();
         if (configurationType == null) {
-            configurationType = DBPDriver.ConfigurationType.EXTENDED;
+            configurationType = DBPDriverConfigurationType.EXTENDED;
         }
         return configurationType;
     }
