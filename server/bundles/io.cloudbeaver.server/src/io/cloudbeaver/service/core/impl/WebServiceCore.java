@@ -162,7 +162,7 @@ public class WebServiceCore implements DBWServiceCore {
             return Collections.singletonList(folderInfo);
         }
         return webSession.getProjectById(projectId).getDataSourceRegistry().getAllFolders().stream()
-            .map(f -> new WebConnectionFolderInfo(webSession, f)).collect(Collectors.toList());
+            .map(f -> new WebConnectionFolderInfo(webSession, f, projectId)).collect(Collectors.toList());
     }
 
     @Override
@@ -630,7 +630,7 @@ public class WebServiceCore implements DBWServiceCore {
             }
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
-            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
+            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder, sessionRegistry.getProject().getId());
             WebServiceUtils.updateConfigAndRefreshDatabases(session);
 
             return folderInfo;

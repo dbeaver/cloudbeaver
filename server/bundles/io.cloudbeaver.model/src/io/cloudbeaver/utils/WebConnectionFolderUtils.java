@@ -33,7 +33,7 @@ public class WebConnectionFolderUtils {
             folder = session.getProjectById(projectId).getDataSourceRegistry().getFolder(folderPath);
         }
         if (folder != null) {
-            return new WebConnectionFolderInfo(session, folder);
+            return new WebConnectionFolderInfo(session, folder, session.getProjectById(projectId).getId());
         } else {
             throw new DBWebException("Folder '" + folderPath + "' not found");
         }
