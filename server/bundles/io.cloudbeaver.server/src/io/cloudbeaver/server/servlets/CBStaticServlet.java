@@ -168,13 +168,17 @@ public class CBStaticServlet extends DefaultServlet {
             try (InputStream fis = new FileInputStream(file)) {
                 IOUtils.copyStream(fis, baos);
             }
-            String indexContents = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+            String indexContents = baos.toString(StandardCharsets.UTF_8);
             indexContents = indexContents
                 .replace("{ROOT_URI}", CBApplication.getInstance().getRootURI())
                 .replace("{STATIC_CONTENT}", CBApplication.getInstance().getStaticContent());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
 
             putHeaders(response, content, indexBytes.length);
+            // Disable cache for index.html
+            response.setHeader(HttpHeader.CACHE_CONTROL.toString(), null);
+            response.setHeader(HttpHeader.EXPIRES.toString(), null);
+
             response.getOutputStream().write(indexBytes);
 
             return true;
