@@ -166,13 +166,6 @@ public class WebNavigatorNodeInfo {
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
         }
-        if (node instanceof DBNRoot) {
-            return features.toArray(new String[0]);
-        }
-        VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
-        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
-            return features.toArray(new String[0]);
-        }
         if (node instanceof DBNDatabaseNode) {
             DBSObject object = ((DBNDatabaseNode) node).getObject();
             if (object != null) {
@@ -187,7 +180,15 @@ public class WebNavigatorNodeInfo {
                     }
                 }
             }
-        } else if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
+        }
+        if (node instanceof DBNRoot) {
+            return features.toArray(new String[0]);
+        }
+        VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
+        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+            return features.toArray(new String[0]);
+        }
+        if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
             features.add(NODE_FEATURE_CAN_RENAME);
             features.add(NODE_FEATURE_CAN_DELETE);
         }
