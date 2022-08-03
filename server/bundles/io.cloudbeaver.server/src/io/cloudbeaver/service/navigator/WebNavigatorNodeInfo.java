@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.navigator;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
@@ -28,6 +29,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
@@ -164,7 +166,13 @@ public class WebNavigatorNodeInfo {
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
         }
-
+        if (node instanceof DBNRoot) {
+            return features.toArray(new String[0]);
+        }
+        VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
+        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+            return features.toArray(new String[0]);
+        }
         if (node instanceof DBNDatabaseNode) {
             DBSObject object = ((DBNDatabaseNode) node).getObject();
             if (object != null) {
