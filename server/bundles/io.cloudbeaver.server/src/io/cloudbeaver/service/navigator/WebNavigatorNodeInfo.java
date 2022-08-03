@@ -179,8 +179,6 @@ public class WebNavigatorNodeInfo {
                     }
                 }
             }
-        } else if (isShared) {
-            return features.toArray(new String[0]);
         } else if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
             features.add(NODE_FEATURE_CAN_RENAME);
             features.add(NODE_FEATURE_CAN_DELETE);
