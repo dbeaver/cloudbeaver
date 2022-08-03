@@ -126,6 +126,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         if (!applicableDrivers.contains(container.getDriver())) {
                             continue;
                         }
+                        // Skip template connections in the navigator
+                        if (container.isTemplate()) {
+                            continue;
+                        }
                     }
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
