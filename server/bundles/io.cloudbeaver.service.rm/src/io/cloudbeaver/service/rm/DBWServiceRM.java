@@ -88,7 +88,7 @@ public interface DBWServiceRM extends DBWService {
         @NotNull String name,
         @Nullable String description) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = RMConstants.PERMISSION_RM_ADMIN)
+    @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
     boolean deleteProject(
         @NotNull WebSession session,
         @NotNull @WebObjectId String projectId) throws DBWebException;
