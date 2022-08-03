@@ -65,7 +65,7 @@ export class ConnectionFormState implements IConnectionFormState {
       return false;
     }
 
-    if (!this.info?.features.includes(EConnectionFeature.manageable)) {
+    if (!this.info?.canEdit) {
       return true;
     }
 
@@ -260,7 +260,7 @@ export class ConnectionFormState implements IConnectionFormState {
     this.statusMessage = context.statusMessage;
 
     if (this.statusMessage === null && this.mode === 'edit') {
-      if (!this.info?.features.includes(EConnectionFeature.manageable)) {
+      if (!this.info?.canEdit) {
         this.statusMessage = 'connections_connection_edit_not_own_deny';
       }
     }

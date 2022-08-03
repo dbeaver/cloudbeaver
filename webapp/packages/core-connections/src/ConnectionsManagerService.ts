@@ -15,7 +15,6 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
-import { EConnectionFeature } from './EConnectionFeature';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export interface IConnectionExecutorData {
@@ -100,7 +99,7 @@ export class ConnectionsManagerService {
   async deleteConnection(key: IConnectionInfoParams): Promise<void> {
     const connection = await this.connectionInfo.load(key);
 
-    if (!connection.features.includes(EConnectionFeature.manageable)) {
+    if (!connection.canDelete) {
       return;
     }
 

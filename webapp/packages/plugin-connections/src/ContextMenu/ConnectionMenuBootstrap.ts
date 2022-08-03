@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, EConnectionFeature } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -160,10 +160,14 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          return connection.features.includes(EConnectionFeature.manageable);
+          return connection.canDelete;
         }
 
-        return action === ACTION_CONNECTION_EDIT;
+        if (action === ACTION_CONNECTION_EDIT) {
+          return connection.canEdit || connection.canViewSettings;
+        }
+
+        return false;
       },
       handler: async (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);

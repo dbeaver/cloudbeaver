@@ -51,4 +51,8 @@ fragment DatabaseConnection on ConnectionInfo {
   navigatorSettings {
     ...AllNavigatorSettings
   }
+
+  canViewSettings
+  canEdit
+  canDelete
 }
