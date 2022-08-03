@@ -162,7 +162,7 @@ public class WebServiceCore implements DBWServiceCore {
             return Collections.singletonList(folderInfo);
         }
         return webSession.getProjectById(projectId).getDataSourceRegistry().getAllFolders().stream()
-            .map(f -> new WebConnectionFolderInfo(webSession, f, projectId)).collect(Collectors.toList());
+            .map(f -> new WebConnectionFolderInfo(webSession, f)).collect(Collectors.toList());
     }
 
     @Override
@@ -630,8 +630,8 @@ public class WebServiceCore implements DBWServiceCore {
             }
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
-            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder, sessionRegistry.getProject().getId());
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
 
             return folderInfo;
         } catch (DBException e) {
@@ -649,7 +649,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
-        WebServiceUtils.updateConfigAndRefreshDatabases(session);
+        WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         return folderInfo;
     }
 
@@ -666,7 +666,7 @@ public class WebServiceCore implements DBWServiceCore {
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
