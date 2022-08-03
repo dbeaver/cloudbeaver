@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.DataSourceFilter;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -45,7 +47,8 @@ public interface WebApplication extends DBPApplication {
     VirtualProjectImpl createProjectImpl(
         @NotNull RMProject project,
         @NotNull SMSessionContext sessionContext,
-        @NotNull SMCredentialsProvider credentialsProvider);
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DataSourceFilter dataSourceFilter);
 
     SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
 

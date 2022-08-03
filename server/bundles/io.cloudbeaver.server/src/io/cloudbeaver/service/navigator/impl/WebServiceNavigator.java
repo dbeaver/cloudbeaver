@@ -131,10 +131,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             continue;
                         }
 
-                        //TODO node should not contain unaccessible datasource
-                        if (session.findWebConnectionInfo(container.getId()) == null) {
-                            continue;
-                        }
                     }
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
