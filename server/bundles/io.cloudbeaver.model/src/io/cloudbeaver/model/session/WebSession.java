@@ -27,6 +27,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -356,11 +357,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         for (DBPProject project : accessibleProjects) {
+            boolean isGlobalProject = WebAppUtils.isGlobalProject(project);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
             for (DBPDataSourceContainer ds : registry.getDataSources()) {
                 WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                connList.add(connectionInfo);
+                if (isGlobalProject) {
+                    if (isDataSourceAccessible(ds)) {
+                        connList.add(connectionInfo);
+                    }
+                } else {
+                    connList.add(connectionInfo);
+                }
             }
             Throwable lastError = registry.getLastError();
             if (lastError != null) {

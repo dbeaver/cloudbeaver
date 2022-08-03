@@ -25,6 +25,7 @@ import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -95,8 +96,7 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
-        String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
-        return session.getProjectById(RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
+        return session.getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
     }
 
     @NotNull
