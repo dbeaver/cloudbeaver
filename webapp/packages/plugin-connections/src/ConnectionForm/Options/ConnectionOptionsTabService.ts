@@ -123,9 +123,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
       validation.error("Field 'name' can't be empty");
     }
 
-    if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
-      validation.error('connections_connection_folder_validation');
-    }
+    // if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+    //   validation.error('connections_connection_folder_validation');
+    // }
   }
 
   private fillConfig(
