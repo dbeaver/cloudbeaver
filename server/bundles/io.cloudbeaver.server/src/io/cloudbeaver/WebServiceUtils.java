@@ -326,8 +326,8 @@ public class WebServiceUtils extends WebCommonUtils {
         return folder;
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session) {
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
+        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
     }
 

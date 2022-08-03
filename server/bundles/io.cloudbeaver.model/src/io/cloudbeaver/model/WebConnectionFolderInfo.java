@@ -21,14 +21,14 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.meta.Property;
 
 public class WebConnectionFolderInfo {
-    private String projectId;
+    private final String projectId;
     private final WebSession session;
     private final DBPDataSourceFolder dataSourceFolder;
 
-    public WebConnectionFolderInfo(WebSession session, DBPDataSourceFolder dataSourceFolder, String projectId) {
+    public WebConnectionFolderInfo(WebSession session, DBPDataSourceFolder dataSourceFolder) {
         this.session = session;
         this.dataSourceFolder = dataSourceFolder;
-        this.projectId = projectId;
+        this.projectId = dataSourceFolder.getDataSourceRegistry().getProject().getId();
     }
 
     public WebSession getSession() {
