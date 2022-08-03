@@ -1,5 +1,6 @@
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
@@ -22,9 +23,9 @@ public class AuthenticationTest {
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
     }
 
-    public static Map<String, Object> authenticateUser(HttpClient client, Path scriptsPath) throws Exception {
-        String input = AllTests.readScriptTemplate(GQL_TEMPLATE_AUTH_LOGIN, scriptsPath);
-        Map<String, Object> map = AllTests.doPost(input, client);
+    private Map<String, Object> authenticateUser(HttpClient client, Path scriptsPath) throws Exception {
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_AUTH_LOGIN, scriptsPath);
+        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getObjectOrNull(data, "authInfo");

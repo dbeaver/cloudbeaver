@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -64,8 +65,8 @@ public class PlatformTest {
     }
 
     private List<Map<String, Object>> getUserConnections(HttpClient client) throws Exception {
-        String input = AllTests.readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS, AllTests.getScriptsPath());
-        Map<String, Object> map = AllTests.doPost(input, client);
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS, AllTests.getScriptsPath());
+        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getObjectList(data, "userConnections");
@@ -74,8 +75,8 @@ public class PlatformTest {
     }
 
     private Map<String, Object> createConnection(HttpClient client) throws Exception {
-        String input = AllTests.readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION, AllTests.getScriptsPath());
-        Map<String, Object> map = AllTests.doPost(input, client);
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION, AllTests.getScriptsPath());
+        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getObjectOrNull(data, "createConnection");
@@ -84,9 +85,9 @@ public class PlatformTest {
     }
 
     private boolean deleteConnection(HttpClient client, String connectionId) throws Exception {
-        String input = AllTests.readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION, AllTests.getScriptsPath())
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION, AllTests.getScriptsPath())
             .replace("${connectionId}", connectionId);
-        Map<String, Object> map = AllTests.doPost(input, client);
+        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getBoolean(data, "deleteConnection");

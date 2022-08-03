@@ -104,28 +104,6 @@ public class AllTests {
         return client;
     }
 
-    public static Map<String, Object> doPost(String input, HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(GQL_API_URL))
-            .POST(HttpRequest.BodyPublishers.ofString(input))
-            .header("Content-Type", "application/json")
-            .build();
-
-        HttpResponse<String> response = client.send(request,
-            HttpResponse.BodyHandlers.ofString());
-
-        return new GsonBuilder().create().fromJson(
-            response.body(),
-            new TypeToken<Map<String, Object>>() {
-            }.getType()
-        );
-    }
-
-    public static String readScriptTemplate(String templateName, Path scriptsPath) throws Exception {
-        Path templatePath = new File(String.valueOf(scriptsPath), templateName).toPath();
-        return Files.readString(templatePath);
-    }
-
     public static Path getScriptsPath() {
         return scriptsPath;
     }
