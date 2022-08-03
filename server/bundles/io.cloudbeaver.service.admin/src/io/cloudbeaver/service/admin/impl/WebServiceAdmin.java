@@ -685,6 +685,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
+            var adminSM = webSession.getAdminSecurityController();
+            adminSM.deleteAllObjectPermissions(connectionId, SMObjects.DATASOURCE);
             webSession.getAdminSecurityController()
                 .setObjectPermissions(Set.of(connectionId), SMObjects.DATASOURCE,
                     new HashSet<>(subjects),
