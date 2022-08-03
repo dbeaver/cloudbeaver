@@ -100,29 +100,34 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
       isActionApplicable: (context, action) => {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
-
-        if (tree?.baseRoot !== ROOT_NODE_PATH || !this.userInfoResource.data) {
+        if (action !== ACTION_NEW_FOLDER) {
           return false;
         }
 
-        return [ACTION_NEW_FOLDER].includes(action);
-      },
-      isDisabled: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (!tree) {
-          return true;
+        if (!tree || !this.userInfoResource.data) {
+          return false;
         }
+        const targetNode = this.getTargetNode(tree);
 
-        if (action === ACTION_NEW_FOLDER) {
-          const targetNode = this.getTargetNode(tree);
-
-          return targetNode === undefined;
-        }
-
-        return false;
+        return targetNode !== undefined;
       },
+      // isDisabled: (context, action) => {
+      //   const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+
+      //   if (!tree) {
+      //     return true;
+      //   }
+
+      //   if (action === ACTION_NEW_FOLDER) {
+      //     const targetNode = this.getTargetNode(tree);
+
+      //     return targetNode === undefined;
+      //   }
+
+      //   return false;
+      // },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 

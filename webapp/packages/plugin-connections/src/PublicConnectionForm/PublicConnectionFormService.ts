@@ -67,7 +67,10 @@ export class PublicConnectionFormService {
     }
 
     this.formState
-      .setOptions(config.connectionId ? 'edit' : 'create', 'public')
+      .setOptions(
+        config.connectionId ? 'edit' : 'create',
+        'public'
+      )
       .setConfig(projectId, config)
       .setAvailableDrivers(availableDrivers || []);
 
