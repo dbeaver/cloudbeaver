@@ -7,12 +7,12 @@
  */
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionsResource } from '../../Administration/ConnectionsResource';
 import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
@@ -23,7 +23,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
-    private readonly connectionsResource: ConnectionsResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
     this.key = 'access';
@@ -81,15 +81,17 @@ export class ConnectionAccessTabService extends Bootstrap {
       { state: data.state }
     );
 
-    if (!config.connectionId || !state.loaded) {
+    if (!config.connectionId || !data.state.projectId || !state.loaded) {
       return;
     }
 
-    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
+    const key = createConnectionParam(data.state.projectId, config.connectionId);
+
+    const changed = await this.isChanged(key, state.grantedSubjects);
 
     if (changed) {
-      await this.connectionsResource.setAccessSubjects(
-        config.connectionId,
+      await this.connectionInfoResource.setAccessSubjects(
+        key,
         state.grantedSubjects
       );
       state.initialGrantedSubjects = state.grantedSubjects.slice();
@@ -110,11 +112,12 @@ export class ConnectionAccessTabService extends Bootstrap {
       { state: data }
     );
 
-    if (!config.connectionId) {
+    if (!config.connectionId || !data.projectId) {
       return;
     }
 
-    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
+    const key = createConnectionParam(data.projectId, config.connectionId);
+    const changed = await this.isChanged(key, state.grantedSubjects);
 
     if (changed) {
       const stateContext = contexts.getContext(connectionFormStateContext);
@@ -123,8 +126,8 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
   }
 
-  private async isChanged(connectionId: string, next: string[]): Promise<boolean> {
-    const current = await this.connectionsResource.loadAccessSubjects(connectionId);
+  private async isChanged(connectionKey: IConnectionInfoParams, next: string[]): Promise<boolean> {
+    const current = await this.connectionInfoResource.loadAccessSubjects(connectionKey);
     if (current.length !== next.length) {
       return true;
     }

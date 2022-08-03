@@ -1,9 +1,11 @@
 mutation executionContextCreate(
+  $projectId: ID!
   $connectionId: ID!
   $defaultCatalog: String
   $defaultSchema: String
 ) {
   context: sqlContextCreate(
+    projectId: $projectId
     connectionId: $connectionId
     defaultCatalog: $defaultCatalog
     defaultSchema: $defaultSchema

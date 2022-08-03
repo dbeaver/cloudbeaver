@@ -14,7 +14,6 @@ import { CreateConnectionBaseBootstrap } from './Administration/Connections/Crea
 import { ConnectionManualService } from './Administration/Connections/CreateConnection/Manual/ConnectionManualService';
 import { ConnectionSearchService } from './Administration/Connections/CreateConnection/Search/ConnectionSearchService';
 import { CreateConnectionService } from './Administration/Connections/CreateConnectionService';
-import { ConnectionsResource } from './Administration/ConnectionsResource';
 import { ConnectionAccessTabService } from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
 import { LocaleService } from './LocaleService';
 
@@ -26,7 +25,6 @@ export const connectionPlugin: PluginManifest = {
   providers: [
     LocaleService,
     ConnectionsAdministrationService,
-    ConnectionsResource,
     ConnectionsAdministrationNavService,
     CreateConnectionService,
     ConnectionManualService,

@@ -8,9 +8,11 @@
 
 import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-extensions';
 
+import type { IConnectionInfoParams } from '../IConnectionsResource';
+
 const connectionProviderSymbol = Symbol('@extension/ConnectionProvider');
 
-export type IConnectionProvider<T = never> = (context: T) => string | undefined;
+export type IConnectionProvider<T = never> = (context: T) => IConnectionInfoParams | undefined;
 
 export function connectionProvider<T>(provider: IConnectionProvider<T>) {
   return createExtension<T>(provider, connectionProviderSymbol);

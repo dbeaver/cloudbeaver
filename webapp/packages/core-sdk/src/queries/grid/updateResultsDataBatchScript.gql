@@ -1,4 +1,5 @@
 mutation updateResultsDataBatchScript(
+    $projectId: ID!
     $connectionId: ID!
     $contextId: ID!
     $resultsId: ID!
@@ -7,6 +8,7 @@ mutation updateResultsDataBatchScript(
     $addedRows: [ SQLResultRow! ]
 ) {
     result: updateResultsDataBatchScript(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         resultsId: $resultsId

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
@@ -19,11 +19,19 @@ import {
   ResourceKeyList,
   SqlContextInfo,
   CachedMapAllKey,
+  isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
+import type { IConnectionInfoParams } from '../IConnectionsResource';
 import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
+
+const connectionExecutionContextProjectKeySymbol = Symbol('@connection-folder/project') as unknown as string;
+export const ConnectionExecutionContextProjectKey = (projectId: string) => resourceKeyList<string>(
+  [connectionExecutionContextProjectKeySymbol],
+  projectId
+);
 
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
@@ -33,6 +41,16 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     permissionsResource: SessionPermissionsResource
   ) {
     super();
+
+    this.addAlias(
+      isConnectionExecutionContextProjectKey,
+      param => resourceKeyList(
+        Array.from(this.data.entries())
+          .filter(([key, context]) => context.projectId === param.mark)
+          .map(([key]) => key)
+      ),
+      true
+    );
 
     permissionsResource
       .require(this, EPermission.public)
@@ -49,22 +67,24 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async create(
-    connectionId: string,
+    key: IConnectionInfoParams,
     defaultCatalog?: string,
     defaultSchema?: string
   ): Promise<IConnectionExecutionContextInfo> {
-    return await this.performUpdate('', [], async () => {
+    return await this.performUpdate(getContextBaseId(key, ''), [], async () => {
       const { context } = await this.graphQLService.sdk.executionContextCreate({
-        connectionId,
+        ...key,
         defaultCatalog,
         defaultSchema,
       });
 
       const baseContext = getBaseContext(context);
 
-      this.updateContexts(baseContext);
+      runInAction(() => {
+        this.updateContexts(baseContext);
+        this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
+      });
 
-      this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       return this.get(baseContext.id)!;
     });
   }
@@ -84,6 +104,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       await this.graphQLService.sdk.executionContextUpdate({
         contextId: context.id,
         connectionId: context.connectionId,
+        projectId: context.projectId,
         defaultCatalog,
         defaultSchema,
       });
@@ -107,6 +128,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       await this.graphQLService.sdk.executionContextDestroy({
         contextId: context.id,
         connectionId: context.connectionId,
+        projectId: context.projectId,
       });
     });
 
@@ -132,52 +154,80 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   protected async loader(
-    key: ResourceKey<string>
+    originalKey: ResourceKey<string>
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
-    key = this.transformParam(key);
+    let projectId: string | undefined;
+    const all = this.includes(originalKey, CachedMapAllKey);
+    const isProjectFolders = isConnectionExecutionContextProjectKey(originalKey);
+    originalKey = this.transformParam(originalKey);
 
-    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async contextId => {
-      const context = this.get(contextId);
-      const { contexts } = await this.graphQLService.sdk.executionContextList({
-        contextId: all ? undefined : (context?.id ?? contextId),
-        // connectionId
-      });
+    if (isProjectFolders) {
+      projectId = (originalKey as ResourceKeyList<string>).mark;
+    }
 
-      const key = this.updateContexts(...contexts.map(getBaseContext));
+    await ResourceKeyUtils.forEachAsync(
+      (all || isProjectFolders) ? CachedMapAllKey : originalKey,
+      async contextId => {
+        let connectionId: string | undefined;
 
-      if (all) {
-        for (const contextId of this.keys) {
-          if (!ResourceKeyUtils.includes(key, contextId)) {
-            this.delete(contextId);
-          }
+        const context = this.get(contextId);
+
+        if (context && !all) {
+          projectId = context.projectId;
+          connectionId = context.connectionId;
         }
+
+        const { contexts } = await this.graphQLService.sdk.executionContextList({
+          projectId,
+          connectionId,
+          contextId: all ? undefined : (context?.id ?? contextId),
+        });
+
+
+        runInAction(() => {
+          const key = this.updateContexts(...contexts.map(getBaseContext));
+
+          if (all) {
+            for (const contextId of this.keys) {
+              if (!this.includes(key, contextId)) {
+                this.delete(contextId);
+              }
+            }
+          }
+        });
       }
-    });
+    );
 
     return this.data;
   }
 
-  private updateConnectionContexts(key: ResourceKey<string>): void {
+  private updateConnectionContexts(key: ResourceKey<IConnectionInfoParams>): void {
     this.delete(
       resourceKeyList(
         flat(ResourceKeyUtils.map(
           key,
-          connectionId => this.values.filter(context => {
-            const connection = this.connectionInfoResource.get(connectionId);
-            return context.connectionId === connectionId && !connection?.connected;
+          key => this.values.filter(context => {
+            const connection = this.connectionInfoResource.get(key);
+            return (
+              context.connectionId === key.connectionId
+              && context.projectId === key.projectId
+              && !connection?.connected
+            );
           })
         )).map(context => context.id)
       )
     );
   }
 
-  private deleteConnectionContexts(key: ResourceKey<string>): void {
+  private deleteConnectionContexts(key: ResourceKey<IConnectionInfoParams>): void {
     this.delete(
       resourceKeyList(
         flat(ResourceKeyUtils.map(
           key,
-          connectionId => this.values.filter(context => context.connectionId === connectionId)
+          key => this.values.filter(context => (
+            context.connectionId === key.connectionId
+            && context.projectId === key.projectId
+          ))
         )).map(context => context.id)
       )
     );
@@ -199,10 +249,15 @@ function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInf
   };
 }
 
-
 /**
  * @deprecated contextId is unique, function don't needed anymore
  */
-export function getContextBaseId(connectionId: string, contextId: string): string {
-  return `${connectionId}_${contextId}`;
+export function getContextBaseId(key: IConnectionInfoParams, contextId: string): string {
+  return `${key.projectId}:${key.connectionId}:${contextId}`;
+}
+
+function isConnectionExecutionContextProjectKey(
+  param: ResourceKey<string>
+): param is ResourceKeyList<string> {
+  return isResourceKeyList(param) && param.list.includes(connectionExecutionContextProjectKeySymbol);
 }

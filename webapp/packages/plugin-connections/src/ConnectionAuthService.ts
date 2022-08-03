@@ -7,7 +7,7 @@
  */
 
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -32,23 +32,26 @@ export class ConnectionAuthService extends Dependency {
     this.authenticationService.onLogout.before(connectionsManagerService.onDisconnect, state => ({
       connections: connectionInfoResource.values
         .filter(connection => connection.connected)
-        .map(connection => connection.id),
+        .map(createConnectionParam),
       state,
     }));
   }
 
-  private async connectionDialog(connectionId: string | null, context: IExecutionContextProvider<string | null>) {
+  private async connectionDialog(
+    connectionKey: IConnectionInfoParams | null,
+    context: IExecutionContextProvider<IConnectionInfoParams | null>
+  ) {
     const connection = context.getContext(this.connectionsManagerService.connectionContext);
 
-    if (!connectionId) {
+    if (!connectionKey) {
       if (!this.connectionsManagerService.hasAnyConnection()) {
         return;
       }
-      connectionId = this.connectionInfoResource.values[0].id;
+      connectionKey = this.connectionInfoResource.keys[0];
     }
 
     try {
-      const tempConnection = await this.auth(connectionId);
+      const tempConnection = await this.auth(connectionKey);
 
       if (!tempConnection?.connected) {
         return;
@@ -60,15 +63,15 @@ export class ConnectionAuthService extends Dependency {
     }
   }
 
-  async auth(connectionId: string): Promise<Connection | null> {
-    if (!this.connectionInfoResource.has(connectionId)) {
+  async auth(key: IConnectionInfoParams): Promise<Connection | null> {
+    if (!this.connectionInfoResource.has(key)) {
       return null;
     }
 
-    let connection = this.connectionInfoResource.get(connectionId);
+    let connection = this.connectionInfoResource.get(key);
 
     if (!connection?.connected) {
-      connection = await this.connectionInfoResource.refresh(connectionId);
+      connection = await this.connectionInfoResource.refresh(key);
     } else {
       return connection;
     }
@@ -85,7 +88,7 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    connection = await this.connectionInfoResource.load(connectionId);
+    connection = await this.connectionInfoResource.load(key);
 
     const networkHandlers = connection.networkHandlersConfig
       .filter(handler => handler.enabled && !handler.savePassword)
@@ -93,13 +96,13 @@ export class ConnectionAuthService extends Dependency {
 
     if (connection.authNeeded || networkHandlers.length > 0) {
       await this.commonDialogService.open(DatabaseAuthDialog, {
-        connectionId,
+        connection: key,
         networkHandlers,
       });
     } else {
-      await this.connectionInfoResource.init({ id: connectionId });
+      await this.connectionInfoResource.init({ projectId: key.projectId, connectionId: key.connectionId });
     }
 
-    return this.connectionInfoResource.get(connectionId)!;
+    return this.connectionInfoResource.get(key)!;
   }
 }

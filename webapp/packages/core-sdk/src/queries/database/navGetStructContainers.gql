@@ -1,5 +1,14 @@
-query navGetStructContainers($connectionId: ID!, $catalogId: ID, $withDetails: Boolean!) {
-  navGetStructContainers(connectionId: $connectionId, catalog: $catalogId) {
+query navGetStructContainers(
+  $projectId: ID!
+  $connectionId: ID!
+  $catalogId: ID
+  $withDetails: Boolean!
+) {
+  navGetStructContainers(
+    projectId: $projectId
+    connectionId: $connectionId
+    catalog: $catalogId
+  ) {
     catalogList {
       catalog {
           ...NavNodeInfo

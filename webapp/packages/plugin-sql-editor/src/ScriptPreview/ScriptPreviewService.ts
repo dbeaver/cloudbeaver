@@ -52,6 +52,7 @@ export class ScriptPreviewService {
     }
 
     const updateVariables: UpdateResultsDataBatchScriptMutationVariables = {
+      projectId: executionContext.context!.projectId,
       connectionId: executionContext.context!.connectionId,
       contextId: executionContext.context!.id,
       resultsId: result.id,

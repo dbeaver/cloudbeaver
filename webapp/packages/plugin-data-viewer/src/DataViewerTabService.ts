@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
 
@@ -31,6 +32,7 @@ export class DataViewerTabService {
     private readonly notificationService: NotificationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -56,9 +58,15 @@ export class DataViewerTabService {
     data: IConnectionExecutorData,
     contexts: IExecutionContextProvider<IConnectionExecutorData>
   ) {
+    const connectionsKey = resourceKeyList(data.connections);
     if (data.state === 'before') {
       const tabs = Array.from(this.navigationTabsService.findTabs(
-        isObjectViewerTab(tab => data.connections.includes(tab.handlerState.connectionId ?? ''))
+        isObjectViewerTab(tab => {
+          if (!tab.handlerState.connectionKey) {
+            return false;
+          }
+          return this.connectionInfoResource.includes(connectionsKey, tab.handlerState.connectionKey);
+        })
       ));
 
       for (const tab of tabs) {

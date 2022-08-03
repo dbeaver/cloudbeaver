@@ -8,11 +8,9 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { Connection, ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { PermissionsService, EPermission, ServerService } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
@@ -68,7 +66,7 @@ export interface INavNodeId {
 
 export interface INodeNavigationContext {
   type: NavigationType;
-  connection: Connection | undefined;
+  projectId: string | undefined;
   nodeId: string;
   parentId: string;
   folderId: string;
@@ -83,6 +81,7 @@ export interface INodeNavigationContext {
 
 export interface INodeNavigationData {
   type: NavigationType;
+  projectId?: string;
   nodeId: string;
   parentId: string;
   folderId?: string;
@@ -113,24 +112,24 @@ export class NavNodeManagerService extends Bootstrap {
   readonly onMove: IExecutor<INodeMoveData>;
 
   constructor(
-    private readonly permissionsService: PermissionsService,
-    readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly serverService: ServerService,
     navigationService: NavigationService
   ) {
     super();
     this.syncNodeInfoCache = new Map();
     this.onMove = new Executor();
-    this.navigator = new Executor(
+    this.navigator = new Executor<INodeNavigationData>(
       {
         type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
       },
-      (active, current) => active.nodeId === current.nodeId && active.type === current.type
+      (active, current) => (
+        active.projectId === current.projectId
+        && active.nodeId === current.nodeId
+        && active.type === current.type
+      )
     )
       .before(navigationService.navigationTask, undefined, data => data.type === NavigationType.open)
       .addHandler(this.navigateHandler.bind(this));
@@ -275,8 +274,10 @@ export class NavNodeManagerService extends Bootstrap {
       return false;
     }
 
-    return node.objectFeatures.includes(ENodeFeature.dataContainer)
-      || node.objectFeatures.includes(ENodeFeature.container);
+    return (
+      node.objectFeatures.includes(ENodeFeature.dataContainer)
+      || node.objectFeatures.includes(ENodeFeature.container)
+    );
   }
 
   async getNodeDatabaseAlias(nodeId: string): Promise<string> {
@@ -318,40 +319,39 @@ export class NavNodeManagerService extends Bootstrap {
     return scanParents(initial, nodeId);
   }
 
-  navigationNavNodeContext = async (
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    data: INodeNavigationData
-  ): Promise<INodeNavigationContext> => {
+  navigationNavNodeContext: ISyncContextLoader<INodeNavigationContext, INodeNavigationData> = (
+    contexts,
+    data
+  ) => {
     let nodeId = data.nodeId;
+    const projectId = data.projectId;
     let parentId = data.parentId;
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
     let canOpen = false;
 
-    await this.connectionInfo.load(CachedMapAllKey);
+    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
+      const node = this.getNode(nodeId);
 
-    const connection = this.connectionInfo.getConnectionForNode(nodeId);
+      if (node) {
+        name = node.name;
+        icon = node.icon;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId) && connection?.connected) {
-      const node = await this.loadNode({ nodeId, parentId });
-
-      name = node.name;
-      icon = node.icon;
-
-      if (node.folder) {
-        const parent = this.getNode(node.parentId);
-        folderId = nodeId;
-        if (parent && !parent.folder) {
-          nodeId = parent.id;
-          parentId = parent.parentId;
-          name = parent.name;
-          icon = parent.icon;
+        if (node.folder) {
+          const parent = this.getNode(node.parentId);
+          folderId = nodeId;
+          if (parent && !parent.folder) {
+            nodeId = parent.id;
+            parentId = parent.parentId;
+            name = parent.name;
+            icon = parent.icon;
+          }
         }
-      }
 
-      if (data.folderId) {
-        folderId = data.folderId;
+        if (data.folderId) {
+          folderId = data.folderId;
+        }
       }
     }
 
@@ -392,7 +392,7 @@ export class NavNodeManagerService extends Bootstrap {
       },
 
       type: data.type,
-      connection,
+      projectId,
       nodeId,
       parentId,
       folderId,
@@ -413,31 +413,6 @@ export class NavNodeManagerService extends Bootstrap {
     if (data.type !== NavigationType.open) {
       return;
     }
-
-    const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
-
-    if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
-      const connection = await this.connectionsManagerService.requireConnection(nodeInfo.connection.id);
-
-      if (!connection?.connected) {
-        throw new Error('Connection not established');
-      }
-    }
-  }
-
-  private async isNavTreeEnabled() {
-    const active = await this.permissionsService.hasAsync(EPermission.public);
-    if (!active) {
-      return false;
-    }
-
-    // TODO: IT'S IS REALLY BAD PLACE FOR THAT
-    const config = await this.serverService.config.load();
-    if (config?.configurationMode) {
-      return false;
-    }
-
-    return true;
   }
 }
 

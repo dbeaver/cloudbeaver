@@ -95,6 +95,22 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     });
   }
 
+  getParents(key: string): string[] {
+    const parents: string[] = [];
+    let current = this.get(key);
+
+    while (
+      current
+      && current.parentId !== current.id
+      && current.parentId !== ROOT_NODE_PATH
+    ) {
+      parents.unshift(current.parentId);
+      current = this.get(current.parentId);
+    }
+
+    return parents;
+  }
+
   getParent(key: string): string | undefined;
   getParent(key: ResourceKeyList<string>): (string | undefined)[];
   getParent(key: ResourceKey<string>): string | undefined | (string | undefined)[];
@@ -130,11 +146,20 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   }
 
   navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string, requestPath?: string): NavNode {
-    return {
+    const oldNode = this.get(node.id);
+
+    let newNode: NavNode = {
       ...node,
       objectFeatures: node.object?.features || [],
       parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? ROOT_NODE_PATH,
     };
+
+    if (oldNode) {
+      Object.assign(oldNode, newNode);
+      newNode = oldNode;
+    }
+
+    return newNode;
   }
 
   async loadNodeFullName(nodePath: string): Promise<NavNode> {

@@ -1,9 +1,11 @@
 query exportDataFromContainer(
-  $connectionId: ID!,
-  $containerNodePath: ID!,
+  $projectId: ID!
+  $connectionId: ID!
+  $containerNodePath: ID!
   $parameters: DataTransferParameters!
 ) {
   taskInfo: dataTransferExportDataFromContainer(
+    projectId: $projectId
     connectionId: $connectionId
     containerNodePath: $containerNodePath
     parameters: $parameters

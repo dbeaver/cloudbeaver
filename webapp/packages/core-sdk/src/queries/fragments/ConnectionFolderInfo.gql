@@ -1,4 +1,5 @@
 fragment ConnectionFolderInfo on ConnectionFolderInfo {
     id
+    projectId
     description
 }

@@ -19,6 +19,7 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource } from './ConnectionInfoResource';
+import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ObjectContainer = NavNodeInfoFragment;
 export interface ICatalogData {
@@ -39,6 +40,7 @@ type DataValue = Map<string, IStructContainers>;
 const defaultCatalog = undefined;
 
 interface ObjectContainerParams {
+  projectId: string;
   connectionId: string;
   catalogId?: string;
 }
@@ -74,44 +76,47 @@ string
 
     permissionsResource.require(this, EPermission.public);
     this.preloadResource(connectionInfoResource, () => CachedMapAllKey);
-    this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key.connectionId)));
+    this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
 
     this.connectionInfoResource.onItemDelete.addHandler(
-      key => ResourceKeyUtils.forEach(key, key => this.data.delete(key))
+      key => ResourceKeyUtils.forEach(
+        key,
+        key => this.data.delete(serializeKey({ projectId: key.projectId, connectionId: key.connectionId }))
+      )
     );
     this.connectionInfoResource.onItemAdd.addHandler(
       key => ResourceKeyUtils.forEach(key, key => {
         if (!this.connectionInfoResource.get(key)?.connected) {
-          this.data.delete(key);
+          this.data.delete(serializeKey({ projectId: key.projectId, connectionId: key.connectionId }));
         }
       })
     );
   }
 
-  get({ connectionId, catalogId }: ObjectContainerParams): IStructContainers | undefined {
-    return this.data.get(connectionId);
+  get(key: ObjectContainerParams): IStructContainers | undefined {
+    return this.data.get(serializeKey(key));
   }
 
   getSchema(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     schemaId: string
   ): ObjectContainer | undefined {
-    const connectionData = this.data.get(connectionId);
+    const connectionData = this.data.get(serializeKey(connectionKey));
 
     return connectionData?.schemaList.find(schema => schema.name === schemaId);
   }
 
   getCatalogData(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     catalogId: string
   ): ICatalogData | undefined {
-    const connectionData = this.data.get(connectionId);
+    const connectionData = this.data.get(serializeKey(connectionKey));
 
     return connectionData?.catalogList.find(catalog => catalog.catalog.name === catalogId);
   }
 
-  isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
-    const container = this.data.get(connectionId);
+  isLoaded({ projectId, connectionId, catalogId }: ObjectContainerParams): boolean {
+    const container = this.data.get(serializeKey({ projectId, connectionId }));
 
     if (!container) {
       return false;
@@ -121,19 +126,19 @@ string
   }
 
   isOutdated(param: ObjectContainerParams): boolean {
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.outdatedData.includes(catalogId);
   }
 
   isDataLoading(param: ObjectContainerParams): boolean {
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.loadingData.includes(catalogId);
   }
 
   markDataLoading(param: ObjectContainerParams): void {
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
 
     if (!metadata.loadingData.includes(catalogId)) {
@@ -142,7 +147,7 @@ string
   }
 
   markDataLoaded(param: ObjectContainerParams): void {
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
@@ -150,7 +155,7 @@ string
   markOutdated(param: ObjectContainerParams): void {
     const catalogId = param.catalogId ?? defaultCatalog;
 
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     if (!metadata.outdatedData.includes(catalogId)) {
       metadata.outdatedData.push(catalogId);
     }
@@ -158,20 +163,21 @@ string
   }
 
   markUpdated(param: ObjectContainerParams): void {
-    const metadata = this.metadata.get(param.connectionId);
+    const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     metadata.exception = null;
     metadata.outdatedData = metadata.outdatedData.filter(id => id !== catalogId);
   }
 
-  protected async loader({ connectionId, catalogId }: ObjectContainerParams): Promise<DataValue> {
+  protected async loader({ projectId, connectionId, catalogId }: ObjectContainerParams): Promise<DataValue> {
     const { navGetStructContainers } = await this.graphQLService.sdk.navGetStructContainers({
+      projectId,
       connectionId,
       catalogId,
       withDetails: false,
     });
 
-    this.data.set(connectionId, {
+    this.data.set(serializeKey({ projectId, connectionId }), {
       catalogList: navGetStructContainers.catalogList,
       schemaList: navGetStructContainers.schemaList,
       supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
@@ -182,7 +188,15 @@ string
     return this.data;
   }
 
-  protected includes(param: ObjectContainerParams, second: ObjectContainerParams): boolean {
-    return param.connectionId === second.connectionId && param.catalogId === second.catalogId;
+  isKeyEqual(param: ObjectContainerParams, second: ObjectContainerParams): boolean {
+    return (
+      param.projectId === second.projectId
+      && param.connectionId === second.connectionId
+      && param.catalogId === second.catalogId
+    );
   }
+}
+
+function serializeKey(key: ObjectContainerParams): string {
+  return `${key.projectId}:${key.connectionId}`;
 }

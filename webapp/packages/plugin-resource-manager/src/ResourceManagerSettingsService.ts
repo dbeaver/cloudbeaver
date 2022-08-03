@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  disabled: false,
+  disabled: false, //! use resourceManagerEnabled in server config instead
 };
 
 export type ResourceManagerSettings = typeof defaultSettings;

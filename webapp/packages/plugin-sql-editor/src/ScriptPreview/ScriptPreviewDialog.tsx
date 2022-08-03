@@ -6,19 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, useClipboard, useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
+import { Button, useClipboard, useMapResource } from '@cloudbeaver/core-blocks';
+import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
-import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
 export const dialogStyle = css`
   footer {
@@ -56,34 +53,12 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   const copy = useClipboard();
 
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
-  const sqlDialectInfoService = useService(SqlDialectInfoService);
   const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
-  const connectionId = context?.context?.connectionId;
-
-  const dialect = useObservableRef(() => ({
-    get dialect(): SqlDialectInfo | undefined {
-      if (!this.connectionId) {
-        return undefined;
-      }
-      return this.sqlDialectInfoService.getDialectInfo(this.connectionId);
-    },
-
-  }), {
-    connectionId: observable.ref,
-    dialect: computed,
-  }, { connectionId, sqlDialectInfoService });
-
-  useEffect(() => {
-    if (!connectionId) {
-      return;
-    }
-
-    sqlDialectInfoService.loadSqlDialectInfo(connectionId)
-      .catch(exception => {
-        console.error(exception);
-        console.warn(`Can't get dialect for connection: '${connectionId}'. Default dialect will be used`);
-      });
-  }, [sqlDialectInfoService, connectionId]);
+  const contextInfo = context?.context;
+  const dialect = useMapResource(ScriptPreviewDialog, ConnectionDialectResource, contextInfo
+    ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId)
+    : null
+  );
 
   const apply = async () => {
     await payload.model.save();
@@ -114,7 +89,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
             autoCursor: false,
           }}
           value={payload.script}
-          dialect={dialect.dialect}
+          dialect={dialect.data}
           readonly
         />
       </wrapper>

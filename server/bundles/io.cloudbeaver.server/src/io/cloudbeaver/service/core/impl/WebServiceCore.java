@@ -140,6 +140,9 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession webSession, @Nullable String projectId
     ) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
+        if (projectId == null) {
+            projectId = WebServiceUtils.getGlobalRegistry(webSession).getProject().getId();
+        }
         DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
@@ -330,7 +333,8 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e.getCause());
+            sessionRegistry.removeDataSource(newDataSource);
+            throw new DBWebException("Failed to create connection", e.getCause());
         }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -372,7 +376,7 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e.getCause());
+            throw new DBWebException("Failed to update connection", e);
         }
 
         return connectionInfo;
@@ -398,7 +402,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException
     {
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
+        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalRegistry(webSession);
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
             throw new DBWebException("Template data source '" + templateId + "' not found");
@@ -461,8 +465,8 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceRegistry.addDataSource(newDataSource);
 
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
-            webSession.addConnection(connectionInfo);
             dataSourceRegistry.checkForErrors();
+            webSession.addConnection(connectionInfo);
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -594,7 +598,8 @@ public class WebServiceCore implements DBWServiceCore {
             try {
                 registry.checkForErrors();
             } catch (DBException e) {
-                throw new DBWebException(e.getMessage(), e.getCause());
+                registry.addDataSource(dataSourceContainer);
+                throw new DBWebException("Failed to delete connection", e);
             }
             webSession.removeConnection(connectionInfo);
         } else {
@@ -631,7 +636,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
 
             return folderInfo;
         } catch (DBException e) {
@@ -649,7 +654,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
-        WebServiceUtils.updateConfigAndRefreshDatabases(session);
+        WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         return folderInfo;
     }
 
@@ -666,7 +671,7 @@ public class WebServiceCore implements DBWServiceCore {
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session);
+            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }

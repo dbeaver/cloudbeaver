@@ -16,14 +16,20 @@ import {
   connectionSetter,
   ConnectionsManagerService,
   ContainerResource,
+  createConnectionParam,
   ICatalogData,
   IConnectionExecutorData,
+  IConnectionInfoParams,
+  objectCatalogProvider,
+  objectCatalogSetter,
+  objectSchemaProvider,
+  objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, objectCatalogProvider, objectSchemaProvider, objectCatalogSetter, objectSchemaSetter, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { NavNodeManagerService, objectNavNodeProvider, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -123,7 +129,7 @@ export class SqlEditorTabService extends Bootstrap {
     dataSource?.setExecutionContext(undefined);
   }
 
-  private async handleConnectionDelete(key: ResourceKey<string>) {
+  private async handleConnectionDelete(key: ResourceKey<IConnectionInfoParams>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -134,8 +140,16 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
-      if (ResourceKeyUtils.includes(key, dataSource?.executionContext?.connectionId)) {
-        this.resetConnectionInfo(tab.handlerState);
+
+      if (dataSource?.executionContext) {
+        const contextConnection = createConnectionParam(
+          dataSource.executionContext.projectId,
+          dataSource.executionContext.connectionId
+        );
+
+        if (this.connectionInfoResource.includes(key, contextConnection)) {
+          this.resetConnectionInfo(tab.handlerState);
+        }
       }
     }
   }
@@ -147,13 +161,16 @@ export class SqlEditorTabService extends Bootstrap {
       return;
     }
 
-    const { connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
+    const { projectId, connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
 
     let catalogData: ICatalogData | undefined;
     let schema: NavNodeInfoFragment | undefined;
 
     if (defaultCatalog) {
-      catalogData = this.containerResource.getCatalogData(connectionId, defaultCatalog);
+      catalogData = this.containerResource.getCatalogData(
+        createConnectionParam(projectId, connectionId),
+        defaultCatalog
+      );
     }
 
     if (catalogData && defaultSchema) {
@@ -199,8 +216,15 @@ export class SqlEditorTabService extends Bootstrap {
       const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext!.id);
 
       if (!executionContext?.context) {
-        if (!this.connectionInfoResource.has(dataSource.executionContext?.connectionId || '')) {
-          this.resetConnectionInfo(tab.handlerState);
+        if (dataSource.executionContext) {
+          const contextConnection = createConnectionParam(
+            dataSource.executionContext.projectId,
+            dataSource.executionContext.connectionId
+          );
+
+          if (!this.connectionInfoResource.has(contextConnection)) {
+            this.resetConnectionInfo(tab.handlerState);
+          }
         }
       } else {
         dataSource.setExecutionContext({ ...executionContext.context });
@@ -219,11 +243,19 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId)!;
-      if (
-        ResourceKeyUtils.includes(key, dataSource.executionContext!.id)
-        && !this.connectionInfoResource.has(dataSource.executionContext!.connectionId)
-      ) {
-        this.resetConnectionInfo(tab.handlerState);
+
+      if (dataSource.executionContext) {
+        const contextConnection = createConnectionParam(
+          dataSource.executionContext.projectId,
+          dataSource.executionContext.connectionId
+        );
+
+        if (
+          ResourceKeyUtils.includes(key, dataSource.executionContext!.id)
+          && !this.connectionInfoResource.has(contextConnection)
+        ) {
+          this.resetConnectionInfo(tab.handlerState);
+        }
       }
     }
   }
@@ -260,7 +292,12 @@ export class SqlEditorTabService extends Bootstrap {
     if (dataSource.executionContext) {
       await this.connectionInfoResource.load(CachedMapAllKey);
 
-      if (!this.connectionInfoResource.has(dataSource.executionContext.connectionId)) {
+      const contextConnection = createConnectionParam(
+        dataSource.executionContext.projectId,
+        dataSource.executionContext.connectionId
+      );
+
+      if (!this.connectionInfoResource.has(contextConnection)) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
@@ -276,9 +313,17 @@ export class SqlEditorTabService extends Bootstrap {
     return true;
   }
 
-  private getConnectionId(tab: ITab<ISqlEditorTabState>) {
+  private getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
-    return dataSource?.executionContext?.connectionId;
+
+    if (!dataSource?.executionContext) {
+      return undefined;
+    }
+
+    return createConnectionParam(
+      dataSource.executionContext.projectId,
+      dataSource.executionContext.connectionId
+    );
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
@@ -295,11 +340,11 @@ export class SqlEditorTabService extends Bootstrap {
 
   async setConnectionId(
     tab: ITab<ISqlEditorTabState>,
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     catalogId?: string,
     schemaId?: string
   ) {
-    return await this.sqlEditorService.setConnection(tab.handlerState, connectionId, catalogId, schemaId);
+    return await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {
@@ -360,11 +405,21 @@ export class SqlEditorTabService extends Bootstrap {
     data: IConnectionExecutorData,
     contexts: IExecutionContextProvider<IConnectionExecutorData>
   ) {
+    const connectionsKey = resourceKeyList(data.connections);
     if (data.state === 'before') {
       for (const tab of this.sqlEditorTabs) {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
-        if (!data.connections.includes(dataSource?.executionContext?.connectionId ?? '')) {
+        if (!dataSource?.executionContext) {
+          continue;
+        }
+
+        const connectionKey = createConnectionParam(
+          dataSource.executionContext.projectId,
+          dataSource.executionContext.connectionId
+        );
+
+        if (!this.connectionInfoResource.includes(connectionsKey, connectionKey)) {
           continue;
         }
 

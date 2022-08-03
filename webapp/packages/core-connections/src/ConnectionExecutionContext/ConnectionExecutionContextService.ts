@@ -11,6 +11,7 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { ConnectionExecutionContext } from './ConnectionExecutionContext';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource';
 
@@ -45,11 +46,11 @@ export class ConnectionExecutionContextService {
   }
 
   async create(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     defaultCatalog?: string,
     defaultSchema?: string
   ): Promise<ConnectionExecutionContext> {
-    const context = await this.connectionExecutionContextResource.create(connectionId, defaultCatalog, defaultSchema);
+    const context = await this.connectionExecutionContextResource.create(connectionKey, defaultCatalog, defaultSchema);
 
     return this.contexts.get(context.id);
   }

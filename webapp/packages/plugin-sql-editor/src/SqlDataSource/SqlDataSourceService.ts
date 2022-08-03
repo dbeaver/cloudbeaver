@@ -37,6 +37,7 @@ interface ISqlDataSourceFabric {
 interface ISqlDataSourceProvider {
   provider: ISqlDataSourceFabric;
   dataSource: ISqlDataSource;
+  isActionActive: boolean;
 }
 
 @injectable()
@@ -98,6 +99,7 @@ export class SqlDataSourceService {
       activeProvider = {
         provider,
         dataSource: provider.getDataSource(editorId, options),
+        isActionActive: false,
       };
 
       this.providers.set(editorId, activeProvider);
@@ -106,6 +108,30 @@ export class SqlDataSourceService {
     }
 
     return activeProvider.dataSource;
+  }
+
+  async executeAction<T>(
+    editorId: string,
+    action: (dataSource: ISqlDataSource) => (Promise<T> | T),
+    notFound: () => void
+  ): Promise<T | undefined> {
+    const provider = this.providers.get(editorId);
+
+    if (!provider) {
+      notFound();
+      return undefined;
+    }
+
+    if (provider.isActionActive) {
+      return;
+    }
+
+    try {
+      provider.isActionActive = true;
+      return await action(provider.dataSource);
+    } finally {
+      provider.isActionActive = false;
+    }
   }
 
   async canDestroy(editorId: string): Promise<boolean> {

@@ -9,12 +9,12 @@
 import { observable, makeObservable, action } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 export interface ICreateMethodOptions {
@@ -35,7 +35,7 @@ export class CreateConnectionService {
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly connectionFormService: ConnectionFormService,
-    private readonly connectionsResource: ConnectionsResource
+    private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer();
@@ -106,15 +106,15 @@ export class CreateConnectionService {
     this.activateMethod(defaultId);
   }
 
-  setConnectionTemplate(config: ConnectionConfig, availableDrivers: string[]): void {
+  setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
     this.data = new ConnectionFormState(
       this.connectionFormService,
-      this.connectionsResource
+      this.connectionInfoResource
     );
 
     this.data
       .setOptions('create', 'admin')
-      .setConfig(config)
+      .setConfig(projectId, config)
       .setAvailableDrivers(availableDrivers || []);
 
     this.data.load();
