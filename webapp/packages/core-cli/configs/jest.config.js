@@ -1,6 +1,7 @@
 // https://jestjs.io/docs/configuration
 
 module.exports = {
+  testRunner: 'jest-jasmine2',
   transformIgnorePatterns: [
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
     '/node_modules/(?!(uuid|go-split|@react-dnd|react-dnd-html5-backend|react-dnd|dnd-core|@cloudbeaver))(.*)',
@@ -17,6 +18,6 @@ module.exports = {
   passWithNoTests: true,
   testEnvironment: 'jsdom',
   setupFiles: ['../tests/setup.ts'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', 'jest-allure/dist/setup'],
   transform: { '\\.[jt]sx?$': ['babel-jest', { configFile: require.resolve('./babel.config.js') }] },
 };
