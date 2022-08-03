@@ -166,10 +166,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
       return key;
     }
 
-    const ref = this.keys.find(k => (
-      k.projectId === key.projectId
-      && k.folderId === key.folderId
-    ));
+    const ref = this.keys.find(k => this.isKeyEqual(k, key));
 
     if (ref) {
       return ref;

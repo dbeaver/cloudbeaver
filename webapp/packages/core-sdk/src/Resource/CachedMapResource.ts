@@ -370,7 +370,7 @@ export abstract class CachedMapResource<
     }
 
     if (this.isAlias(param) || this.isAlias(key)) {
-      return param === key;
+      return this.isAliasEqual(param, key);
     }
 
     param = ResourceKeyUtils.mapKey(param, this.getKeyRef.bind(this));
@@ -451,7 +451,7 @@ export abstract class CachedMapResource<
       this.loadedKeys = [];
     } else {
       if (this.isAlias(key)) {
-        const index = this.loadedKeys.findIndex(loadedKey => this.includes(key!, loadedKey));
+        const index = this.loadedKeys.findIndex(loadedKey => this.isAliasEqual(key!, loadedKey));
 
         if (index >= 0) {
           this.loadedKeys.splice(index, 1);

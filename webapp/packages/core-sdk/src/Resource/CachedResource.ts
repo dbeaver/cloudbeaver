@@ -238,7 +238,7 @@ export abstract class CachedResource<
   }
 
   isAliasLoaded(key: TParam): boolean {
-    return this.loadedKeys.some(loadedKey => this.includes(key, loadedKey));
+    return this.loadedKeys.some(loadedKey => this.isAliasEqual(key, loadedKey));
   }
 
   isIncludes(key: TParam, includes: TContext): boolean {
@@ -427,7 +427,7 @@ export abstract class CachedResource<
 
   protected markOutdatedSync(param: TParam): void {
     if (this.isAlias(param)) {
-      const index = this.loadedKeys.findIndex(key => this.includes(param, key));
+      const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param, key));
 
       if (index >= 0) {
         this.loadedKeys.splice(index, 1);
@@ -440,6 +440,16 @@ export abstract class CachedResource<
     this.onDataOutdated.execute(param);
   }
 
+  isAliasEqual(param: TParam, second: TParam): boolean {
+    return this.paramAliases.some(alias => {
+      if ('getter' in alias && alias.getter) {
+        return alias.param(param) && alias.param(second);
+      } else {
+        return alias.param === param && alias.param === second;
+      }
+    });
+  }
+
   isKeyEqual(param: TParam, second: TParam): boolean {
     return param === second;
   }
@@ -450,7 +460,7 @@ export abstract class CachedResource<
     }
 
     if (this.isAlias(param) || this.isAlias(second)) {
-      return param === second;
+      return this.isAliasEqual(param, second);
     }
 
     param = this.transformParam(param);
