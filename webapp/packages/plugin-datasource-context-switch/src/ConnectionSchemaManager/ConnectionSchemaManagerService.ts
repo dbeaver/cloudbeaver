@@ -8,18 +8,11 @@
 
 import { computed, observable, makeObservable, action, runInAction } from 'mobx';
 
-import {
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  ObjectContainer,
-  DBDriverResource,
-  isConnectionProvider, IConnectionProvider,
-  isConnectionSetter, IConnectionSetter, IStructContainers, Connection, IConnectionInfoParams, serializeConnectionParam
-} from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, ObjectContainer, DBDriverResource, isConnectionProvider, IConnectionProvider, isConnectionSetter, IConnectionSetter, IStructContainers, Connection, IConnectionInfoParams, serializeConnectionParam, IObjectCatalogProvider, IObjectCatalogSetter, IObjectSchemaProvider, IObjectSchemaSetter, isObjectCatalogProvider, isObjectCatalogSetter, isObjectSchemaProvider, isObjectSchemaSetter } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
-import { type IObjectNavNodeProvider, type IObjectSchemaProvider, type IObjectCatalogProvider, type IObjectCatalogSetter, type IObjectSchemaSetter, type IDataContextActiveNode, isObjectNavNodeProvider, isObjectCatalogProvider, isObjectSchemaProvider, isObjectCatalogSetter, isObjectSchemaSetter } from '@cloudbeaver/core-navigation-tree';
+import { type IObjectNavNodeProvider, type IDataContextActiveNode, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 

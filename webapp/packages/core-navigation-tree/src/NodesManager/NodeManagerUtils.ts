@@ -31,7 +31,7 @@ export const NodeManagerUtils = {
   },
 
   isDatabaseObject(objectId: string): boolean {
-    return /^database:\/\//.test(objectId);
+    return objectId.startsWith('database://');
   },
 
   concatSchemaAndCatalog(catalogId?: string, schemaId?: string): string {

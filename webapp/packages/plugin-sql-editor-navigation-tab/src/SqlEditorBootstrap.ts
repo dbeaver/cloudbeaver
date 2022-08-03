@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Connection, ConnectionInfoResource, createConnectionParam, IConnectionInfoParams, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, createConnectionParam, IConnectionInfoParams, isConnectionProvider, isObjectCatalogProvider, isObjectSchemaProvider } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature, isObjectCatalogProvider, isObjectSchemaProvider } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';

@@ -8,11 +8,11 @@
 
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, objectCatalogProvider, objectSchemaProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -34,6 +34,7 @@ export class ObjectViewerTabService {
     private readonly notificationService: NotificationService,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionNavNodeService: ConnectionNavNodeService,
   ) {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -77,7 +78,8 @@ export class ObjectViewerTabService {
     data
   ) => {
     const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
-    const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+    const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+    const connection = await contexts.getContext(this.connectionNavNodeService.navigationNavNodeConnectionContext);
 
     // check if tab already exist for object
     const tab = this.navigationTabsService.findTab(
@@ -100,7 +102,7 @@ export class ObjectViewerTabService {
           handlerId: objectViewerTabHandlerKey,
           handlerState: {
             projectId: nodeInfo.projectId,
-            connectionKey: nodeInfo.connection && createConnectionParam(nodeInfo.connection),
+            connectionKey: connection && createConnectionParam(connection),
             objectId: nodeInfo.nodeId,
             parentId: nodeInfo.parentId,
             parents: nodeInfo.getParents(),

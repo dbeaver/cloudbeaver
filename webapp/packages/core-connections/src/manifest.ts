@@ -18,6 +18,8 @@ import { ConnectionsManagerService } from './ConnectionsManagerService';
 import { ContainerResource } from './ContainerResource';
 import { DatabaseAuthModelsResource } from './DatabaseAuthModelsResource';
 import { DBDriverResource } from './DBDriverResource';
+import { ConnectionNavNodeService } from './NavTree/ConnectionNavNodeService';
+import { NavNodeExtensionsService } from './NavTree/NavNodeExtensionsService';
 import { NetworkHandlerResource } from './NetworkHandlerResource';
 
 
@@ -38,5 +40,7 @@ export const manifest: PluginManifest = {
     DBDriverResource,
     NetworkHandlerResource,
     ConnectionDialectResource,
+    ConnectionNavNodeService,
+    NavNodeExtensionsService,
   ],
 };

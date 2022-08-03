@@ -8,10 +8,9 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
@@ -68,7 +67,6 @@ export interface INavNodeId {
 export interface INodeNavigationContext {
   type: NavigationType;
   projectId: string | undefined;
-  connection: Connection | undefined;
   nodeId: string;
   parentId: string;
   folderId: string;
@@ -114,10 +112,8 @@ export class NavNodeManagerService extends Bootstrap {
   readonly onMove: IExecutor<INodeMoveData>;
 
   constructor(
-    readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly connectionsManagerService: ConnectionsManagerService,
     navigationService: NavigationService
   ) {
     super();
@@ -323,45 +319,39 @@ export class NavNodeManagerService extends Bootstrap {
     return scanParents(initial, nodeId);
   }
 
-  navigationNavNodeContext = async (
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    data: INodeNavigationData
-  ): Promise<INodeNavigationContext> => {
+  navigationNavNodeContext: ISyncContextLoader<INodeNavigationContext, INodeNavigationData> = (
+    contexts,
+    data
+  ) => {
     let nodeId = data.nodeId;
-    let projectId = data.projectId;
+    const projectId = data.projectId;
     let parentId = data.parentId;
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
     let canOpen = false;
 
-    await this.connectionInfo.load(CachedMapAllKey);
+    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
+      const node = this.getNode(nodeId);
 
-    const connection = this.connectionInfo.getConnectionForNode(nodeId);
+      if (node) {
+        name = node.name;
+        icon = node.icon;
 
-    if (connection?.projectId) {
-      projectId = connection.projectId;
-    }
-
-    if (NodeManagerUtils.isDatabaseObject(nodeId) && connection?.connected) {
-      const node = await this.loadNode({ nodeId, parentId });
-
-      name = node.name;
-      icon = node.icon;
-
-      if (node.folder) {
-        const parent = this.getNode(node.parentId);
-        folderId = nodeId;
-        if (parent && !parent.folder) {
-          nodeId = parent.id;
-          parentId = parent.parentId;
-          name = parent.name;
-          icon = parent.icon;
+        if (node.folder) {
+          const parent = this.getNode(node.parentId);
+          folderId = nodeId;
+          if (parent && !parent.folder) {
+            nodeId = parent.id;
+            parentId = parent.parentId;
+            name = parent.name;
+            icon = parent.icon;
+          }
         }
-      }
 
-      if (data.folderId) {
-        folderId = data.folderId;
+        if (data.folderId) {
+          folderId = data.folderId;
+        }
       }
     }
 
@@ -403,7 +393,6 @@ export class NavNodeManagerService extends Bootstrap {
 
       type: data.type,
       projectId,
-      connection,
       nodeId,
       parentId,
       folderId,
@@ -423,18 +412,6 @@ export class NavNodeManagerService extends Bootstrap {
   ): Promise<void> {
     if (data.type !== NavigationType.open) {
       return;
-    }
-
-    const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
-
-    if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
-      const connection = await this.connectionsManagerService.requireConnection(
-        createConnectionParam(nodeInfo.connection)
-      );
-
-      if (!connection?.connected) {
-        throw new Error('Connection not established');
-      }
     }
   }
 }

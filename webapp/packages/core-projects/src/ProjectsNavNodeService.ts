@@ -38,4 +38,8 @@ export class ProjectsNavNodeService {
   getByNodeId(nodeId: string): Project | undefined {
     return this.projectsResource.get(nodeId.replace('resource://', ''));
   }
+
+  getProjectNodeId(projectId: string): string {
+    return `resource://${projectId}`;
+  }
 }

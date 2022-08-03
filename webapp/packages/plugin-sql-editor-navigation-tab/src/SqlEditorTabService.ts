@@ -20,11 +20,15 @@ import {
   ICatalogData,
   IConnectionExecutorData,
   IConnectionInfoParams,
+  objectCatalogProvider,
+  objectCatalogSetter,
+  objectSchemaProvider,
+  objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, objectCatalogProvider, objectSchemaProvider, objectCatalogSetter, objectSchemaSetter, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, objectNavNodeProvider, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';

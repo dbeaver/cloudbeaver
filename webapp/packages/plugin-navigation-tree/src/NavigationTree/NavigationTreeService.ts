@@ -8,11 +8,11 @@
 
 import { action, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams, NavNodeExtensionsService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavNodeExtensionsService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';

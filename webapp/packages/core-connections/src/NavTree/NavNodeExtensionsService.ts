@@ -6,13 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, connectionProvider, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { IExtension } from '@cloudbeaver/core-extensions';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 
-import { objectCatalogProvider } from './extensions/IObjectCatalogProvider';
-import { objectSchemaProvider } from './extensions/IObjectSchemaProvider';
-import { NavNodeManagerService } from './NavNodeManagerService';
+import { ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
+import { connectionProvider } from '../extensions/IConnectionProvider';
+import { objectCatalogProvider } from '../extensions/IObjectCatalogProvider';
+import { objectSchemaProvider } from '../extensions/IObjectSchemaProvider';
+import type { IConnectionInfoParams } from '../IConnectionsResource';
+
 
 @injectable()
 export class NavNodeExtensionsService {

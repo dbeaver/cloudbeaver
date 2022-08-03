@@ -146,11 +146,20 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   }
 
   navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string, requestPath?: string): NavNode {
-    return {
+    const oldNode = this.get(node.id);
+
+    let newNode: NavNode = {
       ...node,
       objectFeatures: node.object?.features || [],
       parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? ROOT_NODE_PATH,
     };
+
+    if (oldNode) {
+      Object.assign(oldNode, newNode);
+      newNode = oldNode;
+    }
+
+    return newNode;
   }
 
   async loadNodeFullName(nodePath: string): Promise<NavNode> {

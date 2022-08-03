@@ -29,6 +29,7 @@
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
+    "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "react": "~18.x.x",
     "react-dom": "~18.x.x",
     "reakit": "~1.x.x",
