@@ -212,20 +212,23 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean closeSession(HttpServletRequest request) {
-        WebSession webSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
-        if (webSession != null) {
-            for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
-                try {
-                    hd.getInstance().handleSessionClose(webSession);
-                } catch (Exception e) {
-                    log.error("Error calling session handler '" + hd.getId() + "'", e);
-                    webSession.addSessionError(e);
+    public boolean closeSession(HttpServletRequest request) throws DBWebException {
+        try {
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
+            if (webSession != null) {
+                for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
+                    try {
+                        hd.getInstance().handleSessionClose(webSession);
+                    } catch (Exception e) {
+                        log.error("Error calling session handler '" + hd.getId() + "'", e);
+                        webSession.addSessionError(e);
+                    }
                 }
+                return true;
             }
-            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error closing session", e);
         }
-
         return false;
     }
 

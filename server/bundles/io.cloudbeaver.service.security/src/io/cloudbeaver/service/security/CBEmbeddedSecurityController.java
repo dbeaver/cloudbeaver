@@ -78,10 +78,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     protected final WebApplication application;
     protected final CBDatabase database;
+    protected final SMCredentialsProvider credentialsProvider;
 
-    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
+    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database, SMCredentialsProvider credentialsProvider) {
         this.application = application;
         this.database = database;
+        this.credentialsProvider = credentialsProvider;
     }
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
@@ -1111,6 +1113,28 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBException("Error while read auth info", e);
         }
+    }
+
+    @Override
+    public void logout() throws DBException {
+        var currentUserCreds = getCurrentUserCreds();
+        invalidateUserSession(currentUserCreds.getSmToken());
+    }
+
+    private void invalidateUserSession(String smToken) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
+        } catch (SQLException e) {
+            throw new DBCException("Session invalidation failed", e);
+        }
+    }
+
+    private SMCredentials getCurrentUserCreds() throws SMException {
+        var currentUserCreds = credentialsProvider.getActiveUserCredentials();
+        if (currentUserCreds == null) {
+            throw new SMException("Unauthorized");
+        }
+        return currentUserCreds;
     }
 
     private String findTokenBySmSession(String smSessionId) throws DBException {
