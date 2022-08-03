@@ -17,27 +17,20 @@
 
 package io.cloudbeaver.test.platform;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.WebTestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import java.io.File;
 import java.net.CookieManager;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({PlatformTest.class, AuthenticationTest.class })
-public class AllTests {
+public class CEServerTestSuite {
 
     public static final String GQL_API_URL = "http://localhost:18978/api/gql";
     public static final String SERVER_STATUS_URL = "http://localhost:18978/status";
@@ -66,7 +59,7 @@ public class AllTests {
             long startTime = System.currentTimeMillis();
             long endTime = 0;
             while (true) {
-                setUpIsDone = getServerStatus();
+                setUpIsDone = WebTestUtils.getServerStatus(client, SERVER_STATUS_URL);
                 endTime = System.currentTimeMillis() - startTime;
                 if (setUpIsDone || endTime > 300000) {
                     break;
@@ -83,21 +76,6 @@ public class AllTests {
     @AfterClass
     public static void shutdownServer() {
         testApp.stop();
-    }
-
-
-
-    private static boolean getServerStatus() {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(SERVER_STATUS_URL))
-            .GET()
-            .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 200;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     public static HttpClient getClient() {

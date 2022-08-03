@@ -52,7 +52,7 @@ public class PlatformTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        HttpClient client = AllTests.getClient();
+        HttpClient client = CEServerTestSuite.getClient();
         List<Map<String, Object>> connections = getUserConnections(client);
         Map<String, Object> addedConnection = createConnection(client);
         if (!getUserConnections(client).contains(addedConnection)) {
@@ -65,8 +65,8 @@ public class PlatformTest {
     }
 
     private List<Map<String, Object>> getUserConnections(HttpClient client) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS, AllTests.getScriptsPath());
-        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS, CEServerTestSuite.getScriptsPath());
+        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getObjectList(data, "userConnections");
@@ -75,8 +75,8 @@ public class PlatformTest {
     }
 
     private Map<String, Object> createConnection(HttpClient client) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION, AllTests.getScriptsPath());
-        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION, CEServerTestSuite.getScriptsPath());
+        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getObjectOrNull(data, "createConnection");
@@ -85,9 +85,9 @@ public class PlatformTest {
     }
 
     private boolean deleteConnection(HttpClient client, String connectionId) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION, AllTests.getScriptsPath())
+        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION, CEServerTestSuite.getScriptsPath())
             .replace("${connectionId}", connectionId);
-        Map<String, Object> map = WebTestUtils.doPost(AllTests.GQL_API_URL, input, client);
+        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
         if (data != null) {
             return JSONUtils.getBoolean(data, "deleteConnection");

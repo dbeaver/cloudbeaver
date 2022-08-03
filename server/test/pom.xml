@@ -48,7 +48,7 @@
                     <application>io.cloudbeaver.product.ce.application</application>
                     <product>io.cloudbeaver.product.ce.product</product>
                     <testRuntime>default</testRuntime>
-                    <testClass>io.cloudbeaver.test.platform.AllTests</testClass>
+                    <testClass>io.cloudbeaver.test.platform.CEServerTestSuite</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
 <!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>-->
                 </configuration>
