@@ -26,6 +26,10 @@ export class ProjectsService {
       project =  this.projectsResource.get(this.userInfoResource.data.userId);
     }
 
+    if (!project && this.projectsResource.has('anonymous')) {
+      project = this.projectsResource.get('anonymous');
+    }
+
     if (!project && this.projectsResource.values.length > 0) {
       project = this.projectsResource.values[0];
     }
