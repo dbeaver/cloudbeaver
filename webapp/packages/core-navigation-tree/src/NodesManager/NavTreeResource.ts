@@ -351,6 +351,21 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onItemAdd.execute(keyObject);
   }
 
+  insertToNode(nodeId: string, index: number, ...nodes: string[]): void {
+    const currentValue = this.data.get(nodeId) || [];
+    const nodeInfo = this.navNodeInfoResource.get(nodeId);
+
+    currentValue.splice(index, 0, ...nodes);
+
+    if (nodeInfo) {
+      nodeInfo.hasChildren = currentValue.length > 0;
+    }
+    this.data.set(nodeId, currentValue);
+
+    this.markUpdated(nodeId);
+    this.onItemAdd.execute(nodeId);
+  }
+
   set(key: string, value: string[]): void;
   set(key: ResourceKeyList<string>, value: string[][]): void;
   set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {

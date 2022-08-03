@@ -85,7 +85,7 @@ export class ConnectionNavNodeService extends Dependency {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfoResource.get(key);
 
-      if (!connectionInfo?.nodePath) {
+      if (!connectionInfo?.nodePath || connectionInfo.template) {
         return;
       }
 
@@ -123,7 +123,7 @@ export class ConnectionNavNodeService extends Dependency {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfoResource.get(key);
 
-      if (!connectionInfo) {
+      if (!connectionInfo || connectionInfo.template) {
         return;
       }
 
@@ -146,7 +146,7 @@ export class ConnectionNavNodeService extends Dependency {
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    if (!connection.nodePath) {
+    if (!connection.nodePath || connection.template) {
       return;
     }
 
@@ -176,7 +176,7 @@ export class ConnectionNavNodeService extends Dependency {
       insertIndex++;
     }
 
-    children.splice(insertIndex, 0, connection.nodePath);
+    this.navTreeResource.insertToNode(folder, insertIndex, connection.nodePath);
   }
 
   private async navigateHandler(
