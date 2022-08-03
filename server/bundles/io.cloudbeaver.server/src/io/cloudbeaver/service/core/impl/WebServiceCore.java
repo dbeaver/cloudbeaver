@@ -338,8 +338,11 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
-        webSession.addConnection(connectionInfo);
-
+        if (CommonUtils.equalObjects(sessionRegistry, WebServiceUtils.getGlobalRegistry(webSession))) {
+            sessionRegistry.flushConfig();
+        } else {
+            webSession.addConnection(connectionInfo);
+        }
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         return connectionInfo;
     }
@@ -601,7 +604,11 @@ public class WebServiceCore implements DBWServiceCore {
                 registry.addDataSource(dataSourceContainer);
                 throw new DBWebException("Failed to delete connection", e);
             }
-            webSession.removeConnection(connectionInfo);
+            if (CommonUtils.equalObjects(registry, WebServiceUtils.getGlobalRegistry(webSession))) {
+                registry.flushConfig();
+            } else {
+                webSession.removeConnection(connectionInfo);
+            }
         } else {
             // Just reset saved credentials
             connectionInfo.clearSavedCredentials();
