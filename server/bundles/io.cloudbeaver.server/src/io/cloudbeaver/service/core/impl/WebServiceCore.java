@@ -319,8 +319,8 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig connectionConfig
     ) throws DBWebException {
         if (!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) &&
-            !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections())
-        {
+            !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+        ) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
         webSession.addInfoMessage("Create new connection");
