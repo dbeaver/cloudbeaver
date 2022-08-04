@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
@@ -14,7 +14,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import type { ILoadableState } from './Loader/ILoadableState';
-import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
 
 interface IActions<
@@ -50,6 +49,9 @@ interface KeyWithIncludes<TKey, TIncludes> {
 }
 
 interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> extends ILoadableState {
+  outdated: boolean;
+  loading: boolean;
+  loaded: boolean;
   resource: TResource;
   isOutdated: () => boolean;
 }
@@ -138,7 +140,7 @@ export function useMapResource<
     includes = keyObj.includes;
   }
 
-  const keyRef = useObjectRef(() => ({
+  const keyRef = useObservableRef(() => ({
     loadedKey: null as TKeyArg | null,
     get actual() {
       if (this.loadedKey === this.key) {
@@ -151,7 +153,11 @@ export function useMapResource<
 
       return resource.includes(this.loadedKey, this.key);
     },
-  }), { key });
+  }), {
+    loadedKey: observable.ref,
+    key: observable.ref,
+    actual: computed,
+  }, { key });
 
   if (key === null) {
     keyRef.loadedKey = null;
@@ -252,16 +258,7 @@ export function useMapResource<
     actions,
   });
 
-  // TODO: getComputed skips update somehow ...
-  const outdated = (
-    refObj.key === null
-    || (
-      (resource.isOutdated(key) || !resource.isLoaded(key, includes as any))
-      && !resource.isDataLoading(key)
-    )
-  );
-
-  const [result] = useState<
+  const result = useObservableRef<
   IMapResourceResult<TResource, TIncludes>
   | IMapResourceListResult<TResource, TIncludes>
   >(() => ({
@@ -279,10 +276,10 @@ export function useMapResource<
         return null;
       }
 
-      return resource.getException(refObj.key);
+      return refObj.resource.getException(refObj.key);
     },
     get data() {
-      if (refObj.key === null || !resource.isLoaded(refObj.key, refObj.includes as any)) {
+      if (refObj.key === null || !refObj.resource.isLoaded(refObj.key, refObj.includes as any)) {
         if (isResourceKeyList(refObj.key)) {
           return [];
         }
@@ -290,16 +287,16 @@ export function useMapResource<
         return undefined;
       }
 
-      return resource.get(refObj.key);
+      return refObj.resource.get(refObj.key);
     },
-    isOutdated: () => {
+    get outdated() {
       if (refObj.key === null || !refObj.preloaded) {
         return true;
       }
 
-      return resource.isOutdated(refObj.key);
+      return refObj.resource.isOutdated(refObj.key);
     },
-    isLoaded() {
+    get loaded() {
       if (refObj.key === null) {
         return true;
       }
@@ -312,19 +309,40 @@ export function useMapResource<
         return false;
       }
 
-      return resource.isLoaded(refObj.key, refObj.includes as any);
+      return refObj.resource.isLoaded(refObj.key, refObj.includes as any);
     },
-    reload: () => {
-      (refObj as any)[loadFunctionName](true);
-    },
-    isLoading: () => {
+    get loading() {
       if (refObj.key === null) {
         return false;
       }
 
-      return refObj.loading || resource.isDataLoading(refObj.key);
+      return refObj.loading || refObj.resource.isDataLoading(refObj.key);
     },
-  }));
+    isOutdated() {
+      return this.outdated;
+    },
+    isLoaded() {
+      return this.loaded;
+    },
+    reload: () => {
+      (refObj as any)[loadFunctionName](true);
+    },
+    isLoading() {
+      return this.loading;
+    },
+  }), {
+    exception: computed,
+    data: computed,
+    outdated: computed,
+    loaded: computed,
+    loading: computed,
+  }, false);
+
+  // TODO: getComputed skips update somehow ...
+  const outdated = (
+    !result.loading
+    && (result.outdated || !result.loaded)
+  );
 
   const preloaded = refObj.preloaded; // make mobx subscription
 

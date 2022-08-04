@@ -93,7 +93,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                   connectionKey
                 )
               ),
-              getExtraProps: () => ({ projectId:connection.projectId, connectionId: connection.id }),
+              getExtraProps: () => ({ connectionKey }),
             }
           ));
         }

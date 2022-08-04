@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
+
 export interface IConnectionSelectorExtraProps {
-  projectId: string;
-  connectionId: string;
+  connectionKey: IConnectionInfoParams;
 }
