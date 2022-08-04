@@ -14,6 +14,7 @@
 # misc
 .DS_Store
 .env*
+.allure-results
 
 # debug
 npm-debug.log*

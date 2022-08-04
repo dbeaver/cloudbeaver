@@ -18,6 +18,6 @@ module.exports = {
   passWithNoTests: true,
   testEnvironment: 'jsdom',
   setupFiles: ['../tests/setup.ts'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom', 'jest-allure/dist/setup'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', 'jest-allure/dist/setup', '<rootDir>/setup/setup_allure.js'],
   transform: { '\\.[jt]sx?$': ['babel-jest', { configFile: require.resolve('./babel.config.js') }] },
 };
