@@ -9,12 +9,13 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface IStatusMessage {
@@ -42,11 +43,11 @@ export class UserFormController implements IInitializableController, IDestructib
   statusMessage: IStatusMessage | null;
 
   get connections(): DatabaseConnection[] {
-    return Array.from(this.connectionInfoResource.data.values());
+    return this.connectionInfoResource.get(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID)) as DatabaseConnection[];
   }
 
   get roles(): RoleInfo[] {
-    return Array.from(this.rolesResource.data.values()).sort(compareRoles);
+    return this.rolesResource.values.slice().sort(compareRoles);
   }
 
   get local(): boolean {
@@ -197,7 +198,7 @@ export class UserFormController implements IInitializableController, IDestructib
         this.selectedConnections.clear();
         for (const connection of this.grantedConnections) {
           if (connection.subjectType !== AdminSubjectType.Role) {
-            this.selectedConnections.set(connection.connectionId, true);
+            this.selectedConnections.set(connection.dataSourceId, true);
           }
         }
       }
@@ -267,7 +268,7 @@ export class UserFormController implements IInitializableController, IDestructib
     return Array.from(this.selectedConnections.keys())
       .filter(connectionId => {
         const connectionPermission = this.grantedConnections.find(
-          connectionPermission => connectionPermission.connectionId === connectionId
+          connectionPermission => connectionPermission.dataSourceId === connectionId
         );
         return this.selectedConnections.get(connectionId)
           && connectionPermission?.subjectType !== AdminSubjectType.Role;
@@ -319,7 +320,7 @@ export class UserFormController implements IInitializableController, IDestructib
   private async loadConnections() {
     try {
       await this.dbDriverResource.loadAll();
-      await this.connectionInfoResource.load(CachedMapAllKey);
+      await this.connectionInfoResource.load(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID));
     } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }
