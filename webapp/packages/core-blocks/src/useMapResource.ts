@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { ILoadableState } from './Loader/ILoadableState';
 import { useObservableRef } from './useObservableRef';
@@ -141,6 +142,8 @@ export function useMapResource<
   }
 
   const keyRef = useObservableRef(() => ({
+    key,
+    includes,
     loadedKey: null as TKeyArg | null,
     get actual() {
       if (this.loadedKey === this.key) {
@@ -156,11 +159,21 @@ export function useMapResource<
   }), {
     loadedKey: observable.ref,
     key: observable.ref,
+    includes: observable.ref,
     actual: computed,
-  }, { key });
+  }, false);
 
   if (key === null) {
+    keyRef.key = null;
     keyRef.loadedKey = null;
+  }
+
+  if (!isArraysEqual(includes, keyRef.includes)) {
+    keyRef.includes = includes;
+  }
+
+  if (!resource.includes(key, keyRef.key)) {
+    keyRef.key = key;
   }
 
   const refObj = useObservableRef(() => ({
@@ -190,7 +203,9 @@ export function useMapResource<
       return true;
     },
     async [loadFunctionName](refresh?: boolean) {
-      const { resource, actions, prevData, key, includes } = this;
+      const { resource, actions, prevData } = this;
+      const key = keyRef.key;
+      const includes = keyRef.includes;
 
       if (this.loading) {
         return;
@@ -248,16 +263,12 @@ export function useMapResource<
       }
     },
   }), {
-    includes: observable.ref,
     exception: observable.ref,
-    key: observable.ref,
     loading: observable.ref,
   }, {
     exceptionObserved: false,
     resource,
-    key,
     exception,
-    includes,
     actions,
   });
 
@@ -275,32 +286,32 @@ export function useMapResource<
         return refObj.exception;
       }
 
-      if (refObj.key === null) {
+      if (keyRef.key === null) {
         return null;
       }
 
-      return refObj.resource.getException(refObj.key);
+      return refObj.resource.getException(keyRef.key);
     },
     get data() {
-      if (refObj.key === null || !refObj.resource.isLoaded(refObj.key, refObj.includes as any)) {
-        if (isResourceKeyList(refObj.key)) {
+      if (keyRef.key === null || !refObj.resource.isLoaded(keyRef.key, keyRef.includes as any)) {
+        if (isResourceKeyList(keyRef.key)) {
           return [];
         }
 
         return undefined;
       }
 
-      return refObj.resource.get(refObj.key);
+      return refObj.resource.get(keyRef.key);
     },
     get outdated() {
-      if (refObj.key === null || !refObj.preloaded) {
+      if (keyRef.key === null || !refObj.preloaded) {
         return true;
       }
 
-      return refObj.resource.isOutdated(refObj.key);
+      return refObj.resource.isOutdated(keyRef.key);
     },
     get loaded() {
-      if (refObj.key === null) {
+      if (keyRef.key === null) {
         return true;
       }
 
@@ -312,14 +323,14 @@ export function useMapResource<
         return false;
       }
 
-      return refObj.resource.isLoaded(refObj.key, refObj.includes as any);
+      return refObj.resource.isLoaded(keyRef.key, keyRef.includes as any);
     },
     get loading() {
-      if (refObj.key === null) {
+      if (keyRef.key === null) {
         return false;
       }
 
-      return refObj.loading || refObj.resource.isDataLoading(refObj.key);
+      return refObj.loading || refObj.resource.isDataLoading(keyRef.key);
     },
     isOutdated() {
       return this.outdated;
@@ -350,7 +361,7 @@ export function useMapResource<
   const preloaded = refObj.preloaded; // make mobx subscription
 
   useEffect(() => {
-    if (!preloaded || (!outdated && keyRef.actual) || refObj.key === null) {
+    if (!preloaded || (!outdated && keyRef.actual) || keyRef.key === null) {
       return;
     }
 
