@@ -248,6 +248,9 @@ export function useMapResource<
       }
     },
   }), {
+    includes: observable.ref,
+    exception: observable.ref,
+    key: observable.ref,
     loading: observable.ref,
   }, {
     exceptionObserved: false,
