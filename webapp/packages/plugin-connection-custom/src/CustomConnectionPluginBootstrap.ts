@@ -8,6 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
@@ -18,7 +19,8 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
     private readonly mainMenuService: MainMenuService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly serverConfigResource: ServerConfigResource
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly projectsService: ProjectsService
   ) {
     super();
   }
@@ -28,7 +30,10 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       id: 'сustomConnection',
       order: 2,
       title: 'app_shared_connectionMenu_custom',
-      isHidden: () => !this.serverConfigResource.data?.supportsCustomConnections,
+      isHidden: () => (
+        !this.serverConfigResource.data?.supportsCustomConnections
+        || !this.projectsService.activeProject?.canCreateConnections
+      ),
       onClick: () => this.openConnectionsDialog(),
     });
   }
