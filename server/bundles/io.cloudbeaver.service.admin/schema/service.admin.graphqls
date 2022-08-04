@@ -138,8 +138,8 @@ extend type Query {
 
     # Permissions
 
-    getConnectionSubjectAccess(connectionId: ID): [AdminConnectionGrantInfo!]!
-    setConnectionSubjectAccess(connectionId: ID!, subjects: [ID!]!): Boolean
+    getConnectionSubjectAccess(projectId: ID, connectionId: ID): [AdminConnectionGrantInfo!]!
+    setConnectionSubjectAccess(projectId: ID, connectionId: ID!, subjects: [ID!]!): Boolean
 
     getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean

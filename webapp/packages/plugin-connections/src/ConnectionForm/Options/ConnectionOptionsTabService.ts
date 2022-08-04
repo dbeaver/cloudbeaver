@@ -8,7 +8,7 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
-import { CONNECTION_FOLDER_NAME_VALIDATION, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { CONNECTION_FOLDER_NAME_VALIDATION, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -75,20 +75,28 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
     const config = contexts.getContext(connectionConfigContext);
 
+    if (!state.projectId) {
+      status.error('connections_connection_create_fail');
+      return;
+    }
+
     try {
       if (submitType === 'submit') {
         if (state.mode === 'edit') {
-          const connection = await state.resource.update(config);
+          const connection = await state.resource.update(
+            createConnectionParam(state.projectId, config.connectionId!),
+            config
+          );
           status.info('Connection was updated');
           status.info(connection.name);
         } else {
-          const connection = await state.resource.create(config);
+          const connection = await state.resource.create(state.projectId, config);
           config.connectionId = connection.id;
           status.info('Connection was created');
           status.info(connection.name);
         }
       } else {
-        const info = await state.resource.test(config);
+        const info = await state.resource.test(state.projectId, config);
         status.info('Connection is established');
         status.info('Client version: ' + info.clientVersion);
         status.info('Server version: ' + info.serverVersion);
@@ -115,9 +123,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
       validation.error("Field 'name' can't be empty");
     }
 
-    if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
-      validation.error('connections_connection_folder_validation');
-    }
+    // if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+    //   validation.error('connections_connection_folder_validation');
+    // }
   }
 
   private fillConfig(

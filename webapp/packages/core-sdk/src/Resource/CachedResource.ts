@@ -24,10 +24,15 @@ export interface IDataError<TParam> {
   exception: Error;
 }
 
-export interface IParamAlias<TParam> {
+export type IParamAlias<TParam> = {
+  getter: false;
   param: TParam;
   getAlias: (param: TParam) => TParam;
-}
+} | {
+  getter: true;
+  param: (param: TParam) => boolean;
+  getAlias: (param: TParam) => TParam;
+};
 
 export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any> ? T : never;
 export type CachedResourceParam<TResource> = TResource extends CachedResource<any, infer T, any, any> ? T : never;
@@ -79,9 +84,9 @@ export abstract class CachedResource<
       exception: null,
       includes: observable([...this.defaultIncludes]),
     }, undefined, { deep: false })));
-    this.scheduler = new TaskScheduler(this.isKeyEqual);
+    this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
-    this.beforeLoad = new Executor(null, this.isKeyEqual);
+    this.beforeLoad = new Executor(null, this.includes);
     this.onDataOutdated = new SyncExecutor<TParam>(null);
     this.onDataUpdate = new SyncExecutor<TParam>(null);
     this.onDataError = new SyncExecutor<IDataError<TParam>>(null);
@@ -215,7 +220,13 @@ export abstract class CachedResource<
   abstract isLoaded(param: TParam, context: TContext): boolean;
 
   isAlias(key: TParam): boolean {
-    return this.paramAliases.some(alias => this.includes(key, alias.param));
+    return this.paramAliases.some(alias => {
+      if ('getter' in alias && alias.getter) {
+        return alias.param(key);
+      } else {
+        return alias.param === key;
+      }
+    });
   }
 
   waitLoad(): Promise<void> {
@@ -227,7 +238,7 @@ export abstract class CachedResource<
   }
 
   isAliasLoaded(key: TParam): boolean {
-    return this.loadedKeys.some(loadedKey => this.includes(key, loadedKey));
+    return this.loadedKeys.some(loadedKey => this.isAliasEqual(key, loadedKey));
   }
 
   isIncludes(key: TParam, includes: TContext): boolean {
@@ -323,8 +334,15 @@ export abstract class CachedResource<
     metadata.outdated = false;
   }
 
-  addAlias(param: TParam, getAlias: (param: TParam) => TParam): void {
-    this.paramAliases.push({ param, getAlias });
+  addAlias(param: TParam, getAlias: (param: TParam) => TParam): void;
+  addAlias<T extends TParam>(
+    param: (param: TParam) => param is T,
+    getAlias: (param: T) => TParam,
+    getter: true
+  ): void;
+  addAlias(param: (param: TParam) => boolean, getAlias: (param: TParam) => TParam, getter: true): void;
+  addAlias(param: TParam | ((param: TParam) => boolean), getAlias: (param: TParam) => TParam, getter?: boolean): void {
+    this.paramAliases.push({ param, getAlias, getter } as IParamAlias<TParam>);
   }
 
   transformParam(param: TParam): TParam {
@@ -334,11 +352,20 @@ export abstract class CachedResource<
 
     if (deep < 10) {
       for (const alias of this.paramAliases) {
-        if (this.includes(alias.param, param)) {
-          param = alias.getAlias(param);
-          deep++;
-          // eslint-disable-next-line no-labels
-          break transform;
+        if ('getter' in alias && alias.getter) {
+          if (alias.param(param)) {
+            param = alias.getAlias(param);
+            deep++;
+            // eslint-disable-next-line no-labels
+            break transform;
+          }
+        } else {
+          if (this.includes(alias.param, param)) {
+            param = alias.getAlias(param);
+            deep++;
+            // eslint-disable-next-line no-labels
+            break transform;
+          }
         }
       }
     } else {
@@ -400,7 +427,7 @@ export abstract class CachedResource<
 
   protected markOutdatedSync(param: TParam): void {
     if (this.isAlias(param)) {
-      const index = this.loadedKeys.findIndex(key => this.includes(param, key));
+      const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param, key));
 
       if (index >= 0) {
         this.loadedKeys.splice(index, 1);
@@ -413,12 +440,18 @@ export abstract class CachedResource<
     this.onDataOutdated.execute(param);
   }
 
-  isKeyEqual(param: TParam, second: TParam): boolean {
-    if (this.isAlias(param) || this.isAlias(second)) {
-      return true;
-    }
+  isAliasEqual(param: TParam, second: TParam): boolean {
+    return this.paramAliases.some(alias => {
+      if ('getter' in alias && alias.getter) {
+        return alias.param(param) && alias.param(second);
+      } else {
+        return alias.param === param && alias.param === second;
+      }
+    });
+  }
 
-    return this.includes(param, second);
+  isKeyEqual(param: TParam, second: TParam): boolean {
+    return param === second;
   }
 
   protected includes(param: TParam, second: TParam): boolean {
@@ -426,9 +459,13 @@ export abstract class CachedResource<
       return true;
     }
 
+    if (this.isAlias(param) || this.isAlias(second)) {
+      return this.isAliasEqual(param, second);
+    }
+
     param = this.transformParam(param);
     second = this.transformParam(second);
-    return param === second;
+    return this.isKeyEqual(param, second);
   }
 
   protected abstract loader(param: TParam, context: TContext): Promise<TData>;

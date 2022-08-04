@@ -1,12 +1,13 @@
 mutation createConnection(
+  $projectId: ID!
   $config: ConnectionConfig!
 
-  $includeOrigin: Boolean!,
-  $customIncludeOriginDetails: Boolean!,
-  $includeAuthProperties: Boolean!,
+  $includeOrigin: Boolean!
+  $customIncludeOriginDetails: Boolean!
+  $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
 ) {
-  connection: createConnection(config: $config) {
+  connection: createConnection(projectId: $projectId, config: $config) {
     ...DatabaseConnection
   }
 }

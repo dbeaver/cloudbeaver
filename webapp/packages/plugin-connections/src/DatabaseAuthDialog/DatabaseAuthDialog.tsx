@@ -16,7 +16,7 @@ import {
   useFocus,
   ErrorMessage,
 } from '@cloudbeaver/core-blocks';
-import { useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
+import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -43,7 +43,7 @@ const styles = css`
 `;
 
 interface Payload {
-  connectionId: string;
+  connection: IConnectionInfoParams;
   networkHandlers: string[];
 }
 
@@ -52,8 +52,8 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   options,
   rejectDialog,
 }) {
-  const connection = useConnectionInfo(payload.connectionId);
-  const controller = useController(DBAuthDialogController, payload.connectionId, payload.networkHandlers, rejectDialog);
+  const connection = useConnectionInfo(payload.connection);
+  const controller = useController(DBAuthDialogController, payload.connection, payload.networkHandlers, rejectDialog);
 
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -96,7 +96,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
               authModelId={authModelId}
               authProperties={connection.connectionInfo?.authProperties}
               networkHandlers={payload.networkHandlers}
-              formId={payload.connectionId}
+              formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
               allowSaveCredentials={credentialsSavingEnabled}
               disabled={controller.isAuthenticating}
             />

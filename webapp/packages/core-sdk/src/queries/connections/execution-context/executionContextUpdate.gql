@@ -1,10 +1,12 @@
 mutation executionContextUpdate(
+  $projectId: ID!
   $connectionId: ID!
   $contextId: ID!
   $defaultCatalog: ID
   $defaultSchema: ID
 ) {
   context: sqlContextSetDefaults(
+    projectId: $projectId
     connectionId: $connectionId
     contextId: $contextId
     defaultCatalog: $defaultCatalog

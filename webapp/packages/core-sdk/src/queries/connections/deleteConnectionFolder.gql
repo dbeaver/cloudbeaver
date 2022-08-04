@@ -1,5 +1,9 @@
 mutation deleteConnectionFolder(
+  $projectId: ID!
   $folderPath: ID!
 ) {
-  deleteConnectionFolder(folderPath: $folderPath)
+  deleteConnectionFolder(
+    projectId: $projectId
+    folderPath: $folderPath
+  )
 }

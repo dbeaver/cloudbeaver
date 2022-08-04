@@ -10,28 +10,30 @@ import type { MenuBaseItemIconComponent, IMenuBaseItem, IMenuBaseItemOptions } f
 import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
 
-interface IMenuBaseItemPropertyGetters {
+interface IMenuBaseItemPropertyGetters<TExtraProps = unknown> {
+  getExtraProps?: () => TExtraProps;
   isDisabled?: () => boolean;
-  iconComponent?: () => MenuBaseItemIconComponent;
+  iconComponent?: () => MenuBaseItemIconComponent<TExtraProps>;
 }
 
-export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
+export class MenuBaseItem<TExtraProps = unknown> extends MenuItem implements IMenuBaseItem<TExtraProps> {
   private readonly isDisabled?: () => boolean;
 
   readonly label: string;
   readonly icon?: string;
   readonly tooltip?: string;
   readonly hidden?: boolean;
-  readonly iconComponent?: () => MenuBaseItemIconComponent;
+  readonly iconComponent?: () => MenuBaseItemIconComponent<TExtraProps>;
+  readonly getExtraProps?: () => TExtraProps;
 
   get disabled(): boolean {
     return this.isDisabled?.() ?? false;
   }
 
   constructor(
-    options: IMenuBaseItemOptions,
+    options: IMenuBaseItemOptions<TExtraProps>,
     events?: IMenuItemEvents,
-    getters?: IMenuBaseItemPropertyGetters,
+    getters?: IMenuBaseItemPropertyGetters<TExtraProps>,
   ) {
     super(options.id, events);
     this.label = options.label;
@@ -39,5 +41,6 @@ export class MenuBaseItem extends MenuItem implements IMenuBaseItem {
     this.tooltip = options.tooltip;
     this.isDisabled = getters?.isDisabled;
     this.iconComponent = getters?.iconComponent;
+    this.getExtraProps = getters?.getExtraProps;
   }
 }

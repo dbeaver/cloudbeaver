@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, EConnectionFeature } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -160,29 +160,37 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          return connection.features.includes(EConnectionFeature.manageable);
+          return connection.canDelete;
         }
 
-        return action === ACTION_CONNECTION_EDIT;
+        if (action === ACTION_CONNECTION_EDIT) {
+          return connection.canEdit || connection.canViewSettings;
+        }
+
+        return false;
       },
       handler: async (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
         switch (action) {
           case ACTION_CONNECTION_DISCONNECT: {
-            await this.connectionsManagerService.closeConnectionAsync(connection.id);
+            await this.connectionsManagerService.closeConnectionAsync(
+              createConnectionParam(connection)
+            );
             break;
           }
           case ACTION_DELETE: {
             try {
-              await this.connectionsManagerService.deleteConnection(connection.id);
+              await this.connectionsManagerService.deleteConnection(
+                createConnectionParam(connection)
+              );
             } catch (exception: any) {
               this.notificationService.logException(exception, 'Failed to delete connection');
             }
             break;
           }
           case ACTION_CONNECTION_EDIT: {
-            this.publicConnectionFormService.open({ connectionId: connection.id });
+            this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
             break;
           }
         }
@@ -194,7 +202,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
   private async changeConnectionView(connection: Connection, settings: NavigatorViewSettings) {
     try {
-      connection = await this.connectionInfoResource.changeConnectionView(connection.id, settings);
+      connection = await this.connectionInfoResource.changeConnectionView(
+        createConnectionParam(connection),
+        settings
+      );
 
       if (connection.nodePath) {
         await this.navNodeManagerService.refreshTree(connection.nodePath);

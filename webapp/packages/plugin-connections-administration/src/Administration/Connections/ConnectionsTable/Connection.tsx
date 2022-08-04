@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Placeholder
 } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -38,16 +38,17 @@ const styles = css`
 `;
 
 interface Props {
+  connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
 }
 
-export const Connection = observer<Props>(function Connection({ connection }) {
+export const Connection = observer<Props>(function Connection({ connectionKey, connection }) {
   const driversResource = useService(DBDriverResource);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;
 
   return styled(useStyles(styles))(
-    <TableItem item={connection.id} expandElement={ConnectionEdit}>
+    <TableItem item={connectionKey} expandElement={ConnectionEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
       </TableColumnValue>

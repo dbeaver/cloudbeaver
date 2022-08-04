@@ -20,11 +20,15 @@ export class ResourceKeyList<TKey> {
     this.mark = mark;
   }
 
-  includes(key: ResourceKeyList<TKey> | TKey): boolean {
+  includes(
+    key: ResourceKeyList<TKey> | TKey,
+    isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB
+  ): boolean {
     if (isResourceKeyList(key)) {
-      return key.list.some(key => this.list.includes(key));
+      return key.list.some(key => this.includes(key, isEqual));
     }
-    return this.list.includes(key);
+
+    return this.list.some(current => isEqual(current, key));
   }
 }
 
@@ -49,7 +53,11 @@ export interface ResourceKeyUtils {
   filter: <TKey>(key: ResourceKey<TKey>, filter: (key: TKey) => boolean) => TKey[];
   mapKey: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
   mapArray: <TKey, TValue>(key: ResourceKey<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
-  includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
+  includes: <TKey>(
+    first: ResourceKey<TKey>,
+    second: ResourceKey<TKey>,
+    isEqual?: (keyA: TKey, keyB: TKey) => boolean
+  ) => boolean;
   exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKeyList<TKey>;
   join: <TKey>(...keys: Array<ResourceKey<TKey>>) => ResourceKeyList<TKey>;
   add: <TKey>(key: ResourceKey<TKey>, ...elements: TKey[]) => ResourceKeyList<TKey>;
@@ -164,7 +172,11 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     }
   },
 
-  includes<TKey>(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
+  includes<TKey>(
+    param: ResourceKey<TKey>,
+    key: ResourceKey<TKey>,
+    isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB
+  ): boolean {
     if (isResourceKeyList(param)) {
       return param.includes(key);
     }
@@ -173,7 +185,7 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
       return key.includes(param);
     }
 
-    return param === key;
+    return isEqual(param, key);
   },
 
   exclude<TKey>(param: ResourceKeyList<TKey>, key: ResourceKey<TKey>): ResourceKeyList<TKey> {

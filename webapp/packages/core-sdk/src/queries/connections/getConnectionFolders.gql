@@ -1,5 +1,11 @@
-query getConnectionFolders($project: ID) {
-  folders: connectionFolders(path: $project) {
+query getConnectionFolders(
+  $projectId: ID
+  $path: ID
+) {
+  folders: connectionFolders(
+    projectId: $projectId
+    path: $path
+  ) {
     ...ConnectionFolderInfo
   }
 }

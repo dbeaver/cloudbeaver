@@ -337,6 +337,7 @@ type ConnectionInfo {
 
 type ConnectionFolderInfo {
     id: ID!
+    projectId: ID!
     description: String
 }
 

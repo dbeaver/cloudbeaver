@@ -1,13 +1,14 @@
 mutation setConnectionNavigatorSettings(
-  $id: ID!,
-  $settings: NavigatorSettingsInput!,
+  $projectId: ID!
+  $connectionId: ID!
+  $settings: NavigatorSettingsInput!
 
-  $includeOrigin: Boolean!,
-  $customIncludeOriginDetails: Boolean!,
-  $includeAuthProperties: Boolean!,
+  $includeOrigin: Boolean!
+  $customIncludeOriginDetails: Boolean!
+  $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
 ) {
-  connection: setConnectionNavigatorSettings(id: $id, settings: $settings) {
+  connection: setConnectionNavigatorSettings(projectId: $projectId, id: $connectionId, settings: $settings) {
     ...DatabaseConnection
   }
 }

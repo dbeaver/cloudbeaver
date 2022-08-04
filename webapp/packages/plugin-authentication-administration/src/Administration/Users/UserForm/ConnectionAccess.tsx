@@ -45,7 +45,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   const driversResource = useService(DBDriverResource);
   const getConnectionPermission = useCallback(
     (connectionId: string) => controller.grantedConnections
-      .find(connectionPermission => connectionPermission.connectionId === connectionId),
+      .find(connectionPermission => connectionPermission.dataSourceId === connectionId),
     [controller.grantedConnections]);
   const loading = controller.isLoading;
   const cloudExists = controller.connections.some(isCloudConnection);
@@ -103,7 +103,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
 
               let grantedBy = '';
               if (isRoleProvided) {
-                grantedBy = `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission?.subjectId}`;
+                grantedBy = `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission.subjectId}`;
               } else if (connectionPermission) {
                 grantedBy = translate('authentication_administration_user_connections_access_granted_directly');
               }

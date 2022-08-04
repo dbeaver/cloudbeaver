@@ -1,8 +1,9 @@
 query getResourceProjectList {
   projects: rmListProjects {
-    id,
-    name,
-    shared,
-    description,
+    id
+    name
+    shared
+    description
+    projectPermissions
   }
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, generateFileName } from '@cloudbeaver/core-utils';
@@ -82,7 +82,7 @@ export class DDLViewerFooterService {
 
             await this.sqlEditorNavigatorService.openNewEditor({
               name,
-              connectionId: connection?.id,
+              connectionKey: connection && createConnectionParam(connection),
               catalogId: container.catalogId,
               schemaId: container.schemaId,
               query: ddl,

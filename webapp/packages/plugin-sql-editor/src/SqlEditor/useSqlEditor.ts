@@ -10,7 +10,7 @@ import { observable, computed, autorun, IReactionDisposer, action, untracked } f
 import { useEffect } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
@@ -69,7 +69,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return undefined;
       }
 
-      return this.sqlDialectInfoService.getDialectInfo(this.dataSource.executionContext.connectionId);
+      return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(
+        this.dataSource.executionContext.projectId,
+        this.dataSource.executionContext.connectionId
+      ));
     },
 
     get activeSegmentMode(): ISQLEditorMode {
@@ -145,11 +148,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           const context = this.connectionExecutionContextService.get(this.dataSource.executionContext.id);
 
           if (context) {
-            const connectionId = this.dataSource.executionContext.connectionId;
+            const key = createConnectionParam(
+              this.dataSource.executionContext.projectId,
+              this.dataSource.executionContext.connectionId
+            );
 
             untracked(() => {
               this.sqlDialectInfoService
-                .loadSqlDialectInfo(connectionId)
+                .loadSqlDialectInfo(key)
                 .then(async dialect => {
                   this.parser.setDialect(dialect || null);
                   await this.updateParserScriptsThrottle();

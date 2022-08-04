@@ -18,7 +18,7 @@ export default [
   ['connections_administration_tools_refresh_success', 'Connection list was refreshed'],
   ['connections_administration_tools_refresh_fail', 'Connection list refresh failed'],
   ['connections_database_authentication', 'Database Authentication'],
-  ['connections_connection_edit_not_own_deny', 'This connection was created by administrator. It cannot be updated.'],
+  ['connections_connection_edit_not_own_deny', 'You have no access to edit this connection.'],
   ['connections_connection_connect', 'Connect'],
   ['connections_connection_create_custom', 'Custom'],
   ['connections_connection_create_search_database', 'Search'],

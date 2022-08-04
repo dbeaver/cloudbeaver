@@ -1,18 +1,20 @@
 mutation initConnection(
-  $id: ID!,
-  $credentials: Object,
-  $networkCredentials: [NetworkHandlerConfigInput!], 
-  $saveCredentials: Boolean,
+  $projectId: ID!
+  $connectionId: ID!
+  $credentials: Object
+  $networkCredentials: [NetworkHandlerConfigInput!] 
+  $saveCredentials: Boolean
 
-  $includeOrigin: Boolean!,
-  $customIncludeOriginDetails: Boolean!,
-  $includeAuthProperties: Boolean!,
+  $includeOrigin: Boolean!
+  $customIncludeOriginDetails: Boolean!
+  $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
 ) {
   connection: initConnection(
-    id: $id,
-    credentials: $credentials,
-    networkCredentials: $networkCredentials,
+    projectId: $projectId
+    id: $connectionId
+    credentials: $credentials
+    networkCredentials: $networkCredentials
     saveCredentials: $saveCredentials
   ) {
     ...DatabaseConnection

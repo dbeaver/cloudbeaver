@@ -11,12 +11,12 @@ import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, useMapResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
@@ -62,7 +62,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useMapResource(ConnectionsAdministration, ConnectionsResource, CachedMapAllKey);
+  useMapResource(ConnectionsAdministration, ConnectionInfoResource, CachedMapAllKey);
 
   return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>
@@ -112,6 +112,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
           )}
           <layout-grid-cell data-span='12'>
             <ConnectionsTable
+              keys={controller.keys}
               connections={controller.connections}
               selectedItems={controller.selectedItems}
               expandedItems={controller.expandedItems}

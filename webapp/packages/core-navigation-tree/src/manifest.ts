@@ -10,7 +10,6 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { NavTreeSettingsService } from './NavTreeSettingsService';
 import { DBObjectResource } from './NodesManager/DBObjectResource';
-import { NavNodeExtensionsService } from './NodesManager/NavNodeExtensionsService';
 import { NavNodeInfoResource } from './NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from './NodesManager/NavNodeManagerService';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
@@ -24,7 +23,6 @@ export const coreNavigationTree: PluginManifest = {
     NavTreeSettingsService,
     NavNodeManagerService,
     DBObjectResource,
-    NavNodeExtensionsService,
     NavNodeInfoResource,
     NavTreeResource,
   ],

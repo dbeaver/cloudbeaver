@@ -74,7 +74,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
       }
       this._loading = true;
       try {
-        if (!this.tab.handlerState.connectionId) {
+        if (!this.tab.handlerState.connectionKey) {
           this._exception = null;
           return;
         }
@@ -101,7 +101,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
 
         if (!model) {
           await connectionInfoResource.waitLoad();
-          const connectionInfo = connectionInfoResource.get(this.tab.handlerState.connectionId);
+          const connectionInfo = connectionInfoResource.get(this.tab.handlerState.connectionKey);
 
           if (!connectionInfo) {
             throw new Error('Connection doesn\'t exists');

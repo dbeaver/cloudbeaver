@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionsResource } from '../../../ConnectionsResource';
 import { CreateConnectionService } from '../../CreateConnectionService';
 
 @injectable()
@@ -22,16 +22,17 @@ export class ConnectionManualService {
   }
 
   constructor(
-    private readonly connectionsResource: ConnectionsResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private createConnectionService: CreateConnectionService
   ) {
     this.select = this.select.bind(this);
   }
 
-  select(driverId: string): void {
+  select(projectId: string, driverId: string): void {
     this.createConnectionService.setConnectionTemplate(
+      projectId,
       {
-        ...this.connectionsResource.getEmptyConfig(),
+        ...this.connectionInfoResource.getEmptyConfig(),
         driverId,
       },
       [driverId]

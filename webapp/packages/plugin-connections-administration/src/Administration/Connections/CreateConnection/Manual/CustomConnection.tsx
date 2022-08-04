@@ -13,22 +13,29 @@ import { useMemo } from 'react';
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionManualService } from './ConnectionManualService';
 import { DriverList } from './DriverList';
 
 export const CustomConnection = observer(function CustomConnection() {
-  const service = useService(ConnectionManualService);
+  const connectionManualService = useService(ConnectionManualService);
   const dbDriverResource = useMapResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
   const drivers = useMemo(() => computed(() => (
     dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
+  useMapResource(CustomConnection, ProjectsResource, CachedMapAllKey);
+
+  function select(driverId: string) {
+    connectionManualService.select(PROJECT_GLOBAL_ID, driverId);
+  }
+
   return (
     <Loader state={[dbDriverResource]}>
-      <DriverList drivers={drivers.get()} onSelect={service.select} />
+      <DriverList drivers={drivers.get()} onSelect={select} />
     </Loader>
   );
 });

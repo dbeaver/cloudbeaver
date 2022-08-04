@@ -23,7 +23,9 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -151,5 +153,14 @@ public class WebAppUtils {
             }
         }
         return null;
+    }
+
+    public static boolean isGlobalProject(DBPProject project) {
+        return project.getId().equals(getGlobalProjectId());
+    }
+
+    public static String getGlobalProjectId() {
+        String globalConfigurationName = getWebApplication().getDefaultProjectName();
+        return RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 }

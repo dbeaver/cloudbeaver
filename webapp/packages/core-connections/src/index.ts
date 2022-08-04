@@ -4,6 +4,13 @@ export * from './ConnectionExecutionContext/ConnectionExecutionContextService';
 export * from './ConnectionExecutionContext/IConnectionExecutionContext';
 export * from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
 
+export * from './extensions/IObjectCatalogProvider';
+export * from './extensions/IObjectCatalogSetter';
+export * from './extensions/IObjectSchemaProvider';
+export * from './extensions/IObjectSchemaSetter';
+export * from './NavTree/ConnectionNavNodeService';
+export * from './NavTree/NavNodeExtensionsService';
+
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';
 export * from './ConnectionsManagerService';

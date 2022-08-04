@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionDialectResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionDialectResource, IConnectionExecutionContextInfo, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
@@ -27,19 +27,19 @@ export class SqlDialectInfoService {
     return query;
   }
 
-  getDialectInfo(connectionId: string): SqlDialectInfo | undefined {
-    return this.connectionDialectResource.get(connectionId);
+  getDialectInfo(key: IConnectionInfoParams): SqlDialectInfo | undefined {
+    return this.connectionDialectResource.get(key);
   }
 
-  async loadSqlDialectInfo(connectionId: string): Promise<SqlDialectInfo | undefined> {
-    if (!this.connectionDialectResource.has(connectionId)) {
+  async loadSqlDialectInfo(key: IConnectionInfoParams): Promise<SqlDialectInfo | undefined> {
+    if (!this.connectionDialectResource.has(key)) {
       try {
-        return this.connectionDialectResource.load(connectionId);
+        return this.connectionDialectResource.load(key);
       } catch (error: any) {
         this.notificationService.logException(error, 'Failed to load SqlDialectInfo');
       }
     }
 
-    return this.getDialectInfo(connectionId);
+    return this.getDialectInfo(key);
   }
 }

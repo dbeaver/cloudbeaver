@@ -9,11 +9,11 @@
 import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource } from '../../../ConnectionsResource';
 import { CreateConnectionService } from '../../CreateConnectionService';
 
 @injectable()
@@ -30,10 +30,10 @@ export class ConnectionSearchService {
   }
 
   constructor(
-    private notificationService: NotificationService,
-    private connectionsResource: ConnectionsResource,
+    private readonly notificationService: NotificationService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private createConnectionService: CreateConnectionService,
-    private administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService
   ) {
     makeObservable(this, {
       hosts: observable,
@@ -70,7 +70,7 @@ export class ConnectionSearchService {
         .replace(/[\s,|+-]+/gm, ' ')
         .split(/[\s,|+-]/);
 
-      this.databases = await this.connectionsResource.searchDatabases(hosts);
+      this.databases = await this.connectionInfoResource.searchDatabases(hosts);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Databases search failed');
     } finally {
@@ -82,10 +82,11 @@ export class ConnectionSearchService {
     this.hosts = hosts;
   }
 
-  select(database: AdminConnectionSearchInfo): void {
+  select(projectId: string, database: AdminConnectionSearchInfo): void {
     this.createConnectionService.setConnectionTemplate(
+      projectId,
       {
-        ...this.connectionsResource.getEmptyConfig(),
+        ...this.connectionInfoResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,
         port: `${database.port}`,

@@ -25,6 +25,7 @@ import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -41,6 +42,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
@@ -91,6 +93,10 @@ public class WebServiceUtils extends WebCommonUtils {
             throw new DBWebException("No activate data source registry");
         }
         return registry;
+    }
+
+    public static DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
+        return session.getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
     }
 
     @NotNull
@@ -329,8 +335,8 @@ public class WebServiceUtils extends WebCommonUtils {
         return folder;
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session) {
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
+        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
     }
 
