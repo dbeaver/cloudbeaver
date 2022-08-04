@@ -1601,7 +1601,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
         var allLinkedSubjects = getAllLinkedSubjects(subjectId);
-        var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
+        var grantedPermissionsByObjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
             var sqlBuilder = new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,OP.PERMISSION\n")
                 .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
@@ -1610,19 +1610,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                 dbStat.setString(1, smObjectType.getObjectType());
-                List<SMDataSourceGrant> result = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String objectId = dbResult.getString(1);
                         SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
                         String permission = dbResult.getString(3);
-                        grantedPermissionsBySubjectId.computeIfAbsent(
-                            subjectId,
+                        grantedPermissionsByObjectId.computeIfAbsent(
+                            objectId,
                             key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
                         ).addPermission(permission);
                     }
                 }
-                return grantedPermissionsBySubjectId.values().stream()
+                return grantedPermissionsByObjectId.values().stream()
                     .map(SMObjectPermissionsGrant.Builder::build)
                     .collect(Collectors.toList());
             }
