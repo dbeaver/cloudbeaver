@@ -455,6 +455,9 @@ input ConnectionConfig {
 
     # Folder
     folder: ID
+
+    # Configuration type
+    configurationType: DriverConfigurationType
 }
 
 ####################################################
