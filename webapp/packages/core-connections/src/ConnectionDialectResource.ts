@@ -98,10 +98,7 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
       return key;
     }
 
-    const ref = this.keys.find(k => (
-      k.projectId === key.projectId
-      && k.connectionId === key.connectionId
-    ));
+    const ref = this.keys.find(k => this.isKeyEqual(k, key));
 
     if (ref) {
       return ref;

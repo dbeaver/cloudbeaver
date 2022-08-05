@@ -11,8 +11,7 @@ import { observable, computed, makeObservable } from 'mobx';
 import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ProjectsResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
 @injectable()
@@ -28,7 +27,6 @@ export class CustomConnectionController implements IInitializableController {
     private readonly dbDriverResource: DBDriverResource,
     private readonly notificationService: NotificationService,
     private readonly projectsService: ProjectsService,
-    private readonly projectsResource: ProjectsResource,
     private readonly publicConnectionFormService: PublicConnectionFormService
   ) {
     makeObservable(this, {
@@ -43,7 +41,7 @@ export class CustomConnectionController implements IInitializableController {
   }
 
   onDriverSelect = async (driverId: string) => {
-    await this.projectsResource.load(CachedMapAllKey);
+    await this.projectsService.load();
 
     if (!this.projectsService.activeProject) {
       this.notificationService.logError({ title: 'core_projects_project_not' });

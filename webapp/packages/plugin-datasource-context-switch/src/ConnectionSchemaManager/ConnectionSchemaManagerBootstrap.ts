@@ -59,7 +59,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         items = [...items];
 
         const connections = this.connectionInfoResource.values
-          .slice()
+          .filter(connection => !connection.template)
           .sort((a, b) => {
             if (a.connected === b.connected) {
               return compareConnectionsInfo(a, b);
@@ -93,7 +93,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                   connectionKey
                 )
               ),
-              getExtraProps: () => ({ projectId:connection.projectId, connectionId: connection.id }),
+              getExtraProps: () => ({ connectionKey }),
             }
           ));
         }

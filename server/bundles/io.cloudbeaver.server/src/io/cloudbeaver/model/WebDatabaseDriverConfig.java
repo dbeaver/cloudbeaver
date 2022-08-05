@@ -142,11 +142,6 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
-    public boolean getAllowsEmptyPassword() {
-        return driver.isAllowsEmptyPassword();
-    }
-
-    @Property
     public boolean getLicenseRequired() {
         return driver.isLicenseRequired();
     }
