@@ -176,8 +176,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       return;
     }
 
-    if (type === ENodeMoveType.CanDrop && targetNode.nodeType) {
-      move.setCanMove(true);
+    if (type === ENodeMoveType.CanDrop) {
+      if (targetProject?.canCreateConnections) {
+        move.setCanMove(true);
+      }
     } else {
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
