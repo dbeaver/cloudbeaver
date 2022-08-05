@@ -21,6 +21,7 @@ import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -155,5 +156,15 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         }
     }
 
+    @Override
+    public Object start(IApplicationContext context) {
+        try {
+            startServer();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
 
+    protected abstract void startServer() throws DBException;
 }
