@@ -31,7 +31,6 @@ import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -217,16 +216,16 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public Object start(IApplicationContext context) {
+    protected void startServer() {
         Path configPath = null;
         try {
             configPath = loadServerConfiguration();
             if (configPath == null) {
-                return null;
+                return;
             }
         } catch (DBException e) {
             log.error(e);
-            return null;
+            return;
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
@@ -253,7 +252,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             }
         } catch (Exception e) {
             log.error("Error setting workspace location to " + workspaceLocation, e);
-            return null;
+            return;
         }
 
         CBPlatform.setApplication(this);
@@ -304,7 +303,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             initializeServer();
         } catch (DBException e) {
             log.error("Error initializing server", e);
-            return null;
+            return;
         }
 
         {
@@ -312,7 +311,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 initializeSecurityController();
             } catch (Exception e) {
                 log.error("Error initializing database", e);
-                return null;
+                return;
             }
         }
 
@@ -335,7 +334,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         log.debug("Shutdown");
 
-        return null;
+        return;
     }
 
     /**
