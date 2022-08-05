@@ -53,7 +53,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       >
         <MenuItemElement
           label={actionInfo.label}
-          icon={<Radio checked={checked} mod={['primary', 'small']} ripple={false} />}
+          icon={<Radio checked={checked} mod={['primary', 'menu']} ripple={false} />}
           tooltip={actionInfo.tooltip}
           loading={loading}
           style={style}

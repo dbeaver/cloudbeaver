@@ -12,6 +12,7 @@ export const baseFormControlStyles = css`
     field {
       box-sizing: border-box;
       max-width: 100%;
+
       &[|small] {
         max-width: 250px;
       }
@@ -20,6 +21,11 @@ export const baseFormControlStyles = css`
       }
       &[|large] {
         max-width: 650px;
+      }
+
+      & field {
+        height: 32px;
+        padding: 0;
       }
     }
 
