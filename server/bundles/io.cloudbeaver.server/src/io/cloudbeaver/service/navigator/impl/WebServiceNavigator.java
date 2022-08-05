@@ -29,6 +29,7 @@ import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -48,6 +49,7 @@ import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceOriginLocal;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -132,7 +134,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         }
 
                         //TODO node should not contain unaccessible datasource
-                        if (session.findWebConnectionInfo(container.getId()) == null) {
+                        if (!(container.getOrigin() instanceof DBPDataSourceOriginExternal)
+                            && session.findWebConnectionInfo(container.getId()) == null
+                        ) {
                             continue;
                         }
                     }
