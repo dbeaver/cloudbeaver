@@ -10,6 +10,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { Project, ProjectsResource } from './ProjectsResource';
 
@@ -52,5 +53,9 @@ export class ProjectsService {
 
   setActiveProject(project: Project): void {
     this.activeProjectId = project.id;
+  }
+
+  async load(): Promise<void> {
+    await this.projectsResource.load(CachedMapAllKey);
   }
 }

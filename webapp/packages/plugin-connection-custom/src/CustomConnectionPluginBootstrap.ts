@@ -20,12 +20,16 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly mainMenuService: MainMenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly projectsService: ProjectsService
+    private readonly projectsService: ProjectsService,
   ) {
     super();
   }
 
   register(): void | Promise<void> {
+    this.mainMenuService.onConnectionClick.addHandler(() => {
+      this.projectsService.load();
+    });
+
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
       id: 'сustomConnection',
       order: 2,
