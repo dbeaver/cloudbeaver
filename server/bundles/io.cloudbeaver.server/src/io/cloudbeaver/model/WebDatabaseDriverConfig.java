@@ -247,6 +247,6 @@ public class WebDatabaseDriverConfig {
 
     @Property
     public DBPDriverConfigurationType[] getConfigurationTypes() {
-        return driver.supportedConfigurationTypes().toArray(DBPDriverConfigurationType[]::new);
+        return driver.getSupportedConfigurationTypes().toArray(DBPDriverConfigurationType[]::new);
     }
 }

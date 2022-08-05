@@ -258,7 +258,7 @@ public class WebConnectionInfo {
     public DBPDriverConfigurationType getConfigurationType() {
         DBPDriverConfigurationType configurationType = dataSourceContainer.getConnectionConfiguration().getConfigurationType();
         if (configurationType == null) {
-            configurationType = DBPDriverConfigurationType.EXTENDED;
+            configurationType = DBPDriverConfigurationType.MANUAL;
         }
         return configurationType;
     }

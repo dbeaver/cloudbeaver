@@ -238,7 +238,7 @@ enum ResultDataFormat {
 }
 
 enum DriverConfigurationType {
-    EXTENDED,
+    MANUAL,
     URL
 }
 
