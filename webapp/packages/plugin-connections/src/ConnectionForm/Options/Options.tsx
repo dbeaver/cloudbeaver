@@ -62,7 +62,7 @@ interface IDriverConfiguration {
 const driverConfiguration: IDriverConfiguration[] = [
   {
     name: 'Manual',
-    value: DriverConfigurationType.Extended,
+    value: DriverConfigurationType.Manual,
   },
   {
     name: 'URL',
