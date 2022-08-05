@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, untracked } from 'mobx';
 import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
@@ -154,7 +154,7 @@ export function useMapResource<
         return false;
       }
 
-      return resource.includes(this.loadedKey, this.key);
+      return untracked(() => resource.includes(this.loadedKey, this.key));
     },
   }), {
     loadedKey: observable.ref,
@@ -163,17 +163,23 @@ export function useMapResource<
     actual: computed,
   }, false);
 
-  if (key === null) {
-    keyRef.key = null;
-    keyRef.loadedKey = null;
+  if (key === null && key !== keyRef.key) {
+    untracked(() => {
+      keyRef.key = null;
+      keyRef.loadedKey = null;
+    });
   }
 
   if (!isArraysEqual(includes, keyRef.includes)) {
-    keyRef.includes = includes;
+    untracked(() => {
+      keyRef.includes = includes;
+    });
   }
 
-  if (!resource.includes(key, keyRef.key)) {
-    keyRef.key = key;
+  if (!untracked(() => resource.includes(key, keyRef.key))) {
+    untracked(() => {
+      keyRef.key = key;
+    });
   }
 
   const refObj = useObservableRef(() => ({

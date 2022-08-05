@@ -45,6 +45,7 @@ export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
 }
 
 export const CachedMapAllKey = resourceKeyList<any>([Symbol('@cached-map-resource/all')], 'all');
+export const CachedMapEmptyKey = resourceKeyList<any>([], 'empty');
 
 export abstract class CachedMapResource<
   TKey,
