@@ -37,6 +37,7 @@ export default [
   ['connections_connection_access_admin_info', 'Администраторы видят все подключения.'],
   ['connections_connection_description', 'Описание'],
   ['connections_connection_driver', 'Драйвер'],
+  ['connections_connection_configuration', 'Конфигурация'],
   ['connections_connection_host', 'Хост'],
   ['connections_connection_port', 'Порт'],
   ['connections_connection_template', 'Шаблон'],

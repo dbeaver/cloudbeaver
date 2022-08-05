@@ -26,14 +26,16 @@ import {
   Combobox,
   Container,
   useFormValidator,
-  Loader,
   getComputed,
+  Radio,
+  RadioGroup,
+  FormFieldDescription,
 } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocalConnection } from '@cloudbeaver/core-connections';
+import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { usePermission } from '@cloudbeaver/core-root';
-import { CachedMapEmptyKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -49,6 +51,24 @@ const styles = css`
     overflow: auto;
   }
 `;
+
+interface IDriverConfiguration {
+  name: string;
+  value: DriverConfigurationType;
+  description?: string;
+  icon?: string;
+}
+
+const driverConfiguration: IDriverConfiguration[] = [
+  {
+    name: 'Manual',
+    value: DriverConfigurationType.Extended,
+  },
+  {
+    name: 'URL',
+    value: DriverConfigurationType.Url,
+  },
+];
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
   state,
@@ -109,6 +129,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   );
 
   const driver = driverMap.data;
+  const configurationTypes = driverConfiguration
+    .filter(conf => driver?.configurationTypes.includes(conf.value));
 
   function handleFormChange(value?: unknown, name?: string) {
     if (name !== 'name') {
@@ -135,12 +157,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   );
 
-  const JDBC = isJDBCConnection(driver, info);
-  const admin = state.type === 'admin';
+  const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
-  const availableAuthModels = applicableAuthModels.filter(model => !!model && (adminPermission
+  const availableAuthModels = applicableAuthModels.filter(model => !!model && (
+    adminPermission
     || !model.requiresLocalConfiguration
   ));
   const drivers = driverMap.resource.values
@@ -178,12 +200,83 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 searchable={drivers.length > 10}
                 readOnly={readonly || edit || drivers.length < 2}
                 disabled={disabled}
+                loading={driverMap.isLoading()}
                 tiny
                 fill
                 onSelect={handleDriverSelect}
               >
                 {translate('connections_connection_driver')}
               </Combobox>
+              {configurationTypes.length > 1 && (
+                <>
+                  {/*<Combobox
+                  name='configurationType'
+                  state={config}
+                  items={configurationTypes}
+                  keySelector={conf => conf.value}
+                  valueSelector={conf => conf.name}
+                  titleSelector={conf => conf.description}
+                  readOnly={readonly || configurationTypes.length < 2}
+                  disabled={disabled}
+                  tiny
+                  fill
+                >
+                  {translate('connections_connection_configuration')}
+              </Combobox>*/}
+                  <FormFieldDescription
+                    label={translate('connections_connection_configuration')}
+                    tiny
+                    fill
+                  >
+                    <Container gap>
+                      <RadioGroup
+                        name='configurationType'
+                        state={config}
+                      >
+                        {driverConfiguration.map(conf => (
+                          <Radio
+                            key={conf.value}
+                            id={conf.value}
+                            value={conf.value}
+                            mod={['primary', 'small']}
+                            readOnly={readonly || configurationTypes.length < 2}
+                            disabled={readonly}
+                            keepSize
+                          >
+                            {conf.name}
+                          </Radio>
+                        ))}
+                      </RadioGroup>
+                    </Container>
+                  </FormFieldDescription>
+                </>
+              )}
+            </Container>
+            {isURLConfiguration ? (
+              <InputField
+                type="text"
+                name="url"
+                state={config}
+                disabled={disabled}
+                readOnly={readonly}
+                autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
+                mod='surface'
+              >
+                {translate('customConnection_url_JDBC')}
+              </InputField>
+            ) : (
+              <ParametersForm
+                config={config}
+                embedded={driver?.embedded}
+                requiresServerName={driver?.requiresServerName}
+                disabled={disabled}
+                readOnly={readonly}
+                originLocal={originLocal}
+              />
+            )}
+          </Group>
+          <Group form gap>
+            <Container wrap gap>
               <InputField
                 type="text"
                 name="name"
@@ -198,65 +291,43 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               >
                 {translate('connections_connection_name')}
               </InputField>
-            </Container>
-            <Loader state={driverMap} inline inlineException>
-              {JDBC ? (
-                <InputField
-                  type="text"
-                  name="url"
-                  state={config}
-                  disabled={disabled}
-                  readOnly={readonly}
-                  autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
-                  mod='surface'
-                >
-                  {translate('customConnection_url_JDBC')}
-                </InputField>
-              ) : (
-                <ParametersForm
-                  config={config}
-                  embedded={driver?.embedded}
-                  requiresServerName={driver?.requiresServerName}
-                  disabled={disabled}
-                  readOnly={readonly}
-                  originLocal={originLocal}
-                />
-              )}
-              {admin && originLocal && (
-                <FieldCheckbox
-                  id={config.connectionId}
-                  name="template"
-                  state={config}
-                  disabled={edit || disabled}
-                  readOnly={readonly}
-                // autoHide // maybe better to use autoHide
-                >
-                  {translate('connections_connection_template')}
-                </FieldCheckbox>
-              )}
-              {admin && !config.template && (
+              {!config.template && (
                 <InputField
                   type="text"
                   name="folder"
                   state={config}
                   disabled={disabled}
-                  readOnly={readonly}
                   autoComplete={`section-${config.driverId || 'driver'} section-folder`}
                   mod='surface'
+                  readOnly
+                  tiny
+                  fill
                 >
                   {translate('customConnection_folder')}
                 </InputField>
               )}
-              <Textarea
-                name="description"
-                rows={3}
+            </Container>
+            {adminPermission && originLocal && (
+              <FieldCheckbox
+                id={config.connectionId}
+                name="template"
                 state={config}
-                disabled={disabled}
+                disabled={edit || disabled}
                 readOnly={readonly}
+                // autoHide // maybe better to use autoHide
               >
-                {translate('connections_connection_description')}
-              </Textarea>
-            </Loader>
+                {translate('connections_connection_template')}
+              </FieldCheckbox>
+            )}
+            <Textarea
+              name="description"
+              rows={3}
+              state={config}
+              disabled={disabled}
+              readOnly={readonly}
+            >
+              {translate('connections_connection_description')}
+            </Textarea>
           </Group>
         </Container>
         <Container medium gap>

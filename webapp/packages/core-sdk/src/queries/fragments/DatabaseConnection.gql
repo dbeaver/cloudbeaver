@@ -25,6 +25,7 @@ fragment DatabaseConnection on ConnectionInfo {
 
   features
   supportedDataFormats
+  configurationType
 
   origin @include(if: $includeOrigin) {
     ...ObjectOriginInfo
