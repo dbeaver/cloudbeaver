@@ -37,7 +37,6 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Web driver configuration
@@ -248,6 +247,6 @@ public class WebDatabaseDriverConfig {
 
     @Property
     public DBPDriverConfigurationType[] getConfigurationTypes() {
-        return driver.getConfigurationTypes().toArray(DBPDriverConfigurationType[]::new);
+        return driver.supportedConfigurationTypes().toArray(DBPDriverConfigurationType[]::new);
     }
 }
