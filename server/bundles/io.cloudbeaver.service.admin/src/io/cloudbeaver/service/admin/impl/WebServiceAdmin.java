@@ -726,6 +726,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
+            webSession.getAdminSecurityController().deleteAllSubjectObjectPermissions(subjectId, SMObjects.DATASOURCE);
             webSession.getAdminSecurityController()
                 .setObjectPermissions(
                     new HashSet<>(connections),
