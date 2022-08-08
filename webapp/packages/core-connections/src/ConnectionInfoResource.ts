@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
@@ -28,6 +28,7 @@ import {
   CachedResourceIncludeArgs,
   AdminConnectionSearchInfo,
   AdminConnectionGrantInfo,
+  isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseConnection } from './DatabaseConnection';
@@ -42,6 +43,13 @@ export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type NewConnection = Connection & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
+
+
+const connectionInfoProjectKeySymbol = Symbol('@connection-info/project') as unknown as IConnectionInfoParams;
+export const ConnectionInfoProjectKey = (projectId: string) => resourceKeyList<IConnectionInfoParams>(
+  [connectionInfoProjectKeySymbol],
+  projectId
+);
 
 export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
   showOnlyEntities: false,
@@ -66,12 +74,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource: SessionDataResource,
     permissionsResource: SessionPermissionsResource
   ) {
-    super();
+    super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
 
     this.onConnectionCreate = new SyncExecutor();
     this.onConnectionClose = new SyncExecutor();
     this.sessionUpdate = false;
     this.nodeIdMap = new Map();
+
+    this.addAlias(
+      isConnectionInfoProjectKey,
+      param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
+      true
+    );
 
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
@@ -370,38 +384,62 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   protected async loader(
-    key: ResourceKey<IConnectionInfoParams>,
+    originalKey: ResourceKey<IConnectionInfoParams>,
     includes: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes>
   ): Promise<Map<IConnectionInfoParams, Connection>> {
-    const all = this.includes(key, CachedMapAllKey);
-    key = this.transformParam(key);
+    let projectId: string | undefined;
+    const all = this.includes(originalKey, CachedMapAllKey);
+    const isProjectKey = isConnectionInfoProjectKey(originalKey);
+    const key = this.transformParam(originalKey);
 
-    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async (
-      key: IConnectionInfoParams
-    ) => {
-      const connectionId = all ? undefined : key.connectionId;
-      const projectId = all ? undefined : key.projectId;
+    if (isProjectKey) {
+      projectId = (originalKey as ResourceKeyList<IConnectionInfoParams>).mark;
+    }
 
-      const { connections } = await this.graphQLService.sdk.getUserConnections({
-        projectId,
-        connectionId,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key, includes),
-      });
+    await ResourceKeyUtils.forEachAsync(
+      (all || isProjectKey) ? CachedMapAllKey : key,
+      async (
+        key: IConnectionInfoParams
+      ) => {
+        let connectionId: string | undefined;
 
-      if (all) {
-        this.resetIncludes();
-        const unrestoredConnectionIdList = Array.from(this.keys)
-          .filter(key => !connections.some(connection => (
-            connection.projectId === key.projectId
+        if (!all && !isProjectKey) {
+          connectionId = key.connectionId;
+          projectId = key.projectId;
+        }
+
+        const { connections } = await this.graphQLService.sdk.getUserConnections({
+          projectId,
+          connectionId,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(key, includes),
+        });
+
+        runInAction(() => {
+          if (all) {
+            this.resetIncludes();
+            const unrestoredConnectionIdList = Array.from(this.keys)
+              .filter(key => !connections.some(connection => (
+                connection.projectId === key.projectId
             && connection.id === key.connectionId
-          )));
+              )));
 
-        this.delete(resourceKeyList(unrestoredConnectionIdList));
-      }
+            this.delete(resourceKeyList(unrestoredConnectionIdList));
+          }
 
-      this.updateConnection(...connections);
-    });
+          if (isProjectKey) {
+            const removedConnections = this.keys
+              .filter(key => !connections.some(f => (
+                key.projectId === projectId
+              && key.connectionId === f.id
+              )));
+
+            this.delete(resourceKeyList(removedConnections));
+          }
+
+          this.updateConnection(...connections);
+        });
+      });
     this.sessionUpdate = false;
 
     return this.data;
@@ -445,6 +483,12 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeOrigin: true,
     };
   }
+}
+
+function isConnectionInfoProjectKey(
+  param: ResourceKey<IConnectionInfoParams>
+): param is ResourceKeyList<IConnectionInfoParams> {
+  return isResourceKeyList(param) && param.list.includes(connectionInfoProjectKeySymbol);
 }
 
 export function isConnectionInfoParamEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {

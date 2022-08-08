@@ -79,13 +79,6 @@ public class WebServerConfig {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }
 
-
-    @Property
-    public boolean isAuthenticationEnabled() {
-        String[] enabledAuthProviders = getEnabledAuthProviders();
-        return enabledAuthProviders == null || !ArrayUtils.isEmpty(enabledAuthProviders);
-    }
-
     @Property
     public boolean isSupportsCustomConnections() {
         return application.getAppConfiguration().isSupportsCustomConnections();

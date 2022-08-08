@@ -19,6 +19,7 @@ import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { getComputed } from '../getComputed';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
+import { Loader } from '../Loader/Loader';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 
@@ -129,6 +130,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   items: TValue[];
   searchable?: boolean;
   defaultValue?: TKey;
+  loading?: boolean;
   keySelector: (item: TValue, index: number) => TKey;
   valueSelector: (item: TValue) => string;
   titleSelector?: (item: TValue) => string | undefined;
@@ -165,6 +167,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   state,
   propertyName,
   items,
+  loading,
   children,
   title,
   className,
@@ -329,13 +332,21 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const focus = menu.visible;
   const select = !searchable;
 
+  if (loading && items.length === 0) {
+    inputValue = translate('ui_processing_loading');
+  }
+
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles))(
     <field className={className}>
       {children && <field-label title={title}>{children}{rest.required && ' *'}</field-label>}
       <input-box>
-        {icon && (
+        {(icon || loading) && (
           <input-icon>
-            {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
+            {loading ? (
+              <Loader small fullSize />
+            ) : (
+              typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon
+            )}
           </input-icon>
         )}
         <input

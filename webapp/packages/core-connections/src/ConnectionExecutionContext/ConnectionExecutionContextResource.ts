@@ -183,16 +183,15 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
           contextId: all ? undefined : (context?.id ?? contextId),
         });
 
-
         runInAction(() => {
           const key = this.updateContexts(...contexts.map(getBaseContext));
 
           if (all) {
-            for (const contextId of this.keys) {
-              if (!this.includes(key, contextId)) {
-                this.delete(contextId);
-              }
-            }
+            this.delete(
+              resourceKeyList(
+                this.keys.filter(contextId => !this.includes(key, contextId))
+              )
+            );
           }
         });
       }
@@ -253,7 +252,7 @@ function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInf
  * @deprecated contextId is unique, function don't needed anymore
  */
 export function getContextBaseId(key: IConnectionInfoParams, contextId: string): string {
-  return `${key.projectId}:${key.connectionId}:${contextId}`;
+  return `${key.connectionId}:${contextId}`;
 }
 
 function isConnectionExecutionContextProjectKey(

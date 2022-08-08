@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -52,6 +53,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -60,7 +62,6 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -327,11 +328,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                createVirtualProject(project);
+                VirtualProjectImpl virtualProject = createVirtualProject(project);
+                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+                    // Projects for which user don't have edit permission can't be saved. So mark the as in memory
+                    virtualProject.setInMemory(true);
+                }
             }
             if (user == null) {
-                createVirtualProject(RMUtils.createAnonymousProject());
-                this.defaultProject.setInMemory(true);
+                VirtualProjectImpl anonymousProject = createVirtualProject(RMUtils.createAnonymousProject());
+                anonymousProject.setInMemory(true);
             }
         } catch (DBException e) {
             addSessionError(e);
@@ -339,18 +344,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void createVirtualProject(RMProject project) {
-        VirtualProjectImpl sessionProject = application.createProjectImpl(project,
-            getSessionAuthContext(),
-            this,
-            (dataSourceId -> findWebConnectionInfo(dataSourceId) != null)
-        );
+    private VirtualProjectImpl createVirtualProject(RMProject project) {
+        VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
         if (!project.isShared() || application.isConfigurationMode()) {
             this.defaultProject = sessionProject;
         }
+        return sessionProject;
     }
 
     public void refreshConnections() {
