@@ -63,10 +63,10 @@ interface IToolsState {
 }
 
 export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
-  const prevTabs = useRef<string[]>([]);
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: null }));
   const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const tabs = container.getIdList();
+  const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
 
   untracked(action(() => {
