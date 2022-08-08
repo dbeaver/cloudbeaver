@@ -297,7 +297,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (
       !isValuesEqual(config.name, data.info.name, '')
-      || !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Extended)
+      || !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Manual)
       || !isValuesEqual(config.description, data.info.description, '')
       || !isValuesEqual(config.template, data.info.template, true)
       || !isValuesEqual(config.folder, data.info.folder, undefined)

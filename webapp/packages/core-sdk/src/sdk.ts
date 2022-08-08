@@ -297,7 +297,7 @@ export interface DatabaseStructContainers {
 }
 
 export enum DriverConfigurationType {
-  Extended = 'EXTENDED',
+  Manual = 'MANUAL',
   Url = 'URL'
 }
 

@@ -78,8 +78,8 @@ export function useOptions(state: IConnectionFormState) {
 
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
           config.configurationType = (
-            driver?.configurationTypes.includes(DriverConfigurationType.Extended)
-              ? DriverConfigurationType.Extended
+            driver?.configurationTypes.includes(DriverConfigurationType.Manual)
+              ? DriverConfigurationType.Manual
               : DriverConfigurationType.Url
           );
         }
