@@ -16,31 +16,26 @@
  */
 package io.cloudbeaver.service.auth;
 
-import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
-import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
-import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +65,6 @@ public class RPSessionHandler implements DBWSessionHandler {
         String userName = request.getHeader(RPAuthProvider.X_USER);
         String roles = request.getHeader(RPAuthProvider.X_ROLE);
         List<String> userRoles = roles == null ? Collections.emptyList() : List.of(roles.split("\\|"));
-        SMSession authSession;
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
@@ -85,33 +79,11 @@ public class RPSessionHandler implements DBWSessionHandler {
                         webSession.getUserContext().getSmSessionId(),
                         sessionParameters,
                         WebSession.CB_SESSION_TYPE, authProvider.getId(), null, userCredentials);
-                    webSession.updateSMAuthInfo(smAuthInfo);
+                    new WebSessionAuthProcessor(webSession, smAuthInfo, false);
                 } catch (SMException e) {
                     log.debug("Error during user authentication", e);
                     throw e;
                 }
-                WebUser user = webSession.getUser();
-                DBWUserIdentity userIdentity = authProviderExternal.getUserIdentity(
-                        webSession.getProgressMonitor(), sessionParameters, credentials);
-
-                if (CommonUtils.isEmpty(user.getDisplayName())) {
-                    user.setDisplayName(userIdentity.getDisplayName());
-                }
-                authSession = authProviderExternal.openSession(
-                        webSession.getProgressMonitor(),
-                        webSession,
-                        sessionParameters,
-                        userCredentials);
-
-                WebAuthInfo authInfo = new WebAuthInfo(
-                        webSession,
-                        user,
-                        authProvider,
-                        userIdentity,
-                        authSession,
-                        OffsetDateTime.now());
-                authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
-                webSession.addAuthInfo(authInfo);
             } catch (Exception e) {
                 throw new DBWebException("Error", e);
             }
