@@ -13,8 +13,8 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ProjectsResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
@@ -85,7 +85,6 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
-    private readonly projectsResource: ProjectsResource,
     private readonly dbAuthModelsResource: DatabaseAuthModelsResource
   ) {
     makeObservable(this, {
@@ -124,7 +123,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       return;
     }
 
-    await this.projectsResource.load(CachedMapAllKey);
+    await this.projectsService.load();
 
     if (!this.projectsService.activeProject) {
       this.notificationService.logError({ title: 'core_projects_project_not' });

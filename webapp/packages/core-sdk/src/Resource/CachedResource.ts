@@ -533,18 +533,18 @@ export abstract class CachedResource<
   }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
-    const contexts = await this.beforeLoad.execute(param);
-
-    if (ExecutorInterrupter.isInterrupted(contexts) && !refresh) {
-      return;
-    }
-
     if (!refresh) {
       await this.scheduler.waitRelease(param);
 
       if (this.isLoaded(param, context) && !this.isOutdated(param)) {
         return;
       }
+    }
+
+    const contexts = await this.beforeLoad.execute(param);
+
+    if (ExecutorInterrupter.isInterrupted(contexts) && !refresh) {
+      return;
     }
 
     let loaded = false;

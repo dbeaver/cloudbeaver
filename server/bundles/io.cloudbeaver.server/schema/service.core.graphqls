@@ -117,7 +117,6 @@ type ServerConfig {
     hostName: String!
 
     anonymousAccessEnabled: Boolean
-    authenticationEnabled: Boolean @deprecated
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
@@ -196,9 +195,6 @@ type DriverInfo {
     embedded: Boolean
     enabled: Boolean!
     requiresServerName: Boolean
-
-    # this fields must be removed and be replaced by DriverAuthModel
-    allowsEmptyPassword: Boolean @deprecated
 
     licenseRequired: Boolean
     license: String
@@ -480,9 +476,6 @@ extend type Query {
     # List of connection folders
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
 
-    # Return connection state
-    connectionState( projectId: ID, id: ID! ): ConnectionInfo! @deprecated
-
     # Return connection info
     connectionInfo( projectId: ID, id: ID! ): ConnectionInfo!
 
@@ -545,15 +538,6 @@ extend type Mutation {
     asyncTaskCancel(id: String!): Boolean
 
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
-
-
-    #### Deprecated API
-
-    # Create connection from template. Use createConnection instead
-    openConnection( config: ConnectionConfig! ): ConnectionInfo! @deprecated
-
-    # Use asyncTaskInfo instead
-    asyncTaskStatus(id: String!): AsyncTaskInfo! @deprecated
 
 }
 

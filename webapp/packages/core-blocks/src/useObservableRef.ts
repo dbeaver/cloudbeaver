@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AnnotationsMap, makeObservable, untracked } from 'mobx';
+import { AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
 import { useState } from 'react';
 
 export function useObservableRef<T extends Record<any, any>>(
@@ -81,15 +81,17 @@ export function useObservableRef<T extends Record<any, any>>(
   });
 
   if (update) {
-    Object.assign(state, update);
+    runInAction(() => {
+      Object.assign(state, update);
 
-    if (bind) {
-      bind = bind.filter(key => (key as any) in (update as T));
+      if (Array.isArray(bind)) {
+        bind = bind.filter(key => (key as any) in (update as T));
 
-      if (bind.length > 0) {
-        bindFunctions(state, bind);
+        if (bind.length > 0) {
+          bindFunctions(state, bind);
+        }
       }
-    }
+    });
   }
 
   return state;

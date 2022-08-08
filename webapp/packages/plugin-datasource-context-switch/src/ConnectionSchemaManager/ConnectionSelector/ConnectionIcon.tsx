@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ConnectionMark, IconOrImage, useMapResource } from '@cloudbeaver/core-blocks';
-import { DBDriverResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { MenuBaseItemIconComponent } from '@cloudbeaver/core-view';
 
@@ -26,8 +26,7 @@ const connectionIconStyle = css`
 
 export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraProps> = observer(function ConnectionInfo({
   style,
-  connectionId,
-  projectId,
+  connectionKey,
   className,
 }) {
   const styles = useStyles(style, connectionIconStyle);
@@ -35,7 +34,7 @@ export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraP
   const connection = useMapResource(
     ConnectionSelector,
     ConnectionInfoResource,
-    createConnectionParam(projectId, connectionId)
+    connectionKey
   );
   const driverId = connection.data?.driverId;
 

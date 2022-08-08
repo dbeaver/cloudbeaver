@@ -118,7 +118,10 @@ export class NavNodeManagerService extends Bootstrap {
   ) {
     super();
     this.syncNodeInfoCache = new Map();
-    this.onMove = new Executor();
+    this.onMove = new Executor<INodeMoveData>(null, (current, next) => (
+      current.type === next.type
+      && current.targetNode === next.targetNode
+    ));
     this.navigator = new Executor<INodeNavigationData>(
       {
         type: NavigationType.open,

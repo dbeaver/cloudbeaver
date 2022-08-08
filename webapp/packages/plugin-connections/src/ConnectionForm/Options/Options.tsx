@@ -27,12 +27,13 @@ import {
   Container,
   useFormValidator,
   Loader,
+  getComputed,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isJDBCConnection, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { usePermission } from '@cloudbeaver/core-root';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapEmptyKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -122,14 +123,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { data: applicableAuthModels } = useMapResource(
     Options,
     DatabaseAuthModelsResource,
-    resourceKeyList(driver?.applicableAuthModels || [])
+    getComputed(() => driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedMapEmptyKey)
   );
-
 
   const { data: authModel } = useMapResource(
     Options,
     DatabaseAuthModelsResource,
-    config.authModelId || info?.authModel || driver?.defaultAuthModel || null,
+    getComputed(() => config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
     {
       onData: data => optionsHook.setAuthModel(data),
     }

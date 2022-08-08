@@ -321,7 +321,9 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String projectId,
         @NotNull WebConnectionConfig connectionConfig
     ) throws DBWebException {
-        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
+        if (!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) &&
+            !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+        ) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
         webSession.addInfoMessage("Create new connection");
@@ -341,11 +343,7 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
-        if (CommonUtils.equalObjects(sessionRegistry, WebServiceUtils.getGlobalRegistry(webSession))) {
-            sessionRegistry.flushConfig();
-        } else {
-            webSession.addConnection(connectionInfo);
-        }
+        webSession.addConnection(connectionInfo);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         return connectionInfo;
     }
@@ -607,11 +605,7 @@ public class WebServiceCore implements DBWServiceCore {
                 registry.addDataSource(dataSourceContainer);
                 throw new DBWebException("Failed to delete connection", e);
             }
-            if (CommonUtils.equalObjects(registry, WebServiceUtils.getGlobalRegistry(webSession))) {
-                registry.flushConfig();
-            } else {
-                webSession.removeConnection(connectionInfo);
-            }
+            webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
             connectionInfo.clearSavedCredentials();

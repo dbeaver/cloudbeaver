@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { AdministrationScreenService, EAdminPermission } from '@cloudbeaver/core-administration';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
 
@@ -24,6 +25,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     private readonly connectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly permissionsResource: PermissionsService
   ) {
     super();
     this.key = 'access';
@@ -36,7 +38,7 @@ export class ConnectionAccessTabService extends Bootstrap {
       title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: (tabId, props) => props?.state.type !== 'admin',
+      isHidden: () => !this.permissionsResource.has(EAdminPermission.admin),
       isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
