@@ -17,6 +17,8 @@
 
 package io.cloudbeaver;
 
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+
 @FunctionalInterface
 public interface DataSourceFilter {
     /**
@@ -25,5 +27,5 @@ public interface DataSourceFilter {
      * @param dataSourceId
      * @return true if datasource accessible
      */
-    boolean filter(String dataSourceId);
+    boolean filter(DBPDataSourceContainer dataSourceId);
 }

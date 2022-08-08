@@ -37,16 +37,17 @@ public class WebDataSourceRegistryProxy extends DataSourceRegistry {
     @Nullable
     @Override
     public DataSourceDescriptor getDataSource(String id) {
-        if (!dataSourceFilter.filter(id)) {
+        DataSourceDescriptor dataSource = dataSourceRegistry.getDataSource(id);
+        if (!dataSourceFilter.filter(dataSource)) {
             return null;
         }
-        return dataSourceRegistry.getDataSource(id);
+        return dataSource;
     }
 
     @Nullable
     @Override
     public DataSourceDescriptor getDataSource(DBPDataSource dataSource) {
-        if (!dataSourceFilter.filter(dataSource.getContainer().getId())) {
+        if (!dataSourceFilter.filter(dataSource.getContainer())) {
             return null;
         }
         return dataSourceRegistry.getDataSource(dataSource);
@@ -57,7 +58,7 @@ public class WebDataSourceRegistryProxy extends DataSourceRegistry {
     public DataSourceDescriptor findDataSourceByName(String name) {
         var dataSource = findDataSourceByName(name);
         if (dataSource != null) {
-            if (dataSourceFilter.filter(dataSource.getId())) {
+            if (dataSourceFilter.filter(dataSource)) {
                 return dataSource;
             }
         }
@@ -69,7 +70,7 @@ public class WebDataSourceRegistryProxy extends DataSourceRegistry {
     public List<? extends DBPDataSourceContainer> getDataSourcesByProfile(@NotNull DBWNetworkProfile profile) {
         return dataSourceRegistry.getDataSourcesByProfile(profile)
             .stream()
-            .filter(dataSource -> dataSourceFilter.filter(dataSource.getId()))
+            .filter(dataSourceFilter::filter)
             .collect(Collectors.toList());
     }
 
@@ -78,7 +79,7 @@ public class WebDataSourceRegistryProxy extends DataSourceRegistry {
     public List<DataSourceDescriptor> getDataSources() {
         return dataSourceRegistry.getDataSources()
             .stream()
-            .filter(dataSource -> dataSourceFilter.filter(dataSource.getId()))
+            .filter(dataSourceFilter::filter)
             .collect(Collectors.toList());
     }
 

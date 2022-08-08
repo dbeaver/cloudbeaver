@@ -324,6 +324,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private void loadProjects() {
         WebUser user = userContext.getUser();
+        refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
@@ -345,7 +346,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     private VirtualProjectImpl createVirtualProject(RMProject project) {
-        VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
+        VirtualProjectImpl sessionProject = application.createProjectImpl(
+            project,
+            getSessionAuthContext(),
+            this,
+            this::isDataSourceAccessible);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
@@ -360,18 +365,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         for (DBPProject project : accessibleProjects) {
-            boolean isGlobalProject = WebAppUtils.isGlobalProject(project);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
             for (DBPDataSourceContainer ds : registry.getDataSources()) {
-                WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                if (isGlobalProject) {
-                    if (isDataSourceAccessible(ds)) {
-                        connList.add(connectionInfo);
-                    }
-                } else {
-                    connList.add(connectionInfo);
-                }
+                connList.add(new WebConnectionInfo(this, ds));
             }
             Throwable lastError = registry.getLastError();
             if (lastError != null) {
