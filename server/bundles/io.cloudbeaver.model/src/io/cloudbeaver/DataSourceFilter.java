@@ -24,8 +24,8 @@ public interface DataSourceFilter {
     /**
      * Filter datasource from registry
      *
-     * @param dataSourceId
+     * @param dataSourceContainer
      * @return true if datasource accessible
      */
-    boolean filter(DBPDataSourceContainer dataSourceId);
+    boolean filter(DBPDataSourceContainer dataSourceContainer);
 }

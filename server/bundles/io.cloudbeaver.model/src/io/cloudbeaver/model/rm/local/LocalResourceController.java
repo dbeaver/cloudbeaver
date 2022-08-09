@@ -108,7 +108,7 @@ public class LocalResourceController implements RMController {
                 RMProject rmProject = makeProjectFromId(projectId, false);
                 project = new VirtualProjectImpl(
                     rmProject,
-                    sessionContext, (id) -> true);
+                    sessionContext, (container) -> true);
                 projectRegistries.put(projectId, project);
             }
             return project;
