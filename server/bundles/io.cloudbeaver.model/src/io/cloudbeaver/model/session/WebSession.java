@@ -310,6 +310,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
         this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.accessibleProjects);
         this.navigatorModel.setModelAuthContext(sessionAuthContext);
+        this.navigatorModel.setDefaultProject(defaultProject);
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
