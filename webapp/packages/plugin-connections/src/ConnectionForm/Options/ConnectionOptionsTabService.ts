@@ -8,7 +8,7 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
-import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
