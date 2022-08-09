@@ -21,9 +21,19 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### CloudBeaver 22.1.4 - 2022-08-08
+- Local  configuration:
+  - The structure of the local configuration file has been improved to simplify the modification process;
+  - A detailed description of the configuration file structure has been added to the wiki.
+- The version upgrade does not affect the CloudBeaver UI due to the local cache.
+- Different improvements have been made.
+
+
 ### CloudBeaver 22.1.3 - 2022-07-25
 - Scripts can be renamed in the Resource Manager.
 - Different Resource Management improvements have been made.
+
 ### CloudBeaver 22.1.2 - 2022-07-11
 
 - New folders allow users to group:
