@@ -345,7 +345,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private VirtualProjectImpl createVirtualProject(RMProject project) {
+    public VirtualProjectImpl createVirtualProject(RMProject project) {
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             getSessionAuthContext(),
@@ -456,8 +456,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
                 userContext.refreshPermissions();
+                refreshAccessibleConnectionIds();
             }
-            refreshAccessibleConnectionIds();
 
         } catch (Exception e) {
             addSessionError(e);
