@@ -29,13 +29,11 @@ import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
@@ -43,14 +41,13 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceOriginLocal;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -354,7 +351,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-
+            checkProjectEditAccess(node, session);
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
                     WebConnectionFolderUtils.validateConnectionFolder(newName);
@@ -396,6 +393,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
+                checkProjectEditAccess(node, session);
                 if (node instanceof DBNDatabaseNode) {
                     DBSObject object = ((DBNDatabaseNode) node).getObject();
                     DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
@@ -439,8 +437,27 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             return nodes.size();
 
         } catch (DBException e) {
-            throw new DBWebException("Error deleting navigator nodes "  + nodePaths, e);
+            throw new DBWebException("Error deleting navigator nodes " + nodePaths, e);
         }
+    }
+
+    private void checkProjectEditAccess(DBNNode node, WebSession session) throws DBException {
+        var project = session.getProjectById(node.getOwnerProject().getId());
+        if (project == null
+            || !hasNodeEditPermission(node, project.getRmProject())
+        ) {
+            throw new DBException("Access denied");
+        }
+    }
+
+    private boolean hasNodeEditPermission(DBNNode node, RMProject rmProject) {
+        var projectPermissions = rmProject.getProjectPermissions();
+        if (node instanceof DBNDataSource || node instanceof DBNLocalFolder) {
+            return projectPermissions.contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId());
+        } else if (node instanceof DBNAbstractResourceManagerNode) {
+            return projectPermissions.contains(RMProjectPermission.RESOURCE_EDIT.getPermissionId());
+        }
+        return true;
     }
 
     @Override
@@ -458,6 +475,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
+                checkProjectEditAccess(node, session);
                 if (node instanceof DBNDataSource) {
                     DBPDataSourceFolder folder;
                     if (folderNode instanceof DBNRoot || folderNode instanceof DBNProject) {
