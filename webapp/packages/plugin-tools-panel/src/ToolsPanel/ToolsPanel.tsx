@@ -81,6 +81,10 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
       prevTabs.current = tabs;
     }
 
+    if (state.selectedTabId === null) {
+      state.selectedTabId = tabs[0] || null;
+    }
+
     if (state.selectedTabId !== null) {
       if (!tabs.includes(state.selectedTabId)) {
         if (tabs.length > 0) {
