@@ -226,6 +226,8 @@ type DriverInfo {
     applicableAuthModels: [ID!]!
 
     applicableNetworkHandlers: [ID]!
+
+    configurationTypes: [DriverConfigurationType]!
 }
 
 enum ResultDataFormat {
@@ -233,6 +235,11 @@ enum ResultDataFormat {
     document,
     graph,
     timeseries
+}
+
+enum DriverConfigurationType {
+    MANUAL,
+    URL
 }
 
 ## Network handler config
@@ -314,6 +321,7 @@ type ConnectionInfo {
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
+    configurationType: DriverConfigurationType
 
     #Access properties
     canViewSettings: Boolean!
@@ -447,6 +455,9 @@ input ConnectionConfig {
 
     # Folder
     folder: ID
+
+    # Configuration type
+    configurationType: DriverConfigurationType
 }
 
 ####################################################
