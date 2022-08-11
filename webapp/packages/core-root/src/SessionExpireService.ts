@@ -18,7 +18,7 @@ export class SessionExpireService extends Bootstrap {
 
   onSessionExpire: IExecutor;
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
   ) {
     super();
     this.onSessionExpire = new Executor();
@@ -41,10 +41,10 @@ export class SessionExpireService extends Bootstrap {
     this.onSessionExpire.execute();
   }
 
-  private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
+  private async sessionExpiredInterceptor(request: Promise<unknown>): Promise<unknown> {
     try {
       return await request;
-    } catch (exception: any) {
+    } catch (exception: unknown) {
       if (exception instanceof GQLError && exception.errorCode === EServerErrorCode.sessionExpired) {
         this.sessionExpired();
       }
