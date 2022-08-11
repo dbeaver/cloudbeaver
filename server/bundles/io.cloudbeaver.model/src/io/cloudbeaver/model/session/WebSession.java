@@ -989,12 +989,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     @Property
     public boolean isValid() {
-        return (maxSessionIdleTime + lastAccessTime - System.currentTimeMillis()) > 0;
+        return getSessionActiveTimeLeft() > 0;
     }
 
     @Property
-    public String getExpirationTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(maxSessionIdleTime + lastAccessTime);
+    public long getExpireAfterSeconds() {
+        return getSessionActiveTimeLeft()/1000;
+    }
+
+    private long getSessionActiveTimeLeft() {
+        return maxSessionIdleTime + lastAccessTime - System.currentTimeMillis();
     }
 
     public void setMaxSessionIdleTime(long maxSessionIdleTime) {
