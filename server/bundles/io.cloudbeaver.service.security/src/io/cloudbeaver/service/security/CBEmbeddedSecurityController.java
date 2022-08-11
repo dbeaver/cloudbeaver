@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security.internal;
+package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,7 +24,9 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.service.security.internal.db.CBDatabase;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.service.security.db.CBDatabase;
+import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -65,8 +67,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final int TOKEN_HOURS_ALIVE_TIME = 1;
 
-    private static final String CHAR_BOOL_TRUE = "Y";
-    private static final String CHAR_BOOL_FALSE = "N";
+    protected static final String CHAR_BOOL_TRUE = "Y";
+    protected static final String CHAR_BOOL_FALSE = "N";
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_ROLE = "R";
@@ -74,12 +76,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    private final WebApplication application;
-    private final CBDatabase database;
+    protected final WebApplication application;
+    protected final CBDatabase database;
+    protected final SMCredentialsProvider credentialsProvider;
 
-    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database) {
+    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database, SMCredentialsProvider credentialsProvider) {
         this.application = application;
         this.database = database;
+        this.credentialsProvider = credentialsProvider;
     }
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
@@ -99,7 +103,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters) throws DBCException {
+    public void createUser(String userId, Map<String, String> metaParameters) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
@@ -1111,6 +1115,28 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    @Override
+    public void logout() throws DBException {
+        var currentUserCreds = getCurrentUserCreds();
+        invalidateUserSession(currentUserCreds.getSmToken());
+    }
+
+    private void invalidateUserSession(String smToken) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
+        } catch (SQLException e) {
+            throw new DBCException("Session invalidation failed", e);
+        }
+    }
+
+    private SMCredentials getCurrentUserCreds() throws SMException {
+        var currentUserCreds = credentialsProvider.getActiveUserCredentials();
+        if (currentUserCreds == null) {
+            throw new SMException("Unauthorized");
+        }
+        return currentUserCreds;
+    }
+
     private String findTokenBySmSession(String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?");
@@ -1472,6 +1498,20 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    @Override
+    public void deleteAllSubjectObjectPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?",
+                objectType.getObjectType(),
+                subjectId
+            );
+
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting subject permissions", e);
+        }
+    }
+
     @NotNull
     @Override
     public List<SMObjectPermissions> getAllAvailableObjectsPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
@@ -1585,7 +1625,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
         var allLinkedSubjects = getAllLinkedSubjects(subjectId);
-        var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
+        var grantedPermissionsByObjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
             var sqlBuilder = new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,OP.PERMISSION\n")
                 .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
@@ -1594,19 +1634,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                 dbStat.setString(1, smObjectType.getObjectType());
-                List<SMDataSourceGrant> result = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String objectId = dbResult.getString(1);
                         SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
                         String permission = dbResult.getString(3);
-                        grantedPermissionsBySubjectId.computeIfAbsent(
-                            subjectId,
+                        grantedPermissionsByObjectId.computeIfAbsent(
+                            objectId,
                             key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
                         ).addPermission(permission);
                     }
                 }
-                return grantedPermissionsBySubjectId.values().stream()
+                return grantedPermissionsByObjectId.values().stream()
                     .map(SMObjectPermissionsGrant.Builder::build)
                     .collect(Collectors.toList());
             }
@@ -1622,6 +1661,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             if (i > 0) sql.append(",");
             sql.append("'").append(id.replace("'", "''")).append("'");
         }
+    }
+
+    public void shutdown() {
+        database.shutdown();
+    }
+
+    public void finishConfiguration(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
+        database.finishConfiguration(adminName, adminPassword, authInfoList);
     }
 
     ///////////////////////////////////////////

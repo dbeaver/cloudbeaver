@@ -8,9 +8,14 @@
 
 import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-extensions';
 
+import type { IConnectionInfoParams } from '../IConnectionsResource';
+
 const connectionSetterSymbol = Symbol('@extension/ConnectionSetter');
 
-export type IConnectionSetter<T = never> = (connectionId: string, context: T) => Promise<boolean> | boolean;
+export type IConnectionSetter<T = never> = (
+  connectionKey: IConnectionInfoParams,
+  context: T
+) => Promise<boolean> | boolean;
 
 export function connectionSetter<T>(setter: IConnectionSetter<T>) {
   return createExtension<T>(setter, connectionSetterSymbol);

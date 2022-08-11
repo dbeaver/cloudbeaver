@@ -2,10 +2,6 @@
 <?eclipse version="3.2"?>
 
 <plugin>
-    <extension point="org.jkiss.dbeaver.pluginService">
-        <service class="io.cloudbeaver.service.security.SecurityPluginService"/>
-    </extension>
-
     <extension point="org.jkiss.dbeaver.auth.provider">
         <authProvider id="local" label="Local"
                 description="Local name/password based authentication"

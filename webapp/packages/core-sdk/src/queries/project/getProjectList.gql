@@ -1,7 +1,9 @@
 query getProjectList {
   projects: listProjects {
-    id,
-    name,
-    description,
+    id
+    name
+    description
+    canCreateConnections
+    canViewConnections
   }
 }

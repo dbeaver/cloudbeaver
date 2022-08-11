@@ -79,7 +79,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
         const executionContextInfo = this.executionContext.context;
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
-          connectionId: this.options.connectionId,
+          projectId: this.options.connectionKey.projectId,
+          connectionId: this.options.connectionKey.connectionId,
           contextId: executionContextInfo.id,
           resultsId: result.id,
         };

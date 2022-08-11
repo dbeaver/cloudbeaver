@@ -52,7 +52,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const objectId = tab.handlerState.objectId;
-  const connectionId = tab.handlerState.connectionId || null;
+  const connectionKey = tab.handlerState.connectionKey || null;
   const parentId = tab.handlerState.parentId;
   const parents = tab.handlerState.parents;
 
@@ -64,8 +64,8 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     notFound: observable.ref,
   }, false);
 
-  const connection = useMapResource(ObjectViewerPanel, ConnectionInfoResource, connectionId, {
-    isActive: resource => !connectionId || !resource.has(connectionId),
+  const connection = useMapResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey, {
+    isActive: resource => !connectionKey || !resource.has(connectionKey),
   });
 
   const connected = getComputed(() => connection.data?.connected || false);
@@ -107,11 +107,11 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     state.connecting = true;
 
     try {
-      await connectionsManagerService.requireConnection(connection.data.id);
+      await connectionsManagerService.requireConnection(connectionKey);
     } finally {
       state.connecting = false;
     }
-  }, []);
+  }, [connectionKey]);
 
   if (connection.data && !connection.data.connected) {
     if (state.connecting || connection.isLoading()) {

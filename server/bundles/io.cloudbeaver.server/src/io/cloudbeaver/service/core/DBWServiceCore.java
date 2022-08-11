@@ -162,18 +162,26 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Folders
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionFolderInfo createConnectionFolder(
-        @NotNull WebSession session, @Nullable String projectId, @Nullable String folderPath, @NotNull String newName
-    ) throws DBWebException;
+        @NotNull WebSession session,
+        @Nullable @WebObjectId String projectId,
+        @NotNull String parentNodePath,
+        @NotNull String newName) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
     WebConnectionFolderInfo renameConnectionFolder(
-        @NotNull WebSession session, @Nullable String projectId, @NotNull String folderPath, @NotNull String newName
-    ) throws DBWebException;
+        @NotNull WebSession session,
+        @Nullable @WebObjectId
+        String projectId,
+        @NotNull String folderPath,
+        @NotNull String newName) throws DBWebException;
 
-    @WebAction
-    boolean deleteConnectionFolder(@NotNull WebSession session, @Nullable String projectId, @NotNull String nodePath) throws DBWebException;
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    boolean deleteConnectionFolder(
+        @NotNull WebSession session,
+        @Nullable @WebObjectId String projectId,
+        @NotNull String nodePath) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings

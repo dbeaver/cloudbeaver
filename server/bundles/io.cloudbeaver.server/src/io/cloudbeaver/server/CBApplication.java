@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -27,10 +28,10 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
-import io.cloudbeaver.service.security.SecurityPluginService;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
+import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -105,7 +106,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     // Configurations
     protected final Map<String, Object> productConfiguration = new HashMap<>();
-    private final Map<String, Object> databaseConfiguration = new HashMap<>();
+    protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
 
@@ -196,13 +197,21 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return securityController;
+    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return new EmbeddedSecurityControllerFactory().createSecurityService(
+            this,
+            databaseConfiguration,
+            credentialsProvider
+        );
     }
 
     @Override
-    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return securityController;
+    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return new EmbeddedSecurityControllerFactory().createSecurityService(
+            this,
+            databaseConfiguration,
+            new NoAuthCredentialsProvider()
+        );
     }
 
     @Override
@@ -216,16 +225,16 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public Object start(IApplicationContext context) {
+    protected void startServer() {
         Path configPath = null;
         try {
             configPath = loadServerConfiguration();
             if (configPath == null) {
-                return null;
+                return;
             }
         } catch (DBException e) {
             log.error(e);
-            return null;
+            return;
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
@@ -252,7 +261,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             }
         } catch (Exception e) {
             log.error("Error setting workspace location to " + workspaceLocation, e);
-            return null;
+            return;
         }
 
         CBPlatform.setApplication(this);
@@ -299,12 +308,19 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         }
 
+        try {
+            initializeServer();
+        } catch (DBException e) {
+            log.error("Error initializing server", e);
+            return;
+        }
+
         {
             try {
                 initializeSecurityController();
             } catch (Exception e) {
                 log.error("Error initializing database", e);
-                return null;
+                return;
             }
         }
 
@@ -323,17 +339,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             System.setSecurityManager(new SecurityManager());
         }
 
-        try {
-            initializeServer();
-        } catch (DBException e) {
-            log.error("Error initializing server", e);
-            return null;
-        }
         runWebServer();
 
         log.debug("Shutdown");
 
-        return null;
+        return;
     }
 
     /**
@@ -451,7 +461,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return SecurityPluginService.createSecurityService(this, databaseConfiguration);
+        return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration, new NoAuthCredentialsProvider());
     }
 
     @Nullable
@@ -681,6 +691,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     private void shutdown() {
+        try {
+            if (securityController instanceof CBEmbeddedSecurityController) {
+                ((CBEmbeddedSecurityController) securityController).shutdown();
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
     }
 
@@ -763,8 +780,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return readConfiguration(runtimeConfigFile);
     }
 
-    protected void finishSecurityServiceConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
-        SecurityPluginService.finishConfiguration(adminName, adminPassword, authInfoList);
+    protected void finishSecurityServiceConfiguration(@NotNull String adminName,
+                                                      @Nullable String adminPassword,
+                                                      @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
+        if (securityController instanceof CBEmbeddedSecurityController) {
+            ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
+        }
     }
 
     public synchronized void flushConfiguration() throws DBException {

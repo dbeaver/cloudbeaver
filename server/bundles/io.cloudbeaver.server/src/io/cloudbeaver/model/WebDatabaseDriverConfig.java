@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -140,11 +141,6 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
-    public boolean getAllowsEmptyPassword() {
-        return driver.isAllowsEmptyPassword();
-    }
-
-    @Property
     public boolean getLicenseRequired() {
         return driver.isLicenseRequired();
     }
@@ -247,5 +243,10 @@ public class WebDatabaseDriverConfig {
             return false;
         }
         return driver.getSampleURL().contains(URL_SERVER_FIELD);
+    }
+
+    @Property
+    public DBPDriverConfigurationType[] getConfigurationTypes() {
+        return driver.getSupportedConfigurationTypes().toArray(DBPDriverConfigurationType[]::new);
     }
 }

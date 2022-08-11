@@ -8,10 +8,10 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
-import { CONNECTION_FOLDER_NAME_VALIDATION, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
@@ -75,20 +75,28 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
     const config = contexts.getContext(connectionConfigContext);
 
+    if (!state.projectId) {
+      status.error('connections_connection_create_fail');
+      return;
+    }
+
     try {
       if (submitType === 'submit') {
         if (state.mode === 'edit') {
-          const connection = await state.resource.update(config);
+          const connection = await state.resource.update(
+            createConnectionParam(state.projectId, config.connectionId!),
+            config
+          );
           status.info('Connection was updated');
           status.info(connection.name);
         } else {
-          const connection = await state.resource.create(config);
+          const connection = await state.resource.create(state.projectId, config);
           config.connectionId = connection.id;
           status.info('Connection was created');
           status.info(connection.name);
         }
       } else {
-        const info = await state.resource.test(config);
+        const info = await state.resource.test(state.projectId, config);
         status.info('Connection is established');
         status.info('Client version: ' + info.clientVersion);
         status.info('Server version: ' + info.serverVersion);
@@ -115,9 +123,17 @@ export class ConnectionOptionsTabService extends Bootstrap {
       validation.error("Field 'name' can't be empty");
     }
 
-    if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
-      validation.error('connections_connection_folder_validation');
+    if (state.config.driverId && state.config.configurationType) {
+      const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+
+      if (!driver.configurationTypes.includes(state.config.configurationType)) {
+        validation.error('Configuration is not supported');
+      }
     }
+
+    // if (state.config.folder && !state.config.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+    //   validation.error('connections_connection_folder_validation');
+    // }
   }
 
   private fillConfig(
@@ -142,6 +158,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     state.config.connectionId = state.info.id;
+    state.config.configurationType = state.info.configurationType;
 
     state.config.name = state.info.name;
     state.config.description = state.info.description;
@@ -198,6 +215,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.connectionId = state.config.connectionId;
     }
 
+    tempConfig.configurationType = state.config.configurationType;
+
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
@@ -214,7 +233,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.folder = state.config.folder;
     }
 
-    if (isJDBCConnection(driver, state.info)) {
+    if (tempConfig.configurationType === DriverConfigurationType.Url) {
       tempConfig.url = state.config.url;
     } else {
       if (!driver.embedded) {
@@ -278,6 +297,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (
       !isValuesEqual(config.name, data.info.name, '')
+      || !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Manual)
       || !isValuesEqual(config.description, data.info.description, '')
       || !isValuesEqual(config.template, data.info.template, true)
       || !isValuesEqual(config.folder, data.info.folder, undefined)

@@ -1,5 +1,6 @@
 fragment DatabaseConnection on ConnectionInfo {
   id
+  projectId
   name
   description
   driverId
@@ -24,6 +25,7 @@ fragment DatabaseConnection on ConnectionInfo {
 
   features
   supportedDataFormats
+  configurationType
 
   origin @include(if: $includeOrigin) {
     ...ObjectOriginInfo
@@ -50,4 +52,8 @@ fragment DatabaseConnection on ConnectionInfo {
   navigatorSettings {
     ...AllNavigatorSettings
   }
+
+  canViewSettings
+  canEdit
+  canDelete
 }

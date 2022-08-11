@@ -8,11 +8,11 @@
 
 import { action, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams, NavNodeExtensionsService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavNodeExtensionsService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
@@ -72,7 +72,7 @@ export class NavigationTreeService extends View<string> {
         let connection = this.connectionInfoResource.getConnectionForNode(id);
 
         if (connection) {
-          connection = await this.connectionInfoResource.load(connection.id);
+          connection = await this.connectionInfoResource.load(createConnectionParam(connection));
         } else {
           return false;
         }
@@ -82,7 +82,7 @@ export class NavigationTreeService extends View<string> {
         }
 
         try {
-          const connected = await this.tryInitConnection(connection.id);
+          const connected = await this.tryInitConnection(createConnectionParam(connection));
           if (!connected) {
             return false;
           }
@@ -166,8 +166,8 @@ export class NavigationTreeService extends View<string> {
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
-  private async tryInitConnection(connectionId: string): Promise<boolean> {
-    const connection = await this.connectionsManagerService.requireConnection(connectionId);
+  private async tryInitConnection(connectionKey: IConnectionInfoParams): Promise<boolean> {
+    const connection = await this.connectionsManagerService.requireConnection(connectionKey);
 
     return connection?.connected || false;
   }

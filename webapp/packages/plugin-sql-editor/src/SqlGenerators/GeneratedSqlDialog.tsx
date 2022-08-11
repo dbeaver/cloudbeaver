@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -80,7 +80,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
         return;
       }
 
-      return this.sqlDialectInfoService.getDialectInfo(this.connection.id);
+      return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(this.connection));
     },
     async load() {
       this.error.clear();
@@ -111,7 +111,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       return;
     }
 
-    sqlDialectInfoService.loadSqlDialectInfo(connection.id)
+    sqlDialectInfoService.loadSqlDialectInfo(createConnectionParam(connection))
       .catch(exception => {
         console.error(exception);
         console.warn(`Can't get dialect for connection: '${connection.id}'. Default dialect will be used`);

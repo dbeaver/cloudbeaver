@@ -10,6 +10,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { Project, ProjectsResource } from './ProjectsResource';
 
@@ -24,6 +25,10 @@ export class ProjectsService {
 
     if (!project && this.userInfoResource.data) {
       project =  this.projectsResource.get(this.userInfoResource.data.userId);
+    }
+
+    if (!project && this.projectsResource.has('anonymous')) {
+      project = this.projectsResource.get('anonymous');
     }
 
     if (!project && this.projectsResource.values.length > 0) {
@@ -48,5 +53,9 @@ export class ProjectsService {
 
   setActiveProject(project: Project): void {
     this.activeProjectId = project.id;
+  }
+
+  async load(): Promise<void> {
+    await this.projectsResource.load(CachedMapAllKey);
   }
 }

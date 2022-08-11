@@ -12,7 +12,7 @@ import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
-import type { PluginManifest } from '@cloudbeaver/core-di';
+import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
 import { codeDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
@@ -40,6 +40,7 @@ export const coreManifests: PluginManifest[] = [
 
     providers: [ ],
   },
+  coreDIManifest,
   coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
   coreThemingManifest,
   coreLocalizationManifest,

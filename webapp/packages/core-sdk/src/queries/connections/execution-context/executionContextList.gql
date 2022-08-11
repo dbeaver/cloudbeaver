@@ -1,8 +1,10 @@
 query executionContextList(
+  $projectId: ID
   $connectionId: ID
   $contextId: ID
 ) {
   contexts: sqlListContexts(
+    projectId: $projectId
     connectionId: $connectionId
     contextId: $contextId
   ) {

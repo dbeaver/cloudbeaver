@@ -10,7 +10,6 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
@@ -23,15 +22,13 @@ import {
   resourceKeyList,
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata,
-  CachedMapAllKey
+  ICachedMapResourceMetadata
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
 import type { NavNode } from './EntityTypes';
-import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
-import { NodeManagerUtils } from './NodeManagerUtils';
+import { NavNodeInfoResource } from './NavNodeInfoResource';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -76,7 +73,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly coreSettingsService: CoreSettingsService,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly sessionDataResource: SessionDataResource,
-    private readonly connectionInfo: ConnectionInfoResource,
     private readonly userInfoResource: UserInfoResource,
     permissionsResource: SessionPermissionsResource,
   ) {
@@ -86,7 +82,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onNodeRename = new Executor();
     this.onNodeMove = new Executor();
 
-    makeObservable<this, 'setNavObject' | 'connectionRemoveHandler'>(this, {
+    makeObservable<this, 'setNavObject'>(this, {
       childrenLimit: computed,
       setDetails: action,
       setNavObject: action,
@@ -94,7 +90,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       deleteInNode: action,
       unshiftToNode: action,
       pushToNode: action,
-      connectionRemoveHandler: action.bound,
     });
 
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
@@ -114,9 +109,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
     this.sessionDataResource.outdateResource(this);
-    this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
-    this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler);
-    this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
     this.userInfoResource.onUserChange.addHandler(action(() => {
       this.clear();
       this.navNodeInfoResource.clear(); // TODO: need more convenient way
@@ -132,19 +124,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     const first = parents[0];
-    await this.connectionInfo.load(CachedMapAllKey);
     await this.load(first);
 
     for (const nodeId of parents) {
       await this.waitLoad();
 
       if (!this.navNodeInfoResource.has(nodeId)) {
-        return false;
-      }
-
-      const connection = this.connectionInfo.getConnectionForNode(nodeId);
-
-      if (connection && !connection.connected) {
         return false;
       }
 
@@ -366,6 +351,21 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onItemAdd.execute(keyObject);
   }
 
+  insertToNode(nodeId: string, index: number, ...nodes: string[]): void {
+    const currentValue = this.data.get(nodeId) || [];
+    const nodeInfo = this.navNodeInfoResource.get(nodeId);
+
+    currentValue.splice(index, 0, ...nodes);
+
+    if (nodeInfo) {
+      nodeInfo.hasChildren = currentValue.length > 0;
+    }
+    this.data.set(nodeId, currentValue);
+
+    this.markUpdated(nodeId);
+    this.onItemAdd.execute(nodeId);
+  }
+
   set(key: string, value: string[]): void;
   set(key: ResourceKeyList<string>, value: string[][]): void;
   set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
@@ -439,101 +439,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     return nestedChildren;
-  }
-
-  private connectionUpdateHandler(key: ResourceKey<string>) {
-    const outdatedTrees: string[] = [];
-    const outdatedFolders: string[] = [];
-    const closedConnections: string[] = [];
-
-    ResourceKeyUtils.forEach(key, key => {
-      const connectionInfo = this.connectionInfo.get(key);
-
-      if (!connectionInfo?.nodePath) {
-        return;
-      }
-
-      if (!this.navNodeInfoResource.has(connectionInfo.nodePath)) {
-        return;
-      }
-
-      if (!connectionInfo.connected) {
-        closedConnections.push(connectionInfo.nodePath);
-        const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
-
-        const folder = /* connectionInfo.folder || */ node?.parentId ?? ROOT_NODE_PATH;
-
-        if (!outdatedFolders.includes(folder)) {
-          outdatedFolders.push(folder);
-        }
-      } else {
-        outdatedTrees.push(connectionInfo.nodePath);
-      }
-    });
-
-    if (closedConnections.length > 0) {
-      const key = resourceKeyList(closedConnections);
-      this.set(key, closedConnections.map(() => []));
-    }
-
-    if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
-      const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
-      this.markOutdated(key);
-    }
-  }
-
-  private connectionRemoveHandler(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, key => {
-      const connectionInfo = this.connectionInfo.get(key);
-
-      if (!connectionInfo) {
-        return;
-      }
-
-      let nodePath = connectionInfo.nodePath;
-
-      if (!nodePath) {
-        nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      }
-
-      const node = this.navNodeInfoResource.get(nodePath);
-      const folder = /* connectionInfo.folder || */ node?.parentId ?? ROOT_NODE_PATH;
-
-      if (nodePath) {
-        this.deleteInNode(folder, [nodePath]);
-      }
-    });
-  }
-
-  private async connectionCreateHandler(connection: Connection) {
-    if (!connection.nodePath) {
-      return;
-    }
-
-    const node = this.navNodeInfoResource.get(connection.nodePath);
-    const folder = /* connection.folder || */ node?.parentId ?? ROOT_NODE_PATH;
-
-    const children = this.get(folder);
-
-    if (!children) {
-      return;
-    }
-
-    const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
-    this.navNodeInfoResource.setParent(connection.nodePath, folder);
-
-    let insertIndex = 0;
-
-    const nodes = this.navNodeInfoResource.get(resourceKeyList(children));
-
-    for (const node of nodes) {
-      if (!node?.folder && node?.name?.localeCompare(connectionNode.name!) === 1) {
-        break;
-      }
-      insertIndex++;
-    }
-
-    children.splice(insertIndex, 0, connection.nodePath);
   }
 
   private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {

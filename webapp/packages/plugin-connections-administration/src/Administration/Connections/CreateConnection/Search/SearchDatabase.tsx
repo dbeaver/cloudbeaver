@@ -8,22 +8,32 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { useService } from '@cloudbeaver/core-di';
 
+import { useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey, type AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+
+import { CustomConnection } from '../Manual/CustomConnection';
 import { ConnectionSearchService } from './ConnectionSearchService';
 import { DatabaseList } from './DatabaseList';
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
-  const service = useService(ConnectionSearchService);
+  const connectionSearchService = useService(ConnectionSearchService);
+  useMapResource(CustomConnection, ProjectsResource, CachedMapAllKey);
+
+  function select(database: AdminConnectionSearchInfo) {
+    connectionSearchService.select(PROJECT_GLOBAL_ID, database);
+  }
 
   return (
     <DatabaseList
-      databases={service.databases}
-      hosts={service.hosts}
-      disabled={service.disabled}
-      onSelect={service.select}
-      onChange={service.change}
-      onSearch={service.search}
+      databases={connectionSearchService.databases}
+      hosts={connectionSearchService.hosts}
+      disabled={connectionSearchService.disabled}
+      onSelect={select}
+      onChange={connectionSearchService.change}
+      onSearch={connectionSearchService.search}
     />
   );
 });

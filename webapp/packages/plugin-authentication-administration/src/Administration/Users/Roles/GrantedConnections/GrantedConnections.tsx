@@ -11,16 +11,16 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
   InfoItem, Loader, TextPlaceholder, useMapResource
 } from '@cloudbeaver/core-blocks';
-import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ConnectionsResource } from '@cloudbeaver/plugin-connections-administration';
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormProps } from '../IRoleFormProps';
 import { ConnectionList } from './ConnectionList';
@@ -57,13 +57,13 @@ export const GrantedConnections: TabContainerPanelComponent<IRoleFormProps> = ob
     GrantedConnections,
     DBDriverResource,
     CachedMapAllKey,
-    { isActive: () => selected }
+    { active: selected }
   );
   const connections = useMapResource(
     GrantedConnections,
-    ConnectionsResource,
-    CachedMapAllKey,
-    { isActive: () => selected }
+    ConnectionInfoResource,
+    ConnectionInfoProjectKey(PROJECT_GLOBAL_ID),
+    { active: selected }
   );
 
   const grantedConnections = useMemo(() => computed(() => connections.resource.values

@@ -12,6 +12,9 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { RadioGroupContext } from './RadioGroupContext';
 
@@ -51,28 +54,33 @@ const radioStyles = css`
 
 const radioMod = {
   primary: css`
-      radio {
-        composes: theme-radio_primary from global;
-      }
-    `,
+    radio {
+      composes: theme-radio_primary from global;
+    }
+  `,
   small: css`
-      radio {
-        composes: theme-radio_small from global;
+    radio {
+      composes: theme-radio_small from global;
+    }
+  `,
+  menu: css`
+    radio {
+      composes: theme-radio_small from global;
+    }
+    field {
+      & radio {
+        width: 14px;
+        height: 14px;
       }
-      field {
-        & radio {
-          width: 14px;
-          height: 14px;
-        }
-        & radio-background {
-          width: 14px;
-          height: 14px;
-        }
-        & radio-inner-circle {
-          border-width: 7px;
-        }
+      & radio-background {
+        width: 14px;
+        height: 14px;
       }
-   `,
+      & radio-inner-circle {
+       border-width: 7px;
+      }
+    }
+  `,
 };
 
 const noRippleStyles = css`
@@ -92,7 +100,9 @@ const radioState = {
     `,
 };
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'>
+& ILayoutSizeProps
+& {
   mod?: Array<keyof typeof radioMod>;
   ripple?: boolean;
 };
@@ -130,6 +140,7 @@ export const Radio: RadioType = observer(function Radio({
   children,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  rest = filterLayoutFakeProps(rest);
   const formContext = useContext(FormContext);
   const context = useContext(RadioGroupContext);
 
@@ -167,6 +178,7 @@ export const Radio: RadioType = observer(function Radio({
   }
 
   return styled(useStyles(
+    baseFormControlStyles,
     radioStyles,
     ...(mod || []).map(mod => radioMod[mod]),
     !ripple && noRippleStyles,

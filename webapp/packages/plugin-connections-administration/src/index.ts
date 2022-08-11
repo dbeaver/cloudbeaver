@@ -6,7 +6,6 @@ export * from './Administration/Connections/ConnectionsAdministrationNavService'
 export * from './Administration/Connections/ConnectionsAdministrationService';
 export * from './Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap';
 export * from './Administration/Connections/CreateConnectionService';
-export * from './Administration/ConnectionsResource';
 export * from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
 
 export default connectionPlugin;

@@ -28,9 +28,6 @@ const menuStyles = css`
     cursor: pointer;
     width: 100%;
   }
-  menu-container:not([|menuEmpty]) value {
-    padding-left: 8px;
-  }
   menu-box {
     display: flex;
     height: 100%;
@@ -41,7 +38,8 @@ const menuStyles = css`
     }
   }
   value {
-    transition: padding 0.2s;
+    flex-grow: 1;
+    flex-shrink: 1;
   }
 `;
 
@@ -86,12 +84,12 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
       {...use({ menuEmpty, menuOpened })}
     >
       <menu-box>
+        <value className='cell-formatter__value' title={value}>{value}</value>
         {!menuEmpty && (
           <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
             <menu-icon><Icon name="snack" viewBox="0 0 16 10" /></menu-icon>
           </ContextMenu>
         )}
-        <value className='cell-formatter__value' title={value}>{value}</value>
       </menu-box>
     </menu-container>
   );

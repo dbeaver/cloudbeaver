@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Connection } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
@@ -15,6 +15,7 @@ import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 export class TemplateConnectionsResource extends CachedDataResource<Connection[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    connectionInfoResource: ConnectionInfoResource,
     permissionsResource: SessionPermissionsResource,
   ) {
     super([]);
@@ -22,6 +23,8 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
     permissionsResource
       .require(this, EPermission.public)
       .outdateResource(this);
+
+    connectionInfoResource.onDataUpdate.addHandler(() => this.markOutdated());
   }
 
   isLoaded(): boolean {

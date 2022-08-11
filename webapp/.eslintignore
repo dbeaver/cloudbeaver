@@ -2,3 +2,4 @@ node_modules
 lib
 **/*.js
 **/next-env.d.ts
+webapp/packages/core-sdk/src/sdk.ts

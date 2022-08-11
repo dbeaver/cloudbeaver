@@ -8,11 +8,12 @@
 
 import { observable, makeObservable, computed } from 'mobx';
 
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
@@ -33,7 +34,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-  implements IInitializableController, IDestructibleController, IConnectionController {
+implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
@@ -74,16 +75,17 @@ export class ConnectionController
 
     return this.template.networkHandlersConfig
       .filter(handler => handler.enabled && !handler.savePassword)
-      .map(handler => handler.id)
+      .map(handler => handler.id);
   }
 
   constructor(
-    private dbDriverResource: DBDriverResource,
-    private connectionInfoResource: ConnectionInfoResource,
-    private templateConnectionsResource: TemplateConnectionsResource,
-    private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService,
-    private dbAuthModelsResource: DatabaseAuthModelsResource
+    private readonly dbDriverResource: DBDriverResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly templateConnectionsResource: TemplateConnectionsResource,
+    private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly projectsService: ProjectsService,
+    private readonly dbAuthModelsResource: DatabaseAuthModelsResource
   ) {
     makeObservable(this, {
       step: observable,
@@ -94,7 +96,7 @@ export class ConnectionController
       config: observable,
       hasDetails: observable,
       responseMessage: observable,
-      networkHandlers: computed
+      networkHandlers: computed,
     });
   }
 
@@ -121,21 +123,33 @@ export class ConnectionController
       return;
     }
 
+    await this.projectsService.load();
+
+    if (!this.projectsService.activeProject) {
+      this.notificationService.logError({ title: 'core_projects_project_not' });
+      return;
+    }
+
+    const projectId = this.projectsService.activeProject.id;
     this.isConnecting = true;
     this.clearError();
     try {
       const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
-      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id, uniqueConnectionName);
+      const connection = await this.connectionInfoResource.createFromTemplate(
+        projectId,
+        this.template.id,
+        uniqueConnectionName
+      );
 
       try {
-        await this.connectionInfoResource.init(this.getConfig(connection.id));
+        await this.connectionInfoResource.init(this.getConfig(projectId, connection.id));
 
         this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();
       } catch (exception: any) {
         this.showError(exception, 'Failed to establish connection');
-        await this.connectionInfoResource.deleteConnection(connection.id);
+        await this.connectionInfoResource.deleteConnection(createConnectionParam(connection));
       }
     } catch (exception: any) {
       this.showError(exception, 'Failed to establish connection');
@@ -189,9 +203,10 @@ export class ConnectionController
     }
   };
 
-  private getConfig(connectionId: string) {
+  private getConfig(projectId: string, connectionId: string) {
     const config: ConnectionInitConfig = {
-      id: connectionId,
+      projectId,
+      connectionId,
     };
 
     if (Object.keys(this.config.credentials).length > 0) {

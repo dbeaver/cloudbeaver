@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -27,6 +28,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -38,9 +40,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -53,6 +53,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -60,9 +61,7 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -125,7 +124,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public WebSession(HttpSession httpSession,
                       WebApplication application,
-                      Map<String, DBWSessionHandler> sessionHandlers) {
+                      Map<String, DBWSessionHandler> sessionHandlers) throws DBException {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
@@ -278,7 +277,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState() {
+    public synchronized void resetUserState() throws DBException {
         clearAuthTokens();
         try {
             resetSessionCache();
@@ -330,11 +329,15 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                createVirtualProject(project);
+                VirtualProjectImpl virtualProject = createVirtualProject(project);
+                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+                    // Projects for which user don't have edit permission can't be saved. So mark the as in memory
+                    virtualProject.setInMemory(true);
+                }
             }
             if (user == null) {
-                createVirtualProject(RMUtils.createAnonymousProject());
-                this.defaultProject.setInMemory(true);
+                VirtualProjectImpl anonymousProject = createVirtualProject(RMUtils.createAnonymousProject());
+                anonymousProject.setInMemory(true);
             }
         } catch (DBException e) {
             addSessionError(e);
@@ -342,7 +345,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void createVirtualProject(RMProject project) {
+    private VirtualProjectImpl createVirtualProject(RMProject project) {
         VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
@@ -350,6 +353,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         if (!project.isShared() || application.isConfigurationMode()) {
             this.defaultProject = sessionProject;
         }
+        return sessionProject;
     }
 
     public void refreshConnections() {
@@ -357,11 +361,18 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         for (DBPProject project : accessibleProjects) {
+            boolean isGlobalProject = WebAppUtils.isGlobalProject(project);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
             for (DBPDataSourceContainer ds : registry.getDataSources()) {
                 WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                connList.add(connectionInfo);
+                if (isGlobalProject) {
+                    if (isDataSourceAccessible(ds)) {
+                        connList.add(connectionInfo);
+                    }
+                } else {
+                    connList.add(connectionInfo);
+                }
             }
             Throwable lastError = registry.getLastError();
             if (lastError != null) {
@@ -567,7 +578,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void close() {
+    public void close() throws DBException {
         try {
             resetNavigationModel();
             resetSessionCache();
@@ -584,7 +595,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void clearAuthTokens() {
+    private void clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
             tokensCopy = new ArrayList<>(this.authTokens);
@@ -835,7 +846,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void removeAuthInfo(String providerId) {
+    public void removeAuthInfo(String providerId) throws DBException {
         if (providerId == null) {
             clearAuthTokens();
         } else {
@@ -928,7 +939,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return parameters;
     }
 
-    public synchronized void resetAuthToken() {
+    public synchronized void resetAuthToken() throws DBException {
         this.userContext.reset();
     }
 

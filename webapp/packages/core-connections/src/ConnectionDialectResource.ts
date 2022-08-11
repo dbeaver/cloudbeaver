@@ -21,12 +21,13 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
-import { ConnectionInfoResource } from './ConnectionInfoResource';
+import { ConnectionInfoResource, isConnectionInfoParamEqual } from './ConnectionInfoResource';
+import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ConnectionDialect = SqlDialectInfo;
 
 @injectable()
-export class ConnectionDialectResource extends CachedMapResource<string, ConnectionDialect> {
+export class ConnectionDialectResource extends CachedMapResource<IConnectionInfoParams, ConnectionDialect> {
   constructor(
     private readonly graphQLService: GraphQLService,
     connectionInfoResource: ConnectionInfoResource,
@@ -47,43 +48,62 @@ export class ConnectionDialectResource extends CachedMapResource<string, Connect
     return result.query;
   }
 
-  async loadAll(): Promise<Map<string, ConnectionDialect>> {
+  async loadAll(): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
     await this.load(CachedMapAllKey);
     return this.data;
   }
 
-  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, ConnectionDialect>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+  protected async loader(
+    key: ResourceKey<IConnectionInfoParams>,
+    includes: string[]
+  ): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
+    const all = this.includes(key, CachedMapAllKey);
     key = this.transformParam(key);
 
-    const dialects: Map<string, ConnectionDialect> = new Map();
+    const dialects: Map<IConnectionInfoParams, ConnectionDialect> = new Map();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      const connectionId = key;
-
       const { dialect } = await this.graphQLService.sdk.querySqlDialectInfo({
-        connectionId,
-        ...this.getIncludesMap(connectionId, includes),
+        ...key,
+        ...this.getIncludesMap(key, includes),
       });
 
       if (!dialect) {
         throw new Error('Dialect not found');
       }
 
-      dialects.set(connectionId, dialect);
+      dialects.set(key, dialect);
     });
 
     runInAction(() => {
       if (all) {
         this.resetIncludes();
-        this.data.clear();
+        this.clear();
       }
 
-      for (const [connectionId, dialect] of dialects) {
-        this.dataSet(connectionId, dialect);
+      for (const [key, dialect] of dialects) {
+        this.dataSet(key, dialect);
       }
     });
 
     return this.data;
+  }
+
+  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+    return isConnectionInfoParamEqual(param, second);
+  }
+
+  getKeyRef(key: IConnectionInfoParams): IConnectionInfoParams {
+    if (this.keys.includes(key)) {
+      return key;
+    }
+
+    const ref = this.keys.find(k => this.isKeyEqual(k, key));
+
+    if (ref) {
+      return ref;
+    }
+
+    return key;
   }
 }

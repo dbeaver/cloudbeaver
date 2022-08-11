@@ -8,7 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, ConnectionInitConfig, DBDriverResource, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionInitConfig, DBDriverResource, IConnectionInfoParams, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -29,16 +29,16 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   readonly error = new GQLErrorCatcher();
 
-  private connectionId!: string;
+  private connectionKey!: IConnectionInfoParams;
   private isDistructed = false;
   private networkHandlers!: string[];
   private close!: () => void;
 
   constructor(
-    private notificationService: NotificationService,
-    private connectionInfoResource: ConnectionInfoResource,
-    private commonDialogService: CommonDialogService,
-    private dbDriverResource: DBDriverResource
+    private readonly notificationService: NotificationService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly dbDriverResource: DBDriverResource
   ) {
     makeObservable(this, {
       isAuthenticating: observable.ref,
@@ -47,8 +47,8 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     });
   }
 
-  async init(connectionId: string, networkHandlers: string[], onClose: () => void): Promise<void> {
-    this.connectionId = connectionId;
+  async init(connectionKey: IConnectionInfoParams, networkHandlers: string[], onClose: () => void): Promise<void> {
+    this.connectionKey = connectionKey;
     this.networkHandlers = networkHandlers;
     this.close = onClose;
 
@@ -88,7 +88,8 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private getConfig() {
     const config: ConnectionInitConfig = {
-      id: this.connectionId,
+      projectId: this.connectionKey.projectId,
+      connectionId: this.connectionKey.connectionId,
     };
 
     if (Object.keys(this.config.credentials).length > 0) {
@@ -106,10 +107,10 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadAuthModel() {
     try {
-      const connection = await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
+      const connection = await this.connectionInfoResource.load(this.connectionKey, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
 
       if (connection.authNeeded) {
-        const property = connection.authProperties?.find(property => property.id === USER_NAME_PROPERTY_ID);
+        const property = connection.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
 
         if (property?.value) {
           this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;

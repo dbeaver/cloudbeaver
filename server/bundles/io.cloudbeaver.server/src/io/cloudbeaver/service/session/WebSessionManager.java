@@ -25,6 +25,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -56,7 +57,7 @@ public class WebSessionManager {
     public WebSessionManager() {
     }
 
-    public WebSession closeSession(@NotNull HttpServletRequest request) {
+    public WebSession closeSession(@NotNull HttpServletRequest request) throws DBException {
         HttpSession session = request.getSession();
         if (session != null) {
             WebSession webSession;
@@ -100,9 +101,13 @@ public class WebSessionManager {
                 Map<String, DBWSessionHandler> sessionHandlers = WebHandlerRegistry.getInstance().getSessionHandlers()
                     .stream()
                     .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
-                webSession = new WebSession(httpSession, application, sessionHandlers);
-                long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-                webSession.setMaxSessionIdleTime(maxSessionIdleTime);
+                try {
+                    webSession = new WebSession(httpSession, application, sessionHandlers);
+                    long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
+                    webSession.setMaxSessionIdleTime(maxSessionIdleTime);
+                } catch (DBException e) {
+                    throw new DBWebException("Failed to create web session", e);
+                }
                 sessionMap.put(sessionId, webSession);
 
                 if (!CBApplication.getInstance().isConfigurationMode()) {
@@ -164,7 +169,11 @@ public class WebSessionManager {
 
         for (WebSession session : expiredList) {
             log.debug("> Expire session '" + session.getSessionId() + "'");
-            session.close();
+            try {
+                session.close();
+            } catch (DBException e) {
+                log.debug("Failed close session:" + session.getSessionId(), e);
+            }
         }
     }
 
