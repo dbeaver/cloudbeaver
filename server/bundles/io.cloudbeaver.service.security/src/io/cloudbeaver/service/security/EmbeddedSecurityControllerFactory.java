@@ -23,6 +23,7 @@ import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.CBDatabaseConfig;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
 import java.util.Map;
 
@@ -30,14 +31,36 @@ import java.util.Map;
  * Embedded Security Controller Factory
  */
 public class EmbeddedSecurityControllerFactory {
+    private static volatile CBDatabase DB_INSTANCE;
 
     /**
      * Create new security controller instance
      */
     public CBEmbeddedSecurityController createSecurityService(
         WebApplication application,
-        Map<String, Object> databaseConfig
+        Map<String, Object> databaseConfig,
+        SMCredentialsProvider credentialsProvider
     ) throws DBException {
+        boolean initDb = false;
+        if (DB_INSTANCE == null) {
+            synchronized (EmbeddedSecurityControllerFactory.class) {
+                if (DB_INSTANCE == null) {
+                    initDatabase(application, databaseConfig);
+                    initDb = true;
+                }
+            }
+        }
+        var securityController = createEmbeddedSecurityController(application, DB_INSTANCE, credentialsProvider);
+        if (initDb) {
+            //FIXME circular dependency
+            DB_INSTANCE.setAdminSecurityController(securityController);
+            DB_INSTANCE.initialize();
+            securityController.initializeMetaInformation();
+        }
+        return securityController;
+    }
+
+    private synchronized void initDatabase(WebApplication application, Map<String, Object> databaseConfig) {
         CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
         InstanceCreator<CBDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
         InstanceCreator<CBDatabaseConfig.Pool> dbPoolConfigCreator = type -> databaseConfiguration.getPool();
@@ -47,17 +70,14 @@ public class EmbeddedSecurityControllerFactory {
             .create();
         gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
 
-        var database = new CBDatabase(application, databaseConfiguration);
-        var securityController = createEmbeddedSecurityController(application, database);
-        //FIXME circular dependency
-        database.setAdminSecurityController(securityController);
-
-        database.initialize();
-        securityController.initializeMetaInformation();
-        return securityController;
+        DB_INSTANCE = new CBDatabase(application, databaseConfiguration);
     }
 
-    protected  CBEmbeddedSecurityController createEmbeddedSecurityController(WebApplication application, CBDatabase database) {
-        return new CBEmbeddedSecurityController(application, database);
+    protected CBEmbeddedSecurityController createEmbeddedSecurityController(
+        WebApplication application,
+        CBDatabase database,
+        SMCredentialsProvider credentialsProvider
+    ) {
+        return new CBEmbeddedSecurityController(application, database, credentialsProvider);
     }
 }

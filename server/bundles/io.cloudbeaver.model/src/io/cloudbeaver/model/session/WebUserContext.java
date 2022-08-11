@@ -52,7 +52,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMAdminController adminSecurityController;
     private RMController rmController;
 
-    public WebUserContext(WebApplication application) {
+    public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
         this.securityController = application.getSecurityController(this);
         this.userPermissions = getDefaultPermissions();
@@ -92,7 +92,10 @@ public class WebUserContext implements SMCredentialsProvider {
     /**
      * reset the state as if the user is not logged in
      */
-    public void reset() {
+    public void reset() throws DBException {
+        if (this.smCredentials != null) {
+            this.securityController.logout();
+        }
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
         this.user = null;
