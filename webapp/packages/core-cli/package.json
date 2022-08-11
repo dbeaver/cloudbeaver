@@ -68,8 +68,11 @@
     "jest-environment-jsdom": "~28.x.x"
   },
   "devDependencies": {
+    "allure-commandline": "^2.18.1",
     "crypto": "^1.0.1",
     "jest": "~28.1.2",
-    "jest-environment-jsdom": "~28.1.2"
+    "jest-allure": "^0.1.3",
+    "jest-environment-jsdom": "~28.1.2",
+    "jest-jasmine2": "^28.1.3"
   }
 }
