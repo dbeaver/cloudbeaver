@@ -8,13 +8,13 @@ schema:
   - ../../../server/bundles/io.cloudbeaver.service.admin/schema/service.admin.graphqls
   - ../../../server/bundles/io.cloudbeaver.service.auth/schema/service.auth.graphqls
   - ../../../server/bundles/io.cloudbeaver.service.rm/schema/service.rm.graphqls
-documents: 
+documents:
   - ./src/**/*.gql
 generates:
   src/sdk.ts:
     plugins:
       - add:
-          content: '/* eslint-disable max-len */'
+          content: '/* eslint-disable */'
       - typescript
       - typescript-operations
       - typescript-graphql-request

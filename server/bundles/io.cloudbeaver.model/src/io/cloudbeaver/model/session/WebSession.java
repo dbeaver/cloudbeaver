@@ -123,7 +123,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public WebSession(HttpSession httpSession,
                       WebApplication application,
-                      Map<String, DBWSessionHandler> sessionHandlers) {
+                      Map<String, DBWSessionHandler> sessionHandlers) throws DBException {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
@@ -276,7 +276,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState() {
+    public synchronized void resetUserState() throws DBException {
         clearAuthTokens();
         try {
             resetSessionCache();
@@ -574,7 +574,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void close() {
+    public void close() throws DBException {
         try {
             resetNavigationModel();
             resetSessionCache();
@@ -591,7 +591,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private void clearAuthTokens() {
+    private void clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
             tokensCopy = new ArrayList<>(this.authTokens);
@@ -842,7 +842,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void removeAuthInfo(String providerId) {
+    public void removeAuthInfo(String providerId) throws DBException {
         if (providerId == null) {
             clearAuthTokens();
         } else {
@@ -935,7 +935,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return parameters;
     }
 
-    public synchronized void resetAuthToken() {
+    public synchronized void resetAuthToken() throws DBException {
         this.userContext.reset();
     }
 

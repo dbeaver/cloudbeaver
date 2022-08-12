@@ -117,11 +117,19 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
+    public void authLogout(
+        @NotNull WebSession webSession,
+        @Nullable String providerId,
+        @Nullable String configurationId
+    ) throws DBWebException {
         if (webSession.getUser() == null) {
             throw new DBWebException("Not logged in");
         }
-        webSession.removeAuthInfo(providerId);
+        try {
+            webSession.removeAuthInfo(providerId);
+        } catch (DBException e) {
+            throw new DBWebException("User logout failed", e);
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { DBDriver, isJDBCConnection } from '@cloudbeaver/core-connections';
-import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
+import { DatabaseAuthModel, DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from '../IConnectionFormProps';
 
@@ -74,6 +74,14 @@ export function useOptions(state: IConnectionFormState) {
 
         if (info || driver?.id !== config.driverId) {
           return;
+        }
+
+        if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
+          config.configurationType = (
+            driver?.configurationTypes.includes(DriverConfigurationType.Manual)
+              ? DriverConfigurationType.Manual
+              : DriverConfigurationType.Url
+          );
         }
 
         if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {

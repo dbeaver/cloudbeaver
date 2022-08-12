@@ -17,6 +17,7 @@ fragment DatabaseDriver on DriverInfo {
   defaultAuthModel
   applicableAuthModels
   applicableNetworkHandlers
+  configurationTypes
 
   providerProperties @include(if: $includeProviderProperties) {
     id

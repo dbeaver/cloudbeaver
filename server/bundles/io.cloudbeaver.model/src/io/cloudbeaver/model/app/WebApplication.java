@@ -19,6 +19,7 @@ package io.cloudbeaver.model.app;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
@@ -50,9 +51,9 @@ public interface WebApplication extends DBPApplication {
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DataSourceFilter dataSourceFilter);
 
-    SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
+    SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider);
+    SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
     RMController getResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
