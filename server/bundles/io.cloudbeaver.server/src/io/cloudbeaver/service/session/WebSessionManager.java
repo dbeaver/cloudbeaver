@@ -103,8 +103,6 @@ public class WebSessionManager {
                     .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
                 try {
                     webSession = new WebSession(httpSession, application, sessionHandlers);
-                    long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-                    webSession.setMaxSessionIdleTime(maxSessionIdleTime == 0 ? Long.MAX_VALUE : maxSessionIdleTime);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
