@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -196,13 +197,21 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return securityController;
+    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return new EmbeddedSecurityControllerFactory().createSecurityService(
+            this,
+            databaseConfiguration,
+            credentialsProvider
+        );
     }
 
     @Override
-    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return securityController;
+    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return new EmbeddedSecurityControllerFactory().createSecurityService(
+            this,
+            databaseConfiguration,
+            new NoAuthCredentialsProvider()
+        );
     }
 
     @Override
@@ -452,7 +461,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration);
+        return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration, new NoAuthCredentialsProvider());
     }
 
     @Nullable
