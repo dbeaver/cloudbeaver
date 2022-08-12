@@ -47,6 +47,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     });
   }
 
+  isReadonly(): boolean {
+    return super.isReadonly() || this.results[0]?.data?.hasRowIdentifier === false;
+  }
+
   isDisabled(resultIndex: number): boolean {
     return !this.getResult(resultIndex)?.data && this.error === null;
   }
