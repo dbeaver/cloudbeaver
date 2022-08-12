@@ -5,5 +5,5 @@ fragment SessionState on SessionInfo {
   locale
   actionParameters
   valid
-  expireAfterSeconds
+  remainingTime
 }

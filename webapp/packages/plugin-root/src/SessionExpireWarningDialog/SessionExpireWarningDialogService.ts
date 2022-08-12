@@ -65,9 +65,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
         return;
       }
 
-      const remainingTime = sessionState.expireAfterSeconds * 1000;
-
-      if (remainingTime < WARN_IN) {
+      if (sessionState.remainingTime < WARN_IN) {
         this.open();
       } else {
         this.close();
