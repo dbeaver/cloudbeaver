@@ -207,8 +207,6 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebSession getSessionState(@NotNull WebSession webSession) {
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
-        webSession.setMaxSessionIdleTime(maxSessionIdleTime == 0 ? Long.MAX_VALUE : maxSessionIdleTime);
         return webSession;
     }
 

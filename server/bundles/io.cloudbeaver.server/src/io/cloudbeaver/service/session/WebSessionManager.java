@@ -75,7 +75,8 @@ public class WebSessionManager {
 
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        webSession.updateInfo(request, response);
+        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
+        webSession.updateInfo(request, response, maxSessionIdleTime);
         return true;
     }
 
@@ -94,6 +95,7 @@ public class WebSessionManager {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
+        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
         synchronized (sessionMap) {
             webSession = sessionMap.get(sessionId);
             if (webSession == null) {
@@ -102,7 +104,8 @@ public class WebSessionManager {
                     .stream()
                     .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
                 try {
-                    webSession = new WebSession(httpSession, application, sessionHandlers);
+
+                    webSession = new WebSession(httpSession, application, sessionHandlers, maxSessionIdleTime);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
@@ -122,7 +125,7 @@ public class WebSessionManager {
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response);
+                        webSession.updateInfo(request, response, maxSessionIdleTime);
                         request.setAttribute("sessionUpdated", true);
                     }
                 }

@@ -124,7 +124,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public WebSession(HttpSession httpSession,
                       WebApplication application,
-                      Map<String, DBWSessionHandler> sessionHandlers) throws DBException {
+                      Map<String, DBWSessionHandler> sessionHandlers,
+                      long maxSessionIdleTime) throws DBException {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
@@ -134,6 +135,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         this.application = application;
         this.sessionHandlers = sessionHandlers;
         this.userContext = new WebUserContext(application);
+        this.maxSessionIdleTime = maxSessionIdleTime;
     }
 
     @NotNull
@@ -506,11 +508,16 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) throws DBWebException {
+    public synchronized void updateInfo(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        long maxSessionIdleTime
+    ) throws DBWebException {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader("User-Agent");
+        this.maxSessionIdleTime = maxSessionIdleTime;
         this.cacheExpired = false;
         if (!httpSession.isNew()) {
             try {
@@ -993,17 +1000,14 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     @Property
-    public long getExpireAfterSeconds() {
-        return getSessionActiveTimeLeft()/1000;
+    public long getRemainingTime() {
+        return getSessionActiveTimeLeft();
     }
 
     private long getSessionActiveTimeLeft() {
         return maxSessionIdleTime + lastAccessTime - System.currentTimeMillis();
     }
 
-    public void setMaxSessionIdleTime(long maxSessionIdleTime) {
-        this.maxSessionIdleTime = maxSessionIdleTime;
-    }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override

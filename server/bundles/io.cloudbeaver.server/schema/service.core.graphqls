@@ -158,7 +158,7 @@ type SessionInfo {
     actionParameters: Object
 
     valid: Boolean!
-    expireAfterSeconds: Int!
+    remainingTime: Int!
 }
 
 ####################################################
