@@ -43,7 +43,11 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env.getArgument("credentials"),
                 CommonUtils.toBoolean(env.getArgument("linkUser"))))
             .dataFetcher("authLogout", env -> {
-                getService(env).authLogout(getWebSession(env, false), env.getArgument("provider"));
+                getService(env).authLogout(
+                    getWebSession(env, false),
+                    env.getArgument("provider"),
+                    env.getArgument("configuration")
+                );
                 return true;
             })
             .dataFetcher("authUpdateStatus", env -> getService(env).authUpdateStatus(

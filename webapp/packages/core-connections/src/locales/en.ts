@@ -40,6 +40,7 @@ export default [
   ['connections_connection_access_admin_info', 'Administrators see all connections.'],
   ['connections_connection_description', 'Description'],
   ['connections_connection_driver', 'Driver'],
+  ['connections_connection_configuration', 'Configuration'],
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Port'],
   ['connections_connection_template', 'Template'],
