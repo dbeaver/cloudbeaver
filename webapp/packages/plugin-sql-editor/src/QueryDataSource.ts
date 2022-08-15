@@ -52,7 +52,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   isReadonly(): boolean {
-    return super.isReadonly() || this.results[0]?.data?.hasRowIdentifier === false;
+    return super.isReadonly() || this.getResult(0)?.data?.hasRowIdentifier === false;
   }
 
   isDisabled(resultIndex: number): boolean {
