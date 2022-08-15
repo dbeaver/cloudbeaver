@@ -47,8 +47,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     });
   }
 
-  isReadonly(): boolean {
-    return super.isReadonly() || this.getResult(0)?.data?.hasRowIdentifier === false;
+  isReadonly(resultIndex: number): boolean {
+    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
   }
 
   isDisabled(resultIndex: number): boolean {

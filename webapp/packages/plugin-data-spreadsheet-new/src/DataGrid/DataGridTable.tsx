@@ -71,7 +71,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   const focusSyncRef = useRef<CellPosition | null>(null);
 
   const editingContext = useEditing({
-    readonly: model.isReadonly() || model.isDisabled(resultIndex),
+    readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
     onEdit: (position, code, key) => {
       const column = tableData.getColumn(position.idx);
       const row = tableData.getRow(position.rowIdx);

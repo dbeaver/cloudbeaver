@@ -177,7 +177,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
-  isReadonly(): boolean {
+  isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly
       || this.results.length > 1
       || !this.executionContext?.context

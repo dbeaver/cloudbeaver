@@ -40,7 +40,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        if (context.data.model.isReadonly()) {
+        if (context.data.model.isReadonly(context.data.resultIndex)) {
           return true;
         }
 
@@ -85,7 +85,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        if (context.data.model.isReadonly()) {
+        if (context.data.model.isReadonly(context.data.resultIndex)) {
           return true;
         }
 
@@ -133,7 +133,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        if (context.data.model.isReadonly()) {
+        if (context.data.model.isReadonly(context.data.resultIndex)) {
           return true;
         }
 
@@ -190,7 +190,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        if (context.data.model.isReadonly()) {
+        if (context.data.model.isReadonly(context.data.resultIndex)) {
           return true;
         }
 
@@ -251,7 +251,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        return context.data.model.isReadonly();
+        return context.data.model.isReadonly(context.data.resultIndex);
       },
       isDisabled(context) {
         if (
@@ -282,7 +282,7 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        return context.data.model.isReadonly();
+        return context.data.model.isReadonly(context.data.resultIndex);
       },
       isDisabled(context) {
         if (
