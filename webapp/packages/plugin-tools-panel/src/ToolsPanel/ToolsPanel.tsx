@@ -59,11 +59,11 @@ interface Props {
 }
 
 interface IToolsState {
-  selectedTabId: string | null;
+  selectedTabId: string | undefined;
 }
 
 export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
-  const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: null }));
+  const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
   const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const tabs = container.getIdList();
   const prevTabs = useRef<string[]>(tabs);
@@ -81,12 +81,12 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
       prevTabs.current = tabs;
     }
 
-    if (state.selectedTabId !== null) {
+    if (state.selectedTabId) {
       if (!tabs.includes(state.selectedTabId)) {
         if (tabs.length > 0) {
           state.selectedTabId = tabs[0];
         } else {
-          state.selectedTabId = null;
+          state.selectedTabId = undefined;
         }
       }
     }
@@ -97,12 +97,7 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
   }
 
   return styled(useStyles(tabStyle, formStyles))(
-    <TabsState
-      currentTabId={state.selectedTabId ?? undefined}
-      container={container}
-      lazy
-      onChange={handleTabChange}
-    >
+    <TabsState currentTabId={state.selectedTabId} container={container} lazy onChange={handleTabChange}>
       <box>
         <TabList style={tabStyle} />
         <content-box>
