@@ -97,7 +97,12 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
   }
 
   return styled(useStyles(tabStyle, formStyles))(
-    <TabsState currentTabId={state.selectedTabId} container={container} lazy onChange={handleTabChange}>
+    <TabsState
+      currentTabId={state.selectedTabId ?? undefined}
+      container={container}
+      lazy
+      onChange={handleTabChange}
+    >
       <box>
         <TabList style={tabStyle} />
         <content-box>

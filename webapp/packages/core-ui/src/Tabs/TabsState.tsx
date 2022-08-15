@@ -53,7 +53,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const props = rest as any as T;
   if (
     !selectedId
-    && !currentTabId
+    && currentTabId === undefined
     && container
   ) {
     const displayed = container.getIdList(props);
@@ -88,7 +88,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabList,
   });
 
-  if (currentTabId) {
+  if (currentTabId !== undefined) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
   }
