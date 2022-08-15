@@ -63,6 +63,7 @@ export class ConnectionsAdministrationController {
     }
     this.isProcessing = true;
     try {
+      this.connectionInfoResource.cleanNewFlags();
       await this.connectionInfoResource.refresh(CachedMapAllKey);
       this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
     } catch (exception: any) {

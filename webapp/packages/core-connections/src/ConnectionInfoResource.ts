@@ -177,7 +177,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       ...this.getIncludesMap(key),
     });
 
-    return this.add(connection);
+    return this.add(connection, true);
   }
 
   async searchDatabases(hosts: string[]): Promise<AdminConnectionSearchInfo[]> {
