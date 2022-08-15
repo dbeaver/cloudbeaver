@@ -18,7 +18,6 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
-import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -112,6 +111,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     protected abstract void loadConfiguration(String configPath) throws DBException;
+
+    protected abstract void validateConfiguration(Map<String, Object> appConfig) throws DBException;
 
     @Override
     public VirtualProjectImpl createProjectImpl(

@@ -546,7 +546,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
             // App config
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
+            validateConfiguration(appConfig);
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
             readProductConfiguration(serverConfig, gson, homeFolder);
@@ -585,6 +587,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    @Override
+    protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
+
     }
 
     protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder) throws DBException {
@@ -820,6 +827,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
         Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName, newServerURL, sessionExpireTime, appConfig);
+        validateConfiguration(configurationProperties);
         writeRuntimeConfig(configurationProperties);
     }
 
