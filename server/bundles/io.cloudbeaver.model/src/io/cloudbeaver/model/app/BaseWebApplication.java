@@ -112,8 +112,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     protected abstract void loadConfiguration(String configPath) throws DBException;
 
-    protected abstract void validateConfiguration(Map<String, Object> appConfig) throws DBException;
-
     @Override
     public VirtualProjectImpl createProjectImpl(
         @NotNull RMProject project,

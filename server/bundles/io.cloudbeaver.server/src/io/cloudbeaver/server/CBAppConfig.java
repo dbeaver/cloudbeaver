@@ -56,6 +56,8 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public CBAppConfig() {
         super();
+        this.anonymousAccessEnabled = false;
+        this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.supportsCustomConnections = true;
         this.supportsConnectionBrowser = false;
         this.supportsUserWorkspaces = false;
@@ -73,6 +75,8 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public CBAppConfig(CBAppConfig src) {
         super(src);
+        this.anonymousAccessEnabled = src.anonymousAccessEnabled;
+        this.anonymousUserRole = src.anonymousUserRole;
         this.supportsCustomConnections = src.supportsCustomConnections;
         this.supportsConnectionBrowser = src.supportsConnectionBrowser;
         this.supportsUserWorkspaces = src.supportsUserWorkspaces;

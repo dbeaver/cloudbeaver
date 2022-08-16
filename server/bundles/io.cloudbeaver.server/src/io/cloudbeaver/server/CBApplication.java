@@ -589,7 +589,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         patchConfigurationWithProperties(productConfiguration);
     }
 
-    @Override
     protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
 
     }

@@ -37,8 +37,6 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
-        this.anonymousAccessEnabled = true;
-        this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.defaultUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
@@ -46,8 +44,6 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
         this.plugins = new LinkedHashMap<>(src.plugins);
-        this.anonymousAccessEnabled = src.anonymousAccessEnabled;
-        this.anonymousUserRole = src.anonymousUserRole;
         this.defaultUserRole = src.defaultUserRole;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
