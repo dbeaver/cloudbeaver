@@ -142,7 +142,7 @@ public interface DBWServiceAdmin extends DBWService {
     // Server configuration
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException;
+    boolean configureServer(WebSession webSession, Map<String, Object> params) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException;
 

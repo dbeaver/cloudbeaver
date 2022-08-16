@@ -550,38 +550,50 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
 
     @Override
-    public boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException {
+    public boolean configureServer(WebSession webSession, Map<String, Object> params) throws DBWebException {
         try {
             CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
-            appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
-            appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
-            appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
-            appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
-            appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
-            appConfig.setEnabledDrivers(config.getEnabledDrivers());
-            appConfig.setDisabledDrivers(config.getDisabledDrivers());
-            appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
+            String adminName = null;
+            String adminPassword = null;
+            String serverName = CBApplication.getInstance().getServerName();
+            String serverURL = CBApplication.getInstance().getServerURL();
+            long sessionExpireTime = CBApplication.getInstance().getMaxSessionIdleTime();
 
-            if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
-                // All of them
-                appConfig.setEnabledAuthProviders(new String[0]);
-            } else {
-                appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
+            if (!params.isEmpty()) {    // FE can send an empty configuration
+                var config = new AdminServerConfig(params);
+                appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
+                appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
+                appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
+                appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
+                appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
+                appConfig.setEnabledDrivers(config.getEnabledDrivers());
+                appConfig.setDisabledDrivers(config.getDisabledDrivers());
+                appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
+
+                if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
+                    // All of them
+                    appConfig.setEnabledAuthProviders(new String[0]);
+                } else {
+                    appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
+                }
+
+                appConfig.setDefaultNavigatorSettings(
+                    CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+
+                adminName = config.getAdminName();
+                adminPassword = config.getAdminPassword();
+                serverName = config.getServerName();
+                serverURL = config.getServerURL();
+                sessionExpireTime = config.getSessionExpireTime();
             }
 
-            appConfig.setDefaultNavigatorSettings(
-                CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-
-            List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
-
-            String adminName = config.getAdminName();
-            String adminPassword = config.getAdminPassword();
             if (CommonUtils.isEmpty(adminName)) {
                 // Grant admin permissions to the current user
                 WebUser curUser = webSession.getUser();
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
             }
+            List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
             if (CommonUtils.isEmpty(adminName)) {
                 // Try to get admin name from existing authentications (first one)
                 if (!authInfoList.isEmpty()) {
@@ -604,12 +616,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
 
             CBApplication.getInstance().finishConfiguration(
-                config.getServerName(),
-                config.getServerURL(),
+                serverName,
+                serverURL,
                 adminName,
                 adminPassword,
                 authInfoList,
-                config.getSessionExpireTime(),
+                sessionExpireTime,
                 appConfig);
 
             // Refresh active session
