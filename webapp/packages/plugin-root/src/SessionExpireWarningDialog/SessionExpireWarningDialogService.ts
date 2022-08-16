@@ -54,6 +54,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
       const { sessionState } = await this.graphQLService.sdk.sessionState();
 
       if (!sessionState.valid) {
+        this.close();
         this.sessionExpireService.sessionExpired();
         return;
       }
