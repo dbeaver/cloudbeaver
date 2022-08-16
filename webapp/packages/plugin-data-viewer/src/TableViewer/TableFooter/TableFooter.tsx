@@ -11,10 +11,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { getDefaultRowsCount } from '../../getDefaultRowsCount';
+import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
@@ -78,6 +79,7 @@ export const TableFooter = observer<Props>(function TableFooter({
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
+  const dataViewerSettingsService = useService(DataViewerSettingsService);
 
   const handleChange = useCallback(
     async () => {
@@ -85,7 +87,7 @@ export const TableFooter = observer<Props>(function TableFooter({
         return;
       }
 
-      const value = getDefaultRowsCount(parseInt(ref.current.value, 10));
+      const value = dataViewerSettingsService.getDefaultRowsCount(parseInt(ref.current.value, 10));
 
       setLimit(value + '');
       if (model.countGain !== value) {
