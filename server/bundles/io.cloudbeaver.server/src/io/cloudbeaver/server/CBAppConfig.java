@@ -47,6 +47,8 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     private boolean linkExternalCredentialsWithUser;
 
     private boolean redirectOnFederatedAuth;
+    private boolean anonymousAccessEnabled;
+    private String anonymousUserRole;
 
     private String[] enabledDrivers;
     private String[] disabledDrivers;
@@ -90,6 +92,16 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
         this.forwardProxy = src.forwardProxy;
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
+    }
+
+    @Override
+    public boolean isAnonymousAccessEnabled() {
+        return anonymousAccessEnabled;
+    }
+
+    @Override
+    public String getAnonymousUserRole() {
+        return anonymousUserRole;
     }
 
     public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
