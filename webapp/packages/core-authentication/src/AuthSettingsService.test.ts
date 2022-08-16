@@ -33,6 +33,7 @@ const equalConfig = {
     authentication: {
       baseAuthProvider: 'sd',
       primaryAuthProvider: 'sd',
+      disableAnonymousAccess: true,
     } as AuthSettings,
   },
 };
@@ -49,4 +50,5 @@ test('Read settings', async () => {
 
   expect(settings.settings.getValue('baseAuthProvider')).toBe('sd');
   expect(settings.settings.getValue('primaryAuthProvider')).toBe('sd');
+  expect(settings.settings.getValue('disableAnonymousAccess')).toBe(true);
 });
