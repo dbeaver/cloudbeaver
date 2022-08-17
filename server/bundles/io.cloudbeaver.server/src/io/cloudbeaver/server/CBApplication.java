@@ -503,15 +503,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         parseConfiguration(configProps);
     }
 
-    private void parseConfiguration(Map<String, Object> configProps) throws DBException {
-        String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
-        if (CommonUtils.isEmpty(homeFolder)) {
-            homeFolder = System.getProperty("user.dir");
-        }
-        if (CommonUtils.isEmpty(homeFolder)) {
-            homeFolder = ".";
-        }
-        homeDirectory = new File(homeFolder);
+    protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
+        String homeFolder = initHomeFolder();
 
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Gson gson = getGson();
@@ -587,6 +580,19 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    @NotNull
+    protected String initHomeFolder() {
+        String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
+        if (CommonUtils.isEmpty(homeFolder)) {
+            homeFolder = System.getProperty("user.dir");
+        }
+        if (CommonUtils.isEmpty(homeFolder)) {
+            homeFolder = ".";
+        }
+        homeDirectory = new File(homeFolder);
+        return homeFolder;
     }
 
     protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
