@@ -1500,7 +1500,9 @@ export interface SessionInfo {
   createTime: Scalars['String'];
   lastAccessTime: Scalars['String'];
   locale: Scalars['String'];
+  remainingTime: Scalars['Int'];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
+  valid: Scalars['Boolean'];
 }
 
 export interface UserAuthToken {
@@ -2183,7 +2185,7 @@ export type ObjectOriginInfoFragment = { type: string, subType?: string, display
 
 export type SqlScriptInfoFragment = { queries: Array<{ start: number, end: number }> };
 
-export type SessionStateFragment = { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any };
+export type SessionStateFragment = { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number };
 
 export type UserConnectionAuthPropertiesFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
@@ -2472,7 +2474,7 @@ export type OpenSessionMutationVariables = Exact<{
 }>;
 
 
-export type OpenSessionMutation = { session: { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any } };
+export type OpenSessionMutation = { session: { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number } };
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
@@ -2495,7 +2497,7 @@ export type SessionPermissionsQuery = { permissions: Array<string> };
 export type SessionStateQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SessionStateQuery = { sessionState: { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any } };
+export type SessionStateQuery = { sessionState: { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number } };
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -2851,6 +2853,8 @@ export const SessionStateFragmentDoc = `
   cacheExpired
   locale
   actionParameters
+  valid
+  remainingTime
 }
     `;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
