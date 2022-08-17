@@ -156,6 +156,9 @@ type SessionInfo {
     serverMessages: [ ServerMessage ]
     connections: [ ConnectionInfo! ]!
     actionParameters: Object
+
+    valid: Boolean!
+    remainingTime: Int!
 }
 
 ####################################################

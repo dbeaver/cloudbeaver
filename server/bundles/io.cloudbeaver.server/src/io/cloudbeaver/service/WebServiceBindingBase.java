@@ -27,7 +27,6 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -124,6 +123,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     public static WebSession findWebSession(DataFetchingEnvironment env) {
         return CBPlatform.getInstance().getSessionManager().findWebSession(
             getServletRequest(env));
+    }
+
+    public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
+            getServletRequest(env), errorOnNotFound);
     }
 
     @NotNull

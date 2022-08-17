@@ -18,7 +18,7 @@ export class SessionExpireService extends Bootstrap {
 
   onSessionExpire: IExecutor;
   constructor(
-    private graphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
   ) {
     super();
     this.onSessionExpire = new Executor();

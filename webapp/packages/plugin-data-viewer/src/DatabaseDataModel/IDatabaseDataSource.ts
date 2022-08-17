@@ -43,7 +43,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly canCancel: boolean;
   readonly serviceInjector: IServiceInjector;
 
-  isReadonly: () => boolean;
+  isReadonly: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex: number) => boolean;
 
