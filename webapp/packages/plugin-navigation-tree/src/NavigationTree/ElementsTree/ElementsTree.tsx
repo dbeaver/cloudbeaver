@@ -44,7 +44,7 @@ const styles = css`
     flex: 1;
     flex-direction: column;
   }
-  
+
   tree-box {
     flex: 1;
     overflow: auto;
@@ -126,7 +126,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   function exitFolders(path: string[]) {
     path = path.filter(nodeId => ref.getChildren(nodeId) !== undefined);
-    folderExplorer.open(path.slice(0, path.length - 1), path[path.length - 1]);
+    if (path.length > 0) {
+      folderExplorer.open(path.slice(0, path.length - 1), path[path.length - 1]);
+    }
   }
 
   const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
