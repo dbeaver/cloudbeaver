@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -28,7 +29,6 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -346,11 +346,13 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
+        // Do not filter data sources from user project
+        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             getSessionAuthContext(),
             this,
-            this::isDataSourceAccessible);
+            filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
