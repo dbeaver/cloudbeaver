@@ -7,15 +7,13 @@
  */
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { CookiesService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
-import { getCookies } from '@cloudbeaver/core-utils';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { SessionExpireWarningDialog } from './SessionExpireWarningDialog';
 
-const SESSION_COOKIE_NAME = 'cb-session';
 const WARN_IN = 5 * 1000 * 60;
 const POLL_INTERVAL = 1 * 1000 * 60;
 
@@ -29,7 +27,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
-    private readonly cookiesService: CookiesService
+    private readonly graphQLService: GraphQLService
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -40,13 +38,11 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   }
 
   load(): void {
-    if (this.cookiesService.cookiesEnabled) {
-      this.startSessionPolling();
-    }
+    this.startSessionPolling();
   }
 
   private startSessionPolling() {
-    const poll = () => {
+    const checkSessionStatus = async () => {
       if (
         !this.serverConfigResource.data?.anonymousAccessEnabled
         && !this.userInfoResource.data
@@ -55,30 +51,34 @@ export class SessionExpireWarningDialogService extends Bootstrap {
         return;
       }
 
-      const cookies = getCookies();
-      const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
-      const sessionExpiredTime = cookies[SESSION_COOKIE_NAME];
+      const { sessionState } = await this.graphQLService.sdk.sessionState();
 
-      if (!sessionExpiredTime) {
+      if (!sessionState.valid) {
+        this.close();
         this.sessionExpireService.sessionExpired();
         return;
       }
 
-      const remainingTime = new Date(sessionExpiredTime).getTime() - Date.now();
+      const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
 
       if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < WARN_IN) {
         this.close();
         return;
       }
 
-      if (remainingTime < WARN_IN) {
+      if (sessionState.remainingTime < WARN_IN) {
         this.open();
       } else {
         this.close();
       }
     };
 
-    setInterval(poll, POLL_INTERVAL);
+    const poll = async () => {
+      await checkSessionStatus();
+      setTimeout(poll, POLL_INTERVAL);
+    };
+
+    setTimeout(poll, POLL_INTERVAL);
   }
 
   private async open(): Promise<void> {
@@ -87,10 +87,10 @@ export class SessionExpireWarningDialogService extends Bootstrap {
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
 
-      const cookies = getCookies();
-
       if (!this.sessionExpireService.expired) {
-        if (cookies[SESSION_COOKIE_NAME]) {
+        const { sessionState } = await this.graphQLService.sdk.sessionState();
+
+        if (sessionState.valid) {
           await this.sessionResource.refreshSilent();
         } else {
           this.sessionExpireService.sessionExpired();

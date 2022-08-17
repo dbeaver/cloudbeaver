@@ -151,6 +151,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     <TabsState currentTabId={state.tabId} onChange={tabData => { state.setTabId(tabData.tabId); }}>
       <CommonDialogWrapper
         size='large'
+        aria-label={translate('authentication_login_dialog_title')}
         title={dialogTitle}
         icon={icon}
         subTitle={subTitle}
