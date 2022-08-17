@@ -161,7 +161,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     env.getArgument("parameters")))
 
             .dataFetcher("configureServer",
-            env -> getService(env).configureServer(getWebSession(env), new AdminServerConfig(env.getArgument("configuration"))))
+                env -> getService(env).configureServer(getWebSession(env), env.getArgument("configuration")))
         .dataFetcher("setDefaultNavigatorSettings",
             env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
         ;
