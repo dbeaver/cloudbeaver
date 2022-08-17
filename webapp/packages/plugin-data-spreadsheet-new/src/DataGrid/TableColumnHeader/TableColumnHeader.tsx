@@ -70,7 +70,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
 
-  const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly());
+  const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
   const sortingDisabled = getComputed(
     () => !tableDataContext.constraints.supported || !model.source.executionContext?.context
   );

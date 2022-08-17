@@ -58,8 +58,8 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.isDisabled(resultIndex);
   }
 
-  isReadonly(): boolean {
-    return this.source.isReadonly();
+  isReadonly(resultIndex: number): boolean {
+    return this.source.isReadonly(resultIndex);
   }
 
   isDataAvailable(offset: number, count: number): boolean {
@@ -74,7 +74,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.getResult(index);
   }
 
-  setName(name: string | null){
+  setName(name: string | null) {
     this.name = name;
     return this;
   }
@@ -117,7 +117,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
   async requestOptionsChange(): Promise<boolean> {
     const contexts = await this.onOptionsChange.execute();
 
-    return ExecutorInterrupter.isInterrupted(contexts) === false;
+    return !ExecutorInterrupter.isInterrupted(contexts);
   }
 
   async save(): Promise<void> {

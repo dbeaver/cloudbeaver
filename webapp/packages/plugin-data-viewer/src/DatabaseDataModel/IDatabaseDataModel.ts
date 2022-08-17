@@ -29,7 +29,7 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
   setName: (name: string | null) => this;
-  isReadonly: () => boolean;
+  isReadonly: (resultIndex: number) => boolean;
   isDisabled: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
