@@ -149,6 +149,17 @@ public class WebSessionManager {
         }
     }
 
+    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+        WebSession webSession = findWebSession(request);
+        if (webSession != null) {
+            return webSession;
+        }
+        if (errorOnNoFound) {
+            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+        }
+        return null;
+    }
+
     public void expireIdleSessions() {
         long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
         if (CBApplication.getInstance().isConfigurationMode()) {
