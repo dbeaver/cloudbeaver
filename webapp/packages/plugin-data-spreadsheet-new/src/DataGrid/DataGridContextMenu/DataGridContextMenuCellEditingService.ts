@@ -37,7 +37,7 @@ export class DataGridContextMenuCellEditingService {
         },
         isHidden(context) {
           return context.data.model.isDisabled(context.data.resultIndex)
-            || context.data.model.isReadonly();
+            || context.data.model.isReadonly(context.data.resultIndex);
         },
       }
     );
@@ -149,7 +149,7 @@ export class DataGridContextMenuCellEditingService {
         isHidden(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
 
-          if (context.data.model.isReadonly() || !editor.hasFeature('delete')) {
+          if (context.data.model.isReadonly(context.data.resultIndex) || !editor.hasFeature('delete')) {
             return true;
           }
 
@@ -178,7 +178,7 @@ export class DataGridContextMenuCellEditingService {
         isHidden(context) {
           const editor = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
 
-          if (context.data.model.isReadonly() || !editor.hasFeature('delete')) {
+          if (context.data.model.isReadonly(context.data.resultIndex) || !editor.hasFeature('delete')) {
             return true;
           }
 

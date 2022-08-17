@@ -45,7 +45,7 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
 
   const readonly = getComputed(() => (
     tableDataContext.isReadOnly()
-    || dataGridContext.model.isReadonly()
+    || dataGridContext.model.isReadonly(dataGridContext.resultIndex)
   ));
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {

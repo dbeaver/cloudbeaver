@@ -147,7 +147,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
-  readonly = model.isReadonly() || model.isDisabled(resultIndex) || readonly;
+  readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
   if (contentType !== state.lastContentType) {
     state.setDefaultContentType(contentType);

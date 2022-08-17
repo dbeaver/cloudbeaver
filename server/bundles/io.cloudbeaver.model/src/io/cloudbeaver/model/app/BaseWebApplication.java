@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import org.eclipse.core.resources.IWorkspace;
@@ -116,11 +117,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public VirtualProjectImpl createProjectImpl(
         @NotNull RMProject project,
         @NotNull SMSessionContext sessionContext,
-        @NotNull SMCredentialsProvider credentialsProvider
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DataSourceFilter dataSourceFilter
     ) {
         return new VirtualProjectImpl(
             project,
-            sessionContext);
+            sessionContext,
+            dataSourceFilter
+        );
     }
 
     @Override
