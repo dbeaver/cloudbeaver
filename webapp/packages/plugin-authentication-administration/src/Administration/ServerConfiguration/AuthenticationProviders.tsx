@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 import styled from 'reshadow';
 
-import { AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { AuthProviderService, AuthProvidersResource, AuthSettingsService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -29,6 +29,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const formContext = useContext(FormContext);
+  const authSettingsService = useService(AuthSettingsService);
 
   if (formContext === null) {
     throw new Error('Form state should be provided');
@@ -76,21 +77,19 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     <React.Fragment>
       <Group key='authentication' form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
-        {localProvider && (
-          <>
-            <Switch
-              name="anonymousAccessEnabled"
-              state={serverConfig}
-              description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
-              mod={['primary']}
-              disabled={authenticationDisabled}
-              small
-              autoHide
-            >
-              {translate('administration_configuration_wizard_configuration_anonymous_access')}
-            </Switch>
-          </>
-        )}
+        {localProvider && !authSettingsService.settings.getValue('disableAnonymousAccess') ? (
+          <Switch
+            name="anonymousAccessEnabled"
+            state={serverConfig}
+            description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
+            mod={['primary']}
+            disabled={authenticationDisabled}
+            small
+            autoHide
+          >
+            {translate('administration_configuration_wizard_configuration_anonymous_access')}
+          </Switch>
+        ) : null}
         <Loader state={providers} inline>
           {() => styled(styles)(
             <>

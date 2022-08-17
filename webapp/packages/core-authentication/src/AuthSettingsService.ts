@@ -12,6 +12,7 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 const defaultSettings = {
   baseAuthProvider: undefined as undefined | string,
   primaryAuthProvider: 'local',
+  disableAnonymousAccess: false,
 };
 
 export type AuthSettings = typeof defaultSettings;

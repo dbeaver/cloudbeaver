@@ -109,7 +109,7 @@ export class MenuBootstrap extends Bootstrap {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isHidden(context) {
-        return context.data.model.isReadonly()
+        return context.data.model.isReadonly(context.data.resultIndex)
           || context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset;
       },
       isDisabled(context) {

@@ -23,6 +23,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
@@ -34,11 +35,16 @@ public class VirtualProjectImpl extends BaseProjectImpl {
 
     @NotNull
     private final Path path;
+    @NotNull
+    protected final DataSourceFilter dataSourceFilter;
 
-    public VirtualProjectImpl(@NotNull RMProject project, @Nullable SMSessionContext sessionContext) {
+    public VirtualProjectImpl(@NotNull RMProject project,
+                              @Nullable SMSessionContext sessionContext,
+                              @NotNull DataSourceFilter dataSourceFilter) {
         super(DBWorkbench.getPlatform().getWorkspace(), sessionContext);
         this.path = RMUtils.getProjectPath(project);
         this.project = project;
+        this.dataSourceFilter = dataSourceFilter;
     }
 
     @Override
@@ -79,8 +85,15 @@ public class VirtualProjectImpl extends BaseProjectImpl {
     public void ensureOpen() {
 
     }
+
     @NotNull
     public RMProject getRmProject() {
         return this.project;
+    }
+
+    @NotNull
+    @Override
+    protected DataSourceRegistry createDataSourceRegistry() {
+        return new WebDataSourceRegistryProxy(super.createDataSourceRegistry(), dataSourceFilter);
     }
 }

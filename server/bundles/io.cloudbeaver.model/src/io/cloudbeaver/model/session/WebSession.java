@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -28,7 +29,6 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -327,6 +327,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     private void loadProjects() {
         WebUser user = userContext.getUser();
+        refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());
             RMProject[] rmProjects =  controller.listAccessibleProjects();
@@ -347,8 +348,14 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    private VirtualProjectImpl createVirtualProject(RMProject project) {
-        VirtualProjectImpl sessionProject = application.createProjectImpl(project, getSessionAuthContext(), this);
+    public VirtualProjectImpl createVirtualProject(RMProject project) {
+        // Do not filter data sources from user project
+        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
+        VirtualProjectImpl sessionProject = application.createProjectImpl(
+            project,
+            getSessionAuthContext(),
+            this,
+            filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
@@ -363,18 +370,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         for (DBPProject project : accessibleProjects) {
-            boolean isGlobalProject = WebAppUtils.isGlobalProject(project);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
             for (DBPDataSourceContainer ds : registry.getDataSources()) {
-                WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                if (isGlobalProject) {
-                    if (isDataSourceAccessible(ds)) {
-                        connList.add(connectionInfo);
-                    }
-                } else {
-                    connList.add(connectionInfo);
-                }
+                connList.add(new WebConnectionInfo(this, ds));
             }
             Throwable lastError = registry.getLastError();
             if (lastError != null) {
@@ -462,8 +461,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
                 userContext.refreshPermissions();
+                refreshAccessibleConnectionIds();
             }
-            refreshAccessibleConnectionIds();
 
         } catch (Exception e) {
             addSessionError(e);
