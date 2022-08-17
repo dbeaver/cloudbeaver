@@ -1316,7 +1316,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return userId;
     }
 
-    private String generateAuthToken(@NotNull String smSessionId, @Nullable String userId, @NotNull Connection dbCon) throws SQLException {
+    protected String generateAuthToken(
+        @NotNull String smSessionId,
+        @Nullable String userId,
+        @NotNull Connection dbCon
+    ) throws SQLException, DBException {
         JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID, SESSION_ID, USER_ID, EXPIRATION_TIME) " +
