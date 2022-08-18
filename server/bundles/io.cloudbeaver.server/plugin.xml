@@ -22,7 +22,7 @@
 
     <extension point="io.cloudbeaver.service">
         <service id="core" label="Core service" description="Core services" class="io.cloudbeaver.service.core.WebServiceBindingCore">
-            <permission id="public" label="Public access" category="general" scope="subject"/>
+            <permission id="public" label="Public access" category="general" scope="subject" description="Provides access to the product features"/>
             <permission id="access" label="Data source access" category="general" scope="datasource"/>
         </service>
         <service id="navigator" label="Database navigator" description="Database navigator services" class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator">
