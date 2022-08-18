@@ -115,7 +115,7 @@ export class PublicConnectionFormService {
 
     await this.close(true);
 
-    if (key) {
+    if (key && this.connectionInfoResource.isConnected(key)) {
       this.tryReconnect(key);
     }
   }
