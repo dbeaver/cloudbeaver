@@ -68,6 +68,8 @@ const radioMod = {
       composes: theme-radio_small from global;
     }
     field {
+      padding: 0;
+
       & radio {
         width: 14px;
         height: 14px;
