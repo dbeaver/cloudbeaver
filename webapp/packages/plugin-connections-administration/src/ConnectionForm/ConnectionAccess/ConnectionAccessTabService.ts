@@ -69,7 +69,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    if (data.submitType === 'test' || data.state.type === 'public') {
+    if (data.submitType === 'test') {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
