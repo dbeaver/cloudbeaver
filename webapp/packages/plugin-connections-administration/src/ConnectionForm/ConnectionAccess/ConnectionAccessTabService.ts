@@ -10,6 +10,7 @@ import { AdministrationScreenService, EAdminPermission } from '@cloudbeaver/core
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
@@ -38,7 +39,8 @@ export class ConnectionAccessTabService extends Bootstrap {
       title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: () => !this.permissionsResource.has(EAdminPermission.admin),
+      isHidden: (_, context) => context?.state.projectId !== PROJECT_GLOBAL_ID
+        || !this.permissionsResource.has(EAdminPermission.admin),
       isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
@@ -67,7 +69,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    if (data.submitType === 'test' || data.state.type === 'public') {
+    if (data.submitType === 'test') {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
