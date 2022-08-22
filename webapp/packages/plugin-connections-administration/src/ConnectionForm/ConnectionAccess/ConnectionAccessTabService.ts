@@ -69,7 +69,11 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    if (data.submitType === 'test') {
+    if (
+      data.submitType === 'test'
+      || data.state.projectId !== PROJECT_GLOBAL_ID // TODO: must be controlled by user's project access rights
+      || !this.permissionsResource.has(EAdminPermission.admin)
+    ) {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
@@ -85,7 +89,7 @@ export class ConnectionAccessTabService extends Bootstrap {
       { state: data.state }
     );
 
-    if (!config.connectionId || !data.state.projectId || !state.loaded) {
+    if (!config.connectionId || !state.loaded) {
       return;
     }
 
