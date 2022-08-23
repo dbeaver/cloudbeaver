@@ -21,6 +21,10 @@ import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
+import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.DBNRoot;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionFolderUtils {
@@ -42,6 +46,16 @@ public class WebConnectionFolderUtils {
     public static void validateConnectionFolder(String folderName) throws DBWebException {
         if (folderName.contains("/")) {
             throw new DBWebException("Folder name '" + folderName + "' contains illegal characters: /");
+        }
+    }
+
+    public static DBPDataSourceFolder getParentFolder(DBNNode folderNode) throws DBWebException {
+        if (folderNode instanceof DBNRoot || folderNode instanceof DBNProject) {
+            return null;
+        } else if (folderNode instanceof DBNLocalFolder) {
+            return ((DBNLocalFolder) folderNode).getFolder();
+        } else {
+            throw new DBWebException("Navigator node '" + folderNode.getNodeItemPath() + "' is not a folder node");
         }
     }
 }
