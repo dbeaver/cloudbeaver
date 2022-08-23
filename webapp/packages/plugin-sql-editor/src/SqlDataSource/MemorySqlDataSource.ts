@@ -52,6 +52,10 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     });
   }
 
+  isReadonly(): boolean {
+    return false;
+  }
+
   setScript(script: string): void {
     this._script = script;
     super.setScript(script);
