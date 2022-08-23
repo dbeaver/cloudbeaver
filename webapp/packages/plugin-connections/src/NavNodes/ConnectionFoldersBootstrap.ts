@@ -155,6 +155,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }: INodeMoveData,
     contexts: IExecutionContextProvider<INodeMoveData>
   ) {
+    if (![NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)) {
+      return;
+    }
+
     await this.projectsResource.load(CachedMapAllKey);
 
     const move = contexts.getContext(navNodeMoveContext);
@@ -163,14 +167,12 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     const children = this.navTreeResource.get(targetNode.id);
     const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
 
-    const supported = (
-      [NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)
-        && nodes.every(node => (
-          node.nodeType === NAV_NODE_TYPE_CONNECTION
-          && targetProject === this.projectsNavNodeService.getProject(node.id)
-          && !children?.includes(node.id)
-        ))
-    );
+    const supported = nodes.every(node => (
+      [NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node.nodeType!)
+      && targetProject === this.projectsNavNodeService.getProject(node.id)
+      && !children?.includes(node.id)
+      && targetNode.id !== node.id
+    ));
 
     if (!supported) {
       return;
