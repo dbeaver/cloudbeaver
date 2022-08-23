@@ -66,15 +66,13 @@ const equalConfigB = {
   },
 };
 
-async function setupSettingsService(mockConfig?: any) {
+async function setupSettingsService(mockConfig: any = {}) {
   const settings = app.injector.getServiceByClass(DataViewerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  if (mockConfig) {
-    server.use(
-      endpoint.query('serverConfig', mockServerConfig(mockConfig)),
-    );
-  }
+  server.use(
+    endpoint.query('serverConfig', mockServerConfig(mockConfig)),
+  );
 
   await config.refresh();
 
