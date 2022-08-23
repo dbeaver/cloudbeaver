@@ -64,13 +64,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           if (
             !['undefined', 'object'].includes(typeof value.nodeInfo)
             || !['string', 'undefined'].includes(typeof value.name)
-            || !['string', 'undefined', 'object'].includes(typeof value.nodeInfo?.nodeId)
+            || !['string', 'undefined'].includes(typeof value.nodeInfo?.nodeId)
             || !['undefined', 'object'].includes(typeof value.nodeInfo?.parents)
             || !['undefined', 'object'].includes(typeof value.executionContext)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.connectionId)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.id)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.id)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultCatalog)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
@@ -114,6 +114,11 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         return dataSource;
       },
       onDestroy: (_, editorId) => this.deleteState(editorId),
+      onUnload: async dataSource => {
+        if (dataSource instanceof ResourceSqlDataSource) {
+          await dataSource.write();
+        }
+      },
       canDestroy: async (dataSource, editorId) => {
         try {
           if (dataSource instanceof ResourceSqlDataSource) {

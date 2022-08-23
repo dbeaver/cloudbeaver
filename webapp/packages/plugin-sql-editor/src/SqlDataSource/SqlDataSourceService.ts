@@ -31,6 +31,7 @@ interface ISqlDataSourceFabric {
   key: string;
   getDataSource: ISqlDataSourceFactory;
   onDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
+  onUnload?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
   canDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<boolean> | boolean;
 }
 
@@ -146,6 +147,14 @@ export class SqlDataSourceService {
     if (activeProvider) {
       await this.destroyProvider(editorId, activeProvider);
     }
+  }
+
+  async unload(editorId: string): Promise<void> {
+    const activeProvider = this.providers.get(editorId);
+
+    if (activeProvider) {
+      await this.unloadProvider(editorId, activeProvider);
+    }
 
     this.providers.delete(editorId);
   }
@@ -158,8 +167,12 @@ export class SqlDataSourceService {
     this.dataSourceProviders.set(dataSourceOptions.key, dataSourceOptions);
   }
 
+  private async unloadProvider(editorId: string, provider: ISqlDataSourceProvider): Promise<void> {
+    await provider.provider.onUnload?.(provider.dataSource, editorId);
+    await provider.dataSource.dispose();
+  }
+
   private async destroyProvider(editorId: string, provider: ISqlDataSourceProvider): Promise<void> {
     await provider.provider.onDestroy?.(provider.dataSource, editorId);
-    await provider.dataSource.dispose();
   }
 }

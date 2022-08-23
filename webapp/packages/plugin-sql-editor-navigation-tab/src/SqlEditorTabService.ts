@@ -70,6 +70,7 @@ export class SqlEditorTabService extends Bootstrap {
       getTabComponent: () => SqlEditorTab,
       getPanelComponent: () => SqlEditorPanel,
       onRestore: this.handleTabRestore.bind(this),
+      onUnload: this.handleTabUnload.bind(this),
       onClose: this.handleTabClose.bind(this),
       canClose: this.handleCanTabClose.bind(this),
       extensions: [
@@ -270,9 +271,9 @@ export class SqlEditorTabService extends Bootstrap {
       typeof tab.handlerState.editorId !== 'string'
       || typeof tab.handlerState.editorId !== 'string'
       || typeof tab.handlerState.order !== 'number'
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.currentTabId)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.source)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.currentModeId)
       || !Array.isArray(tab.handlerState.modeState)
       || !Array.isArray(tab.handlerState.tabs)
       || !Array.isArray(tab.handlerState.executionPlanTabs)
@@ -448,16 +449,20 @@ export class SqlEditorTabService extends Bootstrap {
     return canDestroyDatasource;
   }
 
-  private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+  private async handleTabUnload(editorTab: ITab<ISqlEditorTabState>) {
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
     if (dataSource?.executionContext) {
       await this.sqlEditorService.destroyContext(dataSource.executionContext);
     }
 
-    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
+    await this.sqlDataSourceService.unload(editorTab.handlerState.editorId);
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
+  }
+
+  private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }
 

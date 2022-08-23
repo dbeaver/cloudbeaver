@@ -170,6 +170,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     try {
       this.exception = null;
       this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
+
+      if (this.nodeInfo.parents.length > 0) {
+        this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+      }
+
       this.markOutdated();
       this.saved = true;
       this.loaded = false;
