@@ -15,7 +15,7 @@ import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';
 
-const dbObjectParentKeySymbol = Symbol('@connection-folder/project') as unknown as string;
+const dbObjectParentKeySymbol = Symbol('@db-object/parent') as unknown as string;
 export const DBObjectParentKey = (parentId: string) => resourceKeyList<string>(
   [dbObjectParentKeySymbol],
   parentId
