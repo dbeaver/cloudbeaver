@@ -374,6 +374,10 @@ export abstract class CachedMapResource<
       return this.isAliasEqual(param, key);
     }
 
+    if (ResourceKeyUtils.isEmpty(param) || ResourceKeyUtils.isEmpty(key)) {
+      return ResourceKeyUtils.isEmpty(param) && ResourceKeyUtils.isEmpty(key);
+    }
+
     param = ResourceKeyUtils.mapKey(param, this.getKeyRef.bind(this));
     key = ResourceKeyUtils.mapKey(key, this.getKeyRef.bind(this));
 
