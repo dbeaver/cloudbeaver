@@ -113,7 +113,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         });
 
         dataSource.setInfo({
-          isReadonly: dataSource => !this.networkStateService.state,
+          isReadonly: () => !this.networkStateService.state,
         });
 
         return dataSource;
