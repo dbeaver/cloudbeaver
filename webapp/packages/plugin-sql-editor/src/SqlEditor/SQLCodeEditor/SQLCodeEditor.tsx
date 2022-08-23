@@ -30,11 +30,11 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
     <CodeEditorLoader
       {...controller.bindings}
       options={{
+        readOnly: props.readonly ? 'nocursor' : false,
         ...controller.bindings.options,
         mode: controller.mode,
       }}
       className={props.className}
-      readonly={props.readonly}
       autoFormat={props.autoFormat}
       value={props.value || ''}
     />
