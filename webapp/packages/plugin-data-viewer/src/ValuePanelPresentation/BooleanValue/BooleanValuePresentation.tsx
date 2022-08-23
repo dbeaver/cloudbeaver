@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { Radio, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
@@ -65,7 +65,9 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
 
   const column = view.getColumn(firstSelectedCell.column);
   const nullable = column?.required === false;
-  const readonly = model.isReadonly() || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
+  const readonly = model.isReadonly(resultIndex)
+    || model.isDisabled(resultIndex)
+    || format.isReadOnly(firstSelectedCell);
 
   return styled(styles)(
     <container>

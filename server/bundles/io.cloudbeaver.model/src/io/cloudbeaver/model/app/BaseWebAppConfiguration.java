@@ -29,16 +29,12 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     public static final String DEFAULT_APP_ANONYMOUS_ROLE_NAME = "user";
 
     protected final Map<String, Object> plugins;
-    protected boolean anonymousAccessEnabled;
-    protected String anonymousUserRole;
     protected String defaultUserRole;
     protected boolean resourceManagerEnabled;
     protected String[] enabledFeatures;
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
-        this.anonymousAccessEnabled = true;
-        this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.defaultUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
@@ -46,21 +42,9 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
         this.plugins = new LinkedHashMap<>(src.plugins);
-        this.anonymousAccessEnabled = src.anonymousAccessEnabled;
-        this.anonymousUserRole = src.anonymousUserRole;
         this.defaultUserRole = src.defaultUserRole;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
-    }
-
-    @Override
-    public boolean isAnonymousAccessEnabled() {
-        return anonymousAccessEnabled;
-    }
-
-    @Override
-    public String getAnonymousUserRole() {
-        return anonymousUserRole;
     }
 
     @Override
