@@ -150,7 +150,7 @@ export function useMapResource<
         return true;
       }
 
-      if (this.loadedKey === null) {
+      if (this.loadedKey === null || this.key === null) {
         return false;
       }
 
@@ -176,11 +176,15 @@ export function useMapResource<
     });
   }
 
-  if (!untracked(() => resource.includes(key, keyRef.key))) {
-    untracked(() => {
+  untracked(() => {
+    if (
+      key === null
+      || keyRef.key === null
+      || !resource.includes(key, keyRef.key)
+    ) {
       keyRef.key = key;
-    });
-  }
+    }
+  });
 
   const refObj = useObservableRef(() => ({
     loading: false,
