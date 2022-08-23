@@ -14,7 +14,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import {
   DatabaseDataAccessMode, DatabaseDataModel, DatabaseEditAction, DataViewerDataChangeConfirmationService,
-  getDefaultRowsCount, IDatabaseDataModel, IDatabaseResultSet, DataViewerService, TableViewerStorageService
+  IDatabaseDataModel, IDatabaseResultSet, DataViewerService, TableViewerStorageService,
+  DataViewerSettingsService
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -50,7 +51,8 @@ export class SqlQueryService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly dataViewerDataChangeConfirmationService: DataViewerDataChangeConfirmationService,
     private readonly dataViewerService: DataViewerService,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly dataViewerSettingsService: DataViewerSettingsService
   ) {
     this.statisticsMap = new Map();
 
@@ -121,7 +123,7 @@ export class SqlQueryService {
 
     try {
       await model
-        .setCountGain(getDefaultRowsCount())
+        .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
         .setSlice(0)
         .request();
 
@@ -209,7 +211,7 @@ export class SqlQueryService {
 
       try {
         await model
-          .setCountGain(getDefaultRowsCount())
+          .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
           .setSlice(0)
           .request();
 

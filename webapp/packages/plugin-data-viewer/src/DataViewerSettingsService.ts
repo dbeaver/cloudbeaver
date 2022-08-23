@@ -11,6 +11,9 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   disableEdit: false,
+  fetchMin: 100,
+  fetchMax: 5000,
+  fetchDefault: 200,
 };
 
 export type DataViewerSettings = typeof defaultSettings;
@@ -24,5 +27,17 @@ export class DataViewerSettingsService {
   constructor(private readonly pluginManagerService: PluginManagerService) {
     this.settings = this.pluginManagerService.getPluginSettings('data-viewer', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.dataViewer', defaultSettings);
+  }
+
+  getDefaultRowsCount(count?: number): number {
+    if (typeof count === 'number' && Number.isNaN(count)) {
+      count = 0;
+    }
+    return count !== undefined
+      ? Math.max(
+        this.settings.getValue('fetchMin'),
+        Math.min(count, this.settings.getValue('fetchMax'))
+      )
+      : this.settings.getValue('fetchDefault');
   }
 }
