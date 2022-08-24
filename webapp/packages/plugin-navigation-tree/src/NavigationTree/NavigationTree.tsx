@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -105,8 +106,7 @@ export const NavigationTree = observer(function NavigationTree() {
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>
-              No connections.<br />
-              Use the top menu to setup connection to your database.
+              <Translate token='app_navigationTree_empty_placeholder' />
             </message>
           </center>
         )}
