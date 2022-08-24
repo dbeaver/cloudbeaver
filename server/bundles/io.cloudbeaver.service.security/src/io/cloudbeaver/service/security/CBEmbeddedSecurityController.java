@@ -68,8 +68,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
-    private static final int TOKEN_MINUTES_ALIVE_TIME = 20;
-    private static final int REFRESH_TOKEN_HOURS_ALIVE_TIME = 24;
+    private static final int ACCESS_TOKEN_TTL_IN_MINUTES = 20;
+    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 24;
 
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
@@ -1149,7 +1149,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         try (var dbCon = database.openConnection()) {
             invalidateUserTokens(currentUserAccessToken);
-            return generateNewSessionToken(expectedRefreshTokenInfo.getSessionId(), currentUserCreds.getUserId(), dbCon);
+            return generateNewSessionToken(expectedRefreshTokenInfo.getSessionId(), expectedRefreshTokenInfo.getUserId(), dbCon);
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
@@ -1190,7 +1190,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private RefreshTokenInfo findRefreshToken(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,REFRESH_TOKEN_EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
+                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
              )
         ) {
             dbStat.setString(1, smAccessToken);
@@ -1200,11 +1200,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 var refreshToken = dbResult.getString(1);
                 var sessionId = dbResult.getString(2);
-                var expiredDate = dbResult.getTimestamp(3);
+                var userId = dbResult.getString(3);
+                var expiredDate = dbResult.getTimestamp(4);
                 if (Timestamp.from(Instant.now()).after(expiredDate)) {
                     throw new SMRefreshTokenExpiredException("Refresh token expired");
                 }
-                return new RefreshTokenInfo(refreshToken, sessionId);
+                return new RefreshTokenInfo(refreshToken, sessionId, userId);
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
@@ -1405,12 +1406,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             } else {
                 dbStat.setString(3, userId);
             }
-            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(TOKEN_MINUTES_ALIVE_TIME));
+            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(ACCESS_TOKEN_TTL_IN_MINUTES));
             dbStat.setTimestamp(4, accessTokenExpirationTime);
 
             String smRefreshToken = SecurityUtils.generatePassword(32);
             dbStat.setString(5, smRefreshToken);
-            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(REFRESH_TOKEN_HOURS_ALIVE_TIME));
+            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(REFRESH_TOKEN_TTL_IN_HOURS));
             dbStat.setTimestamp(6, refreshTokenExpirationTime);
 
             dbStat.execute();

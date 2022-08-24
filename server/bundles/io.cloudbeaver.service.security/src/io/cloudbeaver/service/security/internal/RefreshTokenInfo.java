@@ -26,9 +26,13 @@ public class RefreshTokenInfo {
     @NotNull
     private final String sessionId;
 
-    public RefreshTokenInfo(@NotNull String refreshToken, @NotNull String sessionId) {
+    @NotNull
+    private final String userId;
+
+    public RefreshTokenInfo(@NotNull String refreshToken, @NotNull String sessionId, @NotNull String userId) {
         this.refreshToken = refreshToken;
         this.sessionId = sessionId;
+        this.userId = userId;
     }
 
     @NotNull
@@ -39,5 +43,10 @@ public class RefreshTokenInfo {
     @NotNull
     public String getSessionId() {
         return sessionId;
+    }
+
+    @NotNull
+    public String getUserId() {
+        return userId;
     }
 }
