@@ -17,7 +17,7 @@ import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel'
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { DataViewerService } from './DataViewerService';
-import { getDefaultRowsCount } from './getDefaultRowsCount';
+import { DataViewerSettingsService } from './DataViewerSettingsService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
@@ -29,6 +29,7 @@ export class DataViewerTableService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService,
+    private readonly dataViewerSettingsService: DataViewerSettingsService,
   ) { }
 
   has(tableId: string): boolean {
@@ -71,7 +72,7 @@ export class DataViewerTableService {
 
     const editable = this.dataViewerService.isDataEditable(connection);
     const dataModel = this.tableViewerStorageService.add(new DatabaseDataModel(source))
-      .setCountGain(getDefaultRowsCount())
+      .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
       .setSlice(0)
       .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly);
 

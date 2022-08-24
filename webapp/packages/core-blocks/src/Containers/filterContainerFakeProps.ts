@@ -11,6 +11,7 @@ import type { IContainerProps } from './IContainerProps';
 
 export function filterContainerFakeProps<T extends IContainerProps>(props: T): Omit<T, keyof IContainerProps> {
   const {
+    hideEmpty,
     flexStart,
     baseline,
     center,

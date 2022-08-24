@@ -34,6 +34,7 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { usePermission } from '@cloudbeaver/core-root';
 import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -159,6 +160,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
+  const globalProject = state.projectId === PROJECT_GLOBAL_ID;
   const originLocal = !info || isLocalConnection(info);
 
   const availableAuthModels = applicableAuthModels.filter(model => !!model && (
@@ -307,7 +309,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            {adminPermission && originLocal && (
+            {adminPermission && originLocal && globalProject && (
               <FieldCheckbox
                 id={config.connectionId}
                 name="template"
@@ -370,7 +372,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       name="saveCredentials"
                       state={config}
                       disabled={disabled || readonly}
-                    >{translate('connections_connection_edit_save_credentials')}
+                    >
+                      {translate('connections_connection_edit_save_credentials')}
                     </FieldCheckbox>
                   )}
                 </>
