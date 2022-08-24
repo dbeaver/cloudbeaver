@@ -472,6 +472,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         ((DBNDataSource) node).getDataSourceContainer());
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
+                    if (folder != null) {
+                        List<String> siblings = Arrays.stream(folder.getChildren())
+                            .map(DBPDataSourceFolder::getName)
+                            .collect(Collectors.toList());
+                        if (siblings.contains(node.getName())) {
+                            throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() +"'");
+                        }
+                    }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                 } else if (node instanceof DBNResourceManagerResource) {
