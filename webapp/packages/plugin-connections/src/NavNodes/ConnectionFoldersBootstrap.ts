@@ -16,7 +16,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, Ren
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectsResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
@@ -164,15 +164,21 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
-    const children = this.navTreeResource.get(targetNode.id);
+    const children = this.navTreeResource.get(targetNode.id) ?? [];
     const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
 
-    const supported = nodes.every(node => (
-      [NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node.nodeType!)
-      && targetProject === this.projectsNavNodeService.getProject(node.id)
-      && !children?.includes(node.id)
-      && targetNode.id !== node.id
-    ));
+    const supported = nodes.every(node => {
+      if (
+        ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node.nodeType!)
+        || targetProject !== this.projectsNavNodeService.getProject(node.id)
+        || children.includes(node.id)
+        || targetNode.id === node.id
+      ) {
+        return false;
+      }
+
+      return true;
+    });
 
     if (!supported) {
       return;
@@ -183,6 +189,31 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         move.setCanMove(true);
       }
     } else {
+      const childrenNode = this.navNodeInfoResource.get(resourceKeyList(children));
+      const folderDuplicates = nodes.filter(node => (
+        node.nodeType === NAV_NODE_TYPE_FOLDER
+        && (
+          childrenNode.some(child => child?.nodeType === NAV_NODE_TYPE_FOLDER && child.name === node.name)
+          || nodes.some(child => (
+            child.nodeType === NAV_NODE_TYPE_FOLDER
+            && child.name === node.name
+            && child.id !== node.id
+          ))
+        )
+      ));
+
+      if (folderDuplicates.length > 0) {
+        this.notificationService.logError({
+          title: 'connections_public_connection_folder_move_failed',
+          message: this.localizationService.translate(
+            'connections_public_connection_folder_move_duplication',
+            undefined,
+            { name: folderDuplicates.map(node => `"${node.name}"`).join(', ') }
+          ),
+        });
+        return;
+      }
+
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
         const connections = nodeIdList
