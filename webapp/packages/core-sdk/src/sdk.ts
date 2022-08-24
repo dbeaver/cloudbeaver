@@ -563,6 +563,7 @@ export interface MutationRmMoveResourceArgs {
 
 export interface MutationRmWriteResourceStringContentArgs {
   data: Scalars['String'];
+  forceOverwrite: Scalars['Boolean'];
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
 }
@@ -2438,6 +2439,7 @@ export type WriteResourceContentMutationVariables = Exact<{
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
   data: Scalars['String'];
+  forceOverwrite: Scalars['Boolean'];
 }>;
 
 
@@ -3889,11 +3891,12 @@ export const ReadResourceDocument = `
 }
     `;
 export const WriteResourceContentDocument = `
-    mutation writeResourceContent($projectId: String!, $resourcePath: String!, $data: String!) {
+    mutation writeResourceContent($projectId: String!, $resourcePath: String!, $data: String!, $forceOverwrite: Boolean!) {
   rmWriteResourceStringContent(
     projectId: $projectId
     resourcePath: $resourcePath
     data: $data
+    forceOverwrite: $forceOverwrite
   )
 }
     `;
