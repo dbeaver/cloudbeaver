@@ -190,19 +190,22 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         }
       } finally {
         runInAction(() => {
-          const parents: string[] = [];
-          const deletedIds: string[][] = [];
+          const deletionMap = new Map<string, string[]>();
 
           for (const path of deletedPaths) {
             const node = this.navNodeInfoResource.get(path);
 
             if (node) {
-              parents.push(node.parentId);
-              deletedIds.push([path]);
+              const deletedIds = deletionMap.get(node.parentId) ?? [];
+              deletedIds.push(path);
+              deletionMap.set(node.parentId, deletedIds);
             }
           }
 
-          this.deleteInNode(resourceKeyList(parents), deletedIds);
+          const keys = resourceKeyList([...deletionMap.keys()]);
+          const nodes = [...deletionMap.values()];
+
+          this.deleteInNode(keys, nodes);
         });
       }
     });
