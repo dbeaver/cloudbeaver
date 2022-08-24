@@ -25,6 +25,7 @@ import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
+import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -90,6 +91,10 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
+  const projectsRendererRenderer = useMemo(
+    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
+    [navNodeViewService]
+  );
 
   if (!isEnabled) {
     return null;
@@ -101,7 +106,7 @@ export const NavigationTree = observer(function NavigationTree() {
         root={root}
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter]}
-        renderers={[navigationTreeConnectionGroupRenderer]}
+        renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer]}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>
