@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+console.log('test');
+
 export function debounce<T extends (...args: any[]) => any>(func: T, delay: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined;
 
