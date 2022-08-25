@@ -24,6 +24,6 @@ describe('Debounce', () => {
     // Fast-forward time
     jest.runAllTimers();
 
-    expect(func).toBeCalledTimes(1);
+    expect(func).toBeCalledTimes(2);
   });
 });
