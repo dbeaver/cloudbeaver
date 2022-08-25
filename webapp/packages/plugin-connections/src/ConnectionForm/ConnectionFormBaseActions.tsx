@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, PlaceholderComponent, useMapResource } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
@@ -21,12 +20,6 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   onCancel,
 }) {
   const translate = useTranslate();
-  const driverMap = useMapResource(
-    ConnectionFormBaseActions,
-    DBDriverResource,
-    state.config.driverId || null
-  );
-  const driver = driverMap.data;
   const authentication = useAuthenticationAction({
     origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
   });
@@ -45,7 +38,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
       )}
       <Button
         type="button"
-        disabled={state.disabled || !(!driver?.anonymousAccess && authentication.authorized)}
+        disabled={state.disabled || !authentication.authorized}
         mod={['outlined']}
         loader
         onClick={state.test}
