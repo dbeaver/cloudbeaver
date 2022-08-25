@@ -24,15 +24,17 @@ export class NetworkStateService extends Bootstrap {
   private networkState: boolean;
 
   constructor(
-    private graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService
   ) {
     super();
-    makeObservable<NetworkStateService, 'networkState'>(this, {
-      networkState: observable,
-    });
 
     this.networkState = true;
     this.networkStateExecutor = new Executor();
+    this.networkStateExecutor.setInitialDataGetter(() => this.state);
+
+    makeObservable<NetworkStateService, 'networkState'>(this, {
+      networkState: observable,
+    });
   }
 
   register(): void {

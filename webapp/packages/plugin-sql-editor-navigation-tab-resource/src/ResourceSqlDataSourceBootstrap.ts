@@ -13,7 +13,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource, NavNodeInfoResource, INavNodeMoveData, INavNodeRenameData } from '@cloudbeaver/core-navigation-tree';
-import { WindowEventsService } from '@cloudbeaver/core-root';
+import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
@@ -34,6 +34,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, IResourceSqlDataSourceState>();
 
   constructor(
+    private readonly networkStateService: NetworkStateService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly commonDialogService: CommonDialogService,
     private readonly navResourceNodeService: NavResourceNodeService,
@@ -109,6 +110,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           rename: this.rename.bind(this),
           read: this.read.bind(this),
           write: this.write.bind(this),
+        });
+
+        dataSource.setInfo({
+          isReadonly: () => !this.networkStateService.state,
         });
 
         return dataSource;
