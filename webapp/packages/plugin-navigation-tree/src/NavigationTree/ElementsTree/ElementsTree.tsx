@@ -10,9 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { Translate } from '@cloudbeaver/core-localization';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
@@ -281,7 +282,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   const hasChildren = (children.data?.length || 0) > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
 
-  return styled(useStyles(styles, style))(
+  return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
       <ElementsTreeTools tree={tree} style={style} />
       <tree-box>
@@ -305,11 +306,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                       bottom: dropOutside.bottom,
                     })}
                   >
-                    <NavigationNodeNested
-                      component={NavigationNodeElement}
-                      path={folderExplorer.state.path}
-                      root
-                    />
+                    <TreeNodeNested root>
+                      <TreeNodeNestedMessage><Translate token='app_navigationTree_drop_here' /></TreeNodeNestedMessage>
+                    </TreeNodeNested>
                   </drop-outside>
                   <NavigationNodeNested
                     ref={dropOutside.nestedRef}
