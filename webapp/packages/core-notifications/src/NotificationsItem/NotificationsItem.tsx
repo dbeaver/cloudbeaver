@@ -30,6 +30,7 @@ export const NotificationsItem = observer<Props>(function Notification({ notific
     <Snackbar
       title={notification.title}
       message={notification.message}
+      persistent={notification.persistent}
       type={notification.type}
       time={notification.timestamp}
       state={notification.state}

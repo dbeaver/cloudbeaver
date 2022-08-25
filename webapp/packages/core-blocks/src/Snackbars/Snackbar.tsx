@@ -23,6 +23,7 @@ interface SnackbarProps {
   type: ENotificationType;
   message?: string;
   title: string;
+  persistent?: boolean;
   closeDelay: number;
   disableShowDetails?: boolean;
   time: number;
@@ -35,6 +36,7 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
   type,
   message,
   title,
+  persistent,
   closeDelay = 0,
   disableShowDetails,
   onClose,
@@ -46,7 +48,7 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
   useStateDelay(closeDelay > 0, closeDelay, onClose);
 
   return (
-    <SnackbarWrapper closing={!!state?.deleteDelay} onClose={() => onClose(false)}>
+    <SnackbarWrapper closing={!!state?.deleteDelay} persistent={persistent} onClose={() => onClose(false)}>
       <SnackbarStatus status={type} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>

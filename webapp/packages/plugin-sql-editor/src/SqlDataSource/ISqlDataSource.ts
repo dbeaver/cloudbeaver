@@ -20,6 +20,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly onSetScript: ISyncExecutor<string>;
   readonly features: ESqlDataSourceFeatures[];
 
+  isReadonly(): boolean;
   isOutdated(): boolean;
   markOutdated(): void;
   markUpdated(): void;
