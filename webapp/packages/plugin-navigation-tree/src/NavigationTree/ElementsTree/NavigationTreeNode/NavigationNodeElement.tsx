@@ -37,6 +37,7 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
         return (
           <CustomRenderer
             nodeId={nodeId}
+            path={path}
             expanded={expanded}
             dragging={dragging}
             className={className}
