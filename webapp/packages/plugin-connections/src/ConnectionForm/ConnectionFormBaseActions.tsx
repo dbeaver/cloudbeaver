@@ -24,6 +24,8 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
     origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
   });
 
+  const authorized = authentication.type === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
+
   return (
     <>
       {onCancel && (
@@ -38,7 +40,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
       )}
       <Button
         type="button"
-        disabled={state.disabled || !authentication.authorized}
+        disabled={state.disabled || !authorized}
         mod={['outlined']}
         loader
         onClick={state.test}
