@@ -41,6 +41,7 @@ interface MapFnc {
 }
 
 export interface ResourceKeyUtils {
+  isEmpty: <TKey>(key: ResourceKey<TKey>) => boolean;
   hasMark: <TKey>(key: ResourceKey<TKey>, mark: any) => boolean;
   count: <TKey>(key: ResourceKey<TKey>) => number;
   first: <TKey>(key: ResourceKey<TKey>) => TKey;
@@ -65,6 +66,16 @@ export interface ResourceKeyUtils {
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ResourceKeyUtils: ResourceKeyUtils = {
+  isEmpty<TKey>(
+    key: ResourceKey<TKey>
+  ): boolean {
+    if (isResourceKeyList(key)) {
+      return key.list.length === 0;
+    } else {
+      return false;
+    }
+  },
+
   hasMark<TKey>(
     key: ResourceKey<TKey>,
     mark: any

@@ -113,8 +113,10 @@ export class NavNodeViewService {
     const duplicates: string[] = [];
 
     for (const child of nodes) {
-      if (nextChildren.includes(child)) {
-        if (!duplicates.includes(child)) {
+      const isDuplicate = duplicates.includes(child);
+
+      if (nextChildren.includes(child) || isDuplicate) {
+        if (!isDuplicate) {
           duplicates.push(child);
           nextChildren.splice(nextChildren.indexOf(child), 1);
         }

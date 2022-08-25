@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { NavNodeInfoResource, NavTreeResource, DBObjectResource, type DBObject } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoResource, NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
@@ -42,24 +43,26 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
     onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 
-  const { nodes, truncated } = navNodeViewService.limit(tree.data || []);
-  const key = resourceKeyList(nodes);
-  const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, key, {
-    async onLoad(resource: DBObjectResource) {
-      const preloaded = await tree.resource.preloadNodeParents(parents, nodeId);
+  const limited = navNodeViewService.limit(tree.data || []);
 
-      if (!preloaded) {
-        return true;
-      }
+  const { nodes, duplicates } = navNodeViewService.filterDuplicates(limited.nodes);
 
-      await resource.loadChildren(nodeId, key);
-      return true;
-    },
+  const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, DBObjectParentKey(nodeId), {
     preload: [tree],
   });
 
+  useEffect(() => {
+    untracked(() => {
+      navNodeViewService.logDuplicates(nodeId, duplicates);
+    });
+  });
+
   const objects = dbObject.data
-    .filter(object => object && navNodeInfoResource.get(object.id)?.nodeType === nodeType) as DBObject[];
+    .filter(object => (
+      object
+      && nodes.includes(object.id)
+      && navNodeInfoResource.get(object.id)?.nodeType === nodeType
+    )) as DBObject[];
 
   return styled(style)(
     <Loader state={[tree, dbObject]}>{() => styled(style)(
@@ -68,7 +71,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
         ) : (
           <tab-wrapper>
-            <TableLoader objects={objects} truncated={truncated > 0} />
+            <TableLoader objects={objects} truncated={limited.truncated > 0} />
           </tab-wrapper>
         )}
       </>
