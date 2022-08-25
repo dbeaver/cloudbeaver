@@ -88,7 +88,6 @@
         <setEntry value="org.eclipse.osgi@-1:true"/>
         <setEntry value="org.eclipse.text@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.dbcp@default:default"/>
-        <setEntry value="org.jkiss.bundle.apache.kerby@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.poi@default:default"/>
         <setEntry value="org.jkiss.bundle.cassandra@default:default"/>
         <setEntry value="org.jkiss.bundle.couchbase@default:default"/>
@@ -97,8 +96,6 @@
         <setEntry value="org.jkiss.bundle.graphql.java@default:default"/>
         <setEntry value="org.jkiss.bundle.influxdb@default:default"/>
         <setEntry value="org.jkiss.bundle.jaxb@default:default"/>
-        <setEntry value="org.jkiss.bundle.jedis@default:default"/>
-        <setEntry value="org.jkiss.bundle.lightcouch@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
         <setEntry value="org.objectweb.asm*9.1.0.v20210209-1849@default:default"/>
         <setEntry value="org.slf4j.api@default:default"/>
