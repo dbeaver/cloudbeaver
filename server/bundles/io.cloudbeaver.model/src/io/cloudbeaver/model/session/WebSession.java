@@ -584,14 +584,19 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void close() throws DBException {
+    @Override
+    public void close() {
         try {
             resetNavigationModel();
             resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
         }
-        clearAuthTokens();
+        try {
+            clearAuthTokens();
+        } catch (Exception e) {
+            log.error("Error closing web session tokens");
+        }
         this.sessionAuthContext.close();
         this.userContext.setUser(null);
 
@@ -599,6 +604,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.defaultProject.dispose();
             this.defaultProject = null;
         }
+        super.close();
     }
 
     private void clearAuthTokens() throws DBException {
