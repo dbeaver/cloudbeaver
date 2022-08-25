@@ -9,6 +9,6 @@
 export interface IAuthOptions {
   providerId: string | null;
   configurationId?: string;
-  link?: boolean;
+  linkUser?: boolean;
   accessRequest?: boolean;
 }

@@ -67,7 +67,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   payload: {
     providerId,
     configurationId,
-    link = false,
+    linkUser = false,
     accessRequest = false,
   },
   options,
@@ -111,7 +111,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   async function login() {
-    await dialogData.login(link);
+    await dialogData.login(linkUser);
     rejectDialog();
   }
 
