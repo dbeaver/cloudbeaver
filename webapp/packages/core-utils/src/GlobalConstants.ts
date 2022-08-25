@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import path from 'path';
+import { pathJoin } from './pathJoin';
 
 declare const _VERSION_: string | undefined;
 declare const _DEV_: boolean | undefined;
@@ -27,19 +27,19 @@ export const GlobalConstants = {
     if (_ROOT_URI_ === '{ROOT_URI}') {
       return defaultURI;
     }
-    return path.join(_ROOT_URI_ ?? defaultURI, '/');
+    return pathJoin(_ROOT_URI_ ?? defaultURI, '/');
   },
 
   get serviceURI(): string {
-    return path.join(this.rootURI, 'api');
+    return pathJoin(this.rootURI, 'api');
   },
 
   absoluteRootUrl(...parts: string[]): string {
-    return path.join(this.rootURI, ...parts);
+    return pathJoin(this.rootURI, ...parts);
   },
 
   absoluteServiceUrl(...parts: string[]): string {
-    return path.join(this.serviceURI, ...parts);
+    return pathJoin(this.serviceURI, ...parts);
   },
 
   absoluteUrl(...parts: string[]): string {
