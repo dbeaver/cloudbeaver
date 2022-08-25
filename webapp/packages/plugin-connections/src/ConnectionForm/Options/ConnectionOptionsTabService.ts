@@ -11,6 +11,7 @@ import { action, makeObservable, runInAction, toJS } from 'mobx';
 import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ProjectsResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -25,6 +26,7 @@ import { Options } from './Options';
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
+    private readonly projectsResource: ProjectsResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
@@ -120,14 +122,21 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
     if (!state.config.name?.length) {
-      validation.error("Field 'name' can't be empty");
+      validation.error('plugin_connections_connection_form_name_invalid');
     }
 
     if (state.config.driverId && state.config.configurationType) {
       const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
 
       if (!driver.configurationTypes.includes(state.config.configurationType)) {
-        validation.error('Configuration is not supported');
+        validation.error('plugin_connections_connection_form_host_configuration_invalid');
+      }
+    }
+
+    if (state.projectId !== null) {
+      const project = this.projectsResource.get(state.projectId);
+      if (!project?.canCreateConnections) {
+        validation.error('plugin_connections_connection_form_project_invalid');
       }
     }
 

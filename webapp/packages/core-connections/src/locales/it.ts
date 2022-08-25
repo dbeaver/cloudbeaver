@@ -41,7 +41,7 @@ export default [
   ['connections_connection_access_filter_placeholder', 'Cerca per utente o ruolo'],
   ['connections_connection_access_admin_info', 'Gli amministratori vedono tutte le connessioni.'],
   ['connections_connection_description', 'Descrizione'],
-  ['connections_connection_driver', 'Driver'],
+  ['connections_connection_project', 'Project'],
   ['connections_connection_configuration', 'Configuration'],
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Porta'],
