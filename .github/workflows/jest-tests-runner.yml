@@ -1,4 +1,4 @@
-name: CI
+name: Run Jest Tests
 
 # Controls when the workflow will run
 on:
@@ -12,7 +12,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  run-jest-tests:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     defaults:
@@ -24,8 +24,11 @@ jobs:
      - uses: actions/setup-node@v3
        with:
         node-version: '16'
-     - run: npm install --legacy-peer-deps
-     - run: npm install lerna -g
+     - name: Install dependecies
+       run: npm install --legacy-peer-deps
+     - name: Install lerna
+       run: npm install lerna -g
      - run: lerna bootstrap
+     - name: Run tests
      - run: lerna run test --no-bail --stream -- --reporters default github-actions
      
