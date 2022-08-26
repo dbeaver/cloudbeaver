@@ -62,31 +62,11 @@ export class ObjectPropertyTableFooterService {
       onClick: async context => {
         const nodes = this.getSelectedNodes(context.data.tableState.selectedList)
           .filter(node => node.features?.includes(ENodeFeature.canDelete));
-        const nodeNames = nodes.map(getNodeDisplayName);
-
-        const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
-          title: 'ui_data_delete_confirmation',
-          message: `You're going to delete following items: "${nodeNames.join(', ')}". Are you sure?`,
-          confirmActionText: 'ui_delete',
-        });
-
-        if (result === DialogueStateResult.Rejected) {
-          return;
-        }
-
-        const deleted: string[] = [];
 
         try {
-          for (const node of nodes) {
-            await this.navTreeResource.deleteNode(node.id);
-            deleted.push(node.id);
-          }
+          await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.id)));
         } catch (exception: any) {
           this.notificationService.logException(exception, 'Failed to delete item');
-        }
-
-        if (deleted.length) {
-          context.data.tableState.unselect(deleted);
         }
       },
     });

@@ -28,6 +28,9 @@ const menuStyles = css`
     cursor: pointer;
     width: 100%;
   }
+  menu-container:not([|menuEmpty]) value {
+    padding-right: 8px;
+  }
   menu-box {
     display: flex;
     height: 100%;

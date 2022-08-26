@@ -58,7 +58,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         .mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
         .filter<NavNode>(Boolean as any)
         .map(node => node.name)
-        .join();
+        .join(', ');
 
       const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
