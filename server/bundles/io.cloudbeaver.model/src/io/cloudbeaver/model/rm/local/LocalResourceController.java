@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebDataSourceRegistryProxy;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -27,6 +28,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -259,7 +261,7 @@ public class LocalResourceController implements RMController {
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        ((DataSourceRegistry)registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
+        ((WebDataSourceRegistryProxy) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
         registry.checkForErrors();
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
@@ -267,7 +269,7 @@ public class LocalResourceController implements RMController {
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
-        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+        final WebDataSourceRegistryProxy registry = (WebDataSourceRegistryProxy) project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
         registry.loadDataSources(List.of(storage), manager, true, false);
@@ -279,10 +281,10 @@ public class LocalResourceController implements RMController {
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
-        final DataSourceRegistry registry = (DataSourceRegistry) project.getDataSourceRegistry();
+        final WebDataSourceRegistryProxy registry = (WebDataSourceRegistryProxy) project.getDataSourceRegistry();
 
         for (String dataSourceId : dataSourceIds) {
-            final DataSourceDescriptor dataSource = registry.getDataSource(dataSourceId);
+            final DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
 
             if (dataSource != null) {
                 registry.removeDataSource(dataSource);
