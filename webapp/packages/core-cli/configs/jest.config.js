@@ -19,4 +19,5 @@ module.exports = {
   setupFiles: ['../tests/setup.ts'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   transform: { '\\.[jt]sx?$': ['babel-jest', { configFile: require.resolve('./babel.config.js') }] },
+  testLocationInResults: true,
 };
