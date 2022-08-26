@@ -477,7 +477,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             .map(DBPDataSourceFolder::getName)
                             .collect(Collectors.toList());
                         if (siblings.contains(node.getName())) {
-                            throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() +"'");
+                            throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() + "'");
                         }
                     }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
