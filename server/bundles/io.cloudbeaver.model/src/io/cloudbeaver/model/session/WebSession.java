@@ -965,6 +965,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return userContext.getActiveUserCredentials();
     }
 
+    @Override
+    public void refreshSMSession() throws DBException {
+        userContext.refreshSMSession();
+    }
+
     public VirtualProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
