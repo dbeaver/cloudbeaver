@@ -190,12 +190,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       {useCodeEditor ? (
         <CodeEditorLoader
           key={readonly ? '1' : '0'}
-          readonly={readonly}
           value={stringValue}
           autoFormat={autoFormat}
           options={{
             mode: state.currentContentType,
             theme: 'material',
+            readOnly: readonly ? 'nocursor' : false,
             lineNumbers: true,
             indentWithTabs: true,
             smartIndent: true,

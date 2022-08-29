@@ -12,6 +12,7 @@ import styled, { use, css } from 'reshadow';
 import { getComputed, TreeNode } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES } from '@cloudbeaver/core-navigation-tree';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { useDNDData } from '@cloudbeaver/core-ui';
 import {  useDataContext } from '@cloudbeaver/core-view';
 
@@ -21,7 +22,7 @@ import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
-const style = css`
+const styles = css`
   TreeNode[|hovered] ::before {
     opacity: 0.16;
   }
@@ -31,8 +32,10 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   node,
   component,
   path,
-  expanded: expandedExternal,
+  control: externalControl,
+  expanded: externalExpanded,
   className,
+  style,
 }) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const {
@@ -73,10 +76,10 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   context.set(DATA_CONTEXT_NAV_NODE, node);
   context.set(DATA_CONTEXT_NAV_NODES, getSelected);
 
-  const Control = control || NavigationNodeControl;
+  const Control = control || externalControl || NavigationNodeControl;
 
   if (leaf || empty) {
-    expandedExternal = false;
+    externalExpanded = false;
   }
 
   function setRef(refObj: HTMLDivElement  | null) {
@@ -87,7 +90,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
 
-  return styled(style)(
+  return styled(useStyles(style, styles))(
     <TreeNode
       ref={dndBox.setRef}
       group={group}
@@ -97,7 +100,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       indeterminateSelected={indeterminateSelected}
       expanded={expanded}
       showInFilter={showInFilter}
-      externalExpanded={expandedExternal}
+      externalExpanded={externalExpanded}
       leaf={leaf}
       className={className}
       onExpand={expand}
@@ -112,7 +115,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
         dndElement={dndData.state.isDragging}
         node={node}
       />
-      {(expanded || expandedExternal) && (
+      {(expanded || externalExpanded) && (
         <NavigationNodeNested
           nodeId={node.id}
           path={path}

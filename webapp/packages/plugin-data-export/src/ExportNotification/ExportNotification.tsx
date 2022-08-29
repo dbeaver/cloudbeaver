@@ -55,7 +55,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({
   const { title, status, message } = controller.status;
 
   return styled(useStyles(styles))(
-    <SnackbarWrapper unclosable={status === ENotificationType.Loading} onClose={controller.delete}>
+    <SnackbarWrapper persistent={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>

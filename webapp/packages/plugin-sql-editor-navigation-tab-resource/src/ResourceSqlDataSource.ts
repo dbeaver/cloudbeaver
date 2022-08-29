@@ -15,6 +15,10 @@ import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-s
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
+interface IResourceInfo {
+  isReadonly?: (dataSource: ResourceSqlDataSource) => boolean;
+}
+
 interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string>;
@@ -53,6 +57,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private _script: string;
   private saved: boolean;
   private actions?: IResourceActions;
+  private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
 
@@ -85,6 +90,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     });
   }
 
+  isReadonly(): boolean {
+    return !this.isLoaded() || this.info?.isReadonly?.(this) === true;
+  }
+
   isOutdated(): boolean {
     return this.nodeInfo !== undefined && super.isOutdated();
   }
@@ -106,6 +115,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setActions(actions?: IResourceActions): void {
     this.actions = actions;
+  }
+
+  setInfo(info?: IResourceInfo): void {
+    this.info = info;
   }
 
   setName(name: string | null): void {
@@ -170,6 +183,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     try {
       this.exception = null;
       this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
+
+      if (this.nodeInfo.parents.length > 0) {
+        this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+      }
+
       this.markOutdated();
       this.saved = true;
       this.loaded = false;

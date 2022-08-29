@@ -123,7 +123,7 @@ module.exports = (env, argv) => {
       // "react/jsx-dev-runtime.js": "react/jsx-dev-runtime"
       // },
       fallback: {
-        path: require.resolve('path-browserify'),
+        // path: require.resolve('path-browserify'),
       },
       plugins: [
         PnpWebpackPlugin,

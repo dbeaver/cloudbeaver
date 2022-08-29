@@ -8,6 +8,8 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
+import { NetworkStateNotificationService } from './NetworkStateNotification/NetworkStateNotificationService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { SessionExpiredDialogService } from './SessionExpireDialog/SessionExpiredDialogService';
 import { SessionExpireWarningDialogService } from './SessionExpireWarningDialog/SessionExpireWarningDialogService';
@@ -15,8 +17,10 @@ import { SessionExpireWarningDialogService } from './SessionExpireWarningDialog/
 export const rootPlugin: PluginManifest = {
   info: { name: 'Root plugin' },
   providers: [
+    LocaleService,
     PluginBootstrap,
     SessionExpiredDialogService,
     SessionExpireWarningDialogService,
+    NetworkStateNotificationService,
   ],
 };

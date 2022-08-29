@@ -8,8 +8,12 @@
 
 import '@testing-library/jest-dom';
 
+import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
 import { createApp } from '@cloudbeaver/core-cli/tests/utils/createApp';
 import { getService } from '@cloudbeaver/core-cli/tests/utils/getService';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
+import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
+import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import datasourceContextSwitchPlugin from '@cloudbeaver/plugin-datasource-context-switch';
 import navigationTabsPlugin from '@cloudbeaver/plugin-navigation-tabs';
 import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
@@ -17,11 +21,17 @@ import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
 import { navigationTreePlugin } from '../../manifest';
 import { NavNodeViewService } from './NavNodeViewService';
 
+const endpoint = createGQLEndpoint();
 const app = createApp(
   topAppBarPlugin,
   navigationTabsPlugin,
   datasourceContextSwitchPlugin,
   navigationTreePlugin
+);
+
+mockGraphQL(
+  ...mockAppInit(endpoint),
+  ...mockAuthentication(endpoint)
 );
 
 beforeAll(() => app.init());
