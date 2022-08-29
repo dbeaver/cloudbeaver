@@ -5,7 +5,7 @@
 
     <extension point="io.cloudbeaver.service">
         <service id="admin" label="User administration" description="User administration services" class="io.cloudbeaver.service.admin.WebServiceBindingAdmin">
-            <permission id="admin" label="Admin Full Access" category="admin" scope="subject" description="Provides access to the administration page"/>
+            <permission id="admin" label="Admin Full Access" category="admin" scope="subject" description="Provides access to the CloudBeaver configuration"/>
         </service>
     </extension>
 
