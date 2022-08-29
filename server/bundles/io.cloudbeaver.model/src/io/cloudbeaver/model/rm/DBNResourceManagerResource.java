@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -163,6 +164,11 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     @Override
     public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
         return resource;
+    }
+
+    @Override
+    public DBPProject getOwnerProject() {
+        return getParentNode().getOwnerProject();
     }
 
     public RMResource getResource() {

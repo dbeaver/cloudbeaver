@@ -8,12 +8,18 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils
+  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils, ResourceKeyList
 } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';
+
+const dbObjectParentKeySymbol = Symbol('@db-object/parent') as unknown as string;
+export const DBObjectParentKey = (parentId: string) => resourceKeyList<string>(
+  [dbObjectParentKeySymbol],
+  parentId
+);
 
 @injectable()
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
@@ -24,24 +30,25 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   ) {
     super();
 
+    this.addAlias(
+      isDBObjectParentKey,
+      param => resourceKeyList(navTreeResource.get(param.mark) || []),
+      true
+    );
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
     this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
   }
 
-  async loadChildren(parentId: string, key: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    await this.performUpdate(
-      key,
-      [],
-      () => this.loadFromChildren(parentId, 0, this.navTreeResource.childrenLimit + 1),
-      () => this.isLoaded(key) && !this.isOutdated(key)
-    );
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
+    const key = this.transformParam(originalKey);
 
-    return this.data;
-  }
+    if (isDBObjectParentKey(originalKey)) {
+      await this.loadFromChildren(originalKey.mark, 0, this.navTreeResource.childrenLimit + 1);
+      return this.data;
+    }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, DBObject>> {
     if (isResourceKeyList(key)) {
       const values: DBObject[] = [];
       for (const navNodeId of key.list) {
@@ -86,4 +93,10 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     this.markOutdated(outdateKey);
     // }
   }
+}
+
+function isDBObjectParentKey(
+  param: ResourceKey<string>
+): param is ResourceKeyList<string> {
+  return isResourceKeyList(param) && param.list.includes(dbObjectParentKeySymbol);
 }

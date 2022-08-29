@@ -29,7 +29,7 @@ export const ActionSnackbar: NotificationComponent<ActionSnackbarProps> = observ
   const translate = useTranslate();
 
   return (
-    <SnackbarWrapper unclosable={notification.persistent} onClose={() => notification.close(false)}>
+    <SnackbarWrapper persistent={notification.persistent} onClose={() => notification.close(false)}>
       <SnackbarStatus status={notification.type} />
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>

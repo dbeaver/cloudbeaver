@@ -28,7 +28,7 @@ import { SqlEditorStyles } from './theme';
 import { useAutoFormat } from './useAutoFormat';
 
 export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) {
-  const { readonly, autoFormat, className, editorDidMount } = props;
+  const { autoFormat, className, editorDidMount } = props;
 
   const formatter = useAutoFormat(props.options?.mode);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -62,6 +62,8 @@ export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) 
       editorDidMount(editor, value, cb);
     }
   }, [editorDidMount]);
+
+  const readonly = props.options?.readOnly ?? false;
 
   return styled(useStyles(SqlEditorStyles))(
     <code-editor ref={wrapperRef} {...use({ readonly })} className={className}>

@@ -66,30 +66,61 @@ const equalConfigB = {
   },
 };
 
-test('New settings equal deprecated settings A', async () => {
+async function setupSettingsService(mockConfig: any = {}) {
   const settings = app.injector.getServiceByClass(DataViewerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
   server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigA)),
+    endpoint.query('serverConfig', mockServerConfig(mockConfig)),
   );
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disableEdit')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('disableEdit')).toBe(testValueA);
+  return settings;
+}
+
+test('New settings equal deprecated settings A', async () => {
+  const settingsService = await setupSettingsService(equalConfigA);
+
+  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueA);
+  expect(settingsService.deprecatedSettings.getValue('disableEdit')).toBe(testValueA);
 });
 
 test('New settings equal deprecated settings B', async () => {
-  const settings = app.injector.getServiceByClass(DataViewerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settingsService = await setupSettingsService(equalConfigB);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigB)),
-  );
+  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueB);
+  expect(settingsService.deprecatedSettings.getValue('disableEdit')).toBe(testValueB);
+});
 
-  await config.refresh();
+describe('DataViewerSettingsService.getDefaultRowsCount', () => {
+  let settingsService: DataViewerSettingsService = null as any;
 
-  expect(settings.settings.getValue('disableEdit')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('disableEdit')).toBe(testValueB);
+  beforeAll(async () => {
+    settingsService = await setupSettingsService({
+      plugin: {
+        'data-viewer': {
+          fetchMin: 200,
+          fetchMax: 1000,
+          fetchDefault: 300,
+        },
+      },
+    });
+  });
+
+  test('should return valid value', () => {
+    expect(settingsService.getDefaultRowsCount(400)).toBe(400);
+  });
+
+  test('should return valid default value', () => {
+    expect(settingsService.getDefaultRowsCount()).toBe(300);
+  });
+
+  test('should return valid minimal value', () => {
+    expect(settingsService.getDefaultRowsCount(10)).toBe(200);
+  });
+
+  test('should return valid maximal value', () => {
+    expect(settingsService.getDefaultRowsCount(1100)).toBe(1000);
+  });
 });

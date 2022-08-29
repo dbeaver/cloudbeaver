@@ -210,7 +210,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
             databaseConfiguration,
-            new NoAuthCredentialsProvider()
+            credentialsProvider
         );
     }
 

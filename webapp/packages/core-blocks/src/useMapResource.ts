@@ -24,7 +24,7 @@ interface IActions<
 > {
   active?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
-  onLoad?: (resource: TResource) => Promise<boolean | void> | boolean | void;
+  onLoad?: (resource: TResource, key: TKeyArg | null) => Promise<boolean | void> | boolean | void;
   onData?: (
     data: CachedMapResourceLoader<
     TKeyArg,
@@ -150,7 +150,7 @@ export function useMapResource<
         return true;
       }
 
-      if (this.loadedKey === null) {
+      if (this.loadedKey === null || this.key === null) {
         return false;
       }
 
@@ -176,11 +176,15 @@ export function useMapResource<
     });
   }
 
-  if (!untracked(() => resource.includes(key, keyRef.key))) {
-    untracked(() => {
+  untracked(() => {
+    if (
+      key === null
+      || keyRef.key === null
+      || !resource.includes(key, keyRef.key)
+    ) {
       keyRef.key = key;
-    });
-  }
+    }
+  });
 
   const refObj = useObservableRef(() => ({
     loading: false,
@@ -227,7 +231,7 @@ export function useMapResource<
         keyRef.loadedKey = key;
         this.loading = true;
 
-        const prevent = await actions?.onLoad?.(resource);
+        const prevent = await actions?.onLoad?.(resource, key);
 
         if (key === null || prevent === true) {
           setException(null);
@@ -269,6 +273,7 @@ export function useMapResource<
       }
     },
   }), {
+    preloaded: computed,
     exception: observable.ref,
     loading: observable.ref,
   }, {

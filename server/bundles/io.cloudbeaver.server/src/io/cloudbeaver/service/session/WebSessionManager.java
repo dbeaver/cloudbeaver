@@ -181,11 +181,7 @@ public class WebSessionManager {
 
         for (WebSession session : expiredList) {
             log.debug("> Expire session '" + session.getSessionId() + "'");
-            try {
-                session.close();
-            } catch (DBException e) {
-                log.debug("Failed close session:" + session.getSessionId(), e);
-            }
+            session.close();
         }
     }
 

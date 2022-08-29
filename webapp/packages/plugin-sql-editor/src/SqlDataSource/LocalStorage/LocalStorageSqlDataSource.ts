@@ -43,6 +43,10 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     });
   }
 
+  isReadonly(): boolean {
+    return false;
+  }
+
   setName(name: string | null): void {
     this.state.name = name ?? undefined;
   }

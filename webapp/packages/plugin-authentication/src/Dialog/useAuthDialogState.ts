@@ -29,7 +29,7 @@ interface IData {
   providers: AuthProvider[];
   configurations: AuthProvider[];
 
-  login: (link: boolean) => Promise<void>;
+  login: (linkUser: boolean) => Promise<void>;
 }
 
 interface IState {
@@ -139,7 +139,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       }
       return false;
     },
-    async login(link: boolean): Promise<void> {
+    async login(linkUser: boolean): Promise<void> {
       if (!state.activeProvider || this.authenticating) {
         return;
       }
@@ -148,7 +148,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       try {
         await authInfoService.login(state.activeProvider.id, {
           credentials: state.credentials,
-          linkUser: link,
+          linkUser,
         });
       } catch (exception: any) {
         if (this.destroyed) {

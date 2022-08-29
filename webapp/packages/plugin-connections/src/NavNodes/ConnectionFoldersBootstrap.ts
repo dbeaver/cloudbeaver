@@ -16,7 +16,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, Ren
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectsResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';

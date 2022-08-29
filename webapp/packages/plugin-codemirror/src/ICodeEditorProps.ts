@@ -9,6 +9,5 @@
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 export interface ICodeEditorProps extends IControlledCodeMirror {
-  readonly?: boolean;
   autoFormat?: boolean;
 }

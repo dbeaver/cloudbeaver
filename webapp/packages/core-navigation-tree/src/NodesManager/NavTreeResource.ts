@@ -181,23 +181,33 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     const nodePaths = isResourceKeyList(key) ? key.list : [key];
 
     await this.performUpdate(key, [], async () => {
-      await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
+      const deletedPaths: string[] = [];
 
-      runInAction(() => {
-        const parents: string[] = [];
-        const deletedIds: string[][] = [];
-
+      try {
         for (const path of nodePaths) {
-          const node = this.navNodeInfoResource.get(path);
-
-          if (node) {
-            parents.push(node.parentId);
-            deletedIds.push([path]);
-          }
+          await this.graphQLService.sdk.navDeleteNodes({ nodePaths: [path] });
+          deletedPaths.push(path);
         }
+      } finally {
+        runInAction(() => {
+          const deletionMap = new Map<string, string[]>();
 
-        this.deleteInNode(resourceKeyList(parents), deletedIds);
-      });
+          for (const path of deletedPaths) {
+            const node = this.navNodeInfoResource.get(path);
+
+            if (node) {
+              const deletedIds = deletionMap.get(node.parentId) ?? [];
+              deletedIds.push(path);
+              deletionMap.set(node.parentId, deletedIds);
+            }
+          }
+
+          const keys = resourceKeyList([...deletionMap.keys()]);
+          const nodes = [...deletionMap.values()];
+
+          this.deleteInNode(keys, nodes);
+        });
+      }
     });
   }
 

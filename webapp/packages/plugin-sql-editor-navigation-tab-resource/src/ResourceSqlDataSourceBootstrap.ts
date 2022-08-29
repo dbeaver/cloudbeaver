@@ -13,7 +13,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource, NavNodeInfoResource, INavNodeMoveData, INavNodeRenameData } from '@cloudbeaver/core-navigation-tree';
-import { WindowEventsService } from '@cloudbeaver/core-root';
+import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
@@ -34,6 +34,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, IResourceSqlDataSourceState>();
 
   constructor(
+    private readonly networkStateService: NetworkStateService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly commonDialogService: CommonDialogService,
     private readonly navResourceNodeService: NavResourceNodeService,
@@ -64,13 +65,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           if (
             !['undefined', 'object'].includes(typeof value.nodeInfo)
             || !['string', 'undefined'].includes(typeof value.name)
-            || !['string', 'undefined', 'object'].includes(typeof value.nodeInfo?.nodeId)
+            || !['string', 'undefined'].includes(typeof value.nodeInfo?.nodeId)
             || !['undefined', 'object'].includes(typeof value.nodeInfo?.parents)
             || !['undefined', 'object'].includes(typeof value.executionContext)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.connectionId)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.id)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.id)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultCatalog)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
@@ -111,9 +112,18 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           write: this.write.bind(this),
         });
 
+        dataSource.setInfo({
+          isReadonly: () => !this.networkStateService.state,
+        });
+
         return dataSource;
       },
       onDestroy: (_, editorId) => this.deleteState(editorId),
+      onUnload: async dataSource => {
+        if (dataSource instanceof ResourceSqlDataSource) {
+          await dataSource.write();
+        }
+      },
       canDestroy: async (dataSource, editorId) => {
         try {
           if (dataSource instanceof ResourceSqlDataSource) {

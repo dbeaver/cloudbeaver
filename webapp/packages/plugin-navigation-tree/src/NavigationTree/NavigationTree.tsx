@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -25,6 +26,7 @@ import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
+import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -90,6 +92,10 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
+  const projectsRendererRenderer = useMemo(
+    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
+    [navNodeViewService]
+  );
 
   if (!isEnabled) {
     return null;
@@ -101,12 +107,11 @@ export const NavigationTree = observer(function NavigationTree() {
         root={root}
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter]}
-        renderers={[navigationTreeConnectionGroupRenderer]}
+        renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer]}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>
-              No connections.<br />
-              Use the top menu to setup connection to your database.
+              <Translate token='app_navigationTree_empty_placeholder' />
             </message>
           </center>
         )}

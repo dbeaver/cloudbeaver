@@ -52,6 +52,6 @@ export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService'
 export * from './ContainerDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
-export * from './getDefaultRowsCount';
 export * from './useDataModel';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';
+export * from './DataViewerSettingsService';

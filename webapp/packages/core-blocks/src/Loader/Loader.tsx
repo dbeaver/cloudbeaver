@@ -72,7 +72,7 @@ export const Loader = observer<Props>(function Loader({
   fullSize,
   className,
   loader,
-  loading = true,
+  loading,
   inlineException,
   state,
   style,
@@ -87,30 +87,57 @@ export const Loader = observer<Props>(function Loader({
   let exception: Error | null = null;
   let reload: (() => void) | undefined;
 
+  const loadingUndefined = loading === undefined;
+
+  if (loadingUndefined) {
+    loading = true;
+  }
+
   let loaded = !loading;
+
   if (state) {
     state = Array.isArray(state) ? state : [state];
 
-    for (const element of state) {
+    for (let i = 0; i < state.length; i++) {
+      const element = state[i];
+
       if (
         'isLoaded' in element
         && 'isLoading' in element
       ) {
-        loaded = element.isLoaded();
-        loading = element.isLoading();
+
+        if (i === 0 && loadingUndefined) {
+          loaded = element.isLoaded();
+          loading = element.isLoading();
+        } else {
+          loaded &&= element.isLoaded();
+          loading ||= element.isLoading();
+        }
 
         if (loading) {
           if (element.cancel) {
-            onCancel = element.cancel;
+            onCancel = () => {
+              onCancel?.();
+              element.cancel?.();
+            };
           }
 
           if (element.isCancelled) {
-            cancelDisabled = element.isCancelled();
+            if (i == 0 && cancelDisabled === undefined) {
+              cancelDisabled = element.isCancelled();
+            } else {
+              cancelDisabled ||= element.isCancelled();
+            }
           }
         }
       } else {
-        loading = element.loading;
-        loaded = !loading;
+        if (i === 0 && loadingUndefined) {
+          loading = element.loading;
+          loaded = !loading;
+        } else {
+          loading ||= element.loading;
+          loaded &&= !loading;
+        }
       }
 
       if ('exception' in element && element.exception) {
