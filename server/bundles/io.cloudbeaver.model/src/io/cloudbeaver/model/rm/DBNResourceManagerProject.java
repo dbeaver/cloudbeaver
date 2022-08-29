@@ -24,12 +24,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +114,21 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
     @Override
     public String toString() {
         return getNodeName();
+    }
+
+
+    @Override
+    public DBPProject getOwnerProject() {
+        List<? extends DBPProject> globalProjects = getModel().getModelProjects();
+        if (globalProjects == null) {
+            return null;
+        }
+        for (DBPProject modelProject : globalProjects) {
+            if (CommonUtils.equalObjects(modelProject.getId(), project.getId())) {
+                return modelProject;
+            }
+        }
+        return null;
     }
 
     @Nullable

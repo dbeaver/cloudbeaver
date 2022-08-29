@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService';
 import { NavigationTreeBootstrap } from './NavigationTree/NavigationTreeBootstrap';
 import { NavigationTreeService } from './NavigationTree/NavigationTreeService';
@@ -18,6 +19,7 @@ import { NavNodeViewService } from './NodesManager/NavNodeView/NavNodeViewServic
 export const navigationTreePlugin: PluginManifest = {
   info: { name: 'Navigation Tree plugin' },
   providers: [
+    LocaleService,
     NavigationTreeService,
     ElementsTreeToolsMenuService,
     NavigationTreeBootstrap,

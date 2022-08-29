@@ -67,6 +67,7 @@ public abstract class AbstractSessionFederated implements SMSessionFederated {
         return parentSession.getSingletonProject();
     }
 
+    @Override
     public void close() {
         // do nothing
     }
