@@ -76,4 +76,9 @@ public class LocalAuthSession implements SMSession {
         return webSession.getSingletonProject();
     }
 
+    @Override
+    public void close() {
+
+    }
+
 }

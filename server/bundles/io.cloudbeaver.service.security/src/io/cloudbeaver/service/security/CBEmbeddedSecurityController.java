@@ -27,6 +27,7 @@ import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
+import io.cloudbeaver.service.security.internal.RefreshTokenInfo;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -39,7 +40,9 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.security.user.SMRole;
@@ -65,7 +68,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
-    private static final int TOKEN_HOURS_ALIVE_TIME = 1;
+    private static final int ACCESS_TOKEN_TTL_IN_MINUTES = 20;
+    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 24;
 
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
@@ -844,10 +848,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
-                var token = generateAuthToken(smSessionId, null, dbCon);
+                var smTokens = generateNewSessionToken(smSessionId, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return SMAuthInfo.success(UUID.randomUUID().toString(), token, new SMAuthPermissions(null, smSessionId, permissions), Map.of());
+                return SMAuthInfo.success(
+                    UUID.randomUUID().toString(),
+                    smTokens.getSmAccessToken(),
+                    smTokens.getSmRefreshToken(),
+                    new SMAuthPermissions(null, smSessionId, permissions), Map.of()
+                );
             }
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
@@ -1104,9 +1113,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
 
-            String smToken = findTokenBySmSession(smSessionId);
-            SMAuthPermissions authPermissions = getTokenPermissions(smToken);
-            var successAuthStatus = SMAuthInfo.success(authId, smToken, authPermissions, authData);
+            SMTokens smTokens = findTokenBySmSession(smSessionId);
+            SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
+            var successAuthStatus = SMAuthInfo.success(
+                authId,
+                smTokens.getSmAccessToken(),
+                smTokens.getSmRefreshToken(),
+                authPermissions,
+                authData
+            );
             updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
 
@@ -1118,10 +1133,29 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public void logout() throws DBException {
         var currentUserCreds = getCurrentUserCreds();
-        invalidateUserSession(currentUserCreds.getSmToken());
+        invalidateUserTokens(currentUserCreds.getSmToken());
     }
 
-    private void invalidateUserSession(String smToken) throws DBCException {
+    @Override
+    public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
+        var currentUserCreds = getCurrentUserCreds();
+        var currentUserAccessToken = currentUserCreds.getSmToken();
+
+        var expectedRefreshTokenInfo = findRefreshToken(currentUserAccessToken);
+
+        if (!expectedRefreshTokenInfo.getRefreshToken().equals(refreshToken)) {
+            throw new SMException("Invalid refresh token");
+        }
+
+        try (var dbCon = database.openConnection()) {
+            invalidateUserTokens(currentUserAccessToken);
+            return generateNewSessionToken(expectedRefreshTokenInfo.getSessionId(), expectedRefreshTokenInfo.getUserId(), dbCon);
+        } catch (SQLException e) {
+            throw new DBException("Error refreshing sm session", e);
+        }
+    }
+
+    private void invalidateUserTokens(String smToken) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
         } catch (SQLException e) {
@@ -1137,16 +1171,41 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return currentUserCreds;
     }
 
-    private String findTokenBySmSession(String smSessionId) throws DBException {
+    private SMTokens findTokenBySmSession(String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?");
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID, REFRESH_TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?")
         ) {
             dbStat.setString(1, smSessionId);
             try (var dbResult = dbStat.executeQuery()) {
                 if (!dbResult.next()) {
                     throw new SMException("Token not found");
                 }
-                return dbResult.getString(1);
+                return new SMTokens(dbResult.getString(1), dbResult.getString(2));
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading token info in database", e);
+        }
+    }
+
+    private RefreshTokenInfo findRefreshToken(String smAccessToken) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
+             )
+        ) {
+            dbStat.setString(1, smAccessToken);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Refresh token not found");
+                }
+                var refreshToken = dbResult.getString(1);
+                var sessionId = dbResult.getString(2);
+                var userId = dbResult.getString(3);
+                var expiredDate = dbResult.getTimestamp(4);
+                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                    throw new SMRefreshTokenExpiredException("Refresh token expired");
+                }
+                return new RefreshTokenInfo(refreshToken, sessionId, userId);
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
@@ -1173,12 +1232,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
         boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
 
-        String token = null;
+        SMTokens smTokens = null;
         SMAuthPermissions permissions = null;
         if (!isMainAuthSession) {
             //this is an additional authorization and we should to return the original permissions and  userId
-            token = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
-            permissions = getTokenPermissions(token);
+            smTokens = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
+            permissions = getTokenPermissions(smTokens.getSmAccessToken());
         }
         String activeUserId = permissions == null ? null : permissions.getUserId();
 
@@ -1208,7 +1267,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         }
 
-        if (token == null && permissions == null) {
+        if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                     String smSessionId;
@@ -1223,7 +1282,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     } else {
                         smSessionId = authAttemptSessionInfo.getSmSessionId();
                     }
-                    token = generateAuthToken(smSessionId, activeUserId, dbCon);
+                    smTokens = generateNewSessionToken(smSessionId, activeUserId, dbCon);
                     permissions = new SMAuthPermissions(activeUserId, smSessionId, getUserPermissions(activeUserId));
                     txn.commit();
                 }
@@ -1235,7 +1294,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
         updateAuthStatus(authId, authStatus, storedUserData, null, permissions.getSessionId());
-        return SMAuthInfo.success(authId, token, permissions, authInfo.getAuthData());
+        return SMAuthInfo.success(
+            authId,
+            smTokens.getSmAccessToken(),
+            //refresh token must be sent only once
+            isMainAuthSession ? smTokens.getSmRefreshToken() : null,
+            permissions,
+            authInfo.getAuthData()
+        );
     }
 
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
@@ -1316,28 +1382,40 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return userId;
     }
 
-    protected String generateAuthToken(
+    protected SMTokens generateNewSessionToken(
         @NotNull String smSessionId,
         @Nullable String userId,
         @NotNull Connection dbCon
     ) throws SQLException, DBException {
         JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
-        try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID, SESSION_ID, USER_ID, EXPIRATION_TIME) " +
-                "VALUES(?,?,?,?)")) {
+        return generateNewSessionTokens(smSessionId, userId, dbCon);
+    }
 
-            String authToken = SecurityUtils.generatePassword(32);
-            dbStat.setString(1, authToken);
+    private SMTokens generateNewSessionTokens(@NotNull String smSessionId,
+                                              @Nullable String userId,
+                                              @NotNull Connection dbCon) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID,SESSION_ID,USER_ID,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME) " +
+                "VALUES(?,?,?,?,?,?)")) {
+
+            String smAccessToken = SecurityUtils.generatePassword(32);
+            dbStat.setString(1, smAccessToken);
             dbStat.setString(2, smSessionId);
             if (userId == null) {
                 dbStat.setNull(3, Types.VARCHAR);
             } else {
                 dbStat.setString(3, userId);
             }
-            var expirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(TOKEN_HOURS_ALIVE_TIME));
-            dbStat.setTimestamp(4, expirationTime);
+            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(ACCESS_TOKEN_TTL_IN_MINUTES));
+            dbStat.setTimestamp(4, accessTokenExpirationTime);
+
+            String smRefreshToken = SecurityUtils.generatePassword(32);
+            dbStat.setString(5, smRefreshToken);
+            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(REFRESH_TOKEN_TTL_IN_HOURS));
+            dbStat.setTimestamp(6, refreshTokenExpirationTime);
+
             dbStat.execute();
-            return authToken;
+            return new SMTokens(smAccessToken, smRefreshToken);
         }
     }
 
@@ -1356,7 +1434,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 userId = dbResult.getString(1);
                 var expiredDate = dbResult.getTimestamp(2);
                 if (application.isMultiNode() && Timestamp.from(Instant.now()).after(expiredDate)) {
-                    throw new SMException("Token expired");
+                    throw new SMAccessTokenExpiredException("Token expired");
                 }
                 sessionId = dbResult.getString(3);
             }

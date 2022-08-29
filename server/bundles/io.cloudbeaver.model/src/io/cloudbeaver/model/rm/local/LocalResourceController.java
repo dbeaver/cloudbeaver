@@ -545,7 +545,7 @@ public class LocalResourceController implements RMController {
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(
-                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")));
+                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")).toInstant().toEpochMilli());
             } catch (IOException e) {
                 log.error(e);
             }

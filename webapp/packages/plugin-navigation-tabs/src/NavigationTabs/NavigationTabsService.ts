@@ -189,7 +189,8 @@ export class NavigationTabsService extends View<ITab> {
         }
       }
 
-      this.callHandlerCallback(tab, handler => handler.onClose);
+      await this.callHandlerCallback(tab, handler => handler.onClose);
+      await this.callHandlerCallback(tab, handler => handler.onUnload);
     }
 
     this.closeTabSilent(tabId, skipHandlers);
@@ -288,7 +289,7 @@ export class NavigationTabsService extends View<ITab> {
     }
   }
 
-  unloadTabs(): void {
+  async unloadTabs(): Promise<void> {
     // if (this.administrationScreenService.publicDisabled) {
     //   return;
     // }
@@ -296,7 +297,7 @@ export class NavigationTabsService extends View<ITab> {
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
         if (tab.restored) {
-          this.callHandlerCallback(tab, handler => handler.onClose);
+          await this.callHandlerCallback(tab, handler => handler.onUnload);
           tab.restored = false;
         }
       }
@@ -311,10 +312,6 @@ export class NavigationTabsService extends View<ITab> {
 
     if (!this.appAuthService.authenticated) {
       return;
-    }
-
-    for (const handler of this.handlers.values()) {
-      await handler.onNavInit?.();
     }
 
     const removedTabs: string[] = [];
@@ -347,7 +344,7 @@ export class NavigationTabsService extends View<ITab> {
     });
   }
 
-  private callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
+  private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
     const handler = this.handlers.get(tab.handlerId);
 
     if (!handler) {
@@ -357,7 +354,7 @@ export class NavigationTabsService extends View<ITab> {
     const callback = selector(handler);
 
     if (callback) {
-      callback.call(handler, tab);
+      await callback.call(handler, tab);
     }
   }
 
