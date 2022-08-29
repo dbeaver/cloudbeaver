@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, untracked } from 'mobx';
 
 import {
   ConnectionExecutionContextResource,
@@ -28,7 +28,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
@@ -55,7 +55,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly containerResource: ContainerResource
@@ -190,12 +190,9 @@ export class SqlEditorTabService extends Bootstrap {
       return;
     }
 
-    const parents = NodeManagerUtils.parentsFromPath(nodeId);
-    const parent = this.navNodeManagerService.getNode(parents[0]);
+    const parents = this.navNodeInfoResource.getParents(nodeId);
 
-    if (parent) {
-      parents.unshift(parent.parentId);
-    }
+    untracked(() => this.navNodeInfoResource.load(nodeId!));
 
     return {
       nodeId,

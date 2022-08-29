@@ -362,21 +362,7 @@ export class NavNodeManagerService extends Bootstrap {
       canOpen = true;
     };
 
-    const getParents = () => {
-      const parents: string[] = [];
-      let parent = this.getNode(nodeId);
-
-      if (!parent) {
-        return NodeManagerUtils.parentsFromPath(nodeId);
-      }
-
-      while (parent && parent.id !== parent.parentId) {
-        parents.unshift(parent.parentId);
-        parent = this.getNode(parent.parentId);
-      }
-
-      return parents;
-    };
+    const getParents = () => this.navNodeInfoResource.getParents(nodeId);
 
     const loadParents = async (parents: string[]) => {
       let parentId = ROOT_NODE_PATH;

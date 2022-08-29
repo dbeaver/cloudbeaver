@@ -2330,6 +2330,14 @@ export type GetNavNodeFullNameQueryVariables = Exact<{
 
 export type GetNavNodeFullNameQuery = { navNodeInfo: { fullName?: string } };
 
+export type GetNodeParentsQueryVariables = Exact<{
+  nodePath: Scalars['ID'];
+  withDetails: Scalars['Boolean'];
+}>;
+
+
+export type GetNodeParentsQuery = { node: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, parents: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> };
+
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
 }>;
@@ -3779,6 +3787,16 @@ export const GetNavNodeFullNameDocument = `
   }
 }
     `;
+export const GetNodeParentsDocument = `
+    query getNodeParents($nodePath: ID!, $withDetails: Boolean!) {
+  node: navNodeInfo(nodePath: $nodePath) {
+    ...NavNodeInfo
+  }
+  parents: navNodeParents(nodePath: $nodePath) {
+    ...NavNodeInfo
+  }
+}
+    ${NavNodeInfoFragmentDoc}`;
 export const NavDeleteNodesDocument = `
     mutation navDeleteNodes($nodePaths: [ID!]!) {
   navDeleteNodes(nodePaths: $nodePaths)
@@ -4355,6 +4373,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getNavNodeFullName(variables: GetNavNodeFullNameQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNavNodeFullNameQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetNavNodeFullNameQuery>(GetNavNodeFullNameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNavNodeFullName', 'query');
+    },
+    getNodeParents(variables: GetNodeParentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNodeParentsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNodeParentsQuery>(GetNodeParentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNodeParents', 'query');
     },
     navDeleteNodes(variables: NavDeleteNodesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavDeleteNodesMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navDeleteNodes', 'mutation');
