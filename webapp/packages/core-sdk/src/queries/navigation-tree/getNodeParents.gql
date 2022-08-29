@@ -1,0 +1,11 @@
+query getNodeParents(
+  $nodePath: ID!
+  $withDetails: Boolean!
+) {
+  node: navNodeInfo(nodePath: $nodePath) {
+    ...NavNodeInfo
+  }
+  parents: navNodeParents(nodePath: $nodePath) {
+    ...NavNodeInfo
+  }
+}

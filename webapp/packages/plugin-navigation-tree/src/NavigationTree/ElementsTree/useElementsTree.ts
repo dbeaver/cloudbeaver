@@ -409,8 +409,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
           this.select(node, false, false);
           this.actions.execute({ type: 'show', nodeId });
         });
-      }
 
+        if (path.length > 0) {
+          await functionsRef.loadTree(path[0]);
+        }
+      }
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);

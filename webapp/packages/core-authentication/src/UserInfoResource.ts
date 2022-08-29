@@ -119,7 +119,7 @@ UserInfoIncludes
     return authInfo as AuthInfo;
   }
 
-  finishFederatedAuthentication(authId: string, link?: boolean): ITask<UserInfo | null> {
+  finishFederatedAuthentication(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
     let activeTask: ITask<AuthInfo> | undefined;
 
     return new AutoRunningTask<UserInfo | null>(() => this.performUpdate(
@@ -139,7 +139,7 @@ UserInfoIncludes
           async () => {
             const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
               authId,
-              linkUser: link,
+              linkUser,
               customIncludeOriginDetails: true,
             });
             return authInfo as AuthInfo;

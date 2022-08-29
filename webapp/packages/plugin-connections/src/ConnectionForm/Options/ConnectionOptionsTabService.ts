@@ -255,7 +255,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.databaseName = state.config.databaseName;
     }
 
-    if (state.config.authModelId || driver.defaultAuthModel) {
+    if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
       tempConfig.saveCredentials = state.config.saveCredentials;
 

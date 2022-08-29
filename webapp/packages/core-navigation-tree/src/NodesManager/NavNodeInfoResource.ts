@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource, EPermission } from '@cloudbeaver/core-root';
@@ -24,6 +24,7 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
+import { NodeManagerUtils } from './NodeManagerUtils';
 
 type NavNodeInfo = NavNodeInfoFragment;
 
@@ -99,10 +100,14 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     const parents: string[] = [];
     let current = this.get(key);
 
+    if (!current) {
+      return NodeManagerUtils.parentsFromPath(key);
+    }
+
     while (
       current
       && current.parentId !== current.id
-      && current.parentId !== ROOT_NODE_PATH
+      // && current.parentId !== ROOT_NODE_PATH
     ) {
       parents.unshift(current.parentId);
       current = this.get(current.parentId);
@@ -174,13 +179,42 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   }
 
   private async loadNodeInfo(nodePath: string): Promise<NavNode> {
+    if (this.has(nodePath)) {
+      const metadata = this.metadata.get(nodePath);
+      const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
+        nodePath,
+        withDetails: metadata.withDetails,
+      });
+
+      return this.navNodeInfoToNavNode(navNodeInfo);
+    } else {
+      return await this.loadNodeParents(nodePath);
+    }
+  }
+
+  private async loadNodeParents(nodePath: string): Promise<NavNode> {
     const metadata = this.metadata.get(nodePath);
-    const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
+    const { node, parents } = await this.graphQLService.sdk.getNodeParents({
       nodePath,
       withDetails: metadata.withDetails,
     });
 
-    return this.navNodeInfoToNavNode(navNodeInfo);
+
+    return runInAction(() => {
+      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id ?? ROOT_NODE_PATH);
+
+      this.updateNode(
+        resourceKeyList(parents.map(node => node.id), node.id),
+        [
+          ...parents.reduce((list, node, index, array) => {
+            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id ?? ROOT_NODE_PATH));
+            return list;
+          }, [] as NavNode[]),
+          navNode,
+        ]
+      );
+      return navNode;
+    });
   }
 }
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, untracked } from 'mobx';
 
 import {
   ConnectionExecutionContextResource,
@@ -28,7 +28,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
@@ -55,7 +55,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly navNodeManagerService: NavNodeManagerService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly containerResource: ContainerResource
@@ -70,6 +70,7 @@ export class SqlEditorTabService extends Bootstrap {
       getTabComponent: () => SqlEditorTab,
       getPanelComponent: () => SqlEditorPanel,
       onRestore: this.handleTabRestore.bind(this),
+      onUnload: this.handleTabUnload.bind(this),
       onClose: this.handleTabClose.bind(this),
       canClose: this.handleCanTabClose.bind(this),
       extensions: [
@@ -189,12 +190,9 @@ export class SqlEditorTabService extends Bootstrap {
       return;
     }
 
-    const parents = NodeManagerUtils.parentsFromPath(nodeId);
-    const parent = this.navNodeManagerService.getNode(parents[0]);
+    const parents = this.navNodeInfoResource.getParents(nodeId);
 
-    if (parent) {
-      parents.unshift(parent.parentId);
-    }
+    untracked(() => this.navNodeInfoResource.load(nodeId!));
 
     return {
       nodeId,
@@ -270,9 +268,9 @@ export class SqlEditorTabService extends Bootstrap {
       typeof tab.handlerState.editorId !== 'string'
       || typeof tab.handlerState.editorId !== 'string'
       || typeof tab.handlerState.order !== 'number'
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.source)
-      || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentModeId)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.currentTabId)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.source)
+      || !['string', 'undefined'].includes(typeof tab.handlerState.currentModeId)
       || !Array.isArray(tab.handlerState.modeState)
       || !Array.isArray(tab.handlerState.tabs)
       || !Array.isArray(tab.handlerState.executionPlanTabs)
@@ -448,16 +446,20 @@ export class SqlEditorTabService extends Bootstrap {
     return canDestroyDatasource;
   }
 
-  private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+  private async handleTabUnload(editorTab: ITab<ISqlEditorTabState>) {
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
     if (dataSource?.executionContext) {
       await this.sqlEditorService.destroyContext(dataSource.executionContext);
     }
 
-    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
+    await this.sqlDataSourceService.unload(editorTab.handlerState.editorId);
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
+  }
+
+  private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }
 

@@ -155,22 +155,30 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }: INodeMoveData,
     contexts: IExecutionContextProvider<INodeMoveData>
   ) {
+    if (![NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)) {
+      return;
+    }
+
     await this.projectsResource.load(CachedMapAllKey);
 
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
-    const children = this.navTreeResource.get(targetNode.id);
+    const children = this.navTreeResource.get(targetNode.id) ?? [];
     const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
 
-    const supported = (
-      [NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)
-        && nodes.every(node => (
-          node.nodeType === NAV_NODE_TYPE_CONNECTION
-          && targetProject === this.projectsNavNodeService.getProject(node.id)
-          && !children?.includes(node.id)
-        ))
-    );
+    const supported = nodes.every(node => {
+      if (
+        ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node.nodeType!)
+        || targetProject !== this.projectsNavNodeService.getProject(node.id)
+        || children.includes(node.id)
+        || targetNode.id === node.id
+      ) {
+        return false;
+      }
+
+      return true;
+    });
 
     if (!supported) {
       return;
@@ -181,6 +189,31 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         move.setCanMove(true);
       }
     } else {
+      const childrenNode = this.navNodeInfoResource.get(resourceKeyList(children));
+      const folderDuplicates = nodes.filter(node => (
+        node.nodeType === NAV_NODE_TYPE_FOLDER
+        && (
+          childrenNode.some(child => child?.nodeType === NAV_NODE_TYPE_FOLDER && child.name === node.name)
+          || nodes.some(child => (
+            child.nodeType === NAV_NODE_TYPE_FOLDER
+            && child.name === node.name
+            && child.id !== node.id
+          ))
+        )
+      ));
+
+      if (folderDuplicates.length > 0) {
+        this.notificationService.logError({
+          title: 'connections_public_connection_folder_move_failed',
+          message: this.localizationService.translate(
+            'connections_public_connection_folder_move_duplication',
+            undefined,
+            { name: folderDuplicates.map(node => `"${node.name}"`).join(', ') }
+          ),
+        });
+        return;
+      }
+
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
         const connections = nodeIdList

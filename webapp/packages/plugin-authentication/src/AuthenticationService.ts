@@ -66,8 +66,8 @@ export class AuthenticationService extends Bootstrap {
     this.configureIdentityProvider = action;
   }
 
-  async authUser(providerId: string | null = null, link?: boolean): Promise<void> {
-    await this.auth(false, { providerId, link });
+  async authUser(providerId: string | null = null, linkUser?: boolean): Promise<void> {
+    await this.auth(false, { providerId, linkUser });
   }
 
   async logout(): Promise<void> {
@@ -170,7 +170,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.auth(true, { accessRequest: true, providerId: null, link: true });
+    await this.auth(true, { accessRequest: true, providerId: null, linkUser: false });
   }
 
   register(): void {
@@ -188,7 +188,7 @@ export class AuthenticationService extends Bootstrap {
         return;
       }
 
-      await this.auth(false, { providerId: null, link: true, accessRequest: true });
+      await this.auth(false, { providerId: null, linkUser: false, accessRequest: true });
     });
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
@@ -202,7 +202,7 @@ export class AuthenticationService extends Bootstrap {
     const action = contexts.getContext(sessionActionContext);
 
     if (isAutoLoginSessionAction(data)) {
-      const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], true);
+      const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], false);
 
       if (user && this.authPromise) {
         this.authDialogService.closeLoginForm(this.authPromise);
