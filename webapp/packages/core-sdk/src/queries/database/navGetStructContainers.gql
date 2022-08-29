@@ -11,14 +11,14 @@ query navGetStructContainers(
   ) {
     catalogList {
       catalog {
-          ...NavNodeInfo
+        ...NavNodeInfo
       }
       schemaList {
-          ...NavNodeInfo
+        ...NavNodeInfo
       }
     }
     schemaList {
-        ...NavNodeInfo
+      ...NavNodeInfo
     }
     supportsCatalogChange
     supportsSchemaChange
