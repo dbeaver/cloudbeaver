@@ -660,7 +660,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         String connectionId
     ) throws DBWebException {
         DBPProject globalProject = webSession.getProjectById(projectId);
-        if (!CommonUtils.equalObjects(globalProject.getName(), CBApplication.getInstance().getDefaultProjectName())) {
+        if (!WebServiceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
         try {
@@ -685,7 +685,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull List<String> subjects
     ) throws DBWebException {
         DBPProject globalProject = webSession.getProjectById(projectId);
-        if (!CommonUtils.equalObjects(globalProject.getName(), CBApplication.getInstance().getDefaultProjectName())) {
+        if (!WebServiceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
         DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(connectionId);

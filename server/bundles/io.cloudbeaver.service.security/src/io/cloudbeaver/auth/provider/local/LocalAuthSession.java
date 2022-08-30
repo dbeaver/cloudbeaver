@@ -24,6 +24,8 @@ import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 
+import java.time.LocalDateTime;
+
 /**
  * Local auth provider
  */
@@ -63,6 +65,12 @@ public class LocalAuthSession implements SMSession {
     @Override
     public String getSessionId() {
         return webSession.getSessionId();
+    }
+
+    @NotNull
+    @Override
+    public LocalDateTime getSessionStart() {
+        return webSession.getSessionStart();
     }
 
     @Override
