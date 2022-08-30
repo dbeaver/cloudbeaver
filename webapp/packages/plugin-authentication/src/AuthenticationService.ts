@@ -23,11 +23,12 @@ import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
 import { isAutoLoginSessionAction } from './isAutoLoginSessionAction';
 
-export type LogoutEventType = 'before' | 'after';
+type AuthEventType = 'before' | 'after';
 
 @injectable()
 export class AuthenticationService extends Bootstrap {
-  readonly onLogout: Executor<LogoutEventType>;
+  readonly onLogout: Executor<AuthEventType>;
+  readonly onLogin: Executor<AuthEventType>;
 
   configureAuthProvider: (() => void) | null;
   configureIdentityProvider: (() => void) | null;
@@ -52,6 +53,7 @@ export class AuthenticationService extends Bootstrap {
     super();
 
     this.onLogout = new Executor();
+    this.onLogin = new Executor();
 
     this.authPromise = null;
     this.configureAuthProvider = null;
@@ -131,13 +133,24 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async auth(persistent: boolean, options: IAuthOptions) {
+    const contexts = await this.onLogin.execute('before');
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     if (this.authPromise) {
-      return this.authPromise;
+      await this.authPromise;
+      return;
     }
 
     options = observable(options);
 
-    this.authPromise = this.authDialogService.showLoginForm(persistent, options);
+    this.authPromise = this.authDialogService.showLoginForm(persistent, options)
+      .then(state => {
+        this.onLogin.execute('after');
+        return state;
+      });
 
     if (this.serverConfigResource.redirectOnFederatedAuth) {
       await this.authProvidersResource.loadAll();
@@ -158,7 +171,7 @@ export class AuthenticationService extends Bootstrap {
     }
 
     try {
-      return await this.authPromise;
+      await this.authPromise;
     } finally {
       this.authPromise = null;
     }

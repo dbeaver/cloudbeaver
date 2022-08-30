@@ -42,8 +42,23 @@ export class PublicConnectionFormService {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
-    this.authenticationService.onLogout.addHandler(() => {
-      this.close(true);
+
+    this.authenticationService.onLogin.addHandler(async (event, context) => {
+      if (event === 'before') {
+        const confirmed = await this.close(false);
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(context);
+        }
+      }
+    });
+
+    this.authenticationService.onLogout.addHandler(async (event, context) => {
+      if (event === 'before') {
+        const confirmed = await this.close(false);
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(context);
+        }
+      }
     });
 
     makeObservable(this, {
@@ -87,9 +102,9 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(saved?: boolean): Promise<void> {
+  async close(saved?: boolean) {
     if (!this.formState) {
-      return;
+      return true;
     }
 
     if (saved) {
@@ -101,6 +116,8 @@ export class PublicConnectionFormService {
     if (state) {
       this.clearFormState();
     }
+
+    return state;
   }
 
   async save(): Promise<void> {
