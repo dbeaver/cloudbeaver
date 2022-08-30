@@ -11,13 +11,15 @@ import styled, { css, use } from 'reshadow';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { UserFormController } from '../UserForm/UserFormController';
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
+import { UserEditController } from './UserEditController';
 
 const styles = css`
   TableColumnValue[expand] {
@@ -36,8 +38,21 @@ interface Props {
 export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
   const roles = user.grantedRoles.join(', ');
+  const editController = useController(UserEditController, user.userId);
+  const formController = useController(UserFormController);
+  const st = useStyles(styles);
 
-  return styled(useStyles(styles))(
+  if (!editController.user) {
+    return null;
+  }
+
+  formController.update(editController.user, true, () => {});
+
+  function handleEnabledChange() {
+    formController.save();
+  }
+
+  return styled(st)(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>
@@ -50,7 +65,12 @@ export const User = observer<Props>(function User({ user, selectable }) {
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
       <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
       <TableColumnValue>
-        <Checkbox checked={user.enabled} disabled />
+        <FieldCheckbox
+          name='enabled'
+          state={formController}
+          disabled={formController.isSaving}
+          onChange={handleEnabledChange}
+        />
       </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
