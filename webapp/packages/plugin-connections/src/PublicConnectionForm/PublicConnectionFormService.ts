@@ -102,7 +102,7 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(saved?: boolean) {
+  async close(saved?: boolean): Promise<boolean> {
     if (!this.formState) {
       return true;
     }

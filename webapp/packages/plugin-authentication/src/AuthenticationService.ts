@@ -147,8 +147,8 @@ export class AuthenticationService extends Bootstrap {
     options = observable(options);
 
     this.authPromise = this.authDialogService.showLoginForm(persistent, options)
-      .then(state => {
-        this.onLogin.execute('after');
+      .then(async state => {
+        await this.onLogin.execute('after');
         return state;
       });
 
