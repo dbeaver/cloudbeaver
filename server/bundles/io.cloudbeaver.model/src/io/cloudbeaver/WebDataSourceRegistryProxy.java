@@ -15,6 +15,7 @@ import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
+import org.jkiss.dbeaver.registry.DataSourcePersistentRegistry;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry {
+public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry {
     private final DataSourceFilter dataSourceFilter;
     private final DataSourceRegistry dataSourceRegistry;
 
@@ -268,14 +269,17 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry {
         dataSourceRegistry.dispose();
     }
 
+    @Override
     public void setAuthCredentialsProvider(DBACredentialsProvider authCredentialsProvider) {
         dataSourceRegistry.setAuthCredentialsProvider(authCredentialsProvider);
     }
 
+    @Override
     public Set<DBPDataSourceFolder> getTemporaryFolders() {
         return dataSourceRegistry.getTemporaryFolders();
     }
 
+    @Override
     public void loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
         @NotNull DataSourceConfigurationManager manager,
@@ -285,14 +289,17 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry {
         dataSourceRegistry.loadDataSources(storages, manager, refresh, purgeUntouched);
     }
 
+    @Override
     public void saveDataSources() {
         dataSourceRegistry.saveDataSources();
     }
 
+    @Override
     public DataSourceConfigurationManager getConfigurationManager() {
         return dataSourceRegistry.getConfigurationManager();
     }
 
+    @Override
     public void saveConfigurationToManager(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DataSourceConfigurationManager configurationManager,

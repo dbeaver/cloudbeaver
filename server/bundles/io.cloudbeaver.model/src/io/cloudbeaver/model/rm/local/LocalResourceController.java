@@ -18,7 +18,6 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
-import io.cloudbeaver.WebDataSourceRegistryProxy;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -261,7 +260,7 @@ public class LocalResourceController implements RMController {
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        ((WebDataSourceRegistryProxy) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
+        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
         registry.checkForErrors();
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
@@ -269,19 +268,19 @@ public class LocalResourceController implements RMController {
     @Override
     public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
-        final WebDataSourceRegistryProxy registry = (WebDataSourceRegistryProxy) project.getDataSourceRegistry();
+        final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-        registry.loadDataSources(List.of(storage), manager, true, false);
+        ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, true, false);
         registry.checkForErrors();
-        registry.saveDataSources();
+        ((DataSourcePersistentRegistry) registry).saveDataSources();
         registry.checkForErrors();
     }
 
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
-        final WebDataSourceRegistryProxy registry = (WebDataSourceRegistryProxy) project.getDataSourceRegistry();
+        final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
         for (String dataSourceId : dataSourceIds) {
             final DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
