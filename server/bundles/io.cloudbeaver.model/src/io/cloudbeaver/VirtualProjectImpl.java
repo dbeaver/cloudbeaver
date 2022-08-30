@@ -55,7 +55,7 @@ public class VirtualProjectImpl extends BaseProjectImpl {
     @NotNull
     @Override
     public String getName() {
-        return project.getName();
+        return project.getDisplayName();
     }
 
     @NotNull
