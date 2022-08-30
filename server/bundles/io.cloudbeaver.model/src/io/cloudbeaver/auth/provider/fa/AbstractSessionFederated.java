@@ -22,6 +22,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public abstract class AbstractSessionFederated implements SMSessionFederated {
@@ -54,6 +55,12 @@ public abstract class AbstractSessionFederated implements SMSessionFederated {
     @Override
     public SMSessionPrincipal getSessionPrincipal() {
         return parentSession.getSessionPrincipal();
+    }
+
+    @NotNull
+    @Override
+    public LocalDateTime getSessionStart() {
+        return parentSession.getSessionStart();
     }
 
     @Override

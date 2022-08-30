@@ -70,6 +70,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -158,6 +161,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @Property
     public String getSessionId() {
         return id;
+    }
+
+    @NotNull
+    @Override
+    public LocalDateTime getSessionStart() {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
     }
 
     public WebApplication getApplication() {
