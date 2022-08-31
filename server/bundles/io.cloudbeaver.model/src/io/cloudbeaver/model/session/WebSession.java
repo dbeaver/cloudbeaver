@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -366,7 +363,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this,
             filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
-        ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
+        dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
         if (!project.isShared() || application.isConfigurationMode()) {
             this.defaultProject = sessionProject;
