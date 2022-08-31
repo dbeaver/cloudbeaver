@@ -80,7 +80,8 @@ public interface DBWServiceRM extends DBWService {
         @NotNull WebSession webSession,
         @NotNull @WebObjectId String projectId,
         @NotNull String resourcePath,
-        @NotNull String data) throws DBException;
+        @NotNull String data,
+        boolean forceOverwrite) throws DBException;
 
     @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
     WebProjectInfo createProject(
