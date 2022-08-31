@@ -13,9 +13,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { ConnectionAuthService } from '../ConnectionAuthService';
 import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService';
@@ -36,14 +36,29 @@ export class PublicConnectionFormService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionAuthService: ConnectionAuthService,
-    private readonly sessionDataResource: SessionDataResource
+    private readonly authenticationService: AuthenticationService,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
-    this.sessionDataResource.onDataOutdated.addHandler(() => {
-      this.close(true);
+
+    this.authenticationService.onLogin.addHandler(async (event, context) => {
+      if (event === 'before') {
+        const confirmed = await this.showUnsavedChangesDialog();
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(context);
+        }
+      }
+    });
+
+    this.authenticationService.onLogout.addHandler(async (event, context) => {
+      if (event === 'before') {
+        const confirmed = await this.close(false);
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(context);
+        }
+      }
     });
 
     makeObservable(this, {
@@ -87,9 +102,9 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(saved?: boolean): Promise<void> {
+  async close(saved?: boolean): Promise<boolean> {
     if (!this.formState) {
-      return;
+      return true;
     }
 
     if (saved) {
@@ -101,6 +116,8 @@ export class PublicConnectionFormService {
     if (state) {
       this.clearFormState();
     }
+
+    return state;
   }
 
   async save(): Promise<void> {
@@ -147,6 +164,14 @@ export class PublicConnectionFormService {
   };
 
   private readonly closeHandler: IExecutorHandler<any> = async (data, contexts) => {
+    const confirmed = await this.showUnsavedChangesDialog();
+
+    if (!confirmed) {
+      ExecutorInterrupter.interrupt(contexts);
+    }
+  };
+
+  private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
       !this.formState
       || !this.optionsPanelService.isOpen(formGetter)
@@ -159,13 +184,13 @@ export class PublicConnectionFormService {
         ))
       )
     ) {
-      return;
+      return true;
     }
 
     const state = await this.formState.checkFormState();
 
     if (!state?.edited) {
-      return;
+      return true;
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
@@ -174,10 +199,8 @@ export class PublicConnectionFormService {
       confirmActionText: 'ui_processing_ok',
     });
 
-    if (result === DialogueStateResult.Rejected) {
-      ExecutorInterrupter.interrupt(contexts);
-    }
-  };
+    return result !== DialogueStateResult.Rejected;
+  }
 
   private async tryReconnect(connectionKey: IConnectionInfoParams) {
     const result = await this.commonDialogService.open(ConfirmationDialog, {
