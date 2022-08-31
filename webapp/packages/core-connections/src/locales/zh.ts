@@ -39,6 +39,7 @@ export default [
   ['connections_connection_access_filter_placeholder', '搜索用户或角色名称'],
   ['connections_connection_access_admin_info', '管理员查看所有连接。'],
   ['connections_connection_description', '描述'],
+  ['connections_connection_project', 'Project'],
   ['connections_connection_driver', '驱动'],
   ['connections_connection_configuration', 'Configuration'],
   ['connections_connection_host', '主机'],

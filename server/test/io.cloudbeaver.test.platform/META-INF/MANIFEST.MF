@@ -22,5 +22,6 @@ Require-Bundle: org.eclipse.core.runtime,
  io.cloudbeaver.server,
  io.cloudbeaver.resources.drivers.base,
  io.cloudbeaver.product.ce,
- io.cloudbeaver.service.auth
+ io.cloudbeaver.service.auth,
+ io.cloudbeaver.service.rm
 Export-Package: io.cloudbeaver.test.platform
