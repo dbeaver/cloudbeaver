@@ -11,7 +11,7 @@ export function isControlPresented(
 ): boolean {
   if (state !== undefined && name !== undefined) {
     if (name in state) {
-      return state[name] !== null;
+      return state[name] !== null && state[name] !== undefined;
     }
     return defaultValue !== undefined;
   }

@@ -11,7 +11,7 @@ import { action, makeObservable, runInAction, toJS } from 'mobx';
 import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ProjectsResource } from '@cloudbeaver/core-projects';
+import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -236,7 +236,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.description = state.config.description;
-    tempConfig.template = state.config.template;
+
+    if (state.projectId === PROJECT_GLOBAL_ID) {
+      tempConfig.template = state.config.template;
+    }
+
     tempConfig.driverId = state.config.driverId;
 
     if (!state.config.template && state.config.folder) {
