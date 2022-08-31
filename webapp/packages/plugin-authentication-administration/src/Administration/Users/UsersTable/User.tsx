@@ -9,17 +9,17 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import type { AdminUser } from '@cloudbeaver/core-authentication';
+import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, FieldCheckbox
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox
 } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { UserFormController } from '../UserForm/UserFormController';
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
-import { UserEditController } from './UserEditController';
 
 const styles = css`
   TableColumnValue[expand] {
@@ -38,21 +38,22 @@ interface Props {
 export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
   const roles = user.grantedRoles.join(', ');
-  const editController = useController(UserEditController, user.userId);
-  const formController = useController(UserFormController);
-  const st = useStyles(styles);
+  const usersService = useService(UsersResource);
+  const notificationService = useService(NotificationService);
+  const translate = useTranslate();
 
-  if (!editController.user) {
-    return null;
+  async function handleEnabledCheckboxChange(enabled: boolean) {
+    try {
+      await usersService.enableUser(user.userId, enabled);
+    } catch (error: any) {
+      notificationService.logException(error);
+    }
   }
 
-  formController.update(editController.user, true, () => {});
+  const enabledCheckboxTitle = usersService.isActiveUser(user.userId)
+    ? translate('administration_roles_role_granted_users_permission_denied') : undefined;
 
-  function handleEnabledChange() {
-    formController.save();
-  }
-
-  return styled(st)(
+  return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>
@@ -65,11 +66,11 @@ export const User = observer<Props>(function User({ user, selectable }) {
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
       <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
       <TableColumnValue>
-        <FieldCheckbox
-          name='enabled'
-          state={formController}
-          disabled={formController.isSaving}
-          onChange={handleEnabledChange}
+        <Checkbox
+          checked={user.enabled}
+          disabled={usersService.isActiveUser(user.userId)}
+          title={enabledCheckboxTitle}
+          onChange={handleEnabledCheckboxChange}
         />
       </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
