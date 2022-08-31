@@ -34,9 +34,9 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { Project, ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { usePermission } from '@cloudbeaver/core-root';
-import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -115,6 +115,17 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
     optionsHook.setAuthModel(model);
   }, []);
+
+  const projectsLoader = useMapResource(Options, ProjectsResource, CachedMapAllKey);
+  const projects = projectsLoader.data as Project[];
+
+  function handleProjectSelect(projectId: string) {
+    const project = projectsLoader.resource.get(projectId);
+
+    if (project?.canCreateConnections) {
+      state.setProject(projectId);
+    }
+  }
 
   const driverMap = useMapResource(
     Options,
@@ -293,6 +304,24 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               >
                 {translate('connections_connection_name')}
               </InputField>
+              <Combobox
+                name='projectId'
+                value={state.projectId ?? PROJECT_GLOBAL_ID}
+                items={projects}
+                keySelector={project => project.id}
+                valueSelector={project => project.name}
+                titleSelector={project => project.description}
+                isDisabled={project => !project.canCreateConnections}
+                searchable={projects.length > 10}
+                readOnly={readonly || edit || projects.length < 2}
+                disabled={disabled}
+                loading={projectsLoader.isLoading()}
+                tiny
+                fill
+                onSelect={handleProjectSelect}
+              >
+                {translate('connections_connection_project')}
+              </Combobox>
               {!config.template && (
                 <InputField
                   type="text"
@@ -301,6 +330,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   disabled={disabled}
                   autoComplete={`section-${config.driverId || 'driver'} section-folder`}
                   mod='surface'
+                  autoHide
                   readOnly
                   tiny
                   fill

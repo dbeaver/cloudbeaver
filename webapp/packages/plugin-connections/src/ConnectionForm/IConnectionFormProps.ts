@@ -46,6 +46,7 @@ export interface IConnectionFormState {
     type: ConnectionFormType
   ) => this;
   readonly setConfig: (projectId: string, config: ConnectionConfig) => this;
+  readonly setProject: (projectId: string) => this;
   readonly setAvailableDrivers: (drivers: string[]) => this;
   readonly save: () => Promise<void>;
   readonly test: () => Promise<void>;
