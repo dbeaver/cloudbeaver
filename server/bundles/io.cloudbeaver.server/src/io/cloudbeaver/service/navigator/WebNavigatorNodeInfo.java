@@ -160,7 +160,7 @@ public class WebNavigatorNodeInfo {
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
             String projectName = folder.getDataSourceRegistry().getProject().getName();
-            Set<DBPDataSourceFolder> tempFolders = ((DataSourceRegistry) folder.getDataSourceRegistry()).getTemporaryFolders();
+            Set<DBPDataSourceFolder> tempFolders = folder.getDataSourceRegistry().getTemporaryFolders();
             isShared = !projectName.equals(session.getUserId()) || tempFolders.contains(folder);
         }
         if (isShared) {

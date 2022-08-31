@@ -42,8 +42,11 @@ interface IBaseTile extends TileLayerProps {
   checked?: boolean;
 }
 
+export type CrsKey = 'Simple' | 'EPSG3857' | 'EPSG4326' | 'EPSG3395' | 'EPSG900913';
+
 interface Props {
   geoJSON: IGeoJSONFeature[];
+  crsKey: CrsKey;
   getAssociatedValues: (cell: IResultSetElementKey) => IAssociatedValue[];
 }
 
@@ -87,17 +90,17 @@ function polyStyle() {
   };
 }
 
-function getCRS(feature?: IGeoJSONFeature): leaflet.CRS {
-  switch (feature?.properties.srid) {
-    case 0:
+function getCRS(crsKey: CrsKey): leaflet.CRS {
+  switch (crsKey) {
+    case 'Simple':
       return leaflet.CRS.Simple;
-    case 3857:
+    case 'EPSG3857':
       return leaflet.CRS.EPSG3857;
-    case 4326:
+    case 'EPSG4326':
       return leaflet.CRS.EPSG4326;
-    case 3395:
+    case 'EPSG3395':
       return leaflet.CRS.EPSG3395;
-    case 900913:
+    case 'EPSG900913':
       return leaflet.CRS.EPSG900913;
     default:
       return leaflet.CRS.EPSG3857;
@@ -111,14 +114,14 @@ const styles = css`
   }
 `;
 
-export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAssociatedValues }) {
+export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey, getAssociatedValues }) {
   const splitContext = useSplit();
   const translate = useTranslate();
 
   const [mapRef, setMapRef] = useState<leaflet.Map | null>(null);
   const [geoJSONLayerRef, setGeoJSONLayerRef] = useState<leaflet.GeoJSON | null>(null);
 
-  const crs = getCRS(geoJSON[0]);
+  const crs = getCRS(crsKey);
 
   const onEachFeature = useCallback((feature: IGeoJSONFeature, layer: leaflet.Layer) => {
     const associatedValues = getAssociatedValues(feature.properties.associatedCell);

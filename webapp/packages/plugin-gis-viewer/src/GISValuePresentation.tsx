@@ -5,17 +5,50 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import styled, { css } from 'reshadow';
 import wellknown from 'wellknown';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
-import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
+import { CrsInput } from './CrsInput';
+import { IGeoJSONFeature, IAssociatedValue, LeafletMap, CrsKey } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
+
+function getCrsKey(feature?: IGeoJSONFeature): CrsKey {
+  switch (feature?.properties.srid) {
+    case 3857:
+      return 'EPSG3857';
+    case 4326:
+      return 'EPSG4326';
+    case 3395:
+      return 'EPSG3395';
+    case 900913:
+      return 'EPSG900913';
+    default:
+      return 'EPSG3857';
+  }
+}
+
+const styles = css`
+  root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  map {
+    flex: 1 1 auto;
+  }
+
+  toolbar {
+    margin-top: 8px;
+    flex: 0 0 auto;
+  }
+`;
 
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
@@ -87,11 +120,25 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
     return values;
   }, [view]);
 
+
+  const defaultCrsKey = getCrsKey(parsedGISData[0]);
+  const [crsKey, setCrsKey] = useState(defaultCrsKey);
+
   if (!parsedGISData.length) {
     return <TextPlaceholder>{translate('gis_presentation_placeholder')}</TextPlaceholder>;
   }
 
-  return (
-    <LeafletMap geoJSON={parsedGISData} getAssociatedValues={getAssociatedValues} />
+  return styled(styles)(
+    <root>
+      <map>
+        <LeafletMap key={crsKey} geoJSON={parsedGISData} crsKey={crsKey} getAssociatedValues={getAssociatedValues} />
+      </map>
+      <toolbar>
+        <CrsInput
+          value={crsKey}
+          onChange={setCrsKey}
+        />
+      </toolbar>
+    </root>
   );
 });

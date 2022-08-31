@@ -112,7 +112,7 @@ extend type Query {
         limit: Int,
         onlyFolders: Boolean): [ NavigatorNodeInfo! ]!
 
-    # Get child nodes
+    # Get node's parents
     navNodeParents( nodePath: ID! ): [ NavigatorNodeInfo! ]!
 
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!

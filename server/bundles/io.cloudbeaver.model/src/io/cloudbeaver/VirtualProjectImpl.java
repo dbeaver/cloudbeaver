@@ -20,6 +20,7 @@ import io.cloudbeaver.model.rm.RMUtils;
 import org.eclipse.core.resources.IProject;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
@@ -55,7 +56,7 @@ public class VirtualProjectImpl extends BaseProjectImpl {
     @NotNull
     @Override
     public String getName() {
-        return project.getName();
+        return project.getDisplayName();
     }
 
     @NotNull
@@ -93,7 +94,7 @@ public class VirtualProjectImpl extends BaseProjectImpl {
 
     @NotNull
     @Override
-    protected DataSourceRegistry createDataSourceRegistry() {
-        return new WebDataSourceRegistryProxy(super.createDataSourceRegistry(), dataSourceFilter);
+    protected DBPDataSourceRegistry createDataSourceRegistry() {
+        return new WebDataSourceRegistryProxy(new DataSourceRegistry(this), dataSourceFilter);
     }
 }
