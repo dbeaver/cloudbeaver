@@ -538,8 +538,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
     renderers: observable.ref,
     baseRoot: observable.ref,
     collapse: action.bound,
-    isLoading: action.bound,
-    isLoaded: action.bound,
     userData: observable.ref,
   }, {
     isGroup: options.isGroup,
@@ -549,7 +547,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     baseRoot: options.baseRoot,
     renderers,
     userData,
-  });
+  }, ['isLoading', 'isLoaded']);
 
   function exitNodeFolder(nodeId: string) {
     runInAction(() => {
