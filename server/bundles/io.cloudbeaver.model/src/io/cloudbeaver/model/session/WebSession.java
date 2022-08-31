@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -70,6 +67,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -158,6 +158,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @Property
     public String getSessionId() {
         return id;
+    }
+
+    @NotNull
+    @Override
+    public LocalDateTime getSessionStart() {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
     }
 
     public WebApplication getApplication() {
@@ -357,7 +363,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this,
             filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
-        ((DataSourceRegistry) dataSourceRegistry).setAuthCredentialsProvider(this);
+        dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
         if (!project.isShared() || application.isConfigurationMode()) {
             this.defaultProject = sessionProject;

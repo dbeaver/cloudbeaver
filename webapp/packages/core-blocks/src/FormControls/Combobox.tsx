@@ -90,7 +90,7 @@ const styles = css`
             width: 100%;
             height: 100%;
           }
-        } 
+        }
       }
     }
     Icon {
@@ -112,12 +112,12 @@ const styles = css`
           width: 16px;
           height: 16px;
           margin-left: 12px;
-    
+
           & IconOrImage {
             width: 100%;
             height: 100%;
           }
-    
+
           &:not(:empty) + input {
             padding-left: 34px !important;
           }
@@ -131,8 +131,8 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   searchable?: boolean;
   defaultValue?: TKey;
   loading?: boolean;
-  keySelector: (item: TValue, index: number) => TKey;
-  valueSelector: (item: TValue) => string;
+  keySelector?: (item: TValue, index: number) => TKey;
+  valueSelector?: (item: TValue) => string;
   titleSelector?: (item: TValue) => string | undefined;
   iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
   isDisabled?: (item: TValue) => boolean;
