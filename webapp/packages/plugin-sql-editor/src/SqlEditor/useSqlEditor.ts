@@ -95,6 +95,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.executingScript
         || this.readonlyState
         || !!this.dataSource?.isOutdated()
+        || !!this.dataSource?.isReadonly()
       );
     },
 

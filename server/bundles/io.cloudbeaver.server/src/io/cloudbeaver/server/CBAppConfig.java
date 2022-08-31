@@ -35,7 +35,9 @@ import java.util.Map;
  * Application configuration
  */
 public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthConfiguration {
-    public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
+    public static final DataSourceNavigatorSettings.Preset PRESET_WEB = new DataSourceNavigatorSettings.Preset("web", "Web", "Default view");
+
+    public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = PRESET_WEB.getSettings();
 
     private boolean supportsCustomConnections;
     private boolean supportsConnectionBrowser;

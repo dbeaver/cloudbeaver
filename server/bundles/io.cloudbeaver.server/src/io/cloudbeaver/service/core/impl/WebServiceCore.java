@@ -21,17 +21,14 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
-import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
-import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
-import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -55,7 +52,6 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -294,6 +290,8 @@ public class WebServiceCore implements DBWServiceCore {
             connectionInfo.clearSavedCredentials();
         }
         // Mark all specified network configs as saved
+        boolean[] saveConfig = new boolean[1];
+
         if (networkCredentials != null) {
             networkCredentials.forEach(c -> {
                 if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
@@ -302,7 +300,7 @@ public class WebServiceCore implements DBWServiceCore {
                         handlerCfg.setUserName(c.getUserName());
                         handlerCfg.setPassword(c.getPassword());
                         handlerCfg.setSavePassword(true);
-                        dataSourceContainer.persistConfiguration();
+                        saveConfig[0] = true;
                     }
                 }
             });
@@ -316,6 +314,13 @@ public class WebServiceCore implements DBWServiceCore {
                 true);
 
             WebDataSourceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
+            saveConfig[0] = true;
+        }
+        if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
+            // Do not flush config for global project (only admin can do it - CB-2415)
+            saveConfig[0] = false;
+        }
+        if (saveConfig[0]) {
             dataSourceContainer.persistConfiguration();
         }
 

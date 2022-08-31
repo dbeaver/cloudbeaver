@@ -9,6 +9,7 @@
 import type React from 'react';
 
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 
 export type NavTreeNodeComponent = React.FC<{
@@ -33,14 +34,17 @@ export type NavTreeControlComponent = React.FC<NavTreeControlProps>;
 export type NavigationNodeComponent = React.FC<{
   node: NavNode;
   component: NavTreeNodeComponent;
+  control?: NavTreeControlComponent | undefined;
   path: string[];
   dragging?: boolean;
   expanded?: boolean;
   className?: string;
+  style?: ComponentStyle;
 }>;
 
 export type NavigationNodeRendererComponent = React.FC<{
   nodeId: string;
+  path: string[];
   component: NavTreeNodeComponent;
   expanded?: boolean;
   dragging?: boolean;

@@ -47,6 +47,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private Set<String> userPermissions;
     private SMCredentials smCredentials = null;
     private String smSessionId;
+    private String refreshToken;
 
     private SMController securityController;
     private SMAdminController adminSecurityController;
@@ -64,7 +65,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @param smAuthInfo - auth info from security manager
      * @throws DBException - if user already authorized and new token come from another user
      */
-    public void refresh(SMAuthInfo smAuthInfo) throws DBException {
+    public synchronized void refresh(SMAuthInfo smAuthInfo) throws DBException {
         if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS) {
             throw new DBCException("Authorization did not complete successfully");
         }
@@ -77,7 +78,12 @@ public class WebUserContext implements SMCredentialsProvider {
         if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), authPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
-        this.smCredentials = new SMCredentials(smAuthInfo.getSmAuthToken(), authPermissions.getUserId(), authPermissions.getPermissions());
+        this.smCredentials = new SMCredentials(
+            smAuthInfo.getSmAuthToken(),
+            authPermissions.getUserId(),
+            authPermissions.getPermissions()
+        );
+        this.refreshToken = smAuthInfo.getSmRefreshToken();
         this.userPermissions = authPermissions.getPermissions();
         this.securityController = application.getSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
@@ -89,10 +95,23 @@ public class WebUserContext implements SMCredentialsProvider {
 
     }
 
+    public synchronized void refreshSMSession() throws DBException {
+        if (smCredentials == null || refreshToken == null) {
+            return;
+        }
+        var newTokens = securityController.refreshSession(refreshToken);
+        this.refreshToken = newTokens.getSmRefreshToken();
+        this.smCredentials = new SMCredentials(
+            newTokens.getSmAccessToken(),
+            smCredentials.getUserId(),
+            smCredentials.getPermissions()
+        );
+    }
+
     /**
      * reset the state as if the user is not logged in
      */
-    public void reset() throws DBException {
+    public synchronized void reset() throws DBException {
         if (this.smCredentials != null) {
             this.securityController.logout();
         }
@@ -155,8 +174,8 @@ public class WebUserContext implements SMCredentialsProvider {
         }
         if (userPermissions != null &&
             !userPermissions.isEmpty() &&
-            !userPermissions.contains(DBWConstants.PERMISSION_PUBLIC))
-        {
+            !userPermissions.contains(DBWConstants.PERMISSION_PUBLIC)
+        ) {
             userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
     }

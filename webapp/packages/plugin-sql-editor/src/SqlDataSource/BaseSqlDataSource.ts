@@ -46,6 +46,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract setName(name: string | null): void;
   abstract setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void;
 
+  isReadonly(): boolean {
+    return true;
+  }
+
   isOutdated(): boolean {
     return this.outdated;
   }

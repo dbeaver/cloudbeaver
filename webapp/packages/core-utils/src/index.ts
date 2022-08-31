@@ -23,6 +23,7 @@ export * from './md5';
 export * from './MetadataMap';
 export * from './OrderedMap';
 export * from './parseJSONFlat';
+export * from './pathJoin';
 export * from './PriorityQueue';
 export * from './replaceMiddle';
 export * from './TextTools';

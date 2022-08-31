@@ -70,6 +70,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -158,6 +161,12 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @Property
     public String getSessionId() {
         return id;
+    }
+
+    @NotNull
+    @Override
+    public LocalDateTime getSessionStart() {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
     }
 
     public WebApplication getApplication() {
@@ -584,14 +593,19 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public void close() throws DBException {
+    @Override
+    public void close() {
         try {
             resetNavigationModel();
             resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
         }
-        clearAuthTokens();
+        try {
+            clearAuthTokens();
+        } catch (Exception e) {
+            log.error("Error closing web session tokens");
+        }
         this.sessionAuthContext.close();
         this.userContext.setUser(null);
 
@@ -599,6 +613,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             this.defaultProject.dispose();
             this.defaultProject = null;
         }
+        super.close();
     }
 
     private void clearAuthTokens() throws DBException {
@@ -957,6 +972,11 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @Override
     public SMCredentials getActiveUserCredentials() {
         return userContext.getActiveUserCredentials();
+    }
+
+    @Override
+    public void refreshSMSession() throws DBException {
+        userContext.refreshSMSession();
     }
 
     public VirtualProjectImpl getProjectById(@Nullable String projectId) {

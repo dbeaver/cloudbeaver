@@ -20,10 +20,13 @@ interface KeyWithIncludes<TKey, TIncludes> {
   includes: TIncludes;
 }
 
-interface IActions<TResource> {
+interface IActions<
+  TResource,
+  TKeyArg extends CachedDataResourceParam<TResource>,
+> {
   active?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
-  onLoad?: (resource: TResource) => Promise<any> | any;
+  onLoad?: (resource: TResource, key: TKeyArg | null) => Promise<any> | any;
   onData?: (
     data: CachedResourceData<TResource>,
     resource: TResource,
@@ -55,7 +58,7 @@ export function useDataResource<
   keyObj: TResource extends any
     ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes>
     : never,
-  actions?: IActions<TResource>
+  actions?: IActions<TResource, TKeyArg>
 ): IMapResourceResult<TResource, TIncludes>;
 
 export function useDataResource<
@@ -71,7 +74,7 @@ export function useDataResource<
   keyObj: TResource extends any
     ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes>
     : never,
-  actions?: IActions<TResource>
+  actions?: IActions<TResource, TKeyArg>
 ): IMapResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedDataResource ? ctor : useService(ctor);
@@ -113,7 +116,7 @@ export function useDataResource<
         this.firstRender = false;
         this.loading = true;
 
-        await actions?.onLoad?.(resource);
+        await actions?.onLoad?.(resource, key);
 
         if (key === null) {
           return;

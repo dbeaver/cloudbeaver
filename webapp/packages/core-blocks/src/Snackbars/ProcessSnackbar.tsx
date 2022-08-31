@@ -45,7 +45,7 @@ export const ProcessSnackbar: NotificationComponent<Props> = observer(function P
   return (
     <SnackbarWrapper
       closing={!!notification.state.deleteDelay}
-      unclosable={status === ENotificationType.Loading}
+      persistent={status === ENotificationType.Loading}
       onClose={() => notification.close(false)}
     >
       <SnackbarStatus status={status} />
