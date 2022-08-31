@@ -169,7 +169,6 @@ public class WebServiceUtils extends WebCommonUtils {
             if (config.getServerName() != null) {
                 dsConfig.setServerName(config.getServerName());
             }
-            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
         }
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
@@ -196,6 +195,9 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         if (config.getConfigurationType() != null) {
             dsConfig.setConfigurationType(config.getConfigurationType());
+        }
+        if (CommonUtils.isEmpty(config.getUrl())) {
+            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
         }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {
