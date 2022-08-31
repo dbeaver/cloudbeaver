@@ -73,8 +73,8 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
 
   const styles = useStyles(SSH_STYLES, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
-  const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;
+  const disabled = formDisabled || loading || !enabled;
   const keyAuth = handlerState.authType === NetworkHandlerAuthType.PublicKey;
   const passwordFilled = (initialConfig?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
   const testAvailable = keyAuth ? !!handlerState.key?.length : passwordFilled;
@@ -122,7 +122,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
             items={authTypes}
             keySelector={value => value.key}
             valueSelector={value => value.label}
-            disabled={disabled || readonly || !enabled}
+            disabled={disabled || readonly}
             tiny
             onSelect={authTypeChangeHandler}
           >
@@ -133,7 +133,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               type="text"
               name="host"
               state={handlerState.properties}
-              disabled={disabled || !enabled}
+              disabled={disabled}
               readOnly={readonly}
               mod='surface'
               required
@@ -145,7 +145,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               type="number"
               name="port"
               state={handlerState.properties}
-              disabled={disabled || !enabled}
+              disabled={disabled}
               readOnly={readonly}
               mod='surface'
               required
@@ -159,7 +159,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               type="text"
               name="userName"
               state={handlerState}
-              disabled={disabled || !enabled}
+              disabled={disabled}
               readOnly={readonly}
               mod='surface'
               required={handlerState.savePassword}
@@ -172,7 +172,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               name="password"
               autoComplete='new-password'
               state={handlerState}
-              disabled={disabled || !enabled}
+              disabled={disabled}
               readOnly={readonly}
               mod='surface'
               required={!keyAuth && handlerState.savePassword}
@@ -186,7 +186,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                 <Textarea
                   name='key'
                   state={handlerState}
-                  disabled={disabled || !enabled}
+                  disabled={disabled}
                   readOnly={readonly}
                   description={keySaved ? translate('ui_processing_saved') : undefined}
                   required
@@ -197,12 +197,13 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                 <GroupItem>
                   <UploadArea
                     accept='.txt, .ssh'
-                    disabled={disabled || readonly || !enabled}
+                    disabled={disabled || readonly}
                     reset
                     onChange={handleKeyUpload}
                   >
                     <Button
-                      tag='div'
+                      type="button"
+                      disabled={disabled || readonly}
                       mod={['outlined']}
                     >
                       {translate('ui_file')}
@@ -217,7 +218,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
               state={handlerState}
-              disabled={disabled || !enabled || readonly}
+              disabled={disabled || readonly}
             >
               {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>
@@ -232,7 +233,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                   type='number'
                   name='aliveInterval'
                   state={handlerState.properties}
-                  disabled={disabled || !enabled}
+                  disabled={disabled}
                   readOnly={readonly}
                   labelTooltip={aliveIntervalLabel}
                   mod='surface'
@@ -244,7 +245,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                   type='number'
                   name='sshConnectTimeout'
                   state={handlerState.properties}
-                  disabled={disabled || !enabled}
+                  disabled={disabled}
                   readOnly={readonly}
                   labelTooltip={connectTimeoutLabel}
                   mod='surface'
@@ -259,7 +260,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
             <Button
               type='button'
               mod={['unelevated']}
-              disabled={disabled || !enabled || !testAvailable}
+              disabled={disabled || !testAvailable}
               loader
               onClick={testConnection}
             >
