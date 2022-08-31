@@ -201,6 +201,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             @Override
             public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
                 super.fetchRow(session, resultSet);
+                flushExportSite();
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(
                         "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
