@@ -198,6 +198,7 @@ type DriverInfo {
     embedded: Boolean
     enabled: Boolean!
     requiresServerName: Boolean
+    requiresDatabaseName: Boolean
 
     licenseRequired: Boolean
     license: String
