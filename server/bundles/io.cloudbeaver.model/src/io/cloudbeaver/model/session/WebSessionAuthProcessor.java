@@ -82,9 +82,15 @@ public class WebSessionAuthProcessor {
     @SuppressWarnings("unchecked")
     private List<WebAuthInfo> finishWebSessionAuthorization(SMAuthInfo authInfo) throws DBException {
         boolean configMode = WebAppUtils.getWebApplication().isConfigurationMode();
-        boolean resetUserStateOnError = webSession.getUser() == null;
+        boolean alreadyLoggedIn = webSession.getUser() != null;
+        boolean resetUserStateOnError = !alreadyLoggedIn;
 
         try {
+            if (configMode && alreadyLoggedIn) {
+                for (String providerId : authInfo.getAuthData().keySet()) {
+                    webSession.removeAuthInfo(providerId);
+                }
+            }
             webSession.updateSMAuthInfo(authInfo);
             WebUser curUser = webSession.getUser();
             if (curUser == null) {
@@ -117,18 +123,11 @@ public class WebSessionAuthProcessor {
                 }
 
                 SMSession authSession;
-                if (configMode) {
-                    if (webSession.getUser() != null) {
-                        // Already logged in - remove auth token
-                        webSession.removeAuthInfo(providerId);
-                        webSession.resetAuthToken();
-                    }
-                } else {
-                    if (authProviderExternal != null) {
-                        // We may need to associate new credentials with active user
-                        if (linkWithActiveUser) {
-                            securityController.setUserCredentials(userId, authProviderDescriptor.getId(), userCredentials);
-                        }
+
+                if (authProviderExternal != null && !configMode && !alreadyLoggedIn) {
+                    // We may need to associate new credentials with active user
+                    if (linkWithActiveUser) {
+                        securityController.setUserCredentials(userId, authProviderDescriptor.getId(), userCredentials);
                     }
                 }
 
