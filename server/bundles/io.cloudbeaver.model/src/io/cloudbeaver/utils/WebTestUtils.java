@@ -29,6 +29,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class WebTestUtils {
@@ -42,12 +43,24 @@ public class WebTestUtils {
 
 
     public static Map<String, Object> doPost(String apiUrl, String input, HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+        return doPostWithHeaders(apiUrl, input, client, List.of());
+    }
+
+    public static Map<String, Object> doPostWithHeaders(
+        String apiUrl,
+        String input,
+        HttpClient client,
+        List<String> headers
+    ) throws Exception {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(input))
-            .header("Content-Type", "application/json")
-            .build();
+            .header("Content-Type", "application/json");
 
+        if (!headers.isEmpty()) {
+            requestBuilder.headers(headers.toArray(String[]::new));
+        }
+        HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = client.send(request,
             HttpResponse.BodyHandlers.ofString());
 
