@@ -102,6 +102,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   navNodeFilterCompare,
   filters = [],
   renderers = [],
+  expandStateGetters,
   style,
   className,
   getChildren,
@@ -161,7 +162,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  const children = useMapResource(ElementsTree, navTreeResource, root, {
+  useMapResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
       const preload = await resource.preloadNodeParents(fullPath);
@@ -199,6 +200,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     localState,
     filters: [nameFilter, ...filters, limitFilter],
     renderers: [...renderers, elementsTreeLimitRenderer],
+    expandStateGetters,
     getChildren,
     loadChildren,
     isGroup,
@@ -279,7 +281,8 @@ export const ElementsTree = observer<Props>(function ElementsTree({
     }
   });
 
-  const hasChildren = (children.data?.length || 0) > 0;
+  const children = tree.getNodeChildren(root);
+  const hasChildren = children.length > 0;
   const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
 
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
@@ -290,7 +293,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
           root={root}
           context={context}
           emptyPlaceholder={emptyPlaceholder}
-          childrenState={children}
+          childrenState={tree}
           hasChildren={hasChildren}
         >
           <ElementsTreeContext.Provider value={context}>

@@ -7,18 +7,28 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 
+import { useChildren } from '../../NodesManager/useChildren';
 import { useNode } from '../../NodesManager/useNode';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NavigationNodeRenderer } from '../ElementsTree/NavigationTreeNode/NavigationNodeRenderer';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
+
+const nestedStyles = css`
+  TreeNode {
+    margin-top: 8px;
+  }
+  NavigationNodeNested {
+    padding-left: 8px !important;
+  }
+`;
 
 export function navigationTreeProjectsRendererRenderer(
   navNodeInfoResource: NavNodeInfoResource
@@ -61,6 +71,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       dragging={dragging}
       className={className}
       control={NavigationNodeProjectControl}
+      style={nestedStyles}
       component={component}
     />
   );

@@ -104,9 +104,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  const expandable = getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true);
+
   return styled(TREE_NODE_STYLES, nodeIconStyle, styles)(
     <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
-      <TreeNodeExpand filterActive={treeContext?.tree.filtering} />
+      {expandable && <TreeNodeExpand filterActive={treeContext?.tree.filtering} />}
       <TreeNodeIcon icon={icon} style={nodeIconStyle} {...use({ connected })}>
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>

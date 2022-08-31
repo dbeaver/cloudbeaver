@@ -9,7 +9,7 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { IFolderExplorerContext, ILoadableState, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -22,6 +22,16 @@ import type { IElementsTreeAction } from './IElementsTreeAction';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
+
+export interface IElementsTreeNodeExpandedInfo {
+  expanded: boolean;
+  expandable?: boolean;
+}
+
+export type IElementsTreeNodeExpandInfoGetter = (
+  nodeId: string,
+  state: ITreeNodeState
+) => IElementsTreeNodeExpandedInfo | null;
 
 export type IElementsTreeFilter = (
   filter: string,
@@ -56,6 +66,7 @@ export interface IElementsTreeOptions {
   disabled?: boolean;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
+  expandStateGetters?: IElementsTreeNodeExpandInfoGetter[];
   localState?: MetadataMap<string, ITreeNodeState>;
   getChildren: (id: string) => string[] | undefined;
   loadChildren: (id: string, manual: boolean) => Promise<boolean>;
@@ -74,7 +85,7 @@ interface IOptions extends IElementsTreeOptions {
   folderExplorer: IFolderExplorerContext;
 }
 
-export interface IElementsTree {
+export interface IElementsTree extends ILoadableState {
   actions: ISyncExecutor<IElementsTreeAction>;
   settings?: IElementsTreeSettings;
   baseRoot: string;
@@ -89,6 +100,7 @@ export interface IElementsTree {
 
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
+  isNodeExpandable: (nodeId: string) => boolean;
   getExpanded: () => string[];
   getSelected: () => string[];
   isNodeSelected: (nodeId: string) => boolean;
@@ -294,6 +306,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
     get filtering() {
       return this.filter !== '';
     },
+    isLoading() {
+      return this.loading;
+    },
+    isLoaded() {
+      return true;
+    },
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
     },
@@ -307,8 +325,34 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
 
       const nodeState = this.getNodeState(nodeId);
+      const expanded = nodeState.expanded || nodeState.showInFilter;
 
-      return nodeState.expanded || nodeState.showInFilter;
+      if (!expanded && options.expandStateGetters?.length) {
+        return options
+          .expandStateGetters
+          .map(getExpandState => getExpandState(nodeId, nodeState))
+          .filter(stateInfo => stateInfo !== null)
+          .some(stateInfo => stateInfo?.expanded);
+      }
+
+      return expanded;
+    },
+    isNodeExpandable(nodeId: string): boolean {
+      if (nodeId === this.root) {
+        return true;
+      }
+
+      if (options.expandStateGetters?.length) {
+        const nodeState = this.getNodeState(nodeId);
+
+        return options
+          .expandStateGetters
+          .map(getExpandState => getExpandState(nodeId, nodeState))
+          .filter(stateInfo => stateInfo !== null)
+          .every(stateInfo => stateInfo?.expandable !== false);
+      }
+
+      return true;
     },
     getExpanded(): string[] {
       return Array.from(this.state).filter(([key, state]) => state.expanded).map(([key]) => key);
@@ -416,6 +460,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
     async expand(node: NavNode, state: boolean) {
+      if (!this.isNodeExpandable(node.id)) {
+        return;
+      }
+
       const treeNodeState = this.state.get(node.id);
 
       try {
@@ -490,6 +538,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
     renderers: observable.ref,
     baseRoot: observable.ref,
     collapse: action.bound,
+    isLoading: action.bound,
+    isLoaded: action.bound,
     userData: observable.ref,
   }, {
     isGroup: options.isGroup,
