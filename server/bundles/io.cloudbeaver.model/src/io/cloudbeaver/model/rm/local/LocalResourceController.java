@@ -438,7 +438,8 @@ public class LocalResourceController implements RMController {
     public String setResourceContents(
         @NotNull String projectId,
         @NotNull String resourcePath,
-        @NotNull byte[] data) throws DBException
+        @NotNull byte[] data,
+        boolean forceOverwrite) throws DBException
     {
         validateResourcePath(resourcePath);
         Number fileSizeLimit = WebAppUtils.getWebApplication()
@@ -452,6 +453,9 @@ public class LocalResourceController implements RMController {
                     data.length);
         }
         Path targetPath = getTargetPath(projectId, resourcePath);
+        if (!forceOverwrite && Files.exists(targetPath)) {
+            throw new DBException("Resource '" + resourcePath + "' exists");
+        }
         if (!Files.exists(targetPath.getParent())) {
             throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
         }

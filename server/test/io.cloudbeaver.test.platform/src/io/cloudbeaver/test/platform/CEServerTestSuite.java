@@ -29,7 +29,7 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({PlatformTest.class, AuthenticationTest.class })
+@Suite.SuiteClasses({PlatformTest.class, AuthenticationTest.class, ResourceManagerTest.class })
 public class CEServerTestSuite {
 
     public static final String GQL_API_URL = "http://localhost:18978/api/gql";

@@ -89,11 +89,17 @@ public class WebServiceRM implements DBWServiceRM {
 
     @NotNull
     @Override
-    public String writeResourceStringContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, @NotNull String data) throws DBException {
+    public String writeResourceStringContent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull String data,
+        boolean forceOverwrite
+    ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-            return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes);
+            return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
         }
