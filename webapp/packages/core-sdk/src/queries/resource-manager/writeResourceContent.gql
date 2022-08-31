@@ -1,3 +1,13 @@
-mutation writeResourceContent($projectId: String!, $resourcePath: String!, $data: String!) {
-  rmWriteResourceStringContent(projectId: $projectId, resourcePath: $resourcePath, data: $data)
+mutation writeResourceContent(
+  $projectId: String!,
+  $resourcePath: String!,
+  $data: String!,
+  $forceOverwrite: Boolean!
+) {
+  rmWriteResourceStringContent(
+    projectId: $projectId,
+    resourcePath: $resourcePath,
+    data: $data,
+    forceOverwrite: $forceOverwrite
+  )
 }
