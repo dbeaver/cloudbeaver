@@ -69,7 +69,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
     private static final int ACCESS_TOKEN_TTL_IN_MINUTES = 20;
-    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 24;
+    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 72;
 
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
