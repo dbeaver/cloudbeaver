@@ -6,6 +6,7 @@ import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
+import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
 import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
@@ -39,6 +40,7 @@ import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administ
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 
+
 import { defaultProductManifest } from './manifest';
 
 const PLUGINS: PluginManifest[] = [
@@ -50,6 +52,7 @@ const PLUGINS: PluginManifest[] = [
   localization,
   connectionCustom,
   connectionTemplate,
+  connectionSearch,
   dataExport,
   dataViewer,
   gisViewer,
