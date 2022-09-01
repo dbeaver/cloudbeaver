@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
@@ -343,7 +344,7 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static boolean isGlobalProject(DBPProject project) {
-        return CommonUtils.equalObjects(CBApplication.getInstance().getDefaultProjectName(), project.getName());
+        return CommonUtils.equalObjects(((VirtualProjectImpl) project).getRmProject().getType(), RMProject.Type.GLOBAL);
     }
 
 
