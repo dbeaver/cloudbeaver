@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
 
-import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
 import { NavigationNodeEditor } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeEditor';
 import { TreeNodeMenu } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenu';
@@ -62,7 +61,6 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   dndPlaceholder,
 }, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
-  const treeContext = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
@@ -86,7 +84,6 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
   return styled(TREE_NODE_STYLES, styles)(
     <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
-      <TreeNodeExpand filterActive={treeContext?.tree.filtering} />
       <TreeNodeName title={node.name}>
         {editing ? (
           <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />

@@ -36,6 +36,7 @@ export default [
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или роли'],
   ['connections_connection_access_admin_info', 'Администраторы видят все подключения.'],
   ['connections_connection_description', 'Описание'],
+  ['connections_connection_project', 'Проект'],
   ['connections_connection_driver', 'Драйвер'],
   ['connections_connection_configuration', 'Конфигурация'],
   ['connections_connection_host', 'Хост'],

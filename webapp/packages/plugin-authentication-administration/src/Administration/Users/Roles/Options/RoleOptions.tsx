@@ -78,15 +78,22 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
         <Group small gap>
           <GroupTitle>{translate('administration_roles_role_permissions')}</GroupTitle>
           {permissionsResource.resource.values.map(permission => {
-            let label = permission.id;
-            let caption: string | undefined;
+            const label = permission.label ?? permission.id;
 
-            if (permission.label) {
-              label = `${permission.label}`;
-              caption = permission.id;
+            let caption = '';
+
+            if (permission.description) {
+              caption = permission.description;
+            } else if (permission.label) {
+              caption = `(${permission.id})`;
             }
 
-            const tooltip = `${label}${permission.description ? '\n' + permission.description : ''}`;
+            let tooltip = `${permission.id}`;
+
+            if (permission.label) {
+              tooltip = permission.label + ` (${permission.id})`;
+            }
+
             return (
               <FieldCheckbox
                 key={permission.id}
@@ -98,7 +105,8 @@ export const RoleOptions: TabContainerPanelComponent<IRoleFormProps> = observer(
                 readOnly={state.readonly}
                 disabled={state.disabled}
               >
-                {label} {caption && <caption>({caption})</caption>}
+                {label}
+                {caption ? <caption>{caption}</caption> : null}
               </FieldCheckbox>
             );
           })}

@@ -13,13 +13,11 @@ import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AuthenticationService } from './AuthenticationService';
-import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly authDialogService: AuthDialogService,
     private readonly authenticationService: AuthenticationService,
     private readonly authInfoService: AuthInfoService,
     private readonly menuService: MenuService,
@@ -40,7 +38,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'authentication_login',
                 tooltip: 'authentication_login',
               },
-              { onSelect: () => this.authDialogService.showLoginForm(false, { providerId: null, linkUser: false }) }
+              { onSelect: () => this.authenticationService.authUser(null, false) }
             ),
           ];
         }
@@ -54,7 +52,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'authentication_logout',
                 tooltip: 'authentication_logout',
               },
-              { onSelect: this.authenticationService.logout.bind(this.authenticationService) }
+              { onSelect: () => this.authenticationService.logout() }
             ),
           ];
         }

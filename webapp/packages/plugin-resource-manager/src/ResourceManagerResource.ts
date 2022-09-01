@@ -59,11 +59,12 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     await this.load({ projectId, folder:folder ? resourcePath : this.getFolder(resourcePath) });
   }
 
-  async writeResource(projectId: string, resourcePath: string, data: string) {
+  async writeResource(projectId: string, resourcePath: string, data: string, forceOverwrite: boolean) {
     await this.graphQLService.sdk.writeResourceContent({
       projectId,
       resourcePath,
       data,
+      forceOverwrite,
     });
   }
 

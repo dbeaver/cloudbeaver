@@ -57,7 +57,8 @@ extend type Mutation {
     rmWriteResourceStringContent(
         projectId: String!,
         resourcePath: String!,
-        data: String!): String!
+        data: String!,
+        forceOverwrite: Boolean!): String!
 
     rmCreateProject(
         projectName: String!,

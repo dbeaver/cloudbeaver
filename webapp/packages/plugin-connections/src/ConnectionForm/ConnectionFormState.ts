@@ -152,6 +152,7 @@ export class ConnectionFormState implements IConnectionFormState {
       .next(this.formStateTask);
 
     makeObservable<IConnectionFormState, '_availableDrivers' | 'stateInfo' | 'updateFormState'>(this, {
+      projectId: observable,
       mode: observable,
       type: observable,
       config: observable,
@@ -208,9 +209,14 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   setConfig(projectId: string, config: ConnectionConfig): this {
-    this.projectId = projectId;
+    this.setProject(projectId);
     this.config = config;
     this.reset();
+    return this;
+  }
+
+  setProject(projectId: string): this {
+    this.projectId = projectId;
     return this;
   }
 

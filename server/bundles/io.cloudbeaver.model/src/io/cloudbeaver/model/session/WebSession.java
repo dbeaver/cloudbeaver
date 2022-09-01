@@ -493,8 +493,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return locale;
     }
 
-    public void setLocale(String locale) {
-        this.locale = locale;
+    public void setLocale(@Nullable String locale) {
+        this.locale = locale != null ? locale : Locale.getDefault().getLanguage();
     }
 
     public DBNModel getNavigatorModel() {

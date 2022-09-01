@@ -231,6 +231,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       </InputField>
     );
   }
+
   return (
     <InputField
       type={password ? 'password' : 'text'}
