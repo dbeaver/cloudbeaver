@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
@@ -21,6 +22,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly projectsService: ProjectsService,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly permissionsService: PermissionsService,
   ) {
     super();
   }
@@ -37,6 +39,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
       isHidden: () => (
         !this.serverConfigResource.data?.supportsCustomConnections
         || !this.projectsService.activeProject?.canCreateConnections
+        || !this.permissionsService.has(EAdminPermission.admin)
       ),
       onClick: () => {
         this.optionsPanelService.open(() => SearchDatabase);
