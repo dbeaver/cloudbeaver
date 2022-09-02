@@ -25,7 +25,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPExternalFileManager;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBASecureStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
@@ -242,12 +241,6 @@ public class CBPlatform extends BasePlatformImpl {
     @Override
     public DBASecureStorage getSecureStorage() {
         return application.getSecureStorage();
-    }
-
-    @NotNull
-    @Override
-    public DBPExternalFileManager getExternalFileManager() {
-        return workspace;
     }
 
     @NotNull
