@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.model.app;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,11 +30,13 @@ import org.jkiss.dbeaver.model.navigator.DBNResource;
 import java.util.List;
 
 /**
- * Default resource handler
+ * Default server resource handler.
+ * It is a dummy class to support legacy desktop resource management.
+ * It mustn't be called on server.
  */
-public class CBResourceHandler implements DBPResourceHandler {
+public class ServerResourceHandler implements DBPResourceHandler {
 
-    public static final CBResourceHandler INSTANCE = new CBResourceHandler();
+    public static final ServerResourceHandler INSTANCE = new ServerResourceHandler();
 
     @Override
     public int getFeatures(IResource resource) {
@@ -70,8 +72,7 @@ public class CBResourceHandler implements DBPResourceHandler {
     @NotNull
     @Override
     public DBNResource makeNavigatorNode(@NotNull DBNNode parentNode, @NotNull IResource resource) throws CoreException, DBException {
-        DBNResource node = new DBNResource(parentNode, resource, this);
-        return node;
+        return new DBNResource(parentNode, resource, this);
     }
 
     @Override
