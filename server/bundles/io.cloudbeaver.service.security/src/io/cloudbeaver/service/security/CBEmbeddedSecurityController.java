@@ -68,9 +68,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
-    private static final int ACCESS_TOKEN_TTL_IN_MINUTES = 20;
-    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 24;
-
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
 
@@ -84,10 +81,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
-    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database, SMCredentialsProvider credentialsProvider) {
+    private final SMControllerConfiguration smConfig;
+
+    public CBEmbeddedSecurityController(
+        WebApplication application,
+        CBDatabase database,
+        SMCredentialsProvider credentialsProvider,
+        SMControllerConfiguration smConfig
+    ) {
         this.application = application;
         this.database = database;
         this.credentialsProvider = credentialsProvider;
+        this.smConfig = smConfig;
     }
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
@@ -1406,12 +1411,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             } else {
                 dbStat.setString(3, userId);
             }
-            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(ACCESS_TOKEN_TTL_IN_MINUTES));
+            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getAccessTokenTtl()));
             dbStat.setTimestamp(4, accessTokenExpirationTime);
 
             String smRefreshToken = SecurityUtils.generatePassword(32);
             dbStat.setString(5, smRefreshToken);
-            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(REFRESH_TOKEN_TTL_IN_HOURS));
+            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getRefreshTokenTtl()));
             dbStat.setTimestamp(6, refreshTokenExpirationTime);
 
             dbStat.execute();
