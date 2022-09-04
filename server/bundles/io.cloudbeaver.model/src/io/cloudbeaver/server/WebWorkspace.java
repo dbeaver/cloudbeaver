@@ -17,7 +17,6 @@
 package io.cloudbeaver.server;
 
 import org.eclipse.core.resources.IWorkspace;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 
@@ -28,17 +27,8 @@ import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
  */
 public class WebWorkspace extends EclipseWorkspaceImpl {
 
-    private final String workspaceId;
-
     public WebWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
         super(platform, eclipseWorkspace);
-        workspaceId = readWorkspaceId();
-    }
-
-    @NotNull
-    @Override
-    public String getWorkspaceId() {
-        return workspaceId;
     }
 
 }

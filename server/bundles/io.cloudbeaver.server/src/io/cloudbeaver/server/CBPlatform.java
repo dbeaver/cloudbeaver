@@ -25,10 +25,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPExternalFileManager;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBASecureStorage;
-import org.jkiss.dbeaver.model.app.DBPResourceHandler;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
@@ -36,15 +34,15 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.qm.QMController;
+import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
-import org.jkiss.dbeaver.runtime.qm.QMControllerImpl;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
+import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.osgi.framework.Bundle;
@@ -76,7 +74,7 @@ public class CBPlatform extends BasePlatformImpl {
 
     private Path tempFolder;
 
-    private QMControllerImpl queryManager;
+    private QMRegistryImpl queryManager;
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
     private WebWorkspace workspace;
@@ -141,7 +139,7 @@ public class CBPlatform extends BasePlatformImpl {
         this.workspace.initializeProjects();
 
         QMUtils.initApplication(this);
-        this.queryManager = new QMControllerImpl();
+        this.queryManager = new QMRegistryImpl();
 
         this.qmLogWriter = new QMLogFileWriter();
         this.queryManager.registerMetaListener(qmLogWriter);
@@ -208,12 +206,6 @@ public class CBPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public DBPResourceHandler getDefaultResourceHandler() {
-        return CBResourceHandler.INSTANCE;
-    }
-
-    @NotNull
-    @Override
     public CBApplication getApplication() {
         return application;
     }
@@ -229,7 +221,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    public QMController getQueryManager() {
+    public QMRegistry getQueryManager() {
         return queryManager;
     }
 
@@ -249,12 +241,6 @@ public class CBPlatform extends BasePlatformImpl {
     @Override
     public DBASecureStorage getSecureStorage() {
         return application.getSecureStorage();
-    }
-
-    @NotNull
-    @Override
-    public DBPExternalFileManager getExternalFileManager() {
-        return workspace;
     }
 
     @NotNull
