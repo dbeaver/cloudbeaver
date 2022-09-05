@@ -352,10 +352,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
         DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
-        SMSessionContext projectSessionContext = new SMWebSessionContext(sessionAuthContext, this);
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
-            projectSessionContext,
+            sessionAuthContext,
             this,
             filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
