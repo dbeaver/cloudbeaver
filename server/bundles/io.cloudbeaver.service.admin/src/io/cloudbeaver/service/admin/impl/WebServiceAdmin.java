@@ -404,8 +404,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
             ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
             globalDataSourceRegistry.addDataSource(newDataSource);
-
-            return new WebConnectionInfo(webSession, newDataSource);
+            WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
+            webSession.addConnection(connectionInfo);
+            return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
         }

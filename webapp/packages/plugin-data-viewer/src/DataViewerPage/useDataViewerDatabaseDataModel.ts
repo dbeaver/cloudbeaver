@@ -13,7 +13,6 @@ import { ILoadableState, isContainsException, useMapResource, useObservableRef }
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
@@ -38,26 +37,30 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
   const dataPresentationService = useService(DataPresentationService);
   const dataViewerDataChangeConfirmationService = useService(DataViewerDataChangeConfirmationService);
 
-  const connections = useMapResource(useDataViewerDatabaseDataModel, connectionInfoResource, CachedMapAllKey);
+  const connection = useMapResource(
+    useDataViewerDatabaseDataModel,
+    ConnectionInfoResource,
+    tab.handlerState.connectionKey ?? null
+  );
 
   const state = useObservableRef<IDataViewerDatabaseDataModel>(() => ({
     _exception: null,
     _loading: false,
     get exception() {
-      if (isContainsException(connections.exception)) {
-        return connections.exception;
+      if (isContainsException(connection.exception)) {
+        return connection.exception;
       }
       return this._exception;
     },
     isLoading(): boolean {
-      return connections.isLoading() || this._loading;
+      return connection.isLoading() || this._loading;
     },
     isLoaded(): boolean {
-      return connections.isLoaded() && dataViewerTableService.get(this.tab.handlerState.tableId || '') !== undefined;
+      return connection.isLoaded() && dataViewerTableService.get(this.tab.handlerState.tableId || '') !== undefined;
     },
     async reload() {
-      if (isContainsException(connections.exception)) {
-        connections.reload?.();
+      if (isContainsException(connection.exception)) {
+        connection.reload?.();
       }
       this.init();
     },

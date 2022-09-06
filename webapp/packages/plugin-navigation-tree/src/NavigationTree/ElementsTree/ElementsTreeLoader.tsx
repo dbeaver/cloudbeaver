@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { ILoadableState, Loader } from '@cloudbeaver/core-blocks';
+import { ILoadableState, Loader, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { Translate } from '@cloudbeaver/core-localization';
 
 import type { IElementsTreeContext } from './ElementsTreeContext';
 
@@ -58,6 +59,12 @@ export const ElementsTreeLoader = observer<React.PropsWithChildren<Props>>(funct
         <center>
           <Loader />
         </center>
+      );
+    } else if (context.tree.filtering) {
+      return styled(TREE_NODE_STYLES)(
+        <TreeNodeNestedMessage>
+          <Translate token='app_navigationTree_node_no_results' filter={context.tree.filter} />
+        </TreeNodeNestedMessage>
       );
     } else if (context.folderExplorer.root === context.folderExplorer.state.folder) {
       return <>{Placeholder && <Placeholder />}</>;
