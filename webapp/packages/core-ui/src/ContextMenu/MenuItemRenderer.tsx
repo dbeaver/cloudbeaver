@@ -13,7 +13,7 @@ import styled, { use } from 'reshadow';
 
 import { MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
 import { ComponentStyle, joinStyles, useStyles } from '@cloudbeaver/core-theming';
-import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem } from '@cloudbeaver/core-view';
+import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem } from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';
 import { SubMenuElement } from './SubMenuElement';
@@ -40,6 +40,20 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       onItemClose?.();
     }
   }, [item, onItemClose]);
+
+  if (item instanceof MenuCustomItem) {
+    const CustomMenuItem = item.getComponent();
+
+    return styled(styles)(
+      <CustomMenuItem
+        item={item}
+        menu={menu}
+        menuData={menuData}
+        style={style}
+        onClick={onClick}
+      />
+    );
+  }
 
   if (item instanceof MenuSubMenuItem) {
     return styled(styles)(
@@ -70,6 +84,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       <MenuActionElement
         item={item}
         menu={menu}
+        menuData={menuData}
         style={style}
         onClick={onClick}
       />

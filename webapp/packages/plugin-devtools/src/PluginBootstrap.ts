@@ -7,7 +7,7 @@
  */
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
-import { App, Bootstrap, DIService, injectable } from '@cloudbeaver/core-di';
+import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
 import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedResource } from '@cloudbeaver/core-sdk';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -16,6 +16,8 @@ import { MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
+import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH';
+import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem';
 import { DevToolsService } from './DevToolsService';
 import { MENU_DEVTOOLS } from './menu/MENU_DEVTOOLS';
 import { MENU_PLUGIN } from './menu/MENU_PLUGIN';
@@ -95,10 +97,25 @@ export class PluginBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_DEVTOOLS,
-      getItems: (context, items) => [
-        MENU_PLUGINS,
-        ...items,
-      ],
+      getItems: (context, items) => {
+        const search = context.tryGet(DATA_CONTEXT_MENU_SEARCH);
+
+        if (search) {
+
+          return [
+            new SearchResourceMenuItem(),
+            ...this.getResources(this.app
+              .getServices()
+              .filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+          ];
+        }
+
+        return [
+          new SearchResourceMenuItem(),
+          MENU_PLUGINS,
+          ...items,
+        ];
+      },
     });
 
     this.menuService.addCreator({
@@ -152,11 +169,7 @@ export class PluginBootstrap extends Bootstrap {
         }
 
         return [
-          ...plugin.providers
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .filter(service => service.prototype instanceof CachedResource)
-            .map(resource => new ResourceSubMenuItem(resource)),
+          ...this.getResources(plugin.providers),
           ...items,
         ];
       },
@@ -193,5 +206,12 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   load(): void | Promise<void> {
+  }
+
+  private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
+    return providers
+      .filter(service => service.prototype instanceof CachedResource)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(resource => new ResourceSubMenuItem(resource));
   }
 }
