@@ -98,7 +98,10 @@ export abstract class CachedResource<
       this.spy(this.onDataError, 'onDataError');
     }
 
-    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader' | 'loadedKeys'>(this, {
+    makeObservable<
+    CachedResource<TData, TParam, TKey, TContext>,
+    'loader' | 'loadedKeys' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'
+    >(this, {
       loadedKeys: observable,
       data: observable,
       loader: action,
@@ -107,6 +110,9 @@ export abstract class CachedResource<
       markDataError: action,
       markOutdated: action,
       markUpdated: action,
+      commitIncludes: action,
+      markOutdatedSync: action,
+      resetIncludes: action,
     });
   }
 

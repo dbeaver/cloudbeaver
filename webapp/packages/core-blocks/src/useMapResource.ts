@@ -276,6 +276,7 @@ export function useMapResource<
     preloaded: computed,
     exception: observable.ref,
     loading: observable.ref,
+    resource: observable.ref,
   }, {
     exceptionObserved: false,
     resource,

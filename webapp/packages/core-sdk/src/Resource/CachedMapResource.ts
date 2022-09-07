@@ -454,6 +454,7 @@ export abstract class CachedMapResource<
     if (key === undefined) {
       key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
       this.loadedKeys = [];
+      this.resetIncludes();
     } else {
       if (this.isAlias(key)) {
         const index = this.loadedKeys.findIndex(loadedKey => this.isAliasEqual(key!, loadedKey));
