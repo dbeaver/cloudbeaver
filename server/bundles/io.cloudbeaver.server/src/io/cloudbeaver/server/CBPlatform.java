@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -268,10 +269,9 @@ public class CBPlatform extends BasePlatformImpl {
         return folder.toFile();
     }
 
-    @NotNull
     @Override
-    public File getConfigurationFile(String fileName) {
-        return WebPlatformActivator.getConfigurationFile(fileName);
+    protected Plugin getProductPlugin() {
+        return WebPlatformActivator.getInstance();
     }
 
     @Override
