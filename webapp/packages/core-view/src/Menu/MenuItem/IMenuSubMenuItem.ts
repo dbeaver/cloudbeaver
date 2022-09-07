@@ -15,5 +15,8 @@ export interface IMenuSubMenuEvents extends IMenuItemEvents {
 
 export interface IMenuSubMenuItem extends IMenuItem {
   menu: IMenu;
+  label?: string;
+  icon?: string;
+  tooltip?: string;
   events?: IMenuSubMenuEvents;
 }

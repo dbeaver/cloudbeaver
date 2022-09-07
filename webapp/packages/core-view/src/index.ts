@@ -42,6 +42,7 @@ export * from './Menu/createMenu';
 export * from './Menu/DATA_CONTEXT_MENU_LOCAL';
 export * from './Menu/DATA_CONTEXT_MENU_NESTED';
 export * from './Menu/DATA_CONTEXT_MENU';
+export * from './Menu/DATA_CONTEXT_SUBMENU_ITEM';
 export * from './Menu/IMenu';
 export * from './Menu/menuExtractActions';
 export * from './Menu/MenuService';

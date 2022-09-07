@@ -26,6 +26,7 @@ export interface IMenuPanelProps {
   getHasBindings?: () => boolean;
   children: React.ReactNode | (() => React.ReactNode);
   rtl?: boolean;
+  submenu?: boolean;
   style?: ComponentStyle;
   className?: string;
 }

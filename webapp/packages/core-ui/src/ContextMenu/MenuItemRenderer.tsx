@@ -23,13 +23,14 @@ export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<
   item: IMenuItem;
   menuData: IMenuData;
   menu: MenuStateReturn; // from reakit useMenuState
+  modal?: boolean;
   rtl?: boolean;
   onItemClose?: () => void;
   style?: ComponentStyle;
 }
 
 export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({
-  item, rtl, menuData, menu, onItemClose, style,
+  item, modal, rtl, menuData, menu, onItemClose, style,
 }) {
   const styles = useStyles(menuPanelStyles, style);
   const onClick = useCallback(() => {
@@ -44,17 +45,18 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     return styled(styles)(
       <MenuItem
         {...menu}
+        {...{ as: SubMenuElement }}
         {...use({ hidden: item.hidden })}
         id={item.id}
         aria-label={item.menu.label}
         itemRenderer={MenuItemRenderer}
-        rtl={rtl}
+        menuRtl={rtl}
         menuData={menuData}
+        menuModal={modal}
         subMenu={item}
         style={style}
         onItemClose={onItemClose}
         onClick={onClick}
-        {...{ as: SubMenuElement }}
       />
     );
   }

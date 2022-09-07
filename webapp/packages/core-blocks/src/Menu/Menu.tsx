@@ -25,6 +25,7 @@ interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
+  submenu?: boolean;
   modal?: boolean;
   visible?: boolean;
   rtl?: boolean;
@@ -48,6 +49,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   getHasBindings,
   onVisibleSwitch,
   modal,
+  submenu,
   rtl,
   ...props
 }, ref) {
@@ -64,11 +66,17 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
     propsRef.onVisibleSwitch?.(menu.visible);
   }, [menu.visible]);
 
+  let menuVisible = menu.visible;
+
+  if (panelAvailable === false) {
+    menuVisible = false;
+  }
+
 
   if (React.isValidElement(children) && disclosure) {
     return styled(styles)(
       <MenuStateContext.Provider value={menu}>
-        <MenuButton ref={ref} {...menu} {...props} {...children.props}>
+        <MenuButton ref={ref} {...menu} visible={menuVisible} {...props} {...children.props}>
           {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
         </MenuButton>
         <MenuPanel
@@ -76,6 +84,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
           menu={menu}
           style={style}
           rtl={rtl}
+          submenu={submenu}
           panelAvailable={panelAvailable}
           hasBindings={hasBindings}
           getHasBindings={getHasBindings}
@@ -88,7 +97,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
 
   return styled(styles)(
     <MenuStateContext.Provider value={menu}>
-      <MenuButton ref={ref} {...menu} {...props}>
+      <MenuButton ref={ref} {...menu} visible={menuVisible} {...props}>
         <box>{children}</box>
       </MenuButton>
       <MenuPanel
@@ -96,6 +105,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
         menu={menu}
         style={style}
         rtl={rtl}
+        submenu={submenu}
         panelAvailable={panelAvailable}
         hasBindings={hasBindings}
         getHasBindings={getHasBindings}
