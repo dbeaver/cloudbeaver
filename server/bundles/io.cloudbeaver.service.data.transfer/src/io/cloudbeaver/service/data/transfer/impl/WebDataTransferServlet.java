@@ -14,10 +14,10 @@ import org.jkiss.utils.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class WebDataTransferServlet extends WebServiceServletBase {
 
@@ -56,13 +56,13 @@ public class WebDataTransferServlet extends WebServiceServletBase {
             fileName = taskInfo.getDataFileId();
         }
 
-        File dataFile = taskInfo.getDataFile();
+        Path dataFile = taskInfo.getDataFile();
         session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", processor.getContentType());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        response.setHeader("Content-Length", String.valueOf(dataFile.length()));
+        response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
 
-        try (InputStream is = new FileInputStream(dataFile)) {
+        try (InputStream is = Files.newInputStream(dataFile)) {
             IOUtils.copyStream(is, response.getOutputStream());
         }
 

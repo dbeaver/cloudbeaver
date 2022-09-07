@@ -245,7 +245,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    public File getTempFolder(DBRProgressMonitor monitor, String name) {
+    public Path getTempFolder(DBRProgressMonitor monitor, String name) {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
@@ -266,7 +266,7 @@ public class CBPlatform extends BasePlatformImpl {
                 log.error("Error creating temp folder '" + folder.toAbsolutePath() + "'", e);
             }
         }
-        return folder.toFile();
+        return folder;
     }
 
     @Override
