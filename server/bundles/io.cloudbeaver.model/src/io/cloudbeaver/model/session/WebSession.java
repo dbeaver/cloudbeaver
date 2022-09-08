@@ -957,8 +957,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
-        userContext.refresh(smAuthInfo);
-        refreshUserData();
+        boolean contextChanged = userContext.refresh(smAuthInfo);
+        if (contextChanged) {
+            refreshUserData();
+        }
     }
 
     @Override
