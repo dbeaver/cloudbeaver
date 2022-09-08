@@ -80,6 +80,7 @@ export class NotificationService {
       isSilent: !!options.isSilent,
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
+      autoClose: options.autoClose,
       persistent: options.persistent,
       state: observable({ deleteDelay: 0 }),
       timestamp: options.timestamp || Date.now(),
