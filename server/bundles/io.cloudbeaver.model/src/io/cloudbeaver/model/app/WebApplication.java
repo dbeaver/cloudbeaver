@@ -70,4 +70,8 @@ public interface WebApplication extends DBPApplication {
     default String getRootURI() {
         return "";
     }
+
+    String getApplicationInstanceId() throws DBException;
+
+    int getServerPort();
 }

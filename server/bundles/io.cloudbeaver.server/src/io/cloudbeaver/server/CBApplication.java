@@ -707,7 +707,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         shutdown();
     }
 
-    private void shutdown() {
+    protected void shutdown() {
         try {
             if (securityController instanceof CBEmbeddedSecurityController) {
                 ((CBEmbeddedSecurityController) securityController).shutdown();
@@ -792,7 +792,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         configurationMode = CommonUtils.isEmpty(serverName);
     }
 
-    private Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
+    protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
         return readConfiguration(runtimeConfigFile);
     }

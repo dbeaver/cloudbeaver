@@ -39,7 +39,11 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.jkiss.utils.CommonUtils;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -170,4 +174,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     protected abstract void startServer() throws DBException;
+
+    @Override
+    public String getApplicationInstanceId() throws DBException {
+        try {
+            byte[] macAddress = RuntimeUtils.getLocalMacAddress();
+            return GeneralUtils.getProductName() + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
+        } catch (Exception e) {
+            throw new DBException("Error during generation instance id generation", e);
+        }
+    }
 }
