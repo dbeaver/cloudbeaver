@@ -204,7 +204,7 @@ export class PluginBootstrap extends Bootstrap {
         this.notificationService.logInfo({
           title: 'sql_editor_upload_script_max_size_title',
           message: `Max size: ${maxSize}KB\nFile size: ${size}KB`,
-          persistent: true,
+          autoClose: false,
         });
 
         return;
