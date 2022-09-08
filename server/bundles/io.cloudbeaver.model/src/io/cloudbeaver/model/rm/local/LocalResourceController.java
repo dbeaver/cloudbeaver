@@ -149,7 +149,7 @@ public class LocalResourceController implements RMController {
 
     private List<RMProject> readAccessibleSharedProjects(@NotNull String userId) throws DBException {
         if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
-            return Arrays.asList(listAllSharedProjects());
+            return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
         }
         var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
             userId,
