@@ -366,7 +366,7 @@ export abstract class CachedResource<
             break transform;
           }
         } else {
-          if (this.includes(alias.param, param)) {
+          if (alias.param === param) {
             param = alias.getAlias(param);
             deep++;
             // eslint-disable-next-line no-labels
@@ -412,7 +412,7 @@ export abstract class CachedResource<
 
   protected resetIncludes(): void {
     for (const metadata of this.metadata.values()) {
-      metadata.includes = [...this.defaultIncludes];
+      metadata.includes = observable([...this.defaultIncludes]);
     }
   }
 
@@ -447,12 +447,16 @@ export abstract class CachedResource<
   }
 
   isAliasEqual(param: TParam, second: TParam): boolean {
+    if (param === second) {
+      return true;
+    }
+
     return this.paramAliases.some(alias => {
       if ('getter' in alias && alias.getter) {
         return alias.param(param) && alias.param(second);
-      } else {
-        return alias.param === param && alias.param === second;
       }
+
+      return false;
     });
   }
 
@@ -461,12 +465,8 @@ export abstract class CachedResource<
   }
 
   protected includes(param: TParam, second: TParam): boolean {
-    if (param === second) {
+    if (this.isAliasEqual(param, second)) {
       return true;
-    }
-
-    if (this.isAlias(param) || this.isAlias(second)) {
-      return this.isAliasEqual(param, second);
     }
 
     param = this.transformParam(param);

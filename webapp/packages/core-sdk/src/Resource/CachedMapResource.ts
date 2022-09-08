@@ -366,24 +366,20 @@ export abstract class CachedMapResource<
   }
 
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
-    if (param === key) {
+    if
+    (
+      this.isAliasEqual(param, key)
+      || (ResourceKeyUtils.isEmpty(param) && ResourceKeyUtils.isEmpty(key))
+    ) {
       return true;
     }
 
     if (this.isAlias(param) || this.isAlias(key)) {
-      return this.isAliasEqual(param, key);
-    }
-
-    if (ResourceKeyUtils.isEmpty(param) || ResourceKeyUtils.isEmpty(key)) {
-      return ResourceKeyUtils.isEmpty(param) && ResourceKeyUtils.isEmpty(key);
+      return true;
     }
 
     param = ResourceKeyUtils.mapKey(param, this.getKeyRef.bind(this));
     key = ResourceKeyUtils.mapKey(key, this.getKeyRef.bind(this));
-
-    if (param === key) {
-      return true;
-    }
 
     return ResourceKeyUtils.includes(param, key, this.isKeyEqual);
   }
@@ -467,10 +463,10 @@ export abstract class CachedMapResource<
       key = this.transformParam(key);
     }
 
-    runInAction(() => ResourceKeyUtils.forEach(key!, key => {
+    ResourceKeyUtils.forEach(key, key => {
       const metadata = this.getMetadata(key);
       metadata.outdated = true;
-    }));
+    });
 
     this.onDataOutdated.execute(key);
   }
