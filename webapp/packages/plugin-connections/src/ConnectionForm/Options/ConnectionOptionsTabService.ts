@@ -237,9 +237,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     tempConfig.description = state.config.description;
 
-    if (state.projectId === PROJECT_GLOBAL_ID) {
-      tempConfig.template = state.config.template;
-    }
+    tempConfig.template = state.projectId === PROJECT_GLOBAL_ID ? state.config.template : false;
 
     tempConfig.driverId = state.config.driverId;
 
