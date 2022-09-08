@@ -44,6 +44,24 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    @Override
+    public RMProject[] listSharedProjects(@NotNull WebSession webSession) throws DBWebException {
+        try {
+            return getResourceController(webSession).listAllSharedProjects();
+        } catch (DBException e) {
+            throw new DBWebException("Error reading list of accessible projects", e);
+        }
+    }
+
+    @Override
+    public RMProject getProject(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+        try {
+            return getResourceController(webSession).getProject(projectId, false, false);
+        } catch (DBException e) {
+            throw new DBWebException("Error reading list of accessible projects", e);
+        }
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(WebSession webSession, @NotNull String projectId, @Nullable String folder, @Nullable String nameMask, boolean readProperties, boolean readHistory) throws DBException {
@@ -106,13 +124,11 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
-    public WebProjectInfo createProject(
+    public RMProject createProject(
         @NotNull WebSession session, @NotNull String name, @Nullable String description
     ) throws DBWebException {
         try {
-            RMProject rmProject = getResourceController(session).createProject(name, description);
-            var project = session.createVirtualProject(rmProject);
-            return new WebProjectInfo(session, project);
+            return getResourceController(session).createProject(name, description);
         } catch (DBException e) {
             throw new DBWebException("Error creating project", e);
         }

@@ -35,6 +35,12 @@ public interface DBWServiceRM extends DBWService {
     @WebAction
     RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException;
 
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    RMProject[] listSharedProjects(@NotNull WebSession webSession) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    RMProject getProject(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException;
+
     @NotNull
     @WebProjectAction(
         requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_VIEW
@@ -84,7 +90,7 @@ public interface DBWServiceRM extends DBWService {
         boolean forceOverwrite) throws DBException;
 
     @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
-    WebProjectInfo createProject(
+    RMProject createProject(
         @NotNull WebSession session,
         @NotNull String name,
         @Nullable String description) throws DBWebException;

@@ -123,20 +123,7 @@ public class LocalResourceController implements RMController {
         //TODO refactor after implement current user api in sm
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
         if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
-            var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
-                activeUserCreds.getUserId(),
-                SMObjects.PROJECT
-            );
-
-            projects = accessibleSharedProjects
-                .stream()
-                .map(projectPermission -> makeProjectFromPath(
-                    sharedProjectsPath.resolve(projectPermission.getObjectId()),
-                    projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
-                    RMProject.Type.SHARED, true)
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            projects = readAccessibleSharedProjects(activeUserCreds.getUserId());
         } else {
             projects = new ArrayList<>();
         }
@@ -158,6 +145,26 @@ public class LocalResourceController implements RMController {
             projects.add(0, userProject);
         }
         return projects.toArray(new RMProject[0]);
+    }
+
+    private List<RMProject> readAccessibleSharedProjects(@NotNull String userId) throws DBException {
+        if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
+            return Arrays.asList(listAllSharedProjects());
+        }
+        var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
+            userId,
+            SMObjects.PROJECT
+        );
+
+        return accessibleSharedProjects
+            .stream()
+            .map(projectPermission -> makeProjectFromPath(
+                sharedProjectsPath.resolve(projectPermission.getObjectId()),
+                projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
+                RMProject.Type.SHARED, true)
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProject.Type projectType) throws DBException {
