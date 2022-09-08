@@ -63,9 +63,9 @@ export class LogViewerService {
 
   toggle(): void {
     if (this.isActive) {
-      this.stopLog();
+      this.settings.active = false;
     } else {
-      this.startLog();
+      this.settings.active = true;
     }
   }
 
@@ -74,14 +74,14 @@ export class LogViewerService {
   }
 
   async startLog(): Promise<void> {
-    if (this.isActive) {
+    if (this.timeoutTaskId !== null) {
       return;
     }
+
     if (!this.isLogViewerAvailable()) {
       throw new Error('Access denied');
     }
     this.failedRequestsCount = 0;
-    this.settings.active = true;
 
     const refreshInterval = this.logViewerSettingsService.settings.isValueDefault('refreshTimeout')
       ? this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout')
@@ -100,7 +100,6 @@ export class LogViewerService {
       clearTimeout(this.timeoutTaskId);
       this.timeoutTaskId = null;
     }
-    this.settings.active = false;
   }
 
   clearLog(): void {
