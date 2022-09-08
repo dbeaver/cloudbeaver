@@ -19,6 +19,7 @@ export default [
   ['app_navigationTree_node_rename_error', 'Ошибка переименования ноды'],
 
   ['app_navigationTree_node_empty', 'Пусто'],
+  ['app_navigationTree_node_no_results', "Извините, не удалось найти элементы содержащие '{args.filter}'"],
   ['app_navigationTree_node_not_found', 'Элемент не найден'],
   ['app_navigationTree_connection_view', 'Отображение'],
   ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],

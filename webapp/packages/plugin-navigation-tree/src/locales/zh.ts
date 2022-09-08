@@ -15,6 +15,7 @@ export default [
   ['app_navigationTree_node_delete_error', 'Failed to delete "{args.name}'],
   ['app_navigationTree_node_rename_error', 'Error occurred while renaming'],
   ['app_navigationTree_node_empty', 'Empty'],
+  ['app_navigationTree_node_no_results', "We're sorry. There no matching results for '{args.filter}'"],
   ['app_navigationTree_openNodeTab', '打开'],
   ['app_navigationTree_connection_view', '连接视图'],
   ['app_navigationTree_node_not_found', 'Node not found'],

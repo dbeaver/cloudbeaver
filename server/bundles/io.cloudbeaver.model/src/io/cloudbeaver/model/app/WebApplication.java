@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;
@@ -27,7 +27,6 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
-import io.cloudbeaver.VirtualProjectImpl;
 
 import java.nio.file.Path;
 
@@ -40,6 +39,8 @@ public interface WebApplication extends DBPApplication {
     WebAppConfiguration getAppConfiguration();
 
     Path getDataDirectory(boolean create);
+
+    Path getWorkspaceDirectory();
 
     Path getHomeDirectory();
 

@@ -100,11 +100,6 @@ public class WebServiceUtils extends WebCommonUtils {
         return session.getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
     }
 
-    @NotNull
-    public static DBNModel getGlobalNavigatorModel() throws DBWebException {
-        return DBWorkbench.getPlatform().getNavigatorModel();
-    }
-
     public static InputStream openStaticResource(String path) {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
