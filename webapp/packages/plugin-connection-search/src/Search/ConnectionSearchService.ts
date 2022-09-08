@@ -51,17 +51,17 @@ export class ConnectionSearchService {
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
+    this.databases = [];
+    this.search = this.search.bind(this);
+    this.change = this.change.bind(this);
+    this.select = this.select.bind(this);
+
     makeObservable(this, {
       hosts: observable,
       databases: observable,
       disabled: observable,
       formState: observable.shallow,
     });
-
-    this.databases = [];
-    this.search = this.search.bind(this);
-    this.change = this.change.bind(this);
-    this.select = this.select.bind(this);
   }
 
   open(): void {
@@ -74,7 +74,7 @@ export class ConnectionSearchService {
   }
 
   async load(): Promise<void> {
-    if (this.administrationScreenService.isConfigurationMode && this.databases.length === 0) {
+    if (this.databases.length === 0) {
       await this.search();
     }
   }
