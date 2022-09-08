@@ -406,7 +406,7 @@ export abstract class CachedResource<
 
   protected resetIncludes(): void {
     for (const metadata of this.metadata.values()) {
-      metadata.includes = [...this.defaultIncludes];
+      metadata.includes = observable([...this.defaultIncludes]);
     }
   }
 
