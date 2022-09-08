@@ -7,6 +7,7 @@
  */
 
 interface Props {
+  big?: boolean;
   className?: string;
 }
 

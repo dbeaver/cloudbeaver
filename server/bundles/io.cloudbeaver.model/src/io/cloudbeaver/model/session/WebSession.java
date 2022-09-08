@@ -58,7 +58,6 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -184,10 +183,6 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     public SMSessionContext getSessionContext() {
         return defaultProject.getSessionContext();
-    }
-
-    public SMSessionContext getSessionAuthContext() {
-        return sessionAuthContext;
     }
 
     @Property
@@ -359,7 +354,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
-            getSessionAuthContext(),
+            sessionAuthContext,
             this,
             filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();

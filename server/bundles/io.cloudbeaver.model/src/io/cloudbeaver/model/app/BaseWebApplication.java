@@ -17,8 +17,10 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.server.WebWorkspace;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -35,8 +37,6 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
-import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
-import io.cloudbeaver.VirtualProjectImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
@@ -60,7 +60,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
-        return new EclipseWorkspaceImpl(platform, eclipseWorkspace);
+        return new WebWorkspace(platform, eclipseWorkspace);
     }
 
     @Nullable

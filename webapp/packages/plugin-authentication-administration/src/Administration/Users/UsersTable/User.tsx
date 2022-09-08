@@ -9,11 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import type { AdminUser } from '@cloudbeaver/core-authentication';
+import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UsersAdministrationService } from '../UsersAdministrationService';
@@ -36,6 +38,20 @@ interface Props {
 export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
   const roles = user.grantedRoles.join(', ');
+  const usersService = useService(UsersResource);
+  const notificationService = useService(NotificationService);
+  const translate = useTranslate();
+
+  async function handleEnabledCheckboxChange(enabled: boolean) {
+    try {
+      await usersService.enableUser(user.userId, enabled);
+    } catch (error: any) {
+      notificationService.logException(error);
+    }
+  }
+
+  const enabledCheckboxTitle = usersService.isActiveUser(user.userId)
+    ? translate('administration_roles_role_granted_users_permission_denied') : undefined;
 
   return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
@@ -50,7 +66,12 @@ export const User = observer<Props>(function User({ user, selectable }) {
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
       <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
       <TableColumnValue>
-        <Checkbox checked={user.enabled} disabled />
+        <Checkbox
+          checked={user.enabled}
+          disabled={usersService.isActiveUser(user.userId)}
+          title={enabledCheckboxTitle}
+          onChange={handleEnabledCheckboxChange}
+        />
       </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />

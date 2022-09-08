@@ -128,6 +128,16 @@ export const TREE_NODE_STYLES = css`
     TreeNodeNestedMessage {
       composes: theme-typography--caption from global;
       padding: 4px 12px;
+
+      [big] {
+        padding: 4px 24px;
+      }
+    }
+
+    tree-box[|big] {
+      & TreeNodeNestedMessage {
+        padding: 4px 24px;
+      }
     }
 
     node TreeNodeControl[big] {
