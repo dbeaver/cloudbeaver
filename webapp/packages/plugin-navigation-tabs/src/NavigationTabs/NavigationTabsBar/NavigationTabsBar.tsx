@@ -11,7 +11,7 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Button, TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
