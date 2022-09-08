@@ -10,10 +10,9 @@ import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
-import { SearchDatabase } from './Search/SearchDatabase';
+import { ConnectionSearchService } from './Search/ConnectionSearchService';
 
 @injectable()
 export class SearchConnectionPluginBootstrap extends Bootstrap {
@@ -21,8 +20,8 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     private readonly mainMenuService: MainMenuService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly projectsService: ProjectsService,
-    private readonly optionsPanelService: OptionsPanelService,
     private readonly permissionsService: PermissionsService,
+    private readonly connectionSearchService: ConnectionSearchService,
   ) {
     super();
   }
@@ -42,7 +41,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
         || !this.permissionsService.has(EAdminPermission.admin)
       ),
       onClick: () => {
-        this.optionsPanelService.open(() => SearchDatabase);
+        this.connectionSearchService.open();
       },
     });
   }
