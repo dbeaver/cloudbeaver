@@ -456,6 +456,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return dataDir.toPath();
     }
 
+    @Override
+    public Path getWorkspaceDirectory() {
+        return Path.of(workspaceLocation);
+    }
+
     private void initializeSecurityController() throws DBException {
         securityController = createGlobalSecurityController();
     }

@@ -28,9 +28,9 @@ import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.List;
 
 public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
-    public static final File DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
+    public static final Path DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
 
     private final String tableName;
     private final DBSDataContainer dataContainer;
@@ -51,8 +51,12 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         this.tableName = tableName;
         this.dataContainer = dataContainer;
         this.rowIndex = rowIndex;
-        if (!DATA_EXPORT_FOLDER.exists()){
-            DATA_EXPORT_FOLDER.mkdirs();
+        if (!Files.exists(DATA_EXPORT_FOLDER)){
+            try {
+                Files.createDirectories(DATA_EXPORT_FOLDER);
+            } catch (IOException e) {
+                log.error("Error creating temp folder", e);
+            }
         }
 
     }
@@ -81,8 +85,8 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
             throw new DBQuotaException(
                     "Data export quota exceeded", CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length);
         }
-        File file = new File(DATA_EXPORT_FOLDER, exportFileName);
-        Files.write(file.toPath(), binaryValue);
+        Path file = DATA_EXPORT_FOLDER.resolve(exportFileName);
+        Files.write(file, binaryValue);
         return exportFileName;
     }
 
