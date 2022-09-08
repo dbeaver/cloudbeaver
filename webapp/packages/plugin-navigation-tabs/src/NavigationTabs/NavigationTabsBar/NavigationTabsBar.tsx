@@ -11,7 +11,7 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
+import { Button, TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -73,7 +73,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }, []);
 
   if (navigation.tabIdList.length === 0) {
-    return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
+    return (
+      <TextPlaceholder>
+        {translate('app_shared_navigationTabsBar_placeholder')}
+      </TextPlaceholder>
+    );
   }
 
   return styled(style)(
