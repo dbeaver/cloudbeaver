@@ -296,7 +296,7 @@ public class CBPlatform extends BasePlatformImpl {
                     boolean hasAllFiles = true;
                     for (DBPDriverLibrary lib : libraries) {
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !lib.getLocalFile().exists())) {
+                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile()))) {
                             hasAllFiles = false;
                             log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
                             break;
