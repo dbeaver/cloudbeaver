@@ -65,7 +65,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @param smAuthInfo - auth info from security manager
      * @throws DBException - if user already authorized and new token come from another user
      */
-    public synchronized void refresh(SMAuthInfo smAuthInfo) throws DBException {
+    public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
         if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS) {
             throw new DBCException("Authorization did not complete successfully");
         }
@@ -92,7 +92,7 @@ public class WebUserContext implements SMCredentialsProvider {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
             setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getUserById(authPermissions.getUserId())));
         }
-
+        return isSessionChanged;
     }
 
     public synchronized void refreshSMSession() throws DBException {
