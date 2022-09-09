@@ -2,27 +2,29 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import org.jkiss.dbeaver.Log;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class WebDataTransferTaskConfig {
 
     private static final Log log = Log.getLog(WebDataTransferTaskConfig.class);
 
-    private File dataFile;
+    private Path dataFile;
     private WebDataTransferParameters parameters;
     private String exportFileName;
 
-    public WebDataTransferTaskConfig(File dataFile, WebDataTransferParameters parameters) {
+    public WebDataTransferTaskConfig(Path dataFile, WebDataTransferParameters parameters) {
         this.dataFile = dataFile;
         this.parameters = parameters;
     }
 
-    public File getDataFile() {
+    public Path getDataFile() {
         return dataFile;
     }
 
     public String getDataFileId() {
-        return dataFile.getName();
+        return dataFile.getFileName().toString();
     }
 
     public WebDataTransferParameters getParameters() {
@@ -38,8 +40,10 @@ public class WebDataTransferTaskConfig {
     }
 
     public void deleteFile() {
-        if (!dataFile.delete()) {
-            log.error("Error deleting export file " + dataFile.getAbsolutePath());
+        try {
+            Files.delete(dataFile);
+        } catch (IOException e) {
+            log.error("Error deleting export file " + dataFile.toAbsolutePath(), e);
         }
     }
 }

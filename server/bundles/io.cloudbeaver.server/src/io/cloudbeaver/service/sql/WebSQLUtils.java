@@ -39,9 +39,9 @@ import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -211,7 +211,7 @@ public class WebSQLUtils {
                     case WebSQLConstants.VALUE_TYPE_CONTENT: {
                         if (map.get(WebSQLConstants.ATTR_BINARY) != null) {
                             DBDContentStorage storage;
-                            File openFile = new File(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER, (String) map.get("fileName"));
+                            Path openFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve((String) map.get("fileName"));
                             Object tempValue = ((DBDAttributeBinding) attribute).getValueHandler().getValueFromObject(
                                     session,
                                     attribute,

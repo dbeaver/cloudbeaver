@@ -203,7 +203,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       }
 
       const query = this.value;
-      const script = this.getExecutingQuery(true);
+      const script = this.getExecutingQuery(false);
 
       if (!script) {
         return;

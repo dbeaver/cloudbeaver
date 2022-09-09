@@ -51,9 +51,10 @@ import org.jkiss.dbeaver.tools.transfer.stream.StreamTransferConsumer;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,19 +67,17 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     private static final Log log = Log.getLog(WebServiceDataTransfer.class);
 
-    private final File dataExportFolder;
+    private final Path dataExportFolder;
 
     public WebServiceDataTransfer() {
         dataExportFolder = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "data-transfer");
 
         ContentUtils.deleteFileRecursive(dataExportFolder);
-        if (!dataExportFolder.mkdirs()) {
-            log.error("Error re-creating temporary folder");
+        try {
+            Files.createDirectories(dataExportFolder);
+        } catch (IOException e) {
+            log.error("Error re-creating temporary folder", e);
         }
-    }
-
-    public File getDataExportFolder() {
-        return dataExportFolder;
     }
 
     @Override
@@ -130,10 +129,12 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         if (taskInfo == null) {
             throw new DBWebException("Session task '" + dataFileId + "' not found");
         }
-        File dataFile = taskInfo.getDataFile();
+        Path dataFile = taskInfo.getDataFile();
         if (dataFile != null) {
-            if (!dataFile.delete()) {
-                log.warn("Error deleting data file '" + dataFile.getAbsolutePath() + "'");
+            try {
+                Files.delete(dataFile);
+            } catch (IOException e) {
+                log.warn("Error deleting data file '" + dataFile.toAbsolutePath() + "'", e);
             }
         }
         dtConfig.removeTask(taskInfo);
@@ -151,13 +152,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 monitor.beginTask("Export data", 1);
                 try {
                     monitor.subTask("Export data using " + processor.getName());
-                    File exportFile = new File(dataExportFolder, makeUniqueFileName(sqlProcessor, processor));
+                    Path exportFile = dataExportFolder.resolve(makeUniqueFileName(sqlProcessor, processor));
                     try {
                         exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
                     } catch (Exception e) {
-                        if (exportFile.exists()) {
-                            if (!exportFile.delete()) {
-                                log.error("Error deleting export file " + exportFile.getAbsolutePath());
+                        if (Files.exists(exportFile)) {
+                            try {
+                                Files.delete(exportFile);
+                            } catch (IOException ex) {
+                                log.error("Error deleting export file " + exportFile.toAbsolutePath(), e);
                             }
                         }
                         if (e instanceof DBException) {
@@ -170,7 +173,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     taskConfig.setExportFileName(exportFileName);
                     WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession()).addTask(taskConfig);
 
-                    result = exportFile.getName();
+                    result = exportFile.getFileName().toString();
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
                 } finally {
@@ -187,7 +190,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DBSDataContainer dataContainer,
         WebDataTransferParameters parameters,
         WebSQLResultsInfo resultsInfo,
-        File exportFile) throws DBException, IOException
+        Path exportFile) throws DBException, IOException
     {
         IDataTransferProcessor processorInstance = processor.getInstance();
         if (!(processorInstance instanceof IStreamDataExporter)) {
@@ -211,8 +214,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         StreamConsumerSettings settings = new StreamConsumerSettings();
 
         settings.setOutputEncodingBOM(false);
-        settings.setOutputFolder(exportFile.getParentFile().getAbsolutePath());
-        settings.setOutputFilePattern(exportFile.getName());
+        settings.setOutputFolder(exportFile.getParent().toAbsolutePath().toString());
+        settings.setOutputFilePattern(exportFile.getFileName().toString());
 
         Map<String, Object> properties = new HashMap<>();
 

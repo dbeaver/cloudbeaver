@@ -65,7 +65,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(
         onReject={props.rejectDialog}
       >
         <ColoredContainer>
-          <Group gap>
+          <Group gap compact box>
             {!productInfo ? (
               <TextPlaceholder>{translate('app_product_info_placeholder')}</TextPlaceholder>
             ) : (
