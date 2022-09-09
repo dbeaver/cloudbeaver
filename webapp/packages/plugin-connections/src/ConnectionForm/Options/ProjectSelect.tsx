@@ -5,20 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type React from 'react';
+import { useEffect } from 'react';
 
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { Project, ProjectsResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
-
 interface Props {
   value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
   disabled?: boolean;
+  inline?: boolean;
 }
 
 export function ProjectSelect(props: Props) {
@@ -26,6 +26,14 @@ export function ProjectSelect(props: Props) {
 
   const projectsLoader = useMapResource(ProjectSelect, ProjectsResource, CachedMapAllKey);
   const projects = projectsLoader.data as Project[];
+
+  const possibleOptions = projects.filter(project => project.canCreateConnections);
+
+  useEffect(() => {
+    if (!props.value && possibleOptions[0]) {
+      props.onChange(possibleOptions[0].id);
+    }
+  }, [projects]);
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);
@@ -35,7 +43,6 @@ export function ProjectSelect(props: Props) {
     }
   }
 
-  const possibleOptions = projects.filter(project => project.canCreateConnections);
 
   return  (
     <Combobox
@@ -50,6 +57,7 @@ export function ProjectSelect(props: Props) {
       searchable={projects.length > 10}
       disabled={props.disabled}
       loading={projectsLoader.isLoading()}
+      inline={props.inline}
       tiny
       fill
       onSelect={handleProjectSelect}
