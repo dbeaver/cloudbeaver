@@ -116,8 +116,9 @@ export const Loader = observer<Props>(function Loader({
 
         if (loading) {
           if (element.cancel) {
+            const cancelCopy = onCancel;
             onCancel = () => {
-              onCancel?.();
+              cancelCopy?.();
               element.cancel?.();
             };
           }
