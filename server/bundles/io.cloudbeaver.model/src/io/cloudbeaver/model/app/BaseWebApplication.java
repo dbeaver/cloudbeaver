@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -179,7 +180,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public String getApplicationInstanceId() throws DBException {
         try {
             byte[] macAddress = RuntimeUtils.getLocalMacAddress();
-            return GeneralUtils.getProductName() + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
+            String appId = ApplicationRegistry.getInstance().getApplication().getId();
+            return appId + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
         } catch (Exception e) {
             throw new DBException("Error during generation instance id generation", e);
         }

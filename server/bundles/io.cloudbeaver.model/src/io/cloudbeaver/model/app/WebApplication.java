@@ -73,5 +73,8 @@ public interface WebApplication extends DBPApplication {
 
     String getApplicationInstanceId() throws DBException;
 
+    /**
+     * Port this server listens on
+     */
     int getServerPort();
 }

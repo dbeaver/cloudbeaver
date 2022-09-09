@@ -129,6 +129,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
+    @Override
     public int getServerPort() {
         return serverPort;
     }
