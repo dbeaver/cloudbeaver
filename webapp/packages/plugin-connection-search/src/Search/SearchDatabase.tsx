@@ -9,7 +9,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
-import {  PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { ConnectionForm } from '@cloudbeaver/plugin-connections';
 
@@ -20,7 +19,7 @@ export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   const connectionSearchService = useService(ConnectionSearchService);
 
   function select(database: AdminConnectionSearchInfo) {
-    connectionSearchService.select(PROJECT_GLOBAL_ID, database);
+    connectionSearchService.select(database);
   }
 
   if (connectionSearchService.formState) {

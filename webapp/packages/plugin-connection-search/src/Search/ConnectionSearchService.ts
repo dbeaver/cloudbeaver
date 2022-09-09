@@ -13,6 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
@@ -36,6 +37,7 @@ export class ConnectionSearchService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly projectsService: ProjectsService,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -54,6 +56,11 @@ export class ConnectionSearchService {
 
   open(): void {
     this.optionsPanelService.open(formGetter);
+  }
+
+  close(): void {
+    this.hosts = 'localhost';
+    this.databases = [];
   }
 
   async load(): Promise<void> {
@@ -92,6 +99,7 @@ export class ConnectionSearchService {
     }
 
     this.clearFormState();
+    this.close();
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
@@ -137,7 +145,7 @@ export class ConnectionSearchService {
     this.clearFormState();
   }
 
-  select(projectId: string, database: AdminConnectionSearchInfo): void {
+  select(database: AdminConnectionSearchInfo): void {
     if (!this.formState) {
       this.formState = new ConnectionFormState(
         this.connectionFormService,
@@ -150,7 +158,7 @@ export class ConnectionSearchService {
         'create',
         'public'
       )
-      .setConfig(projectId, {
+      .setConfig(this.projectsService.activeProject?.id ?? PROJECT_GLOBAL_ID, {
         ...this.connectionInfoResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,

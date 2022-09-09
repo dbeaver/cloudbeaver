@@ -36,8 +36,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
       order: 3,
       title: 'connections_connection_create_search_database',
       isHidden: () => (
-        !this.serverConfigResource.data?.supportsCustomConnections
-        || !this.projectsService.activeProject?.canCreateConnections
+        !this.projectsService.activeProject?.canCreateConnections
         || !this.permissionsService.has(EAdminPermission.admin)
       ),
       onClick: () => {
