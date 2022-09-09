@@ -17,7 +17,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectsResource } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
@@ -47,7 +47,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly projectsResource: ProjectsResource,
+    private readonly projectsResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService
   ) {
     super();

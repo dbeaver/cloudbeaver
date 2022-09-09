@@ -10,12 +10,12 @@ import { runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, ProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
-export type Project = ProjectInfo;
+export type ProjectInfo = SchemaProjectInfo;
 
 @injectable()
-export class ProjectsResource extends CachedMapResource<string, Project> {
+export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
@@ -28,14 +28,14 @@ export class ProjectsResource extends CachedMapResource<string, Project> {
     });
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, Project>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
     const { projects } = await this.graphQLService.sdk.getProjectList();
 
     runInAction(() => {
       if (all) {
-        this.data.clear();
+        this.delete(resourceKeyList(this.keys.filter(id => !projects.some(project => project.id === id))));
       }
 
       this.set(resourceKeyList(projects.map(project => project.id)), projects);

@@ -55,6 +55,7 @@ interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> 
   loaded: boolean;
   resource: TResource;
   isOutdated: () => boolean;
+  reload: () => void;
 }
 
 interface IMapResourceListResult<

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, type AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { CustomConnection } from '../Manual/CustomConnection';
@@ -20,7 +20,7 @@ import { DatabaseList } from './DatabaseList';
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   const connectionSearchService = useService(ConnectionSearchService);
-  useMapResource(CustomConnection, ProjectsResource, CachedMapAllKey);
+  useMapResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(database: AdminConnectionSearchInfo) {
     connectionSearchService.select(PROJECT_GLOBAL_ID, database);

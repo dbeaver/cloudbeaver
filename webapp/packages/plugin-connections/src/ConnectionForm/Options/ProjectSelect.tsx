@@ -10,7 +10,7 @@ import type React from 'react';
 
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { Project, ProjectsResource } from '@cloudbeaver/core-projects';
+import { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 
@@ -24,8 +24,8 @@ interface Props {
 export function ProjectSelect(props: Props) {
   const translate = useTranslate();
 
-  const projectsLoader = useMapResource(ProjectSelect, ProjectsResource, CachedMapAllKey);
-  const projects = projectsLoader.data as Project[];
+  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey);
+  const projects = projectsLoader.data as ProjectInfo[];
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);

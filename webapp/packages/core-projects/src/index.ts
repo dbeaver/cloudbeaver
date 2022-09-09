@@ -1,4 +1,4 @@
-export * from './ProjectsResource';
+export * from './ProjectInfoResource';
 export * from './ProjectsService';
 export * from './NAV_NODE_TYPE_PROJECT';
 export * from './PROJECT_GLOBAL_ID';

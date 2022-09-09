@@ -12,12 +12,12 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
-import { Project, ProjectsResource } from './ProjectsResource';
+import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 @injectable()
 export class ProjectsService {
-  get activeProject(): Project | undefined {
-    let project: Project | undefined;
+  get activeProject(): ProjectInfo | undefined {
+    let project: ProjectInfo | undefined;
 
     if (this.activeProjectId) {
       project = this.projectsResource.get(this.activeProjectId);
@@ -41,7 +41,7 @@ export class ProjectsService {
   private activeProjectId: string | null;
 
   constructor(
-    private readonly projectsResource: ProjectsResource,
+    private readonly projectsResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource
   ) {
     this.activeProjectId = null;
@@ -51,7 +51,7 @@ export class ProjectsService {
     });
   }
 
-  setActiveProject(project: Project): void {
+  setActiveProject(project: ProjectInfo): void {
     this.activeProjectId = project.id;
   }
 
