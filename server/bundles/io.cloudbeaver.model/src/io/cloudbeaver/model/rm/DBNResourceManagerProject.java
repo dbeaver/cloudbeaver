@@ -53,7 +53,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
     @NotNull
     @Override
     public String getName() {
-        return project.getId();
+        return project.getDisplayName();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
 
     @Override
     public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getName();
+        return getParentNode().getNodeItemPath() + "/" + project.getId();
     }
 
     @Override
