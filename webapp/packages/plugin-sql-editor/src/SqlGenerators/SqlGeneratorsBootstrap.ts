@@ -58,7 +58,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
           return false;
         }
 
-        return !context.find(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS) && !context.has(DATA_CONTEXT_MENU_NESTED);
+        return !context.hasValue(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS) && !context.has(DATA_CONTEXT_MENU_NESTED);
       },
       getItems: (context, items) => [
         ...items,
