@@ -8,18 +8,17 @@
 
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { MenuItem, MenuItemCheckbox, MenuItemRadio, MenuStateReturn } from 'reakit/Menu';
+import { MenuItem, MenuItemCheckbox, MenuItemRadio } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
 import { Checkbox, MenuItemElement, menuPanelStyles, Radio } from '@cloudbeaver/core-blocks';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import type { IMenuActionItem } from '@cloudbeaver/core-view';
 
-interface IMenuActionElementProps {
+import type { IContextMenuItemProps } from './IContextMenuItemProps';
+
+interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;
-  menu: MenuStateReturn;
-  style?: ComponentStyle;
-  onClick: () => void;
 }
 
 export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({

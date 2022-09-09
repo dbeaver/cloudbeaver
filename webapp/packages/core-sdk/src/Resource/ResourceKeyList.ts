@@ -188,6 +188,10 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     key: ResourceKey<TKey>,
     isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB
   ): boolean {
+    if (param === key) {
+      return true;
+    }
+
     if (isResourceKeyList(param)) {
       return param.includes(key);
     }

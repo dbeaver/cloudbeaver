@@ -6,10 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { flat } from '@cloudbeaver/core-utils';
+
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
-import type { IServiceCollection, IServiceInjector } from './IApp';
+import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
 
@@ -22,6 +24,14 @@ export class App {
     this.plugins = plugins;
 
     this.getServiceCollection().addServiceByClass(App, this);
+  }
+
+  getPlugins(): PluginManifest[] {
+    return [...this.plugins];
+  }
+
+  getServices(): IServiceConstructor<any>[] {
+    return flat(this.plugins.map(plugin => plugin.providers));
   }
 
   registerChildContainer(container: DIContainer): void {
@@ -42,41 +52,33 @@ export class App {
 
   // first phase register all dependencies
   registerServices(): void {
-    for (const plugin of this.plugins) {
-      if (plugin.providers.length) {
-        plugin.providers.forEach(provider => {
-          // console.log('provider', provider.name);
-          this.diWrapper.collection.addServiceByClass(provider);
-        });
-      }
+    for (const service of this.getServices()) {
+      // console.log('provider', provider.name);
+      this.diWrapper.collection.addServiceByClass(service);
     }
   }
 
   async initializeServices(): Promise<void> {
-    for (const plugin of this.plugins) {
-      for (const service of plugin.providers) {
-        if (service.prototype instanceof Bootstrap) {
-          const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+    for (const service of this.getServices()) {
+      if (service.prototype instanceof Bootstrap) {
+        const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
-          if ('register' in serviceInstance) {
-            await serviceInstance.register();
-          }
-        } else if (service.prototype instanceof Dependency) {
-          this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+        if ('register' in serviceInstance) {
+          await serviceInstance.register();
         }
+      } else if (service.prototype instanceof Dependency) {
+        this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
       }
     }
   }
 
   async loadServices(): Promise<void> {
-    for (const plugin of this.plugins) {
-      for (const service of plugin.providers) {
-        if (service.prototype instanceof Bootstrap) {
-          const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+    for (const service of this.getServices()) {
+      if (service.prototype instanceof Bootstrap) {
+        const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
-          if ('load' in serviceInstance) {
-            await serviceInstance.load();
-          }
+        if ('load' in serviceInstance) {
+          await serviceInstance.load();
         }
       }
     }
