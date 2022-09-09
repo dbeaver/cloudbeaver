@@ -67,7 +67,7 @@ extend type Mutation {
     rmCreateProject(
         projectId: ID,
         projectName: String!,
-        description: String): ProjectInfo!
+        description: String): RMProject!
 
     rmDeleteProject(projectId: ID!): Boolean!
 }
