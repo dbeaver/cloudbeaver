@@ -117,7 +117,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }, []);
 
   const projectsLoader = useMapResource(Options, ProjectsResource, CachedMapAllKey);
-  const projects = projectsLoader.data as Project[];
+  const projects = (projectsLoader.data as Project[]).filter(p => {
+    if (!adminPermission && p.id === PROJECT_GLOBAL_ID) {
+      return false;
+    }
+
+    return true;
+  });
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);
