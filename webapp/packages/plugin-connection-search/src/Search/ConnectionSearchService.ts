@@ -8,7 +8,6 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -16,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, IConnectionFormState, PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { SearchDatabase } from './SearchDatabase';
 
@@ -31,20 +30,9 @@ export class ConnectionSearchService {
 
   formState: IConnectionFormState | null = null;
 
-  // get disabled(): boolean {
-  //   return this.createConnectionService.disabled;
-  // }
-
-  // set disabled(value: boolean) {
-  //   this.createConnectionService.disabled = value;
-  // }
-
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    // private createConnectionService: CreateConnectionService,
-    private readonly administrationScreenService: AdministrationScreenService,
-    private readonly publicConnectionFormService: PublicConnectionFormService,
     private readonly connectionFormService: ConnectionFormService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
@@ -66,11 +54,6 @@ export class ConnectionSearchService {
 
   open(): void {
     this.optionsPanelService.open(formGetter);
-  }
-
-  close(): void {
-    this.hosts = 'localhost';
-    this.databases = [];
   }
 
   async load(): Promise<void> {
@@ -100,7 +83,7 @@ export class ConnectionSearchService {
     }
   }
 
-  private readonly closeHandler: IExecutorHandler<any> = async (data, contexts) => {
+  private readonly closeHandler: IExecutorHandler<void> = async (data, contexts) => {
     const isDialogClosed = await this.showUnsavedChangesDialog();
 
     if (!isDialogClosed) {
