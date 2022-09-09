@@ -72,16 +72,6 @@ public class WebPlatformActivator extends Plugin {
         super.stop(context);
     }
 
-    /**
-     * Returns configuration file
-     */
-    public static synchronized File getConfigurationFile(String fileName) {
-        if (configDir == null) {
-            configDir = getInstance().getStateLocation().toFile();
-        }
-        return new File(configDir, fileName);
-    }
-
     public DBPPreferenceStore getPreferences() {
         return preferences;
     }

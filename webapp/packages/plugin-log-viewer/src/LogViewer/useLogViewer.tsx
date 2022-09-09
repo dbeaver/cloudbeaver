@@ -7,6 +7,7 @@
  */
 
 import { observable } from 'mobx';
+import { useEffect } from 'react';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -21,6 +22,13 @@ interface Props {
 
 export function useLogViewer() {
   const logViewerService = useService(LogViewerService);
+
+  useEffect(() => {
+    logViewerService.startLog();
+    return () => {
+      logViewerService.stopLog();
+    };
+  }, []);
 
   const props: Props = useObservableRef(
     () => ({ selectedItem: null }),

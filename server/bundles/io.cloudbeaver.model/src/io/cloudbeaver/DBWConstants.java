@@ -22,8 +22,9 @@ package io.cloudbeaver;
 public class DBWConstants {
 
     public static final String PERMISSION_PUBLIC = "public";
-
     public static final String PERMISSION_ADMIN = "admin";
+
+    public static final String PERMISSION_CONFIGURATION_MANAGER = "configuration-manager";
 
     public static final String PERMISSION_EDIT_STRUCTURE = "edit-meta";
     public static final String PERMISSION_EDIT_DATA = "edit-data";
