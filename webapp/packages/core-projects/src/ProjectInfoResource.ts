@@ -10,6 +10,7 @@ import { runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
@@ -18,11 +19,15 @@ export type ProjectInfo = SchemaProjectInfo;
 export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
   ) {
     super([]);
 
     this.sync(this.userInfoResource);
+    this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
+    this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });

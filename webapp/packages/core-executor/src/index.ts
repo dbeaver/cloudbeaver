@@ -3,6 +3,7 @@ export * from './TaskScheduler/ITask';
 export * from './TaskScheduler/Task';
 export * from './TaskScheduler/TaskScheduler';
 export * from './ExecutionContext';
+export * from './executionExceptionContext';
 export * from './Executor';
 export * from './ExecutorHandlersCollection';
 export * from './ExecutorInterrupter';
