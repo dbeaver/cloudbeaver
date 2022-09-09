@@ -15,7 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { throttleAsync } from '@cloudbeaver/core-utils';
+import { isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
@@ -431,7 +431,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executeQueryNewTab: action.bound,
     showExecutionPlan: action.bound,
     executeScript: action.bound,
-    activeSegmentMode: computed,
+    activeSegmentMode: computed({
+      equals: isObjectsEqual,
+    }),
     dialect: computed,
     activeSegment: computed,
     isLineScriptEmpty: computed,
