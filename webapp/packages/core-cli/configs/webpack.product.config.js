@@ -74,6 +74,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
 
     minimizer: [new TerserPlugin({
       extractComments: /Copyright \(C\)/i,
+      terserOptions: {
+        keep_classnames: true,
+        keep_fnames: true,
+      },
     })],
   },
   plugins: [
