@@ -82,6 +82,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
         this.notificationService.logInfo({
           title: 'sql_editor_upload_script_max_size_title',
           message: `Max size: ${maxSize}KB\nFile size: ${size}KB`,
+          autoClose: false,
         });
 
         return false;

@@ -54,6 +54,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   message?: string;
   timestamp: number;
   details?: string | Error | null;
+  autoClose?: boolean;
   persistent?: boolean;
   state: { deleteDelay: number };
   isSilent: boolean;
@@ -69,6 +70,7 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   message?: string;
   details?: string | Error | null;
   isSilent?: boolean;
+  autoClose?: boolean;
   persistent?: boolean;
   extraProps?: TProps;
   timestamp?: number;
