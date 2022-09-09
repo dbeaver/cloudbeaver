@@ -26,6 +26,7 @@ export type NavTreeControlProps = {
   dndPlaceholder?: boolean;
   expanded?: boolean;
   className?: string;
+  style?: ComponentStyle;
   ref?: React.Ref<HTMLDivElement> | undefined;
 };
 

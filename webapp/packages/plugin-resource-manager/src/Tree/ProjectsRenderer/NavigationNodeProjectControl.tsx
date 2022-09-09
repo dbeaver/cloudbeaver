@@ -14,10 +14,8 @@ import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
+import { NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
-import { NavigationNodeEditor } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeEditor';
-import { TreeNodeMenu } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenu';
 
 const styles = css`
   TreeNodeControl {
@@ -55,7 +53,7 @@ const styles = css`
   }
 `;
 
-export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeControl({
+export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeProjectControl({
   node,
   dndElement,
   dndPlaceholder,
