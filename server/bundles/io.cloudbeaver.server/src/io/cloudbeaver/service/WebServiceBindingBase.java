@@ -254,7 +254,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
                 // Check permissions
                 for (String rp : reqPermissions) {
-                    if (!sessionPermissions.contains(rp)) {
+                    if (!session.hasPermission(rp)) {
                         log.debug("Access to " + method.getName() + " denied for " + session.getUser());
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }

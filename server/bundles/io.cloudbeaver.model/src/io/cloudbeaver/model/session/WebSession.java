@@ -242,7 +242,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public synchronized boolean hasPermission(String perm) {
-        return getSessionPermissions().contains(perm);
+        return getSessionPermissions().contains(DBWConstants.PERMISSION_ADMIN) ||
+            getSessionPermissions().contains(perm);
     }
 
     public synchronized boolean isAuthorizedInSecurityManager() {

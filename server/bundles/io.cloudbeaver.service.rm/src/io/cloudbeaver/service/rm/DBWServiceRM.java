@@ -89,13 +89,13 @@ public interface DBWServiceRM extends DBWService {
         @NotNull String data,
         boolean forceOverwrite) throws DBException;
 
-    @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
+    @WebAction(requirePermissions = {RMConstants.PERMISSION_RM_ADMIN})
     RMProject createProject(
         @NotNull WebSession session,
         @NotNull String name,
         @Nullable String description) throws DBWebException;
 
-    @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, RMConstants.PERMISSION_RM_ADMIN})
+    @WebAction(requirePermissions = {RMConstants.PERMISSION_RM_ADMIN})
     boolean deleteProject(
         @NotNull WebSession session,
         @NotNull @WebObjectId String projectId) throws DBWebException;
